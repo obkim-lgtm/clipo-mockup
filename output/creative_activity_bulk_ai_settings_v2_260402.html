@@ -1,0 +1,377 @@
+﻿<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>AI 기록 생성 설정 - CLIPO</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard-gov.min.css">
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<style>
+*{font-family:'Pretendard GOV',-apple-system,sans-serif;box-sizing:border-box;margin:0;padding:0}
+body{background:#f6f7f9;color:#222631}
+
+/* ── Header ── */
+.g-hd{height:56px;background:#fff;border-bottom:1px solid #d9d9d9;display:flex;align-items:center;padding:0 20px 0 8px;position:fixed;top:0;left:0;right:0;z-index:200}
+.g-hd-r{margin-left:auto;display:flex;align-items:center;gap:6px;font-size:14px;color:#3b3f4c}
+.plan-badge{background:#416bff;color:#fff;font-size:11px;font-weight:600;padding:2px 8px;border-radius:4px}
+.hd-div{width:1px;height:14px;background:#d9d9d9;margin:0 4px}
+.credit-wrap{display:flex;align-items:center;gap:4px;padding:4px 10px;background:#f6f7f9;border-radius:6px;font-size:13px;font-weight:600;color:#3b3f4c}
+.user-btn{display:flex;align-items:center;gap:4px;padding:4px 10px;border:1px solid #d9d9d9;border-radius:6px;background:#fff;font-size:13px;color:#3b3f4c;cursor:pointer}
+
+/* ── Icon Sidebar ── */
+.icon-sb{width:56px;background:#fff;border-right:1px solid #d9d9d9;position:fixed;top:56px;bottom:0;left:0;display:flex;flex-direction:column;padding:8px 0;z-index:150;transition:width .2s ease}
+.icon-sb.expanded{width:200px}
+.si{height:40px;display:flex;align-items:center;border-radius:8px;color:#6d7381;cursor:pointer;margin-bottom:2px;position:relative;padding:0 4px 0 16px;gap:10px;white-space:nowrap;flex-shrink:0}
+.si:hover{background:#f1f3f5}
+.si.active{background:#e9f2ff;color:#416bff}
+.si-icon{width:24px;height:24px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.si-label{font-size:13px;font-weight:500;opacity:0;transition:opacity .1s;overflow:hidden}
+.icon-sb.expanded .si-label{opacity:1}
+.si-tip{position:absolute;left:48px;top:50%;transform:translateY(-50%);background:#222631;color:#fff;font-size:11px;padding:3px 8px;border-radius:4px;white-space:nowrap;display:none;z-index:300;pointer-events:none}
+.si:hover .si-tip{display:block}
+.icon-sb.expanded .si-tip{display:none!important}
+.nav-bottom{margin-top:auto;width:100%}
+.nav-div{height:1px;background:#f1f3f5;margin:4px 0}
+
+/* ── Nav expand transitions ── */
+body.nav-expanded .sub-bar{left:200px;transition:left .2s ease}
+body.nav-expanded .settings-wrap{margin-left:200px;transition:margin-left .2s ease}
+
+/* ── Sub-bar ── */
+.sub-bar{height:48px;background:#fff;border-bottom:1px solid #d9d9d9;position:fixed;top:56px;left:56px;right:0;z-index:100;display:flex;align-items:center;padding:0 20px;gap:8px}
+.sub-bc{display:flex;align-items:center;gap:6px;font-size:14px;color:#6d7381}
+.sub-bc a{color:#6d7381;text-decoration:none;cursor:pointer}.sub-bc a:hover{color:#416bff}
+.sub-bc strong{color:#222631;font-weight:600}
+.sub-acts{margin-left:auto;display:flex;align-items:center;gap:8px}
+.mode-group{display:flex;border:1px solid #d9d9d9;border-radius:6px;overflow:hidden}
+.mode-btn{padding:5px 14px;font-size:13px;font-weight:500;font-family:inherit;border:none;cursor:pointer;background:#fff;color:#6d7381}
+.mode-btn.active{background:#416bff;color:#fff}
+.btn-outline{display:flex;align-items:center;gap:5px;padding:6px 12px;font-size:13px;font-weight:500;font-family:inherit;border:1px solid #d9d9d9;border-radius: 4px;background:#fff;color:#3b3f4c;cursor:pointer}
+.btn-outline:hover{border-color:#b3b3b3}
+
+/* ── Main content ── */
+.settings-wrap{margin-left:56px;margin-top:104px;padding:40px 48px;max-width:860px;padding-bottom:100px}
+
+/* ── Back link ── */
+.back-link{display:inline-flex;align-items:center;gap:6px;font-size:14px;font-weight:500;color:#6d7381;cursor:pointer;margin-bottom:20px;text-decoration:none;border:none;background:none;padding:0;font-family:inherit}
+.back-link:hover{color:#416bff}
+
+/* ── Page title ── */
+.page-title{font-size:20px;font-weight:600;color:#222631;margin-bottom:8px}
+.page-sub{font-size:14px;color:#6d7381;margin-bottom:32px}
+
+/* ── Cards ── */
+.settings-card{background:#fff;border:1px solid #e0e3e8;border-radius:12px;padding:24px;margin-bottom:20px}
+.card-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:16px}
+.card-header-left{}
+.card-title{font-size:16px;font-weight:600;color:#222631}
+.card-desc{font-size:13px;color:#6d7381;margin-top:4px}
+.card-badge{font-size:14px;font-weight:600;color:#416bff;white-space:nowrap;margin-left:16px;margin-top:2px}
+.card-divider{height:1px;background:#f1f3f5;margin:0 -24px 14px}
+.card-divider-thin{height:1px;background:#f6f7f9;margin:0 -24px 4px}
+
+/* ── 전체 선택 row ── */
+.sel-all-row{display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:8px;cursor:pointer;user-select:none}
+.sel-all-row:hover{background:#f6f7f9}
+.sel-all-label{font-size:14px;font-weight:500;color:#3b3f4c}
+
+/* ── Student rows ── */
+.stu-row{display:flex;align-items:center;gap:12px;padding:11px 14px;border-radius:8px;transition:background .12s;cursor:pointer;user-select:none}
+.stu-row:hover{background:#f6f7f9}
+.stu-row.disabled-row{opacity:0.45;cursor:not-allowed}
+.stu-row.disabled-row:hover{background:transparent}
+.stu-name-wrap{flex:1;display:flex;align-items:center;gap:6px}
+.stu-name{font-size:14px;font-weight:600;color:#222631}
+.stu-sid{font-size:11px;color:#b3b6bd;font-weight:400}
+.stu-badge-has{background:#e9f2ff;color:#365eef;font-size:12px;padding:2px 8px;border-radius:10px;white-space:nowrap;flex-shrink:0}
+.stu-badge-none{background:#f1f3f5;color:#b3b6bd;font-size:12px;padding:2px 8px;border-radius:10px;white-space:nowrap;flex-shrink:0}
+
+/* ── Checkboxes ── */
+input[type=checkbox]{width:18px;height:18px;accent-color:#416bff;flex-shrink:0;cursor:pointer}
+input[type=checkbox]:disabled{cursor:not-allowed}
+
+/* ── Level options ── */
+.level-opts{display:flex;gap:10px;margin-top:16px}
+.level-opt{flex:1;padding:12px 8px;border:1.5px solid #d9d9d9;border-radius: 4px;text-align:center;font-size:15px;font-weight:500;color:#3b3f4c;cursor:pointer;transition:all .15s;font-family:inherit;background:#fff}
+.level-opt:hover{border-color:#94adff;background:#fafbff}
+.level-opt.selected{border-color:#416bff;background:#f4f8ff;color:#416bff;font-weight:600}
+
+/* ── Volume options ── */
+.vol-opts{margin-top:16px}
+.vol-opt{display:flex;align-items:center;gap:12px;padding:14px 16px;border:1.5px solid #d9d9d9;border-radius: 4px;cursor:pointer;margin-bottom:8px;transition:all .15s;user-select:none}
+.vol-opt:last-child{margin-bottom:0}
+.vol-opt:hover{border-color:#94adff;background:#fafbff}
+.vol-opt.selected{border-color:#416bff;background:#f4f8ff}
+.vol-opt input[type=radio]{width:18px;height:18px;accent-color:#416bff;flex-shrink:0;cursor:pointer}
+.vol-label-main{font-size:14px;font-weight:600;color:#222631}
+.vol-label-sub{font-size:12px;color:#6d7381;margin-left:4px;font-weight:400}
+.vol-opt.selected .vol-label-main{color:#416bff}
+
+/* ── Fixed footer ── */
+.gen-footer{position:fixed;bottom:0;left:56px;right:0;background:#fff;border-top:1px solid #e0e3e8;padding:16px 48px;display:flex;align-items:center;justify-content:space-between;z-index:50}
+.gen-info{font-size:13px;color:#6d7381}
+.btn-gen{display:inline-flex;align-items:center;gap:7px;padding:12px 28px;border:none;border-radius: 4px;background: #365eef;color:#fff;font-size: 14px;font-weight:600;font-family:inherit;cursor:pointer;transition:background .15s}
+.btn-gen:hover:not(:disabled){background: #3151c4}
+.btn-gen:disabled{background:#dde1e8;color:#b3b6bd;cursor:not-allowed}
+
+/* ── Toast ── */
+.toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(12px);background:#222631;color:#fff;padding:10px 20px;border-radius:8px;font-size:14px;font-weight:500;opacity:0;transition:all .25s;z-index:500;pointer-events:none;white-space:nowrap}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+</style>
+</head>
+<body>
+
+<!-- ── Global Header ── -->
+<header class="g-hd">
+  <button onclick="toggleNav()" style="width:36px;height:36px;border:none;background:none;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#3b3f4c;margin-right:8px"><i data-lucide="menu" style="width:20px;height:20px"></i></button>
+  <svg width="76" height="16" viewBox="0 0 76 16" fill="none"><path d="M11.3613 4.03516H4.09668V11.9629H8.88281L8.88086 11.9648H15.6016V16H4.02539C1.80242 15.9998 0 14.223 0 12.0322V3.96777C0 1.77696 1.80242 0.000177874 4.02539 0H15.4561L11.3613 4.03516ZM22.0703 11.9648H33.5781V16H22.002C19.7788 16 17.9756 14.2231 17.9756 12.0322V0H22.0703V11.9648ZM40.0459 16H35.9521V0H40.0459V16ZM54.5381 0C56.4564 0 58.0138 1.53228 58.0186 3.42285L58.0166 3.4248V8.54297C58.014 10.4333 56.4567 11.9648 54.5361 11.9648H46.5107L42.416 16V0H54.5381ZM71.9746 0C74.0086 0.000134956 75.6887 1.49046 75.958 3.42285H76V12.5771H75.958C75.6887 14.5095 74.011 15.9999 71.9746 16H64.4238C62.3897 16 60.7098 14.5096 60.4404 12.5771C60.4145 12.398 60.3984 12.2184 60.3984 12.0322V3.96777C60.3984 3.78159 60.4145 3.60205 60.4404 3.42285C60.7098 1.49037 62.3873 0 64.4238 0H71.9746ZM64.4922 12.5771H71.9062V3.42285H64.4922V12.5771ZM46.5107 3.42285V8.54004H53.9238V3.42285H46.5107Z" fill="#365EEF"/></svg>
+  <div class="g-hd-r">
+    <span class="plan-badge">개인 유료</span>
+    <span style="font-size:13px;color:#6d7381">D-1710</span>
+    <div class="hd-div"></div>
+    <i data-lucide="bot" style="width:16px;height:16px;color:#416bff"></i>
+    <div class="credit-wrap">AI 크레딧 <span id="credit-num">700</span></div>
+    <div class="hd-div"></div>
+    <button class="user-btn">test99 선생님(담임) <i data-lucide="chevron-down" style="width:14px;height:14px"></i></button>
+  </div>
+</header>
+
+<!-- ── Icon Sidebar ── -->
+<nav class="icon-sb" id="icon-sb">
+  <div class="si"><div class="si-icon"><i data-lucide="home" style="width:20px;height:20px"></i></div><span class="si-label">홈</span><span class="si-tip">홈</span></div>
+  <div class="si"><div class="si-icon"><i data-lucide="scissors" style="width:20px;height:20px"></i></div><span class="si-label">평가계획</span><span class="si-tip">평가계획</span></div>
+  <div class="si"><div class="si-icon"><i data-lucide="layout-grid" style="width:20px;height:20px"></i></div><span class="si-label">수업</span><span class="si-tip">수업</span></div>
+  <div class="si active"><div class="si-icon"><i data-lucide="notebook-pen" style="width:20px;height:20px"></i></div><span class="si-label">창의적 체험활동 <span style="font-size:10px;background:#416bff;color:#fff;padding:1px 5px;border-radius:3px;margin-left:2px">Beta</span></span><span class="si-tip">창의적 체험활동</span></div>
+  <div class="si"><div class="si-icon"><i data-lucide="zap" style="width:20px;height:20px"></i></div><span class="si-label">세특 간편 생성기</span><span class="si-tip">세특 간편 생성기</span></div>
+  <div class="si"><div class="si-icon"><i data-lucide="smile" style="width:20px;height:20px"></i></div><span class="si-label">행동특성 및 종합기록</span><span class="si-tip">행동특성 및 종합기록</span></div>
+  <div class="si"><div class="si-icon"><i data-lucide="bar-chart-2" style="width:20px;height:20px"></i></div><span class="si-label">리포트</span><span class="si-tip">리포트</span></div>
+  <div class="si"><div class="si-icon"><i data-lucide="building-2" style="width:20px;height:20px"></i></div><span class="si-label">학교 설정</span><span class="si-tip">학교 설정</span></div>
+  <div class="nav-bottom">
+    <div class="nav-div"></div>
+    <div class="si"><div class="si-icon"><i data-lucide="file-down" style="width:20px;height:20px"></i></div><span class="si-label">매뉴얼 다운로드</span><span class="si-tip">매뉴얼 다운로드</span></div>
+    <div class="si"><div class="si-icon"><i data-lucide="credit-card" style="width:20px;height:20px"></i></div><span class="si-label">요금제</span><span class="si-tip">요금제</span></div>
+    <div class="si"><div class="si-icon"><i data-lucide="help-circle" style="width:20px;height:20px"></i></div><span class="si-label">고객센터</span><span class="si-tip">고객센터</span></div>
+  </div>
+</nav>
+
+<!-- ── Sub-bar ── -->
+<div class="sub-bar">
+  <div class="sub-bc">
+    <a onclick="goList()">창의적 체험활동</a>
+    <i data-lucide="chevron-right" style="width:14px;height:14px"></i>
+    <strong>자율활동 · 2학년 1반</strong>
+  </div>
+  <div class="sub-acts">
+    <div class="mode-group">
+      <button class="mode-btn" onclick="goIndividual()">개별 작성</button>
+      <button class="mode-btn active" onclick="location.href='creative_activity_bulk_v2_260402.html'">일괄 작성</button>
+    </div>
+    <div style="width:1px;height:18px;background:#e0e0e0"></div>
+    <button class="btn-outline" onclick="showToast('활동지 일괄 업로드 화면으로 이동해요')"><i data-lucide="file-up" style="width:14px;height:14px"></i> 활동지 일괄 업로드</button>
+    <button class="btn-outline" onclick="showToast('특성 일괄 등록 화면으로 이동해요')"><i data-lucide="table-2" style="width:14px;height:14px"></i> 특성 일괄 등록</button>
+    <button class="btn-outline"><i data-lucide="download" style="width:14px;height:14px"></i> 기록 다운로드</button>
+  </div>
+</div>
+
+<!-- ── Main Content ── -->
+<div class="settings-wrap">
+
+  <!-- Back link -->
+  <button class="back-link" onclick="location.href='creative_activity_bulk_v2_260402.html'">
+    <i data-lucide="chevron-left" style="width:16px;height:16px"></i>이전으로
+  </button>
+
+  <!-- Title -->
+  <div class="page-title">AI 기록 생성 설정</div>
+  <div class="page-sub">기록을 생성할 학생과 옵션을 설정하면 AI가 학생별 기록 초안을 생성해요.</div>
+
+  <!-- ── Card 1: 학생 선택 ── -->
+  <div class="settings-card">
+    <div class="card-header">
+      <div class="card-header-left">
+        <div class="card-title">기록 생성할 학생 선택</div>
+        <div class="card-desc">활동 특성이 입력된 학생만 선택할 수 있어요.</div>
+      </div>
+      <div class="card-badge" id="sel-count">0명 / 4명</div>
+    </div>
+    <div class="card-divider"></div>
+
+    <!-- 전체 선택 -->
+    <label class="sel-all-row" onclick="event.preventDefault(); toggleAll(document.getElementById('cb-all').checked ? false : true)">
+      <input type="checkbox" id="cb-all" onclick="event.stopPropagation(); toggleAll(this.checked)">
+      <span class="sel-all-label">전체 선택</span>
+    </label>
+
+    <div class="card-divider-thin" style="margin-top:4px"></div>
+
+    <!-- Student list -->
+    <div id="student-list"></div>
+  </div>
+
+  <!-- ── Card 2: 학생 수준 ── -->
+  <div class="settings-card">
+    <div class="card-header" style="margin-bottom:0">
+      <div class="card-header-left">
+        <div class="card-title">학생 수준</div>
+        <div class="card-desc">선택한 수준에 맞게 AI가 기록의 표현을 조정해요.</div>
+      </div>
+    </div>
+    <div class="level-opts">
+      <button class="level-opt selected" onclick="selectLevel(this)">수준 고려 없음</button>
+      <button class="level-opt" onclick="selectLevel(this)">상</button>
+      <button class="level-opt" onclick="selectLevel(this)">중</button>
+      <button class="level-opt" onclick="selectLevel(this)">하</button>
+    </div>
+  </div>
+
+  <!-- ── Card 3: 기록 분량 ── -->
+  <div class="settings-card" style="margin-bottom:100px">
+    <div class="card-header" style="margin-bottom:0">
+      <div class="card-header-left">
+        <div class="card-title">기록 분량</div>
+        <div class="card-desc">학생 수준과 분량을 선택해 주세요. 입력하신 내용에 따라 실제 생성 분량은 달라질 수 있습니다.</div>
+      </div>
+    </div>
+    <div class="vol-opts">
+      <label class="vol-opt" onclick="selectVol(this)">
+        <input type="radio" name="vol" value="300">
+        <span>
+          <span class="vol-label-main">300~400자</span>
+          <span class="vol-label-sub">(900~1,200 Byte)</span>
+        </span>
+      </label>
+      <label class="vol-opt selected" onclick="selectVol(this)">
+        <input type="radio" name="vol" value="400" checked>
+        <span>
+          <span class="vol-label-main">400~500자</span>
+          <span class="vol-label-sub">(1,200~1,500 Byte)</span>
+        </span>
+      </label>
+      <label class="vol-opt" onclick="selectVol(this)">
+        <input type="radio" name="vol" value="500">
+        <span>
+          <span class="vol-label-main">500~600자</span>
+          <span class="vol-label-sub">(1,500~1,800 Byte)</span>
+        </span>
+      </label>
+    </div>
+  </div>
+
+</div><!-- /settings-wrap -->
+
+<!-- ── Fixed Footer ── -->
+<div class="gen-footer">
+  <span class="gen-info" id="gen-info">학생을 선택하면 AI 기록을 생성할 수 있어요.</span>
+  <button class="btn-gen" id="btn-gen" disabled onclick="location.href='creative_activity_bulk_v2_260402.html'">
+    <i data-lucide="sparkles" style="width:16px;height:16px"></i>AI 기록 생성
+  </button>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const STUDENTS = [
+  {sid:'10101', name:'강민준', keywords:['리더십','발표 능력','봉사 정신']},
+  {sid:'10102', name:'이서연', keywords:['수학과 진로 희망','발표 능력 우수','자기성찰']},
+  {sid:'10103', name:'김태윤', keywords:['협동심','봉사']},
+  {sid:'10104', name:'최수아', keywords:[]},
+  {sid:'10105', name:'정도윤', keywords:[]},
+  {sid:'10106', name:'한예린', keywords:[]},
+  {sid:'10107', name:'오지훈', keywords:['자기주도 학습','창의적 문제 해결']},
+];
+const ENABLED = STUDENTS.filter(s => s.keywords.length > 0); // 4명
+
+function renderStudents() {
+  const list = document.getElementById('student-list');
+  list.innerHTML = '';
+  STUDENTS.forEach((s, i) => {
+    const enabled = s.keywords.length > 0;
+    const row = document.createElement('label');
+    row.className = 'stu-row' + (enabled ? '' : ' disabled-row');
+    row.style.cursor = enabled ? 'pointer' : 'not-allowed';
+
+    const badge = s.keywords.length > 0
+      ? `<span class="stu-badge-has">특성 ${s.keywords.length}개</span>`
+      : `<span class="stu-badge-none">특성 미입력</span>`;
+
+    row.innerHTML = `
+      <input type="checkbox" class="stu-cb" data-idx="${i}" ${enabled ? '' : 'disabled'}
+        onclick="event.stopPropagation(); updateSelCount()" style="pointer-events:${enabled ? 'auto' : 'none'}">
+      <div class="stu-name-wrap">
+        <span class="stu-name">${s.name}</span>
+        <span class="stu-sid">${s.sid}</span>
+      </div>
+      ${badge}
+    `;
+    if (enabled) {
+      row.addEventListener('click', function(e) {
+        if (e.target.tagName === 'INPUT') return;
+        const cb = row.querySelector('.stu-cb');
+        cb.checked = !cb.checked;
+        updateSelCount();
+      });
+    }
+    list.appendChild(row);
+  });
+  lucide.createIcons();
+  updateSelCount();
+}
+
+function updateSelCount() {
+  const n = document.querySelectorAll('.stu-cb:not(:disabled):checked').length;
+  document.getElementById('sel-count').textContent = n + '명 / ' + ENABLED.length + '명';
+  document.getElementById('gen-info').textContent = n > 0
+    ? n + '명의 학생 기록을 생성해요 · 크레딧 ' + n + '개 사용'
+    : '학생을 선택하면 AI 기록을 생성할 수 있어요.';
+  document.getElementById('btn-gen').disabled = n === 0;
+
+  const all = ENABLED.length;
+  const cbAll = document.getElementById('cb-all');
+  cbAll.checked = n === all;
+  cbAll.indeterminate = n > 0 && n < all;
+}
+
+function toggleAll(checked) {
+  document.querySelectorAll('.stu-cb:not(:disabled)').forEach(cb => cb.checked = checked);
+  updateSelCount();
+}
+
+function selectLevel(el) {
+  document.querySelectorAll('.level-opt').forEach(o => o.classList.remove('selected'));
+  el.classList.add('selected');
+}
+
+function selectVol(el) {
+  document.querySelectorAll('.vol-opt').forEach(o => {
+    o.classList.remove('selected');
+    o.querySelector('input[type=radio]').checked = false;
+  });
+  el.classList.add('selected');
+  el.querySelector('input[type=radio]').checked = true;
+}
+
+function toggleNav() {
+  document.getElementById('icon-sb').classList.toggle('expanded');
+  document.body.classList.toggle('nav-expanded');
+}
+
+function goList() {
+  location.href = 'creative_activity_list_v4_260402.html';
+}
+
+function goIndividual() {
+  location.href = 'creative_activity_detail_v3_260402.html?type=자율활동';
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+// Init
+renderStudents();
+lucide.createIcons();
+</script>
+</body>
+</html>

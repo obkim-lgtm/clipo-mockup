@@ -1,0 +1,410 @@
+﻿<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>동아리 학생 관리 - CLIPO</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard-gov.min.css">
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<style>
+*{font-family:'Pretendard GOV',-apple-system,sans-serif;box-sizing:border-box;margin:0;padding:0}
+body{background:#f6f7f9;color:#222631}
+
+/* 헤더 */
+.g-hd{height:56px;background:#fff;border-bottom:1px solid #d9d9d9;display:flex;align-items:center;padding:0 20px 0 8px;position:fixed;top:0;left:0;right:0;z-index:200}
+.g-hd-r{margin-left:auto;display:flex;align-items:center;gap:6px;font-size:14px;color:#3b3f4c}
+.plan-badge{background:#416bff;color:#fff;font-size:11px;font-weight:600;padding:2px 8px;border-radius:4px}
+.hd-div{width:1px;height:14px;background:#d9d9d9;margin:0 4px}
+.credit-wrap{display:flex;align-items:center;gap:4px;padding:4px 10px;background:#f6f7f9;border-radius:6px;font-size:13px;font-weight:600;color:#3b3f4c}
+.user-btn{display:flex;align-items:center;gap:4px;padding:4px 10px;border:1px solid #d9d9d9;border-radius:6px;background:#fff;font-size:13px;color:#3b3f4c;cursor:pointer}
+
+/* 사이드바 */
+.icon-sb{width:56px;background:#fff;border-right:1px solid #d9d9d9;position:fixed;top:56px;bottom:0;left:0;display:flex;flex-direction:column;padding:8px 0;z-index:150;transition:width .2s ease}
+.icon-sb.expanded{width:200px}
+.si{height:40px;display:flex;align-items:center;border-radius:8px;color:#6d7381;cursor:pointer;margin-bottom:2px;position:relative;padding:0 4px 0 16px;gap:10px;white-space:nowrap;flex-shrink:0}
+.si:hover{background:#f1f3f5}
+.si.active{background:#e9f2ff;color:#416bff}
+.si-icon{width:24px;height:24px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.si-label{font-size:13px;font-weight:500;opacity:0;transition:opacity .1s;overflow:hidden}
+.icon-sb.expanded .si-label{opacity:1}
+.si-tip{position:absolute;left:48px;top:50%;transform:translateY(-50%);background:#222631;color:#fff;font-size:11px;padding:3px 8px;border-radius:4px;white-space:nowrap;display:none;z-index:300;pointer-events:none}
+.si:hover .si-tip{display:block}
+.icon-sb.expanded .si-tip{display:none!important}
+.nav-bottom{margin-top:auto;width:100%}
+.nav-div{height:1px;background:#f1f3f5;margin:4px 0}
+body.nav-expanded .main{margin-left:200px;transition:margin-left .2s ease}
+
+/* 서브바 */
+.sub-bar{height:48px;background:#fff;border-bottom:1px solid #d9d9d9;position:fixed;top:56px;left:56px;right:0;z-index:100;display:flex;align-items:center;padding:0 20px;gap:8px}
+.sub-bc{display:flex;align-items:center;gap:6px;font-size:14px;color:#6d7381}
+.sub-bc a{color:#6d7381;text-decoration:none;cursor:pointer}
+.sub-bc a:hover{color:#416bff}
+
+/* 메인 */
+.main{margin-left:56px;margin-top:104px;padding:32px 40px;max-width:1100px}
+
+/* 카드 */
+.card{background:#fff;border:1px solid #d9d9d9;border-radius:12px;padding:24px}
+
+/* 등록 학생 현황 */
+.reg-header{display:flex;align-items:center;margin-bottom:16px}
+.reg-title{font-size:16px;font-weight:600;color:#222631;flex:1}
+.reg-count{font-size:14px;color:#6d7381}
+.reg-count strong{color:#416bff;font-weight:700}
+.student-chips{display:flex;flex-wrap:wrap;gap:6px;min-height:40px}
+.student-chip{display:inline-flex;align-items:center;gap:6px;padding:5px 10px;background:#f4f8ff;border:1px solid #c7d9ff;border-radius:20px;font-size:13px;color:#365eef;font-weight:500}
+.student-chip button{border:none;background:none;cursor:pointer;color:#416bff;display:flex;opacity:.6;padding:0}
+.student-chip button:hover{opacity:1}
+.empty-chips{font-size:13px;color:#b3b6bd;display:flex;align-items:center;height:40px}
+.btn-start{display:inline-flex;align-items:center;gap:6px;padding:10px 20px;border-radius: 4px;border:none;background: #365eef;color:#fff;font-size:14px;font-weight:600;font-family:inherit;cursor:pointer;white-space:nowrap}
+.btn-start:disabled{background:#d9d9d9;cursor:not-allowed}
+.btn-start:not(:disabled):hover{background: #3151c4}
+
+/* 두 섹션 */
+.two-col{display:grid;grid-template-columns:2fr 3fr;gap:20px;margin-top:20px}
+
+/* 검색 */
+.search-input-wrap{position:relative;margin-bottom:12px}
+.search-input{width:100%;padding:9px 12px 9px 36px;border:1px solid #d9d9d9;border-radius: 4px;font-size:14px;font-family:inherit;color:#222631;outline:none}
+.search-input:focus{border-color:#416bff}
+.search-icon{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:#b3b6bd;pointer-events:none}
+.search-results{border:1px solid #d9d9d9;border-radius:8px;overflow:hidden;max-height:260px;overflow-y:auto}
+.sr-item{display:flex;align-items:center;padding:10px 14px;border-bottom:1px solid #f1f3f5;cursor:pointer;gap:10px}
+.sr-item:last-child{border-bottom:none}
+.sr-item:hover{background:#f6f7f9}
+.sr-item.added{background:#f4f8ff;cursor:default}
+.sr-num{font-size:12px;color:#b3b6bd;width:32px}
+.sr-name{font-size:14px;color:#222631;flex:1}
+.sr-sid{font-size:12px;color:#b3b6bd}
+.sr-add-btn{display:inline-flex;align-items:center;gap:3px;padding:4px 10px;border:1px solid #416bff;border-radius: 4px;background:#fff;color:#416bff;font-size:12px;font-weight:500;font-family:inherit;cursor:pointer}
+.sr-add-btn:hover{background:#f4f8ff}
+.sr-added-label{font-size:12px;color:#1ab864;font-weight:500}
+
+/* 엑셀 업로드 */
+.template-btn{display:inline-flex;align-items:center;gap:5px;padding:7px 14px;border:1px solid #d9d9d9;border-radius: 4px;background:#fff;color:#3b3f4c;font-size:13px;font-weight:500;font-family:inherit;cursor:pointer;margin-bottom:14px}
+.template-btn:hover{border-color:#b3b3b3}
+.dropzone{border:1.5px dashed #c7cbd3;border-radius:10px;padding:24px 20px;text-align:center;cursor:pointer;transition:all .15s;margin-bottom:14px}
+.dropzone:hover,.dropzone.over{border-color:#416bff;background:#f4f8ff}
+.upload-preview{border:1px solid #d9d9d9;border-radius:8px;overflow:hidden}
+.up-table{width:100%;border-collapse:collapse;font-size:13px}
+.up-table th{background:#f6f7f9;padding:8px 12px;text-align:left;font-weight:600;color:#6d7381;border-bottom:1px solid #e0e0e0}
+.up-table td{padding:8px 12px;border-bottom:1px solid #f1f3f5}
+.up-table tr:last-child td{border-bottom:none}
+.row-ok{background:#fff}
+.row-err{background:#fff8f8}
+.err-badge{display:inline-flex;align-items:center;gap:3px;font-size:11px;font-weight:600;padding:2px 7px;border-radius:10px;background:#fee2e2;color:#f2525f}
+.ok-badge{display:inline-flex;align-items:center;gap:3px;font-size:11px;font-weight:600;padding:2px 7px;border-radius:10px;background:#eefcf4;color:#1ab864}
+.err-summary{display:flex;flex-direction:column;gap:6px;padding:12px 14px;background:#fff8f8;border:1px solid #fecaca;border-radius:8px;margin-bottom:12px;font-size:13px;color:#f2525f}
+.err-summary-row{display:flex;align-items:center;gap:6px}
+.btn-upload-confirm{display:flex;align-items:center;justify-content:center;gap:6px;width:100%;padding:10px;border-radius: 4px;border:none;background: #365eef;color:#fff;font-size:14px;font-weight:600;font-family:inherit;cursor:pointer;margin-top:12px}
+.btn-upload-confirm:hover{background: #3151c4}
+.btn-upload-confirm:disabled{background:#d9d9d9;cursor:not-allowed}
+
+/* 섹션 제목 */
+.sec-title{font-size:15px;font-weight:700;color:#222631;margin-bottom:4px}
+.sec-sub{font-size:13px;color:#6d7381;margin-bottom:16px}
+
+/* 토스트 */
+.toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(20px);background:#222631;color:#fff;padding:10px 20px;border-radius:8px;font-size:14px;opacity:0;transition:all .3s;pointer-events:none;z-index:999;white-space:nowrap}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+</style>
+</head>
+<body>
+
+<!-- 헤더 -->
+<header class="g-hd">
+  <button onclick="toggleNav()" style="width:36px;height:36px;border:none;background:none;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#3b3f4c;margin-right:8px">
+    <i data-lucide="menu" style="width:20px;height:20px"></i>
+  </button>
+  <svg width="76" height="16" viewBox="0 0 76 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M11.3613 4.03516H4.09668V11.9629H8.88281L8.88086 11.9648H15.6016V16H4.02539C1.80242 15.9998 0 14.223 0 12.0322V3.96777C0 1.77696 1.80242 0.000177874 4.02539 0H15.4561L11.3613 4.03516ZM22.0703 11.9648H33.5781V16H22.002C19.7788 16 17.9756 14.2231 17.9756 12.0322V0H22.0703V11.9648ZM40.0459 16H35.9521V0H40.0459V16ZM54.5381 0C56.4564 0 58.0138 1.53228 58.0186 3.42285L58.0166 3.4248V8.54297C58.014 10.4333 56.4567 11.9648 54.5361 11.9648H46.5107L42.416 16V0H54.5381ZM71.9746 0C74.0086 0.000134956 75.6887 1.49046 75.958 3.42285H76V12.5771H75.958C75.6887 14.5095 74.011 15.9999 71.9746 16H64.4238C62.3897 16 60.7098 14.5096 60.4404 12.5771C60.4145 12.398 60.3984 12.2184 60.3984 12.0322V3.96777C60.3984 3.78159 60.4145 3.60205 60.4404 3.42285C60.7098 1.49037 62.3873 0 64.4238 0H71.9746ZM64.4922 12.5771H71.9062V3.42285H64.4922V12.5771ZM46.5107 3.42285V8.54004H53.9238V3.42285H46.5107Z" fill="#365EEF"/>
+  </svg>
+  <div class="g-hd-r">
+    <span class="plan-badge">개인 유료</span>
+    <span style="font-size:13px;color:#6d7381">D-1710</span>
+    <div class="hd-div"></div>
+    <i data-lucide="bot" style="width:16px;height:16px;color:#416bff"></i>
+    <div class="credit-wrap">AI 크레딧 700</div>
+    <div class="hd-div"></div>
+    <button class="user-btn">test99 선생님(담임) <i data-lucide="chevron-down" style="width:14px;height:14px"></i></button>
+  </div>
+</header>
+
+<!-- 사이드바 -->
+<nav class="icon-sb" id="icon-sb">
+  <div class="si"><div class="si-icon"><i data-lucide="home" style="width:20px;height:20px"></i></div><span class="si-label">홈</span><span class="si-tip">홈</span></div>
+  <div class="si"><div class="si-icon"><i data-lucide="scissors" style="width:20px;height:20px"></i></div><span class="si-label">평가계획</span><span class="si-tip">평가계획</span></div>
+  <div class="si"><div class="si-icon"><i data-lucide="layout-grid" style="width:20px;height:20px"></i></div><span class="si-label">수업</span><span class="si-tip">수업</span></div>
+  <div class="si active"><div class="si-icon"><i data-lucide="notebook-pen" style="width:20px;height:20px"></i></div><span class="si-label">창의적체험활동 기록</span><span class="si-tip">창의적체험활동 기록</span></div>
+  <div class="si"><div class="si-icon"><i data-lucide="zap" style="width:20px;height:20px"></i></div><span class="si-label">세특 간편 생성기 <span style="font-size:10px;background:#416bff;color:#fff;padding:1px 5px;border-radius:3px;margin-left:2px">Beta</span></span><span class="si-tip">세특 간편 생성기</span></div>
+  <div class="si"><div class="si-icon"><i data-lucide="smile" style="width:20px;height:20px"></i></div><span class="si-label">행동특성 및 종합기록</span><span class="si-tip">행동특성 및 종합기록 지원</span></div>
+  <div class="si"><div class="si-icon"><i data-lucide="bar-chart-2" style="width:20px;height:20px"></i></div><span class="si-label">리포트</span><span class="si-tip">리포트</span></div>
+  <div class="si"><div class="si-icon"><i data-lucide="building-2" style="width:20px;height:20px"></i></div><span class="si-label">학교 설정</span><span class="si-tip">학교 설정</span></div>
+  <div class="nav-bottom">
+    <div class="nav-div"></div>
+    <div class="si"><div class="si-icon"><i data-lucide="file-down" style="width:20px;height:20px"></i></div><span class="si-label">매뉴얼 다운로드</span><span class="si-tip">매뉴얼 다운로드</span></div>
+    <div class="si"><div class="si-icon"><i data-lucide="credit-card" style="width:20px;height:20px"></i></div><span class="si-label">요금제</span><span class="si-tip">요금제</span></div>
+    <div class="si"><div class="si-icon"><i data-lucide="help-circle" style="width:20px;height:20px"></i></div><span class="si-label">고객센터</span><span class="si-tip">고객센터</span></div>
+  </div>
+</nav>
+
+<!-- 서브바 -->
+<div class="sub-bar">
+  <div class="sub-bc">
+    <a onclick="location.href='creative_activity_list_v4_260402.html'">창의적체험활동</a>
+    <i data-lucide="chevron-right" style="width:14px;height:14px"></i>
+    <strong style="color:#222631;font-weight:600">과학탐구부 · 학생 관리</strong>
+  </div>
+</div>
+
+<!-- 메인 -->
+<div class="main">
+
+  <!-- 등록 현황 카드 -->
+  <div class="card" style="margin-bottom:0">
+    <div class="reg-header">
+      <div>
+        <div class="reg-title">등록된 학생</div>
+        <div class="reg-count" style="margin-top:2px">현재 <strong id="reg-cnt">0</strong>명 등록됨</div>
+      </div>
+      <button class="btn-start" id="btn-start" onclick="goDetail()" disabled style="margin-left:auto">
+        <i data-lucide="check" style="width:15px;height:15px"></i>
+        저장
+      </button>
+    </div>
+    <div id="reg-chips" class="student-chips">
+      <span class="empty-chips">아직 등록된 학생이 없어요. 아래에서 학생을 추가해주세요.</span>
+    </div>
+  </div>
+
+  <!-- 두 섹션 -->
+  <div class="two-col">
+
+    <!-- 개별 검색 추가 -->
+    <div class="card">
+      <div class="sec-title">개별 검색 추가</div>
+      <div class="sec-sub">이름 또는 학번으로 학교설정에 등록된 학생을 검색해요.</div>
+      <div class="search-input-wrap">
+        <i data-lucide="search" class="search-icon" style="width:15px;height:15px"></i>
+        <input class="search-input" id="search-input" placeholder="이름 또는 학번 검색" oninput="doSearch(this.value)">
+      </div>
+      <div class="search-results" id="search-results">
+        <div style="padding:20px;text-align:center;font-size:13px;color:#b3b6bd">이름 또는 학번을 입력하면 검색 결과가 나타나요.</div>
+      </div>
+    </div>
+
+    <!-- 엑셀 일괄 업로드 -->
+    <div class="card">
+      <div class="sec-title">엑셀 일괄 업로드</div>
+      <div class="sec-sub">양식에 맞게 작성한 엑셀 파일을 업로드하면 한번에 등록할 수 있어요.</div>
+
+      <button class="template-btn" onclick="showToast('양식 파일을 다운로드합니다.')">
+        <i data-lucide="download" style="width:14px;height:14px"></i>
+        양식 다운로드 (학년·반·번호·이름)
+      </button>
+
+      <div class="dropzone" id="dropzone" onclick="simulateUpload()" ondragover="event.preventDefault();this.classList.add('over')" ondragleave="this.classList.remove('over')">
+        <i data-lucide="upload-cloud" style="width:32px;height:32px;color:#b3b6bd;margin-bottom:8px"></i>
+        <div style="font-size:14px;color:#6d7381">클릭하거나 파일을 여기에 끌어다 놓으세요</div>
+        <div style="font-size:12px;color:#b3b6bd;margin-top:4px">.xlsx, .xls 파일 지원</div>
+      </div>
+
+      <div id="upload-result" style="display:none">
+        <!-- 오류 요약 -->
+        <div class="err-summary" id="err-summary">
+          <div style="font-weight:600;margin-bottom:4px;display:flex;align-items:center;gap:5px">
+            <i data-lucide="alert-circle" style="width:14px;height:14px"></i>
+            3개 행에 오류가 있어요. 오류 행은 등록에서 제외돼요.
+          </div>
+          <div class="err-summary-row"><span style="background:#fee2e2;border-radius:4px;padding:1px 6px;font-size:12px;font-weight:600">중복</span> 2행 — 동일 파일 내 중복 학생</div>
+          <div class="err-summary-row"><span style="background:#fee2e2;border-radius:4px;padding:1px 6px;font-size:12px;font-weight:600">빈 셀</span> 5행 — 이름이 비어있어요</div>
+          <div class="err-summary-row"><span style="background:#fee2e2;border-radius:4px;padding:1px 6px;font-size:12px;font-weight:600">미등록</span> 7행 — 학교설정에 없는 학생이에요</div>
+        </div>
+
+        <!-- 미리보기 테이블 -->
+        <div class="upload-preview">
+          <table class="up-table">
+            <thead>
+              <tr><th>행</th><th>학년</th><th>반</th><th>번호</th><th>이름</th><th>상태</th></tr>
+            </thead>
+            <tbody>
+              <tr class="row-ok"><td>1</td><td>2</td><td>1</td><td>1</td><td>강민준</td><td><span class="ok-badge"><i data-lucide="check" style="width:10px;height:10px"></i> 정상</span></td></tr>
+              <tr class="row-err"><td>2</td><td>2</td><td>1</td><td>1</td><td>강민준</td><td><span class="err-badge"><i data-lucide="x" style="width:10px;height:10px"></i> 중복</span></td></tr>
+              <tr class="row-ok"><td>3</td><td>2</td><td>1</td><td>2</td><td>이서연</td><td><span class="ok-badge"><i data-lucide="check" style="width:10px;height:10px"></i> 정상</span></td></tr>
+              <tr class="row-ok"><td>4</td><td>2</td><td>1</td><td>3</td><td>김태윤</td><td><span class="ok-badge"><i data-lucide="check" style="width:10px;height:10px"></i> 정상</span></td></tr>
+              <tr class="row-err"><td>5</td><td>2</td><td>1</td><td>4</td><td style="color:#b3b6bd">—</td><td><span class="err-badge"><i data-lucide="x" style="width:10px;height:10px"></i> 빈 셀</span></td></tr>
+              <tr class="row-ok"><td>6</td><td>2</td><td>1</td><td>5</td><td>정도윤</td><td><span class="ok-badge"><i data-lucide="check" style="width:10px;height:10px"></i> 정상</span></td></tr>
+              <tr class="row-err"><td>7</td><td>2</td><td>3</td><td>9</td><td>홍길동</td><td><span class="err-badge"><i data-lucide="x" style="width:10px;height:10px"></i> 미등록</span></td></tr>
+              <tr class="row-ok"><td>8</td><td>2</td><td>1</td><td>6</td><td>한예린</td><td><span class="ok-badge"><i data-lucide="check" style="width:10px;height:10px"></i> 정상</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <button class="btn-upload-confirm" onclick="confirmUpload()">
+          <i data-lucide="user-check" style="width:15px;height:15px"></i>
+          정상 학생 5명 등록하기
+        </button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- 학생 제거 확인 모달 -->
+<div id="remove-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:500;align-items:center;justify-content:center">
+  <div style="background:#fff;border-radius:12px;padding:28px 24px;width:380px;box-shadow:0 0 1px #2226314D, 0 4px 8px #0000001A">
+    <div style="width:48px;height:48px;border-radius:50%;background:#fee2e2;display:flex;align-items:center;justify-content:center;margin-bottom:16px">
+      <i data-lucide="alert-triangle" style="width:22px;height:22px;color:#f2525f"></i>
+    </div>
+    <div style="font-size:16px;font-weight:700;color:#222631;margin-bottom:8px"><span id="remove-name"></span>을(를) 제거할까요?</div>
+    <div style="font-size:14px;color:#6d7381;line-height:1.7;margin-bottom:20px">
+      이 학생에 대해 작성된 <strong style="color:#f2525f">모든 기록이 삭제</strong>되며<br>복구할 수 없어요.
+    </div>
+    <div style="display:flex;gap:8px">
+      <button onclick="closeRemoveModal()" style="flex:1;padding:11px;border-radius:8px;border:1px solid #d9d9d9;background:#fff;color:#6d7381;font-size:14px;font-family:inherit;cursor:pointer">취소</button>
+      <button onclick="confirmRemove()" style="flex:1;padding:11px;border-radius:8px;border:none;background:#f2525f;color:#fff;font-size:14px;font-weight:600;font-family:inherit;cursor:pointer">제거하기</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// 학교설정 mock 학생 데이터
+const SCHOOL_STUDENTS = [
+  {id:1, grade:2, cls:1, num:1, name:'강민준', sid:'20101'},
+  {id:2, grade:2, cls:1, num:2, name:'이서연', sid:'20102'},
+  {id:3, grade:2, cls:1, num:3, name:'김태윤', sid:'20103'},
+  {id:4, grade:2, cls:1, num:4, name:'최수아', sid:'20104'},
+  {id:5, grade:2, cls:1, num:5, name:'정도윤', sid:'20105'},
+  {id:6, grade:2, cls:1, num:6, name:'한예린', sid:'20106'},
+  {id:7, grade:2, cls:1, num:7, name:'오지훈', sid:'20107'},
+  {id:8, grade:2, cls:2, num:1, name:'박서준', sid:'20201'},
+  {id:9, grade:2, cls:2, num:2, name:'김나은', sid:'20202'},
+  {id:10, grade:1, cls:1, num:1, name:'윤재혁', sid:'10101'},
+];
+
+// 상세에서 돌아온 경우 기등록 상태로 표시 (mock: 5명 기등록)
+const fromDetail = document.referrer.includes('creative_activity_detail');
+let registered = fromDetail
+  ? new Set([1, 2, 3, 5, 6]) // 강민준, 이서연, 김태윤, 정도윤, 한예린
+  : new Set();
+
+function doSearch(q) {
+  const box = document.getElementById('search-results');
+  q = q.trim();
+  if (!q) {
+    box.innerHTML = '<div style="padding:20px;text-align:center;font-size:13px;color:#b3b6bd">이름 또는 학번을 입력하면 검색 결과가 나타나요.</div>';
+    return;
+  }
+  const results = SCHOOL_STUDENTS.filter(s =>
+    s.name.includes(q) || s.sid.includes(q)
+  );
+  if (!results.length) {
+    box.innerHTML = '<div style="padding:20px;text-align:center;font-size:13px;color:#b3b6bd">검색 결과가 없어요.</div>';
+    return;
+  }
+  box.innerHTML = results.map(s => {
+    const added = registered.has(s.id);
+    return `<div class="sr-item ${added?'added':''}">
+      <span class="sr-name">${s.sid} ${s.name}</span>
+      ${added
+        ? '<span class="sr-added-label"><i data-lucide="check" style="width:12px;height:12px;vertical-align:middle"></i> 추가됨</span>'
+        : `<button class="sr-add-btn" onclick="addStudent(${s.id})"><i data-lucide="plus" style="width:12px;height:12px"></i> 추가</button>`
+      }
+    </div>`;
+  }).join('');
+  lucide.createIcons();
+}
+
+function addStudent(id) {
+  if (registered.has(id)) return;
+  registered.add(id);
+  renderChips();
+  doSearch(document.getElementById('search-input').value);
+  showToast('학생을 추가했어요.');
+}
+
+let pendingRemoveId = null;
+function removeStudent(id) {
+  pendingRemoveId = id;
+  const s = SCHOOL_STUDENTS.find(x => x.id === id);
+  document.getElementById('remove-name').textContent = s ? s.sid + ' ' + s.name : '학생';
+  const m = document.getElementById('remove-modal');
+  m.style.display = 'flex';
+  lucide.createIcons();
+}
+function closeRemoveModal() {
+  document.getElementById('remove-modal').style.display = 'none';
+  pendingRemoveId = null;
+}
+function confirmRemove() {
+  if(pendingRemoveId !== null) {
+    registered.delete(pendingRemoveId);
+    renderChips();
+    doSearch(document.getElementById('search-input').value);
+  }
+  closeRemoveModal();
+  showToast('학생이 제거됐어요.');
+}
+
+function renderChips() {
+  const box = document.getElementById('reg-chips');
+  const cnt = registered.size;
+  document.getElementById('reg-cnt').textContent = cnt;
+  document.getElementById('btn-start').disabled = cnt === 0;
+  if (cnt === 0) {
+    box.innerHTML = '<span class="empty-chips">아직 등록된 학생이 없어요. 아래에서 학생을 추가해주세요.</span>';
+    return;
+  }
+  const students = SCHOOL_STUDENTS.filter(s => registered.has(s.id));
+  // sort by grade, cls, num
+  students.sort((a,b) => a.grade-b.grade || a.cls-b.cls || a.num-b.num);
+  box.innerHTML = students.map(s =>
+    `<span class="student-chip">
+      <span>${s.sid} ${s.name}</span>
+      <button onclick="removeStudent(${s.id})"><i data-lucide="x" style="width:11px;height:11px"></i></button>
+    </span>`
+  ).join('');
+  lucide.createIcons();
+}
+
+function simulateUpload() {
+  document.getElementById('upload-result').style.display = 'block';
+  document.getElementById('dropzone').style.display = 'none';
+  lucide.createIcons();
+  showToast('파일을 분석했어요.');
+}
+
+const UPLOAD_VALID_IDS = [1, 2, 5, 6]; // 강민준, 이서연, 정도윤, 한예린, 오지훈 → id 기준
+const UPLOAD_VALID_NAMES = ['강민준','이서연','정도윤','한예린','오지훈'];
+function confirmUpload() {
+  SCHOOL_STUDENTS.filter(s => UPLOAD_VALID_NAMES.includes(s.name)).forEach(s => registered.add(s.id));
+  renderChips();
+  document.getElementById('upload-result').style.display = 'none';
+  document.getElementById('dropzone').style.display = 'block';
+  showToast('5명이 등록됐어요.');
+}
+
+function toggleNav() {
+  document.getElementById('icon-sb').classList.toggle('expanded');
+  document.body.classList.toggle('nav-expanded');
+}
+
+function goDetail() {
+  showToast('학생이 등록됐어요. 기록 화면으로 이동합니다.');
+  setTimeout(() => {
+    location.href = 'creative_activity_detail_v3_260402.html?type=동아리활동';
+  }, 1200);
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2800);
+}
+
+renderChips();
+lucide.createIcons();
+</script>
+</body>
+</html>
