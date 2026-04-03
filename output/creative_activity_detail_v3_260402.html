@@ -1306,6 +1306,15 @@ function showToast(msg) {
 }
 
 // ── 초기화 ──
+// 학급별 학생 로스터 (학교설정 mock)
+const CLASS_ROSTER = {
+  '2학년 1반': [{id:1,num:1,sid:'20101',name:'강민준'},{id:2,num:2,sid:'20102',name:'이서연'},{id:3,num:3,sid:'20103',name:'김태윤'},{id:4,num:4,sid:'20104',name:'최수아'},{id:5,num:5,sid:'20105',name:'정도윤'},{id:6,num:6,sid:'20106',name:'한예린'},{id:7,num:7,sid:'20107',name:'오지훈'}],
+  '2학년 2반': [{id:1,num:1,sid:'20201',name:'박서준'},{id:2,num:2,sid:'20202',name:'김나은'},{id:3,num:3,sid:'20203',name:'이준혁'},{id:4,num:4,sid:'20204',name:'조예진'},{id:5,num:5,sid:'20205',name:'장민서'},{id:6,num:6,sid:'20206',name:'윤도현'},{id:7,num:7,sid:'20207',name:'신지아'}],
+  '1학년 1반': [{id:1,num:1,sid:'10101',name:'홍예슬'},{id:2,num:2,sid:'10102',name:'문준영'},{id:3,num:3,sid:'10103',name:'배수진'},{id:4,num:4,sid:'10104',name:'임태양'},{id:5,num:5,sid:'10105',name:'권지우'},{id:6,num:6,sid:'10106',name:'오채린'},{id:7,num:7,sid:'10107',name:'허성민'}],
+  '1학년 2반': [{id:1,num:1,sid:'10201',name:'강지훈'},{id:2,num:2,sid:'10202',name:'이하은'},{id:3,num:3,sid:'10203',name:'박민재'},{id:4,num:4,sid:'10204',name:'최유나'},{id:5,num:5,sid:'10205',name:'정승원'},{id:6,num:6,sid:'10206',name:'김서현'},{id:7,num:7,sid:'10207',name:'윤재호'}],
+  '3학년 1반': [{id:1,num:1,sid:'30101',name:'손예원'},{id:2,num:2,sid:'30102',name:'조현준'},{id:3,num:3,sid:'30103',name:'나은서'},{id:4,num:4,sid:'30104',name:'류민호'},{id:5,num:5,sid:'30105',name:'서지수'},{id:6,num:6,sid:'30106',name:'고태민'},{id:7,num:7,sid:'30107',name:'변수아'}],
+};
+
 const _params = new URLSearchParams(location.search);
 const ACTIVITY_TYPE = _params.get('type') || '자율활동';
 const IS_NEW = _params.get('new') === '1';
@@ -1316,15 +1325,13 @@ if(ACTIVITY_TYPE === '동아리활동') {
   document.getElementById('btn-student-icon').setAttribute('data-lucide', 'users');
 }
 if (IS_NEW) {
-  STUDENTS.splice(0);
-  document.getElementById('ss-list').innerHTML = '<div style="padding:24px 16px;text-align:center;color:#b3b6bd;font-size:13px;line-height:1.7"><i data-lucide="users" style="width:28px;height:28px;opacity:.35;margin-bottom:8px"></i><br>등록된 학생이 없어요.<br>학생을 추가해 주세요.</div>';
-  document.getElementById('ss-done-n').textContent = '0';
-  document.getElementById('ss-left-n').textContent = '0';
-  document.getElementById('ss-prog-text').textContent = '0 / 0명';
-  document.getElementById('ss-pb-fill').style.width = '0%';
-  document.getElementById('ss-total-label').textContent = '전체 0명';
-  document.getElementById('empty-state').style.display = 'flex';
-  document.getElementById('student-area').style.display = 'none';
+  const _roster = CLASS_ROSTER[_cls] || CLASS_ROSTER['2학년 1반'];
+  STUDENTS.splice(0, STUDENTS.length, ..._roster.map(s => ({
+    ...s, done:false, reachedTab:1, lastTab:1,
+    files:[], manualTags:[], selectedTraitIdxs:[], draft:''
+  })));
+  renderSidebar();
+  selectStudent(STUDENTS[0].id);
 } else {
   renderSidebar();
   selectStudent(2);
