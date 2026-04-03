@@ -1288,27 +1288,27 @@ const ACTIVITY_TYPE = '동아리활동';
 document.querySelector('.sub-bc strong').textContent = '동아리활동 · 과학탐구부';
 document.getElementById('btn-student-label').textContent = '학생 관리';
 document.getElementById('btn-student-icon').setAttribute('data-lucide', 'users');
-// dong_register?먯꽌 ?꾨떖???숈깮 紐⑸줉 ?뺤씤
 const _regRaw = sessionStorage.getItem('dong_registered_students');
 if (_regRaw) {
   const _regList = JSON.parse(_regRaw);
   sessionStorage.removeItem('dong_registered_students');
-  _regList.forEach(s => STUDENTS.push({
-    id: s.id, num: s.num, sid: s.sid, name: s.name,
-    done: false, reachedTab: 1, lastTab: 1,
-    files: [], manualTags: [], selectedTraitIdxs: [], draft: ''
-  }));
-}
-if (STUDENTS.length > 0) {
+  _regList.forEach(s => STUDENTS.push({id:s.id,num:s.num,sid:s.sid,name:s.name,done:false,reachedTab:1,lastTab:1,files:[],manualTags:[],selectedTraitIdxs:[],draft:''}));
   renderSidebar();
   selectStudent(STUDENTS[0].id);
 } else {
-  document.getElementById('ss-total-label').textContent = '?꾩껜 0紐?;
-  document.getElementById('ss-prog-text').textContent = '0 / 0紐?;
-  document.getElementById('ss-list').innerHTML =
-    '<div style="padding:24px 16px;text-align:center;color:#b3b6bd;font-size:13px;line-height:1.7"><i data-lucide="users" style="width:28px;height:28px;opacity:.35;margin-bottom:8px"></i><br>?깅줉???숈깮???놁뼱??<br>?숈깮??異붽???二쇱꽭??</div>';
-  document.getElementById('empty-state').style.display = 'flex';
-  document.getElementById('student-area').style.display = 'none';
+renderSidebar();
+// 학생 0명 — 빈 상태 유지 (selectStudent 호출 안 함)
+document.getElementById('ss-total-label').textContent = '전체 0명';
+document.getElementById('ss-prog-text').textContent = '0 / 0명';
+// 사이드바 빈 상태 안내
+document.getElementById('ss-list').innerHTML =
+  `<div style="padding:24px 16px;text-align:center;color:#b3b6bd;font-size:13px;line-height:1.7">
+     <i data-lucide="users" style="width:28px;height:28px;opacity:.35;margin-bottom:8px"></i><br>
+     등록된 학생이 없어요.<br>학생을 추가해 주세요.
+   </div>`;
+// 메인 빈 상태
+document.getElementById('empty-state').style.display = 'flex';
+document.getElementById('student-area').style.display = 'none';
 }
 lucide.createIcons();
 </script>
