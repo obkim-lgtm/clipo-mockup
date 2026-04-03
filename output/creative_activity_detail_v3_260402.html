@@ -1308,13 +1308,27 @@ function showToast(msg) {
 // ── 초기화 ──
 const _params = new URLSearchParams(location.search);
 const ACTIVITY_TYPE = _params.get('type') || '자율활동';
-document.querySelector('.sub-bc strong').textContent = ACTIVITY_TYPE + ' · 2학년 1반';
+const IS_NEW = _params.get('new') === '1';
+const _cls = _params.get('cls') || '2학년 1반';
+document.querySelector('.sub-bc strong').textContent = ACTIVITY_TYPE + ' · ' + _cls;
 if(ACTIVITY_TYPE === '동아리활동') {
   document.getElementById('btn-student-label').textContent = '학생 관리';
   document.getElementById('btn-student-icon').setAttribute('data-lucide', 'users');
 }
-renderSidebar();
-selectStudent(2);
+if (IS_NEW) {
+  STUDENTS.splice(0);
+  document.getElementById('ss-list').innerHTML = '<div style="padding:24px 16px;text-align:center;color:#b3b6bd;font-size:13px;line-height:1.7"><i data-lucide="users" style="width:28px;height:28px;opacity:.35;margin-bottom:8px"></i><br>등록된 학생이 없어요.<br>학생을 추가해 주세요.</div>';
+  document.getElementById('ss-done-n').textContent = '0';
+  document.getElementById('ss-left-n').textContent = '0';
+  document.getElementById('ss-prog-text').textContent = '0 / 0명';
+  document.getElementById('ss-pb-fill').style.width = '0%';
+  document.getElementById('ss-total-label').textContent = '전체 0명';
+  document.getElementById('empty-state').style.display = 'flex';
+  document.getElementById('student-area').style.display = 'none';
+} else {
+  renderSidebar();
+  selectStudent(2);
+}
 lucide.createIcons();
 </script>
 </body>

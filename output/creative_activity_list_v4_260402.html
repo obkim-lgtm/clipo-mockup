@@ -290,12 +290,13 @@
     document.body.classList.toggle('nav-expanded');
   }
 
-  function goDetail(e, type, cls, badge, hasStudents=true) {
+  function goDetail(e, type, cls, badge, hasStudents=true, isNew=false) {
     if (e.target.closest('.menu-btn') || e.target.closest('.card-dropdown')) return;
     if (type === '동아리활동') {
       location.href = hasStudents ? 'dong_activity_detail_v2_260402.html' : 'dong_register_v2_260402.html';
     } else {
-      location.href = 'creative_activity_detail_v3_260402.html?type=' + encodeURIComponent(type);
+      const extra = isNew ? '&new=1&cls=' + encodeURIComponent(cls) : '';
+      location.href = 'creative_activity_detail_v3_260402.html?type=' + encodeURIComponent(type) + extra;
     }
   }
 
@@ -365,7 +366,11 @@
     const today = new Date();
     const card = document.createElement('div');
     card.className = 'card';
-    card.setAttribute('onclick', `goDetail(event,'${typeLabel}','${title}','${typeClass}')`);
+    if (currentType === 'dong') {
+      card.setAttribute('onclick', `goDetail(event,'동아리활동','${title}','b-dong',false)`);
+    } else {
+      card.setAttribute('onclick', `goDetail(event,'${typeLabel}','${title}','${typeClass}',true,true)`);
+    }
     card.innerHTML = `
       <div style="display:flex;align-items:center;justify-content:space-between;">
         <span class="badge-type ${typeClass}">${typeLabel}</span>
