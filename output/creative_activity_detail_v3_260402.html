@@ -192,7 +192,10 @@ body.nav-expanded .stu-sb{left:200px;transition:left .2s ease}
 .btn-copy-ai:hover{border-color:#b3b3b3}
 
 /* ── 토스트 ── */
-.toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(12px);background:#222631;color:#fff;padding:10px 20px;border-radius:8px;font-size:14px;font-weight:500;opacity:0;transition:all .25s;z-index:500;pointer-events:none;white-space:nowrap}
+.toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(12px);background:#319d64;color:#fff;padding:16px 24px 16px 16px;border-radius:2px;font-family:inherit;font-size:15px;font-weight:500;line-height:1.25;box-shadow:0 8px 16px rgba(0,0,0,.1),0 0 1px rgba(34,38,49,.3);opacity:0;transition:all .25s;z-index:500;pointer-events:none;white-space:nowrap;min-width:280px;max-width:384px;text-align:left}
+.toast.tip{background:#222631;padding:4px 8px;border-radius:4px;font-size:13px;line-height:1.55;min-width:0}
+[data-tip]{position:relative}
+[data-tip]:hover::after{content:attr(data-tip);position:absolute;bottom:calc(100% + 6px);left:50%;transform:translateX(-50%);background:#222631;color:#fff;font-family:'Pretendard GOV',sans-serif;font-size:13px;font-weight:500;line-height:1.55;padding:4px 8px;border-radius:4px;white-space:nowrap;box-shadow:0 8px 16px rgba(0,0,0,.1),0 0 1px rgba(34,38,49,.3);pointer-events:none;z-index:800}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 
 /* ── 빈 상태 ── */
@@ -253,7 +256,7 @@ body.nav-expanded .stu-sb{left:200px;transition:left .2s ease}
   <div class="sub-acts">
     <div class="mode-group">
       <button class="mode-btn active">개별 작성</button>
-      <button class="mode-btn" onclick="location.href='creative_activity_bulk_v2_260402.html'">일괄 작성</button>
+      <button class="mode-btn" onclick="location.href='creative_activity_bulk_v4_260407.html'">일괄 작성</button>
     </div>
     <div style="width:1px;height:18px;background:#e0e0e0"></div>
     <button class="btn-outline" onclick="openClassUpload()">
@@ -630,6 +633,33 @@ body.nav-expanded .stu-sb{left:200px;transition:left .2s ease}
     <button onclick="closeUploadModal()" style="width:100%;padding:10px;border-radius:8px;border:1px solid #d9d9d9;background:#fff;color:#6d7381;font-size:14px;font-family:inherit;cursor:pointer">취소</button>
   </div>
 </div>
+
+<!-- ── 첫 진입 온보딩 팝업 ── -->
+<div id="ob-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:900;align-items:center;justify-content:center">
+  <div style="background:#fff;border-radius:12px;width:512px;max-width:calc(100vw - 48px);box-shadow:0 12px 48px rgba(0,0,0,.18);position:relative">
+    <div style="padding:24px 24px 16px;position:relative">
+      <div style="font-size:18px;font-weight:600;color:#222631;line-height:1.25">시작하기 전에 알려주세요</div>
+      <button onclick="closeOb()" style="position:absolute;top:11px;right:11px;width:36px;height:36px;border:none;background:none;cursor:pointer;color:#6d7381;display:flex;align-items:center;justify-content:center;border-radius:4px"><i data-lucide="x" style="width:16px;height:16px"></i></button>
+    </div>
+    <div style="padding:8px 24px 8px">
+      <div style="font-size:16px;color:#222631;line-height:1.55;margin-bottom:14px">학생들의 <strong>활동지(과제물 파일)</strong>가 있나요?</div>
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <button class="ob-card" onclick="finishOb('yes')"><div style="display:flex;align-items:center;gap:12px"><div class="ob-ic"><i data-lucide="file-text" style="width:20px;height:20px"></i></div><div style="text-align:left"><div style="font-size:16px;font-weight:600;color:#222631">있어요</div><div style="font-size:14px;color:#6d7381;margin-top:2px">파일을 업로드해서 AI로 특성을 자동 추출해요</div></div></div></button>
+        <button class="ob-card" onclick="finishOb('no')"><div style="display:flex;align-items:center;gap:12px"><div class="ob-ic"><i data-lucide="pencil-line" style="width:20px;height:20px"></i></div><div style="text-align:left"><div style="font-size:16px;font-weight:600;color:#222631">없어요</div><div style="font-size:14px;color:#6d7381;margin-top:2px">활동 특성을 직접 입력해서 AI 기록을 만들어요</div></div></div></button>
+      </div>
+      <div style="font-size:13px;color:#b3b6bd;margin-top:12px">※ 활동지는 언제든 다시 추가할 수 있어요</div>
+    </div>
+    <div style="padding:16px 24px 20px;background:#f4f8ff;border-top:1px solid #e8eaed;border-radius:0 0 12px 12px;margin-top:8px">
+      <div style="font-size:14px;color:#3151c4;line-height:1.55"><strong>💡 Tip ·</strong> 여러 학생을 한 번에 처리하려면 상단 <strong>[일괄 작성]</strong> 탭을 이용하세요</div>
+    </div>
+  </div>
+</div>
+<style>
+.ob-card{display:block;width:100%;padding:14px 16px;border:1.5px solid #e0e3e8;border-radius:10px;background:#fff;cursor:pointer;font-family:inherit;text-align:left;transition:all .12s}
+.ob-card:hover{border-color:#365eef;background:#f4f8ff}
+.ob-ic{width:40px;height:40px;border-radius:8px;background:#e9f2ff;color:#3151c4;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+#ob-overlay.show{display:flex !important}
+</style>
 
 <script>
 // ── 데이터 ──
@@ -1324,6 +1354,10 @@ if(ACTIVITY_TYPE === '동아리활동') {
   document.getElementById('btn-student-label').textContent = '학생 관리';
   document.getElementById('btn-student-icon').setAttribute('data-lucide', 'users');
 }
+function showOb(){document.getElementById('ob-overlay').classList.add('show');lucide.createIcons();}
+function closeOb(){document.getElementById('ob-overlay').classList.remove('show');}
+function finishOb(choice){closeOb();if(choice==='no'){const cur=STUDENTS.find(x=>x.id===curStudentId);if(cur){cur.reachedTab=Math.max(cur.reachedTab||1,2);cur.lastTab=2;cur.selectedTraitIdxs=[];cur.manualTags=[];}selectedTraits=new Set();manualTags=[];reachedTab=Math.max(reachedTab,2);goTab(2,true);try{renderTraitList();}catch(e){}showToast('활동 특성을 직접 입력해 보세요');}else{showToast('활동지를 업로드하면 AI가 특성을 추출해요');}}
+function maybeShowOb(){setTimeout(showOb,300);}
 if (IS_NEW) {
   const _roster = CLASS_ROSTER[_cls] || CLASS_ROSTER['2학년 1반'];
   STUDENTS.splice(0, STUDENTS.length, ..._roster.map(s => ({
@@ -1337,6 +1371,7 @@ if (IS_NEW) {
   selectStudent(2);
 }
 lucide.createIcons();
+maybeShowOb();
 </script>
 </body>
 </html>

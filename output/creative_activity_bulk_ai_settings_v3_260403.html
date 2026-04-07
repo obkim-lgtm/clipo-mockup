@@ -116,7 +116,10 @@ input[type=checkbox]:disabled{cursor:not-allowed}
 .btn-gen:disabled{background:#dde1e8;color:#b3b6bd;cursor:not-allowed}
 
 /* ── Toast ── */
-.toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(12px);background:#222631;color:#fff;padding:10px 20px;border-radius:8px;font-size:14px;font-weight:500;opacity:0;transition:all .25s;z-index:500;pointer-events:none;white-space:nowrap}
+.toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(12px);background:#319d64;color:#fff;padding:16px 24px 16px 16px;border-radius:2px;font-family:inherit;font-size:15px;font-weight:500;line-height:1.25;box-shadow:0 8px 16px rgba(0,0,0,.1),0 0 1px rgba(34,38,49,.3);opacity:0;transition:all .25s;z-index:500;pointer-events:none;white-space:nowrap;min-width:280px;max-width:384px;text-align:left}
+.toast.tip{background:#222631;padding:4px 8px;border-radius:4px;font-size:13px;line-height:1.55;min-width:0}
+[data-tip]{position:relative}
+[data-tip]:hover::after{content:attr(data-tip);position:absolute;bottom:calc(100% + 6px);left:50%;transform:translateX(-50%);background:#222631;color:#fff;font-family:'Pretendard GOV',sans-serif;font-size:13px;font-weight:500;line-height:1.55;padding:4px 8px;border-radius:4px;white-space:nowrap;box-shadow:0 8px 16px rgba(0,0,0,.1),0 0 1px rgba(34,38,49,.3);pointer-events:none;z-index:800}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 </style>
 </head>
@@ -165,7 +168,7 @@ input[type=checkbox]:disabled{cursor:not-allowed}
   <div class="sub-acts">
     <div class="mode-group">
       <button class="mode-btn" onclick="goIndividual()">개별 작성</button>
-      <button class="mode-btn active" onclick="location.href='creative_activity_bulk_v3_260403.html'">일괄 작성</button>
+      <button class="mode-btn active" onclick="location.href='creative_activity_bulk_v4_260407.html'">일괄 작성</button>
     </div>
     <div style="width:1px;height:18px;background:#e0e0e0"></div>
     <button class="btn-outline" onclick="showToast('활동지 일괄 업로드 화면으로 이동해요')"><i data-lucide="file-up" style="width:14px;height:14px"></i> 활동지 일괄 업로드</button>
@@ -179,7 +182,7 @@ input[type=checkbox]:disabled{cursor:not-allowed}
 <div class="settings-wrap">
 
   <!-- Back link -->
-  <button class="back-link" onclick="location.href='creative_activity_bulk_v3_260403.html'">
+  <button class="back-link" onclick="location.href='creative_activity_bulk_v4_260407.html'">
     <i data-lucide="chevron-left" style="width:16px;height:16px"></i>이전으로
   </button>
 
@@ -192,15 +195,15 @@ input[type=checkbox]:disabled{cursor:not-allowed}
     <div class="card-header">
       <div class="card-header-left">
         <div class="card-title">기록 생성할 학생 선택</div>
-        <div class="card-desc">활동 특성이 입력되었거나 과제물이 업로드된 학생만 선택할 수 있어요.</div>
+        <div class="card-desc">특성이 입력된 학생만 선택할 수 있어요. 과제물만 있는 학생은 먼저 분석을 진행해 주세요.</div>
       </div>
       <div class="card-badge" id="sel-count">0명 / 6명</div>
     </div>
 
     <!-- Info banner -->
-    <div style="display:flex;align-items:flex-start;gap:8px;padding:10px 14px;background:#fff7ed;border-radius:8px;margin-bottom:12px;font-size:13px;color:#c2600a;line-height:1.5">
-      <i data-lucide="info" style="width:15px;height:15px;flex-shrink:0;margin-top:1px;color:#c2600a"></i>
-      <span>과제물만 있는 학생은 AI가 자동으로 키워드를 추출한 후 기록을 생성해요. <strong>크레딧 2개</strong>가 사용됩니다.</span>
+    <div style="display:flex;align-items:flex-start;gap:8px;padding:10px 14px;background:#f4f8ff;border-radius:8px;margin-bottom:12px;font-size:13px;color:#365eef;line-height:1.55">
+      <i data-lucide="info" style="width:15px;height:15px;flex-shrink:0;margin-top:2px;color:#416bff"></i>
+      <span>선택한 학생당 <strong>크레딧 1개</strong>가 사용됩니다. 과제물만 있고 특성이 비어있는 학생은 먼저 분석을 진행해 주세요.</span>
     </div>
 
     <div class="card-divider"></div>
@@ -272,7 +275,7 @@ input[type=checkbox]:disabled{cursor:not-allowed}
 <!-- ── Fixed Footer ── -->
 <div class="gen-footer">
   <span class="gen-info" id="gen-info">학생을 선택하면 AI 기록을 생성할 수 있어요.</span>
-  <button class="btn-gen" id="btn-gen" disabled onclick="location.href='creative_activity_bulk_v3_260403.html'">
+  <button class="btn-gen" id="btn-gen" disabled onclick="location.href='creative_activity_bulk_v4_260407.html'">
     <i data-lucide="sparkles" style="width:16px;height:16px"></i>AI 기록 생성
   </button>
 </div>
@@ -289,27 +292,36 @@ const STUDENTS = [
   {sid:'10106', name:'한예린', files:2, keywords:[]},
   {sid:'10107', name:'오지훈', files:1, keywords:['자기주도 학습','창의적 문제 해결']},
 ];
-const ENABLED = STUDENTS.filter(s => s.keywords.length > 0 || s.files > 0); // 6명
+const ENABLED = STUDENTS.filter(s => s.keywords.length > 0); // 특성 있는 학생만
 
 function renderStudents() {
   const list = document.getElementById('student-list');
   list.innerHTML = '';
   STUDENTS.forEach((s, i) => {
-    const isFileOnly = s.keywords.length === 0 && s.files > 0;
-    const enabled = s.keywords.length > 0 || s.files > 0;
+    const hasFile = s.files > 0;
+    const hasKw = s.keywords.length > 0;
+    const enabled = hasKw; // 특성이 있어야만 생성 가능
+    const needsAnalysis = hasFile && !hasKw;
     const row = document.createElement('label');
     row.className = 'stu-row' + (enabled ? '' : ' disabled-row');
     row.style.cursor = enabled ? 'pointer' : 'not-allowed';
 
-    const badge = s.keywords.length > 0
-      ? `<span class="stu-badge-has">특성 ${s.keywords.length}개</span>`
-      : s.files > 0
-        ? `<span class="stu-badge-file">과제물 ${s.files}개</span>`
-        : `<span class="stu-badge-none">특성 미입력</span>`;
+    let badge = '';
+    if (hasKw && hasFile) {
+      badge = `<span class="stu-badge-has">특성 ${s.keywords.length}개</span><span class="stu-badge-file" style="margin-left:4px">과제물 ${s.files}개</span>`;
+    } else if (hasKw) {
+      badge = `<span class="stu-badge-has">특성 ${s.keywords.length}개</span>`;
+    } else if (hasFile) {
+      badge = `<span class="stu-badge-file">과제물 ${s.files}개</span>`;
+    } else {
+      badge = `<span class="stu-badge-none">특성 미입력</span>`;
+    }
 
-    const autoNote = isFileOnly
-      ? `<span style="font-size:11px;color:#c2600a;margin-top:1px;display:block">과제물 기반 자동 분석 · 크레딧 2개</span>`
-      : '';
+    const autoNote = needsAnalysis
+      ? `<span style="font-size:11px;color:#c2600a;margin-top:2px;display:block">과제물 분석을 먼저 진행해 주세요</span>`
+      : (!hasKw && !hasFile)
+        ? `<span style="font-size:11px;color:#b3b6bd;margin-top:2px;display:block">특성을 입력하거나 활동지를 일괄 업로드해 주세요</span>`
+        : '';
 
     row.innerHTML = `
       <input type="checkbox" class="stu-cb" data-idx="${i}" ${enabled ? '' : 'disabled'}
@@ -343,7 +355,7 @@ function updateSelCount() {
   let totalCredits = 0;
   checked.forEach(cb => {
     const s = STUDENTS[parseInt(cb.dataset.idx)];
-    totalCredits += (s.keywords.length === 0 && s.files > 0) ? 2 : 1;
+    totalCredits += 1;
   });
   document.getElementById('sel-count').textContent = n + '명 / ' + ENABLED.length + '명';
   document.getElementById('gen-info').textContent = n > 0

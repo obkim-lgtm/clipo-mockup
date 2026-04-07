@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>창의적 체험활동 - CLIPO</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard-gov.min.css">
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<style>
+*{font-family:'Pretendard GOV',-apple-system,sans-serif;box-sizing:border-box;margin:0;padding:0}
+html{scrollbar-gutter:stable}
+body{background:#f6f7f9;color:#222631}
+.g-hd{height:56px;background:#fff;border-bottom:1px solid #d9d9d9;display:flex;align-items:center;padding:0 20px 0 8px;position:fixed;top:0;left:0;right:0;z-index:200}
+.g-hd-r{margin-left:auto;display:flex;align-items:center;gap:6px;font-size:14px;color:#3b3f4c}
+.plan-badge{background:#416bff;color:#fff;font-size:11px;font-weight:600;padding:2px 8px;border-radius:4px}
+.hd-div{width:1px;height:14px;background:#d9d9d9;margin:0 4px}
+.credit-wrap{display:flex;align-items:center;gap:4px;padding:4px 10px;background:#f6f7f9;border-radius:6px;font-size:13px;font-weight:600;color:#3b3f4c}
+.user-btn{display:flex;align-items:center;gap:4px;padding:4px 10px;border:1px solid #d9d9d9;border-radius:6px;background:#fff;font-size:13px;color:#3b3f4c;cursor:pointer}
+.icon-sb{width:56px;background:#fff;border-right:1px solid #d9d9d9;position:fixed;top:56px;bottom:0;left:0;display:flex;flex-direction:column;padding:8px 0;z-index:150;transition:width .2s ease}
+.icon-sb.expanded{width:200px}
+.si{height:40px;display:flex;align-items:center;border-radius:8px;color:#6d7381;cursor:pointer;margin-bottom:2px;position:relative;padding:0 4px 0 16px;gap:10px;white-space:nowrap;flex-shrink:0}
+.si:hover{background:#f1f3f5}
+.si.active{background:#e9f2ff;color:#416bff}
+.si-icon{width:24px;height:24px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.si-label{font-size:13px;font-weight:500;opacity:0;transition:opacity .1s;overflow:hidden}
+.icon-sb.expanded .si-label{opacity:1}
+.si-tip{position:absolute;left:48px;top:50%;transform:translateY(-50%);background:#222631;color:#fff;font-size:11px;padding:3px 8px;border-radius:4px;white-space:nowrap;display:none;z-index:300;pointer-events:none}
+.si:hover .si-tip{display:block}
+.icon-sb.expanded .si-tip{display:none!important}
+.nav-bottom{margin-top:auto;width:100%}
+.nav-div{height:1px;background:#f1f3f5;margin:4px 0}
+body.nav-expanded .sub-bar{left:200px;transition:left .2s ease}
+body.nav-expanded .bulk-wrap{margin-left:200px;transition:margin-left .2s ease}
+.sub-bar{height:48px;background:#fff;border-bottom:1px solid #d9d9d9;position:fixed;top:56px;left:56px;right:0;z-index:100;display:flex;align-items:center;padding:0 20px;gap:8px}
+.sub-bc{display:flex;align-items:center;gap:6px;font-size:14px;color:#6d7381}
+.sub-bc a{color:#6d7381;text-decoration:none;cursor:pointer}.sub-bc a:hover{color:#416bff}
+.sub-bc strong{color:#222631;font-weight:600}
+.sub-acts{margin-left:auto;display:flex;align-items:center;gap:8px}
+.mode-group{display:flex;border:1px solid #d9d9d9;border-radius:6px;overflow:hidden}
+.mode-btn{padding:5px 14px;font-size:13px;font-weight:500;font-family:inherit;border:none;cursor:pointer;background:#fff;color:#6d7381}
+.mode-btn.active{background:#416bff;color:#fff}
+.btn-outline{display:flex;align-items:center;gap:5px;padding:6px 12px;font-size:13px;font-weight:500;font-family:inherit;border:1px solid #d9d9d9;border-radius: 4px;background:#fff;color:#3b3f4c;cursor:pointer}
+.btn-outline:hover{border-color:#b3b3b3}
+.bulk-wrap{margin-left:56px;margin-top:104px;display:flex;flex-direction:column;height:calc(100vh - 104px)}
+.bulk-info{display:flex;align-items:center;justify-content:space-between;padding:10px 24px;background:#fff;border-bottom:1px solid #e8eaed;flex-shrink:0}
+.bulk-total{font-size:14px;font-weight:600;color:#3b3f4c}
+.bulk-save-status{font-size:13px;color:#6d7381;display:flex;align-items:center;gap:5px}
+.bulk-table-wrap{flex:1;overflow-y:auto;overflow-x:auto}
+.bulk-table{width:100%;border-collapse:collapse;table-layout:fixed;min-width:1000px}
+.col-num{width:56px}.col-name{width:80px}.col-file{width:96px}.col-kw{width:210px}.col-ai{width:auto}.col-arrow{width:44px}.col-teacher{width:auto}
+/* ── 파일 셀 ── */
+.file-cell-btn{display:inline-flex;flex-direction:column;align-items:flex-start;gap:3px;padding:5px 8px;border:1px solid #e0e3e8;border-radius:6px;background:#fff;font-family:inherit;cursor:pointer;width:100%;text-align:left;transition:all .12s;line-height:1.3}
+.file-cell-btn:hover{border-color:#416bff;background:#f4f8ff}
+.file-cell-btn.empty{border-style:dashed;color:#b3b6bd}
+.file-cell-btn.empty:hover{color:#416bff}
+.file-cell-count{display:inline-flex;align-items:center;gap:4px;font-size:14px;font-weight:600;color:#365eef}
+.file-cell-empty-text{font-size:13px;color:#b3b6bd}
+.file-cell-btn:hover .file-cell-empty-text{color:#416bff}
+.file-cell-status{font-size:12px;font-weight:500}
+.file-cell-status.analyzed{color:#1ab864}
+.file-cell-status.unanalyzed{color:#c2600a}
+/* ── 파일 팝오버 ── */
+.fp-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.25);z-index:700;align-items:center;justify-content:center}
+.fp-overlay.show{display:flex}
+/* Dialog tokens (Figma DS): md=512, radius=12, header pt24/px24/pb16, body pt8/px24/pb24, footer pt8/px24/pb16 */
+.fp-box{background:#fff;border-radius:12px;width:512px;max-width:calc(100vw - 48px);max-height:84vh;box-shadow:0 12px 48px rgba(0,0,0,.18);display:flex;flex-direction:column;overflow:hidden;position:relative}
+.fp-head{padding:24px 24px 16px;display:flex;flex-direction:column;gap:8px;position:relative}
+.fp-title{font-size:18px;font-weight:600;color:#222631;line-height:1.25}
+.fp-sub{font-size:14px;color:#6d7381;line-height:1.55}
+.fp-close{position:absolute;top:11px;right:11px;width:36px;height:36px;border:none;background:none;cursor:pointer;color:#6d7381;display:flex;align-items:center;justify-content:center;border-radius:4px;flex-shrink:0;padding:0}
+.fp-close:hover{background:#f1f3f5;color:#222631}
+.fp-body{padding:8px 24px 24px;overflow-y:auto;flex:1}
+.fp-empty{text-align:center;padding:28px 0;color:#b3b6bd;font-size:16px;line-height:1.55}
+.fp-file-row{display:flex;align-items:center;gap:12px;padding:12px 14px;border:1px solid #e8eaed;border-radius:8px;margin-bottom:8px}
+.fp-file-row:last-child{margin-bottom:0}
+.fp-file-icon{width:36px;height:36px;background:#e9f2ff;border-radius:6px;display:flex;align-items:center;justify-content:center;color:#3151c4;flex-shrink:0}
+.fp-file-meta{flex:1;min-width:0}
+.fp-file-name{font-size:16px;font-weight:500;color:#222631;line-height:1.4;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.fp-file-size{font-size:13px;color:#b3b6bd;margin-top:3px}
+.fp-file-act{display:flex;gap:6px}
+.fp-file-act button{width:32px;height:32px;border:1px solid #e0e3e8;border-radius:4px;background:#fff;cursor:pointer;color:#6d7381;display:flex;align-items:center;justify-content:center}
+.fp-file-act button:hover{border-color:#3151c4;color:#3151c4}
+.fp-add{display:flex;align-items:center;justify-content:center;gap:6px;width:100%;padding:14px;border:1.5px dashed #d9d9d9;border-radius:8px;background:#fff;font-family:inherit;font-size:15px;font-weight:500;color:#6d7381;cursor:pointer;margin-top:8px}
+.fp-add:hover{border-color:#3151c4;color:#3151c4;background:#f4f8ff}
+.fp-foot{padding:8px 24px 16px;display:flex;flex-direction:column;gap:12px}
+.fp-analyze-msg{font-size:14px;color:#6d7381;line-height:1.55}
+.fp-analyze-msg.analyzed{color:#1ab864;display:flex;align-items:center;gap:6px}
+.fp-analyze-btns{display:flex;gap:12px;justify-content:flex-end}
+.fp-btn-analyze{display:inline-flex;align-items:center;justify-content:center;gap:8px;height:40px;padding:0 16px;border:none;border-radius:4px;background:#365eef;color:#fff;font-family:inherit;font-size:15px;font-weight:500;cursor:pointer;line-height:1.25}
+.fp-btn-analyze:hover{background:#2c4dd0}
+.fp-btn-analyze:disabled{background:#dde1e8;color:#b3b6bd;cursor:not-allowed}
+.fp-btn-reanalyze{display:inline-flex;align-items:center;justify-content:center;gap:8px;height:40px;padding:0 16px;border:1px solid #a3c3ff;border-radius:4px;background:#fff;color:#3151c4;font-family:inherit;font-size:15px;font-weight:500;cursor:pointer;line-height:1.25}
+.fp-btn-reanalyze:hover{background:#f4f8ff}
+.kb-drop{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px 20px;border:1.5px dashed #ccdfff;border-radius:8px;background:#fafbfd;cursor:pointer;text-align:center;transition:all .15s}
+.kb-drop:hover{border-color:#365eef;background:#f4f8ff}
+.kb-filter-btn.active{background:#365eef !important;color:#fff}
+.rg-kw-tag{display:inline-flex;align-items:center;gap:4px;padding:4px 4px 4px 10px;background:#e9f2ff;border-radius:4px;font-size:15px;color:#3151c4;font-weight:500}
+.rg-kw-x{display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;border:none;background:none;color:#3151c4;cursor:pointer;border-radius:3px;padding:0}
+.rg-kw-x:hover{background:#ccdfff}
+.rg-kw-input-row{width:100%;min-height:44px;max-height:200px;padding:11px 14px;border:1px solid #d9d9d9;border-radius:8px;outline:none;font-family:inherit;font-size:16px;line-height:1.4;color:#222631;box-sizing:border-box;resize:none;overflow-y:auto}
+.rg-kw-input-row:focus{border-color:#365eef}
+.rg-radio-label{display:flex;align-items:center;gap:7px;padding:8px 14px;border:1.5px solid #d9d9d9;border-radius:8px;background:#fff;cursor:pointer;font-size:16px;font-weight:500;color:#3b3f4c;transition:border-color .12s}
+.rg-radio-label:hover{border-color:#365eef}
+.rg-radio-label.rg-radio-active{border-color:#365eef;background:#f4f8ff;color:#365eef}
+.rg-len-label{display:flex;align-items:center;gap:10px;padding:12px 16px;border:1.5px solid #d9d9d9;border-radius:8px;cursor:pointer;transition:border-color .12s}
+.rg-len-label:hover{border-color:#365eef}
+.rg-len-label.rg-len-active{border-color:#365eef;background:#f4f8ff}
+.rg-len-main{font-size:16px;font-weight:500;color:#222631}
+.rg-len-sub{font-size:13px;color:#6d7381;margin-top:2px}
+.fp-btn-analyze:disabled{background:#dde1e8;color:#fff;cursor:not-allowed}
+/* ── 일괄 분석 버튼 ── */
+.btn-bulk-analyze{display:inline-flex;align-items:center;gap:6px;padding:7px 13px;border:1px solid #c2600a;border-radius:7px;background:#fff7ed;color:#c2600a;font-size:13px;font-weight:600;font-family:inherit;cursor:pointer}
+.btn-bulk-analyze:hover{background:#ffead0}
+.bulk-table thead tr{background:#f6f7f9;position:sticky;top:0;z-index:10}
+.bulk-table th{padding:10px 14px;font-size:14px;font-weight:600;color:#6d7381;border-bottom:2px solid #d9d9d9;border-right:1px solid #e8eaed;text-align:left;white-space:nowrap;background:#f6f7f9}
+.bulk-table th:last-child{border-right:none}
+.th-ai{display:flex;align-items:center;gap:10px}
+.btn-batch{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border:1px solid #416bff;border-radius:5px;background:#fff;color:#416bff;font-size:13px;font-weight:500;font-family:inherit;cursor:pointer;white-space:nowrap}
+.btn-batch:hover{background:#f4f8ff}
+.bulk-table td{padding:16px 14px;border-bottom:1px solid #e8eaed;border-right:1px solid #e8eaed;vertical-align:top;font-size:16px;color:#222631}
+.bulk-table td:last-child{border-right:none}
+.bulk-table tr:hover td{background:#fafbff}
+.bulk-table tr.row-done td{background:#fff}
+.bulk-table tr.row-done:hover td{background:#f9fffe}
+.td-num{font-size:13px;color:#b3b6bd;padding-top:18px}
+.td-name{font-size:16px;font-weight:600;color:#222631;padding-top:18px;cursor:pointer}
+.td-name:hover{color:#365eef;text-decoration:underline}
+.td-file{padding-top:18px;font-size:13px;text-align:left}
+.kw-tags{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:10px}
+.kw-tag{display:inline-flex;align-items:center;gap:5px;padding:3px 5px 3px 10px;background:#e9f2ff;color:#365eef;border-radius:20px;font-size:14px;font-weight:500}
+.kw-tag-x{width:16px;height:16px;border:none;border-radius:50%;background:rgba(54,94,239,.12);color:#365eef;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;padding:0;font-family:inherit}
+.kw-tag-x:hover{background:#365eef;color:#fff}
+.kw-tag-none{font-size:14px;color:#b3b6bd;padding:4px 0}
+.kw-input-row{display:flex;gap:5px}
+.kw-input{width:100%;border:1px solid #d9d9d9;border-radius:5px;padding:6px 10px;font-size:15px;font-family:inherit;color:#222631;outline:none;min-width:0}
+.kw-input:focus{border-color:#416bff}
+.kw-add-btn{padding:4px 9px;border:1px solid #d9d9d9;border-radius:5px;background:#fff;font-size:12px;font-family:inherit;color:#3b3f4c;cursor:pointer;white-space:nowrap}
+.kw-add-btn:hover{border-color:#416bff;color:#416bff}
+.btn-regen{display:inline-flex;align-items:center;gap:4px;padding:5px 10px;border:1px solid #d9d9d9;border-radius:6px;background:#fff;color:#6d7381;font-size:13px;font-family:inherit;cursor:pointer;margin-top:8px}
+.btn-regen:hover{border-color:#416bff;color:#416bff}
+.ai-text-box{background:#f4f8ff;border:1px solid #ccdfff;border-radius:8px;padding:13px 14px;font-size:16px;line-height:1.8;color:#222631;white-space:pre-wrap;min-height:80px}
+.ai-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:28px 16px;border:1.5px dashed #d9d9d9;border-radius:8px;gap:8px;text-align:center}
+.ai-empty p{font-size:14px;color:#b3b6bd}
+.btn-ai-gen{display:inline-flex;align-items:center;gap:5px;padding:7px 14px;border:none;border-radius:6px;background:#416bff;color:#fff;font-size:14px;font-weight:600;font-family:inherit;cursor:pointer}
+.btn-ai-gen:hover{background:#365eef}
+.btn-ai-gen:disabled{background:#d9d9d9;cursor:not-allowed}
+.ai-footer{display:flex;align-items:center;justify-content:space-between;margin-top:8px}
+.ai-byte{font-size:13px;color:#b3b6bd}
+.btn-copy-all{display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border:1px solid #d9d9d9;border-radius:5px;background:#fff;color:#6d7381;font-size:13px;font-family:inherit;cursor:pointer}
+.btn-copy-all:hover{border-color:#416bff;color:#416bff}
+.hist-nav-row{display:flex;align-items:center;gap:5px;margin-bottom:8px}
+.hist-btn-sm{width:22px;height:22px;border:1px solid #d9d9d9;border-radius:5px;background:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#6d7381;padding:0;flex-shrink:0}
+.hist-btn-sm:hover{border-color:#416bff;color:#416bff}
+.hist-btn-sm:disabled{opacity:.3;cursor:default;pointer-events:none}
+.hist-label-sm{font-size:13px;color:#6d7381;flex:1;text-align:center;white-space:nowrap}
+.auto-save-st{font-size:13px;color:#1ab864;transition:opacity .3s}
+.td-arrow{text-align:center;vertical-align:middle!important;padding:0!important}
+.btn-arrow{width:32px;height:32px;border:1.5px solid #d9d9d9;border-radius:8px;background:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#6d7381;margin:0 auto;transition:all .15s}
+.btn-arrow:hover{border-color:#416bff;color:#416bff;background:#f4f8ff}
+.btn-arrow:disabled{opacity:.3;cursor:not-allowed}
+.teacher-textarea{width:100%;border:1.5px solid #d9d9d9;border-radius:8px;padding:13px 14px;font-size:16px;line-height:1.8;color:#222631;font-family:inherit;resize:none;overflow:hidden;outline:none;transition:border-color .15s;background:#fff}
+.teacher-textarea:focus{border-color:#1ab864}
+.teacher-footer{display:flex;align-items:center;justify-content:space-between;margin-top:8px}
+.teacher-byte{font-size:13px;color:#b3b6bd}
+.teacher-byte.over{color:#f2525f}
+.done-badge{display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:600;padding:2px 8px;border-radius:10px;background:#eefcf4;color:#1ab864;margin-bottom:6px}
+.bulk-done-msg{padding:24px;text-align:center;font-size:14px;color:#6d7381;background:#f6f7f9;border-top:1px solid #e8eaed}
+.row-loading{display:flex;align-items:center;gap:8px;padding:24px 0;color:#6d7381;font-size:14px}
+.mini-spinner{width:16px;height:16px;border:2px solid #e9f2ff;border-top-color:#416bff;border-radius:50%;animation:spin .7s linear infinite;flex-shrink:0}
+@keyframes spin{to{transform:rotate(360deg)}}
+.toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(12px);background:#319d64;color:#fff;padding:16px 24px 16px 16px;border-radius:2px;font-family:inherit;font-size:15px;font-weight:500;line-height:1.25;box-shadow:0 8px 16px rgba(0,0,0,.1),0 0 1px rgba(34,38,49,.3);opacity:0;transition:all .25s;z-index:500;pointer-events:none;white-space:nowrap;min-width:280px;max-width:384px;text-align:left}
+.toast.tip{background:#222631;padding:4px 8px;border-radius:4px;font-size:13px;line-height:1.55;min-width:0}
+[data-tip]{position:relative}
+[data-tip]:hover::after{content:attr(data-tip);position:absolute;bottom:calc(100% + 6px);left:50%;transform:translateX(-50%);background:#222631;color:#fff;font-family:'Pretendard GOV',sans-serif;font-size:13px;font-weight:500;line-height:1.55;padding:4px 8px;border-radius:4px;white-space:nowrap;box-shadow:0 8px 16px rgba(0,0,0,.1),0 0 1px rgba(34,38,49,.3);pointer-events:none;z-index:800}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+/* ── 중앙 인포 알림 ── */
+.info-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.25);z-index:600;align-items:center;justify-content:center}
+.info-overlay.show{display:flex}
+.info-box{background:#fff;border-radius:14px;padding:28px 32px;max-width:420px;width:calc(100vw - 48px);box-shadow:0 8px 40px rgba(0,0,0,.16);position:relative}
+.info-icon{width:44px;height:44px;border-radius:50%;background:#e9f2ff;display:flex;align-items:center;justify-content:center;margin-bottom:14px}
+.info-title{font-size:15px;font-weight:600;color:#222631;margin-bottom:6px}
+.info-msg{font-size:14px;color:#6d7381;line-height:1.7}
+.info-close{margin-top:20px;width:100%;padding:10px;border:1px solid #d9d9d9;border-radius:8px;background:#fff;font-size:14px;font-weight:500;font-family:inherit;color:#3b3f4c;cursor:pointer}
+.info-close:hover{background:#f6f7f9}
+</style>
+</head>
+<body>
+<header class="g-hd">
+  <button onclick="toggleNav()" style="width:36px;height:36px;border:none;background:none;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#3b3f4c;margin-right:8px"><i data-lucide="menu" style="width:20px;height:20px"></i></button>
+  <svg width="76" height="16" viewBox="0 0 76 16" fill="none"><path d="M11.3613 4.03516H4.09668V11.9629H8.88281L8.88086 11.9648H15.6016V16H4.02539C1.80242 15.9998 0 14.223 0 12.0322V3.96777C0 1.77696 1.80242 0.000177874 4.02539 0H15.4561L11.3613 4.03516ZM22.0703 11.9648H33.5781V16H22.002C19.7788 16 17.9756 14.2231 17.9756 12.0322V0H22.0703V11.9648ZM40.0459 16H35.9521V0H40.0459V16ZM54.5381 0C56.4564 0 58.0138 1.53228 58.0186 3.42285L58.0166 3.4248V8.54297C58.014 10.4333 56.4567 11.9648 54.5361 11.9648H46.5107L42.416 16V0H54.5381ZM71.9746 0C74.0086 0.000134956 75.6887 1.49046 75.958 3.42285H76V12.5771H75.958C75.6887 14.5095 74.011 15.9999 71.9746 16H64.4238C62.3897 16 60.7098 14.5096 60.4404 12.5771C60.4145 12.398 60.3984 12.2184 60.3984 12.0322V3.96777C60.3984 3.78159 60.4145 3.60205 60.4404 3.42285C60.7098 1.49037 62.3873 0 64.4238 0H71.9746ZM64.4922 12.5771H71.9062V3.42285H64.4922V12.5771ZM46.5107 3.42285V8.54004H53.9238V3.42285H46.5107Z" fill="#365EEF"/></svg>
+  <div class="g-hd-r">
+    <span class="plan-badge">개인 유료</span>
+    <span style="font-size:13px;color:#6d7381">D-1710</span>
+    <div class="hd-div"></div>
+    <i data-lucide="bot" style="width:16px;height:16px;color:#416bff"></i>
+    <div class="credit-wrap">AI 크레딧 <span id="credit-num">700</span></div>
+    <div class="hd-div"></div>
+    <button class="user-btn">test99 선생님(담임) <i data-lucide="chevron-down" style="width:14px;height:14px"></i></button>
+  </div>
+</header>
+<nav class="icon-sb" id="icon-sb">
+  <div class="si"><div class="si-icon"><i data-lucide="home" style="width:20px;height:20px"></i></div><span class="si-label">홈</span><span class="si-tip">홈</span></div>
+  <div class="si"><div class="si-icon"><i data-lucide="scissors" style="width:20px;height:20px"></i></div><span class="si-label">평가계획</span><span class="si-tip">평가계획</span></div>
+  <div class="si"><div class="si-icon"><i data-lucide="layout-grid" style="width:20px;height:20px"></i></div><span class="si-label">수업</span><span class="si-tip">수업</span></div>
+  <div class="si active"><div class="si-icon"><i data-lucide="notebook-pen" style="width:20px;height:20px"></i></div><span class="si-label">창의적 체험활동 <span style="font-size:10px;background:#416bff;color:#fff;padding:1px 5px;border-radius:3px;margin-left:2px">Beta</span></span><span class="si-tip">창의적 체험활동</span></div>
+  <div class="si"><div class="si-icon"><i data-lucide="zap" style="width:20px;height:20px"></i></div><span class="si-label">세특 간편 생성기</span><span class="si-tip">세특 간편 생성기</span></div>
+  <div class="si"><div class="si-icon"><i data-lucide="smile" style="width:20px;height:20px"></i></div><span class="si-label">행동특성 및 종합기록</span><span class="si-tip">행동특성 및 종합기록</span></div>
+  <div class="si"><div class="si-icon"><i data-lucide="bar-chart-2" style="width:20px;height:20px"></i></div><span class="si-label">리포트</span><span class="si-tip">리포트</span></div>
+  <div class="si"><div class="si-icon"><i data-lucide="building-2" style="width:20px;height:20px"></i></div><span class="si-label">학교 설정</span><span class="si-tip">학교 설정</span></div>
+  <div class="nav-bottom">
+    <div class="nav-div"></div>
+    <div class="si"><div class="si-icon"><i data-lucide="file-down" style="width:20px;height:20px"></i></div><span class="si-label">매뉴얼 다운로드</span><span class="si-tip">매뉴얼 다운로드</span></div>
+    <div class="si"><div class="si-icon"><i data-lucide="credit-card" style="width:20px;height:20px"></i></div><span class="si-label">요금제</span><span class="si-tip">요금제</span></div>
+    <div class="si"><div class="si-icon"><i data-lucide="help-circle" style="width:20px;height:20px"></i></div><span class="si-label">고객센터</span><span class="si-tip">고객센터</span></div>
+  </div>
+</nav>
+<div class="sub-bar">
+  <div class="sub-bc">
+    <a onclick="goList()">창의적 체험활동</a>
+    <i data-lucide="chevron-right" style="width:14px;height:14px"></i>
+    <strong>자율활동 · 2학년 1반</strong>
+  </div>
+  <div class="sub-acts">
+    <div class="mode-group">
+      <button class="mode-btn" onclick="goIndividual()">개별 작성</button>
+      <button class="mode-btn active">일괄 작성</button>
+    </div>
+    <div style="width:1px;height:18px;background:#e0e0e0"></div>
+    <button id="btn-bulk-upload" class="btn-outline" onclick="bulkUploadFiles()"><i data-lucide="file-up" style="width:14px;height:14px"></i> 활동지 일괄 업로드</button>
+    <button id="btn-kw-bulk" class="btn-outline" onclick="openKwBulkDialog()"><i data-lucide="table-2" style="width:14px;height:14px"></i> 특성 일괄 등록</button>
+    <button class="btn-outline"><i data-lucide="download" style="width:14px;height:14px"></i> 기록 다운로드</button>
+  </div>
+</div>
+<div class="bulk-wrap" id="bulk-wrap">
+  <div class="bulk-info">
+    <span class="bulk-total">총 <strong id="total-cnt" style="color:#416bff">7</strong>명 · 완료 <strong id="done-cnt" style="color:#1ab864">3</strong>명</span>
+    <div style="display:flex;align-items:center;gap:10px">
+      <button id="btn-bulk-analyze" class="btn-bulk-analyze" onclick="bulkAnalyze()" style="display:none"><i data-lucide="search" style="width:13px;height:13px"></i> <span id="bulk-analyze-label">미분석 과제물 일괄 분석</span></button>
+      <button onclick="location.href='creative_activity_bulk_ai_settings_v3_260403.html'" style="display:inline-flex;align-items:center;gap:6px;padding:7px 14px;border:none;border-radius:7px;background:#416bff;color:#fff;font-size:13px;font-weight:600;font-family:inherit;cursor:pointer" onmouseover="this.style.background='#365eef'" onmouseout="this.style.background='#416bff'"><i data-lucide="sparkles" style="width:14px;height:14px"></i> AI 기록 생성 설정</button>
+      <span class="bulk-save-status"><i data-lucide="check-circle" style="width:14px;height:14px;color:#1ab864"></i> 04/01 자동 저장됨</span>
+    </div>
+  </div>
+  <div class="bulk-table-wrap">
+    <table class="bulk-table">
+      <colgroup><col class="col-num"><col class="col-name"><col class="col-file"><col class="col-kw"><col class="col-ai"><col class="col-arrow"><col class="col-teacher"></colgroup>
+      <thead><tr>
+        <th>번호</th><th>이름</th><th>파일</th><th>활동 특성</th>
+        <th><div class="th-ai"><span>AI가 생성한 기록</span><button class="btn-batch" onclick="batchApply()"><i data-lucide="arrow-right" style="width:12px;height:12px"></i> 기록 일괄 가져오기</button></div></th>
+        <th></th><th>교사 최종 기록</th>
+      </tr></thead>
+      <tbody id="bulk-tbody"></tbody>
+    </table>
+    <div class="bulk-done-msg" id="done-msg" style="display:none"><i data-lucide="check-circle-2" style="width:18px;height:18px;color:#1ab864;vertical-align:middle;margin-right:6px"></i>수고하셨습니다. 모든 학생의 기록을 확인하셨습니다.</div>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+<!-- 파일 관리 팝오버 -->
+<div class="fp-overlay" id="fp-overlay" onclick="if(event.target===this)closeFilePopover()">
+  <div class="fp-box">
+    <div class="fp-head">
+      <div>
+        <div class="fp-title" id="fp-title">활동지 파일</div>
+        <div class="fp-sub" id="fp-sub"></div>
+      </div>
+      <button class="fp-close" onclick="closeFilePopover()"><i data-lucide="x" style="width:18px;height:18px"></i></button>
+    </div>
+    <div class="fp-body" id="fp-body"></div>
+    <div class="fp-foot" id="fp-foot"></div>
+  </div>
+</div>
+<!-- 중앙 인포 알림 -->
+<div class="fp-overlay" id="rg-overlay" onclick="if(event.target===this)closeRegenDialog()">
+  <div class="fp-box" style="max-width:480px;width:480px">
+    <div class="fp-head">
+      <div class="fp-title" id="rg-title">AI 기록 생성</div>
+      <button class="fp-close" onclick="closeRegenDialog()"><i data-lucide="x" style="width:16px;height:16px"></i></button>
+    </div>
+    <div class="fp-body" style="display:flex;flex-direction:column;gap:20px">
+      <div>
+        <div style="font-size:15px;font-weight:600;color:#6d7381;margin-bottom:10px">활동 특성</div>
+        <div id="rg-kw-area"></div>
+      </div>
+      <div>
+        <div style="font-size:15px;font-weight:600;color:#6d7381;margin-bottom:10px">학생 수준</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <label class="rg-radio-label rg-radio-active"><input type="radio" name="rg-level" value="none" checked style="accent-color:#365eef"> 수준 고려 없음</label>
+          <label class="rg-radio-label" onclick="rgLabelClick(this)"><input type="radio" name="rg-level" value="high" style="accent-color:#365eef"> 상</label>
+          <label class="rg-radio-label" onclick="rgLabelClick(this)"><input type="radio" name="rg-level" value="mid" style="accent-color:#365eef"> 중</label>
+          <label class="rg-radio-label" onclick="rgLabelClick(this)"><input type="radio" name="rg-level" value="low" style="accent-color:#365eef"> 하</label>
+        </div>
+      </div>
+      <div>
+        <div style="font-size:15px;font-weight:600;color:#6d7381;margin-bottom:10px">생성 분량</div>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <label class="rg-len-label" onclick="rgLenClick(this)"><input type="radio" name="rg-length" value="300" style="accent-color:#365eef;flex-shrink:0"><div><div class="rg-len-main">300~400자</div><div class="rg-len-sub">900~1,200 Byte</div></div></label>
+          <label class="rg-len-label rg-len-active" onclick="rgLenClick(this)"><input type="radio" name="rg-length" value="400" checked style="accent-color:#365eef;flex-shrink:0"><div><div class="rg-len-main" style="color:#365eef">400~500자</div><div class="rg-len-sub">1,200~1,500 Byte</div></div></label>
+          <label class="rg-len-label" onclick="rgLenClick(this)"><input type="radio" name="rg-length" value="500" style="accent-color:#365eef;flex-shrink:0"><div><div class="rg-len-main">500~600자</div><div class="rg-len-sub">1,500~1,800 Byte</div></div></label>
+        </div>
+      </div>
+    </div>
+    <div class="fp-foot">
+      <div class="fp-analyze-btns">
+        <button class="fp-btn-reanalyze" onclick="closeRegenDialog()">취소</button>
+        <button class="fp-btn-analyze" onclick="confirmGenerate()"><i data-lucide="sparkles" style="width:14px;height:14px"></i> 생성하기 (1 크레딧)</button>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="fp-overlay" id="kb-overlay" onclick="if(event.target===this)closeKwBulkDialog()">
+  <div class="fp-box" style="max-width:640px;width:640px">
+    <div class="fp-head">
+      <div class="fp-title">특성 일괄 등록</div>
+      <button class="fp-close" onclick="closeKwBulkDialog()"><i data-lucide="x" style="width:16px;height:16px"></i></button>
+    </div>
+    <div class="fp-body" style="display:flex;flex-direction:column;gap:16px">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 16px;background:#f4f8ff;border:1px solid #ccdfff;border-radius:8px">
+        <div><div style="font-size:16px;font-weight:500;color:#222631"><strong>1단계 ·</strong> 학생 명단이 채워진 양식 다운로드</div><div style="font-size:15px;color:#6d7381;margin-top:4px">필수 항목: 활동 특성 / 선택 항목: 성적 수준</div></div>
+        <button class="fp-btn-reanalyze" onclick="downloadKwTemplate()" style="flex-shrink:0"><i data-lucide="download" style="width:14px;height:14px"></i> 양식 다운로드</button>
+      </div>
+      <div id="kb-drop" class="kb-drop" onclick="fakeUploadKwFile()"><i data-lucide="upload-cloud" style="width:28px;height:28px;color:#a3c3ff"></i><div style="font-size:16px;font-weight:500;color:#222631;margin-top:8px"><strong>2단계 ·</strong> 작성한 엑셀 파일을 업로드</div><div style="font-size:15px;color:#6d7381;margin-top:4px">파일을 끌어다 놓거나 클릭해서 선택하세요 (.xlsx)</div></div>
+      <div id="kb-preview" style="display:none">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;gap:12px"><div style="font-size:16px;font-weight:600;color:#222631">미리보기</div><div id="kb-summary" style="font-size:15px;color:#6d7381;text-align:right;margin-left:auto"></div><div id="kb-filter-wrap" style="display:none"></div></div>
+        <div style="border:1px solid #e8eaed;border-radius:8px;overflow:hidden;max-height:240px;overflow-y:auto"><table style="width:100%;border-collapse:collapse;font-size:15px"><thead style="background:#f8f9fb;position:sticky;top:0"><tr><th style="padding:10px 12px;text-align:left;font-weight:600;color:#6d7381">학년반번호</th><th style="padding:10px 12px;text-align:left;font-weight:600;color:#6d7381">이름</th><th style="padding:10px 12px;text-align:left;font-weight:600;color:#6d7381">활동 특성</th><th style="padding:10px 12px;text-align:left;font-weight:600;color:#6d7381">성적 수준</th></tr></thead><tbody id="kb-tbody"></tbody></table></div>
+        <div style="display:flex;align-items:center;gap:16px;margin-top:14px;padding-top:14px;border-top:1px solid #f1f3f5"><div style="font-size:16px;color:#222631;font-weight:500">기존 특성 처리</div><label style="display:flex;align-items:center;gap:6px;font-size:16px;color:#222631;cursor:pointer"><input type="radio" name="kb-mode" value="add" checked> 기존에 추가</label><label style="display:flex;align-items:center;gap:6px;font-size:16px;color:#222631;cursor:pointer"><input type="radio" name="kb-mode" value="overwrite"> 덮어쓰기</label></div>
+      </div>
+    </div>
+    <div class="fp-foot">
+      <div class="fp-analyze-btns">
+        <button class="fp-btn-analyze" id="kb-apply" onclick="applyKwBulk()" disabled>적용하기</button>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="fp-overlay" id="cf-overlay" onclick="if(event.target===this)closeUploadDialog()">
+  <div class="fp-box" style="max-width:512px">
+    <div class="fp-head">
+      <div class="fp-title">이미 업로드된 파일이 있어요</div>
+      <button class="fp-close" onclick="closeUploadDialog()"><i data-lucide="x" style="width:16px;height:16px"></i></button>
+    </div>
+    <div class="fp-body">
+      <p style="font-size:16px;line-height:1.55;color:#222631;margin:0 0 8px">총 <strong id="cf-existing">0</strong>명의 학생에게 이미 업로드된 활동지가 있어요.<br>기존 파일에 추가할까요, 새로 덮어쓸까요?</p>
+      <ul style="font-size:14px;line-height:1.6;color:#6d7381;margin:12px 0 0;padding-left:18px">
+        <li><strong style="color:#222631">추가하기</strong> — 기존 파일은 유지하고 새 파일을 더해요. 분석 결과는 유지되며 재분석이 필요한 경우 안내돼요.</li>
+        <li><strong style="color:#d8453a">덮어쓰기</strong> — 기존 파일과 추출된 특성이 모두 삭제되고 새 파일로 대체돼요.</li>
+      </ul>
+    </div>
+    <div class="fp-foot">
+      <div class="fp-analyze-btns">
+        <button class="fp-btn-reanalyze" style="border-color:#f5c2c0;color:#d8453a" onclick="runBulkUpload('overwrite')">덮어쓰기</button>
+        <button class="fp-btn-analyze" onclick="runBulkUpload('add')">추가하기</button>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="info-overlay" id="info-overlay" onclick="if(event.target===this)closeInfo()">
+  <div class="info-box">
+    <div class="info-icon"><i data-lucide="info" style="width:20px;height:20px;color:#416bff"></i></div>
+    <p class="info-title" id="info-title"></p>
+    <p class="info-msg" id="info-msg"></p>
+    <button class="info-close" onclick="closeInfo()">확인</button>
+  </div>
+</div>
+<script>
+const STUDENTS=[
+ {id:1,num:1,sid:'10101',name:'강민준',
+  fileList:[{name:'자치회_활동소감문.pdf',size:'248 KB'},{name:'체육대회_역할분담표.docx',size:'92 KB'}],analyzed:true,
+  keywords:['리더십','발표 능력','봉사 정신'],
+  aiHistory:['학급 자치회 체육대회에서 반장으로서 리더십을 발휘하여 반 학생들을 이끌었음. 경기 종목별 역할 배분과 연습 일정을 조율하는 과정에서 팀원들의 의견을 적극 수렴하고, 갈등 상황에서 중재자 역할을 자처하는 성숙한 태도를 보임. 발표 수업에서는 명확한 논리 전개와 자신감 있는 전달력으로 급우들의 이해를 도왔으며, 봉사 활동에서도 적극적인 참여 자세를 유지함.','리더십과 발표 능력, 봉사 정신이 두드러진 학생으로, 학급 내 다양한 역할을 자발적으로 수행함. 체육대회 준비 과정에서 반장으로서의 책임감과 조율 역량을 발휘하였으며, 발표 수업에서도 논리적 전달력이 돋보임.'],
+  histCursor:0,teacherText:'학급 자치회 체육대회에서 반장으로서 리더십을 발휘하여 반 학생들을 이끌었음. 경기 종목별 역할 배분과 연습 일정을 조율하는 과정에서 팀원들의 의견을 적극 수렴하고, 갈등 상황에서 중재자 역할을 자처하는 성숙한 태도를 보임.',done:true,generating:false},
+ {id:2,num:2,sid:'10102',name:'이서연',
+  fileList:[{name:'수학탐구_보고서.pdf',size:'412 KB'}],analyzed:true,
+  keywords:['수학과 진로 희망','발표 능력 우수','자기성찰'],
+  aiHistory:['수학자를 꿈꾸는 명확한 진로 의식을 바탕으로 학업에 열중하며, 발표 수업에서 논리적이고 명쾌한 설명으로 급우들의 이해를 도왔음. 활동 소감문에서 자신의 학습 태도를 객관적으로 돌아보는 자기성찰적 서술이 두드러졌으며, 향후 꾸준한 성장이 기대됨.'],
+  histCursor:0,teacherText:'',done:false,generating:false},
+ {id:3,num:3,sid:'10103',name:'김태윤',
+  fileList:[],analyzed:false,
+  keywords:['협동심','봉사'],
+  aiHistory:['봉사 활동 및 학급 행사에 적극 참여하여 협동심을 발휘함. 어려움을 겪는 친구를 먼저 나서 도운 사례가 다수 관찰되었으며, 공동 과제 수행 시 팀 내 역할을 성실히 이행함.'],
+  histCursor:0,teacherText:'봉사 활동 및 학급 행사에 적극 참여하여 협동심을 발휘함. 어려움을 겪는 친구를 먼저 나서 도운 사례가 다수 관찰되었으며, 공동 과제 수행 시 팀 내 역할을 성실히 이행함.',done:true,generating:false},
+ {id:4,num:4,sid:'10104',name:'최수아',
+  fileList:[{name:'동아리_활동지.pdf',size:'186 KB'},{name:'발표자료.pptx',size:'1.2 MB'},{name:'소감문.hwp',size:'34 KB'}],analyzed:false,
+  keywords:[],aiHistory:[],histCursor:0,teacherText:'',done:false,generating:false},
+ {id:5,num:5,sid:'10105',name:'정도윤',
+  fileList:[],analyzed:false,
+  keywords:[],aiHistory:[],histCursor:0,teacherText:'',done:false,generating:false},
+ {id:6,num:6,sid:'10106',name:'한예린',
+  fileList:[{name:'미술작품_사진.jpg',size:'2.4 MB'},{name:'창작_노트.pdf',size:'156 KB'}],analyzed:false,
+  keywords:[],aiHistory:[],histCursor:0,teacherText:'',done:false,generating:false},
+ {id:7,num:7,sid:'10107',name:'오지훈',
+  fileList:[{name:'자기주도학습_계획서.pdf',size:'298 KB'}],analyzed:true,
+  keywords:['자기주도 학습','창의적 문제 해결'],
+  aiHistory:['자기주도적인 학습 태도와 창의적 문제 해결 능력이 돋보임. 주어진 과제 이상의 탐구를 자발적으로 수행하며, 독창적인 시각으로 문제에 접근하는 모습이 관찰됨.'],
+  histCursor:0,teacherText:'자기주도적인 학습 태도와 창의적 문제 해결 능력이 돋보임. 주어진 과제 이상의 탐구를 자발적으로 수행하며, 독창적인 시각으로 문제에 접근하는 모습이 관찰됨.',done:true,generating:false},
+];
+let credits=700;
+const autoSaveTimers={};
+function render(){
+ const tbody=document.getElementById('bulk-tbody');
+ tbody.innerHTML='';
+ STUDENTS.forEach(s=>{const tr=document.createElement('tr');if(s.done)tr.className='row-done';tr.innerHTML=buildRow(s);tbody.appendChild(tr);});
+ lucide.createIcons();updateCounts();
+ requestAnimationFrame(()=>document.querySelectorAll('.teacher-textarea').forEach(ta=>autoResize(ta)));
+}
+function buildRow(s){
+ const fileCount=s.fileList.length;
+ let fileCell;
+ if(fileCount>0){
+  const statusHTML=s.analyzed
+   ?`<span class="file-cell-status analyzed">분석 완료</span>`
+   :`<span class="file-cell-status unanalyzed">분석 필요</span>`;
+  fileCell=`<td class="td-file"><button class="file-cell-btn" onclick="openFilePopover(${s.id})"><span class="file-cell-count"><i data-lucide="paperclip" style="width:13px;height:13px"></i>${fileCount}개</span>${statusHTML}</button></td>`;
+ }else{
+  fileCell=`<td class="td-file"><button class="file-cell-btn empty" onclick="openFilePopover(${s.id})"><span class="file-cell-empty-text"><i data-lucide="plus" style="width:12px;height:12px;vertical-align:middle"></i> 추가</span></button></td>`;
+ }
+ const numCell=`<td class="td-num">${s.sid}</td><td class="td-name" onclick="goIndividual1('${s.sid}')">${s.name}</td>${fileCell}`;
+ const kwTags=s.keywords.length?s.keywords.map((k,ki)=>`<span class="kw-tag">${k}<button class="kw-tag-x" onclick="removeKw(${s.id},${ki})" data-tip="삭제"><i data-lucide="x" style="width:11px;height:11px"></i></button></span>`).join(''):`<span class="kw-tag-none">입력된 키워드 없음</span>`;
+ const kwCell=`<td><div class="kw-tags">${kwTags}</div><input class="kw-input" id="kw-input-${s.id}" placeholder="특성 입력 후 Enter" onkeydown="onKwKey(event,${s.id})"></td>`;
+ let aiCell;
+ if(s.generating){aiCell=`<td><div class="row-loading"><span class="mini-spinner"></span>AI가 기록을 생성하고 있어요...</div></td>`;}
+ else if(s.aiHistory.length){
+  const cur=s.aiHistory[s.histCursor],total=s.aiHistory.length,curNum=total-s.histCursor;
+  aiCell=`<td><div class="ai-text-box">${cur}</div><div class="ai-footer"><span class="ai-byte">${cur.length}자 / ${countBytes(cur)}byte</span><div style="display:flex;align-items:center;gap:4px"><button class="hist-btn-sm" onclick="navHist(${s.id},-1)" ${s.histCursor===0?'disabled':''} data-tip="이전 기록" style="position:relative"><i data-lucide="chevron-left" style="width:13px;height:13px"></i></button><button class="hist-btn-sm" onclick="navHist(${s.id},1)" ${s.histCursor===total-1?'disabled':''} data-tip="다음 기록" style="position:relative"><i data-lucide="chevron-right" style="width:13px;height:13px"></i></button><button class="btn-copy-all" onclick="copyAI(${s.id})"><i data-lucide="copy" style="width:12px;height:12px"></i> 전체 복사</button><button class="btn-copy-all" onclick="openRegenDialog(${s.id},true)" data-tip="다시 생성"><i data-lucide="refresh-cw" style="width:12px;height:12px"></i> 다시 생성</button></div></div>${total>1?`<div style="font-size:12px;color:#b3b6bd;margin-top:4px;text-align:right">버전 ${curNum} / ${total}</div>`:''}</td>`;
+ }else{
+  const hasKw=s.keywords.length>0;
+  aiCell=`<td><div class="ai-empty"><p>${hasKw?'특성을 바탕으로 AI 기록을 생성해보세요.':'특성·키워드를 먼저 입력해주세요.'}</p><button class="btn-ai-gen" onclick="generateAI(${s.id})" ${!hasKw?'disabled':''}><i data-lucide="sparkles" style="width:14px;height:14px"></i> AI 기록 생성</button></div></td>`;
+ }
+ const hasAI=s.aiHistory.length>0&&!s.generating;
+ const arrowCell=`<td class="td-arrow"><button class="btn-arrow" onclick="applyAI(${s.id})" ${!hasAI?'disabled':''} data-tip="교사 기록란에 가져오기"><i data-lucide="arrow-right" style="width:15px;height:15px"></i></button></td>`;
+ const teacherCell=`<td><textarea class="teacher-textarea" id="ta-${s.id}" oninput="scheduleAutoSave(${s.id})">${s.teacherText}</textarea><div class="teacher-footer"><span class="teacher-byte" id="byte-${s.id}">${s.teacherText.length}자 / ${countBytes(s.teacherText)}byte</span><span class="auto-save-st" id="ast-${s.id}" style="opacity:0">자동 저장됨</span></div>${s.done?`<div class="done-badge" style="margin-top:6px"><i data-lucide="check" style="width:10px;height:10px"></i> 저장됨</div>`:''}</td>`;
+ return numCell+kwCell+aiCell+arrowCell+teacherCell;
+}
+function goIndividual1(sid){location.href='creative_activity_detail_v3_260402.html?type='+encodeURIComponent('자율활동')+'&step=1&sid='+sid;}
+function onKwKey(e,id){if(e.key==='Enter'){e.preventDefault();addKw(id);}}
+function addKw(id){const input=document.getElementById('kw-input-'+id);const v=input.value.trim();if(!v)return;const s=STUDENTS.find(x=>x.id===id);if(!s.keywords.includes(v))s.keywords.push(v);input.value='';render();document.getElementById('kw-input-'+id)?.focus();}
+function removeKw(id,idx){const s=STUDENTS.find(x=>x.id===id);if(!s)return;s.keywords.splice(idx,1);render();}
+function navHist(id,dir){const s=STUDENTS.find(x=>x.id===id);if(!s)return;s.histCursor=Math.max(0,Math.min(s.aiHistory.length-1,s.histCursor+dir));render();}
+let RG_TARGET_ID=null;
+function openRegenDialog(id,isRegen=false){
+ const s=STUDENTS.find(x=>x.id===id);if(!s)return;
+ RG_TARGET_ID=id;
+ document.getElementById('rg-title').textContent=isRegen?'다시 생성':'AI 기록 생성';
+ renderRgKw();
+ document.getElementById('rg-overlay').classList.add('show');
+ lucide.createIcons();
+}
+function renderRgKw(){
+ const s=STUDENTS.find(x=>x.id===RG_TARGET_ID);if(!s)return;
+ const area=document.getElementById('rg-kw-area');
+ const tags=s.keywords.length?s.keywords.map((k,i)=>`<span class="rg-kw-tag">${k}<button class="rg-kw-x" onclick="rgRemoveKw(${i})" data-tip="삭제"><i data-lucide="x" style="width:11px;height:11px"></i></button></span>`).join(''):`<span style="font-size:15px;color:#b3b6bd">입력된 특성이 없어요</span>`;
+ area.innerHTML=`<div style="display:flex;flex-wrap:wrap;gap:6px;padding:12px 14px;background:#f8f9fb;border:1px solid #e8eaed;border-radius:8px;min-height:44px;margin-bottom:8px">${tags}</div><textarea class="rg-kw-input-row" id="rg-kw-input" rows="1" placeholder="특성 입력 후 Enter (예: 리더십, 발표 능력)" onkeydown="rgKwKey(event)" oninput="rgKwAutoGrow(this)"></textarea>`;
+ lucide.createIcons();
+}
+function rgRemoveKw(idx){const s=STUDENTS.find(x=>x.id===RG_TARGET_ID);if(!s)return;s.keywords.splice(idx,1);renderRgKw();render();}
+function rgKwKey(e){if(e.key!=='Enter'||e.shiftKey)return;e.preventDefault();const inp=e.target,v=inp.value.trim();if(!v)return;const s=STUDENTS.find(x=>x.id===RG_TARGET_ID);if(!s)return;if(!s.keywords.includes(v))s.keywords.push(v);inp.value='';renderRgKw();render();document.getElementById('rg-kw-input')?.focus();}
+function rgKwAutoGrow(t){t.style.height='auto';t.style.height=Math.min(t.scrollHeight,200)+'px';}
+function closeRegenDialog(){document.getElementById('rg-overlay').classList.remove('show');RG_TARGET_ID=null;}
+function rgLabelClick(label){document.querySelectorAll('label.rg-radio-label').forEach(l=>l.classList.remove('rg-radio-active'));label.classList.add('rg-radio-active');}
+function rgLenClick(label){document.querySelectorAll('label.rg-len-label').forEach(l=>{l.classList.remove('rg-len-active');l.querySelector('.rg-len-main').style.color='#222631';});label.classList.add('rg-len-active');label.querySelector('.rg-len-main').style.color='#365eef';}
+function confirmGenerate(){
+ const id=RG_TARGET_ID;if(!id)return;
+ const level=document.querySelector('input[name="rg-level"]:checked')?.value||'none';
+ const lenVal=document.querySelector('input[name="rg-length"]:checked')?.value||'400';
+ const len=lenVal==='300'?'short':lenVal==='500'?'long':'mid';
+ closeRegenDialog();
+ generateAI(id,level,len);
+}
+function generateAI(id,level='none',len='mid'){
+ const s=STUDENTS.find(x=>x.id===id);if(!s||s.keywords.length===0)return;
+ s.generating=true;render();credits=Math.max(0,credits-1);document.getElementById('credit-num').textContent=credits;
+ const lenMap={short:'간결하게 서술함.',mid:'구성원들과의 협력 과정에서 자신의 역할을 성실히 수행하였으며, 활동 소감문에서 자기성찰적 서술이 돋보임.',long:'구성원들과의 협력 과정에서 자신의 역할을 성실히 수행하였으며, 갈등 상황에서 중재자 역할을 자처하는 성숙한 태도를 보임. 발표 수업에서는 명확한 논리 전개와 자신감 있는 전달력으로 급우들의 이해를 도왔으며, 봉사 활동에서도 적극적인 참여 자세를 유지함.'};
+ const lvLabel=level==='high'?'(상) ':level==='mid'?'(중) ':level==='low'?'(하) ':'';
+ setTimeout(()=>{const kw=s.keywords.slice(0,3).join(', ');s.aiHistory.unshift(`${lvLabel}${s.name} 학생은 ${kw} 등의 역량을 자율활동 전반에서 두드러지게 발휘함. ${lenMap[len]}`);s.histCursor=0;s.generating=false;render();showToast('AI 기록이 생성됐어요.');},1800);
+}
+function applyAI(id){const s=STUDENTS.find(x=>x.id===id);if(!s||!s.aiHistory.length)return;s.teacherText=s.aiHistory[s.histCursor];render();const ta=document.getElementById('ta-'+id);if(ta){ta.focus();ta.setSelectionRange(ta.value.length,ta.value.length);}showToast('AI 기록을 가져왔어요.');}
+function batchApply(){let count=0;STUDENTS.forEach(s=>{if(s.aiHistory.length&&!s.done&&!s.teacherText){s.teacherText=s.aiHistory[s.histCursor];count++;}});render();showToast(count?`${count}명의 AI 기록을 가져왔어요.`:'가져올 기록이 없어요.');}
+function copyAI(id){const s=STUDENTS.find(x=>x.id===id);if(!s||!s.aiHistory.length)return;navigator.clipboard?.writeText(s.aiHistory[s.histCursor]).catch(()=>{});showToast('복사됐어요.');}
+function autoResize(ta){ta.style.height='auto';ta.style.height=ta.scrollHeight+'px';}
+function scheduleAutoSave(id){
+ clearTimeout(autoSaveTimers[id]);
+ const ta=document.getElementById('ta-'+id),byteEl=document.getElementById('byte-'+id);
+ if(ta){autoResize(ta);}
+ if(ta&&byteEl){const n=countBytes(ta.value);byteEl.textContent=ta.value.length+'자 / '+n+'byte';byteEl.className='teacher-byte'+(n>1500?' over':'');}
+ autoSaveTimers[id]=setTimeout(()=>{
+  const s=STUDENTS.find(x=>x.id===id),ta2=document.getElementById('ta-'+id);
+  if(!s||!ta2)return;s.teacherText=ta2.value;const wasDone=s.done;s.done=!!ta2.value.trim();
+  const row=ta2.closest('tr');if(row)row.className=s.done?'row-done':'';
+  if(s.done&&!wasDone){const el=document.createElement('div');el.className='done-badge';el.innerHTML='<i data-lucide="check" style="width:10px;height:10px"></i> 저장됨';ta2.parentNode.insertBefore(el,ta2);lucide.createIcons();}
+  else if(!s.done&&wasDone){row?.querySelector('.done-badge')?.remove();}
+  const astEl=document.getElementById('ast-'+id);if(astEl){astEl.style.opacity='1';setTimeout(()=>{if(astEl)astEl.style.opacity='0';},2500);}
+  updateCounts();
+ },1200);
+}
+function countBytes(str){let n=0;for(const ch of str)n+=ch.charCodeAt(0)>127?2:1;return n;}
+function updateCounts(){
+ const done=STUDENTS.filter(s=>s.done).length;
+ document.getElementById('done-cnt').textContent=done;
+ document.getElementById('done-msg').style.display=done===STUDENTS.length?'block':'none';
+ const needAnalysis=STUDENTS.filter(s=>s.fileList.length>0&&!s.analyzed);
+ const btn=document.getElementById('btn-bulk-analyze');
+ if(btn){
+  if(needAnalysis.length>0){btn.style.display='inline-flex';document.getElementById('bulk-analyze-label').textContent=`미분석 과제물 일괄 분석 (${needAnalysis.length}명 · ${needAnalysis.length} 크레딧)`;}
+  else{btn.style.display='none';}
+ }
+}
+/* ── 파일 팝오버 ── */
+let fpCurrentId=null;
+function openFilePopover(id){
+ fpCurrentId=id;
+ const s=STUDENTS.find(x=>x.id===id);if(!s)return;
+ document.getElementById('fp-title').textContent=`${s.name} · 활동지 파일`;
+ document.getElementById('fp-sub').textContent=`업로드한 파일을 관리하고 분석을 진행할 수 있어요.`;
+ renderFilePopover();
+ document.getElementById('fp-overlay').classList.add('show');
+ lucide.createIcons();
+}
+function closeFilePopover(){document.getElementById('fp-overlay').classList.remove('show');fpCurrentId=null;}
+function renderFilePopover(){
+ const s=STUDENTS.find(x=>x.id===fpCurrentId);if(!s)return;
+ const body=document.getElementById('fp-body');
+ const foot=document.getElementById('fp-foot');
+ if(s.fileList.length===0){
+  body.innerHTML=`<div class="fp-empty">아직 업로드된 파일이 없어요.</div><button class="fp-add" onclick="addFakeFile()"><i data-lucide="upload" style="width:14px;height:14px"></i> 파일 업로드</button>`;
+ }else{
+  body.innerHTML=s.fileList.map((f,idx)=>`
+   <div class="fp-file-row">
+    <div class="fp-file-icon"><i data-lucide="file-text" style="width:16px;height:16px"></i></div>
+    <div class="fp-file-meta"><div class="fp-file-name">${f.name}</div><div class="fp-file-size">${f.size}</div></div>
+    <div class="fp-file-act">
+     <button data-tip="다운로드" onclick="showToast('파일을 다운로드해요')"><i data-lucide="download" style="width:13px;height:13px"></i></button>
+     <button data-tip="삭제" onclick="removeFile(${idx})"><i data-lucide="trash-2" style="width:13px;height:13px"></i></button>
+    </div>
+   </div>
+  `).join('')+`<button class="fp-add" onclick="addFakeFile()"><i data-lucide="plus" style="width:14px;height:14px"></i> 파일 추가</button>`;
+ }
+ if(s.fileList.length===0){
+  foot.innerHTML=`<div class="fp-analyze-msg">파일을 업로드한 후 AI 분석으로 학생 특성을 자동 추출할 수 있어요.</div>`;
+ }else if(!s.analyzed){
+  foot.innerHTML=`<div class="fp-analyze-msg">AI가 업로드된 파일을 분석해 학생 특성을 자동으로 추출합니다. <strong>1 크레딧</strong>이 사용돼요.</div><div class="fp-analyze-btns"><button class="fp-btn-analyze" onclick="analyzeStudent(${s.id})"><i data-lucide="search" style="width:14px;height:14px"></i> 분석하기 (1 크레딧)</button></div>`;
+ }else{
+  foot.innerHTML=`<div class="fp-analyze-msg analyzed"><i data-lucide="check-circle" style="width:13px;height:13px;vertical-align:middle"></i> 분석이 완료되어 학생 특성이 자동으로 채워졌어요.</div><div class="fp-analyze-btns"><button class="fp-btn-reanalyze" onclick="analyzeStudent(${s.id},true)"><i data-lucide="refresh-cw" style="width:13px;height:13px"></i> 다시 분석 (1 크레딧)</button></div>`;
+ }
+ lucide.createIcons();
+}
+function addFakeFile(){
+ const s=STUDENTS.find(x=>x.id===fpCurrentId);if(!s)return;
+ const idx=s.fileList.length+1;
+ s.fileList.push({name:`새파일_${idx}.pdf`,size:`${Math.floor(Math.random()*400)+50} KB`});
+ if(s.analyzed){s.analyzed=false;showToast('새 파일이 추가되어 다시 분석이 필요해요');}
+ renderFilePopover();render();
+}
+function removeFile(idx){
+ const s=STUDENTS.find(x=>x.id===fpCurrentId);if(!s)return;
+ s.fileList.splice(idx,1);
+ if(s.fileList.length===0)s.analyzed=false;
+ renderFilePopover();render();
+}
+function analyzeStudent(id,isRe){
+ const s=STUDENTS.find(x=>x.id===id);if(!s||s.fileList.length===0)return;
+ if(credits<1){showToast('크레딧이 부족해요');return;}
+ credits-=1;document.getElementById('credit-num').textContent=credits;
+ const foot=document.getElementById('fp-foot');
+ foot.innerHTML=`<div class="row-loading"><span class="mini-spinner"></span>AI가 과제물을 분석하고 있어요...</div>`;
+ setTimeout(()=>{
+  const extracted=samplekw(s.name);
+  extracted.forEach(k=>{if(!s.keywords.includes(k))s.keywords.push(k);});
+  s.analyzed=true;
+  render();
+  if(fpCurrentId===id)renderFilePopover();
+  showToast(`${s.name} 학생의 특성 ${extracted.length}개가 추가됐어요`);
+ },1500);
+}
+function samplekw(name){
+ const pool=[['탐구심','자기주도성','문제 해결력'],['협력','의사소통','책임감'],['창의성','표현력','분석력'],['리더십','조직력','공감 능력']];
+ return pool[name.charCodeAt(0)%pool.length];
+}
+function bulkAnalyze(){
+ const targets=STUDENTS.filter(s=>s.fileList.length>0&&!s.analyzed);
+ if(targets.length===0)return;
+ if(credits<targets.length){showToast('크레딧이 부족해요');return;}
+ credits-=targets.length;document.getElementById('credit-num').textContent=credits;
+ targets.forEach(s=>{s.generating=false;});
+ render();
+ showToast(`${targets.length}명의 과제물을 분석 중이에요...`);
+ setTimeout(()=>{
+  targets.forEach(s=>{
+   const ex=samplekw(s.name);
+   ex.forEach(k=>{if(!s.keywords.includes(k))s.keywords.push(k);});
+   s.analyzed=true;
+  });
+  render();
+  showToast(`${targets.length}명의 학생 특성이 추가됐어요`);
+ },2000);
+}
+function toggleNav(){document.getElementById('icon-sb').classList.toggle('expanded');document.body.classList.toggle('nav-expanded');}
+function goList(){location.href='creative_activity_list_v4_260402.html';}
+function goIndividual(){location.href='creative_activity_detail_v3_260402.html?type=자율활동';}
+function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2500);}
+let KB_PARSED=null,KB_FILTER='all';
+function openKwBulkDialog(){KB_PARSED=null;KB_FILTER='all';document.getElementById('kb-preview').style.display='none';document.getElementById('kb-apply').disabled=true;document.getElementById('kb-overlay').classList.add('show');lucide.createIcons();}
+function closeKwBulkDialog(){document.getElementById('kb-overlay').classList.remove('show');}
+function downloadKwTemplate(){showToast('양식(.xlsx)을 다운로드했어요');}
+function fakeUploadKwFile(){const samples=[['리더십','협업','책임감'],['창의적 사고','문제 해결'],['성실성','꾸준한 노력','발표 능력'],['배려심','소통','공감 능력'],['탐구심','분석력']];const levels=['상','상','중','중','하'];KB_PARSED=STUDENTS.map((s,i)=>({sid:s.sid,name:s.name,kw:[...samples[i%samples.length]],level:levels[i%levels.length],err:null}));if(KB_PARSED[2]){KB_PARSED[2].kw=[];KB_PARSED[2].err='활동 특성이 비어있어요';}if(KB_PARSED[5]){KB_PARSED[5].level='최상';KB_PARSED[5].err='성적 수준 값이 올바르지 않아요 (상/중/하)';}renderKbPreview();document.getElementById('kb-preview').style.display='block';document.getElementById('kb-apply').disabled=false;showToast('파일을 인식했어요');}
+function renderKbPreview(){if(!KB_PARSED)return;const ok=KB_PARSED.filter(r=>!r.err).length,err=KB_PARSED.length-ok;const rows=KB_PARSED.filter(r=>KB_FILTER==='err'?r.err:true);const tbody=document.getElementById('kb-tbody');tbody.innerHTML=rows.map(r=>{const bg=r.err?'background:#fef3f2':'';const lb=r.err?`border-left:3px solid #d8453a`:'border-left:3px solid transparent';const kwTd=r.kw.length?r.kw.join(', '):`<span data-tip="${r.err||''}" style="color:#d8453a;font-weight:500">⚠ 비어있음</span>`;const lvTd=r.level==='최상'?`<span data-tip="${r.err||''}" style="color:#d8453a;font-weight:500">⚠ ${r.level}</span>`:r.level;return `<tr style="border-top:1px solid #f1f3f5;${bg}"><td style="padding:10px 12px;color:#6d7381;${lb}">${r.sid}</td><td style="padding:10px 12px;color:#222631">${r.name}</td><td style="padding:10px 12px;color:#222631">${kwTd}</td><td style="padding:10px 12px;color:#6d7381">${lvTd}</td></tr>`;}).join('');document.getElementById('kb-summary').innerHTML=`<span style="color:#1ab864;font-weight:600">정상 ${ok}명</span> · <span style="color:${err?'#d8453a':'#b3b6bd'};font-weight:${err?'600':'400'}">오류 ${err}명</span>`;document.getElementById('kb-filter-wrap').style.display=err?'flex':'none';document.getElementById('kb-apply').textContent=err?`오류 제외하고 ${ok}명 적용`:`${ok}명 적용`;document.getElementById('kb-apply').disabled=ok===0;lucide.createIcons();}
+function setKbFilter(f){KB_FILTER=f;document.querySelectorAll('.kb-filter-btn').forEach(b=>b.classList.toggle('active',b.dataset.f===f));renderKbPreview();}
+function applyKwBulk(){if(!KB_PARSED)return;const mode=document.querySelector('input[name="kb-mode"]:checked').value;let n=0;KB_PARSED.filter(r=>!r.err).forEach(r=>{const s=STUDENTS.find(x=>x.sid===r.sid);if(!s)return;if(mode==='overwrite'){s.keywords=[...r.kw];}else{r.kw.forEach(k=>{if(!s.keywords.includes(k))s.keywords.push(k);});}n++;});closeKwBulkDialog();render();showToast(`${n}명의 활동 특성을 ${mode==='overwrite'?'덮어썼어요':'추가했어요'}`);}
+function bulkUploadFiles(){const exist=STUDENTS.filter(s=>s.fileList.length>0).length;if(exist===0){runBulkUpload('add');return;}document.getElementById('cf-existing').textContent=exist;document.getElementById('cf-overlay').classList.add('show');lucide.createIcons();}
+function closeUploadDialog(){document.getElementById('cf-overlay').classList.remove('show');}
+function runBulkUpload(mode){closeUploadDialog();const samples=[['활동소감문.pdf','312 KB'],['활동사진_정리.pdf','520 KB'],['역할분담표.docx','88 KB'],['결과보고서.pdf','274 KB']];let added=0,replaced=0;STUDENTS.forEach(s=>{const had=s.fileList.length>0;if(mode==='overwrite'){s.fileList=[];s.keywords=[];s.analyzed=false;s.aiHistory=[];}const n=1+Math.floor(Math.random()*2);for(let i=0;i<n;i++){const pick=samples[Math.floor(Math.random()*samples.length)];s.fileList.push({name:pick[0],size:pick[1]});}if(mode==='add'&&s.analyzed){s.analyzed=false;}if(had&&mode==='overwrite')replaced++;else added++;});render();const msg=mode==='overwrite'?`${replaced+added}명의 활동지를 새로 덮어썼어요`:`${STUDENTS.length}명에게 활동지를 추가했어요`;showToast(msg);}
+function showInfo(title,msg){document.getElementById('info-title').textContent=title;document.getElementById('info-msg').textContent=msg;document.getElementById('info-overlay').classList.add('show');lucide.createIcons();}
+function closeInfo(){document.getElementById('info-overlay').classList.remove('show');}
+function initTextareaHeights(){document.querySelectorAll('.teacher-textarea').forEach(ta=>autoResize(ta));}
+render();
+initTextareaHeights();
+</script>
+</body>
+</html>
