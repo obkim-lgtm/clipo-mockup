@@ -1,0 +1,1194 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>창의적 체험활동 - 일괄 작성 (v5) - CLIPO</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard-gov.min.css">
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<style>
+*{font-family:'Pretendard GOV',-apple-system,sans-serif;box-sizing:border-box;margin:0;padding:0}
+html{scrollbar-gutter:stable}
+body{background:#f6f7f9;color:#222631}
+
+/* ─── 상단 헤더 ─── */
+.g-hd{height:56px;background:#fff;border-bottom:1px solid #d9d9d9;display:flex;align-items:center;padding:0 20px 0 8px;position:fixed;top:0;left:0;right:0;z-index:200}
+.g-hd-r{margin-left:auto;display:flex;align-items:center;gap:6px;font-size:14px;color:#3b3f4c}
+.plan-badge{background:#416bff;color:#fff;font-size:11px;font-weight:600;padding:2px 8px;border-radius:4px}
+.hd-div{width:1px;height:14px;background:#d9d9d9;margin:0 4px}
+.credit-wrap{display:flex;align-items:center;gap:4px;padding:4px 10px;background:#f6f7f9;border-radius:6px;font-size:13px;font-weight:600;color:#3b3f4c}
+.user-btn{display:flex;align-items:center;gap:4px;padding:4px 10px;border:1px solid #d9d9d9;border-radius:6px;background:#fff;font-size:13px;color:#3b3f4c;cursor:pointer}
+
+/* ─── 사이드바 ─── */
+.icon-sb{width:56px;background:#fff;border-right:1px solid #d9d9d9;position:fixed;top:56px;bottom:0;left:0;display:flex;flex-direction:column;padding:8px 0;z-index:150;transition:width .2s ease}
+.icon-sb.expanded{width:200px}
+.si{height:40px;display:flex;align-items:center;border-radius:8px;color:#6d7381;cursor:pointer;margin-bottom:2px;position:relative;padding:0 4px 0 16px;gap:10px;white-space:nowrap;flex-shrink:0}
+.si:hover{background:#f1f3f5}
+.si.active{background:#e9f2ff;color:#416bff}
+.si-icon{width:24px;height:24px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.si-label{font-size:13px;font-weight:500;opacity:0;transition:opacity .1s;overflow:hidden}
+.icon-sb.expanded .si-label{opacity:1}
+.si-tip{position:absolute;left:48px;top:50%;transform:translateY(-50%);background:#222631;color:#fff;font-size:11px;padding:3px 8px;border-radius:4px;white-space:nowrap;display:none;z-index:300;pointer-events:none}
+.si:hover .si-tip{display:block}
+.icon-sb.expanded .si-tip{display:none!important}
+.nav-bottom{margin-top:auto;width:100%}
+.nav-div{height:1px;background:#f1f3f5;margin:4px 0}
+body.nav-expanded .sub-bar{left:200px;transition:left .2s ease}
+body.nav-expanded .main-wrap{margin-left:200px;transition:margin-left .2s ease}
+
+/* ─── 서브바 ─── */
+.sub-bar{height:48px;background:#fff;border-bottom:1px solid #d9d9d9;position:fixed;top:56px;left:56px;right:0;z-index:100;display:flex;align-items:center;padding:0 20px;gap:8px}
+.sub-bc{display:flex;align-items:center;gap:6px;font-size:14px;color:#6d7381}
+.sub-bc a{color:#6d7381;text-decoration:none;cursor:pointer}.sub-bc a:hover{color:#416bff}
+.sub-bc strong{color:#222631;font-weight:600}
+.sub-acts{margin-left:auto;display:flex;align-items:center;gap:8px}
+.mode-group{display:flex;border:1px solid #d9d9d9;border-radius:6px;overflow:hidden}
+.mode-btn{padding:5px 14px;font-size:13px;font-weight:500;font-family:inherit;border:none;cursor:pointer;background:#fff;color:#6d7381}
+.mode-btn.active{background:#416bff;color:#fff}
+.btn-outline{display:flex;align-items:center;gap:5px;padding:6px 12px;font-size:13px;font-weight:500;font-family:inherit;border:1px solid #d9d9d9;border-radius:4px;background:#fff;color:#3b3f4c;cursor:pointer}
+.btn-outline:hover{border-color:#b3b3b3}
+
+/* ─── 본문 wrapper ─── */
+.main-wrap{margin-left:56px;margin-top:104px;padding:24px 32px 120px;min-height:calc(100vh - 104px)}
+
+/* ─── Stepper ─── */
+.stepper{display:flex;align-items:center;background:#fff;border:1px solid #e8eaed;border-radius:12px;padding:18px 24px;margin-bottom:20px;gap:8px}
+.step{display:flex;align-items:center;gap:12px;cursor:pointer;padding:6px 8px;border-radius:8px;transition:background .12s}
+.step:hover{background:#f6f7f9}
+.step-num{width:32px;height:32px;border-radius:50%;background:#f1f3f5;color:#b3b6bd;font-size:15px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;border:2px solid #f1f3f5}
+.step-info{display:flex;flex-direction:column}
+.step-label{font-size:12px;color:#b3b6bd;font-weight:500;line-height:1.2}
+.step-title{font-size:15px;color:#6d7381;font-weight:600;line-height:1.4;margin-top:2px}
+.step.active .step-num{background:#416bff;color:#fff;border-color:#416bff}
+.step.active .step-label{color:#416bff}
+.step.active .step-title{color:#222631}
+.step.done .step-num{background:#1ab864;color:#fff;border-color:#1ab864}
+.step.done .step-label{color:#1ab864}
+.step.done .step-title{color:#222631}
+.step-bar{flex:1;height:2px;background:#f1f3f5;margin:0 4px;border-radius:1px;min-width:24px}
+.step-bar.done{background:#1ab864}
+
+/* ─── 패널 공통 ─── */
+.panel{background:#fff;border:1px solid #e8eaed;border-radius:12px;padding:28px 32px}
+.panel-head{margin-bottom:20px}
+.panel-title{font-size:20px;font-weight:700;color:#222631;line-height:1.3}
+.panel-sub{font-size:16px;color:#6d7381;line-height:1.6;margin-top:6px}
+.panel-tag{display:inline-block;font-size:14px;font-weight:600;color:#6d7381;background:#f1f3f5;padding:3px 10px;border-radius:10px;margin-bottom:8px}
+
+/* ─── Step 1: 활동지 업로드 ─── */
+.up-drop{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:48px 24px;border:2px dashed #ccdfff;border-radius:12px;background:#f4f8ff;cursor:pointer;transition:all .15s;margin-bottom:20px}
+.up-drop:hover{border-color:#365eef;background:#e9f2ff}
+.up-drop-ico{width:56px;height:56px;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;color:#365eef;margin-bottom:14px;box-shadow:0 2px 6px rgba(54,94,239,.12)}
+.up-drop-title{font-size:17px;font-weight:600;color:#222631;margin-bottom:6px}
+.up-drop-sub{font-size:16px;color:#6d7381;line-height:1.55;text-align:center}
+.up-drop-sub strong{color:#365eef}
+
+.up-list{margin-top:8px}
+.up-list-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.up-list-title{font-size:15px;font-weight:600;color:#3b3f4c}
+.up-list-cnt{color:#365eef;margin-left:4px}
+.up-list-acts{display:flex;gap:8px}
+.up-btn-sm{display:inline-flex;align-items:center;gap:5px;padding:6px 12px;border:1px solid #d9d9d9;border-radius:6px;background:#fff;font-size:13px;color:#3b3f4c;cursor:pointer;font-family:inherit}
+.up-btn-sm:hover{border-color:#365eef;color:#365eef}
+
+.up-row{display:grid;grid-template-columns:36px 1fr 220px 80px 36px;align-items:center;gap:14px;padding:12px 16px;border:1px solid #e8eaed;border-radius:8px;margin-bottom:8px;background:#fff}
+.up-row.unmatched{border-color:#ffd7a8;background:#fffaf2}
+.up-file-ico{width:36px;height:36px;background:#e9f2ff;border-radius:6px;display:flex;align-items:center;justify-content:center;color:#3151c4}
+.up-file-name{font-size:15px;font-weight:500;color:#222631;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.up-file-size{font-size:13px;color:#b3b6bd;margin-top:2px}
+.up-match{display:flex;align-items:center;gap:6px}
+.up-match select{width:100%;padding:7px 10px;border:1px solid #d9d9d9;border-radius:6px;font-size:14px;font-family:inherit;color:#222631;background:#fff;outline:none}
+.up-match select:focus{border-color:#365eef}
+.up-match-auto{display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:600;color:#1ab864;padding:2px 6px;background:#eefcf4;border-radius:10px;white-space:nowrap}
+.up-match-warn{display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:600;color:#c2600a;padding:2px 6px;background:#fff7ed;border-radius:10px;white-space:nowrap}
+.up-row-x{width:30px;height:30px;border:none;background:none;color:#b3b6bd;cursor:pointer;border-radius:6px;display:flex;align-items:center;justify-content:center}
+.up-row-x:hover{background:#f1f3f5;color:#f2525f}
+
+/* ─── Step 2: 키워드 입력 ─── */
+.kw-info-bar{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;background:#f4f8ff;border:1px solid #ccdfff;border-radius:8px;margin-bottom:20px}
+.kw-info-text{font-size:14px;color:#3151c4;line-height:1.55;display:flex;align-items:center;gap:8px}
+.kw-auto-btn{display:inline-flex;align-items:center;gap:6px;padding:9px 16px;border:none;border-radius:7px;background:#365eef;color:#fff;font-size:14px;font-weight:600;font-family:inherit;cursor:pointer;white-space:nowrap}
+.kw-auto-btn:hover{background:#2c4dd0}
+.kw-auto-btn:disabled{background:#dde1e8;color:#b3b6bd;cursor:not-allowed}
+
+.kw-table{width:100%;border-collapse:collapse;background:#fff;border:1px solid #e8eaed;border-radius:8px;overflow:hidden}
+.kw-table th{background:#f6f7f9;padding:12px 16px;font-size:13px;font-weight:600;color:#6d7381;text-align:left;border-bottom:1px solid #e8eaed;border-right:1px solid #e8eaed;white-space:nowrap}
+.kw-table th:last-child{border-right:none}
+.kw-table td{padding:14px 16px;border-bottom:1px solid #e8eaed;border-right:1px solid #e8eaed;vertical-align:top;font-size:15px}
+.kw-table td:last-child{border-right:none}
+.kw-table tr:last-child td{border-bottom:none}
+.kw-col-chk{width:40px;text-align:center;padding-top:15px!important}
+.kw-col-num{width:48px;color:#b3b6bd;font-size:13px;padding-top:18px!important}
+.kw-col-name{width:96px;font-weight:600;color:#222631;padding-top:16px!important}
+.kw-col-file{width:88px;padding-top:16px!important}
+.kw-file-chip{display:inline-flex;align-items:center;gap:4px;padding:3px 8px;background:#e9f2ff;color:#3151c4;border-radius:10px;font-size:12px;font-weight:600}
+.kw-file-none{font-size:12px;color:#b3b6bd}
+.kw-tag-cell{min-height:48px}
+.kw-tags{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:8px}
+.kw-tag{display:inline-flex;align-items:flex-start;gap:5px;padding:4px 6px 4px 10px;background:#e9f2ff;color:#365eef;border-radius:10px;font-size:14px;font-weight:500;white-space:normal;word-break:keep-all;line-height:1.5;max-width:100%}
+.kw-tag.auto{background:#eff2ef;color:#5a7862}
+.kw-tag.auto .kw-tag-x{background:rgba(90,120,98,.1);color:#5a7862}
+.kw-tag-x{width:16px;height:16px;border:none;border-radius:50%;background:rgba(54,94,239,.12);color:#365eef;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;padding:0;font-family:inherit;flex-shrink:0;margin-top:2px}
+.kw-tag-x:hover{background:#365eef;color:#fff}
+.kw-tag.auto .kw-tag-x:hover{background:#5a7862;color:#fff}
+.kw-input-row{display:flex;gap:5px}
+.kw-input{flex:1;border:1px solid #d9d9d9;border-radius:5px;padding:6px 10px;font-size:14px;font-family:inherit;color:#222631;outline:none;min-width:0}
+.kw-input:focus{border-color:#416bff}
+.kw-add-btn{padding:5px 10px;border:1px solid #d9d9d9;border-radius:5px;background:#fff;font-size:12px;font-family:inherit;color:#3b3f4c;cursor:pointer;white-space:nowrap}
+.kw-add-btn:hover{border-color:#416bff;color:#416bff}
+
+/* ─── Step 3: 기록 생성 + 엑셀뷰 ─── */
+.gen-info-bar{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;background:#f4f8ff;border:1px solid #ccdfff;border-radius:8px;margin-bottom:20px;gap:12px}
+.gen-info-left{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.gen-sel-info{font-size:14px;color:#3151c4}
+.gen-sel-info strong{font-weight:700}
+.gen-credit-info{display:inline-flex;align-items:center;gap:5px;font-size:13px;color:#6d7381;padding:4px 10px;background:#fff;border:1px solid #ccdfff;border-radius:14px}
+.gen-credit-info strong{color:#365eef;font-weight:700}
+.gen-acts{display:flex;align-items:center;gap:8px}
+.gen-btn-primary{display:inline-flex;align-items:center;gap:6px;padding:9px 18px;border:none;border-radius:7px;background:#365eef;color:#fff;font-size:14px;font-weight:600;font-family:inherit;cursor:pointer}
+.gen-btn-primary:hover{background:#2c4dd0}
+.gen-btn-primary:disabled{background:#dde1e8;color:#b3b6bd;cursor:not-allowed}
+
+.bulk-table-wrap{background:#fff;border:1px solid #e8eaed;border-radius:8px;overflow:auto}
+.bulk-table{width:100%;border-collapse:collapse;table-layout:fixed;min-width:1100px}
+.col-chk{width:48px}.col-num{width:56px}.col-name{width:88px}.col-kw{width:200px}.col-ai{width:auto}.col-arrow{width:44px}.col-teacher{width:auto}
+.bulk-table thead tr{background:#f6f7f9}
+.bulk-table th{padding:12px 14px;font-size:13px;font-weight:600;color:#6d7381;border-bottom:2px solid #e8eaed;border-right:1px solid #e8eaed;text-align:left;white-space:nowrap}
+.bulk-table th:last-child{border-right:none}
+.bulk-table td{padding:16px 14px;border-bottom:1px solid #e8eaed;border-right:1px solid #e8eaed;vertical-align:top;font-size:15px;color:#222631}
+.bulk-table td:last-child{border-right:none}
+.bulk-table tr:last-child td{border-bottom:none}
+.bulk-table tr:hover td{background:#fafbff}
+.td-chk{text-align:center;padding-top:18px!important}
+.td-chk input{width:18px;height:18px;cursor:pointer;accent-color:#416bff}
+.td-num{font-size:13px;color:#b3b6bd;padding-top:18px!important}
+.td-name{font-size:15px;font-weight:600;color:#222631;padding-top:18px!important}
+.td-kw .kw-tags{margin-bottom:0}
+.ai-text-box{background:#f4f8ff;border:1px solid #ccdfff;border-radius:8px;padding:13px 14px;font-size:15px;line-height:1.75;color:#222631;white-space:pre-wrap;min-height:80px}
+.ai-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px 16px;border:1.5px dashed #d9d9d9;border-radius:8px;gap:6px;text-align:center;min-height:80px}
+.ai-empty p{font-size:13px;color:#b3b6bd}
+.ai-loading{display:flex;align-items:center;gap:8px;padding:24px 0;color:#6d7381;font-size:14px;justify-content:center}
+.mini-spinner{width:16px;height:16px;border:2px solid #e9f2ff;border-top-color:#416bff;border-radius:50%;animation:spin .7s linear infinite;flex-shrink:0}
+@keyframes spin{to{transform:rotate(360deg)}}
+.ai-footer{display:flex;align-items:center;justify-content:space-between;margin-top:8px;gap:8px}
+.ai-byte{font-size:12px;color:#b3b6bd}
+.btn-regen{display:inline-flex;align-items:center;gap:4px;padding:4px 9px;border:1px solid #d9d9d9;border-radius:5px;background:#fff;color:#6d7381;font-size:12px;font-family:inherit;cursor:pointer}
+.btn-regen:hover{border-color:#416bff;color:#416bff}
+.td-arrow{text-align:center;vertical-align:middle!important;padding:0!important}
+.btn-arrow{width:32px;height:32px;border:1.5px solid #d9d9d9;border-radius:8px;background:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#6d7381;margin:0 auto;transition:all .15s}
+.btn-arrow:hover{border-color:#416bff;color:#416bff;background:#f4f8ff}
+.btn-arrow:disabled{opacity:.3;cursor:not-allowed}
+.teacher-textarea{width:100%;border:1.5px solid #d9d9d9;border-radius:8px;padding:13px 14px;font-size:15px;line-height:1.75;color:#222631;font-family:inherit;resize:none;overflow:hidden;outline:none;transition:border-color .15s;background:#fff;min-height:80px}
+.teacher-textarea:focus{border-color:#1ab864}
+.teacher-footer{display:flex;align-items:center;justify-content:space-between;margin-top:8px}
+.teacher-byte{font-size:12px;color:#b3b6bd}
+.teacher-byte.over{color:#f2525f}
+.done-badge{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:600;padding:2px 7px;border-radius:10px;background:#eefcf4;color:#1ab864;margin-bottom:6px}
+
+/* ─── 업로드 미니 스텝 인디케이터 ─── */
+.upload-mini-steps{display:flex;align-items:center;gap:6px}
+.ums-item{display:inline-flex;align-items:center;gap:4px;font-size:13px;font-weight:500;color:#b3b6bd;padding:4px 10px;border-radius:20px}
+.ums-item.active{color:#365eef;background:#e9f2ff;font-weight:600}
+.ums-item.done{color:#1ab864;background:#eefcf4;font-weight:600}
+.ums-arrow{color:#d9d9d9;font-size:14px;line-height:1}
+/* ─── Step 1 v2: PDF 분할 업로드 ─── */
+.pdf-upload-two-col{display:grid;grid-template-columns:1fr 420px;gap:24px;align-items:start}
+.pdf-viewer-mock{border:1px solid #e8eaed;border-radius:10px;overflow:hidden;background:#fff}
+.pdf-toolbar{display:flex;align-items:center;gap:10px;padding:10px 14px;background:#2d2d2d;color:#fff;font-size:14px}
+.pdf-toolbar-name{flex:1;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:14px}
+.pdf-toolbar-nav{display:flex;align-items:center;gap:6px;font-size:14px}
+.pdf-toolbar-btn{width:24px;height:24px;border:none;background:rgba(255,255,255,.15);color:#fff;border-radius:4px;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0}
+.pdf-toolbar-btn:hover{background:rgba(255,255,255,.3)}
+.pdf-page-area{background:#525659;padding:16px;display:flex;justify-content:center}
+.pdf-page-mock{width:100%;max-width:420px;background:#fff;border-radius:2px;box-shadow:0 2px 10px rgba(0,0,0,.35);padding:24px 22px}
+.pdf-page-line{height:10px;background:#ececec;border-radius:2px;margin-bottom:8px}
+.pdf-page-line.hand{height:8px;background:#dde2ee;transform:skewX(-1deg)}
+.pdf-page-line.w80{width:80%}.pdf-page-line.w60{width:60%}.pdf-page-line.w90{width:90%}
+.pdf-page-section{border:1px solid #e8eaed;border-radius:4px;padding:10px 12px;margin:10px 0}
+.pdf-highlight-bar{position:absolute;left:0;right:0;background:rgba(65,107,255,.12);border-left:3px solid #416bff;padding:2px 8px;font-size:14px;font-weight:600;color:#3151c4}
+.split-panel{border:1px solid #e8eaed;border-radius:10px;background:#fff;overflow:hidden}
+.split-panel-head{padding:16px 20px;border-bottom:1px solid #e8eaed}
+.split-panel-title{font-size:17px;font-weight:700;color:#222631}
+.split-panel-body{padding:20px}
+.split-section-label{font-size:13px;font-weight:700;color:#6d7381;text-transform:uppercase;letter-spacing:.4px;margin-bottom:14px}
+.split-row{display:flex;align-items:center;gap:10px;margin-bottom:16px;font-size:16px;color:#3b3f4c}
+.split-row label{flex:1;font-size:16px}
+.split-num{width:64px;padding:7px 8px;border:1.5px solid #d9d9d9;border-radius:6px;font-size:17px;font-weight:400;text-align:center;font-family:inherit;outline:none;color:#222631}
+.split-num:focus{border-color:#416bff}
+.split-unit{color:#6d7381;font-size:16px;white-space:nowrap}
+.split-radio-group{display:flex;gap:16px;margin-bottom:4px}
+.split-radio{display:flex;align-items:center;gap:7px;font-size:16px;color:#3b3f4c;cursor:pointer}
+.split-radio input{accent-color:#416bff;width:17px;height:17px}
+.split-panel-foot{padding:12px 20px 18px;display:flex;gap:8px}
+.split-btn-outline{flex:1;padding:10px 0;border:1px solid #d9d9d9;border-radius:7px;background:#fff;font-size:16px;font-weight:500;font-family:inherit;color:#3b3f4c;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px}
+.split-btn-outline:hover{border-color:#416bff;color:#416bff}
+.split-btn-primary{flex:2;padding:10px 0;border:none;border-radius:7px;background:#365eef;color:#fff;font-size:16px;font-weight:600;font-family:inherit;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px}
+.split-btn-primary:hover{background:#2c4dd0}
+.split-result-scroll{padding:0 2px;max-height:460px;overflow-y:auto}
+.split-result-table{width:100%;border-collapse:collapse;font-size:16px}
+.split-result-table th{padding:10px 12px;background:#f6f7f9;font-size:13px;font-weight:700;color:#6d7381;text-align:center;border-bottom:2px solid #e8eaed;white-space:nowrap}
+.split-result-table td{padding:10px 12px;border-bottom:1px solid #f1f3f5;vertical-align:middle;text-align:center}
+.split-result-table tr:last-child td{border-bottom:none}
+.split-num-badge{font-size:15px;font-weight:400;color:#6d7381}
+.split-name-cell{font-size:16px;font-weight:400;color:#222631}
+.split-page-count{font-size:16px;color:#3b3f4c;text-align:center;font-weight:400}
+.split-page-range{display:flex;align-items:center;justify-content:center;gap:5px}
+.split-page-input{width:48px;padding:5px 6px;border:1.5px solid #d9d9d9;border-radius:5px;font-size:16px;font-weight:400;text-align:center;font-family:inherit;outline:none;color:#222631}
+.split-page-input:focus{border-color:#416bff}
+.split-page-input.warn{border-color:#f2525f;color:#f2525f;background:#fff5f5}
+.split-page-sep{color:#b3b6bd;font-size:16px}
+.split-result-foot{padding:12px 20px 18px;display:flex;gap:8px;border-top:1px solid #e8eaed}
+/* ─── 푸터 네비게이션 ─── */
+.foot-nav{position:fixed;left:56px;right:0;bottom:0;background:#fff;border-top:1px solid #e8eaed;padding:14px 32px;display:flex;justify-content:space-between;align-items:center;z-index:90;box-shadow:0 -2px 8px rgba(0,0,0,.04)}
+body.nav-expanded .foot-nav{left:200px}
+.foot-info{font-size:13px;color:#6d7381}
+.foot-info strong{color:#365eef}
+.foot-acts{display:flex;gap:10px}
+.btn-step{display:inline-flex;align-items:center;gap:6px;padding:11px 22px;border-radius:7px;font-size:15px;font-weight:600;font-family:inherit;cursor:pointer}
+.btn-step.prev{background:#fff;border:1px solid #d9d9d9;color:#3b3f4c}
+.btn-step.prev:hover{border-color:#416bff;color:#416bff}
+.btn-step.next{background:#365eef;border:none;color:#fff}
+.btn-step.next:hover{background:#2c4dd0}
+.btn-step:disabled{background:#dde1e8!important;color:#b3b6bd!important;cursor:not-allowed;border:none}
+.btn-skip{background:none;border:none;color:#6d7381;font-size:13px;font-family:inherit;cursor:pointer;text-decoration:underline;padding:8px}
+.btn-skip:hover{color:#416bff}
+
+/* ─── Toast ─── */
+.toast{position:fixed;bottom:88px;left:50%;transform:translateX(-50%) translateY(12px);background:#319d64;color:#fff;padding:16px 24px 16px 16px;border-radius:2px;font-size:15px;font-weight:500;line-height:1.25;box-shadow:0 8px 16px rgba(0,0,0,.1);opacity:0;transition:all .25s;z-index:500;pointer-events:none}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* ─── Dialog ─── */
+.dlg-ov{display:none;position:fixed;inset:0;background:rgba(0,0,0,.25);z-index:700;align-items:center;justify-content:center}
+.dlg-ov.show{display:flex}
+.dlg-box{background:#fff;border-radius:12px;width:512px;max-width:calc(100vw - 48px);box-shadow:0 12px 48px rgba(0,0,0,.18);display:flex;flex-direction:column;position:relative}
+.dlg-head{padding:24px 24px 16px}
+.dlg-title{font-size:18px;font-weight:600;color:#222631;line-height:1.25}
+.dlg-close{position:absolute;top:11px;right:11px;width:36px;height:36px;border:none;background:none;cursor:pointer;color:#6d7381;display:flex;align-items:center;justify-content:center;border-radius:4px}
+.dlg-close:hover{background:#f1f3f5}
+.dlg-body{padding:8px 24px 24px;font-size:16px;color:#3b3f4c;line-height:1.55}
+.dlg-foot{padding:8px 24px 16px;display:flex;gap:8px;justify-content:flex-end}
+.dlg-btn{height:40px;padding:0 18px;border-radius:4px;font-family:inherit;font-size:15px;font-weight:500;cursor:pointer;border:none}
+.dlg-btn.ghost{background:#fff;border:1px solid #d9d9d9;color:#3b3f4c}
+.dlg-btn.primary{background:#365eef;color:#fff}
+.dlg-btn.primary:hover{background:#2c4dd0}
+</style>
+</head>
+<body>
+<header class="g-hd">
+  <button onclick="toggleNav()" style="width:36px;height:36px;border:none;background:none;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#3b3f4c;margin-right:8px"><i data-lucide="menu" style="width:20px;height:20px"></i></button>
+  <svg width="76" height="16" viewBox="0 0 76 16" fill="none"><path d="M11.3613 4.03516H4.09668V11.9629H8.88281L8.88086 11.9648H15.6016V16H4.02539C1.80242 15.9998 0 14.223 0 12.0322V3.96777C0 1.77696 1.80242 0.000177874 4.02539 0H15.4561L11.3613 4.03516ZM22.0703 11.9648H33.5781V16H22.002C19.7788 16 17.9756 14.2231 17.9756 12.0322V0H22.0703V11.9648ZM40.0459 16H35.9521V0H40.0459V16ZM54.5381 0C56.4564 0 58.0138 1.53228 58.0186 3.42285L58.0166 3.4248V8.54297C58.014 10.4333 56.4567 11.9648 54.5361 11.9648H46.5107L42.416 16V0H54.5381ZM71.9746 0C74.0086 0.000134956 75.6887 1.49046 75.958 3.42285H76V12.5771H75.958C75.6887 14.5095 74.011 15.9999 71.9746 16H64.4238C62.3897 16 60.7098 14.5096 60.4404 12.5771C60.4145 12.398 60.3984 12.2184 60.3984 12.0322V3.96777C60.3984 3.78159 60.4145 3.60205 60.4404 3.42285C60.7098 1.49037 62.3873 0 64.4238 0H71.9746ZM64.4922 12.5771H71.9062V3.42285H64.4922V12.5771ZM46.5107 3.42285V8.54004H53.9238V3.42285H46.5107Z" fill="#365EEF"/></svg>
+  <div class="g-hd-r">
+    <span class="plan-badge">개인 유료</span>
+    <span style="font-size:13px;color:#6d7381">D-1710</span>
+    <div class="hd-div"></div>
+    <i data-lucide="bot" style="width:16px;height:16px;color:#416bff"></i>
+    <div class="credit-wrap">AI 크레딧 <span id="credit-num">700</span></div>
+    <div class="hd-div"></div>
+    <button class="user-btn">test99 선생님(담임) <i data-lucide="chevron-down" style="width:14px;height:14px"></i></button>
+  </div>
+</header>
+<nav class="icon-sb" id="icon-sb">
+  <div class="si"><div class="si-icon"><i data-lucide="home" style="width:20px;height:20px"></i></div><span class="si-label">홈</span><span class="si-tip">홈</span></div>
+  <div class="si"><div class="si-icon"><i data-lucide="scissors" style="width:20px;height:20px"></i></div><span class="si-label">평가계획</span><span class="si-tip">평가계획</span></div>
+  <div class="si"><div class="si-icon"><i data-lucide="layout-grid" style="width:20px;height:20px"></i></div><span class="si-label">수업</span><span class="si-tip">수업</span></div>
+  <div class="si active"><div class="si-icon"><i data-lucide="notebook-pen" style="width:20px;height:20px"></i></div><span class="si-label">창의적 체험활동 <span style="font-size:10px;background:#416bff;color:#fff;padding:1px 5px;border-radius:3px;margin-left:2px">Beta</span></span><span class="si-tip">창의적 체험활동</span></div>
+  <div class="si"><div class="si-icon"><i data-lucide="zap" style="width:20px;height:20px"></i></div><span class="si-label">세특 간편 생성기</span><span class="si-tip">세특 간편 생성기</span></div>
+  <div class="si"><div class="si-icon"><i data-lucide="smile" style="width:20px;height:20px"></i></div><span class="si-label">행동특성 및 종합기록</span><span class="si-tip">행동특성 및 종합기록</span></div>
+  <div class="si"><div class="si-icon"><i data-lucide="bar-chart-2" style="width:20px;height:20px"></i></div><span class="si-label">리포트</span><span class="si-tip">리포트</span></div>
+  <div class="si"><div class="si-icon"><i data-lucide="building-2" style="width:20px;height:20px"></i></div><span class="si-label">학교 설정</span><span class="si-tip">학교 설정</span></div>
+  <div class="nav-bottom">
+    <div class="nav-div"></div>
+    <div class="si"><div class="si-icon"><i data-lucide="file-down" style="width:20px;height:20px"></i></div><span class="si-label">매뉴얼 다운로드</span><span class="si-tip">매뉴얼 다운로드</span></div>
+    <div class="si"><div class="si-icon"><i data-lucide="credit-card" style="width:20px;height:20px"></i></div><span class="si-label">요금제</span><span class="si-tip">요금제</span></div>
+    <div class="si"><div class="si-icon"><i data-lucide="help-circle" style="width:20px;height:20px"></i></div><span class="si-label">고객센터</span><span class="si-tip">고객센터</span></div>
+  </div>
+</nav>
+<div class="sub-bar">
+  <div class="sub-bc">
+    <a onclick="goList()">창의적 체험활동</a>
+    <i data-lucide="chevron-right" style="width:14px;height:14px"></i>
+    <strong>자율활동 · 2학년 1반</strong>
+  </div>
+  <div class="sub-acts">
+    <div class="mode-group">
+      <button class="mode-btn" onclick="goIndividual()">개별 작성</button>
+      <button class="mode-btn active">일괄 작성</button>
+    </div>
+    <div style="width:1px;height:18px;background:#e0e0e0"></div>
+    <button class="btn-outline"><i data-lucide="download" style="width:14px;height:14px"></i> 기록 다운로드</button>
+  </div>
+</div>
+
+<div class="main-wrap">
+  <!-- Stepper -->
+  <div class="stepper">
+    <div class="step active" data-step="1" onclick="goStep(1)">
+      <div class="step-num">1</div>
+      <div class="step-info">
+        <span class="step-label">STEP 1 · 선택</span>
+        <span class="step-title">활동지 일괄 업로드</span>
+      </div>
+    </div>
+    <div class="step-bar"></div>
+    <div class="step" data-step="2" onclick="goStep(2)">
+      <div class="step-num">2</div>
+      <div class="step-info">
+        <span class="step-label">STEP 2</span>
+        <span class="step-title">활동 특성 입력</span>
+      </div>
+    </div>
+    <div class="step-bar"></div>
+    <div class="step" data-step="3" onclick="goStep(3)">
+      <div class="step-num">3</div>
+      <div class="step-info">
+        <span class="step-label">STEP 3</span>
+        <span class="step-title">기록 생성 · 검토</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ Step 1: 활동지 업로드 ============ -->
+  <div class="panel" id="panel-1">
+    <div class="panel-head">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+        <span class="panel-tag">선택 단계</span>
+        <div class="upload-mini-steps" id="upload-mini-steps">
+          <span class="ums-item active" id="ums-1"><i data-lucide="upload" style="width:13px;height:13px"></i> 파일 선택</span>
+          <span class="ums-arrow">›</span>
+          <span class="ums-item" id="ums-2"><i data-lucide="scissors" style="width:13px;height:13px"></i> 분할 설정</span>
+          <span class="ums-arrow">›</span>
+          <span class="ums-item" id="ums-3"><i data-lucide="check" style="width:13px;height:13px"></i> 완료</span>
+        </div>
+      </div>
+      <div class="panel-title">활동지 일괄 업로드</div>
+      <div class="panel-sub">
+        학급 전체 활동지를 번호순으로 스캔한 PDF 1개를 업로드합니다. 학생당 페이지 수를 지정하면 자동으로 분할해요.<br>
+        <strong style="color:#3b3f4c">활동지가 없어도 괜찮습니다</strong> — 다음 단계에서 키워드만 입력해도 기록을 만들 수 있어요.
+      </div>
+    </div>
+
+    <!-- 업로드 전 -->
+    <div class="up-drop" id="up-drop-zone" onclick="addMockFile()">
+      <div class="up-drop-ico"><i data-lucide="upload-cloud" style="width:28px;height:28px"></i></div>
+      <div class="up-drop-title">PDF 파일을 끌어다 놓거나 클릭해서 선택</div>
+      <div class="up-drop-sub">번호순 스캔 PDF 1개 업로드 · <strong>최대 50MB</strong></div>
+    </div>
+
+    <!-- 파일 업로드 후: 분할 설정 -->
+    <div id="split-setup-wrap" style="display:none">
+      <div class="pdf-upload-two-col">
+        <div class="pdf-viewer-mock">
+          <div class="pdf-toolbar">
+            <div class="pdf-toolbar-name" id="pdf-filename">파일명.pdf</div>
+            <div class="pdf-toolbar-nav">
+              <button class="pdf-toolbar-btn"><i data-lucide="chevron-left" style="width:12px;height:12px"></i></button>
+              <span>1</span><span style="opacity:.4;margin:0 2px">/</span><span id="pdf-total-pages">14</span>
+              <button class="pdf-toolbar-btn"><i data-lucide="chevron-right" style="width:12px;height:12px"></i></button>
+            </div>
+            <span style="opacity:.5;font-size:11px;margin-left:4px">100%</span>
+            <button class="pdf-toolbar-btn"><i data-lucide="zoom-in" style="width:12px;height:12px"></i></button>
+          </div>
+          <div class="pdf-page-area">
+            <div class="pdf-page-mock">
+              <div class="pdf-page-line w80"></div>
+              <div class="pdf-page-section">
+                <div class="pdf-page-line w60"></div>
+                <div class="pdf-page-line hand w90"></div>
+                <div class="pdf-page-line hand w80"></div>
+                <div class="pdf-page-line hand" style="width:72%"></div>
+              </div>
+              <div class="pdf-page-line w80"></div>
+              <div class="pdf-page-section">
+                <div class="pdf-page-line w60"></div>
+                <div class="pdf-page-line hand w90"></div>
+                <div class="pdf-page-line hand" style="width:85%"></div>
+                <div class="pdf-page-line hand w60"></div>
+                <div class="pdf-page-line hand w80"></div>
+              </div>
+              <div class="pdf-page-line w80"></div>
+              <div class="pdf-page-section">
+                <div class="pdf-page-line w60"></div>
+                <div class="pdf-page-line hand w90"></div>
+                <div class="pdf-page-line hand w80"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="split-panel">
+          <div class="split-panel-head"><div class="split-panel-title">PDF 분할 설정</div></div>
+          <div class="split-panel-body">
+            <div class="split-section-label">PDF 파일 정보</div>
+            <div class="split-row">
+              <label>학생당 기본</label>
+              <input class="split-num" type="number" id="pages-per-student" value="2" min="1" max="20" oninput="previewTotalPages()">
+              <span class="split-unit">장 분량으로 작성</span>
+            </div>
+            <div class="split-row">
+              <label>스캔된 파일</label>
+              <input class="split-num" type="number" id="start-page" value="1" min="1" oninput="previewTotalPages()">
+              <span class="split-unit">페이지부터 시작</span>
+            </div>
+            <div style="margin-bottom:16px;padding:10px 14px;background:#f6f7f9;border-radius:7px;font-size:16px;color:#6d7381">
+              예상 총 페이지 <strong style="color:#365eef" id="expected-pages">14</strong>장
+              <span style="margin:0 6px;color:#d9d9d9">·</span> 7명 × 2장
+            </div>
+            <div class="split-section-label">분할 결과 수정 방식</div>
+            <div class="split-radio-group">
+              <label class="split-radio"><input type="radio" name="edit-mode" value="range" checked> 페이지 번호 입력</label>
+              <label class="split-radio"><input type="radio" name="edit-mode" value="count"> 페이지 장수 입력</label>
+            </div>
+          </div>
+          <div class="split-panel-foot">
+            <button class="split-btn-outline" onclick="reuploadFile()"><i data-lucide="upload" style="width:13px;height:13px"></i> 다시 업로드</button>
+            <button class="split-btn-primary" onclick="startSplit()"><i data-lucide="scissors" style="width:14px;height:14px"></i> 파일 분할 시작</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 분할 결과 -->
+    <div id="split-result-wrap" style="display:none">
+      <div class="pdf-upload-two-col">
+        <div class="pdf-viewer-mock">
+          <div class="pdf-toolbar">
+            <div class="pdf-toolbar-name" id="pdf-filename-r">파일명.pdf</div>
+            <div class="pdf-toolbar-nav">
+              <button class="pdf-toolbar-btn"><i data-lucide="chevron-left" style="width:12px;height:12px"></i></button>
+              <span>1</span><span style="opacity:.4;margin:0 2px">/</span><span id="pdf-total-pages-r">14</span>
+              <button class="pdf-toolbar-btn"><i data-lucide="chevron-right" style="width:12px;height:12px"></i></button>
+            </div>
+            <span style="opacity:.5;font-size:11px;margin-left:4px">100%</span>
+          </div>
+          <div class="pdf-page-area">
+            <div class="pdf-page-mock">
+              <div class="pdf-page-line w80"></div>
+              <div class="pdf-page-section">
+                <div class="pdf-page-line w60"></div>
+                <div class="pdf-page-line hand w90"></div>
+                <div class="pdf-page-line hand w80"></div>
+                <div class="pdf-page-line hand" style="width:72%"></div>
+              </div>
+              <div class="pdf-page-line w80"></div>
+              <div class="pdf-page-section">
+                <div class="pdf-page-line w60"></div>
+                <div class="pdf-page-line hand w90"></div>
+                <div class="pdf-page-line hand" style="width:85%"></div>
+                <div class="pdf-page-line hand w60"></div>
+              </div>
+              <div class="pdf-page-line w80"></div>
+            </div>
+          </div>
+        </div>
+        <div class="split-panel">
+          <div class="split-panel-head"><div class="split-panel-title">PDF 분할 결과</div></div>
+          <div class="split-result-scroll">
+            <table class="split-result-table">
+              <thead><tr>
+                <th>학번</th><th>이름</th>
+                <th style="text-align:center">페이지 수</th>
+                <th>페이지 번호</th>
+                <th style="text-align:center">미제출</th>
+              </tr></thead>
+              <tbody id="split-result-tbody"></tbody>
+            </table>
+          </div>
+          <div class="split-result-foot">
+            <button class="split-btn-outline" onclick="resetSplit()"><i data-lucide="refresh-cw" style="width:13px;height:13px"></i> 분할 재설정</button>
+            <button class="split-btn-primary" onclick="confirmSplit()"><i data-lucide="upload" style="width:14px;height:14px"></i> 활동지 업로드</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- 등록 현황 (완료 후 상시 표시) -->
+    <div id="split-done-wrap" style="display:none">
+      <!-- 헤더 -->
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:14px 20px;background:#f6f7f9;border:1px solid #e8eaed;border-radius:12px 12px 0 0;border-bottom:none">
+        <div style="display:flex;align-items:center;gap:10px">
+          <i data-lucide="users" style="width:18px;height:18px;color:#6d7381"></i>
+          <span style="font-size:16px;font-weight:600;color:#222631">학급 활동지 등록 현황</span>
+          <span style="font-size:14px;color:#6d7381" id="split-done-desc"></span>
+        </div>
+        <div style="display:flex;gap:8px">
+          <button onclick="confirmResetAll()" style="display:flex;align-items:center;gap:5px;padding:7px 13px;border:1px solid #d9d9d9;border-radius:7px;background:#fff;font-size:14px;font-family:inherit;color:#6d7381;cursor:pointer">
+            <i data-lucide="refresh-cw" style="width:13px;height:13px"></i> 전체 초기화
+          </button>
+          <button onclick="addMoreFiles()" style="display:flex;align-items:center;gap:5px;padding:7px 13px;border:1px solid #365eef;border-radius:7px;background:#fff;font-size:14px;font-family:inherit;color:#365eef;cursor:pointer;font-weight:600">
+            <i data-lucide="plus" style="width:13px;height:13px"></i> 파일 추가 등록
+          </button>
+        </div>
+      </div>
+      <!-- 명단 테이블 -->
+      <div style="border:1px solid #e8eaed;border-top:none;border-radius:0 0 12px 12px;overflow:hidden">
+        <table style="width:100%;border-collapse:collapse">
+          <thead>
+            <tr style="background:#f6f7f9">
+              <th style="padding:10px 14px;font-size:13px;font-weight:600;color:#6d7381;text-align:left;border-bottom:1px solid #e8eaed;white-space:nowrap">학번</th>
+              <th style="padding:10px 14px;font-size:13px;font-weight:600;color:#6d7381;text-align:left;border-bottom:1px solid #e8eaed">이름</th>
+              <th style="padding:10px 14px;font-size:13px;font-weight:600;color:#6d7381;text-align:left;border-bottom:1px solid #e8eaed">등록된 활동지 파일</th>
+              <th style="padding:10px 14px;font-size:13px;font-weight:600;color:#6d7381;text-align:center;border-bottom:1px solid #e8eaed;white-space:nowrap">파일 수</th>
+              <th style="padding:10px 14px;border-bottom:1px solid #e8eaed"></th>
+            </tr>
+          </thead>
+          <tbody id="split-done-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ Step 2: 키워드 입력 ============ -->
+  <div class="panel" id="panel-2" style="display:none">
+    <div class="panel-head">
+      <div class="panel-title">활동 특성 키워드 입력</div>
+      <div class="panel-sub">
+        학생별 활동에서 드러난 특성·태도·역량 등을 키워드로 입력해주세요. 활동지가 업로드된 학생은 <strong style="color:#365eef">AI 자동입력</strong>으로 키워드를 한 번에 추출할 수 있습니다.
+      </div>
+    </div>
+
+    <div class="kw-info-bar">
+      <div class="kw-info-text">
+        <i data-lucide="sparkles" style="width:16px;height:16px"></i>
+        선택된 <strong id="kw-pdf-cnt">0</strong>명의 학생에 대해 AI가 키워드를 자동으로 추출합니다.
+      </div>
+      <button class="kw-auto-btn" id="kw-auto-btn" onclick="autoExtractKeywords()">
+        <i data-lucide="wand-2" style="width:15px;height:15px"></i> AI 키워드 자동입력
+      </button>
+    </div>
+
+    <table class="kw-table">
+      <thead>
+        <tr>
+          <th class="kw-col-chk"><input type="checkbox" id="kw-chk-all" checked onchange="toggleKwAll(this.checked)"></th>
+          <th class="kw-col-num">학번</th>
+          <th class="kw-col-name">이름</th>
+          <th class="kw-col-file">활동지</th>
+          <th>활동 특성 키워드</th>
+        </tr>
+      </thead>
+      <tbody id="kw-tbody"></tbody>
+    </table>
+  </div>
+
+  <!-- ============ Step 3: 기록 생성 ============ -->
+  <div class="panel" id="panel-3" style="display:none">
+    <div class="panel-head">
+      <div class="panel-title">AI 기록 생성 · 검토</div>
+      <div class="panel-sub">
+        기록을 생성할 학생을 선택한 뒤 일괄 생성 버튼을 누르세요. 생성된 기록을 검토하고 교사 최종 기록란에서 자유롭게 수정할 수 있습니다.
+      </div>
+    </div>
+
+    <div class="gen-info-bar">
+      <div class="gen-info-left">
+        <span class="gen-sel-info"><strong id="gen-sel-cnt">0</strong>명 선택됨 · 활동지 또는 키워드가 있는 학생만 생성 가능</span>
+        <span class="gen-credit-info"><i data-lucide="coins" style="width:13px;height:13px"></i> 학생당 <strong>1 크레딧</strong></span>
+      </div>
+      <div class="gen-acts">
+        <button class="btn-outline" onclick="openGenSettings()"><i data-lucide="settings-2" style="width:14px;height:14px"></i> 생성 설정</button>
+        <button class="gen-btn-primary" id="gen-btn" onclick="generateSelected()" disabled>
+          <i data-lucide="sparkles" style="width:15px;height:15px"></i> <span id="gen-btn-label">선택 학생 기록 생성</span>
+        </button>
+      </div>
+    </div>
+
+    <div class="bulk-table-wrap">
+      <table class="bulk-table">
+        <colgroup>
+          <col class="col-chk"><col class="col-num"><col class="col-name"><col class="col-kw">
+          <col class="col-ai"><col class="col-arrow"><col class="col-teacher">
+        </colgroup>
+        <thead><tr>
+          <th class="td-chk"><input type="checkbox" id="chk-all" onchange="toggleAll(this.checked)"></th>
+          <th>학번</th>
+          <th>이름</th>
+          <th>활동 특성</th>
+          <th>AI가 생성한 기록</th>
+          <th></th>
+          <th>교사 최종 기록</th>
+        </tr></thead>
+        <tbody id="gen-tbody"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ─── 푸터 네비게이션 ─── -->
+<div class="foot-nav">
+  <div class="foot-info" id="foot-info">총 <strong>7</strong>명 · 자율활동 · 2학년 1반</div>
+  <div class="foot-acts">
+    <button class="btn-skip" id="btn-skip" onclick="skipStep()">이 단계 건너뛰기</button>
+    <button class="btn-step prev" id="btn-prev" onclick="prevStep()" style="display:none"><i data-lucide="chevron-left" style="width:16px;height:16px"></i> 이전</button>
+    <button class="btn-step next" id="btn-next" onclick="nextStep()">다음 단계 <i data-lucide="chevron-right" style="width:16px;height:16px"></i></button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<!-- 삭제 확인 다이얼로그 -->
+<div class="dlg-ov" id="dlg-confirm" onclick="if(event.target===this)closeDlg()">
+  <div class="dlg-box">
+    <div class="dlg-head">
+      <div class="dlg-title" id="dlg-title">전체 파일을 삭제할까요?</div>
+      <button class="dlg-close" onclick="closeDlg()"><i data-lucide="x" style="width:18px;height:18px"></i></button>
+    </div>
+    <div class="dlg-body" id="dlg-body">업로드한 모든 파일이 삭제됩니다. 이 작업은 되돌릴 수 없어요.</div>
+    <div class="dlg-foot">
+      <button class="dlg-btn ghost" onclick="closeDlg()">취소</button>
+      <button class="dlg-btn ghost" id="dlg-mid" onclick="dlgMidAction()" style="display:none">추가</button>
+      <button class="dlg-btn primary" id="dlg-ok" onclick="dlgConfirm()">삭제</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ─── 초기 데이터 ───
+const STUDENTS = [
+  {no:1, sid:'20101', name:'김민준', file:null, files:[], absent:false, kws:[], ai:'', teacher:''},
+  {no:2, sid:'20102', name:'이서연', file:null, files:[], absent:false, kws:[], ai:'', teacher:''},
+  {no:3, sid:'20103', name:'박지호', file:null, files:[], absent:false, kws:[], ai:'', teacher:''},
+  {no:4, sid:'20104', name:'최예린', file:null, files:[], absent:false, kws:[], ai:'', teacher:''},
+  {no:5, sid:'20105', name:'정우빈', file:null, files:[], absent:false, kws:[], ai:'', teacher:''},
+  {no:6, sid:'20201', name:'한소율', file:null, files:[], absent:false, kws:[], ai:'', teacher:''},
+  {no:7, sid:'20301', name:'윤도현', file:null, files:[], absent:false, kws:[], ai:'', teacher:''},
+];
+
+const MOCK_KW_POOL = {
+  1:['리더십','협동심','친구들의 의견을 끝까지 경청하고 합리적인 대안을 제시하는 능력이 돋보임','책임감'],
+  2:['창의력','평면도를 직접 그려 동선을 분석하고 문제점을 짚어내는 분석적 사고가 뛰어남','꼼꼼함'],
+  3:['배려심','모둠 활동에서 발언 기회가 적은 친구에게 먼저 의견을 묻는 세심한 배려를 보임','성실함'],
+  4:['도전정신','탐구력','처음 접하는 과제에도 두려워하지 않고 끝까지 완수하는 도전적인 태도를 보임'],
+  5:['공감능력','꾸준함','책임감'],
+  6:['기획력','행사 준비 과정에서 세부 일정을 체계적으로 수립하고 역할 분담을 명확히 조율함','실행력'],
+  7:['관찰력','분석력','집중력','성실성'],
+};
+const MOCK_AI_TEXT = {
+  1:'학급 자치 활동에서 회장 역할을 맡아 학급 행사 기획 및 운영을 주도하였으며, 의견 차이가 있을 때 친구들의 이야기를 끝까지 경청하고 합리적인 대안을 제시하는 모습이 인상적임. 책임감 있게 맡은 일을 끝까지 수행하며 학급 분위기를 긍정적으로 이끔.',
+  2:'학급 환경 개선 프로젝트에서 평면도를 직접 그려가며 동선을 분석하고, 친구들이 미처 발견하지 못한 문제점을 짚어내는 등 분석적 사고와 꼼꼼함이 돋보임. 실현 가능성 있는 아이디어를 다수 제안하며 활동에 기여함.',
+};
+
+let curStep = 1;
+let pendingDlg = null;
+let pendingDlgMid = null;
+
+// ─── Stepper ───
+function goStep(n){
+  curStep = n;
+  document.querySelectorAll('.step').forEach(el=>{
+    const s = +el.dataset.step;
+    el.classList.toggle('active', s===n);
+    el.classList.toggle('done', s<n);
+  });
+  document.querySelectorAll('.step-bar').forEach((el,i)=>{
+    el.classList.toggle('done', i<n-1);
+  });
+  for(let i=1;i<=3;i++){
+    document.getElementById('panel-'+i).style.display = (i===n)?'block':'none';
+  }
+  // 푸터 버튼
+  document.getElementById('btn-prev').style.display = n>1?'inline-flex':'none';
+  document.getElementById('btn-skip').style.display = n===1?'inline-block':'none';
+  const nextBtn = document.getElementById('btn-next');
+  if(n===3){
+    nextBtn.innerHTML = '<i data-lucide="check" style="width:16px;height:16px"></i> 작업 완료';
+    nextBtn.onclick = finishWork;
+  }else{
+    nextBtn.innerHTML = '다음 단계 <i data-lucide="chevron-right" style="width:16px;height:16px"></i>';
+    nextBtn.onclick = nextStep;
+  }
+  if(n===2){ initKwSelected(); renderKwTable(); }
+  if(n===3) renderGenTable();
+  window.scrollTo({top:0,behavior:'smooth'});
+  setTimeout(()=>lucide.createIcons(),0);
+}
+function nextStep(){ if(curStep<3) goStep(curStep+1); }
+function prevStep(){ if(curStep>1) goStep(curStep-1); }
+function skipStep(){ goStep(2); }
+
+// ─── Step 1: PDF 분할 업로드 ───
+const MOCK_CLASS_FILE = { name: '2학년1반_자율활동_활동지.pdf', totalPages: 14 };
+let classFile = null;
+let splitRanges = []; // [{no, name, start, end}]
+
+function setUms(step){
+  [1,2,3].forEach(i=>{
+    const el = document.getElementById('ums-'+i);
+    el.classList.remove('active','done');
+    if(i < step) el.classList.add('done');
+    else if(i === step) el.classList.add('active');
+  });
+  lucide.createIcons();
+}
+function addMockFile(){
+  classFile = MOCK_CLASS_FILE;
+  document.getElementById('up-drop-zone').style.display = 'none';
+  document.getElementById('split-setup-wrap').style.display = 'block';
+  document.getElementById('pdf-filename').textContent = classFile.name;
+  document.getElementById('pdf-total-pages').textContent = classFile.totalPages;
+  previewTotalPages();
+  setUms(2);
+  lucide.createIcons();
+  showToast('"' + classFile.name + '" 업로드 완료');
+}
+function previewTotalPages(){
+  const pps = parseInt(document.getElementById('pages-per-student').value) || 2;
+  const n = STUDENTS.length;
+  const total = pps * n;
+  const el = document.getElementById('expected-pages');
+  if(el) el.textContent = total;
+  const infoEl = el?.closest('div');
+  if(infoEl){
+    infoEl.querySelector('strong+span+span') && (infoEl.lastChild.textContent = '');
+    // update hint text
+    const hint = infoEl.querySelectorAll('span');
+    if(hint.length >= 2) hint[1].textContent = ` · ${n}명 × ${pps}장`;
+  }
+}
+function reuploadFile(){
+  classFile = null;
+  splitRanges = [];
+  STUDENTS.forEach(s=>s.file=null);
+  document.getElementById('up-drop-zone').style.display = 'flex';
+  document.getElementById('split-setup-wrap').style.display = 'none';
+  document.getElementById('split-result-wrap').style.display = 'none';
+  setUms(1);
+}
+function startSplit(){
+  if(!classFile) return;
+  const pps = parseInt(document.getElementById('pages-per-student').value) || 2;
+  const startP = parseInt(document.getElementById('start-page').value) || 1;
+  splitRanges = STUDENTS.map((s, i)=>{
+    const start = startP + i * pps;
+    const end = start + pps - 1;
+    return { no: s.no, name: s.name, start, end, absent: false };
+  });
+  document.getElementById('split-setup-wrap').style.display = 'none';
+  document.getElementById('split-result-wrap').style.display = 'block';
+  document.getElementById('pdf-filename-r').textContent = classFile.name;
+  document.getElementById('pdf-total-pages-r').textContent = classFile.totalPages;
+  renderSplitResult();
+  setUms(3);
+  lucide.createIcons();
+}
+function renderSplitResult(){
+  const editMode = document.querySelector('input[name="edit-mode"]:checked')?.value || 'range';
+  const totalPages = classFile?.totalPages || 14;
+  document.getElementById('split-result-tbody').innerHTML = splitRanges.map(r=>{
+    const s = STUDENTS.find(x=>x.no===r.no);
+    const count = r.end - r.start + 1;
+    const overTotal = r.end > totalPages;
+    const warnClass = overTotal ? 'warn' : '';
+    const rowStyle = r.absent ? 'opacity:.4;' : '';
+    const disabledAttr = r.absent ? 'disabled' : '';
+    return `<tr style="${rowStyle}">
+      <td><span class="split-num-badge">${s.sid}</span></td>
+      <td class="split-name-cell">${r.name}</td>
+      <td class="split-page-count">${r.absent ? '—' : count}</td>
+      <td>
+        ${r.absent ? '<span style="font-size:14px;color:#b3b6bd">미제출</span>' : `
+        <div class="split-page-range">
+          <input class="split-page-input ${warnClass}" type="number" value="${r.start}" min="1"
+            onchange="updateRange(${r.no},'start',this.value)">
+          <span class="split-page-sep">~</span>
+          <input class="split-page-input ${warnClass}" type="number" value="${r.end}" min="1"
+            onchange="updateRange(${r.no},'end',this.value)">
+        </div>`}
+      </td>
+      <td style="text-align:center">
+        <input type="checkbox" ${r.absent?'checked':''} onchange="toggleSplitAbsent(${r.no},this.checked)"
+          style="width:17px;height:17px;cursor:pointer;accent-color:#f2525f">
+      </td>
+    </tr>`;
+  }).join('');
+}
+function updateRange(no, field, val){
+  const r = splitRanges.find(x=>x.no===no);
+  if(!r) return;
+  r[field] = parseInt(val) || 1;
+  if(r.start > r.end) r.end = r.start;
+  renderSplitResult();
+}
+function toggleSplitAbsent(no, val){
+  const r = splitRanges.find(x=>x.no===no);
+  if(r) r.absent = val;
+  renderSplitResult();
+}
+function confirmResetAll(){
+  pendingDlg = ()=>{ resetSplit(); };
+  document.getElementById('dlg-title').textContent = '활동지를 전체 초기화할까요?';
+  document.getElementById('dlg-body').textContent = '등록된 모든 활동지 파일이 삭제됩니다. 이 작업은 되돌릴 수 없어요.';
+  document.getElementById('dlg-ok').textContent = '초기화';
+  document.getElementById('dlg-ok').className = 'dlg-btn primary';
+  document.getElementById('dlg-confirm').classList.add('show');
+}
+function resetSplit(){
+  STUDENTS.forEach(s=>{ s.file=null; s.files=[]; s.absent=false; });
+  classFile=null; splitRanges=[];
+  document.getElementById('split-result-wrap').style.display = 'none';
+  document.getElementById('split-done-wrap').style.display = 'none';
+  document.getElementById('split-setup-wrap').style.display = 'none';
+  document.getElementById('up-drop-zone').style.display = 'flex';
+  setUms(1);
+  lucide.createIcons();
+  showToast('활동지가 전체 초기화되었어요.');
+}
+let isAdditionalUpload = false;
+let indivFileSeq = 0;
+
+function confirmSplit(){
+  splitRanges.forEach(r=>{
+    const s = STUDENTS.find(x=>x.no===r.no);
+    if(!s) return;
+    if(r.absent){
+      s.absent = true;
+    } else if(s.files.length >= 5){
+      // 최대 5개 초과 시 스킵
+    } else {
+      const seq = s.files.length + 1;
+      const label = `${s.sid}_${s.name}_자율활동지${seq}`;
+      if(!s.files.find(f=>f===label)) s.files.push(label);
+      s.file = s.files[0];
+      s.absent = false;
+    }
+  });
+  document.getElementById('split-result-wrap').style.display = 'none';
+  document.getElementById('up-drop-zone').style.display = 'none';
+  document.getElementById('split-setup-wrap').style.display = 'none';
+  document.getElementById('split-done-wrap').style.display = 'block';
+  isAdditionalUpload = false;
+  renderDoneTable();
+  setUms(3);
+  lucide.createIcons();
+  const total = STUDENTS.filter(s=>s.files.length>0).length;
+  showToast(`분할 완료 · ${total}명 활동지 등록됨`);
+}
+function renderDoneTable(){
+  const registered = STUDENTS.filter(s=>s.files.length>0).length;
+  const unregistered = STUDENTS.filter(s=>s.files.length===0 && !s.absent).length;
+  const absent = STUDENTS.filter(s=>s.absent).length;
+  let desc = `등록 ${registered}명 · 미등록 ${unregistered}명`;
+  if(absent) desc += ` · 미제출 ${absent}명`;
+  document.getElementById('split-done-desc').textContent = desc;
+  document.getElementById('split-done-tbody').innerHTML = STUDENTS.map(s=>{
+    const rowOpacity = s.absent ? 'opacity:.45;' : '';
+    const fileChips = s.files.map((f,i)=>`
+      <span style="display:inline-flex;align-items:center;gap:4px;padding:3px 9px;background:#e9f2ff;color:#3151c4;border-radius:8px;font-size:14px;margin:2px 4px 2px 0">
+        <i data-lucide="file-text" style="width:11px;height:11px"></i>${f}
+        <button onclick="removeStudentFile(${s.no},${i})" style="border:none;background:none;cursor:pointer;color:#6d7381;padding:0;margin-left:2px;display:flex;align-items:center" title="삭제">
+          <i data-lucide="x" style="width:11px;height:11px"></i>
+        </button>
+      </span>`).join('');
+    return `
+    <tr style="border-bottom:1px solid #f1f3f5;${rowOpacity}">
+      <td style="padding:10px 14px;font-size:14px;color:#6d7381">${s.sid}</td>
+      <td style="padding:10px 14px;font-size:16px;color:#222631;font-weight:500">${s.name}</td>
+      <td style="padding:10px 14px">
+        <div style="display:flex;flex-wrap:wrap;align-items:center;gap:0">
+          ${s.absent
+          ? '<span style="display:inline-flex;align-items:center;gap:4px;font-size:13px;font-weight:600;color:#f2525f;background:#fff0f0;padding:3px 9px;border-radius:20px"><i data-lucide=\'x\' style=\'width:11px;height:11px\'></i> 미제출</span>'
+          : fileChips || '<span style="font-size:14px;color:#b3b6bd">없음</span>'}
+        </div>
+      </td>
+      <td style="padding:10px 14px;text-align:center">
+        ${s.absent
+          ? '<span style="font-size:13px;color:#b3b6bd">—</span>'
+          : `<span style="display:inline-flex;align-items:center;justify-content:center;min-width:26px;height:22px;padding:0 7px;background:${s.files.length?'#1ab864':'#f1f3f5'};color:${s.files.length?'#fff':'#b3b6bd'};border-radius:20px;font-size:13px;font-weight:600">${s.files.length}</span>`}
+      </td>
+      <td style="padding:10px 14px;text-align:right">
+        ${(()=>{
+          const full = s.files.length >= 5;
+          const dis = s.absent || full;
+          const tip = full ? '파일은 최대 5개까지 등록할 수 있어요' : '';
+          return `<button onclick="addIndividualFile(${s.no})" ${dis?'disabled':''} title="${tip}"
+            style="display:inline-flex;align-items:center;gap:4px;padding:5px 11px;border:1px solid ${dis?'#e8eaed':'#d9d9d9'};border-radius:6px;background:${dis?'#f6f7f9':'#fff'};font-size:13px;font-family:inherit;color:${dis?'#b3b6bd':'#3b3f4c'};cursor:${dis?'not-allowed':'pointer'};white-space:nowrap">
+            <i data-lucide="plus" style="width:12px;height:12px"></i> ${full?'최대 등록':'개별 추가'}
+          </button>`;
+        })()}
+      </td>
+    </tr>`;
+  }).join('');
+  lucide.createIcons();
+}
+function toggleAbsent(no, val){
+  const s = STUDENTS.find(x=>x.no===no);
+  if(s){ s.absent = val; if(val){ s.files=[]; s.file=null; } }
+  renderDoneTable();
+}
+function removeStudentFile(no, idx){
+  const s = STUDENTS.find(x=>x.no===no);
+  if(s){ s.files.splice(idx,1); s.file=s.files[0]||null; }
+  renderDoneTable();
+}
+function addIndividualFile(no){
+  const s = STUDENTS.find(x=>x.no===no);
+  if(!s) return;
+  if(s.files.length >= 5){ showToast('파일은 최대 5개까지 등록할 수 있어요.', 'error'); return; }
+  // 목업: 사용자가 업로드한 파일명 시뮬레이션
+  const mockNames = ['활동지_스캔.pdf','자율활동_개별.pdf','IMG_0392.pdf','활동지완성본.pdf','scan_final.pdf'];
+  const label = mockNames[s.files.length] || `개별파일_${s.files.length+1}.pdf`;
+  if(!s.files.find(f=>f===label)){
+    s.files.push(label);
+    s.file = s.files[0];
+    showToast(`"${s.name}" 활동지 추가 등록됨`);
+    renderDoneTable();
+  } else {
+    showToast('이미 동일한 파일이 등록되어 있어요.');
+  }
+}
+function addMoreFiles(){
+  isAdditionalUpload = true;
+  classFile = null; splitRanges = [];
+  document.getElementById('split-done-wrap').style.display = 'none';
+  document.getElementById('up-drop-zone').style.display = 'flex';
+  setUms(1);
+  lucide.createIcons();
+}
+
+// ─── Step 2: 키워드 입력 ───
+// kw-table 선택 상태 (디폴트: 전체선택)
+let kwSelectedNos = new Set();
+function initKwSelected(){ kwSelectedNos = new Set(STUDENTS.map(s=>s.no)); }
+function toggleKwSel(no, checked){
+  if(checked) kwSelectedNos.add(no); else kwSelectedNos.delete(no);
+  updateKwInfo();
+  // 헤더 체크박스 indeterminate 처리
+  const allChk = document.getElementById('kw-chk-all');
+  if(allChk){
+    if(kwSelectedNos.size===0) { allChk.checked=false; allChk.indeterminate=false; }
+    else if(kwSelectedNos.size===STUDENTS.length) { allChk.checked=true; allChk.indeterminate=false; }
+    else { allChk.checked=false; allChk.indeterminate=true; }
+  }
+}
+function toggleKwAll(checked){
+  if(checked) kwSelectedNos = new Set(STUDENTS.map(s=>s.no));
+  else kwSelectedNos = new Set();
+  // 각 행 체크박스 동기화
+  STUDENTS.forEach(s=>{
+    const el = document.getElementById('kw-row-chk-'+s.no);
+    if(el) el.checked = checked;
+  });
+  updateKwInfo();
+}
+function updateKwInfo(){
+  document.getElementById('kw-pdf-cnt').textContent = kwSelectedNos.size;
+  document.getElementById('kw-auto-btn').disabled = kwSelectedNos.size===0;
+}
+
+function renderKwTable(){
+  if(kwSelectedNos.size===0) initKwSelected();
+  updateKwInfo();
+  document.getElementById('kw-tbody').innerHTML = STUDENTS.map(s=>{
+    const checked = kwSelectedNos.has(s.no) ? 'checked' : '';
+    return `
+    <tr>
+      <td class="kw-col-chk"><input type="checkbox" id="kw-row-chk-${s.no}" ${checked} onchange="toggleKwSel(${s.no},this.checked)"></td>
+      <td class="kw-col-num" style="font-size:13px">${s.sid}</td>
+      <td class="kw-col-name">${s.name}</td>
+      <td class="kw-col-file">${s.files && s.files.length
+        ? `<span class="kw-file-chip"><i data-lucide="paperclip" style="width:11px;height:11px"></i> ${s.files.length}개</span>`
+        : '<span class="kw-file-none">없음</span>'}</td>
+      <td class="kw-tag-cell">
+        <div class="kw-tags" id="kw-tags-${s.no}">${renderTagsHtml(s)}</div>
+        <div class="kw-input-row">
+          <input class="kw-input" id="kw-input-${s.no}" placeholder="키워드 입력 후 Enter" onkeydown="if(event.key==='Enter'){addKw(${s.no});event.preventDefault();}">
+          <button class="kw-add-btn" onclick="addKw(${s.no})">+ 추가</button>
+        </div>
+      </td>
+    </tr>
+  `}).join('');
+  lucide.createIcons();
+}
+function renderTagsHtml(s){
+  if(!s.kws.length) return '<span class="kw-file-none">키워드 없음</span>';
+  return s.kws.map(k=>`
+    <span class="kw-tag ${k.auto?'auto':''}">${k.text}<button class="kw-tag-x" onclick="removeKw(${s.no},'${k.text.replace(/'/g,"\\'")}')"><i data-lucide="x" style="width:10px;height:10px"></i></button></span>
+  `).join('');
+}
+function addKw(no){
+  const inp = document.getElementById('kw-input-'+no);
+  const txt = inp.value.trim();
+  if(!txt) return;
+  const s = STUDENTS.find(x=>x.no===no);
+  if(s.kws.find(k=>k.text===txt)){ inp.value=''; return; }
+  s.kws.push({text:txt, auto:false});
+  inp.value='';
+  document.getElementById('kw-tags-'+no).innerHTML = renderTagsHtml(s);
+  lucide.createIcons();
+}
+function removeKw(no, text){
+  const s = STUDENTS.find(x=>x.no===no);
+  s.kws = s.kws.filter(k=>k.text!==text);
+  document.getElementById('kw-tags-'+no).innerHTML = renderTagsHtml(s);
+  lucide.createIcons();
+}
+function autoExtractKeywords(){
+  const targets = STUDENTS.filter(s=>kwSelectedNos.has(s.no));
+  if(targets.length===0){ showToast('선택된 학생이 없어요.'); return; }
+  document.getElementById('kw-auto-btn').disabled=true;
+  document.getElementById('kw-auto-btn').innerHTML='<div class="mini-spinner"></div> 분석 중...';
+  setTimeout(()=>{
+    targets.forEach(s=>{
+      const pool = MOCK_KW_POOL[s.no] || ['적극성','성실함','협동심'];
+      pool.forEach(t=>{
+        if(!s.kws.find(k=>k.text===t)) s.kws.push({text:t, auto:true});
+      });
+    });
+    renderKwTable();
+    document.getElementById('kw-auto-btn').disabled=false;
+    document.getElementById('kw-auto-btn').innerHTML='<i data-lucide="wand-2" style="width:15px;height:15px"></i> AI 키워드 자동입력';
+    lucide.createIcons();
+    showToast(targets.length+'명의 키워드를 자동으로 추출했어요.');
+  }, 1200);
+}
+
+// ─── Step 3: 기록 생성 ───
+let selectedNos = new Set();
+
+function renderGenTable(){
+  // 기본: 활동지 또는 키워드 있는 학생만 자동 선택
+  selectedNos = new Set(STUDENTS.filter(s=>s.file||s.kws.length).map(s=>s.no));
+  document.getElementById('gen-tbody').innerHTML = STUDENTS.map(s=>{
+    const can = !!(s.file || s.kws.length);
+    const checked = selectedNos.has(s.no)?'checked':'';
+    const disabled = can?'':'disabled';
+    return `
+      <tr>
+        <td class="td-chk"><input type="checkbox" ${checked} ${disabled} onchange="toggleSel(${s.no},this.checked)"></td>
+        <td class="td-num" style="font-size:13px">${s.sid}</td>
+        <td class="td-name">${s.name}</td>
+        <td class="td-kw">${s.kws.length
+          ? '<div class="kw-tags">'+s.kws.map(k=>`<span class="kw-tag ${k.auto?'auto':''}">${k.text}</span>`).join('')+'</div>'
+          : '<span class="kw-file-none">키워드 없음</span>'}
+        </td>
+        <td>
+          ${s.ai
+            ? `<div class="ai-text-box">${s.ai}</div>
+               <div class="ai-footer"><span class="ai-byte">${s.ai.length}자</span>
+                 <button class="btn-regen" onclick="regenOne(${s.no})"><i data-lucide="refresh-cw" style="width:11px;height:11px"></i> 다시 생성</button>
+               </div>`
+            : `<div class="ai-empty"><i data-lucide="sparkles" style="width:20px;height:20px;color:#b3b6bd"></i><p>${can?'기록을 생성해 주세요':'활동지 또는 키워드가 필요해요'}</p></div>`
+          }
+        </td>
+        <td class="td-arrow">
+          <button class="btn-arrow" ${s.ai?'':'disabled'} onclick="copyToTeacher(${s.no})" title="교사 기록으로 복사">
+            <i data-lucide="arrow-right" style="width:16px;height:16px"></i>
+          </button>
+        </td>
+        <td>
+          ${s.teacher?'<div class="done-badge"><i data-lucide="check" style="width:10px;height:10px"></i> 작성 완료</div>':''}
+          <textarea class="teacher-textarea" placeholder="교사 최종 기록을 입력하세요" oninput="updateTeacher(${s.no},this.value);autoResize(this)">${s.teacher||''}</textarea>
+          <div class="teacher-footer">
+            <span class="teacher-byte" id="byte-${s.no}">${(s.teacher||'').length}자</span>
+          </div>
+        </td>
+      </tr>
+    `;
+  }).join('');
+  document.querySelectorAll('.teacher-textarea').forEach(autoResize);
+  updateGenInfo();
+  lucide.createIcons();
+}
+function autoResize(el){ el.style.height='auto'; el.style.height=el.scrollHeight+'px'; }
+function toggleSel(no, checked){
+  if(checked) selectedNos.add(no); else selectedNos.delete(no);
+  updateGenInfo();
+}
+function toggleAll(checked){
+  if(checked){
+    STUDENTS.forEach(s=>{ if(s.file||s.kws.length) selectedNos.add(s.no); });
+  }else{
+    selectedNos.clear();
+  }
+  renderGenTable();
+}
+function updateGenInfo(){
+  const n = selectedNos.size;
+  document.getElementById('gen-sel-cnt').textContent = n;
+  document.getElementById('gen-btn').disabled = n===0;
+  document.getElementById('gen-btn-label').textContent = n>0?`선택 ${n}명 기록 생성 (${n} 크레딧)`:'선택 학생 기록 생성';
+  // 전체 체크박스 상태
+  const eligible = STUDENTS.filter(s=>s.file||s.kws.length).length;
+  const chk = document.getElementById('chk-all');
+  if(chk) chk.checked = eligible>0 && n===eligible;
+}
+function generateSelected(){
+  if(selectedNos.size===0) return;
+  const targets = [...selectedNos];
+  const btn = document.getElementById('gen-btn');
+  btn.disabled = true;
+  btn.innerHTML = '<div class="mini-spinner"></div> 생성 중...';
+  setTimeout(()=>{
+    targets.forEach(no=>{
+      const s = STUDENTS.find(x=>x.no===no);
+      const tpl = MOCK_AI_TEXT[no];
+      if(tpl){
+        s.ai = tpl;
+      }else{
+        const kwText = s.kws.map(k=>k.text).join(', ');
+        s.ai = `${s.name} 학생은 자율활동 시간에 ${kwText||'활동'}을 보여주며 적극적으로 참여하였음. 친구들과 협력하여 과제를 수행하는 과정에서 ${s.kws[0]?.text||'성실한 태도'}이(가) 두드러지게 드러났으며, 활동 후 소감 나누기에서도 자신의 생각을 논리적으로 표현하는 모습이 인상적임.`;
+      }
+    });
+    // 크레딧 차감
+    const credit = +document.getElementById('credit-num').textContent;
+    document.getElementById('credit-num').textContent = Math.max(0, credit-targets.length);
+    btn.innerHTML='<i data-lucide="sparkles" style="width:15px;height:15px"></i> <span id="gen-btn-label">선택 학생 기록 생성</span>';
+    renderGenTable();
+    showToast(targets.length+'명의 기록을 생성했어요.');
+  }, 1500);
+}
+function regenOne(no){
+  const s = STUDENTS.find(x=>x.no===no);
+  s.ai = '';
+  selectedNos = new Set([no]);
+  generateSelected();
+}
+function copyToTeacher(no){
+  const s = STUDENTS.find(x=>x.no===no);
+  if(!s.ai) return;
+  s.teacher = s.ai;
+  renderGenTable();
+  showToast(s.name+' 학생의 기록을 교사 최종 기록란에 복사했어요.');
+}
+function updateTeacher(no, val){
+  const s = STUDENTS.find(x=>x.no===no);
+  s.teacher = val;
+  document.getElementById('byte-'+no).textContent = val.length+'자';
+}
+function openGenSettings(){
+  showToast('생성 설정 화면(별도 페이지)으로 이동합니다.');
+}
+function finishWork(){
+  showToast('작업이 저장되었습니다. 목록으로 돌아갑니다.');
+  setTimeout(()=>goList(), 900);
+}
+
+// ─── 다이얼로그 ───
+function closeDlg(){
+  document.getElementById('dlg-confirm').classList.remove('show');
+  document.getElementById('dlg-mid').style.display='none';
+  document.getElementById('dlg-ok').textContent='삭제';
+  document.getElementById('dlg-ok').className='dlg-btn primary';
+  pendingDlg=null; pendingDlgMid=null;
+}
+function dlgConfirm(){ const fn=pendingDlg; closeDlg(); if(fn) fn(); }
+function dlgMidAction(){ const fn=pendingDlgMid; closeDlg(); if(fn) fn(); }
+
+// ─── Toast ───
+let toastTimer;
+function showToast(msg, type){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.style.background = type==='error' ? '#f2525f' : '#319d64';
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(()=>t.classList.remove('show'), 2800);
+}
+
+// ─── 네비 ───
+function toggleNav(){ document.body.classList.toggle('nav-expanded'); document.getElementById('icon-sb').classList.toggle('expanded'); }
+function goList(){ location.href='creative_activity_list_v5_260408.html'; }
+function goIndividual(){ location.href='creative_activity_detail_v4_260408.html'; }
+
+// ─── 초기화 ───
+lucide.createIcons();
+goStep(1);
+</script>
+</body>
+</html>
