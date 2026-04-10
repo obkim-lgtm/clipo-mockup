@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>연수 - CLIPO</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard-gov.min.css">
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+  <style>
+    * { font-family: 'Pretendard GOV', -apple-system, sans-serif; box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: #f6f7f9; }
+
+    /* ── 헤더 ── */
+    .g-hd { height: 56px; background: #fff; border-bottom: 1px solid #d9d9d9; display: flex; align-items: center; padding: 0 20px 0 8px; position: fixed; top: 0; left: 0; right: 0; z-index: 200; }
+    .g-hd-r { margin-left: auto; display: flex; align-items: center; gap: 6px; font-size: 14px; color: #3b3f4c; }
+    .plan-badge { background: #416bff; color: #fff; font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 4px; }
+    .hd-div { width: 1px; height: 14px; background: #d9d9d9; margin: 0 4px; }
+    .credit-wrap { display: flex; align-items: center; gap: 4px; padding: 4px 10px; background: #f6f7f9; border-radius: 6px; font-size: 13px; font-weight: 600; color: #3b3f4c; }
+    .user-btn { display: flex; align-items: center; gap: 4px; padding: 4px 10px; border: 1px solid #d9d9d9; border-radius: 6px; background: #fff; font-size: 13px; color: #3b3f4c; cursor: pointer; }
+
+    /* ── 사이드바 ── */
+    .icon-sb{width:56px;background:#fff;border-right:1px solid #d9d9d9;position:fixed;top:56px;bottom:0;left:0;display:flex;flex-direction:column;padding:8px 0;z-index:150;transition:width .2s ease}
+    .icon-sb.expanded{width:200px}
+    .si{height:40px;display:flex;align-items:center;border-radius:8px;color:#6d7381;cursor:pointer;margin-bottom:2px;position:relative;padding:0 4px 0 16px;gap:10px;white-space:nowrap;flex-shrink:0}
+    .si:hover{background:#f1f3f5}
+    .si.active{background:#e9f2ff;color:#416bff}
+    .si-icon{width:24px;height:24px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+    .si-label{font-size:13px;font-weight:500;opacity:0;transition:opacity .1s;overflow:hidden}
+    .icon-sb.expanded .si-label{opacity:1}
+    .si-tip{position:absolute;left:48px;top:50%;transform:translateY(-50%);background:#222631;color:#fff;font-size:11px;padding:3px 8px;border-radius:4px;white-space:nowrap;display:none;z-index:300;pointer-events:none}
+    .si:hover .si-tip{display:block}
+    .icon-sb.expanded .si-tip{display:none!important}
+    .nav-bottom{margin-top:auto;width:100%}
+    .nav-div{height:1px;background:#f1f3f5;margin:4px 0}
+    body.nav-expanded .main-shell{margin-left:200px;transition:margin-left .2s ease}
+
+    /* ── 메인 ── */
+    .main-shell { margin-left: 56px; margin-top: 56px; min-height: calc(100vh - 56px); transition: margin-left .2s ease; }
+    .main-inner { max-width: 1100px; margin: 0 auto; padding: 32px 48px 60px; }
+
+    /* ── 탭 ── */
+    .tab-bar { display: flex; gap: 0; border-bottom: 2px solid #e5e7eb; margin-bottom: 28px; }
+    .tab-item { padding: 12px 24px; font-size: 15px; font-weight: 500; color: #6d7381; cursor: pointer; border-bottom: 2px solid transparent; margin-bottom: -2px; transition: all .15s; }
+    .tab-item:hover { color: #3b3f4c; }
+    .tab-item.active { color: #416bff; font-weight: 600; border-bottom-color: #416bff; }
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+
+    /* ── 공통 ── */
+    .section-title { font-size: 20px; font-weight: 600; color: #222631; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+    .section-sub { font-size: 14px; color: #6d7381; margin-bottom: 20px; }
+
+    /* ── 히어로 배너 ── */
+    .hero-banner { background: linear-gradient(135deg, #416bff 0%, #6b8cff 50%, #93aaff 100%); border-radius: 16px; padding: 32px 36px; color: #fff; margin-bottom: 32px; position: relative; overflow: hidden; }
+    .hero-banner::after { content: ''; position: absolute; top: -40px; right: -20px; width: 200px; height: 200px; background: rgba(255,255,255,0.08); border-radius: 50%; }
+    .hero-banner::before { content: ''; position: absolute; bottom: -60px; right: 80px; width: 160px; height: 160px; background: rgba(255,255,255,0.05); border-radius: 50%; }
+    .hero-title { font-size: 24px; font-weight: 700; margin-bottom: 8px; position: relative; z-index: 1; }
+    .hero-desc { font-size: 15px; opacity: 0.9; line-height: 1.6; margin-bottom: 16px; position: relative; z-index: 1; }
+    .hero-badges { display: flex; gap: 12px; position: relative; z-index: 1; }
+    .hero-badge { display: flex; align-items: center; gap: 6px; background: rgba(255,255,255,0.18); backdrop-filter: blur(4px); padding: 8px 16px; border-radius: 8px; font-size: 14px; font-weight: 500; }
+
+    /* ── 연수 신청 카드 ── */
+    .training-card { background: #fff; border: 1px solid #d9d9d9; border-radius: 12px; padding: 24px 28px; transition: box-shadow .15s, border-color .15s; }
+    .training-card:hover { border-color: #b3b3b3; box-shadow: 0 4px 12px rgba(0,0,0,.08); }
+    .tc-badge { display: inline-block; font-size: 12px; font-weight: 600; padding: 3px 10px; border-radius: 20px; background: #e9f2ff; color: #365eef; margin-bottom: 12px; }
+    .tc-badge.closed { background: #f1f3f5; color: #6d7381; }
+    .tc-title { font-size: 18px; font-weight: 600; color: #222631; margin-bottom: 8px; }
+    .tc-meta { display: flex; flex-direction: column; gap: 6px; margin-bottom: 16px; }
+    .tc-meta-row { display: flex; align-items: center; gap: 8px; font-size: 14px; color: #6d7381; }
+    .tc-meta-row i { width: 16px; height: 16px; color: #808080; }
+    .tc-desc { font-size: 14px; color: #3b3f4c; line-height: 1.6; margin-bottom: 16px; padding: 12px 16px; background: #f6f7f9; border-radius: 8px; }
+    .btn-apply { display: inline-flex; align-items: center; gap: 6px; background: #365eef; color: #fff; border: none; border-radius: 6px; padding: 10px 20px; font-size: 14px; font-weight: 600; cursor: pointer; font-family: inherit; text-decoration: none; }
+    .btn-apply:hover { background: #3151c4; }
+
+    /* ── 혜택 3-step ── */
+    .benefit-section { margin-top: 36px; }
+    .benefit-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 16px; }
+    .benefit-card { background: #fff; border: 1px solid #e5e7eb; border-radius: 12px; padding: 24px 20px; text-align: center; }
+    .benefit-step { display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; background: #416bff; color: #fff; font-size: 13px; font-weight: 700; border-radius: 50%; margin-bottom: 12px; }
+    .benefit-icon { width: 48px; height: 48px; margin: 0 auto 12px; display: flex; align-items: center; justify-content: center; background: #f0f4ff; border-radius: 12px; color: #416bff; }
+    .benefit-title { font-size: 15px; font-weight: 600; color: #222631; margin-bottom: 6px; }
+    .benefit-desc { font-size: 13px; color: #6d7381; line-height: 1.5; }
+    .benefit-note { background: #f0f4ff; border-radius: 10px; padding: 16px 20px; display: flex; flex-direction: column; gap: 6px; }
+    .benefit-note-row { display: flex; align-items: flex-start; gap: 8px; font-size: 14px; color: #3b3f4c; line-height: 1.5; }
+    .benefit-note-row i { width: 16px; height: 16px; color: #416bff; margin-top: 2px; flex-shrink: 0; }
+
+    /* ── FAQ ── */
+    .faq-section { margin-top: 36px; }
+    .faq-item { background: #fff; border: 1px solid #e5e7eb; border-radius: 8px; margin-bottom: 8px; overflow: hidden; }
+    .faq-q { display: flex; align-items: center; justify-content: space-between; padding: 16px 20px; cursor: pointer; font-size: 15px; font-weight: 500; color: #222631; }
+    .faq-q i { width: 18px; height: 18px; color: #808080; transition: transform .2s; flex-shrink: 0; }
+    .faq-q.open i { transform: rotate(180deg); }
+    .faq-a { display: none; padding: 0 20px 16px; font-size: 14px; color: #6d7381; line-height: 1.7; }
+    .faq-a.open { display: block; }
+
+    /* ── 후기 캐러셀 (탭2) ── */
+    .review-section { margin-top: 32px; }
+    .review-stats { display: flex; gap: 24px; margin-bottom: 20px; }
+    .review-stat { background: #fff; border: 1px solid #e5e7eb; border-radius: 10px; padding: 16px 24px; text-align: center; flex: 1; }
+    .review-stat-num { font-size: 28px; font-weight: 700; color: #416bff; }
+    .review-stat-label { font-size: 13px; color: #6d7381; margin-top: 2px; }
+    .review-carousel-wrap { overflow: hidden; position: relative; }
+    .review-carousel { display: flex; gap: 16px; width: max-content; animation: marquee 20s linear infinite; }
+    .review-carousel:hover { animation-play-state: paused; }
+    @keyframes marquee { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+    .review-card { background: #fff; border: 1px solid #e5e7eb; border-radius: 10px; padding: 20px; min-width: 280px; flex-shrink: 0; }
+    .review-text { font-size: 14px; color: #3b3f4c; line-height: 1.6; font-style: italic; margin-bottom: 8px; }
+    .review-author { font-size: 13px; color: #808080; }
+
+    /* ── 지난 연수 (탭2) ── */
+    .filter-bar { display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; }
+    .filter-chip { padding: 6px 16px; font-size: 13px; font-weight: 500; border: 1px solid #d9d9d9; border-radius: 20px; background: #fff; color: #6d7381; cursor: pointer; font-family: inherit; }
+    .filter-chip:hover { border-color: #b3b3b3; }
+    .filter-chip.active { background: #416bff; color: #fff; border-color: #416bff; }
+    .video-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; }
+    .video-card { background: #fff; border: 1px solid #e5e7eb; border-radius: 12px; overflow: hidden; cursor: pointer; transition: box-shadow .15s, border-color .15s; }
+    .video-card:hover { border-color: #b3b3b3; box-shadow: 0 4px 12px rgba(0,0,0,.08); }
+    .video-thumb { width: 100%; aspect-ratio: 16/9; background: linear-gradient(135deg, #e0e7ff 0%, #c7d2fe 100%); display: flex; align-items: center; justify-content: center; position: relative; }
+    .video-thumb .play-icon { width: 48px; height: 48px; background: rgba(0,0,0,0.5); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #fff; }
+    .video-thumb .duration { position: absolute; bottom: 8px; right: 8px; background: rgba(0,0,0,0.7); color: #fff; font-size: 12px; padding: 2px 8px; border-radius: 4px; }
+    .video-info { padding: 16px; }
+    .video-tag { display: inline-block; font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 4px; margin-bottom: 8px; }
+    .tag-science { background: #dcfce7; color: #16a34a; }
+    .tag-general { background: #e9f2ff; color: #365eef; }
+    .tag-korean { background: #fef3c7; color: #d97706; }
+    .video-title { font-size: 16px; font-weight: 600; color: #222631; margin-bottom: 4px; }
+    .video-meta { font-size: 13px; color: #808080; }
+    .video-speaker { font-size: 13px; color: #6d7381; margin-top: 4px; }
+    .video-actions { display: flex; gap: 8px; margin-top: 12px; }
+    .btn-sm { display: inline-flex; align-items: center; gap: 4px; padding: 6px 12px; font-size: 13px; font-weight: 500; border-radius: 6px; border: 1px solid #d9d9d9; background: #fff; color: #3b3f4c; cursor: pointer; font-family: inherit; text-decoration: none; }
+    .btn-sm:hover { background: #f6f7f9; }
+    .btn-sm i { width: 14px; height: 14px; }
+
+    /* ── 강사지원 (탭3) ── */
+    .support-hero { background: #fff; border: 1px solid #e5e7eb; border-radius: 16px; padding: 32px; margin-bottom: 28px; }
+    .support-hero-title { font-size: 22px; font-weight: 700; color: #222631; margin-bottom: 8px; }
+    .support-hero-desc { font-size: 15px; color: #6d7381; line-height: 1.6; }
+    .support-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 28px; }
+    .support-card { background: #fff; border: 1px solid #e5e7eb; border-radius: 12px; padding: 24px; display: flex; gap: 16px; align-items: flex-start; }
+    .support-card-icon { width: 44px; height: 44px; border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .sci-blue { background: #e9f2ff; color: #416bff; }
+    .sci-green { background: #dcfce7; color: #16a34a; }
+    .sci-orange { background: #ffedd5; color: #ea580c; }
+    .sci-purple { background: #ebdfff; color: #6f34db; }
+    .support-card-title { font-size: 15px; font-weight: 600; color: #222631; margin-bottom: 4px; }
+    .support-card-desc { font-size: 13px; color: #6d7381; line-height: 1.5; }
+
+    .steps-section { background: #fff; border: 1px solid #e5e7eb; border-radius: 16px; padding: 32px; margin-bottom: 28px; }
+    .step-list { display: flex; flex-direction: column; gap: 16px; margin-top: 16px; }
+    .step-row { display: flex; align-items: flex-start; gap: 16px; }
+    .step-num { width: 32px; height: 32px; border-radius: 50%; background: #416bff; color: #fff; font-size: 14px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .step-content { padding-top: 4px; }
+    .step-title { font-size: 15px; font-weight: 600; color: #222631; margin-bottom: 2px; }
+    .step-desc { font-size: 14px; color: #6d7381; line-height: 1.5; }
+    .btn-primary-lg { display: inline-flex; align-items: center; gap: 8px; background: #365eef; color: #fff; border: none; border-radius: 8px; padding: 14px 28px; font-size: 15px; font-weight: 600; cursor: pointer; font-family: inherit; text-decoration: none; margin-top: 8px; }
+    .btn-primary-lg:hover { background: #3151c4; }
+
+    .newsletter-section { background: #fff; border: 1px solid #e5e7eb; border-radius: 16px; padding: 32px; }
+    .nl-title { font-size: 18px; font-weight: 600; color: #222631; margin-bottom: 6px; }
+    .nl-desc { font-size: 14px; color: #6d7381; margin-bottom: 16px; line-height: 1.5; }
+    .nl-form { display: flex; gap: 10px; }
+    .nl-input { flex: 1; padding: 12px 16px; font-size: 14px; font-family: inherit; border: 1px solid #d9d9d9; border-radius: 8px; }
+    .nl-input:focus { outline: none; border-color: #416bff; }
+    .nl-input::placeholder { color: #b3b3b3; }
+    .nl-btn { padding: 12px 24px; background: #416bff; color: #fff; border: none; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; font-family: inherit; white-space: nowrap; }
+    .nl-btn:hover { background: #3151c4; }
+
+    /* empty state */
+    .empty-state { text-align: center; padding: 48px 20px; color: #808080; }
+    .empty-state i { width: 48px; height: 48px; margin-bottom: 12px; color: #d9d9d9; }
+    .empty-state p { font-size: 15px; }
+  </style>
+</head>
+<body>
+
+<!-- 헤더 -->
+<header class="g-hd">
+  <button onclick="toggleNav()" style="width:36px;height:36px;border:none;background:none;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#3b3f4c;margin-right:8px">
+    <i data-lucide="menu" style="width:20px;height:20px"></i>
+  </button>
+  <svg width="76" height="16" viewBox="0 0 76 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M11.3613 4.03516H4.09668V11.9629H8.88281L8.88086 11.9648H15.6016V16H4.02539C1.80242 15.9998 0 14.223 0 12.0322V3.96777C0 1.77696 1.80242 0.000177874 4.02539 0H15.4561L11.3613 4.03516ZM22.0703 11.9648H33.5781V16H22.002C19.7788 16 17.9756 14.2231 17.9756 12.0322V0H22.0703V11.9648ZM40.0459 16H35.9521V0H40.0459V16ZM54.5381 0C56.4564 0 58.0138 1.53228 58.0186 3.42285L58.0166 3.4248V8.54297C58.014 10.4333 56.4567 11.9648 54.5361 11.9648H46.5107L42.416 16V0H54.5381ZM71.9746 0C74.0086 0.000134956 75.6887 1.49046 75.958 3.42285H76V12.5771H75.958C75.6887 14.5095 74.011 15.9999 71.9746 16H64.4238C62.3897 16 60.7098 14.5096 60.4404 12.5771C60.4145 12.398 60.3984 12.2184 60.3984 12.0322V3.96777C60.3984 3.78159 60.4145 3.60205 60.4404 3.42285C60.7098 1.49037 62.3873 0 64.4238 0H71.9746ZM64.4922 12.5771H71.9062V3.42285H64.4922V12.5771ZM46.5107 3.42285V8.54004H53.9238V3.42285H46.5107Z" fill="#365EEF"/>
+  </svg>
+  <div class="g-hd-r">
+    <span class="plan-badge">개인 유료</span>
+    <span style="font-size:13px;color:#6d7381">D-1710</span>
+    <div class="hd-div"></div>
+    <i data-lucide="bot" style="width:16px;height:16px;color:#416bff"></i>
+    <div class="credit-wrap">AI 크레딧 700</div>
+    <div class="hd-div"></div>
+    <button class="user-btn">
+      test99 선생님(담임) <i data-lucide="chevron-down" style="width:14px;height:14px"></i>
+    </button>
+  </div>
+</header>
+
+<!-- 사이드바 -->
+<nav class="icon-sb" id="icon-sb">
+  <div class="si"><div class="si-icon"><i data-lucide="home" style="width:20px;height:20px"></i></div><span class="si-label">홈</span><span class="si-tip">홈</span></div>
+  <div class="si"><div class="si-icon"><i data-lucide="scissors" style="width:20px;height:20px"></i></div><span class="si-label">평가계획</span><span class="si-tip">평가계획</span></div>
+  <div class="si"><div class="si-icon"><i data-lucide="layout-grid" style="width:20px;height:20px"></i></div><span class="si-label">수업</span><span class="si-tip">수업</span></div>
+  <div class="si"><div class="si-icon"><i data-lucide="notebook-pen" style="width:20px;height:20px"></i></div><span class="si-label">창의적 체험활동 <span style="font-size:10px;background:#416bff;color:#fff;padding:1px 5px;border-radius:3px;margin-left:2px">Beta</span></span><span class="si-tip">창의적 체험활동</span></div>
+  <div class="si"><div class="si-icon"><i data-lucide="zap" style="width:20px;height:20px"></i></div><span class="si-label">세특 간편 생성기</span><span class="si-tip">세특 간편 생성기</span></div>
+  <div class="si"><div class="si-icon"><i data-lucide="smile" style="width:20px;height:20px"></i></div><span class="si-label">행동특성 및 종합기록</span><span class="si-tip">행동특성 및 종합기록 지원</span></div>
+  <div class="si"><div class="si-icon"><i data-lucide="bar-chart-2" style="width:20px;height:20px"></i></div><span class="si-label">리포트</span><span class="si-tip">리포트</span></div>
+  <div class="si"><div class="si-icon"><i data-lucide="building-2" style="width:20px;height:20px"></i></div><span class="si-label">학교 설정</span><span class="si-tip">학교 설정</span></div>
+  <div class="nav-div"></div>
+  <div class="si active"><div class="si-icon"><i data-lucide="presentation" style="width:20px;height:20px"></i></div><span class="si-label">연수</span><span class="si-tip">연수</span></div>
+  <div class="nav-bottom">
+    <div class="nav-div"></div>
+    <div class="si"><div class="si-icon"><i data-lucide="file-down" style="width:20px;height:20px"></i></div><span class="si-label">매뉴얼 다운로드</span><span class="si-tip">매뉴얼 다운로드</span></div>
+    <div class="si"><div class="si-icon"><i data-lucide="credit-card" style="width:20px;height:20px"></i></div><span class="si-label">요금제</span><span class="si-tip">요금제</span></div>
+    <div class="si"><div class="si-icon"><i data-lucide="help-circle" style="width:20px;height:20px"></i></div><span class="si-label">고객센터</span><span class="si-tip">고객센터</span></div>
+  </div>
+</nav>
+
+<!-- 메인 -->
+<div class="main-shell">
+  <div class="main-inner">
+
+    <!-- 탭 바 -->
+    <div class="tab-bar">
+      <div class="tab-item active" onclick="switchTab('apply')">연수 신청</div>
+      <div class="tab-item" onclick="switchTab('archive')">지난 연수 보기</div>
+      <div class="tab-item" onclick="switchTab('instructor')">연수 강사 지원</div>
+    </div>
+
+    <!-- ========== 탭1: 연수 신청 ========== -->
+    <div class="tab-content active" id="tab-apply">
+
+      <!-- 히어로 배너 -->
+      <div class="hero-banner">
+        <div class="hero-title">연수 참여하면 AI 크레딧 200개 쿠폰!</div>
+        <div class="hero-desc">연수 참여자 전원에게 유료 이용권과 동일한 AI 크레딧 200개 쿠폰을 드려요.<br>등록일로부터 14일간 사용 가능합니다.</div>
+        <div class="hero-badges">
+          <div class="hero-badge"><i data-lucide="ticket" style="width:16px;height:16px"></i> AI 크레딧 200개</div>
+          <div class="hero-badge"><i data-lucide="clock" style="width:16px;height:16px"></i> 14일간 사용</div>
+          <div class="hero-badge"><i data-lucide="users" style="width:16px;height:16px"></i> 강사 · 수강자 모두</div>
+        </div>
+      </div>
+
+      <!-- 이번 달 연수 -->
+      <div class="section-title"><i data-lucide="calendar" style="width:20px;height:20px;color:#416bff"></i> 이번 달 연수</div>
+      <div style="margin-bottom:32px">
+        <div class="training-card">
+          <span class="tc-badge">신청 가능</span>
+          <div class="tc-title">[4월] 국어과 실전 연수</div>
+          <div class="tc-meta">
+            <div class="tc-meta-row"><i data-lucide="clock"></i> 4월 16일(목) 19:00 (90분)</div>
+            <div class="tc-meta-row"><i data-lucide="user"></i> 서울여중 성예은 선생님</div>
+            <div class="tc-meta-row"><i data-lucide="monitor"></i> Zoom 온라인 (신청 후 링크 발송)</div>
+          </div>
+          <div class="tc-desc">
+            <strong>IB 학교에서 클리포 200% 활용하기</strong><br>
+            서·논술형 평가 및 IB 학습자 피드백 실제 사례 공유
+          </div>
+          <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap">
+            <a href="https://docs.google.com/forms/d/e/1FAIpQLSfXA37xtWBcJutUvBFzqOS-RLsKDUKWK2auMx6ENoasGGOIpQ/viewform" target="_blank" class="btn-apply">
+              <i data-lucide="external-link" style="width:16px;height:16px"></i> 무료로 신청하기
+            </a>
+            <span style="font-size:13px;color:#808080">* 연수 후 자료를 이메일로 보내드립니다</span>
+          </div>
+        </div>
+      </div>
+
+
+      <!-- FAQ -->
+      <div class="faq-section">
+        <div class="section-title" style="margin-top:36px"><i data-lucide="help-circle" style="width:20px;height:20px;color:#416bff"></i> 자주 묻는 질문</div>
+        <div class="faq-item">
+          <div class="faq-q" onclick="toggleFaq(this)">연수는 어떻게 신청하나요? <i data-lucide="chevron-down"></i></div>
+          <div class="faq-a">이 페이지 상단 [이번 달 연수] 섹션에서 신청 링크를 클릭하신 후 간단한 정보만 입력해주시면 신청이 완료됩니다. (30초 내외)<br>클리포 공지사항과 이메일을 통해서도 신청 링크를 안내드리고 있어요!</div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-q" onclick="toggleFaq(this)">참가비가 있나요? <i data-lucide="chevron-down"></i></div>
+          <div class="faq-a">별도의 참가비는 없습니다. 편하게 참여해주시면 돼요!</div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-q" onclick="toggleFaq(this)">연수 참여 시 어떤 혜택이 있나요? <i data-lucide="chevron-down"></i></div>
+          <div class="faq-a">연수에 참여해주신 선생님들께는 감사의 마음을 담아 AI 크레딧 200개 특별 쿠폰을 제공해 드려요! 쿠폰 번호와 등록 방법은 연수 당일 안내드리고 있으니, 끝까지 잘 참여해주시면 감사하겠습니다.</div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-q" onclick="toggleFaq(this)">AI 크레딧 쿠폰은 어떻게 등록하나요? <i data-lucide="chevron-down"></i></div>
+          <div class="faq-a">클리포 우측 상단 이름 클릭 → '이용권 관리' 클릭 → 쿠폰 등록 메뉴에서 연수 당일 안내받은 쿠폰 코드를 입력하시면 즉시 적용됩니다.</div>
+        </div>
+        <div class="faq-item">
+          <div class="faq-q" onclick="toggleFaq(this)">연수 종료 후 자료(또는 영상)는 언제 올라오나요? <i data-lucide="chevron-down"></i></div>
+          <div class="faq-a">보통 연수 종료 후 3영업일 이내에 업로드하고 있으며, '지난 연수 보기' 탭에서 확인하실 수 있습니다. 연수에 따라 녹화본은 제공되지 않을 수도 있는 점 양해 부탁드립니다.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========== 탭2: 지난 연수 보기 ========== -->
+    <div class="tab-content" id="tab-archive">
+
+      <div class="filter-bar">
+        <button class="filter-chip active">전체</button>
+        <button class="filter-chip">국어</button>
+        <button class="filter-chip">과학</button>
+        <button class="filter-chip">클리포 입문</button>
+      </div>
+
+      <div class="video-grid">
+        <!-- 3월 과학 -->
+        <div class="video-card">
+          <div class="video-thumb" style="background: linear-gradient(135deg, #d1fae5, #a7f3d0);">
+            <div class="play-icon"><i data-lucide="play" style="width:24px;height:24px"></i></div>
+            <span class="duration">90분</span>
+          </div>
+          <div class="video-info">
+            <span class="video-tag tag-science">과학</span>
+            <div class="video-title">[3월] 과학과 실전 연수</div>
+            <div class="video-meta">2026.03.25</div>
+            <div class="video-speaker">경기 광수중 김요섭 선생님 (과학교사 K)</div>
+            <div style="font-size:13px;color:#6d7381;margin-top:4px;">AI로 끝내는 평가계획 생성 및 생기부 작성</div>
+            <div class="video-actions">
+              <a href="https://drive.google.com/drive/folders/1t4Jp68yiajE_deselYmDB2B3Y0zBxVDb?usp=sharing" target="_blank" class="btn-sm"><i data-lucide="download"></i> 자료 다운로드</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- 2월 입문 -->
+        <div class="video-card">
+          <div class="video-thumb" style="background: linear-gradient(135deg, #dbeafe, #bfdbfe);">
+            <div class="play-icon"><i data-lucide="play" style="width:24px;height:24px"></i></div>
+            <span class="duration">90분</span>
+          </div>
+          <div class="video-info">
+            <span class="video-tag tag-general">전과목</span>
+            <div class="video-title">[2월] 클리포 신학기 실전 연수</div>
+            <div class="video-meta">2026.02.24</div>
+            <div class="video-speaker">고등학교 현직 교사</div>
+            <div style="font-size:13px;color:#6d7381;margin-top:4px;">선생님의 퇴근을 앞당기는 클리포 완벽 가이드</div>
+            <div class="video-actions">
+              <a href="https://drive.google.com/drive/folders/1fF0Tby3BvYXBKbMDHm_-pnQ-EqIK7oGR?usp=sharing" target="_blank" class="btn-sm"><i data-lucide="download"></i> 자료 다운로드</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 후기 -->
+      <div class="review-section">
+        <div class="section-title" style="margin-top:36px"><i data-lucide="message-circle" style="width:20px;height:20px;color:#416bff"></i> 연수 후기</div>
+        <div class="review-stats">
+          <div class="review-stat">
+            <div class="review-stat-num">80%+</div>
+            <div class="review-stat-label">매우 만족</div>
+          </div>
+          <div class="review-stat">
+            <div class="review-stat-num">99%</div>
+            <div class="review-stat-label">추천 의향</div>
+          </div>
+        </div>
+        <div class="review-carousel-wrap">
+          <div class="review-carousel">
+            <div class="review-card">
+              <div class="review-text">"수행평가 기준안 만들어 주는 것 너무 좋았습니다. 신세계네요."</div>
+              <div class="review-author">- 연수 참여 선생님</div>
+            </div>
+            <div class="review-card">
+              <div class="review-text">"클리포가 막연히 어렵게만 느껴졌는데 실습을 통해 해 볼 수 있겠다는 자신감을 갖게 되었습니다."</div>
+              <div class="review-author">- 연수 참여 선생님</div>
+            </div>
+            <div class="review-card">
+              <div class="review-text">"채점의 신뢰도와 타당도를 높이는 방안을 소개해주신 점이 도움이 되었어요."</div>
+              <div class="review-author">- 연수 참여 선생님</div>
+            </div>
+            <div class="review-card">
+              <div class="review-text">"각 교과별로 따로 클리포 강의 열어주시면 너무 감사하겠습니다. 또 듣고 싶어요."</div>
+              <div class="review-author">- 연수 참여 선생님</div>
+            </div>
+            <!-- 복제 (끊김 없는 루프) -->
+            <div class="review-card">
+              <div class="review-text">"수행평가 기준안 만들어 주는 것 너무 좋았습니다. 신세계네요."</div>
+              <div class="review-author">- 연수 참여 선생님</div>
+            </div>
+            <div class="review-card">
+              <div class="review-text">"클리포가 막연히 어렵게만 느껴졌는데 실습을 통해 해 볼 수 있겠다는 자신감을 갖게 되었습니다."</div>
+              <div class="review-author">- 연수 참여 선생님</div>
+            </div>
+            <div class="review-card">
+              <div class="review-text">"채점의 신뢰도와 타당도를 높이는 방안을 소개해주신 점이 도움이 되었어요."</div>
+              <div class="review-author">- 연수 참여 선생님</div>
+            </div>
+            <div class="review-card">
+              <div class="review-text">"각 교과별로 따로 클리포 강의 열어주시면 너무 감사하겠습니다. 또 듣고 싶어요."</div>
+              <div class="review-author">- 연수 참여 선생님</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ========== 탭3: 연수 강사 지원 ========== -->
+    <div class="tab-content" id="tab-instructor">
+
+      <div class="support-hero">
+        <div class="support-hero-title">선생님이 직접 연수를 운영해보세요!</div>
+        <div class="support-hero-desc">클리포를 동료 선생님들에게 소개하고 싶으신가요?<br>자체 연수 운영에 필요한 모든 것을 지원해드립니다.</div>
+      </div>
+
+      <div class="section-title"><i data-lucide="package" style="width:20px;height:20px;color:#416bff"></i> 지원 내용</div>
+      <div class="support-grid">
+        <div class="support-card">
+          <div class="support-card-icon sci-blue"><i data-lucide="key-round" style="width:22px;height:22px"></i></div>
+          <div>
+            <div class="support-card-title">자동 인증 코드 발급</div>
+            <div class="support-card-desc">참여 선생님들이 재직증명서 없이 6자리 코드만으로 바로 교사인증을 완료할 수 있습니다.</div>
+          </div>
+        </div>
+        <div class="support-card">
+          <div class="support-card-icon sci-green"><i data-lucide="ticket" style="width:22px;height:22px"></i></div>
+          <div>
+            <div class="support-card-title">AI 크레딧 200개 쿠폰</div>
+            <div class="support-card-desc">강사·참여자 모두에게 유료 이용권과 동일한 AI 크레딧 200개를 14일간 제공합니다.</div>
+          </div>
+        </div>
+        <div class="support-card">
+          <div class="support-card-icon sci-orange"><i data-lucide="file-text" style="width:22px;height:22px"></i></div>
+          <div>
+            <div class="support-card-title">최신 연수 자료 제공</div>
+            <div class="support-card-desc">PPT/PDF 형식의 최신 연수 자료를 제공해드립니다. 주기적으로 업데이트됩니다.</div>
+          </div>
+        </div>
+        <div class="support-card">
+          <div class="support-card-icon sci-purple"><i data-lucide="headphones" style="width:22px;height:22px"></i></div>
+          <div>
+            <div class="support-card-title">연수 운영 가이드</div>
+            <div class="support-card-desc">연수 진행 시 자주 묻는 질문과 답변을 미리 정리해드립니다.</div>
+          </div>
+        </div>
+      </div>
+
+      <div style="margin-bottom:28px;background:#f8f9fb;border:1px solid #e5e7eb;border-radius:10px;padding:16px 20px;display:flex;align-items:center;gap:14px">
+        <i data-lucide="gift" style="width:20px;height:20px;color:#416bff;flex-shrink:0"></i>
+        <div style="font-size:14px;color:#3b3f4c;line-height:1.5">
+          연수 참여 선생님 모두에게 유료 이용권과 동일한 <strong style="color:#365eef">AI 크레딧 200개</strong> 쿠폰을 증정합니다. <span style="color:#808080">(14일간 사용 가능)</span>
+        </div>
+      </div>
+
+      <div class="steps-section">
+        <div class="section-title" style="margin-bottom:0"><i data-lucide="list-ordered" style="width:20px;height:20px;color:#416bff"></i> 신청 방법</div>
+        <div class="step-list">
+          <div class="step-row">
+            <div class="step-num">1</div>
+            <div class="step-content">
+              <div class="step-title">클리포 로그인</div>
+              <div class="step-desc">클리포 홈페이지에 접속 후 로그인해주세요.</div>
+            </div>
+          </div>
+          <div class="step-row">
+            <div class="step-num">2</div>
+            <div class="step-content">
+              <div class="step-title">고객센터 > 1:1 문의</div>
+              <div class="step-desc">고객센터 내 '1:1 문의' 게시판에 접속해주세요.</div>
+            </div>
+          </div>
+          <div class="step-row">
+            <div class="step-num">3</div>
+            <div class="step-content">
+              <div class="step-title">연수 정보 작성</div>
+              <div class="step-desc">문의유형: 기타 / 제목에 '연수' 포함 / 내용에 성함, 소속 학교, 연락처, 연수 예정일·참여자 수 등을 적어주세요.</div>
+            </div>
+          </div>
+          <div class="step-row">
+            <div class="step-num">4</div>
+            <div class="step-content">
+              <div class="step-title">연수일 5일 전까지 신청</div>
+              <div class="step-desc">확인 후 답변을 드리며, 인증 코드·쿠폰·연수 자료를 전달해드립니다.</div>
+            </div>
+          </div>
+        </div>
+        <a href="https://clipo.ai/teachers/helps/questions/create" target="_blank" class="btn-primary-lg" style="margin-top:24px">
+          <i data-lucide="send" style="width:18px;height:18px"></i> 연수 운영 지원 신청하기
+        </a>
+      </div>
+
+      <!-- 연수 자료 -->
+      <div style="background:#fff;border:1px solid #e5e7eb;border-radius:16px;padding:32px;margin-bottom:28px">
+        <div class="section-title" style="margin-bottom:8px"><i data-lucide="folder-open" style="width:20px;height:20px;color:#416bff"></i> 연수 자료</div>
+        <p style="font-size:14px;color:#6d7381;margin-bottom:16px;line-height:1.5">정확하고 효과적인 연수를 위해 최신 사항이 반영된 연수 자료를 PPT와 PDF 형식으로 제공합니다.</p>
+        <a href="https://drive.google.com/drive/u/0/folders/1Ju8OZNFOcgA3tiSf9Ig2_ZN9BqFv8iIx" target="_blank" class="btn-sm" style="font-size:14px;padding:10px 18px">
+          <i data-lucide="external-link" style="width:16px;height:16px"></i> 클리포 연수 자료 확인하기
+        </a>
+      </div>
+
+      <!-- 뉴스레터 -->
+      <div class="newsletter-section">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
+          <i data-lucide="mail" style="width:20px;height:20px;color:#416bff"></i>
+          <div class="nl-title">강사 뉴스레터 구독</div>
+        </div>
+        <div class="nl-desc">클리포 업데이트 소식, 새 연수 자료, 강사 팁을 이메일로 받아보세요.<br>연수를 진행하시는 선생님들을 위한 전용 소식지입니다.</div>
+        <div class="nl-form" id="nl-form">
+          <input type="email" class="nl-input" id="nl-email" placeholder="이메일 주소를 입력해주세요">
+          <button class="nl-btn" id="nl-btn" onclick="subscribeNewsletter()">구독하기</button>
+        </div>
+        <div id="nl-msg" style="display:none;margin-top:10px;font-size:14px;padding:10px 14px;border-radius:8px"></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+lucide.createIcons();
+
+function toggleNav() {
+  document.getElementById('icon-sb').classList.toggle('expanded');
+  document.body.classList.toggle('nav-expanded');
+}
+
+function switchTab(tab) {
+  document.querySelectorAll('.tab-item').forEach((el, i) => {
+    const tabs = ['apply', 'archive', 'instructor'];
+    el.classList.toggle('active', tabs[i] === tab);
+  });
+  document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+  document.getElementById('tab-' + tab).classList.add('active');
+}
+
+function toggleFaq(el) {
+  el.classList.toggle('open');
+  el.nextElementSibling.classList.toggle('open');
+}
+
+// 필터 칩
+document.querySelectorAll('.filter-chip').forEach(chip => {
+  chip.addEventListener('click', () => {
+    document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+    chip.classList.add('active');
+  });
+});
+
+// ── 뉴스레터 구독 ──
+// ⚠️ 아래 URL을 Google Apps Script 배포 URL로 교체하세요
+const APPS_SCRIPT_URL = 'YOUR_APPS_SCRIPT_URL_HERE';
+
+function subscribeNewsletter() {
+  const email = document.getElementById('nl-email').value.trim();
+  const btn = document.getElementById('nl-btn');
+  const msg = document.getElementById('nl-msg');
+
+  if (!email || !email.includes('@')) {
+    showMsg('이메일 주소를 정확히 입력해주세요.', 'error');
+    return;
+  }
+
+  if (APPS_SCRIPT_URL === 'YOUR_APPS_SCRIPT_URL_HERE') {
+    showMsg('Apps Script URL이 아직 설정되지 않았습니다. newsletter_apps_script.js 참고해주세요.', 'error');
+    return;
+  }
+
+  btn.textContent = '전송 중...';
+  btn.disabled = true;
+
+  fetch(APPS_SCRIPT_URL, {
+    method: 'POST',
+    mode: 'no-cors',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email: email })
+  })
+  .then(() => {
+    showMsg('구독이 완료되었습니다! 감사합니다.', 'success');
+    document.getElementById('nl-email').value = '';
+  })
+  .catch(() => {
+    showMsg('오류가 발생했습니다. 잠시 후 다시 시도해주세요.', 'error');
+  })
+  .finally(() => {
+    btn.textContent = '구독하기';
+    btn.disabled = false;
+  });
+}
+
+function showMsg(text, type) {
+  const msg = document.getElementById('nl-msg');
+  msg.style.display = 'block';
+  msg.textContent = text;
+  msg.style.background = type === 'success' ? '#dcfce7' : '#fee2e2';
+  msg.style.color = type === 'success' ? '#16a34a' : '#dc2626';
+  setTimeout(() => { msg.style.display = 'none'; }, 4000);
+}
+</script>
+
+</body>
+</html>
