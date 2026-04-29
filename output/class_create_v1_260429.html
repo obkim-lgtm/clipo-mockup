@@ -129,7 +129,24 @@
     /* 반 편성 하위 영역 */
     .ban-sub{display:flex;flex-direction:column;gap:12px;margin-top:12px;padding-left:30px;border-left:2px solid #e9f2ff}
     .ban-sub.hidden{display:none}
-    .ban-sub .field-class{max-width:240px}
+    .ban-sub .field-class{max-width:280px}
+
+    /* Multiselect */
+    .multiselect{position:relative;width:100%}
+    .ms-trigger{height:40px;border:1px solid #dde1e8;border-radius:4px;padding:0 12px;font-size:16px;font-weight:500;color:#222631;background:#fff;cursor:pointer;width:100%;display:flex;align-items:center;gap:8px;font-family:inherit;text-align:left}
+    .ms-trigger:focus,.multiselect.open .ms-trigger{outline:none;border-color:#416bff}
+    .ms-display{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+    .ms-display.placeholder{color:#6d7381;font-weight:500}
+    .ms-trigger i{flex-shrink:0;color:#6d7381;transition:transform .15s}
+    .multiselect.open .ms-trigger i{transform:rotate(180deg)}
+    .ms-panel{display:none;position:absolute;top:44px;left:0;right:0;background:#fff;border:1px solid #dde1e8;border-radius:4px;box-shadow:0 4px 12px rgba(0,0,0,.1);max-height:260px;overflow-y:auto;z-index:50;padding:4px}
+    .multiselect.open .ms-panel{display:block}
+    .ms-item{display:flex;align-items:center;gap:10px;padding:8px 10px;cursor:pointer;font-size:15px;color:#222631;border-radius:4px}
+    .ms-item:hover{background:#f6f7f9}
+    .ms-item input{display:none}
+    .ms-checkbox{width:18px;height:18px;border:1px solid #d9d9d9;border-radius:4px;flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:.15s;background:#fff}
+    .ms-item input:checked ~ .ms-checkbox{background:#416bff;border-color:#416bff}
+    .ms-item input:checked ~ .ms-checkbox::after{content:'';width:5px;height:9px;border-right:2px solid #fff;border-bottom:2px solid #fff;transform:rotate(45deg);margin-bottom:2px}
 
     .modal-footer{display:flex;gap:12px;justify-content:flex-end;padding:8px 24px 16px}
     .btn-outline{height:40px;background:transparent;border:1px solid #a3c3ff;border-radius:4px;padding:10px 16px;font-size:15px;font-weight:500;color:#3151c4;cursor:pointer}
@@ -411,12 +428,14 @@
         <!-- 학적 기준반 하위 -->
         <div class="ban-sub" id="banSubHomeroom">
           <div class="field field-class" id="fieldClass">
-            <label class="field-label req">반</label>
-            <select class="select" id="selClass">
-              <option value="1">1-1반</option>
-              <option value="2">1-2반</option>
-              <option value="3">1-3반</option>
-            </select>
+            <label class="field-label req">반 <span style="font-weight:400;color:#6d7381">(여러 반 선택 가능)</span></label>
+            <div class="multiselect" id="msClass">
+              <button class="ms-trigger" type="button" onclick="toggleMsClass(event)">
+                <span class="ms-display placeholder" id="msDisplay">반을 선택해 주세요</span>
+                <i data-lucide="chevron-down" style="width:20px;height:20px"></i>
+              </button>
+              <div class="ms-panel" id="msPanel"></div>
+            </div>
           </div>
           <div class="notice-box">
             <i data-lucide="info"></i>
@@ -499,6 +518,10 @@
     document.getElementById('selSubject').selectedIndex = 0;
     document.getElementById('selSubject').classList.add('placeholder');
     document.getElementById('inputClassName').value = '';
+    selectedClasses = [];
+    buildClassPanel();
+    updateMsDisplay();
+    document.getElementById('msClass').classList.remove('open');
   }
 
   function createClass(){
@@ -512,19 +535,12 @@
       return;
     }
 
-    let classTag, classTagClass;
-    if(isHomeroom){
-      const opt = document.getElementById('selClass').selectedOptions[0];
-      if(!opt){ alert('반을 선택해 주세요.'); return; }
-      const m = opt.text.match(/^(\d+)-(\d+)반$/);
-      classTag = m ? `${m[1]}학년 ${m[2]}반` : opt.text;
-      classTagClass = 'tag-class';
-    } else {
-      classTag = '이동수업반';
-      classTagClass = 'tag-move';
+    if(isHomeroom && selectedClasses.length === 0){
+      alert('반을 선택해 주세요.');
+      return;
     }
 
-    // Build card via DOM (안전한 텍스트 삽입)
+    // Build card via DOM
     const card = document.createElement('article');
     card.className = 'card';
     card.addEventListener('click', goToClass);
@@ -547,14 +563,26 @@
 
     const tags = document.createElement('div');
     tags.className = 'card-tags';
-    const tag1 = document.createElement('span');
-    tag1.className = `tag ${classTagClass}`;
-    tag1.textContent = classTag;
-    const tag2 = document.createElement('span');
-    tag2.className = 'tag tag-subject';
-    tag2.textContent = subjectText;
-    tags.appendChild(tag1);
-    tags.appendChild(tag2);
+    if(isHomeroom){
+      // 선택한 반마다 태그 1개씩
+      selectedClasses.forEach(s => {
+        const m = s.label.match(/^(\d+)-(\d+)반$/);
+        const tagText = m ? `${m[1]}학년 ${m[2]}반` : s.label;
+        const tag = document.createElement('span');
+        tag.className = 'tag tag-class';
+        tag.textContent = tagText;
+        tags.appendChild(tag);
+      });
+    } else {
+      const tag = document.createElement('span');
+      tag.className = 'tag tag-move';
+      tag.textContent = '이동수업반';
+      tags.appendChild(tag);
+    }
+    const subjectTag = document.createElement('span');
+    subjectTag.className = 'tag tag-subject';
+    subjectTag.textContent = subjectText;
+    tags.appendChild(subjectTag);
 
     card.appendChild(cardTop);
     card.appendChild(meta);
@@ -576,30 +604,82 @@
     resetForm();
   }
 
+  let selectedClasses = []; // [{val:'1-1', label:'1-1반'}, ...]
+
+  function getClassOptionsForGrade(grade){
+    const opts = [];
+    if(grade === 'none'){
+      for(let g=1; g<=6; g++) for(let i=1; i<=3; i++) opts.push({val:`${g}-${i}`, label:`${g}-${i}반`});
+    } else {
+      for(let i=1; i<=3; i++) opts.push({val:`${grade}-${i}`, label:`${grade}-${i}반`});
+    }
+    return opts;
+  }
+
+  function buildClassPanel(){
+    const panel = document.getElementById('msPanel');
+    panel.innerHTML = '';
+    const grade = document.getElementById('selGrade').value;
+    const opts = getClassOptionsForGrade(grade);
+    opts.forEach(o => {
+      const label = document.createElement('label');
+      label.className = 'ms-item';
+      const cb = document.createElement('input');
+      cb.type = 'checkbox';
+      cb.value = o.val;
+      cb.checked = selectedClasses.some(s => s.val === o.val);
+      cb.addEventListener('change', () => toggleClassOption(o));
+      const box = document.createElement('span');
+      box.className = 'ms-checkbox';
+      const text = document.createElement('span');
+      text.textContent = o.label;
+      label.appendChild(cb);
+      label.appendChild(box);
+      label.appendChild(text);
+      panel.appendChild(label);
+    });
+  }
+
+  function toggleClassOption(o){
+    const idx = selectedClasses.findIndex(s => s.val === o.val);
+    if(idx === -1) selectedClasses.push(o);
+    else selectedClasses.splice(idx, 1);
+    // 학년 순서대로 정렬
+    selectedClasses.sort((a, b) => a.val.localeCompare(b.val, undefined, {numeric:true}));
+    updateMsDisplay();
+  }
+
+  function updateMsDisplay(){
+    const disp = document.getElementById('msDisplay');
+    if(selectedClasses.length === 0){
+      disp.textContent = '반을 선택해 주세요';
+      disp.classList.add('placeholder');
+    } else {
+      disp.textContent = selectedClasses.map(s => s.label).join(', ');
+      disp.classList.remove('placeholder');
+    }
+  }
+
+  function toggleMsClass(e){
+    e.stopPropagation();
+    document.getElementById('msClass').classList.toggle('open');
+  }
+
+  // 외부 클릭 시 패널 닫기
+  document.addEventListener('click', (e) => {
+    const ms = document.getElementById('msClass');
+    if(ms && !ms.contains(e.target)) ms.classList.remove('open');
+  });
+
   function updateClassOptions(){
     const grade = document.getElementById('selGrade').value;
-    const sel = document.getElementById('selClass');
     const noticeMain = document.getElementById('noticeMain');
-
-    sel.innerHTML = '';
+    selectedClasses = []; // 학년 바뀌면 초기화
+    buildClassPanel();
+    updateMsDisplay();
     if(grade === 'none'){
-      // 학년 구분 없음 → 학교에 등록된 모든 반 (1-1반 ... 6-3반)
-      for(let g=1; g<=6; g++){
-        for(let i=1; i<=3; i++){
-          const opt = document.createElement('option');
-          opt.value = `${g}-${i}`;
-          opt.textContent = `${g}-${i}반`;
-          sel.appendChild(opt);
-        }
-      }
       noticeMain.textContent = '선택한 반의 학생이 자동으로 참여 학생에 추가됩니다.';
     } else {
-      for(let i=1; i<=3; i++){
-        const opt = document.createElement('option');
-        opt.value = i;
-        opt.textContent = `${grade}-${i}반`;
-        sel.appendChild(opt);
-      }
       noticeMain.textContent = '선택한 학년·반의 학생이 자동으로 참여 학생에 추가됩니다.';
     }
   }
