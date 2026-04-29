@@ -1,0 +1,1075 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/svg+xml" href="clipo_favicon.svg">
+  <title>AI 채점 · CLIPO</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard-gov.min.css">
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+  <style>
+    * { font-family: 'Pretendard GOV', -apple-system, sans-serif; box-sizing: border-box; }
+    body { margin: 0; background: #f6f7f9; color:#222631; }
+
+    /* ===== Global Header (CLIPO NB v2.0) ===== */
+    .global-header { height:56px; background:white; position:fixed; top:0; left:0; right:0; z-index:210; display:flex; justify-content:space-between; align-items:center; padding:0; border-bottom:1px solid #dde1e8; }
+    .gh-left { display:flex; align-items:center; gap:6px; padding-left:8px; }
+    .gh-right { display:flex; align-items:center; gap:10px; padding-right:20px; }
+    .gh-menu-btn { width:40px; height:40px; border:none; background:none; border-radius:4px; color:#3b3f4c; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; }
+    .gh-menu-btn:hover { background:#f6f7f9; }
+    .gh-logo { display:inline-flex; align-items:center; text-decoration:none; }
+    .gh-plan { height:22px; display:inline-flex; align-items:center; padding:0 9px; border-radius:100px; background:#e9f2ff; border:1px solid #ccdfff; font-size:13px; font-weight:500; color:#3151c4; }
+    .gh-dday { font-size:15px; font-weight:500; color:#222631; }
+    .gh-credit { display:inline-flex; align-items:center; gap:5px; font-size:15px; font-weight:500; color:#222631; }
+    .gh-sep { width:0; height:14px; border-left:1px solid #dde1e8; }
+    .gh-user { display:inline-flex; align-items:center; gap:3px; font-size:15px; font-weight:500; color:#222631; border:none; background:none; cursor:pointer; font-family:inherit; }
+
+    /* ===== Sidebar ===== */
+    .sidebar { position:fixed; top:56px; left:0; bottom:0; width:56px; background:white; border-right:1px solid #dde1e8; transition:width .2s; z-index:200; display:flex; flex-direction:column; justify-content:space-between; overflow:hidden; }
+    .sidebar.expanded { width:222px; }
+    .nv-main, .nv-bottom { display:flex; flex-direction:column; padding:8px 0; }
+    .nv-item { display:flex; align-items:center; padding:10px; gap:10px; border-radius:4px; margin:0 8px; color:#3b3f4c; font-size:15px; font-weight:500; text-decoration:none; cursor:pointer; position:relative; }
+    .nv-item i { width:20px; height:20px; flex-shrink:0; }
+    .nv-item .nv-label { opacity:0; transition:opacity .1s; white-space:nowrap; display:inline-flex; align-items:center; }
+    .sidebar.expanded .nv-item .nv-label { opacity:1; }
+    .nv-item.active { background:#e9f2ff; color:#3151c4; font-weight:600; }
+    .nv-item:hover:not(.active) { background:#f6f7f9; }
+    .nv-div { height:1px; background:#dde1e8; margin:8px; }
+    .sidebar:not(.expanded) .nv-item:hover::after { content:attr(data-tip); position:absolute; left:52px; top:50%; transform:translateY(-50%); background:#222631; color:white; padding:4px 8px; border-radius:4px; font-size:13px; white-space:nowrap; z-index:300; }
+    .nv-beta { font-size:11px; font-weight:600; padding:2px 6px; border-radius:4px; background:#ebdfff; color:#6f34db; margin-left:6px; }
+
+    /* ===== Main Content Area ===== */
+    .main { position:fixed; top:56px; left:56px; right:0; bottom:0; background:#f6f7f9; overflow:auto; transition:left .2s; }
+    body.nav-expanded .main { left:222px; }
+
+    /* ===== Page Inner Tabs ===== */
+    .ptabs { display:flex; gap:2px; border-bottom:1px solid #dde1e8; }
+    .ptab { padding:10px 16px; font-size:15px; font-weight:500; color:#6d7381; border-bottom:2px solid transparent; cursor:pointer; background:none; border-top:none; border-left:none; border-right:none; font-family:inherit; }
+    .ptab.active { color:#3151c4; border-bottom:2px solid #416bff; font-weight:600; }
+
+    /* ===== Panels / Cards ===== */
+    .panel { background:white; border-radius:12px; padding:24px; box-shadow:0 0 1px #2226314D, 0 4px 8px #0000001A; }
+    .card { background:white; border:1px solid #dde1e8; border-radius:12px; padding:24px; }
+
+    /* ===== Buttons ===== */
+    .btn { display:inline-flex; align-items:center; justify-content:center; gap:6px; border-radius:4px; cursor:pointer; font-family:inherit; white-space:nowrap; border:1px solid transparent; }
+    .btn-primary { background:#416bff; color:white; border-color:#416bff; height:40px; padding:0 16px; font-size:15px; font-weight:600; }
+    .btn-primary:hover { background:#365eef; border-color:#365eef; }
+    .btn-primary.compact { height:34px; font-size:14px; padding:0 12px; }
+    .btn-primary.small { height:28px; font-size:13px; padding:0 10px; }
+    .btn-secondary { background:white; color:#3151c4; border:1px solid #ccdfff; height:40px; padding:0 16px; font-size:15px; font-weight:600; }
+    .btn-secondary:hover { background:#e9f2ff; }
+    .btn-secondary.compact { height:34px; font-size:14px; padding:0 12px; }
+    .btn-outline { background:white; color:#3b3f4c; border:1px solid #d9d9d9; height:40px; padding:0 16px; font-size:15px; font-weight:500; }
+    .btn-outline:hover { background:#f6f7f9; }
+    .btn-ghost { background:transparent; color:#416bff; border:none; padding:0; font-size:15px; font-weight:600; cursor:pointer; font-family:inherit; display:inline-flex; align-items:center; gap:4px; }
+    .btn-ghost:hover { text-decoration:underline; }
+    .btn-icon { width:34px; height:34px; padding:0; background:white; border:1px solid #d9d9d9; color:#3b3f4c; border-radius:4px; display:inline-flex; align-items:center; justify-content:center; cursor:pointer; }
+    .btn-icon:hover { background:#f6f7f9; }
+
+    /* ===== Status Badge (pill) ===== */
+    .pill { display:inline-flex; align-items:center; border-radius:100px; padding:3px 10px; font-size:13px; font-weight:600; }
+    .pill-done { background:#eefcf4; color:#319d64; }
+    .pill-progress { background:#e9f2ff; color:#3151c4; }
+    .pill-muted { background:#f6f7f9; color:#6d7381; }
+
+    /* Scoring status badges (table) */
+    .b-done  { background:#eefcf4; color:#319d64; }
+    .b-doing { background:#fff7ed; color:#ea580c; }
+    .b-todo  { background:#fff7ed; color:#f97316; }
+    .b-check { background:#fff3f4; color:#f2525f; }
+    .b-review{ background:#fff7ed; color:#f97316; }
+
+    /* Score chip */
+    .score-chip { display:inline-flex; align-items:center; justify-content:center; padding:2px 8px; border-radius:4px; font-size:14px; font-weight:500; background:#e9f2ff; color:#3151c4; }
+
+    /* Progress bar */
+    .progress-bar-bg { background:#e9f2ff; border-radius:4px; height:8px; flex:1; overflow:hidden; }
+    .progress-bar-fill { background:#416bff; height:100%; border-radius:4px; transition:width .3s; }
+
+    /* Modal */
+    .modal-overlay { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.4); z-index:1000; align-items:center; justify-content:center; }
+    .modal-overlay.open { display:flex; }
+    .modal-box { background:white; border-radius:12px; box-shadow:0 0 1px #2226314D, 0 4px 8px #0000001A; width:672px; max-width:90vw; overflow:hidden; }
+
+    /* Toast */
+    .toast { position:fixed; bottom:28px; left:50%; transform:translateX(-50%) translateY(12px);
+      font-size:15px; font-weight:600; font-family:inherit;
+      padding:14px 20px; border-radius:8px; z-index:9999;
+      min-width:320px; max-width:90vw;
+      display:flex; align-items:center; gap:12px;
+      opacity:0; transition:opacity .25s ease, transform .25s ease;
+      pointer-events:none;
+      box-shadow:0 0 1px #2226314D, 0 4px 8px #0000001A;
+      line-height:1.55; }
+    .toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
+    .toast.toast-success { background:#319d64; color:white; }
+    .toast.toast-error { background:#db3e51; color:white; }
+    .toast.toast-loading { background:#416bff; color:white; }
+
+    /* Radio card */
+    .radio-card { border:none; border-radius:0; padding:0; cursor:pointer; display:flex; align-items:center; gap:10px; }
+    .radio-card .radio-dot { width:20px; height:20px; border-radius:50%; border:1.5px solid #b3b3b3; flex-shrink:0; background:white; }
+    .radio-card.selected .radio-dot { border:5px solid #416bff; }
+
+    /* Checkbox */
+    .chk { width:20px; height:20px; border-radius:2px; border:1px solid #b3b3b3; flex-shrink:0; display:flex; align-items:center; justify-content:center; cursor:pointer; background:white; }
+    .chk.checked { background:#416bff; border-color:#416bff; }
+    .chk.checked::after { content:''; display:block; width:6px; height:10px; border:solid white; border-width:0 2px 2px 0; transform:rotate(45deg) translateY(-1px); }
+
+    /* Spin */
+    @keyframes spin { to { transform:rotate(360deg); } }
+    .animate-spin { animation:spin 1s linear infinite; }
+
+    /* SPA */
+    .screen { display:none; }
+    .screen.active { display:block; }
+
+    /* Table (B-plan class detail) */
+    .tbl-b { width:100%; border-collapse:collapse; font-size:15px; }
+    .tbl-b thead th { background:#f6f7f9; color:#222631; font-weight:600; padding:14px 12px; border-bottom:1px solid #dde1e8; text-align:center; font-size:15px; }
+    .tbl-b tbody td { padding:14px 12px; border-bottom:1px solid #f0f2f5; text-align:center; color:#222631; font-size:15px; }
+    .tbl-b tbody tr:hover { background:#f6f7f9; }
+
+    /* Eval table row (list screen) */
+    .evhead { display:flex; background:#f6f7f9; border-radius:8px; height:42px; align-items:center; font-size:15px; font-weight:600; color:#222631; text-align:center; }
+    .evrow { display:flex; align-items:center; min-height:62px; border-bottom:1px solid #dde1e8; font-size:15px; color:#222631; }
+    .evrow:last-child { border-bottom:none; }
+  </style>
+</head>
+<body>
+
+<!-- ===== Global Header ===== -->
+<div class="global-header">
+  <div class="gh-left">
+    <button class="gh-menu-btn" onclick="toggleNav()"><i data-lucide="menu" style="width:20px;height:20px"></i></button>
+    <a class="gh-logo" href="#">
+      <svg width="76" height="16" viewBox="0 0 76 16" fill="none"><path d="M11.3613 4.03516H4.09668V11.9629H8.88281L8.88086 11.9648H15.6016V16H4.02539C1.80242 15.9998 0 14.223 0 12.0322V3.96777C0 1.77696 1.80242 0.000177874 4.02539 0H15.4561L11.3613 4.03516ZM22.0703 11.9648H33.5781V16H22.002C19.7788 16 17.9756 14.2231 17.9756 12.0322V0H22.0703V11.9648ZM40.0459 16H35.9521V0H40.0459V16ZM54.5381 0C56.4564 0 58.0138 1.53228 58.0186 3.42285L58.0166 3.4248V8.54297C58.014 10.4333 56.4567 11.9648 54.5361 11.9648H46.5107L42.416 16V0H54.5381ZM71.9746 0C74.0086 0.000134956 75.6887 1.49046 75.958 3.42285H76V12.5771H75.958C75.6887 14.5095 74.011 15.9999 71.9746 16H64.4238C62.3897 16 60.7098 14.5096 60.4404 12.5771C60.4145 12.398 60.3984 12.2184 60.3984 12.0322V3.96777C60.3984 3.78159 60.4145 3.60205 60.4404 3.42285C60.7098 1.49037 62.3873 0 64.4238 0H71.9746ZM64.4922 12.5771H71.9062V3.42285H64.4922V12.5771ZM46.5107 3.42285V8.54004H53.9238V3.42285H46.5107Z" fill="#365EEF"/></svg>
+    </a>
+  </div>
+  <div class="gh-right">
+    <div class="gh-plan">학교 유료</div>
+    <span class="gh-dday">D-180</span>
+    <div class="gh-credit"><i data-lucide="wand-sparkles" style="width:20px;height:20px"></i>AI 크레딧 200</div>
+    <div class="gh-sep"></div>
+    <button class="gh-user">최대표 선생님(대표교사)<i data-lucide="chevron-down" style="width:20px;height:20px"></i></button>
+  </div>
+</div>
+
+<!-- ===== Sidebar ===== -->
+<aside class="sidebar" id="sidebar">
+  <nav class="nv-main">
+    <a class="nv-item" data-tip="홈"><i data-lucide="home"></i><span class="nv-label">홈</span></a>
+    <a class="nv-item" data-tip="평가계획"><i data-lucide="scissors"></i><span class="nv-label">평가계획</span></a>
+    <div class="nv-div"></div>
+    <a class="nv-item active" data-tip="수업"><i data-lucide="clipboard-list"></i><span class="nv-label">수업</span></a>
+    <div class="nv-div"></div>
+    <a class="nv-item" data-tip="세특 간편 생성기"><i data-lucide="zap"></i><span class="nv-label">세특 간편 생성기<span class="nv-beta">Beta</span></span></a>
+    <a class="nv-item" data-tip="행동특성 및 종합기록 지원"><i data-lucide="refresh-cw"></i><span class="nv-label">행동특성 및 종합기록 지원</span></a>
+    <a class="nv-item" data-tip="리포트"><i data-lucide="bar-chart-2"></i><span class="nv-label">리포트</span></a>
+    <a class="nv-item" data-tip="학교 설정"><i data-lucide="building-2"></i><span class="nv-label">학교 설정</span></a>
+  </nav>
+  <div class="nv-bottom">
+    <div class="nv-div"></div>
+    <a class="nv-item" data-tip="매뉴얼 다운로드"><i data-lucide="file-down"></i><span class="nv-label">매뉴얼 다운로드</span></a>
+    <a class="nv-item" data-tip="요금제"><i data-lucide="credit-card"></i><span class="nv-label">요금제</span></a>
+    <a class="nv-item" data-tip="고객센터"><i data-lucide="circle-help"></i><span class="nv-label">고객센터</span></a>
+  </div>
+</aside>
+
+<!-- ===== Main Content ===== -->
+<div class="main">
+
+<!-- ===== SCREEN 0: AI 채점 목록 ===== -->
+<div id="screen-list" class="screen active">
+
+  <!-- 타이틀 바 -->
+  <div style="background:white; padding:24px 32px 16px; border-bottom:1px solid #dde1e8;">
+    <div style="max-width:1240px; margin:0 auto;">
+      <div style="font-size:22px; font-weight:700; color:#222631; margin-bottom:4px;">1학년 국어</div>
+      <div style="font-size:15px; color:#6d7381;">AI Assistant와 함께 과제를 채점합니다</div>
+    </div>
+  </div>
+
+  <!-- 탭 영역 + 본문 -->
+  <div style="padding:24px 32px 80px;">
+    <div style="max-width:1240px; margin:0 auto;">
+
+      <!-- 페이지 내 탭 -->
+      <div class="ptabs" style="margin-bottom:24px;">
+        <button class="ptab" onclick="location.href='eval_home_v6_260403.html'">평가 홈</button>
+        <button class="ptab">평가 대상</button>
+        <button class="ptab" onclick="location.href='evaluation_design_v3_260403.html'">평가 설계</button>
+        <button class="ptab" onclick="goTaskReview()">과제물 관리</button>
+        <button class="ptab active">AI 채점</button>
+        <button class="ptab" onclick="location.href='report_list_v1.html'">평가 리포트</button>
+      </div>
+
+      <!-- 패널 -->
+      <div class="panel" style="display:flex; flex-direction:column; gap:24px;">
+
+        <!-- 헤더 -->
+        <div>
+          <div style="font-size:20px; font-weight:700; color:#222631; margin-bottom:6px;">AI 채점</div>
+          <div style="font-size:16px; color:#3b3f4c; line-height:1.55;">AI Assistant와 함께 과제를 채점하고 피드백 기록을 생성할 수 있습니다. AI는 선생님을 보조하는 역할을 하며 채점의 최종 권한은 선생님에게만 있습니다.</div>
+        </div>
+
+        <!-- 섹션 -->
+        <div style="background:#f6f7f9; border-radius:12px; padding:24px; display:flex; flex-direction:column; gap:20px;">
+
+          <!-- 카드: 평가명(최종) (C안) -->
+          <div class="card">
+            <div style="font-size:18px; font-weight:700; color:#222631; margin-bottom:16px;">평가명(최종)</div>
+            <div style="width:100%;">
+              <div class="evhead">
+                <div style="width:80px;">상태</div>
+                <div style="width:90px;">결과 공개</div>
+                <div style="width:70px;">반</div>
+                <div style="flex:1;">채점 현황</div>
+                <div style="width:110px;">원점수 평균</div>
+                <div style="width:270px;">AI 채점</div>
+                <div style="width:160px;">채점 실시 결과</div>
+              </div>
+              <!-- C안 1-1: 채점 완료 -->
+              <div class="evrow">
+                <div style="width:80px; text-align:center;"><span class="pill pill-done">완료</span></div>
+                <div style="width:90px; text-align:center;"><span class="pill pill-muted">비공개</span></div>
+                <div style="width:70px; text-align:center; font-weight:600;">1-1</div>
+                <div style="flex:1; display:flex; align-items:center; gap:10px; padding:0 16px;"><div class="progress-bar-bg" style="max-width:120px;"><div class="progress-bar-fill" style="width:100%;"></div></div><span style="font-size:14px; color:#222631; font-weight:600;">9/9</span></div>
+                <div style="width:110px; text-align:center; font-weight:600;">12.6</div>
+                <div style="width:270px; display:flex; align-items:center; justify-content:center; gap:8px;">
+                  <button class="btn btn-primary compact" onclick="openRerunModal(1)"><i data-lucide="rotate-cw" style="width:16px;height:16px;"></i>재실행</button>
+                  <button class="btn btn-secondary compact"><i data-lucide="chart-column-decreasing" style="width:16px;height:16px;"></i>AI 점수 확인</button>
+                </div>
+                <div style="width:160px; text-align:center;"><button class="btn-ghost" onclick="showClassC(1)">채점 결과 상세 <i data-lucide="chevron-right" style="width:14px;height:14px;"></i></button></div>
+              </div>
+              <!-- C안 1-2: AI 채점 실행 (OCR 일부 미확인) -->
+              <div class="evrow">
+                <div style="width:80px; text-align:center;"><span class="pill pill-progress">진행</span></div>
+                <div style="width:90px; text-align:center;"><span class="pill pill-muted">비공개</span></div>
+                <div style="width:70px; text-align:center; font-weight:600;">1-2</div>
+                <div style="flex:1; display:flex; align-items:center; gap:10px; padding:0 16px;"><div class="progress-bar-bg" style="max-width:120px;"><div class="progress-bar-fill" style="width:0%;"></div></div><span style="font-size:14px; color:#6d7381; font-weight:600;">0/14</span></div>
+                <div style="width:110px; text-align:center; color:#6d7381;">-</div>
+                <div style="width:270px; text-align:center;"><button class="btn btn-primary compact" onclick="openOcrFewModal()"><i data-lucide="wand-sparkles" style="width:16px;height:16px;"></i>AI 채점 실행</button></div>
+                <div style="width:160px; text-align:center;"><button class="btn-ghost" style="opacity:0.4; cursor:default;" disabled>채점 결과 상세</button></div>
+              </div>
+              <!-- C안 1-3: AI 채점 실행 (OCR 먼저) -->
+              <div class="evrow" style="border-bottom:none;">
+                <div style="width:80px; text-align:center;"><span class="pill pill-progress">진행</span></div>
+                <div style="width:90px; text-align:center;"><span class="pill pill-muted">비공개</span></div>
+                <div style="width:70px; text-align:center; font-weight:600;">1-3</div>
+                <div style="flex:1; display:flex; align-items:center; gap:10px; padding:0 16px;"><div class="progress-bar-bg" style="max-width:120px;"><div class="progress-bar-fill" style="width:0%;"></div></div><span style="font-size:14px; color:#6d7381; font-weight:600;">0/14</span></div>
+                <div style="width:110px; text-align:center; color:#6d7381;">-</div>
+                <div style="width:270px; text-align:center;"><button class="btn btn-primary compact" onclick="openOcrFirstModal()"><i data-lucide="wand-sparkles" style="width:16px;height:16px;"></i>AI 채점 실행</button></div>
+                <div style="width:160px; text-align:center;"><button class="btn-ghost" style="opacity:0.4; cursor:default;" disabled>채점 결과 상세</button></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 카드: 미래 사회 예측 시나리오(A안) -->
+          <div class="card">
+            <div style="font-size:18px; font-weight:700; color:#222631; margin-bottom:16px;">미래 사회 예측 시나리오(A안)</div>
+            <div style="width:100%;">
+              <div class="evhead">
+                <div style="width:80px;">상태</div>
+                <div style="width:90px;">결과 공개</div>
+                <div style="width:70px;">반</div>
+                <div style="flex:1;">채점 현황</div>
+                <div style="width:110px;">원점수 평균</div>
+                <div style="width:270px;">AI 채점</div>
+                <div style="width:160px;">채점 실시 결과</div>
+              </div>
+              <!-- Row 1: 1-1반 (OCR 일부 미확인) -->
+              <div class="evrow">
+                <div style="width:80px; text-align:center;"><span class="pill pill-progress">진행</span></div>
+                <div style="width:90px; text-align:center;"><span class="pill pill-muted">비공개</span></div>
+                <div style="width:70px; text-align:center; font-weight:600;">1-1</div>
+                <div style="flex:1; display:flex; align-items:center; gap:10px; padding:0 16px;"><div class="progress-bar-bg" style="max-width:120px;"><div class="progress-bar-fill" style="width:0%;"></div></div><span style="font-size:14px; color:#6d7381; font-weight:600;">0/14</span></div>
+                <div style="width:110px; text-align:center; color:#6d7381;">-</div>
+                <div style="width:270px; text-align:center;"><button class="btn btn-primary compact" onclick="openOcrFewModal()"><i data-lucide="wand-sparkles" style="width:16px;height:16px;"></i>AI 채점 실행</button></div>
+                <div style="width:160px; text-align:center;"><button class="btn-ghost">수동 채점 진행</button></div>
+              </div>
+              <!-- Row 2: 1-2반 (OCR 과반 미확인) -->
+              <div class="evrow">
+                <div style="width:80px; text-align:center;"><span class="pill pill-progress">진행</span></div>
+                <div style="width:90px; text-align:center;"><span class="pill pill-muted">비공개</span></div>
+                <div style="width:70px; text-align:center; font-weight:600;">1-2</div>
+                <div style="flex:1; display:flex; align-items:center; gap:10px; padding:0 16px;"><div class="progress-bar-bg" style="max-width:120px;"><div class="progress-bar-fill" style="width:0%;"></div></div><span style="font-size:14px; color:#6d7381; font-weight:600;">0/14</span></div>
+                <div style="width:110px; text-align:center; color:#6d7381;">-</div>
+                <div style="width:270px; text-align:center;"><button class="btn btn-primary compact" onclick="openOcrManyModal()"><i data-lucide="wand-sparkles" style="width:16px;height:16px;"></i>AI 채점 실행</button></div>
+                <div style="width:160px; text-align:center;"><button class="btn-ghost">수동 채점 진행</button></div>
+              </div>
+              <!-- Row 3: 1-3반 (OCR 모두 확인) -->
+              <div class="evrow" style="border-bottom:none;">
+                <div style="width:80px; text-align:center;"><span class="pill pill-progress">진행</span></div>
+                <div style="width:90px; text-align:center;"><span class="pill pill-muted">비공개</span></div>
+                <div style="width:70px; text-align:center; font-weight:600;">1-3</div>
+                <div style="flex:1; display:flex; align-items:center; gap:10px; padding:0 16px;"><div class="progress-bar-bg" style="max-width:120px;"><div class="progress-bar-fill" style="width:0%;"></div></div><span style="font-size:14px; color:#6d7381; font-weight:600;">0/14</span></div>
+                <div style="width:110px; text-align:center; color:#6d7381;">-</div>
+                <div style="width:270px; text-align:center;"><button class="btn btn-primary compact" onclick="openRunModal()"><i data-lucide="wand-sparkles" style="width:16px;height:16px;"></i>AI 채점 실행</button></div>
+                <div style="width:160px; text-align:center;"><button class="btn-ghost">수동 채점 진행</button></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 카드: 창작 문화 비평(B안) -->
+          <div class="card">
+            <div style="font-size:18px; font-weight:700; color:#222631; margin-bottom:16px;">창작 문화 비평(B안)</div>
+            <div style="width:100%;">
+              <div class="evhead">
+                <div style="width:80px;">상태</div>
+                <div style="width:90px;">결과 공개</div>
+                <div style="width:70px;">반</div>
+                <div style="flex:1;">채점 현황</div>
+                <div style="width:110px;">원점수 평균</div>
+                <div style="width:270px;">AI 채점</div>
+                <div style="width:160px;">채점 실시 결과</div>
+              </div>
+              <!-- B안 1-1: 채점 완료 -->
+              <div class="evrow">
+                <div style="width:80px; text-align:center;"><span class="pill pill-done">완료</span></div>
+                <div style="width:90px; text-align:center;"><span class="pill pill-muted">비공개</span></div>
+                <div style="width:70px; text-align:center; font-weight:600;">1-1</div>
+                <div style="flex:1; display:flex; align-items:center; gap:10px; padding:0 16px;"><div class="progress-bar-bg" style="max-width:120px;"><div class="progress-bar-fill" style="width:100%;"></div></div><span style="font-size:14px; color:#222631; font-weight:600;">9/9</span></div>
+                <div style="width:110px; text-align:center; font-weight:600;">12.6</div>
+                <div style="width:270px; display:flex; align-items:center; justify-content:center; gap:8px;">
+                  <button class="btn btn-primary compact" onclick="openRerunModal(1)"><i data-lucide="rotate-cw" style="width:16px;height:16px;"></i>재실행</button>
+                  <button class="btn btn-secondary compact"><i data-lucide="chart-column-decreasing" style="width:16px;height:16px;"></i>AI 점수 확인</button>
+                </div>
+                <div style="width:160px; text-align:center;"><button class="btn-ghost" onclick="showClassB(1)">채점 결과 상세 <i data-lucide="chevron-right" style="width:14px;height:14px;"></i></button></div>
+              </div>
+              <!-- B안 1-2: 채점 완료 -->
+              <div class="evrow">
+                <div style="width:80px; text-align:center;"><span class="pill pill-done">완료</span></div>
+                <div style="width:90px; text-align:center;"><span class="pill pill-muted">비공개</span></div>
+                <div style="width:70px; text-align:center; font-weight:600;">1-2</div>
+                <div style="flex:1; display:flex; align-items:center; gap:10px; padding:0 16px;"><div class="progress-bar-bg" style="max-width:120px;"><div class="progress-bar-fill" style="width:100%;"></div></div><span style="font-size:14px; color:#222631; font-weight:600;">9/9</span></div>
+                <div style="width:110px; text-align:center; font-weight:600;">11.4</div>
+                <div style="width:270px; display:flex; align-items:center; justify-content:center; gap:8px;">
+                  <button class="btn btn-primary compact" onclick="openRerunModal(2)"><i data-lucide="rotate-cw" style="width:16px;height:16px;"></i>재실행</button>
+                  <button class="btn btn-secondary compact"><i data-lucide="chart-column-decreasing" style="width:16px;height:16px;"></i>AI 점수 확인</button>
+                </div>
+                <div style="width:160px; text-align:center;"><button class="btn-ghost" onclick="showClassB(2)">채점 결과 상세 <i data-lucide="chevron-right" style="width:14px;height:14px;"></i></button></div>
+              </div>
+              <!-- B안 1-3: AI 채점 실행 (OCR 먼저) -->
+              <div class="evrow" style="border-bottom:none;">
+                <div style="width:80px; text-align:center;"><span class="pill pill-progress">진행</span></div>
+                <div style="width:90px; text-align:center;"><span class="pill pill-muted">비공개</span></div>
+                <div style="width:70px; text-align:center; font-weight:600;">1-3</div>
+                <div style="flex:1; display:flex; align-items:center; gap:10px; padding:0 16px;"><div class="progress-bar-bg" style="max-width:120px;"><div class="progress-bar-fill" style="width:0%;"></div></div><span style="font-size:14px; color:#6d7381; font-weight:600;">0/14</span></div>
+                <div style="width:110px; text-align:center; color:#6d7381;">-</div>
+                <div style="width:270px; text-align:center;"><button class="btn btn-primary compact" onclick="openOcrFirstModal()"><i data-lucide="wand-sparkles" style="width:16px;height:16px;"></i>AI 채점 실행</button></div>
+                <div style="width:160px; text-align:center;"><button class="btn-ghost" style="opacity:0.4; cursor:default;" disabled>채점 결과 상세</button></div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+</div><!-- /screen-list -->
+
+<!-- ===== SCREEN 1: B안 학급 채점 결과 상세 ===== -->
+<div id="screen-class-b" class="screen">
+
+  <!-- 타이틀 바 -->
+  <div style="background:white; padding:20px 32px; border-bottom:1px solid #dde1e8;">
+    <div style="max-width:1240px; margin:0 auto; display:flex; align-items:center; gap:12px;">
+      <i data-lucide="arrow-left" style="width:24px;height:24px;color:#3b3f4c;cursor:pointer;flex-shrink:0;" onclick="showScreen('screen-list')"></i>
+      <span style="font-size:22px; font-weight:700; color:#222631;">1학년 국어</span>
+      <div style="width:1px; height:20px; background:#dde1e8; margin:0 4px;"></div>
+      <span id="class-b-subtitle" style="font-size:16px; font-weight:500; color:#6d7381;">창작 문화 비평(B안) — 채점 결과</span>
+    </div>
+  </div>
+
+  <!-- 탭 + 본문 -->
+  <div style="padding:24px 32px 80px;">
+    <div style="max-width:1240px; margin:0 auto;">
+
+      <!-- 페이지 내 탭 -->
+      <div class="ptabs" style="margin-bottom:24px;">
+        <button class="ptab" onclick="location.href='eval_home_v6_260403.html'">평가 홈</button>
+        <button class="ptab">평가 대상</button>
+        <button class="ptab" onclick="location.href='evaluation_design_v3_260403.html'">평가 설계</button>
+        <button class="ptab" onclick="goTaskReview()">과제물 관리</button>
+        <button class="ptab active">AI 채점</button>
+        <button class="ptab" onclick="location.href='report_list_v1.html'">평가 리포트</button>
+      </div>
+
+      <!-- 패널 -->
+      <div class="panel">
+
+        <!-- 타이틀 행 -->
+        <div style="display:flex; justify-content:space-between; align-items:center; gap:24px; margin-bottom:16px;">
+          <div>
+            <h2 id="class-b-title" style="font-size:20px; font-weight:700; margin:0; color:#222631;">1-1반 채점 결과 상세</h2>
+            <div style="color:#3b3f4c; font-size:16px; margin-top:6px; line-height:1.55;">채점을 실시하고 결과를 엑셀로 내려받거나 출력해 활용할 수 있습니다.</div>
+          </div>
+          <div style="display:flex; align-items:center; gap:8px; flex-shrink:0;">
+            <button class="btn btn-secondary compact"><i data-lucide="file-down" style="width:16px;height:16px;"></i>채점 결과 다운로드</button>
+            <button class="btn btn-primary compact"><i data-lucide="printer" style="width:16px;height:16px;"></i>결과지 출력 · 배부</button>
+          </div>
+        </div>
+
+        <!-- Callout -->
+        <div style="display:flex; align-items:center; gap:14px; background:#e9f2ff; border:1px solid #ccdfff; border-radius:8px; padding:14px 20px; margin-bottom:20px;">
+          <div style="width:32px; height:32px; border-radius:50%; background:#416bff; color:white; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
+            <i data-lucide="sparkles" style="width:18px;height:18px;"></i>
+          </div>
+          <div style="flex:1; font-size:15px; color:#3151c4; line-height:1.55;">
+            채점이 끝났다면 <strong style="color:#365eef;">「결과지 출력 · 배부」</strong>로 학생별 피드백을 바로 인쇄해 보세요.
+            점수와 선생님 작성 피드백을 파일로 받으려면 <strong style="color:#365eef;">「채점 결과 다운로드」</strong>를 이용하세요.
+          </div>
+        </div>
+
+        <!-- 테이블 섹션 -->
+        <div style="border:1px solid #dde1e8; border-radius:12px; background:white; overflow:hidden;">
+          <div style="display:flex; align-items:center; justify-content:space-between; padding:16px 20px; border-bottom:1px solid #dde1e8; background:#f6f7f9;">
+            <h3 style="margin:0; font-size:17px; font-weight:700; color:#222631;">채점 진행 결과</h3>
+            <div style="display:flex; align-items:center; gap:8px;">
+              <button class="btn btn-primary compact"><i data-lucide="wand-sparkles" style="width:16px;height:16px;"></i>AI 채점 실행</button>
+              <button class="btn-icon"><i data-lucide="bar-chart-3" style="width:18px;height:18px;"></i></button>
+              <button class="btn-icon"><i data-lucide="rotate-cw" style="width:18px;height:18px;"></i></button>
+            </div>
+          </div>
+          <table class="tbl-b">
+            <thead>
+              <tr>
+                <th style="width:100px;">상태</th>
+                <th style="width:90px;">학번</th>
+                <th style="width:90px;">이름</th>
+                <th>AI 채점 결과</th>
+                <th style="width:80px;">점수</th>
+                <th style="width:160px;">선생님 채점</th>
+              </tr>
+            </thead>
+            <tbody id="class-b-tbody"></tbody>
+          </table>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+
+</div><!-- /screen-class-b -->
+
+</div><!-- /.main -->
+
+<!-- ===== OCR 경고 모달 (소수) — 2명 미확인 ===== -->
+<div id="ocrFewModal" class="modal-overlay" onclick="if(event.target===this) closeOcrFewModal()">
+  <div class="modal-box">
+    <div style="padding:24px 24px 16px; position:relative;">
+      <div style="display:flex; align-items:center; gap:10px; padding-right:36px;">
+        <i data-lucide="triangle-alert" style="width:22px;height:22px;color:#f97316;flex-shrink:0;"></i>
+        <span style="font-size:20px; font-weight:600; color:#222631;">OCR 미확인 학생이 있습니다</span>
+      </div>
+      <button onclick="closeOcrFewModal()" style="position:absolute;top:11px;right:11px;width:36px;height:36px;background:none;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;border-radius:6px;" onmouseover="this.style.background='#f6f7f9'" onmouseout="this.style.background='none'">
+        <i data-lucide="x" style="width:20px;height:20px;color:#6d7381;"></i>
+      </button>
+    </div>
+    <div style="padding:0 24px 20px; display:flex; flex-direction:column; gap:14px;">
+      <p style="font-size:16px; color:#3b3f4c; line-height:1.55; margin:0;">아래 학생의 OCR 결과가 아직 확인되지 않았습니다. 인식 불확실 구간이 있어 채점 정확도에 영향을 줄 수 있습니다.</p>
+      <div style="border:1px solid #fed7aa; border-radius:8px; overflow:hidden; background:#fff7ed;">
+        <div style="padding:12px 16px; display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid #fed7aa;">
+          <div style="display:flex; align-items:center; gap:8px;">
+            <i data-lucide="triangle-alert" style="width:14px;height:14px;color:#f97316;"></i>
+            <span style="font-size:16px; font-weight:600; color:#222631;">10102 이준호</span>
+            <span style="font-size:13px; font-weight:600; background:#ffedd5; color:#ea580c; border-radius:100px; padding:2px 8px;">2개 문항</span>
+          </div>
+          <a href="task_ocr_review_v1.html#ocr=10102" target="_blank" style="font-size:14px; font-weight:600; color:#416bff; display:inline-flex; align-items:center; gap:4px; text-decoration:none;">
+            OCR 결과 확인 <i data-lucide="external-link" style="width:13px;height:13px;"></i>
+          </a>
+        </div>
+        <div style="padding:12px 16px; display:flex; align-items:center; justify-content:space-between;">
+          <div style="display:flex; align-items:center; gap:8px;">
+            <i data-lucide="triangle-alert" style="width:14px;height:14px;color:#f97316;"></i>
+            <span style="font-size:16px; font-weight:600; color:#222631;">10103 박지민</span>
+            <span style="font-size:13px; font-weight:600; background:#ffedd5; color:#ea580c; border-radius:100px; padding:2px 8px;">1개 문항</span>
+          </div>
+          <a href="task_ocr_review_v1.html#ocr=10103" target="_blank" style="font-size:14px; font-weight:600; color:#416bff; display:inline-flex; align-items:center; gap:4px; text-decoration:none;">
+            OCR 결과 확인 <i data-lucide="external-link" style="width:13px;height:13px;"></i>
+          </a>
+        </div>
+      </div>
+    </div>
+    <div style="padding:8px 24px 20px; display:flex; justify-content:flex-end; gap:10px;">
+      <button class="btn btn-secondary" onclick="location.href='task_ocr_review_v1.html#list'">과제물 확인하러 가기</button>
+      <button class="btn btn-primary" onclick="proceedToRunModal('ocrFewModal')">이대로 채점 진행하기</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== OCR 경고 모달 (다수) — 8/14명 미확인 ===== -->
+<div id="ocrManyModal" class="modal-overlay" onclick="if(event.target===this) closeOcrManyModal()">
+  <div class="modal-box">
+    <div style="padding:24px 24px 16px; position:relative;">
+      <div style="display:flex; align-items:center; gap:10px; padding-right:36px;">
+        <i data-lucide="triangle-alert" style="width:22px;height:22px;color:#f2525f;flex-shrink:0;"></i>
+        <span style="font-size:20px; font-weight:600; color:#222631;">다수 학생의 OCR 결과가 확인되지 않았습니다</span>
+      </div>
+      <button onclick="closeOcrManyModal()" style="position:absolute;top:11px;right:11px;width:36px;height:36px;background:none;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;border-radius:6px;" onmouseover="this.style.background='#f6f7f9'" onmouseout="this.style.background='none'">
+        <i data-lucide="x" style="width:20px;height:20px;color:#6d7381;"></i>
+      </button>
+    </div>
+    <div style="padding:0 24px 20px; display:flex; flex-direction:column; gap:14px;">
+      <div style="background:#fff3f4; border:1px solid #f2525f; border-radius:8px; padding:14px 16px; display:flex; align-items:flex-start; gap:10px;">
+        <i data-lucide="info" style="width:18px;height:18px;color:#f2525f;flex-shrink:0;margin-top:2px;"></i>
+        <div style="font-size:16px; color:#3b3f4c; line-height:1.65;">
+          <strong style="color:#db3e51;">1-2반 학생 14명 중 8명</strong>의 OCR 결과가 확인되지 않았습니다.<br>
+          활동지의 특정 문항 구성으로 인해 손글씨 인식률이 낮을 수 있습니다.<br>
+          채점 전 OCR 결과를 일괄 검토하는 것을 권장합니다.
+        </div>
+      </div>
+    </div>
+    <div style="padding:8px 24px 20px; display:flex; justify-content:flex-end; gap:10px;">
+      <button class="btn btn-secondary" onclick="location.href='task_ocr_review_v1.html#list'">과제물 확인하러 가기</button>
+      <button class="btn btn-primary" onclick="proceedToRunModal('ocrManyModal')">이대로 채점 진행하기</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== OCR 먼저 진행 모달 ===== -->
+<div id="ocrFirstModal" class="modal-overlay" onclick="if(event.target===this) closeOcrFirstModal()">
+  <div class="modal-box" style="width:520px;">
+
+    <!-- 1단계: 안내 -->
+    <div id="ocrf-stage1">
+      <div style="padding:28px 28px 0; position:relative;">
+        <button onclick="closeOcrFirstModal()" style="position:absolute;top:16px;right:16px;width:36px;height:36px;background:none;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;border-radius:6px;" onmouseover="this.style.background='#f6f7f9'" onmouseout="this.style.background='none'">
+          <i data-lucide="x" style="width:20px;height:20px;color:#6d7381;"></i>
+        </button>
+        <div style="display:flex; flex-direction:column; align-items:center; gap:16px; text-align:center; padding-bottom:24px;">
+          <div style="width:64px;height:64px;border-radius:16px;background:#e9f2ff;display:flex;align-items:center;justify-content:center;">
+            <i data-lucide="scan-text" style="width:32px;height:32px;color:#416bff;"></i>
+          </div>
+          <div>
+            <div style="font-size:20px; font-weight:700; color:#222631; margin-bottom:8px;">AI 채점 전 OCR 분석이 필요해요</div>
+            <div style="font-size:16px; color:#3b3f4c; line-height:1.65;">1-3반 학생들의 제출물이 아직 OCR 처리되지 않았습니다.<br>손글씨 인식 결과를 확인하고 채점해야 정확한 결과를 얻을 수 있어요.</div>
+          </div>
+        </div>
+      </div>
+      <div style="padding:0 28px 24px;">
+        <div style="background:#e9f2ff; border:1px solid #ccdfff; border-radius:8px; padding:16px 20px; display:flex; gap:14px; align-items:flex-start;">
+          <i data-lucide="info" style="width:18px;height:18px;color:#416bff;flex-shrink:0;margin-top:2px;"></i>
+          <div style="font-size:15px; color:#3151c4; line-height:1.65;">
+            <strong>OCR 분석을 먼저 진행합니다.</strong><br>
+            분석 완료 후 확인이 필요한 항목을 검토하거나, 별도 확인 없이 바로 AI 채점을 실행할 수 있어요.
+          </div>
+        </div>
+      </div>
+      <div style="padding:0 28px 28px; display:flex; justify-content:flex-end; gap:10px;">
+        <button class="btn btn-outline" onclick="closeOcrFirstModal()">취소</button>
+        <button class="btn btn-primary" onclick="startOcrAnalysis()"><i data-lucide="scan-text" style="width:16px;height:16px;"></i>OCR 분석 시작하기</button>
+      </div>
+    </div>
+
+    <!-- 2단계: 진행 중 -->
+    <div id="ocrf-stage2" style="display:none;">
+      <div style="padding:48px 28px 40px; display:flex; flex-direction:column; align-items:center; gap:28px; text-align:center;">
+        <div style="width:72px;height:72px;border-radius:50%;background:#e9f2ff;display:flex;align-items:center;justify-content:center;">
+          <i data-lucide="loader-circle" style="width:36px;height:36px;color:#416bff;" class="animate-spin"></i>
+        </div>
+        <div>
+          <div style="font-size:20px; font-weight:700; color:#222631; margin-bottom:8px;">OCR 분석 중...</div>
+          <div id="ocrf-prog-text" style="font-size:16px; color:#6d7381; font-weight:500;">9명 중 0명 처리 완료</div>
+        </div>
+        <div style="width:100%;">
+          <div style="background:#e9f2ff; border-radius:8px; height:10px; overflow:hidden;">
+            <div id="ocrf-prog-bar" style="background:#416bff; height:100%; border-radius:8px; width:0%; transition:width .4s ease;"></div>
+          </div>
+          <div style="display:flex; justify-content:space-between; margin-top:8px; font-size:13px; color:#6d7381; font-weight:500;">
+            <span>처리 중</span>
+            <span id="ocrf-prog-pct">0%</span>
+          </div>
+        </div>
+        <div id="ocrf-current-stu" style="font-size:14px; color:#416bff; font-weight:600; min-height:20px;"></div>
+      </div>
+    </div>
+
+    <!-- 3단계: 결과 (review) -->
+    <div id="ocrf-stage3-review" style="display:none;">
+      <div style="padding:28px 28px 0; position:relative;">
+        <button onclick="closeOcrFirstModal()" style="position:absolute;top:16px;right:16px;width:36px;height:36px;background:none;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;border-radius:6px;" onmouseover="this.style.background='#f6f7f9'" onmouseout="this.style.background='none'">
+          <i data-lucide="x" style="width:20px;height:20px;color:#6d7381;"></i>
+        </button>
+        <div style="display:flex; flex-direction:column; align-items:center; gap:12px; text-align:center; padding-bottom:20px;">
+          <div style="width:64px;height:64px;border-radius:16px;background:#e9f2ff;display:flex;align-items:center;justify-content:center;">
+            <i data-lucide="circle-check-big" style="width:32px;height:32px;color:#416bff;"></i>
+          </div>
+          <div>
+            <div style="font-size:20px; font-weight:700; color:#222631; margin-bottom:6px;">OCR 분석 완료</div>
+            <div style="font-size:16px; color:#3b3f4c;">확인이 필요한 항목이 발견됐습니다</div>
+          </div>
+          <div style="display:flex; gap:8px; flex-wrap:wrap; justify-content:center;">
+            <span style="background:#fff7ed; border:1px solid #fed7aa; color:#ea580c; border-radius:100px; padding:4px 14px; font-size:13px; font-weight:600;">3명 확인 필요</span>
+            <span style="background:#fff7ed; border:1px solid #fed7aa; color:#ea580c; border-radius:100px; padding:4px 14px; font-size:13px; font-weight:600;">5개 문항</span>
+            <span style="background:#eefcf4; border:1px solid #b8ebcf; color:#319d64; border-radius:100px; padding:4px 14px; font-size:13px; font-weight:600;">6명 정상</span>
+          </div>
+        </div>
+      </div>
+      <div style="padding:0 28px 20px;">
+        <div style="border:1px solid #fed7aa; border-radius:8px; overflow:hidden; background:#fff7ed;">
+          <div style="padding:10px 16px; display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid #fed7aa;">
+            <div style="display:flex; align-items:center; gap:8px;">
+              <i data-lucide="triangle-alert" style="width:14px;height:14px;color:#f97316;flex-shrink:0;"></i>
+              <span style="font-size:16px; font-weight:600; color:#222631;">10301 이지후</span>
+              <span style="font-size:13px; font-weight:600; background:#ffedd5; color:#ea580c; border-radius:100px; padding:2px 8px;">2개 문항</span>
+            </div>
+            <a href="task_ocr_review_v1.html#ocr=10301" target="_blank" style="font-size:14px; font-weight:600; color:#416bff; display:inline-flex; align-items:center; gap:4px; text-decoration:none;">
+              OCR 결과 확인 <i data-lucide="external-link" style="width:13px;height:13px;"></i>
+            </a>
+          </div>
+          <div style="padding:10px 16px; display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid #fed7aa;">
+            <div style="display:flex; align-items:center; gap:8px;">
+              <i data-lucide="triangle-alert" style="width:14px;height:14px;color:#f97316;flex-shrink:0;"></i>
+              <span style="font-size:16px; font-weight:600; color:#222631;">10304 박서준</span>
+              <span style="font-size:13px; font-weight:600; background:#ffedd5; color:#ea580c; border-radius:100px; padding:2px 8px;">2개 문항</span>
+            </div>
+            <a href="task_ocr_review_v1.html#ocr=10304" target="_blank" style="font-size:14px; font-weight:600; color:#416bff; display:inline-flex; align-items:center; gap:4px; text-decoration:none;">
+              OCR 결과 확인 <i data-lucide="external-link" style="width:13px;height:13px;"></i>
+            </a>
+          </div>
+          <div style="padding:10px 16px; display:flex; align-items:center; justify-content:space-between;">
+            <div style="display:flex; align-items:center; gap:8px;">
+              <i data-lucide="triangle-alert" style="width:14px;height:14px;color:#f97316;flex-shrink:0;"></i>
+              <span style="font-size:16px; font-weight:600; color:#222631;">10307 한다솜</span>
+              <span style="font-size:13px; font-weight:600; background:#ffedd5; color:#ea580c; border-radius:100px; padding:2px 8px;">1개 문항</span>
+            </div>
+            <a href="task_ocr_review_v1.html#ocr=10307" target="_blank" style="font-size:14px; font-weight:600; color:#416bff; display:inline-flex; align-items:center; gap:4px; text-decoration:none;">
+              OCR 결과 확인 <i data-lucide="external-link" style="width:13px;height:13px;"></i>
+            </a>
+          </div>
+        </div>
+      </div>
+      <div style="padding:0 28px 28px; display:flex; gap:10px;">
+        <button class="btn btn-secondary" style="flex:1; height:44px;" onclick="location.href='task_ocr_review_v1.html#list'">과제물 확인하러 가기</button>
+        <button class="btn btn-primary" style="flex:1; height:44px;" onclick="closeOcrFirstModal(); proceedToRunModal('ocrFirstModal')">이대로 채점 진행하기</button>
+      </div>
+    </div>
+
+    <!-- 3단계: 결과 (clean) -->
+    <div id="ocrf-stage3-clean" style="display:none;">
+      <div style="padding:28px 28px 0; position:relative;">
+        <button onclick="closeOcrFirstModal()" style="position:absolute;top:16px;right:16px;width:36px;height:36px;background:none;border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;border-radius:6px;" onmouseover="this.style.background='#f6f7f9'" onmouseout="this.style.background='none'">
+          <i data-lucide="x" style="width:20px;height:20px;color:#6d7381;"></i>
+        </button>
+        <div style="display:flex; flex-direction:column; align-items:center; gap:12px; text-align:center; padding-bottom:20px;">
+          <div style="width:64px;height:64px;border-radius:16px;background:#e9f2ff;display:flex;align-items:center;justify-content:center;">
+            <i data-lucide="circle-check-big" style="width:32px;height:32px;color:#416bff;"></i>
+          </div>
+          <div>
+            <div style="font-size:20px; font-weight:700; color:#222631; margin-bottom:6px;">OCR 분석 완료</div>
+            <div style="font-size:16px; color:#3b3f4c;">모든 학생의 제출물이 정상 인식됐어요</div>
+          </div>
+          <div style="display:flex; gap:8px; flex-wrap:wrap; justify-content:center;">
+            <span style="background:#eefcf4; border:1px solid #b8ebcf; color:#319d64; border-radius:100px; padding:4px 14px; font-size:13px; font-weight:600;">9명 모두 정상 인식</span>
+          </div>
+        </div>
+      </div>
+      <div style="padding:0 28px 20px;">
+        <div style="border:1px solid #b8ebcf; border-radius:8px; background:#eefcf4; padding:20px; display:flex; align-items:center; gap:14px;">
+          <i data-lucide="shield-check" style="width:22px;height:22px;color:#319d64;flex-shrink:0;"></i>
+          <div style="font-size:16px; color:#1d5a2f; line-height:1.65;">
+            <strong>확인이 필요한 항목이 없어요.</strong><br>
+            AI 채점을 바로 진행할 수 있어요.
+          </div>
+        </div>
+      </div>
+      <div style="padding:0 28px 28px; display:flex; gap:10px;">
+        <button class="btn btn-outline" style="flex:1; height:44px;" onclick="closeOcrFirstModal()">닫기</button>
+        <button class="btn btn-primary" style="flex:1; height:44px;" onclick="closeOcrFirstModal(); proceedToRunModal('ocrFirstModal')"><i data-lucide="wand-sparkles" style="width:16px;height:16px;"></i>바로 채점 진행</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ===== AI 채점 실행 모달 ===== -->
+<div id="runModal" class="modal-overlay" onclick="if(event.target===this) closeRunModal()">
+  <div class="modal-box">
+    <div style="padding:24px 24px 16px 24px;">
+      <div style="font-size:20px; font-weight:700; color:#222631;">AI 채점 실행</div>
+    </div>
+    <div style="padding:0 24px 24px 24px; display:flex; flex-direction:column; gap:20px;">
+      <div style="font-size:16px; color:#3b3f4c; line-height:1.55;">
+        AI 채점을 실행합니다. 채점 대상 학생을 선택하고 채점 수준을 설정한 뒤 실행 버튼을 눌러주세요.<br>
+        과제를 제출하지 않은 학생은 선택할 수 없습니다.
+      </div>
+
+      <div>
+        <div style="font-size:16px; font-weight:600; color:#222631; margin-bottom:10px;">AI 채점 대상</div>
+        <div style="border:1px solid #dde1e8; border-radius:8px; overflow:hidden;">
+          <div style="background:#f6f7f9; padding:12px 16px; display:flex; align-items:center; gap:10px; border-bottom:1px solid #dde1e8;">
+            <div class="chk checked" onclick="toggleRunAll(this)"></div>
+            <span style="font-size:14px; font-weight:600; color:#222631;">1-1반 (1/3명)</span>
+          </div>
+          <div style="padding:12px 16px; display:flex; align-items:center; gap:10px; border-bottom:1px solid #f0f2f5;">
+            <div class="chk checked" onclick="toggleChk(this)"></div>
+            <span style="font-size:16px; color:#222631; flex:1;">10101 일일일</span>
+            <span style="font-size:13px; color:#416bff; font-weight:600;">AI 채점결과 2점</span>
+          </div>
+          <div style="padding:12px 16px; display:flex; align-items:center; gap:10px; border-bottom:1px solid #f0f2f5; opacity:0.5;">
+            <div class="chk" style="cursor:not-allowed;"></div>
+            <span style="font-size:16px; color:#222631; flex:1;">10102 일일이</span>
+            <span style="font-size:13px; color:#6d7381;">과제 미제출</span>
+          </div>
+          <div style="padding:12px 16px; display:flex; align-items:center; gap:10px; opacity:0.5;">
+            <div class="chk" style="cursor:not-allowed;"></div>
+            <span style="font-size:16px; color:#222631; flex:1;">10103 일일삼</span>
+            <span style="font-size:13px; color:#6d7381;">과제 미제출</span>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div style="font-size:16px; font-weight:600; color:#222631; margin-bottom:10px;">AI 채점 수준</div>
+        <div style="display:flex; flex-direction:column; gap:10px;" id="runLevelGroup">
+          <div class="radio-card selected" onclick="selectRunLevel(this)">
+            <div class="radio-dot"></div>
+            <span style="font-size:16px; font-weight:500; color:#222631;">기본 설정으로 채점</span>
+          </div>
+          <div class="radio-card" onclick="selectRunLevel(this)">
+            <div class="radio-dot"></div>
+            <span style="font-size:16px; font-weight:500; color:#222631;">비교적 관대하게 채점</span>
+          </div>
+          <div class="radio-card" onclick="selectRunLevel(this)">
+            <div class="radio-dot"></div>
+            <span style="font-size:16px; font-weight:500; color:#222631;">비교적 엄격하게 채점</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div style="padding:8px 24px 24px 24px; display:flex; justify-content:flex-end; gap:10px;">
+      <button class="btn btn-outline" onclick="closeRunModal()">취소</button>
+      <button class="btn btn-primary" onclick="runAI()">AI 채점 실행</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== AI 채점 재실행 모달 ===== -->
+<div id="rerunModal" class="modal-overlay" onclick="if(event.target===this) closeRerunModal()">
+  <div class="modal-box">
+    <div style="padding:24px 24px 16px 24px;">
+      <div style="font-size:20px; font-weight:700; color:#222631;">AI 채점 재실행</div>
+    </div>
+    <div style="padding:0 24px 24px 24px; display:flex; flex-direction:column; gap:20px;">
+      <div style="font-size:16px; color:#3b3f4c; line-height:1.55;">
+        AI Assistant 자동 채점을 진행할 학생과 AI 채점 수준을 선택해 주세요.<br>
+        AI 채점 결과를 기반으로 채점 수준을 조정하여 해당 학생에 대한 AI Assistant 자동 채점을 재실행합니다.<br>
+        AI는 선생님을 보조하는 역할을 하며 채점의 최종 권한은 선생님에게만 있습니다.
+      </div>
+
+      <div>
+        <div style="font-size:16px; font-weight:600; color:#222631; margin-bottom:10px;">AI 채점 대상</div>
+        <div style="border:1px solid #dde1e8; border-radius:8px; overflow:hidden;">
+          <div style="background:#f6f7f9; padding:12px 16px; display:flex; align-items:center; gap:10px; border-bottom:1px solid #dde1e8;">
+            <div class="chk checked" onclick="toggleRerunAll(this)"></div>
+            <span style="font-size:14px; font-weight:600; color:#222631;">1-2반 (1/3명)</span>
+          </div>
+          <div style="padding:12px 16px; display:flex; align-items:center; gap:10px; border-bottom:1px solid #f0f2f5;">
+            <div class="chk checked" onclick="toggleChk(this)"></div>
+            <span style="font-size:16px; color:#222631; flex:1;">10101 김하나</span>
+            <span style="font-size:13px; color:#416bff; font-weight:600;">AI 채점결과 30점</span>
+          </div>
+          <div style="padding:12px 16px; display:flex; align-items:center; gap:10px; border-bottom:1px solid #f0f2f5; opacity:0.5;">
+            <div class="chk" style="cursor:not-allowed;"></div>
+            <span style="font-size:16px; color:#222631; flex:1;">10102 김하이</span>
+            <span style="font-size:13px; color:#6d7381;">과제 미제출</span>
+          </div>
+          <div style="padding:12px 16px; display:flex; align-items:center; gap:10px; opacity:0.5;">
+            <div class="chk" style="cursor:not-allowed;"></div>
+            <span style="font-size:16px; color:#222631; flex:1;">10103 김하삼</span>
+            <span style="font-size:13px; color:#6d7381;">과제 미제출</span>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div style="font-size:16px; font-weight:600; color:#222631; margin-bottom:10px;">AI 채점 수준</div>
+        <div style="display:flex; flex-direction:column; gap:10px;" id="rerunLevelGroup">
+          <div class="radio-card selected" onclick="selectRerunLevel(this)">
+            <div class="radio-dot"></div>
+            <span style="font-size:16px; font-weight:500; color:#222631;">이전과 동일하게 채점</span>
+          </div>
+          <div class="radio-card" onclick="selectRerunLevel(this)">
+            <div class="radio-dot"></div>
+            <span style="font-size:16px; font-weight:500; color:#222631;">이전보다 관대하게 채점</span>
+          </div>
+          <div class="radio-card" onclick="selectRerunLevel(this)">
+            <div class="radio-dot"></div>
+            <span style="font-size:16px; font-weight:500; color:#222631;">이전보다 엄격하게 채점</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div style="padding:8px 24px 24px 24px; display:flex; justify-content:flex-end; gap:10px;">
+      <button class="btn btn-outline" onclick="closeRerunModal()">취소</button>
+      <button class="btn btn-primary" onclick="rerunAI()">AI 채점 재실행</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== Toast ===== -->
+<div id="toast" class="toast">
+  <i id="toast-icon" data-lucide="circle-check-big" style="width:20px;height:20px;color:white;flex-shrink:0;"></i>
+  <span id="toast-msg"></span>
+</div>
+
+<script>
+  // ── Sidebar toggle ──
+  function toggleNav() {
+    document.getElementById('sidebar').classList.toggle('expanded');
+    document.body.classList.toggle('nav-expanded');
+  }
+
+  // ── 멀티스크린 ──
+  function showScreen(id) {
+    document.querySelectorAll('.screen').forEach(function(s){ s.classList.remove('active'); });
+    var el = document.getElementById(id);
+    if (el) { el.classList.add('active'); window.scrollTo(0,0); lucide.createIcons(); }
+  }
+
+  // ── B안 학생 데이터 ──
+  var CLASS_B_DATA = {
+    1: {
+      title: '창작 문화 비평(B안) — 1-1반',
+      subtitle: '창작 문화 비평(B안) — 1-1반 채점 결과',
+      students: [
+        { id:'10101', name:'김서윤', st:'진행 중',   stCls:'b-doing', ai:'성공',          score:'-'    },
+        { id:'10102', name:'이준호', st:'확인 필요', stCls:'b-check', ai:'성공',          score:'10'   },
+        { id:'10103', name:'박지민', st:'완료',      stCls:'b-done',  ai:'성공',          score:'12'   },
+        { id:'10104', name:'최유진', st:'완료',      stCls:'b-done',  ai:'성공',          score:'15'   },
+        { id:'10105', name:'정현우', st:'미채점',    stCls:'b-todo',  ai:'성공',          score:'(13)' },
+        { id:'10106', name:'한지우', st:'미채점',    stCls:'b-todo',  ai:'성공',          score:'(11)' },
+        { id:'10107', name:'조민재', st:'미채점',    stCls:'b-todo',  ai:'성공',          score:'(12)' },
+        { id:'10108', name:'윤하은', st:'확인 필요', stCls:'b-check', ai:'네트워크 오류', score:'(13)' },
+        { id:'10109', name:'임도윤', st:'완료',      stCls:'b-done',  ai:'성공',          score:'14'   }
+      ]
+    },
+    2: {
+      title: '창작 문화 비평(B안) — 1-2반',
+      subtitle: '창작 문화 비평(B안) — 1-2반 채점 결과',
+      students: [
+        { id:'10201', name:'강민준', st:'완료',      stCls:'b-done',  ai:'성공',          score:'14'   },
+        { id:'10202', name:'오서영', st:'완료',      stCls:'b-done',  ai:'성공',          score:'12'   },
+        { id:'10203', name:'배찬혁', st:'확인 필요', stCls:'b-check', ai:'성공',          score:'10'   },
+        { id:'10204', name:'류지아', st:'완료',      stCls:'b-done',  ai:'성공',          score:'12'   },
+        { id:'10205', name:'신동현', st:'미채점',    stCls:'b-todo',  ai:'성공',          score:'(13)' },
+        { id:'10206', name:'황예은', st:'완료',      stCls:'b-done',  ai:'성공',          score:'12'   },
+        { id:'10207', name:'문태양', st:'미채점',    stCls:'b-todo',  ai:'성공',          score:'(10)' },
+        { id:'10208', name:'전수빈', st:'진행 중',   stCls:'b-doing', ai:'네트워크 오류', score:'-'    },
+        { id:'10209', name:'고은찬', st:'완료',      stCls:'b-done',  ai:'성공',          score:'14'   }
+      ]
+    }
+  };
+
+  var currentClassB = 1;
+  var currentEvalPlan = 'B';
+
+  function goTaskReview() {
+    location.href = 'task_ocr_review_v1.html?eval=' + currentEvalPlan;
+  }
+
+  function showClassB(classNum) {
+    currentClassB = classNum;
+    currentEvalPlan = 'B';
+    var data = CLASS_B_DATA[classNum];
+    if (!data) return;
+    var titleEl = document.getElementById('class-b-title');
+    var subtitleEl = document.getElementById('class-b-subtitle');
+    if (titleEl) titleEl.textContent = '1-' + classNum + '반 채점 결과 상세';
+    if (subtitleEl) subtitleEl.textContent = data.subtitle;
+    renderClassBTable(data.students);
+    showScreen('screen-class-b');
+  }
+
+  function showClassC(classNum) {
+    showClassB(classNum);
+    currentEvalPlan = 'C';
+    var subtitleEl = document.getElementById('class-b-subtitle');
+    if (subtitleEl) subtitleEl.textContent = '평가명(최종) — 1-' + classNum + '반 채점 결과';
+  }
+
+  function renderClassBTable(students) {
+    var tbody = document.getElementById('class-b-tbody');
+    if (!tbody) return;
+    var html = '';
+    students.forEach(function(s) {
+      var statusBadge = '<span class="' + s.stCls + '" style="border-radius:100px;padding:3px 10px;font-size:13px;font-weight:600;">' + s.st + '</span>';
+      var aiCell = s.ai === '네트워크 오류'
+        ? '<span style="color:#db3e51;font-weight:600;font-size:14px;">네트워크 오류</span>'
+          + ' <button class="btn btn-primary small" style="margin-left:6px;">'
+          + '<i data-lucide="rotate-cw" style="width:12px;height:12px;"></i>재실행</button>'
+        : '<span style="color:#319d64;font-weight:600;font-size:14px;">' + s.ai + '</span>';
+      var teacherCell = '<span onclick="goToStudentDetail(\'' + s.id + '\',\'' + s.name + '\')" '
+        + 'style="color:#416bff;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;gap:3px;font-size:14px;">'
+        + '학생 채점 상세 <i data-lucide="chevron-right" style="width:13px;height:13px;"></i></span>';
+
+      html += '<tr>';
+      html += '<td>' + statusBadge + '</td>';
+      html += '<td style="font-weight:500;color:#6d7381;">' + s.id + '</td>';
+      html += '<td style="font-weight:600;color:#222631;">' + s.name + '</td>';
+      html += '<td>' + aiCell + '</td>';
+      html += '<td style="font-size:16px;font-weight:700;color:#222631;">' + s.score + '</td>';
+      html += '<td>' + teacherCell + '</td>';
+      html += '</tr>';
+    });
+    tbody.innerHTML = html;
+    lucide.createIcons();
+  }
+
+  function goToStudentDetail(studentId, studentName) {
+    location.href = 'scoring_student_v1.html?id=' + studentId + '&name=' + encodeURIComponent(studentName) + '&eval=' + currentEvalPlan + '&classNum=' + currentClassB + '&from=scoring_list_v1.html';
+  }
+
+  // ── OCR 먼저 진행 모달 ──
+  var ocrFirstTimer = null;
+  var ocrFirstCount = 0;
+  var ocrFirstTotal = 9;
+  var ocrFirstVariant = 'review';
+  var ocrFirstStudents = ['10301 이지후','10302 최민준','10303 서예린','10304 박서준','10305 김도현','10306 오지수','10307 한다솜','10308 임현우','10309 강소율'];
+
+  function openOcrFirstModal(variant) {
+    clearInterval(ocrFirstTimer);
+    ocrFirstCount = 0;
+    ocrFirstVariant = variant === 'clean' ? 'clean' : 'review';
+    document.getElementById('ocrf-stage1').style.display = 'block';
+    document.getElementById('ocrf-stage2').style.display = 'none';
+    document.getElementById('ocrf-stage3-review').style.display = 'none';
+    document.getElementById('ocrf-stage3-clean').style.display = 'none';
+    document.getElementById('ocrFirstModal').classList.add('open');
+    lucide.createIcons();
+  }
+
+  function closeOcrFirstModal() {
+    clearInterval(ocrFirstTimer);
+    document.getElementById('ocrFirstModal').classList.remove('open');
+  }
+
+  function startOcrAnalysis() {
+    document.getElementById('ocrf-stage1').style.display = 'none';
+    document.getElementById('ocrf-stage2').style.display = 'block';
+    lucide.createIcons();
+    ocrFirstCount = 0;
+    _updateOcrProgress();
+    var interval = Math.round(5000 / ocrFirstTotal);
+    ocrFirstTimer = setInterval(function() {
+      ocrFirstCount++;
+      _updateOcrProgress();
+      if (ocrFirstCount >= ocrFirstTotal) {
+        clearInterval(ocrFirstTimer);
+        setTimeout(function() {
+          document.getElementById('ocrf-stage2').style.display = 'none';
+          var targetId = ocrFirstVariant === 'clean' ? 'ocrf-stage3-clean' : 'ocrf-stage3-review';
+          document.getElementById(targetId).style.display = 'block';
+          lucide.createIcons();
+        }, 500);
+      }
+    }, interval);
+  }
+
+  function _updateOcrProgress() {
+    var pct = Math.round(ocrFirstCount / ocrFirstTotal * 100);
+    document.getElementById('ocrf-prog-bar').style.width = pct + '%';
+    document.getElementById('ocrf-prog-pct').textContent = pct + '%';
+    document.getElementById('ocrf-prog-text').textContent = ocrFirstTotal + '명 중 ' + ocrFirstCount + '명 처리 완료';
+    var stuEl = document.getElementById('ocrf-current-stu');
+    if (stuEl) {
+      stuEl.textContent = ocrFirstCount < ocrFirstTotal
+        ? '처리 중: ' + ocrFirstStudents[ocrFirstCount]
+        : '모든 학생 처리 완료 ✓';
+    }
+  }
+
+  // Modal open/close
+  function openRunModal() { document.getElementById('runModal').classList.add('open'); lucide.createIcons(); }
+  function closeRunModal() { document.getElementById('runModal').classList.remove('open'); }
+  function openRerunModal() { document.getElementById('rerunModal').classList.add('open'); lucide.createIcons(); }
+  function closeRerunModal() { document.getElementById('rerunModal').classList.remove('open'); }
+  function openOcrFewModal() { document.getElementById('ocrFewModal').classList.add('open'); lucide.createIcons(); }
+  function closeOcrFewModal() { document.getElementById('ocrFewModal').classList.remove('open'); }
+  function openOcrManyModal() { document.getElementById('ocrManyModal').classList.add('open'); lucide.createIcons(); }
+  function closeOcrManyModal() { document.getElementById('ocrManyModal').classList.remove('open'); }
+  function proceedToRunModal(fromModalId) {
+    document.getElementById(fromModalId).classList.remove('open');
+    openRunModal();
+  }
+
+  // Radio toggle
+  function selectRunLevel(el) {
+    document.querySelectorAll('#runLevelGroup .radio-card').forEach(c => c.classList.remove('selected'));
+    el.classList.add('selected');
+  }
+  function selectRerunLevel(el) {
+    document.querySelectorAll('#rerunLevelGroup .radio-card').forEach(c => c.classList.remove('selected'));
+    el.classList.add('selected');
+  }
+
+  // Checkbox toggle
+  function toggleChk(el) { el.classList.toggle('checked'); }
+  function toggleRunAll(el) { el.classList.toggle('checked'); }
+  function toggleRerunAll(el) { el.classList.toggle('checked'); }
+
+  // Toast
+  let toastTimer = null;
+  function showToast(type, msg) {
+    const t = document.getElementById('toast');
+    const icon = document.getElementById('toast-icon');
+    const msgEl = document.getElementById('toast-msg');
+    clearTimeout(toastTimer);
+    t.classList.remove('show', 'toast-success', 'toast-error', 'toast-loading');
+
+    if (type === 'success') {
+      t.classList.add('toast-success');
+      icon.setAttribute('data-lucide', 'circle-check-big');
+    } else if (type === 'error') {
+      t.classList.add('toast-error');
+      icon.setAttribute('data-lucide', 'circle-alert');
+    } else if (type === 'loading') {
+      t.classList.add('toast-loading');
+      icon.setAttribute('data-lucide', 'loader-circle');
+    }
+    msgEl.textContent = msg;
+    lucide.createIcons();
+
+    requestAnimationFrame(() => { t.classList.add('show'); });
+
+    if (type !== 'loading') {
+      toastTimer = setTimeout(() => { t.classList.remove('show'); }, 2500);
+    }
+  }
+
+  // AI Run / Rerun
+  function runAI() {
+    closeRunModal();
+    showToast('loading', 'AI 채점을 실행하고 있습니다...');
+    setTimeout(() => { showToast('success', 'AI 채점이 완료되었습니다.'); }, 2000);
+  }
+  function rerunAI() {
+    closeRerunModal();
+    showToast('loading', 'AI 채점을 재실행하고 있습니다...');
+    setTimeout(() => { showToast('success', 'AI 채점 재실행이 완료되었습니다.'); }, 2000);
+  }
+
+  // Init
+  document.addEventListener('DOMContentLoaded', () => {
+    lucide.createIcons();
+    var params = new URLSearchParams(location.search);
+    var showClass = params.get('showClass');
+    var evalParam = params.get('eval');
+    if (showClass) {
+      if (evalParam === 'C') {
+        showClassC(parseInt(showClass));
+      } else {
+        showClassB(parseInt(showClass));
+      }
+    }
+  });
+</script>
+
+</body>
+</html>

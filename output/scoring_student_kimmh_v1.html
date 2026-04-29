@@ -1,0 +1,692 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>채점 - 김민혁 | CLIPO</title>
+<link rel="icon" type="image/svg+xml" href="clipo_favicon.svg">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard-gov.min.css">
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<style>
+*{font-family:'Pretendard GOV',-apple-system,sans-serif;box-sizing:border-box;margin:0;padding:0}
+html{scrollbar-gutter:stable}
+body{background:#fff;color:#222631;overflow:hidden;height:100vh}
+
+/* ══════ 글로벌 헤더 (44px) ══════ */
+.global-header{height:44px;background:#fff;display:flex;align-items:center;justify-content:space-between;position:fixed;top:0;left:0;right:0;z-index:210;padding:0;border-bottom:1px solid #f1f3f5}
+.gh-left{display:flex;align-items:center;gap:6px;padding-left:8px}
+.gh-menu-btn{width:32px;height:32px;display:flex;align-items:center;justify-content:center;border:none;background:none;cursor:pointer;color:#3b3f4c;border-radius:4px}
+.gh-menu-btn:hover{background:#f6f7f9}
+.gh-logo{display:flex;align-items:center;text-decoration:none}
+.gh-right{display:flex;align-items:center;gap:10px;padding-right:20px}
+.gh-plan{display:flex;align-items:center;height:22px;padding:0 9px;border-radius:100px;background:#e9f2ff;border:1px solid #ccdfff;font-size:12px;font-weight:500;color:#3151c4}
+.gh-dday{font-size:13px;font-weight:500;color:#6d7381}
+.gh-credit{display:flex;align-items:center;gap:5px;font-size:13px;font-weight:500;color:#3b3f4c}
+.gh-sep{width:0;height:12px;border-left:1px solid #dde1e8}
+.gh-user{display:flex;align-items:center;gap:3px;font-size:13px;font-weight:500;color:#3b3f4c;cursor:pointer;border:none;background:none;padding:0}
+.gh-user:hover{color:#365eef}
+
+/* ══════ 채점 액션바 (48px) ══════ */
+.top-bar{height:48px;background:#fff;display:flex;align-items:center;position:fixed;top:44px;left:0;right:0;z-index:200;border-bottom:1px solid #dde1e8;padding:0 16px 0 0}
+.tb-left{display:flex;align-items:center;gap:0;flex:1;min-width:0}
+.btn-back{display:flex;align-items:center;gap:4px;height:48px;padding:0 14px;border-right:1px solid #dde1e8;background:#fff;color:#6d7381;font-size:14px;font-weight:500;font-family:inherit;cursor:pointer;flex-shrink:0;border-top:none;border-bottom:none;border-left:none;border-radius:0}
+.btn-back:hover{background:#f6f7f9;color:#222631}
+.tb-student-area{display:flex;align-items:center;gap:8px;padding:0 12px;position:relative}
+.student-select{display:flex;align-items:center;justify-content:space-between;width:260px;height:32px;padding:0 8px 0 10px;border:1px solid #dde1e8;border-radius:4px;background:#fff;font-size:15px;font-weight:600;color:#222631;cursor:pointer;white-space:nowrap;overflow:hidden}
+.student-select:hover{border-color:#a3c3ff}
+.student-select .st-status-need{color:#db3e51;margin-left:4px}
+.student-select .st-status-progress{color:#f97316;margin-left:4px}
+.student-select .st-status-done{color:#319d64;margin-left:4px}
+.progress-chip{font-size:13px;font-weight:400;color:#b3b6bd;white-space:nowrap}
+.tb-nav{display:flex;align-items:center;gap:2px}
+.tb-nav-btn{width:28px;height:28px;display:flex;align-items:center;justify-content:center;border:1px solid #dde1e8;border-radius:4px;background:#fff;cursor:pointer;color:#3b3f4c}
+.tb-nav-btn:hover{border-color:#a3c3ff;color:#365eef}
+.tb-right{display:flex;align-items:center;gap:12px;flex-shrink:0}
+.btn-save{display:flex;align-items:center;gap:6px;height:34px;padding:0 14px;border-radius:4px;background:#365eef;color:#fff;font-size:14px;font-weight:600;border:none;cursor:pointer;white-space:nowrap}
+.btn-save:hover{background:#3151c4}
+
+/* ══════ 메인 영역 ══════ */
+.main-wrap{display:flex;position:fixed;top:92px;left:0;right:0;bottom:0}
+
+/* 뷰어 */
+.viewer{flex:1;display:flex;flex-direction:column;min-width:0;position:relative;background:#dde1e8}
+.viewer-topbar{height:44px;background:#3b3f4c;display:flex;align-items:center;justify-content:space-between;padding:0 16px;flex-shrink:0}
+.viewer-ctrl{display:flex;align-items:center;gap:2px}
+.ctrl-btn{width:30px;height:30px;display:flex;align-items:center;justify-content:center;border:none;background:none;color:#fff;cursor:pointer;border-radius:4px}
+.ctrl-btn:hover{background:rgba(255,255,255,.12)}
+.ctrl-sep{width:1px;height:14px;background:rgba(255,255,255,.2);margin:0 6px}
+.ctrl-page-info{font-size:13px;color:#fff;min-width:40px;text-align:center}
+.ctrl-zoom{display:flex;align-items:center;gap:6px;margin-left:auto}
+.zoom-info{font-size:13px;color:#fff;min-width:40px;text-align:center;cursor:pointer}
+.viewer-body{flex:1;overflow:auto;padding:24px;background:#dde1e8;display:flex;justify-content:center}
+.viewer-paper{background:#fff;width:100%;max-width:800px;min-height:600px;box-shadow:0 2px 8px rgba(0,0,0,.15);padding:40px;font-size:16px;line-height:1.8;color:#3b3f4c;position:relative}
+.viewer-paper h3{font-size:18px;font-weight:700;color:#222631;margin-bottom:16px}
+.viewer-paper .q-label{display:inline-block;background:#e9f2ff;color:#3151c4;border-radius:100px;padding:3px 12px;font-size:13px;font-weight:600;margin-bottom:8px}
+.viewer-paper .q-desc{font-size:14px;color:#6d7381;margin-bottom:10px}
+.viewer-paper .q-ans{font-size:16px;color:#222631;line-height:1.8;margin-bottom:28px}
+.hl-q-1{background:rgba(65,107,255,.1);border-left:3px solid #416bff;padding:10px 14px;border-radius:4px;cursor:pointer}
+.hl-q-2{background:rgba(25,114,251,.1);border-left:3px solid #1972fb;padding:10px 14px;border-radius:4px;cursor:pointer}
+.hl-q-3{background:rgba(249,115,22,.1);border-left:3px solid #f97316;padding:10px 14px;border-radius:4px;cursor:pointer}
+
+/* 리사이즈 */
+.resize-handle{width:8px;background:#eaecf0;cursor:col-resize;flex-shrink:0;position:relative;z-index:10;display:flex;align-items:center;justify-content:center;transition:background .15s}
+.resize-handle:hover,.resize-handle.dragging{background:#d4deff}
+.resize-grip{display:flex;flex-direction:column;gap:3px;pointer-events:none}
+.resize-grip span{display:block;width:3px;height:3px;border-radius:50%;background:#b3b6bd}
+.resize-handle:hover .resize-grip span,.resize-handle.dragging .resize-grip span{background:#365eef}
+
+/* 채점 패널 */
+.grading-panel{width:560px;background:#fff;overflow-y:auto;flex-shrink:0;border-left:1px solid #eaecf0}
+.pn-section{padding:20px 24px}
+.pn-section+.pn-section{border-top:6px solid #f1f3f5}
+.pn-section-hd{display:flex;align-items:center;gap:8px;margin-bottom:8px}
+.pn-section-title{font-size:17px;font-weight:700;color:#222631}
+.pn-section-desc{font-size:14px;color:#808080;margin-bottom:16px}
+
+.score-summary{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.score-total{display:flex;align-items:baseline;gap:4px}
+.score-total .lbl{font-size:16px;font-weight:600;color:#222631}
+.score-total .val{font-size:20px;font-weight:700;color:#365eef}
+.score-total .unit{font-size:16px;font-weight:600;color:#222631}
+.score-total .plan{font-size:16px;font-weight:600;color:#3b3f4c;margin-left:4px}
+.status-radios{display:flex;gap:16px;align-items:center}
+.radio-item{display:flex;align-items:center;gap:6px;cursor:pointer}
+.radio-ring{width:18px;height:18px;border-radius:50%;border:2px solid #dde1e8;background:#fff;flex-shrink:0}
+.radio-ring.checked{border:5px solid #365eef}
+.radio-text{font-size:15px;font-weight:600;color:#222631;white-space:nowrap}
+
+.rubric-row{display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid #eaecf0}
+.rubric-row:last-child{border-bottom:none}
+.rubric-name{font-size:16px;font-weight:600;color:#222631}
+.score-btns{display:flex;gap:10px;align-items:center}
+.score-btn{min-width:32px;height:30px;padding:0 8px;border-radius:4px;font-size:15px;font-weight:600;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;border:1.5px solid #dde1e8;background:#fff;color:#3b3f4c;transition:all .12s}
+.score-btn:hover{border-color:#a3c3ff;background:#f4f8ff;color:#365eef}
+.score-btn.selected{background:#365eef;color:#fff;border-color:#365eef}
+.rubric-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:16px}
+.pill-btn{background:#fff;border:1px solid #dde1e8;border-radius:100px;height:32px;padding:0 14px;font-size:13px;font-weight:600;color:#3b3f4c;cursor:pointer;display:inline-flex;align-items:center;gap:4px}
+.pill-btn:hover{border-color:#a3c3ff;color:#365eef}
+
+.tab-toggle{height:44px;background:#f6f7f9;border-radius:6px;overflow:hidden;display:flex;gap:0;margin-bottom:16px;padding:4px}
+.tab-toggle-btn{flex:1;height:36px;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:600;cursor:pointer;border-radius:4px;border:none;background:transparent;color:#6d7381;font-family:inherit}
+.tab-toggle-btn.active{background:#fff;color:#365eef;box-shadow:0 1px 2px rgba(0,0,0,.05)}
+
+.ai-box{background:#fff;border:1px solid #eaecf0;border-radius:8px;padding:20px;display:flex;flex-direction:column;gap:20px;margin-bottom:12px}
+.ai-badge{background:#f1f3f5;color:#3b3f4c;border-radius:100px;font-size:13px;font-weight:600;padding:3px 12px;display:inline-block}
+.ai-ground-lbl{font-size:16px;font-weight:700;color:#222631;margin-bottom:10px}
+.ai-ground-list{font-size:16px;color:#222631;line-height:1.7;margin:0;padding-left:20px}
+.ai-ground-list li{margin-bottom:8px}
+.ai-divider{height:1px;background:#eaecf0}
+.ai-feedback-hd-lbl{font-size:16px;font-weight:700;color:#222631}
+
+.fb-seg-bar{height:40px;background:#f1f3f5;border-radius:6px;display:flex;gap:0;margin-bottom:16px;padding:3px}
+.fb-seg-btn{flex:1;height:34px;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:600;cursor:pointer;border-radius:4px;border:none;background:transparent;color:#6d7381;font-family:inherit;transition:all .15s}
+.fb-seg-btn.fb-seg-active{background:#fff;color:#365eef;box-shadow:0 1px 3px rgba(0,0,0,.08)}
+
+.ai-feedback-text{font-size:16px;color:#222631;line-height:1.7;margin:0;white-space:pre-wrap}
+
+.item-feedback-card{background:#f6f7f9;border:1px solid #eaecf0;border-radius:8px;padding:14px 16px;display:flex;flex-direction:column;gap:10px;transition:all .15s}
+.item-feedback-card:hover{border-color:#a3c3ff}
+.item-feedback-card .item-label{display:inline-flex;align-items:center;gap:8px}
+.item-feedback-card .item-number{background:#365eef;color:#fff;width:22px;height:22px;border-radius:50%;font-size:12px;font-weight:700;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0}
+.item-feedback-card .item-score-badge{background:#e9f2ff;color:#3151c4;font-size:13px;font-weight:600;padding:2px 10px;border-radius:100px}
+.item-feedback-card .feedback-text{font-size:16px;color:#222631;line-height:1.6;margin:0}
+.good-point{color:#319d64;font-weight:600;font-size:14px;display:flex;align-items:center;gap:4px}
+.improve-point{color:#db3e51;font-weight:600;font-size:14px;display:flex;align-items:center;gap:4px}
+.subpoint-box{display:flex;flex-direction:column;gap:6px;padding:10px 12px;background:#fff;border-radius:6px}
+
+.ai-footer{display:flex;align-items:center;justify-content:space-between}
+.ai-count{font-size:13px;color:#6d7381}
+
+.btn-ai-rerun{background:#365eef;border:none;border-radius:4px;height:36px;padding:0 14px;font-size:14px;font-weight:600;color:#fff;cursor:pointer;display:inline-flex;align-items:center;gap:6px}
+.btn-ai-rerun:hover{background:#3151c4}
+.ai-notice{font-size:14px;color:#6d7381;line-height:1.5;margin-top:8px}
+
+.teacher-fb{background:#f6f7f9;padding:20px 24px 48px}
+.teacher-fb-hd{display:flex;align-items:center;gap:8px;margin-bottom:16px}
+.teacher-fb-title{font-size:17px;font-weight:700;color:#222631}
+.teacher-fb-ta{width:100%;background:#fff;border:1px solid #dde1e8;border-radius:8px;padding:18px;height:180px;resize:none;font-size:16px;font-family:inherit;color:#222631;outline:none;line-height:1.7}
+.teacher-fb-ta:focus{border-color:#365eef}
+.char-count{font-size:13px;color:#6d7381;padding:4px 0 16px}
+.teacher-fb-save{display:flex;justify-content:flex-end}
+.btn-save-next{background:#365eef;border:none;border-radius:4px;height:38px;padding:0 18px;font-size:15px;font-weight:600;color:#fff;cursor:pointer;display:inline-flex;align-items:center;gap:6px}
+.btn-save-next:hover{background:#3151c4}
+
+.student-dropdown{position:absolute;top:calc(100% + 4px);left:0;width:340px;max-height:400px;overflow-y:auto;background:#fff;border:1px solid #dde1e8;border-radius:8px;box-shadow:0 4px 16px rgba(0,0,0,.12);z-index:300;display:none;padding:4px 0}
+.student-dropdown.show{display:block}
+.sd-item{padding:10px 16px;display:flex;align-items:center;justify-content:space-between;cursor:pointer;font-size:15px;color:#222631}
+.sd-item:hover{background:#f6f7f9}
+.sd-item.active{background:#f4f8ff;color:#365eef;font-weight:600}
+.sd-item .sd-status{font-size:13px;font-weight:600}
+.sd-status.done{color:#319d64}
+.sd-status.progress{color:#f97316}
+.sd-status.need{color:#db3e51}
+.sd-status.none{color:#6d7381}
+
+.toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(12px);padding:14px 22px;border-radius:4px;font-size:15px;font-weight:500;line-height:1.4;box-shadow:0 4px 12px rgba(0,0,0,.15);opacity:0;transition:all .25s;z-index:900;pointer-events:none;display:flex;align-items:center;gap:10px;min-width:280px}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.toast.success{background:#319d64;color:#fff}
+.toast.error{background:#db3e51;color:#fff}
+.toast.loading{background:#365eef;color:#fff}
+
+::-webkit-scrollbar{width:6px;height:6px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:#dde1e8;border-radius:3px}
+</style>
+</head>
+<body>
+
+<div class="global-header">
+  <div class="gh-left">
+    <button class="gh-menu-btn"><i data-lucide="menu" style="width:20px;height:20px"></i></button>
+    <a class="gh-logo" href="#">
+      <svg width="76" height="16" viewBox="0 0 76 16" fill="none"><path d="M11.3613 4.03516H4.09668V11.9629H8.88281L8.88086 11.9648H15.6016V16H4.02539C1.80242 15.9998 0 14.223 0 12.0322V3.96777C0 1.77696 1.80242 0.000177874 4.02539 0H15.4561L11.3613 4.03516ZM22.0703 11.9648H33.5781V16H22.002C19.7788 16 17.9756 14.2231 17.9756 12.0322V0H22.0703V11.9648ZM40.0459 16H35.9521V0H40.0459V16ZM54.5381 0C56.4564 0 58.0138 1.53228 58.0186 3.42285L58.0166 3.4248V8.54297C58.014 10.4333 56.4567 11.9648 54.5361 11.9648H46.5107L42.416 16V0H54.5381ZM71.9746 0C74.0086 0.000134956 75.6887 1.49046 75.958 3.42285H76V12.5771H75.958C75.6887 14.5095 74.011 15.9999 71.9746 16H64.4238C62.3897 16 60.7098 14.5096 60.4404 12.5771C60.4145 12.398 60.3984 12.2184 60.3984 12.0322V3.96777C60.3984 3.78159 60.4145 3.60205 60.4404 3.42285C60.7098 1.49037 62.3873 0 64.4238 0H71.9746ZM64.4922 12.5771H71.9062V3.42285H64.4922V12.5771ZM46.5107 3.42285V8.54004H53.9238V3.42285H46.5107Z" fill="#365EEF"/></svg>
+    </a>
+  </div>
+  <div class="gh-right">
+    <div class="gh-plan">학교 유료</div>
+    <span class="gh-dday">D-180</span>
+    <div class="gh-credit"><i data-lucide="wand-sparkles" style="width:20px;height:20px"></i>AI 크레딧 200</div>
+    <div class="gh-sep"></div>
+    <button class="gh-user">최대표 선생님(대표교사)<i data-lucide="chevron-down" style="width:20px;height:20px"></i></button>
+  </div>
+</div>
+
+<div class="top-bar">
+  <div class="tb-left">
+    <button class="btn-back" onclick="goBack()">
+      <i data-lucide="chevron-left" style="width:16px;height:16px"></i>
+      이전으로
+    </button>
+    <div class="tb-student-area">
+      <div style="position:relative">
+        <div class="student-select" onclick="toggleDropdown(event)">
+          <span id="selectedStudent">10301 김민혁<span class="st-status-done">(채점 완료)</span></span>
+          <i data-lucide="chevron-down" style="width:16px;height:16px;color:#6d7381;flex-shrink:0"></i>
+        </div>
+        <div class="student-dropdown" id="studentDropdownList"></div>
+      </div>
+      <div class="tb-nav">
+        <button class="tb-nav-btn" onclick="navStudent(-1)" title="이전 학생"><i data-lucide="chevron-left" style="width:16px;height:16px"></i></button>
+        <button class="tb-nav-btn" onclick="navStudent(1)" title="다음 학생"><i data-lucide="chevron-right" style="width:16px;height:16px"></i></button>
+      </div>
+      <span class="progress-chip">8 / 21명 완료</span>
+    </div>
+  </div>
+  <div class="tb-right">
+    <button class="btn-save" onclick="saveScoring()"><i data-lucide="save" style="width:14px;height:14px"></i>저장</button>
+  </div>
+</div>
+
+<div class="main-wrap">
+
+  <div class="viewer">
+    <div class="viewer-topbar">
+      <div class="viewer-ctrl">
+        <button class="ctrl-btn" onclick="changeViewerPage(-1)"><i data-lucide="chevron-left" style="width:16px;height:16px"></i></button>
+        <span class="ctrl-page-info" id="viewerPageInfo">1 / 3</span>
+        <button class="ctrl-btn" onclick="changeViewerPage(1)"><i data-lucide="chevron-right" style="width:16px;height:16px"></i></button>
+        <div class="ctrl-sep"></div>
+        <button class="ctrl-btn" onclick="rotateViewer(-90)"><i data-lucide="rotate-ccw" style="width:16px;height:16px"></i></button>
+        <button class="ctrl-btn" onclick="rotateViewer(90)"><i data-lucide="rotate-cw" style="width:16px;height:16px"></i></button>
+      </div>
+      <div class="ctrl-zoom">
+        <button class="ctrl-btn" onclick="changeViewerZoom(-10)"><i data-lucide="minus" style="width:16px;height:16px"></i></button>
+        <span class="zoom-info" id="viewerZoomInfo" onclick="resetViewerZoom()">100%</span>
+        <button class="ctrl-btn" onclick="changeViewerZoom(10)"><i data-lucide="plus" style="width:16px;height:16px"></i></button>
+      </div>
+    </div>
+    <div class="viewer-body">
+      <div class="viewer-paper" id="viewerPaper">
+        <h3>수행평가 - 지구 온난화와 기후변화</h3>
+        <div>
+          <span class="q-label">문항 1</span>
+          <div class="q-desc">지구 온난화의 원인을 과학적 근거를 들어 서술하시오.</div>
+          <div class="q-ans hl-q-1">산업혁명 이후 화석연료 사용이 급증하면서 이산화탄소 농도가 현재 421ppm까지 상승했다. 온실효과로 인해 지구의 평균 기온이 상승하며, 인간 활동과 자연적 요인을 구분하여 볼 때 인간 활동이 주요 원인임을 확인할 수 있다.</div>
+        </div>
+        <div>
+          <span class="q-label">문항 2</span>
+          <div class="q-desc">국제사회의 기후변화 대응 노력을 구체적 사례를 들어 설명하시오.</div>
+          <div class="q-ans hl-q-2">파리기후협약(2015)에서 각국은 온실가스 감축 목표를 자발적으로 제출하기로 합의했다. 한국도 2050 탄소중립을 선언했으며, 유럽연합은 탄소국경조정제도(CBAM)를 도입하여 제도적 압박을 가하고 있다.</div>
+        </div>
+        <div>
+          <span class="q-label">문항 3</span>
+          <div class="q-desc">기후변화 문제 해결을 위한 개인과 사회의 역할을 논술하시오.</div>
+          <div class="q-ans hl-q-3">개인 차원에서는 탄소발자국 줄이기, 대중교통 이용 등이 필요하며, 사회 차원에서는 탄소세 도입과 재생에너지 확대가 중요하다. 개인과 제도가 함께 움직여야 실질적 변화가 가능하다.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="resize-handle" id="resizeHandle">
+    <div class="resize-grip"><span></span><span></span><span></span></div>
+  </div>
+
+  <div class="grading-panel">
+
+    <div class="pn-section">
+      <div class="score-summary">
+        <div class="score-total">
+          <span class="lbl">총점</span>
+          <span class="val" id="totalScoreVal">40 / 50</span>
+          <span class="unit">점</span>
+          <span class="plan" id="scorePlanBadge">(A)</span>
+        </div>
+        <div class="status-radios">
+          <label class="radio-item" onclick="selectStatus(this)">
+            <div class="radio-ring checked"></div>
+            <span class="radio-text">채점 진행</span>
+          </label>
+          <label class="radio-item" onclick="selectStatus(this)">
+            <div class="radio-ring"></div>
+            <span class="radio-text">미제출</span>
+          </label>
+          <label class="radio-item" onclick="selectStatus(this)">
+            <div class="radio-ring"></div>
+            <span class="radio-text">미응시</span>
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <div class="pn-section">
+      <div class="pn-section-hd">
+        <i data-lucide="circle-check-big" style="width:20px;height:20px;color:#222631"></i>
+        <span class="pn-section-title">채점 결과</span>
+      </div>
+      <div class="pn-section-desc">AI는 채점을 보조하는 역할을 하며, 채점의 최종 권한은 선생님에게만 있습니다.</div>
+
+      <div>
+        <!-- 김민혁: 전체 채점 완료 Q1=15, Q2=15, Q3=10 -->
+        <div class="rubric-row">
+          <span class="rubric-name">작성 내용의 구체성</span>
+          <div class="score-btns" data-rubric="1">
+            <button class="score-btn selected" onclick="selectScore(this,1)">15</button>
+            <button class="score-btn" onclick="selectScore(this,1)">10</button>
+            <button class="score-btn" onclick="selectScore(this,1)">5</button>
+          </div>
+        </div>
+        <div class="rubric-row">
+          <span class="rubric-name">작성 분량 수준</span>
+          <div class="score-btns" data-rubric="2">
+            <button class="score-btn selected" onclick="selectScore(this,2)">15</button>
+            <button class="score-btn" onclick="selectScore(this,2)">10</button>
+            <button class="score-btn" onclick="selectScore(this,2)">5</button>
+          </div>
+        </div>
+        <div class="rubric-row">
+          <span class="rubric-name">작성의 창의성</span>
+          <div class="score-btns" data-rubric="3">
+            <button class="score-btn" onclick="selectScore(this,3)">15</button>
+            <button class="score-btn selected" onclick="selectScore(this,3)">10</button>
+            <button class="score-btn" onclick="selectScore(this,3)">5</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="rubric-actions">
+        <button class="pill-btn" onclick="resetScores()">점수 초기화</button>
+        <button class="pill-btn" onclick="applyAiScores()"><i data-lucide="check" style="width:14px;height:14px"></i>AI 점수 그대로 적용</button>
+      </div>
+    </div>
+
+    <div class="pn-section">
+      <div class="pn-section-hd">
+        <i data-lucide="sparkles" style="width:20px;height:20px;color:#365eef"></i>
+        <span class="pn-section-title">AI 채점 근거 및 피드백</span>
+      </div>
+
+      <div class="tab-toggle">
+        <button class="tab-toggle-btn active" id="tab-analysis" onclick="switchTab('analysis')">과제물 분석 AI</button>
+        <button class="tab-toggle-btn" id="tab-rubric" onclick="switchTab('rubric')">루브릭 기반 AI</button>
+      </div>
+
+      <div class="ai-box">
+        <div><span class="ai-badge">기본 설정으로 채점</span></div>
+
+        <div>
+          <div class="ai-ground-lbl">AI 채점 근거</div>
+          <ol class="ai-ground-list">
+            <li>학생은 지구 온난화의 원인과 결과를 체계적으로 분석하고, 온실가스 배출 감소를 위한 국제적 협력의 필요성을 논리적으로 서술함.</li>
+            <li>파리기후협약, 탄소중립 정책 등 구체적인 사례를 인용하여 주장의 근거를 뒷받침함.</li>
+            <li>개인적 실천과 제도적 변화를 연결 짓는 다층적 관점을 보여주었으나, 경제적 비용에 대한 고려가 부족함.</li>
+          </ol>
+        </div>
+
+        <div class="ai-divider"></div>
+
+        <div>
+          <div class="ai-feedback-hd-lbl" style="margin-bottom:10px">AI 피드백</div>
+
+          <div class="fb-seg-bar">
+            <button class="fb-seg-btn" id="fb-seg-summary" onclick="selectFeedbackMode('summary')">요약 보기</button>
+            <button class="fb-seg-btn" id="fb-seg-peritem" onclick="selectFeedbackMode('per-item')">채점요소별 보기</button>
+            <button class="fb-seg-btn fb-seg-active" id="fb-seg-perq" onclick="selectFeedbackMode('per-question')">문항별 보기</button>
+          </div>
+
+          <div id="feedback-summary" style="display:none">
+            <p class="ai-feedback-text">지구 온난화와 기후변화에 대해 체계적으로 분석하고, 국제적 협력 사례를 활용한 논거가 우수합니다. 다만, 경제적 비용과 개발도상국의 현실적 한계에 대한 고려가 추가되면 더욱 균형 잡힌 글이 될 것입니다.
+
+[잘한 점]
+- 파리기후협약, 탄소중립 등 구체적 사례를 적절히 활용함.
+- 개인과 제도의 연결 고리를 만들어 다층적 관점을 보여줌.
+
+[보완할 점]
+- 탄소세 도입 시 경제적 부담에 대한 반론 검토가 필요함.
+- 개발도상국의 에너지 전환 과정에서의 현실적 어려움도 고려할 것.</p>
+          </div>
+
+          <div id="feedback-per-item" style="display:none;flex-direction:column;gap:12px">
+            <div class="item-feedback-card">
+              <div style="display:flex;align-items:center;justify-content:space-between">
+                <div class="item-label">
+                  <span class="item-number">1</span>
+                  <span style="font-size:16px;font-weight:600;color:#222631">작성 내용의 구체성</span>
+                </div>
+                <span class="item-score-badge">15 / 15점</span>
+              </div>
+              <p class="feedback-text">파리기후협약(2015), 탄소중립 2050 선언, 유럽 탄소국경조정제도(CBAM) 등 <strong>구체적인 정책 사례를 3건 이상 인용</strong>하여 논거를 뒷받침함. 데이터 인용(온실가스 농도 421ppm 등)도 적절하게 활용됨.</p>
+              <div class="subpoint-box">
+                <span class="good-point"><i data-lucide="circle-check" style="width:14px;height:14px"></i>잘한 점: 국제 협약과 수치 데이터를 정확하게 활용하여 주장에 설득력을 부여함</span>
+                <span style="font-size:14px;color:#808080;line-height:1.5">보완 사항 없음</span>
+              </div>
+            </div>
+
+            <div class="item-feedback-card">
+              <div style="display:flex;align-items:center;justify-content:space-between">
+                <div class="item-label">
+                  <span class="item-number">2</span>
+                  <span style="font-size:16px;font-weight:600;color:#222631">작성 분량 수준</span>
+                </div>
+                <span class="item-score-badge">15 / 15점</span>
+              </div>
+              <p class="feedback-text">서론(문제 제기) - 본론(원인 분석 + 사례) - 결론(개인·제도적 해결방안)의 3단 구성으로 <strong>총 847자를 작성</strong>하여 요구 분량(600자 이상)을 충분히 충족함.</p>
+              <div class="subpoint-box">
+                <span class="good-point"><i data-lucide="circle-check" style="width:14px;height:14px"></i>잘한 점: 구조적으로 잘 나뉜 글 전개와 충분한 분량</span>
+                <span style="font-size:14px;color:#808080;line-height:1.5">보완 사항 없음</span>
+              </div>
+            </div>
+
+            <div class="item-feedback-card">
+              <div style="display:flex;align-items:center;justify-content:space-between">
+                <div class="item-label">
+                  <span class="item-number">3</span>
+                  <span style="font-size:16px;font-weight:600;color:#222631">작성의 창의성</span>
+                </div>
+                <span class="item-score-badge">10 / 15점</span>
+              </div>
+              <p class="feedback-text">개인의 실천(탄소발자국 줄이기)과 국가 정책(탄소세)을 연결하는 관점은 좋으나, <strong>독창적인 해결 방안 제시가 부족</strong>함. 기존에 널리 알려진 정책 나열에 그치고 있음.</p>
+              <div class="subpoint-box">
+                <span class="good-point"><i data-lucide="circle-check" style="width:14px;height:14px"></i>잘한 점: 개인-제도를 연결하는 다층적 사고 시도</span>
+                <span class="improve-point"><i data-lucide="triangle-alert" style="width:14px;height:14px"></i>보완할 점: 학생 자신만의 독창적 관점이나 새로운 해결책 제안이 필요함</span>
+              </div>
+            </div>
+          </div>
+
+          <div id="feedback-per-question" style="display:flex;flex-direction:column;gap:12px">
+            <div class="item-feedback-card" style="border-left:3px solid #416bff">
+              <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+                <span style="background:#416bff;color:#fff;font-size:12px;font-weight:700;padding:2px 10px;border-radius:100px">문항 1</span>
+                <span style="font-size:14px;font-weight:600;color:#222631">지구 온난화의 원인을 과학적 근거를 들어 서술하시오.</span>
+              </div>
+              <p class="feedback-text">산업혁명 이후 화석연료 사용 증가와 이산화탄소 농도(421ppm) 데이터를 정확히 제시하며 원인을 과학적으로 설명함. <strong>온실효과 메커니즘에 대한 설명이 체계적</strong>이며, 인간 활동과 자연적 요인을 구분하여 서술한 점이 우수함.</p>
+              <div class="subpoint-box">
+                <span class="good-point"><i data-lucide="circle-check" style="width:14px;height:14px"></i>정량적 데이터와 과학적 메커니즘을 연결하여 논증함</span>
+                <span style="font-size:14px;color:#808080;line-height:1.5">보완 사항 없음</span>
+              </div>
+            </div>
+
+            <div class="item-feedback-card" style="border-left:3px solid #1972fb">
+              <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+                <span style="background:#1972fb;color:#fff;font-size:12px;font-weight:700;padding:2px 10px;border-radius:100px">문항 2</span>
+                <span style="font-size:14px;font-weight:600;color:#222631">국제사회의 기후변화 대응 노력을 구체적 사례를 들어 설명하시오.</span>
+              </div>
+              <p class="feedback-text">파리기후협약(2015), 한국의 2050 탄소중립 선언, EU의 탄소국경조정제도(CBAM) 등 <strong>3건의 구체적 사례를 시간순으로 제시</strong>하여 국제 공조의 흐름을 잘 보여줌. 각 사례의 목표와 의의를 명확히 서술함.</p>
+              <div class="subpoint-box">
+                <span class="good-point"><i data-lucide="circle-check" style="width:14px;height:14px"></i>다양한 수준(국제·국가·지역)의 사례를 균형있게 활용함</span>
+                <span class="improve-point"><i data-lucide="triangle-alert" style="width:14px;height:14px"></i>각 정책의 한계점이나 비판적 관점도 함께 다루면 더 균형 잡힌 서술이 됨</span>
+              </div>
+            </div>
+
+            <div class="item-feedback-card" style="border-left:3px solid #f97316">
+              <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px">
+                <span style="background:#f97316;color:#fff;font-size:12px;font-weight:700;padding:2px 10px;border-radius:100px">문항 3</span>
+                <span style="font-size:14px;font-weight:600;color:#222631">기후변화 문제 해결을 위한 개인과 사회의 역할을 논술하시오.</span>
+              </div>
+              <p class="feedback-text">탄소발자국 줄이기, 대중교통 이용 등 <strong>개인 실천 방안을 제시</strong>하고, 탄소세·재생에너지 정책 등 제도적 차원과 연결 지은 점은 좋음. 다만 <strong>독창적 해결책 없이 기존 정책을 나열</strong>하는 데 그쳐 논술의 깊이가 부족함.</p>
+              <div class="subpoint-box">
+                <span class="good-point"><i data-lucide="circle-check" style="width:14px;height:14px"></i>개인-제도를 연결하여 다층적으로 접근함</span>
+                <span class="improve-point"><i data-lucide="triangle-alert" style="width:14px;height:14px"></i>학생만의 창의적 해결 방안이나 구체적 실행 계획을 제안하면 설득력이 높아짐</span>
+              </div>
+              <div style="margin-top:4px;padding:8px 12px;background:#fff7ed;border-radius:6px;border:1px solid #fed7aa">
+                <span style="font-size:14px;color:#ea580c;font-weight:600">참고:</span>
+                <span style="font-size:14px;color:#3b3f4c;line-height:1.5"> 경제적 비용(예: 탄소세가 저소득층에 미치는 영향)에 대한 반론도 다루면 논술의 균형이 크게 향상됩니다.</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="ai-footer">
+          <span class="ai-count">412자 / 1,024 byte</span>
+          <button class="pill-btn"><i data-lucide="download" style="width:14px;height:14px"></i>피드백 가져오기</button>
+        </div>
+      </div>
+
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+        <button class="btn-ai-rerun" onclick="openRerunModal()">
+          <i data-lucide="wand-sparkles" style="width:16px;height:16px"></i>AI 채점 재실행
+        </button>
+      </div>
+      <div class="ai-notice">AI Assistant의 채점 결과는 부정확할 수 있습니다. 언제나 선생님의 최종 확인이 필요합니다.</div>
+    </div>
+
+    <div class="teacher-fb">
+      <div class="teacher-fb-hd">
+        <i data-lucide="message-circle" style="width:20px;height:20px;color:#365eef"></i>
+        <span class="teacher-fb-title">선생님 직접 피드백</span>
+      </div>
+      <textarea id="teacherFeedback" class="teacher-fb-ta" oninput="updateCharCount()" placeholder="채점 완료 시, 학생에게 제공되는 과제 피드백 내용입니다.&#10;AI 생성 기록을 참고하여 피드백을 작성해 보세요.">기후변화에 대한 다양한 정책 사례를 잘 활용하였습니다. 특히 파리기후협약과 탄소중립 선언을 연결하여 논리적 흐름을 만든 점이 인상적입니다. 다만, 경제적 측면에서의 반론(예: 탄소세가 저소득층에 미치는 영향)도 함께 다루면 더 깊이 있는 글이 될 것입니다.</textarea>
+      <div class="char-count" id="charCount">0자 / 0 byte</div>
+      <div class="teacher-fb-save">
+        <button class="btn-save-next" onclick="saveAndNext()">
+          <i data-lucide="check" style="width:16px;height:16px"></i>저장 후 다음 학생
+        </button>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
+<div class="toast" id="toast">
+  <i id="toastIcon" data-lucide="circle-check-big" style="width:18px;height:18px;flex-shrink:0"></i>
+  <span id="toastMsg"></span>
+</div>
+
+<script>
+var urlParams = new URLSearchParams(location.search);
+var studentId = urlParams.get('id') || '10301';
+var studentName = urlParams.get('name') || '김민혁';
+var evalPlan = urlParams.get('eval') || 'A';
+var classNum = urlParams.get('classNum') || '1';
+var fromUrl = urlParams.get('from') || '';
+
+var STUDENT_LIST = [
+  {id:'10101', name:'김하나', status:'확인 필요', statusCls:'need', link:'scoring_student_v1.html'},
+  {id:'10102', name:'이지은', status:'완료', statusCls:'done', link:'scoring_student_v1.html'},
+  {id:'10103', name:'박수진', status:'완료', statusCls:'done', link:'scoring_student_v1.html'},
+  {id:'10104', name:'최유진', status:'완료', statusCls:'done', link:'scoring_student_v1.html'},
+  {id:'10105', name:'정현우', status:'미채점', statusCls:'none', link:'scoring_student_v1.html'},
+  {id:'10106', name:'한가람', status:'미채점', statusCls:'none', link:'scoring_student_v1.html'},
+  {id:'10107', name:'오세훈', status:'미채점', statusCls:'none', link:'scoring_student_v1.html'},
+  {id:'10108', name:'한지우', status:'진행 중', statusCls:'progress', link:'scoring_student_v1.html'},
+  {id:'10201', name:'김하이', status:'진행 중', statusCls:'progress', link:'scoring_student_kimhi_v1.html'},
+  {id:'10301', name:'김민혁', status:'완료', statusCls:'done', link:'scoring_student_kimmh_v1.html'}
+];
+var currentStudentIdx = STUDENT_LIST.findIndex(function(s){ return s.id === studentId; });
+if (currentStudentIdx < 0) currentStudentIdx = 9;
+
+function goBack() {
+  if ((evalPlan === 'B' || evalPlan === 'C') && fromUrl === 'scoring_list_v1.html') {
+    location.href = 'scoring_list_v1.html?showClass=' + classNum + '&eval=' + evalPlan;
+  } else if (fromUrl) {
+    location.href = fromUrl;
+  } else {
+    location.href = 'grading_individual_v3_260406.html';
+  }
+}
+
+function renderDropdown() {
+  var list = document.getElementById('studentDropdownList');
+  list.innerHTML = STUDENT_LIST.map(function(s, i){
+    var isCurrent = s.id === studentId;
+    return '<div class="sd-item ' + (isCurrent ? 'active' : '') + '" data-idx="' + i + '" onclick="selectStudent(' + i + ')">'
+      + '<span>' + s.id + ' ' + s.name + '</span>'
+      + '<span class="sd-status ' + s.statusCls + '">' + s.status + '</span>'
+      + '</div>';
+  }).join('');
+}
+function toggleDropdown(e) {
+  if (e) e.stopPropagation();
+  document.getElementById('studentDropdownList').classList.toggle('show');
+}
+function selectStudent(idx) {
+  var s = STUDENT_LIST[idx];
+  var p = new URLSearchParams(location.search);
+  p.set('id', s.id);
+  p.set('name', s.name);
+  if (s.link && s.link !== location.pathname.split('/').pop()) {
+    var p2 = new URLSearchParams(location.search);
+    p2.delete('id'); p2.delete('name');
+    var qs = p2.toString();
+    location.href = s.link + (qs ? '?' + qs : '');
+  } else {
+    location.reload();
+  }
+}
+function navStudent(dir) {
+  var next = currentStudentIdx + dir;
+  if (next < 0 || next >= STUDENT_LIST.length) return;
+  selectStudent(next);
+}
+document.addEventListener('click', function(){
+  document.getElementById('studentDropdownList').classList.remove('show');
+});
+
+function selectStatus(el) {
+  document.querySelectorAll('.status-radios .radio-ring').forEach(function(r){ r.classList.remove('checked'); });
+  el.querySelector('.radio-ring').classList.add('checked');
+}
+
+var scores = {1:15, 2:15, 3:10};
+function selectScore(btn, rubricId) {
+  if (btn.classList.contains('hatched')) return;
+  var container = btn.closest('[data-rubric]');
+  container.querySelectorAll('.score-btn:not(.hatched)').forEach(function(b){ b.classList.remove('selected'); });
+  btn.classList.add('selected');
+  scores[rubricId] = parseInt(btn.textContent, 10);
+  updateTotal();
+}
+function resetScores() {
+  document.querySelectorAll('.score-btn:not(.hatched)').forEach(function(b){ b.classList.remove('selected'); });
+  scores = {};
+  updateTotal();
+}
+function applyAiScores() {
+  showToast('success', 'AI 점수가 적용되었습니다.');
+}
+function updateTotal() {
+  var sum = 0, has = false;
+  Object.keys(scores).forEach(function(k){ if (scores[k]) { sum += scores[k]; has = true; } });
+  document.getElementById('totalScoreVal').textContent = has ? (sum + ' / 50') : ('- / 50');
+}
+
+function switchTab(tab) {
+  document.getElementById('tab-analysis').classList.toggle('active', tab === 'analysis');
+  document.getElementById('tab-rubric').classList.toggle('active', tab === 'rubric');
+}
+
+var activeFeedbackMode = 'per-question';
+function selectFeedbackMode(mode) {
+  activeFeedbackMode = mode;
+  ['summary','per-item','per-question'].forEach(function(m){
+    var btnId = m === 'summary' ? 'fb-seg-summary' : (m === 'per-item' ? 'fb-seg-peritem' : 'fb-seg-perq');
+    var paneId = 'feedback-' + m;
+    document.getElementById(btnId).classList.toggle('fb-seg-active', m === mode);
+    var pane = document.getElementById(paneId);
+    if (pane) pane.style.display = (m === mode) ? (m === 'per-item' ? 'flex' : (m === 'per-question' ? 'flex' : 'block')) : 'none';
+  });
+}
+
+function updateCharCount() {
+  var t = document.getElementById('teacherFeedback');
+  var txt = t.value;
+  document.getElementById('charCount').textContent = txt.length + '자 / ' + new TextEncoder().encode(txt).length + ' byte';
+}
+
+var viewerZoom = 100, viewerRotation = 0, viewerPage = 1, viewerTotal = 3;
+function applyViewerTransform() {
+  var p = document.getElementById('viewerPaper');
+  if (p) p.style.transform = 'rotate(' + viewerRotation + 'deg) scale(' + (viewerZoom/100) + ')';
+  document.getElementById('viewerZoomInfo').textContent = viewerZoom + '%';
+  document.getElementById('viewerPageInfo').textContent = viewerPage + ' / ' + viewerTotal;
+}
+function changeViewerZoom(d){ viewerZoom = Math.max(30, Math.min(300, viewerZoom + d)); applyViewerTransform(); }
+function resetViewerZoom(){ viewerZoom = 100; viewerRotation = 0; applyViewerTransform(); }
+function rotateViewer(d){ viewerRotation = (viewerRotation + d + 360) % 360; applyViewerTransform(); }
+function changeViewerPage(d){ viewerPage = Math.max(1, Math.min(viewerTotal, viewerPage + d)); applyViewerTransform(); }
+
+(function(){
+  var handle = document.getElementById('resizeHandle');
+  var panel = document.querySelector('.grading-panel');
+  var dragging = false;
+  handle.addEventListener('mousedown', function(e){
+    dragging = true; handle.classList.add('dragging');
+    document.body.style.cursor = 'col-resize'; e.preventDefault();
+  });
+  document.addEventListener('mousemove', function(e){
+    if (!dragging) return;
+    var w = window.innerWidth - e.clientX;
+    if (w < 380) w = 380;
+    if (w > 780) w = 780;
+    panel.style.width = w + 'px';
+  });
+  document.addEventListener('mouseup', function(){
+    dragging = false; handle.classList.remove('dragging');
+    document.body.style.cursor = '';
+  });
+})();
+
+function saveScoring() { showToast('success', '저장되었습니다.'); }
+function saveAndNext() {
+  showToast('success', '저장되었습니다. 다음 학생으로 이동합니다.');
+  setTimeout(function(){ navStudent(1); }, 900);
+}
+function openRerunModal() {
+  showToast('loading', 'AI 채점을 진행 중입니다...');
+  setTimeout(function(){ showToast('success', 'AI 채점이 완료되었습니다.'); }, 1800);
+}
+
+var _toastTimer;
+function showToast(type, msg) {
+  var t = document.getElementById('toast');
+  var icon = document.getElementById('toastIcon');
+  clearTimeout(_toastTimer);
+  t.className = 'toast ' + type;
+  var iconName = type === 'success' ? 'circle-check-big' : (type === 'error' ? 'circle-alert' : 'loader');
+  icon.setAttribute('data-lucide', iconName);
+  document.getElementById('toastMsg').textContent = msg;
+  lucide.createIcons();
+  requestAnimationFrame(function(){ t.classList.add('show'); });
+  _toastTimer = setTimeout(function(){ t.classList.remove('show'); }, 2500);
+}
+
+(function(){
+  document.getElementById('scorePlanBadge').textContent = '(' + evalPlan + ')';
+  renderDropdown();
+  updateCharCount();
+  selectFeedbackMode('per-question');
+  lucide.createIcons();
+})();
+</script>
+</body>
+</html>
