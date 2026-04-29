@@ -337,7 +337,7 @@
       <div class="row cols-2">
         <div class="field">
           <label class="field-label">학기</label>
-          <select class="select">
+          <select class="select" id="selTerm">
             <option>2026학년도 1학기</option>
             <option>2026학년도 2학기</option>
           </select>
@@ -371,11 +371,14 @@
             <span>2022 개정 교육과정</span>
           </label>
         </div>
-        <select class="select placeholder" style="margin-top:6px">
+        <select class="select placeholder" id="selSubject" style="margin-top:6px" onchange="onSubjectChange()">
           <option>과목을 선택해 주세요.</option>
           <option>국어</option>
           <option>수학</option>
           <option>통합교과(봄)</option>
+          <option>슬기로운 생활</option>
+          <option>즐거운 생활</option>
+          <option>바른 생활</option>
         </select>
         <div class="helper">
           <span>* 원하는 과목이 없을 경우 내 정보에서 교과를 추가해 주세요.</span>
@@ -386,7 +389,7 @@
       <!-- 수업명 -->
       <div class="field">
         <label class="field-label">수업명</label>
-        <input class="input" placeholder="수업명을 입력해 주세요. (예: 국어, 수학 1반, 인공지능 이해 등)">
+        <input class="input" id="inputClassName" placeholder="수업명을 입력해 주세요. (예: 국어, 수학 1반, 인공지능 이해 등)">
       </div>
 
       <!-- 반 편성 + 하위(반 드롭다운 / 안내) -->
@@ -436,7 +439,7 @@
 
     <div class="modal-footer">
       <button class="btn-outline" onclick="closeModal()">취소</button>
-      <button class="btn-solid">저장</button>
+      <button class="btn-solid" onclick="createClass()">저장</button>
     </div>
   </div>
 </div>
@@ -481,6 +484,96 @@
 
   function goToClass(){
     window.location.href = 'scoring_list_v1.html';
+  }
+
+  function onSubjectChange(){
+    const sel = document.getElementById('selSubject');
+    const subj = sel.value;
+    if(subj && subj !== '과목을 선택해 주세요.'){
+      document.getElementById('inputClassName').value = subj;
+      sel.classList.remove('placeholder');
+    }
+  }
+
+  function resetForm(){
+    document.getElementById('selSubject').selectedIndex = 0;
+    document.getElementById('selSubject').classList.add('placeholder');
+    document.getElementById('inputClassName').value = '';
+  }
+
+  function createClass(){
+    const isHomeroom = document.querySelectorAll('input[name="ban"]')[0].checked;
+    const subjectSel = document.getElementById('selSubject');
+    const subjectText = subjectSel.value;
+    const className = document.getElementById('inputClassName').value.trim() || subjectText;
+
+    if(!subjectText || subjectText === '과목을 선택해 주세요.'){
+      alert('과목을 선택해 주세요.');
+      return;
+    }
+
+    let classTag, classTagClass;
+    if(isHomeroom){
+      const opt = document.getElementById('selClass').selectedOptions[0];
+      if(!opt){ alert('반을 선택해 주세요.'); return; }
+      const m = opt.text.match(/^(\d+)-(\d+)반$/);
+      classTag = m ? `${m[1]}학년 ${m[2]}반` : opt.text;
+      classTagClass = 'tag-class';
+    } else {
+      classTag = '이동수업반';
+      classTagClass = 'tag-move';
+    }
+
+    // Build card via DOM (안전한 텍스트 삽입)
+    const card = document.createElement('article');
+    card.className = 'card';
+    card.addEventListener('click', goToClass);
+
+    const cardTop = document.createElement('div');
+    cardTop.className = 'card-top';
+    const titleDiv = document.createElement('div');
+    titleDiv.className = 'card-title';
+    titleDiv.textContent = className;
+    const menuBtn = document.createElement('button');
+    menuBtn.className = 'menu-btn';
+    menuBtn.innerHTML = '<i data-lucide="more-vertical" style="width:18px;height:18px"></i>';
+    menuBtn.addEventListener('click', e => e.stopPropagation());
+    cardTop.appendChild(titleDiv);
+    cardTop.appendChild(menuBtn);
+
+    const meta = document.createElement('div');
+    meta.className = 'card-meta';
+    meta.textContent = '수행평가 0개';
+
+    const tags = document.createElement('div');
+    tags.className = 'card-tags';
+    const tag1 = document.createElement('span');
+    tag1.className = `tag ${classTagClass}`;
+    tag1.textContent = classTag;
+    const tag2 = document.createElement('span');
+    tag2.className = 'tag tag-subject';
+    tag2.textContent = subjectText;
+    tags.appendChild(tag1);
+    tags.appendChild(tag2);
+
+    card.appendChild(cardTop);
+    card.appendChild(meta);
+    card.appendChild(tags);
+
+    // 첫 학기 그룹의 카드 그리드 맨 앞에 추가
+    const grid = document.querySelector('.term-group .card-grid');
+    grid.insertBefore(card, grid.firstChild);
+
+    // 카운트 증가
+    const metaEl = document.querySelector('.term-group .term-head .term-meta');
+    const cm = metaEl.textContent.match(/진행 중 (\d+)개/);
+    if(cm){
+      metaEl.textContent = `진행 중 ${parseInt(cm[1]) + 1}개`;
+    }
+
+    lucide.createIcons();
+    closeModal();
+    resetForm();
   }
 
   function updateClassOptions(){
