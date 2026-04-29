@@ -486,17 +486,21 @@
   function updateClassOptions(){
     const grade = document.getElementById('selGrade').value;
     const sel = document.getElementById('selClass');
-    const fieldClass = document.getElementById('fieldClass');
     const noticeMain = document.getElementById('noticeMain');
-    const noticeSub = document.getElementById('noticeSub');
 
+    sel.innerHTML = '';
     if(grade === 'none'){
-      fieldClass.style.display = 'none';
-      noticeMain.textContent = '학교설정에 등록된 전체 학생이 자동으로 참여 학생에 추가됩니다.';
-      noticeSub.style.display = 'none';
+      // 학년 구분 없음 → 학교에 등록된 모든 반 (1-1반 ... 6-3반)
+      for(let g=1; g<=6; g++){
+        for(let i=1; i<=3; i++){
+          const opt = document.createElement('option');
+          opt.value = `${g}-${i}`;
+          opt.textContent = `${g}-${i}반`;
+          sel.appendChild(opt);
+        }
+      }
+      noticeMain.textContent = '선택한 반의 학생이 자동으로 참여 학생에 추가됩니다.';
     } else {
-      fieldClass.style.display = '';
-      sel.innerHTML = '';
       for(let i=1; i<=3; i++){
         const opt = document.createElement('option');
         opt.value = i;
@@ -504,7 +508,6 @@
         sel.appendChild(opt);
       }
       noticeMain.textContent = '선택한 학년·반의 학생이 자동으로 참여 학생에 추가됩니다.';
-      noticeSub.style.display = '';
     }
   }
   updateClassOptions();
