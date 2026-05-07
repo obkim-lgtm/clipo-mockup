@@ -792,8 +792,9 @@ body.nav-expanded .sticky-cta{left:200px;transition:left .2s ease}
 <!-- ── 목업 시나리오 토글 (개발용) ── -->
 <div class="mockup-toggle" id="mockup-toggle">
   <span class="mt-label">MOCKUP</span>
-  <button class="mt-btn" data-scenario="data" onclick="applyScenario('data')">자료 1+ 있음</button>
+  <button class="mt-btn" data-scenario="empty" onclick="applyScenario('empty')">빈 화면</button>
   <button class="mt-btn" data-scenario="keywords-only" onclick="applyScenario('keywords-only')">키워드만</button>
+  <button class="mt-btn" data-scenario="data" onclick="applyScenario('data')">자료 1+ 있음</button>
 </div>
 
 <!-- 토스트 -->
@@ -1497,6 +1498,10 @@ function applyScenario(scenario){
         ? orig.keywords.map(k=>({...k, source:'keyword'}))
         : KEYWORDS_FALLBACK.slice(0, 2 + (i%3)).map(k=>({...k}));
       s.level = orig.level;
+    } else if(scenario === 'empty'){
+      s.files = [];
+      s.keywords = [];
+      s.level = null;
     }
     s.s2 = { status:'idle', selectedIds:new Set(), customs:[] };
   });
@@ -1504,12 +1509,13 @@ function applyScenario(scenario){
   refreshAll();
   const active = document.querySelector('.step-btn.active');
   if(active && active.id === 'step-2') renderStep2();
-  showToast(scenario === 'data' ? '자료 1+ 시나리오로 전환' : '키워드만 시나리오로 전환');
+  const labels = {data:'자료 1+ 있음', 'keywords-only':'키워드만', empty:'빈 화면'};
+  showToast(`'${labels[scenario]}' 시나리오로 전환`);
 }
 function detectInitialScenario(){
   const hasFiles = STUDENTS.some(s => s.files.length > 0);
   const hasKw = STUDENTS.some(s => s.keywords.length > 0);
-  return hasFiles ? 'data' : (hasKw ? 'keywords-only' : null);
+  return hasFiles ? 'data' : (hasKw ? 'keywords-only' : 'empty');
 }
 function rerunAI(){
   // 헤더의 [전체 분석 시작] / [전체 재분석]
