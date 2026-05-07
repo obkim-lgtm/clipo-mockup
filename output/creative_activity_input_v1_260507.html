@@ -403,10 +403,14 @@ body.nav-expanded .sticky-cta{left:200px;transition:left .2s ease}
 .s2-item-tags{display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap}
 .s2-tag{display:inline-flex;align-items:center;padding:3px 10px;border-radius:6px;font-size:12px;font-weight:600;line-height:1.5}
 .s2-tag-cat{background:#eff3ff;color:#416bff}
-.s2-tag-src{background:#dcfce7;color:#15803d}
-.s2-tag-src.individual{background:#fef3c7;color:#b45309}
-.s2-tag-src.keyword{background:#e9f2ff;color:#365eef}
-.s2-tag-src.auto{background:#f3eeff;color:#7c3aed}
+.s2-tag-comp{background:#f3eeff;color:#7c3aed}
+.s2-tag-cross{background:#dcfce7;color:#15803d;display:inline-flex;align-items:center;gap:3px}
+.s2-item-source{display:flex;align-items:flex-start;gap:6px;padding:9px 12px;background:#f9fafb;border:1px solid #f1f3f5;border-radius:6px;font-size:13px;color:#3b3f4c;line-height:1.55;margin-bottom:8px}
+.s2-item-source strong{color:#222631;font-weight:600}
+.s2-source-sec{color:#6d7381;font-weight:400}
+.s2-stats-bar{display:flex;align-items:center;gap:14px;padding:12px 18px;background:#f9fafb;border:1px solid #e5e7eb;border-radius:10px;font-size:13px;color:#3b3f4c;margin-bottom:8px}
+.s2-stats-bar strong{color:#222631}
+.s2-stats-sep{width:1px;height:12px;background:#d9d9d9}
 .s2-item-content{font-size:14px;color:#222631;line-height:1.65;margin-bottom:10px}
 .s2-item-rationale{background:#f4f8ff;border-left:3px solid #416bff;border-radius:0 8px 8px 0;padding:10px 14px;font-size:13px;color:#3b3f4c;line-height:1.65}
 .s2-item-rationale-label{font-weight:600;color:#416bff;display:inline-flex;align-items:center;gap:4px;margin-right:6px}
@@ -865,53 +869,98 @@ let curDetailId = null;
 let pendingFile = null;
 let s2CurStudentId = null;
 
-// ───── STEP 2 더미 데이터 ─────
+// ───── STEP 2 더미 데이터 (실제 API 응답 구조 그대로) ─────
+// 필드: id / category / content / sources[{file,section,type}] / source_origin / rationale / competency / cross_validated
 const STEP2_DEFAULT_ITEMS = [
-  {id:'C01', category:'활동 내용', sources:[{label:'일괄·봉사보고서.pdf', kind:'bulk'}, {label:'키워드', kind:'keyword'}],
-   content:'학급 봉사활동 시간에 청소 구역 정리와 분리수거를 책임감 있게 도맡아 수행함.',
-   source_origin:'stage1_recommended',
-   rationale:'자율·자치활동의 핵심인 학급 공동체 참여를 잘 보여주는 사례. 봉사보고서와 교사 키워드 두 출처에서 반복 관찰되었고, 책임감 있는 행동이 구체적 활동(청소·분리수거)으로 드러나 신뢰도가 높음.'},
-  {id:'C02', category:'태도·역할', sources:[{label:'키워드', kind:'keyword'}, {label:'일괄', kind:'bulk'}],
-   content:'또래 친구들이 함께 참여할 수 있도록 안내하고 챙기는 리더십이 관찰됨.',
-   source_origin:'stage1_recommended',
-   rationale:'자율·자치활동 평가에서 가장 중요한 또래 관계 속 자치 역량의 직접 증거. 키워드("리더 역할")와 봉사보고서 사진이 상호 검증되며, 4학년 발달단계에서 핵심적인 사회성 지표.'},
-  {id:'C03', category:'활동 내용', sources:[{label:'개별·자화상.jpg', kind:'individual'}],
-   content:'미술 자화상 그리기 활동에서 다양한 색감을 활용하여 자신의 모습을 창의적으로 표현함.',
-   source_origin:'stage1_recommended',
-   rationale:'자율활동의 창의적 표현 측면을 보여주는 항목. 실제 작품 이미지가 첨부되어 구체적 증거가 명확하며, 학급 공동 활동에 다양한 방식으로 참여하는 모습으로 연결 가능.'},
-  {id:'C04', category:'강점·성장', sources:[{label:'일괄·독서활동.xlsx', kind:'bulk'}, {label:'키워드', kind:'keyword'}],
-   content:'학기 중 5권의 책을 읽고 독서록을 성실히 작성하며 사고력과 분석력이 향상됨.',
-   source_origin:'stage1_recommended',
-   rationale:'자율활동의 자기관리 영역에 해당. 독서기록표의 정량 근거(5권)와 키워드("분석력 좋음")의 정성 평가가 결합되어 학습 태도의 꾸준함을 입증.'},
-  {id:'C05', category:'핵심역량', sources:[{label:'자동 매핑', kind:'auto'}],
-   content:'자기관리 역량 · 공동체 역량 · 심미적 감성 역량',
-   source_origin:'stage1_recommended',
-   rationale:''},
-  {id:'C06', category:'진로 연결', sources:[{label:'일괄·독서기록표', kind:'bulk'}],
-   content:'독서활동을 통해 진로 흥미를 탐색하고 학기 내 5권 완독 등 학습 자기주도성을 보임.',
-   source_origin:'stage1_candidate',
-   rationale:'후보 항목 — 독서활동이 진로 탐색으로 직접 연결되는 근거가 부족하지만 학습 태도 보강용으로 추가 가능.'},
-  {id:'C07', category:'학기 성장', sources:[{label:'키워드', kind:'keyword'}],
-   content:'학기 초보다 협력적 태도와 책임감이 눈에 띄게 성장함.',
-   source_origin:'stage1_candidate',
-   rationale:'후보 항목 — 키워드만 출처라 구체적 사례 보강 시 추천으로 승격 가능.'},
+  {
+    id:'C01', category:'활동 내용',
+    content:'학급 봉사활동 시간에 청소 구역 정리와 분리수거를 책임감 있게 도맡아 수행함.',
+    sources:[
+      {file:'봉사보고서.pdf', section:'2학기 봉사일지 · 환경 분야', type:'student'},
+      {file:'관찰 키워드', section:'책임감, 학급 공동체', type:'teacher'}
+    ],
+    source_origin:'stage1_recommended',
+    rationale:'자율·자치활동의 핵심인 학급 공동체 참여를 잘 보여주는 사례. 봉사보고서와 교사 키워드 두 출처에서 반복 관찰되었고, 책임감 있는 행동이 구체적 활동(청소·분리수거)으로 드러나 신뢰도가 높음.',
+    competency:'공동체역량',
+    cross_validated:true
+  },
+  {
+    id:'C02', category:'태도·역할',
+    content:'또래 친구들이 함께 참여할 수 있도록 안내하고 챙기는 리더십이 관찰됨.',
+    sources:[
+      {file:'관찰 키워드', section:'리더 역할, 또래 챙김', type:'teacher'},
+      {file:'봉사보고서.pdf', section:'활동 장면 사진 캡션', type:'student'}
+    ],
+    source_origin:'stage1_recommended',
+    rationale:'자율·자치활동 평가에서 가장 중요한 또래 관계 속 자치 역량의 직접 증거. 키워드와 봉사보고서 사진이 상호 검증됨.',
+    competency:'공동체역량',
+    cross_validated:true
+  },
+  {
+    id:'C03', category:'활동 내용',
+    content:'미술 자화상 그리기 활동에서 다양한 색감을 활용하여 자신의 모습을 창의적으로 표현함.',
+    sources:[
+      {file:'자화상.jpg', section:'학생 제출 작품', type:'student'}
+    ],
+    source_origin:'stage1_recommended',
+    rationale:'자율활동의 창의적 표현 측면을 보여주는 항목. 실제 작품 이미지가 첨부되어 구체적 증거가 명확함.',
+    competency:'심미적감성',
+    cross_validated:false
+  },
+  {
+    id:'C04', category:'강점·성장',
+    content:'학기 중 5권의 책을 읽고 독서록을 성실히 작성하며 사고력과 분석력이 향상됨.',
+    sources:[
+      {file:'독서활동.xlsx', section:'독서기록표 · 1~5권', type:'student'},
+      {file:'관찰 키워드', section:'분석력 좋음, 사고력', type:'teacher'}
+    ],
+    source_origin:'stage1_recommended',
+    rationale:'자율활동의 자기관리 영역에 해당. 독서기록표의 정량 근거(5권)와 교사 키워드의 정성 평가가 결합되어 학습 태도의 꾸준함을 입증.',
+    competency:'자기관리',
+    cross_validated:true
+  },
+  {
+    id:'C05', category:'진로 연결',
+    content:'독서한 도서 중 과학 분야 비중이 높고, 관찰 키워드에서도 진로 흥미가 일관되게 드러남.',
+    sources:[
+      {file:'독서활동.xlsx', section:'5권 중 3권 과학 분야', type:'student'},
+      {file:'관찰 키워드', section:'과학 호기심', type:'teacher'}
+    ],
+    source_origin:'stage1_recommended',
+    rationale:'정량 데이터(과학 도서 비중 60%)와 정성 키워드가 일치해 진로 탐색의 자기주도성을 신뢰성 있게 입증.',
+    competency:'지식정보처리',
+    cross_validated:true
+  },
+  {
+    id:'C06', category:'활동 내용',
+    content:'학급 회의 시간에 안건을 발표하고 의견 조율에 적극 참여함.',
+    sources:[
+      {file:'관찰 키워드', section:'발표력, 의사소통', type:'teacher'}
+    ],
+    source_origin:'stage1_candidate',
+    rationale:'후보 항목 — 키워드만 출처라 구체적 일화 보강 시 추천으로 승격 가능.',
+    competency:'공동체역량',
+    cross_validated:false
+  },
+  {
+    id:'C07', category:'학기 성장',
+    content:'학기 초보다 협력적 태도와 책임감이 눈에 띄게 성장함.',
+    sources:[
+      {file:'관찰 키워드', section:'성장 · 1학기→2학기 비교', type:'teacher'}
+    ],
+    source_origin:'stage1_candidate',
+    rationale:'후보 항목 — 시간 변화에 대한 정량 근거가 부족하지만 종합 평가에 활용 가능.',
+    competency:'자기관리',
+    cross_validated:false
+  }
 ];
 
+// 학생별 데이터: API 구조에 있는 items만. 그 외 통계는 items에서 derive.
 const STEP2_DATA = {
-  20101: {
-    extracted_total:7, recommended_count:5, competency_count:3, cross_validated:4, expected_chars:480,
-    overall_rationale:'김민수 학생은 학급 봉사활동에서의 <strong>책임감 있는 수행</strong>과 <strong>또래를 이끄는 리더십</strong>이 여러 자료에서 일관되게 관찰되어, 자율·자치활동의 핵심 평가 관점인 <strong>학급 공동체 참여</strong>와 <strong>자치 역량</strong>을 잘 보여줍니다. 여기에 미술 자화상 작품(개별 업로드)과 독서활동 5권(정량 데이터)을 함께 묶으면, 자율활동의 <strong>다양한 학급 활동 참여</strong>라는 종합적 모습이 자연스럽게 드러납니다.',
-    items: STEP2_DEFAULT_ITEMS
-  },
-  20102: {extracted_total:6, recommended_count:4, competency_count:3, cross_validated:3, expected_chars:420,
-    overall_rationale:'박서연 학생은 <strong>독서활동의 꾸준함</strong>과 <strong>또래 협력</strong>이 일관되게 관찰되어 자율활동의 학습·공동체 면을 잘 보여줍니다.',
-    items: STEP2_DEFAULT_ITEMS.slice(0,6)},
-  20103: {extracted_total:3, recommended_count:2, competency_count:2, cross_validated:1, expected_chars:300,
-    overall_rationale:'이지호 학생은 봉사 1건과 입력된 키워드를 기반으로 한 추천이며, 자료 보강 시 신뢰도가 더 높아질 수 있습니다.',
-    items: STEP2_DEFAULT_ITEMS.slice(0,3)},
-  20104: {extracted_total:5, recommended_count:3, competency_count:2, cross_validated:2, expected_chars:380,
-    overall_rationale:'최유진 학생은 <strong>미술 자화상·정물화·풍경화 3종</strong>을 통해 창의적 표현과 미적 감수성이 두드러지게 관찰됩니다.',
-    items: STEP2_DEFAULT_ITEMS.slice(0,5)},
+  20101: { items: STEP2_DEFAULT_ITEMS },
+  20102: { items: STEP2_DEFAULT_ITEMS.slice(0,5).concat(STEP2_DEFAULT_ITEMS.slice(6)) },
+  20103: { items: STEP2_DEFAULT_ITEMS.slice(0,3) },
+  20104: { items: STEP2_DEFAULT_ITEMS.slice(0,5) }
 };
 
 // ───── 유틸 ─────
@@ -1290,35 +1339,29 @@ function renderS2Main(){
 }
 function renderS2Done(s){
   const s2 = getS2(s);
-  const data = STEP2_DATA[s.sid] || {
-    extracted_total:5, recommended_count:5, competency_count:3, cross_validated:2, expected_chars:400,
-    overall_rationale:`${s.name} 학생의 자료에서 추출한 핵심 항목을 정리했습니다.`,
-    items: STEP2_DEFAULT_ITEMS.slice(0,5)
-  };
+  const data = STEP2_DATA[s.sid] || { items: STEP2_DEFAULT_ITEMS.slice(0,5) };
   const items = data.items;
   const recItems = items.filter(it=>it.source_origin==='stage1_recommended');
   const candItems = items.filter(it=>it.source_origin==='stage1_candidate');
+  // items에서 직접 derive
+  const competencySet = new Set(items.filter(it=>it.competency).map(it=>it.competency));
+  const crossCount = items.filter(it=>it.cross_validated).length;
 
-  const rationaleCard = `<div class="s2-rationale">
-    <div class="s2-rationale-hd">
-      <span class="s2-rationale-hd-icon"><i data-lucide="sparkles" style="width:16px;height:16px"></i></span>
-      <span class="s2-rationale-hd-title">종합 추천 근거</span>
-      <span class="s2-rationale-hd-badge">${ACTIVITY_TYPE} 기준</span>
-    </div>
-    <div class="s2-rationale-text">${data.overall_rationale}</div>
-    <div class="s2-rationale-stats">
-      <span class="s2-rationale-stat"><i data-lucide="list" style="width:14px;height:14px;color:#416bff"></i><strong>${data.recommended_count}개</strong> 추천</span>
-      <span class="s2-rationale-stat"><i data-lucide="target" style="width:14px;height:14px;color:#416bff"></i><strong>${data.competency_count}개</strong> 핵심역량</span>
-      <span class="s2-rationale-stat"><i data-lucide="link" style="width:14px;height:14px;color:#416bff"></i>상호검증 <strong>${data.cross_validated}건</strong></span>
-      <span class="s2-rationale-stat"><i data-lucide="file-text" style="width:14px;height:14px;color:#416bff"></i>예상 글자수 <strong>약 ${data.expected_chars}자</strong></span>
-    </div>
+  const statsBar = `<div class="s2-stats-bar">
+    <span><strong>추천 ${recItems.length}개</strong></span>
+    <span class="s2-stats-sep"></span>
+    <span>후보 ${candItems.length}개</span>
+    <span class="s2-stats-sep"></span>
+    <span>핵심역량 <strong>${competencySet.size}종</strong></span>
+    <span class="s2-stats-sep"></span>
+    <span>상호검증 <strong>${crossCount}건</strong></span>
   </div>`;
 
-  const recHtml = recItems.map(it=>renderS2ItemCard(s.id, it, false)).join('');
-  const candHtml = candItems.map(it=>renderS2ItemCard(s.id, it, false)).join('');
+  const recHtml = recItems.map(it=>renderS2ItemCard(s.id, it)).join('');
+  const candHtml = candItems.map(it=>renderS2ItemCard(s.id, it)).join('');
   const customHtml = s2.customs.map((c,i)=>renderS2CustomCard(s.id, c, i)).join('');
 
-  return rationaleCard + `
+  return statsBar + `
     <div class="s2-group-hd">
       <span class="s2-group-title">추천 항목</span>
       <span class="s2-group-cnt">${recItems.length}개</span>
@@ -1328,7 +1371,7 @@ function renderS2Done(s){
       <div class="s2-group-hd">
         <span class="s2-group-title">추가 후보</span>
         <span class="s2-group-cnt">${candItems.length}개</span>
-        <button class="s2-group-toggle" onclick="toggleCandidates()"><span id="cand-toggle-text">${getS2(s).candidatesCollapsed?'펼치기':'접기'}</span> <i data-lucide="${getS2(s).candidatesCollapsed?'chevron-down':'chevron-up'}" style="width:14px;height:14px"></i></button>
+        <button class="s2-group-toggle" onclick="toggleCandidates()"><span>${getS2(s).candidatesCollapsed?'펼치기':'접기'}</span> <i data-lucide="${getS2(s).candidatesCollapsed?'chevron-down':'chevron-up'}" style="width:14px;height:14px"></i></button>
       </div>
       <div id="s2-cand-wrap" style="display:${getS2(s).candidatesCollapsed?'none':'flex'};flex-direction:column;gap:8px">${candHtml}</div>
     ` : ''}
@@ -1340,22 +1383,29 @@ function renderS2Done(s){
     <button class="s2-add-btn" onclick="addCustomItem(${s.id})"><i data-lucide="plus" style="width:16px;height:16px"></i> 빈 카드 추가</button>
   `;
 }
-function renderS2ItemCard(sid, item, isCustom){
+function renderS2ItemCard(sid, item){
   const s = STUDENTS.find(x=>x.id===sid);
   const s2 = getS2(s);
   const checked = s2.selectedIds.has(item.id);
   const isCandidate = item.source_origin === 'stage1_candidate';
   const klass = `s2-item ${checked?'checked':''} ${isCandidate?'candidate':''}`;
-  const sourceTags = item.sources.map(src=>`<span class="s2-tag s2-tag-src ${src.kind}">${src.label}</span>`).join('');
+  const tags = [
+    `<span class="s2-tag s2-tag-cat">${item.category}</span>`,
+    item.competency ? `<span class="s2-tag s2-tag-comp">${item.competency}</span>` : '',
+    item.cross_validated ? `<span class="s2-tag s2-tag-cross"><i data-lucide="link" style="width:11px;height:11px"></i>상호검증</span>` : ''
+  ].filter(Boolean).join('');
+  const sourceLine = item.sources && item.sources.length ? `
+    <div class="s2-item-source">
+      <i data-lucide="paperclip" style="width:13px;height:13px;color:#b3b6bd;flex-shrink:0;margin-top:2px"></i>
+      <span>${item.sources.map(src => `<strong>${src.file}</strong>${src.section ? ` <span class="s2-source-sec">· ${src.section}</span>` : ''}`).join('  /  ')}</span>
+    </div>` : '';
   const rationaleBlock = item.rationale ? `<div class="s2-item-rationale"><span class="s2-item-rationale-label">추천 근거</span>${item.rationale}</div>` : '';
   return `<div class="${klass}" onclick="toggleS2Item(${sid}, '${item.id}')">
     <span class="s2-item-check"><i data-lucide="check" style="width:14px;height:14px"></i></span>
     <div class="s2-item-body">
-      <div class="s2-item-tags">
-        <span class="s2-tag s2-tag-cat">${item.category}</span>
-        ${sourceTags}
-      </div>
+      <div class="s2-item-tags">${tags}</div>
       <div class="s2-item-content">${item.content}</div>
+      ${sourceLine}
       ${rationaleBlock}
     </div>
   </div>`;
