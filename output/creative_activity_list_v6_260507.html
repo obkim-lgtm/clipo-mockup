@@ -212,6 +212,22 @@
           <span style="font-size:13px;color:#b3b6bd">학생 등록 전</span>
         </div>
       </div>
+      <div class="card" onclick="goDetail(event,'동아리활동','수학사고력반','b-dong',true)">
+        <div style="display:flex;align-items:center;justify-content:space-between;">
+          <span class="badge-type b-dong">동아리활동</span>
+          <button class="menu-btn" onclick="toggleDropdown(event,this)"><i data-lucide="more-horizontal" style="width:16px;height:16px;"></i></button>
+        </div>
+        <div class="card-dropdown">
+          <div class="dropdown-item" onclick="openEditModal(event,this)"><i data-lucide="pencil" style="width:14px;height:14px;"></i>수정</div>
+          <div class="dropdown-item danger" onclick="openDelModal(event,this)"><i data-lucide="trash-2" style="width:14px;height:14px;"></i>삭제</div>
+        </div>
+        <p class="card-class">수학사고력반</p><p class="card-date">2026. 3. 5. 시작</p>
+        <div class="divider"></div>
+        <div style="display:flex;align-items:center;gap:6px;padding:6px 0">
+          <i data-lucide="user-plus" style="width:14px;height:14px;color:#b3b6bd"></i>
+          <span style="font-size:13px;color:#b3b6bd">학생 등록 전</span>
+        </div>
+      </div>
     </div>
   </section>
 
@@ -353,6 +369,31 @@
       card.setAttribute('onclick', `goDetail(event,'동아리활동','${name}','b-dong',true)`);
     });
   }
+  // 데모 시드: 수학사고력반은 학생 등록된 상태로 노출
+  (function preseedDongDemo(){
+    const store = getDongStore();
+    if(!store['수학사고력반']){
+      store['수학사고력반'] = {
+        count: 8,
+        classes: {
+          '2학년 1반': [
+            {n:1,name:'김민수',sid:'20101'},
+            {n:2,name:'박서연',sid:'20102'},
+            {n:3,name:'이지호',sid:'20103'},
+            {n:4,name:'최유진',sid:'20104'}
+          ],
+          '2학년 2반': [
+            {n:5,name:'정우진',sid:'20205'},
+            {n:6,name:'한지민',sid:'20206'},
+            {n:7,name:'유태성',sid:'20207'},
+            {n:8,name:'송예린',sid:'20208'}
+          ]
+        },
+        savedAt: new Date().toISOString()
+      };
+      localStorage.setItem('clipo_dong_students', JSON.stringify(store));
+    }
+  })();
   refreshDongCards();
 
   // 등록 직후 토스트
