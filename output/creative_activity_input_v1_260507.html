@@ -41,6 +41,8 @@ body.nav-expanded .sticky-cta{left:200px;transition:left .2s ease}
 /* ── 버튼: 아웃라인 (재사용) ── */
 .btn-outline{display:inline-flex;align-items:center;justify-content:center;gap:5px;padding:6px 12px;font-size:13px;font-weight:500;border:1px solid #d9d9d9;border-radius:6px;background:#fff;color:#3b3f4c;cursor:pointer;line-height:1;font-family:inherit;transition:border-color .15s}
 .btn-outline:hover{border-color:#b3b3b3;color:#222631}
+.btn-outline:disabled{opacity:.45;cursor:not-allowed;color:#6d7381}
+.btn-outline:disabled:hover{border-color:#d9d9d9;color:#6d7381}
 
 /* ── 메인 래퍼 ── */
 .main-wrap{margin-left:56px;margin-top:56px;padding:24px 32px;transition:margin-left .2s ease}
@@ -322,6 +324,13 @@ body.nav-expanded .sticky-cta{left:200px;transition:left .2s ease}
 .match-stu{font-size:13px;font-weight:600;color:#416bff}
 .match-stu.unmatched{color:#c2410c}
 .match-pick{padding:5px 10px;border:1px solid #d9d9d9;border-radius:6px;background:#fff;font-size:12px;cursor:pointer;font-family:inherit}
+
+/* 목업 시나리오 토글 (개발용) */
+.mockup-toggle{position:fixed;bottom:90px;right:24px;background:#222631;color:#fff;border-radius:24px;padding:5px;display:inline-flex;align-items:center;gap:2px;box-shadow:0 8px 24px rgba(0,0,0,.2);z-index:550;font-family:inherit}
+.mt-label{padding:4px 12px;color:#b3b6bd;font-size:11px;font-weight:700;letter-spacing:.05em}
+.mt-btn{padding:7px 14px;border:none;background:none;color:#b3b6bd;font-size:13px;font-weight:500;cursor:pointer;font-family:inherit;border-radius:18px;line-height:1;transition:all .15s}
+.mt-btn:hover{color:#fff}
+.mt-btn.active{background:#416bff;color:#fff}
 
 /* 토스트 */
 .toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%) translateY(12px);background:#222631;color:#fff;padding:12px 18px;border-radius:8px;font-size:14px;font-weight:500;line-height:1.3;box-shadow:0 8px 16px rgba(0,0,0,.16);opacity:0;transition:all .25s;z-index:600;pointer-events:none}
@@ -776,6 +785,13 @@ body.nav-expanded .sticky-cta{left:200px;transition:left .2s ease}
   </div>
 </div>
 
+<!-- ── 목업 시나리오 토글 (개발용) ── -->
+<div class="mockup-toggle" id="mockup-toggle">
+  <span class="mt-label">MOCKUP</span>
+  <button class="mt-btn" data-scenario="data" onclick="applyScenario('data')">자료 1+ 있음</button>
+  <button class="mt-btn" data-scenario="keywords-only" onclick="applyScenario('keywords-only')">키워드만</button>
+</div>
+
 <!-- 토스트 -->
 <div class="toast" id="toast"></div>
 
@@ -822,6 +838,18 @@ let STUDENTS = [
     {name:'학기말_자율설문 (행)', type:'survey', source:'bulk', kindLabel:'설문'},
     {name:'봉사보고서_송예린.pdf', size:'1.4MB', type:'pdf', source:'bulk', kindLabel:'활동지'}
   ], keywords:[]},
+];
+
+// 원본 데모 데이터 백업 (시나리오 토글용)
+const STUDENTS_FULL = STUDENTS.map(s => ({
+  ...s,
+  files: s.files.map(f=>({...f})),
+  keywords: s.keywords.map(k=>({...k}))
+}));
+const KEYWORDS_FALLBACK = [
+  {text:'성실함',source:'keyword'},
+  {text:'배려심',source:'keyword'},
+  {text:'책임감',source:'keyword'}
 ];
 
 if(!IS_DEMO){
@@ -1205,7 +1233,6 @@ function renderS2Main(){
   const s = STUDENTS.find(x=>x.id===s2CurStudentId);
   if(!s){ $('s2-main').innerHTML=''; return; }
   const s2 = getS2(s);
-  const eligible = s2Eligible(s);
   const summary = `자료 ${s.files.length}건 · 키워드 ${s.keywords.length}개${s.level?` · 성적 ${ {high:'상',mid:'중',low:'하'}[s.level]||'-'}`:''}`;
   const stuHd = `<div class="s2-stu-hd">
     <span class="s2-stu-hd-avatar">${s.name.charAt(0)}</span>
@@ -1381,7 +1408,7 @@ function startAnalyze(sid){
 }
 function startAnalyzeAll(){
   STUDENTS.forEach(s=>{
-    if(!s2Eligible(s)) return;
+    if(!s2HasFiles(s)) return;
     const s2 = getS2(s);
     if(s2.status === 'idle') startAnalyze(s.id);
   });
@@ -1399,12 +1426,40 @@ function reanalyze(sid){
 }
 function reanalyzeAll(){
   STUDENTS.forEach(s=>{
-    if(!s2Eligible(s)) return;
+    if(!s2HasFiles(s)) return;
     const s2 = getS2(s);
     s2.status = 'idle';
     s2.selectedIds.clear();
   });
   startAnalyzeAll();
+}
+function applyScenario(scenario){
+  document.querySelectorAll('.mt-btn').forEach(b=>b.classList.toggle('active', b.dataset.scenario === scenario));
+  STUDENTS.forEach((s, i) => {
+    const orig = STUDENTS_FULL[i] || {files:[], keywords:[], level:null};
+    if(scenario === 'data'){
+      s.files = orig.files.map(f=>({...f}));
+      s.keywords = orig.keywords.map(k=>({...k}));
+      s.level = orig.level;
+    } else if(scenario === 'keywords-only'){
+      s.files = [];
+      s.keywords = (orig.keywords && orig.keywords.length)
+        ? orig.keywords.map(k=>({...k, source:'keyword'}))
+        : KEYWORDS_FALLBACK.slice(0, 2 + (i%3)).map(k=>({...k}));
+      s.level = orig.level;
+    }
+    s.s2 = { status:'idle', selectedIds:new Set(), customs:[] };
+  });
+  s2CurStudentId = null;
+  refreshAll();
+  const active = document.querySelector('.step-btn.active');
+  if(active && active.id === 'step-2') renderStep2();
+  showToast(scenario === 'data' ? '자료 1+ 시나리오로 전환' : '키워드만 시나리오로 전환');
+}
+function detectInitialScenario(){
+  const hasFiles = STUDENTS.some(s => s.files.length > 0);
+  const hasKw = STUDENTS.some(s => s.keywords.length > 0);
+  return hasFiles ? 'data' : (hasKw ? 'keywords-only' : null);
 }
 function rerunAI(){
   // 헤더의 [전체 분석 시작] / [전체 재분석]
@@ -1442,23 +1497,26 @@ function refreshS2Cta(){
   const active = document.querySelector('.step-btn.active');
   const n = active ? +active.id.split('-')[1] : 1;
   if(n !== 2) return;
-  let doneCount = 0, eligible = 0, selectedTotal = 0;
+  let doneCount = 0, analyzable = 0, selectedTotal = 0;
   STUDENTS.forEach(s=>{
-    if(!s2Eligible(s)) return;
-    eligible++;
+    if(!s2HasFiles(s)) return;
+    analyzable++;
     const s2 = getS2(s);
     if(s2.status === 'done') doneCount++;
     selectedTotal += s2.selectedIds.size + s2.customs.filter(c=>c.content && c.content.trim()).length;
   });
-  if(eligible === 0){
-    $('cta-progress').textContent = '키워드만 입력되어 자동 추출이 불필요합니다 — 건너뛰기 가능';
+  if(analyzable === 0){
+    $('cta-progress').textContent = '분석할 자료가 없어요 — 키워드 기반으로 다음 단계 진행 가능';
   } else {
-    $('cta-progress').textContent = `분석 완료 ${doneCount}/${eligible}명 · 선택된 항목 ${selectedTotal}개`;
+    $('cta-progress').textContent = `분석 완료 ${doneCount}/${analyzable}명 · 선택된 항목 ${selectedTotal}개`;
   }
-  // 헤더 [재추출] 버튼 라벨도 동적 (분석 시작 vs 재분석)
+  // 헤더 [전체 분석 시작] 버튼: 자료 있을 때만 활성화, 분석 후 라벨 전환
   const someDone = STUDENTS.some(s => getS2(s).status === 'done');
-  const rerunBtn = document.querySelector('.s2-header .btn-outline');
-  if(rerunBtn) rerunBtn.innerHTML = `<i data-lucide="${someDone?'refresh-ccw':'sparkles'}" style="width:14px;height:14px"></i> ${someDone?'전체 재분석':'전체 분석 시작'}`;
+  const rerunBtn = $('s2-rerun-btn');
+  if(rerunBtn){
+    rerunBtn.disabled = analyzable === 0;
+    rerunBtn.innerHTML = `<i data-lucide="${someDone?'refresh-ccw':'sparkles'}" style="width:14px;height:14px"></i> ${someDone?'전체 재분석':'전체 분석 시작'}`;
+  }
 }
 function nextStep(){
   const active = document.querySelector('.step-btn.active');
@@ -1512,6 +1570,12 @@ function toggleNav(){
 }
 
 // ───── 초기 렌더 ─────
+// 목업 토글 초기 active 상태 (현재 데이터로 추정)
+(function initMockupToggle(){
+  const initial = detectInitialScenario();
+  if(initial) document.querySelectorAll('.mt-btn').forEach(b=>b.classList.toggle('active', b.dataset.scenario === initial));
+})();
+
 refreshAll();
 lucide.createIcons();
 </script>
