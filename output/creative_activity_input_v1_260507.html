@@ -519,7 +519,7 @@ body.nav-expanded .sticky-cta{left:200px;transition:left .2s ease}
         기록 확인 및 수정
       </button>
     </div>
-    <button class="btn-outline" onclick="openAddStudent()"><i data-lucide="user-plus" style="width:14px;height:14px"></i> 학생 추가</button>
+    <button class="btn-outline" id="btn-student-manage" onclick="onStudentBtn()"><i data-lucide="user-plus" style="width:14px;height:14px" id="btn-student-icon"></i> <span id="btn-student-label">학생 추가</span></button>
   </div>
 
   <!-- ============ STEP 1 ============ -->
@@ -786,6 +786,12 @@ const ACTIVITY_TYPE = _params.get('type') || '자율활동';
 const CLS = _params.get('cls') || '2학년 1반';
 const IS_DEMO = _params.get('demo') === '1';
 document.getElementById('pt-title').textContent = ACTIVITY_TYPE + ' : ' + CLS;
+if(ACTIVITY_TYPE === '동아리활동'){
+  const lbl = document.getElementById('btn-student-label');
+  const ico = document.getElementById('btn-student-icon');
+  if(lbl) lbl.textContent = '학생 관리';
+  if(ico) ico.setAttribute('data-lucide','users');
+}
 
 let STUDENTS = [
   {id:1, sid:'20101', name:'김민수', level:'high', files:[
@@ -1053,6 +1059,23 @@ let CANDIDATES = [
 ];
 let pickedCands = new Set();
 
+function onStudentBtn(){
+  if(ACTIVITY_TYPE === '동아리활동'){
+    // 동아리: 학생 등록 여부에 따라 분기
+    let count = 0;
+    try {
+      const store = JSON.parse(localStorage.getItem('clipo_dong_students') || '{}');
+      count = (store[CLS] && store[CLS].count) || 0;
+    } catch(e) {}
+    if(count > 0){
+      location.href = 'dong_student_manage_v1_260507.html?dong=' + encodeURIComponent(CLS);
+    } else {
+      location.href = 'dong_register_v4_260507.html?dong=' + encodeURIComponent(CLS);
+    }
+  } else {
+    openAddStudent();
+  }
+}
 function openAddStudent(){
   pickedCands.clear();
   renderCandidates();
