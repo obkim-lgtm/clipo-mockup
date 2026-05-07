@@ -1,0 +1,541 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>동아리 학생 관리 - CLIPO</title>
+<link rel="icon" type="image/svg+xml" href="clipo_favicon.svg">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard-gov.min.css">
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<style>
+* { font-family: 'Pretendard GOV', -apple-system, sans-serif; box-sizing: border-box; margin: 0; padding: 0; }
+body { background: #f6f7f9; color: #222631; }
+
+.g-hd { height: 56px; background: #fff; border-bottom: 1px solid #d9d9d9; display: flex; align-items: center; padding: 0 20px 0 8px; position: fixed; top: 0; left: 0; right: 0; z-index: 200; }
+.g-hd-r { margin-left: auto; display: flex; align-items: center; gap: 6px; font-size: 14px; color: #3b3f4c; }
+.plan-badge { background: #416bff; color: #fff; font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 4px; }
+.hd-div { width: 1px; height: 14px; background: #d9d9d9; margin: 0 4px; }
+.credit-wrap { display: flex; align-items: center; gap: 4px; padding: 4px 10px; background: #f6f7f9; border-radius: 6px; font-size: 13px; font-weight: 600; color: #3b3f4c; }
+.user-btn { display: inline-flex; align-items: center; justify-content: center; gap: 4px; padding: 4px 10px; border: 1px solid #d9d9d9; border-radius: 6px; background: #fff; font-size: 13px; color: #3b3f4c; cursor: pointer; line-height: 1; }
+
+.icon-sb { width: 56px; background: #fff; border-right: 1px solid #d9d9d9; position: fixed; top: 56px; bottom: 0; left: 0; display: flex; flex-direction: column; padding: 8px 0; z-index: 150; transition: width .2s ease; }
+.icon-sb.expanded { width: 200px; }
+.si { height: 40px; display: flex; align-items: center; border-radius: 8px; color: #6d7381; cursor: pointer; margin-bottom: 2px; position: relative; padding: 0 4px 0 16px; gap: 10px; white-space: nowrap; flex-shrink: 0; }
+.si:hover { background: #f1f3f5; }
+.si.active { background: #e9f2ff; color: #416bff; }
+.si-icon { width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.si-label { font-size: 13px; font-weight: 500; opacity: 0; transition: opacity .1s; overflow: hidden; }
+.icon-sb.expanded .si-label { opacity: 1; }
+.si-tip { position: absolute; left: 48px; top: 50%; transform: translateY(-50%); background: #222631; color: #fff; font-size: 11px; padding: 3px 8px; border-radius: 4px; white-space: nowrap; display: none; z-index: 300; pointer-events: none; }
+.si:hover .si-tip { display: block; }
+.icon-sb.expanded .si-tip { display: none !important; }
+.nav-bottom { margin-top: auto; width: 100%; }
+.nav-div { height: 1px; background: #f1f3f5; margin: 4px 0; }
+body.nav-expanded .main-shell { margin-left: 200px; transition: margin-left .2s ease; }
+
+.main-shell { margin-left: 56px; margin-top: 56px; min-height: calc(100vh - 56px); }
+.main { max-width: 1200px; margin: 0 auto; padding: 32px 48px 48px; }
+
+.back-link { display: inline-flex; align-items: center; gap: 4px; font-size: 14px; color: #6d7381; text-decoration: none; margin-bottom: 12px; cursor: pointer; }
+.back-link:hover { color: #416bff; }
+
+.page-title { font-size: 26px; font-weight: 600; color: #222631; display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+.page-title .beta { font-size: 11px; font-weight: 600; background: #f1f3f5; color: #6d7381; padding: 2px 7px; border-radius: 4px; display: inline-flex; align-items: center; gap: 3px; }
+.page-sub { font-size: 14px; color: #6d7381; margin-bottom: 24px; line-height: 1.6; }
+
+.manage-card { background: #fff; border: 1px solid #d9d9d9; border-radius: 12px; padding: 24px; }
+.manage-cols { display: grid; grid-template-columns: 1fr 110px 1fr; gap: 16px; align-items: stretch; min-height: 520px; }
+
+.pane { display: flex; flex-direction: column; border: 1px solid #d9d9d9; border-radius: 8px; background: #fff; min-height: 0; }
+.pane-head { padding: 14px 16px; font-size: 16px; font-weight: 600; color: #222631; border-bottom: 1px solid #f1f3f5; }
+.pane-body { padding: 8px 8px; overflow-y: auto; flex: 1; min-height: 320px; max-height: 520px; }
+.pane-empty { padding: 60px 24px; text-align: center; color: #b3b6bd; font-size: 14px; }
+
+.center-actions { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; }
+.action-btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 10px 20px; border: none; border-radius: 6px; font-size: 14px; font-weight: 600; font-family: inherit; cursor: pointer; line-height: 1; min-width: 96px; }
+.action-btn.add { background: #416bff; color: #fff; }
+.action-btn.add:hover:not(:disabled) { background: #3151c4; }
+.action-btn.remove { background: #fee2e2; color: #f2525f; }
+.action-btn.remove:hover:not(:disabled) { background: #fecaca; }
+.action-btn:disabled { background: #f1f3f5; color: #b3b6bd; cursor: not-allowed; }
+
+/* 학급 아코디언 (pane 내부) */
+.tree-row { border-radius: 6px; margin-bottom: 2px; }
+.tree-row:hover { background: #f6f7f9; }
+.tree-row.open { background: #f6f7f9; }
+.tree-class { display: flex; align-items: center; gap: 10px; padding: 10px 8px; cursor: pointer; user-select: none; }
+.tree-cb { width: 18px; height: 18px; border: 1.5px solid #c7cbd3; border-radius: 4px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; background: #fff; color: #fff; }
+.tree-cb.checked { background: #416bff; border-color: #416bff; }
+.tree-cb.indeterminate { background: #416bff; border-color: #416bff; position: relative; }
+.tree-cb.indeterminate::after { content:''; width: 10px; height: 2px; background: #fff; border-radius: 1px; position: absolute; }
+.tree-class-name { font-size: 16px; font-weight: 500; color: #222631; flex: 1; }
+.tree-cnt { font-size: 13px; color: #6d7381; font-weight: 500; padding: 0 8px; }
+.tree-caret { width: 16px; height: 16px; color: #6d7381; transition: transform .2s; flex-shrink: 0; }
+.tree-row.open .tree-caret { transform: rotate(180deg); }
+.tree-students { display: none; padding: 0 8px 8px 38px; }
+.tree-row.open .tree-students { display: block; }
+.tree-student { display: flex; align-items: center; gap: 10px; padding: 6px 4px; cursor: pointer; border-radius: 4px; }
+.tree-student:hover { background: #fff; }
+.tree-st-label { font-size: 14px; color: #3b3f4c; }
+
+/* 카드 푸터 */
+.manage-footer { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-top: 20px; }
+.footer-link { display: inline-flex; align-items: center; gap: 5px; font-size: 14px; color: #6d7381; text-decoration: none; cursor: pointer; }
+.footer-link:hover { color: #416bff; }
+.footer-link a { color: #416bff; text-decoration: none; }
+.footer-right { display: flex; align-items: center; gap: 12px; margin-left: auto; }
+.footer-total { font-size: 14px; color: #3b3f4c; }
+.footer-total strong { font-weight: 700; color: #222631; }
+.btn-save-lg { display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 10px 24px; border: none; border-radius: 6px; background: #365eef; color: #fff; font-size: 14px; font-weight: 600; font-family: inherit; cursor: pointer; line-height: 1; }
+.btn-save-lg:hover:not(:disabled) { background: #3151c4; }
+.btn-save-lg:disabled { background: #dde1e8; color: #b3b6bd; cursor: not-allowed; }
+
+/* 페이지 푸터 액션 */
+.page-foot-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 24px; }
+.btn-cancel-lg { padding: 10px 20px; border: 1px solid #d9d9d9; border-radius: 6px; background: #fff; color: #3b3f4c; font-size: 14px; font-weight: 500; font-family: inherit; cursor: pointer; line-height: 1; }
+.btn-cancel-lg:hover { background: #f6f7f9; }
+
+/* 모달 */
+.overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 300; align-items: center; justify-content: center; }
+.overlay.open { display: flex; }
+.confirm-box { background: #fff; border-radius: 12px; padding: 36px 32px 28px; width: 400px; max-width: calc(100vw - 48px); box-shadow: 0 0 1px #2226314D, 0 4px 8px #0000001A; text-align: center; }
+.confirm-icon { width: 56px; height: 56px; border-radius: 50%; background: #fee2e2; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; color: #f2525f; }
+.confirm-title { font-size: 20px; font-weight: 700; color: #222631; line-height: 1.5; margin-bottom: 12px; }
+.confirm-desc { font-size: 16px; color: #6d7381; line-height: 1.6; margin-bottom: 28px; }
+.confirm-foot { display: flex; gap: 10px; }
+.btn-confirm-cancel { flex: 1; padding: 13px; border: 1px solid #f2525f; border-radius: 4px; background: #fff; color: #f2525f; font-size: 14px; font-weight: 500; font-family: inherit; cursor: pointer; line-height: 1; }
+.btn-confirm-cancel:hover { background: #fff3f4; }
+.btn-confirm-save { flex: 1; padding: 13px; border: none; border-radius: 4px; background: #f2525f; color: #fff; font-size: 14px; font-weight: 600; font-family: inherit; cursor: pointer; line-height: 1; }
+.btn-confirm-save:hover { background: #db3e51; }
+
+/* 토스트 */
+.toast { position: fixed; bottom: 32px; left: 50%; transform: translateX(-50%) translateY(20px); background: #222631; color: #fff; padding: 12px 20px; border-radius: 8px; font-size: 14px; display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 4px 16px rgba(0,0,0,.2); opacity: 0; transition: opacity .2s, transform .2s; z-index: 400; pointer-events: none; line-height: 1; }
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+.toast-ic { display: inline-flex; align-items: center; justify-content: center; color: #1ab864; }
+
+footer { text-align: center; padding: 48px 0 24px; font-size: 13px; color: #6d7381; }
+footer a { color: #6d7381; text-decoration: none; margin: 0 8px; }
+</style>
+</head>
+<body>
+
+<header class="g-hd">
+  <button onclick="toggleNav()" style="width:36px;height:36px;border:none;background:none;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#3b3f4c;margin-right:8px">
+    <i data-lucide="menu" style="width:20px;height:20px"></i>
+  </button>
+  <svg width="76" height="16" viewBox="0 0 76 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M11.3613 4.03516H4.09668V11.9629H8.88281L8.88086 11.9648H15.6016V16H4.02539C1.80242 15.9998 0 14.223 0 12.0322V3.96777C0 1.77696 1.80242 0.000177874 4.02539 0H15.4561L11.3613 4.03516ZM22.0703 11.9648H33.5781V16H22.002C19.7788 16 17.9756 14.2231 17.9756 12.0322V0H22.0703V11.9648ZM40.0459 16H35.9521V0H40.0459V16ZM54.5381 0C56.4564 0 58.0138 1.53228 58.0186 3.42285L58.0166 3.4248V8.54297C58.014 10.4333 56.4567 11.9648 54.5361 11.9648H46.5107L42.416 16V0H54.5381ZM71.9746 0C74.0086 0.000134956 75.6887 1.49046 75.958 3.42285H76V12.5771H75.958C75.6887 14.5095 74.011 15.9999 71.9746 16H64.4238C62.3897 16 60.7098 14.5096 60.4404 12.5771C60.4145 12.398 60.3984 12.2184 60.3984 12.0322V3.96777C60.3984 3.78159 60.4145 3.60205 60.4404 3.42285C60.7098 1.49037 62.3873 0 64.4238 0H71.9746ZM64.4922 12.5771H71.9062V3.42285H64.4922V12.5771ZM46.5107 3.42285V8.54004H53.9238V3.42285H46.5107Z" fill="#365EEF"/>
+  </svg>
+  <div class="g-hd-r">
+    <span class="plan-badge">개인 유료</span>
+    <span style="font-size:13px;color:#6d7381">D-1710</span>
+    <div class="hd-div"></div>
+    <i data-lucide="bot" style="width:16px;height:16px;color:#416bff"></i>
+    <div class="credit-wrap">AI 크레딧 700</div>
+    <div class="hd-div"></div>
+    <button class="user-btn">test99 선생님(담임) <i data-lucide="chevron-down" style="width:14px;height:14px"></i></button>
+  </div>
+</header>
+
+<nav class="icon-sb" id="icon-sb">
+  <div class="si"><div class="si-icon"><i data-lucide="home" style="width:20px;height:20px"></i></div><span class="si-label">홈</span><span class="si-tip">홈</span></div>
+  <div class="si"><div class="si-icon"><i data-lucide="scissors" style="width:20px;height:20px"></i></div><span class="si-label">평가계획</span><span class="si-tip">평가계획</span></div>
+  <div class="si"><div class="si-icon"><i data-lucide="layout-grid" style="width:20px;height:20px"></i></div><span class="si-label">수업</span><span class="si-tip">수업</span></div>
+  <div class="si active"><div class="si-icon"><i data-lucide="notebook-pen" style="width:20px;height:20px"></i></div><span class="si-label">창의적 체험활동 <span style="font-size:10px;background:#416bff;color:#fff;padding:1px 5px;border-radius:3px;margin-left:2px">Beta</span></span><span class="si-tip">창의적 체험활동</span></div>
+  <div class="si"><div class="si-icon"><i data-lucide="zap" style="width:20px;height:20px"></i></div><span class="si-label">세특 간편 생성기</span><span class="si-tip">세특 간편 생성기</span></div>
+  <div class="si"><div class="si-icon"><i data-lucide="smile" style="width:20px;height:20px"></i></div><span class="si-label">행동특성 및 종합기록</span><span class="si-tip">행동특성 및 종합기록 지원</span></div>
+  <div class="si"><div class="si-icon"><i data-lucide="bar-chart-2" style="width:20px;height:20px"></i></div><span class="si-label">리포트</span><span class="si-tip">리포트</span></div>
+  <div class="si"><div class="si-icon"><i data-lucide="building-2" style="width:20px;height:20px"></i></div><span class="si-label">학교 설정</span><span class="si-tip">학교 설정</span></div>
+  <div class="nav-bottom">
+    <div class="nav-div"></div>
+    <div class="si"><div class="si-icon"><i data-lucide="file-down" style="width:20px;height:20px"></i></div><span class="si-label">매뉴얼 다운로드</span><span class="si-tip">매뉴얼 다운로드</span></div>
+    <div class="si"><div class="si-icon"><i data-lucide="credit-card" style="width:20px;height:20px"></i></div><span class="si-label">요금제</span><span class="si-tip">요금제</span></div>
+    <div class="si"><div class="si-icon"><i data-lucide="help-circle" style="width:20px;height:20px"></i></div><span class="si-label">고객센터</span><span class="si-tip">고객센터</span></div>
+  </div>
+</nav>
+
+<div class="main-shell">
+<main class="main">
+
+  <a class="back-link" onclick="goBack()">
+    <i data-lucide="chevron-left" style="width:14px;height:14px"></i> 이전으로
+  </a>
+
+  <h1 class="page-title">
+    <span id="dongName">과학탐구부</span> 참여 학생 추가 / 제외
+    <span class="beta"><i data-lucide="lock" style="width:10px;height:10px"></i> Beta</span>
+  </h1>
+  <p class="page-sub">
+    동아리에 참여할 학생을 추가 또는 제외할 수 있어요. 학생 제외 시, 해당 학생의 동아리 활동 기록이 삭제됩니다.
+  </p>
+
+  <div class="manage-card">
+    <div class="manage-cols">
+      <div class="pane">
+        <div class="pane-head">추가 가능한 학생</div>
+        <div class="pane-body" id="poolList"></div>
+      </div>
+
+      <div class="center-actions">
+        <button class="action-btn add" id="btnAdd" onclick="doAdd()" disabled>
+          <i data-lucide="arrow-right" style="width:14px;height:14px"></i> 추가
+        </button>
+        <button class="action-btn remove" id="btnRemove" onclick="doRemove()" disabled>
+          제외 <i data-lucide="arrow-left" style="width:14px;height:14px"></i>
+        </button>
+      </div>
+
+      <div class="pane">
+        <div class="pane-head">동아리 참여 학생</div>
+        <div class="pane-body" id="registeredList"></div>
+      </div>
+    </div>
+
+    <div class="manage-footer">
+      <a class="footer-link" onclick="event.preventDefault()">
+        <i data-lucide="info" style="width:14px;height:14px"></i>
+        새로운 학생 등록이 필요한가요? <span style="color:#416bff;font-weight:500;text-decoration:none;margin-left:2px">학교 설정 ↗</span>
+      </a>
+      <div class="footer-right">
+        <span class="footer-total">전체 참여 학생 <strong id="totalCount">0</strong>명</span>
+        <button class="btn-save-lg" id="btnSave" onclick="onSave()">
+          <i data-lucide="check" style="width:14px;height:14px"></i> 저장
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="page-foot-actions">
+    <button class="btn-cancel-lg" onclick="onCancel()">취소</button>
+  </div>
+
+</main>
+</div>
+
+<footer>
+  <a href="#">회사소개</a><a href="#">이용약관</a><a href="#">개인정보처리방침</a><a href="#">고객센터</a>
+  <div style="margin-top:8px;">© 2026 Datadriven Inc. All rights reserved.</div>
+</footer>
+
+<!-- 제외 확인 모달 -->
+<div class="overlay" id="confirmModal" onclick="if(event.target===this)closeConfirm()">
+  <div class="confirm-box">
+    <div class="confirm-icon"><i data-lucide="alert-circle" style="width:28px;height:28px"></i></div>
+    <p class="confirm-title">제외된 참여 학생이 있어요.<br>해당 학생을 제외하고 저장할까요?</p>
+    <p class="confirm-desc">참여 학생 제외 시, 해당 학생의<br>동아리 활동 기록이 삭제됩니다.</p>
+    <div class="confirm-foot">
+      <button class="btn-confirm-cancel" onclick="closeConfirm()">취소</button>
+      <button class="btn-confirm-save" onclick="commitSave()">저장</button>
+    </div>
+  </div>
+</div>
+
+<!-- 토스트 -->
+<div class="toast" id="toast">
+  <span class="toast-ic"><i data-lucide="check-circle-2" style="width:18px;height:18px"></i></span>
+  <span id="toastMsg"></span>
+</div>
+
+<script>
+lucide.createIcons();
+
+function toggleNav() {
+  document.getElementById('icon-sb').classList.toggle('expanded');
+  document.body.classList.toggle('nav-expanded');
+}
+
+const params = new URLSearchParams(location.search);
+const DONG_NAME = params.get('dong') || '과학탐구부';
+document.getElementById('dongName').textContent = DONG_NAME;
+
+function goBack() {
+  if (dirty()) { if (!confirm('저장하지 않은 변경사항이 있어요. 정말 나가시겠어요?')) return; }
+  location.href = 'creative_activity_list_v6_260507.html';
+}
+function onCancel() { goBack(); }
+
+// ── 전체 학생 풀 ──
+const ALL_CLASSES = [
+  { id:'1-1', name:'1학년 1반', students:[
+    {n:1,name:'김하나',sid:'10101'},{n:2,name:'이민수',sid:'10102'},
+    {n:3,name:'박서연',sid:'10103'},{n:4,name:'정유진',sid:'10104'}
+  ]},
+  { id:'1-2', name:'1학년 2반', students:[
+    {n:1,name:'최지호',sid:'10201'},{n:2,name:'한도윤',sid:'10202'},
+    {n:3,name:'윤서아',sid:'10203'},{n:4,name:'송하늘',sid:'10204'}
+  ]},
+  { id:'1-3', name:'1학년 3반', students:[
+    {n:1,name:'김하나',sid:'10301'},{n:2,name:'김두나',sid:'10302'},
+    {n:3,name:'김세나',sid:'10303'},{n:4,name:'김네나',sid:'10304'}
+  ]},
+  { id:'2-1', name:'2학년 1반', students:[
+    {n:1,name:'이주원',sid:'20101'},{n:2,name:'박서준',sid:'20102'},
+    {n:3,name:'장민하',sid:'20103'},{n:4,name:'오지유',sid:'20104'}
+  ]},
+  { id:'2-2', name:'2학년 2반', students:[
+    {n:1,name:'백하늘',sid:'20201'},{n:2,name:'문지호',sid:'20202'},
+    {n:3,name:'서나은',sid:'20203'},{n:4,name:'권유찬',sid:'20204'}
+  ]}
+];
+
+function getStore() {
+  try { return JSON.parse(localStorage.getItem('clipo_dong_students') || '{}'); }
+  catch(e) { return {}; }
+}
+function classByName(name) { return ALL_CLASSES.find(c => c.name === name); }
+
+// ── 상태 ──
+// registered: { className: [{n,name,sid}, ...] }
+// original: { className: [sid, ...] } - 페이지 진입 시점
+// leftSel/rightSel: { classId: Set<sid> }
+let registered = {};
+let original = {};
+let leftSel = {};
+let rightSel = {};
+
+(function loadInitial() {
+  const store = getStore();
+  let data = store[DONG_NAME];
+  if (!data || !data.classes || Object.keys(data.classes).length === 0) {
+    // 목업 fallback
+    data = { classes: {
+      '1학년 1반': [
+        {n:1,name:'김하나',sid:'10101'},
+        {n:2,name:'이민수',sid:'10102'},
+        {n:3,name:'박서연',sid:'10103'},
+        {n:4,name:'정유진',sid:'10104'}
+      ],
+      '1학년 3반': [
+        {n:2,name:'김두나',sid:'10302'}
+      ]
+    }};
+  }
+  registered = JSON.parse(JSON.stringify(data.classes));
+  Object.keys(registered).forEach(cls => { original[cls] = registered[cls].map(s => s.sid); });
+  render();
+})();
+
+function isRegistered(cname, sid) {
+  return (registered[cname] || []).some(s => s.sid === sid);
+}
+
+function dirty() {
+  // 원본과 다르면 dirty
+  const keys = new Set([...Object.keys(original), ...Object.keys(registered)]);
+  for (const k of keys) {
+    const a = (original[k] || []).slice().sort().join(',');
+    const b = (registered[k] || []).map(s => s.sid).slice().sort().join(',');
+    if (a !== b) return true;
+  }
+  return false;
+}
+
+function getRemovedSids() {
+  // original에 있었으나 현재 registered에 없는 학생
+  const removed = [];
+  Object.keys(original).forEach(cls => {
+    original[cls].forEach(sid => {
+      if (!isRegistered(cls, sid)) removed.push({cls, sid});
+    });
+  });
+  return removed;
+}
+
+function render() {
+  renderPool();
+  renderRegistered();
+  refreshActions();
+  refreshSummary();
+}
+
+function renderPool() {
+  const list = document.getElementById('poolList');
+  // pool = ALL_CLASSES 학생 - registered에 있는 학생
+  const items = ALL_CLASSES.map(c => ({
+    cid: c.id, cname: c.name,
+    students: c.students.filter(s => !isRegistered(c.name, s.sid))
+  })).filter(c => c.students.length > 0);
+  if (items.length === 0) {
+    list.innerHTML = `<div class="pane-empty">추가 가능한 학생이 없어요</div>`;
+    return;
+  }
+  list.innerHTML = items.map(c => renderTreeRow(c, leftSel, true)).join('');
+  lucide.createIcons();
+  applyCbStates(items, leftSel);
+}
+
+function renderRegistered() {
+  const list = document.getElementById('registeredList');
+  // registered class들을 ALL_CLASSES 순서로 정렬
+  const ordered = ALL_CLASSES.map(c => ({
+    cid: c.id, cname: c.name, students: registered[c.name] || []
+  })).filter(c => c.students.length > 0);
+  Object.keys(registered).forEach(cname => {
+    if (!ordered.find(o => o.cname === cname) && registered[cname].length) {
+      ordered.push({ cid: 'x-' + cname, cname, students: registered[cname] });
+    }
+  });
+  if (ordered.length === 0) {
+    list.innerHTML = `<div class="pane-empty">참여 학생이 없어요<br><span style="color:#b3b6bd;font-size:13px">좌측에서 학생을 선택해 추가하세요</span></div>`;
+    return;
+  }
+  list.innerHTML = ordered.map(c => renderTreeRow(c, rightSel, false)).join('');
+  lucide.createIcons();
+  applyCbStates(ordered, rightSel);
+}
+
+function renderTreeRow(c, selMap, isPool) {
+  const sel = selMap[c.cid] ? selMap[c.cid].size : 0;
+  const totalText = `${sel}/${c.students.length}`;
+  return `
+  <div class="tree-row" data-cid="${c.cid}" data-pool="${isPool}">
+    <div class="tree-class" onclick="toggleClassRow(event,'${c.cid}',${isPool})">
+      <div class="tree-cb" data-cb="class" data-cid="${c.cid}" onclick="event.stopPropagation();toggleClass('${c.cid}',${isPool})"></div>
+      <span class="tree-class-name">${c.cname}</span>
+      <span class="tree-cnt">${totalText}</span>
+      <i data-lucide="chevron-down" class="tree-caret"></i>
+    </div>
+    <div class="tree-students">
+      ${c.students.map(s => `
+        <div class="tree-student" onclick="toggleStudent('${c.cid}','${s.sid}',${isPool})">
+          <div class="tree-cb" data-cb="st" data-cid="${c.cid}" data-sid="${s.sid}"></div>
+          <span class="tree-st-label">${s.sid} ${s.name}</span>
+        </div>
+      `).join('')}
+    </div>
+  </div>`;
+}
+
+function applyCbStates(items, selMap) {
+  items.forEach(c => {
+    const sel = selMap[c.cid] ? selMap[c.cid].size : 0;
+    const cb = document.querySelector(`.pane-body .tree-row[data-cid="${c.cid}"] .tree-cb[data-cb="class"]`);
+    if (cb) {
+      cb.classList.remove('checked','indeterminate');
+      cb.innerHTML = '';
+      if (sel === c.students.length && sel > 0) { cb.classList.add('checked'); cb.innerHTML = '<i data-lucide="check" style="width:12px;height:12px"></i>'; }
+      else if (sel > 0) cb.classList.add('indeterminate');
+    }
+    c.students.forEach(s => {
+      const stCb = document.querySelector(`.pane-body .tree-row[data-cid="${c.cid}"] .tree-cb[data-cb="st"][data-sid="${s.sid}"]`);
+      if (stCb) {
+        const checked = !!selMap[c.cid]?.has(s.sid);
+        stCb.classList.toggle('checked', checked);
+        stCb.innerHTML = checked ? '<i data-lucide="check" style="width:12px;height:12px"></i>' : '';
+      }
+    });
+  });
+  lucide.createIcons();
+}
+
+function toggleClassRow(e, cid, isPool) {
+  if (e.target.closest('.tree-cb')) return;
+  const pane = isPool ? '#poolList' : '#registeredList';
+  document.querySelector(`${pane} .tree-row[data-cid="${cid}"]`)?.classList.toggle('open');
+}
+
+function toggleClass(cid, isPool) {
+  const selMap = isPool ? leftSel : rightSel;
+  // 현재 풀에서 해당 cid의 학생 목록
+  let students;
+  if (isPool) {
+    const c = ALL_CLASSES.find(x => x.id === cid);
+    if (!c) return;
+    students = c.students.filter(s => !isRegistered(c.name, s.sid));
+  } else {
+    const c = ALL_CLASSES.find(x => x.id === cid);
+    const cname = c ? c.name : cid.replace(/^x-/, '');
+    students = (registered[cname] || []).map(s => ({sid: s.sid}));
+  }
+  if (!students.length) return;
+  if (!selMap[cid]) selMap[cid] = new Set();
+  if (selMap[cid].size === students.length) selMap[cid].clear();
+  else students.forEach(s => selMap[cid].add(s.sid));
+  if (isPool) renderPool(); else renderRegistered();
+  refreshActions();
+  document.querySelector(`${isPool?'#poolList':'#registeredList'} .tree-row[data-cid="${cid}"]`)?.classList.add('open');
+}
+
+function toggleStudent(cid, sid, isPool) {
+  const selMap = isPool ? leftSel : rightSel;
+  if (!selMap[cid]) selMap[cid] = new Set();
+  if (selMap[cid].has(sid)) selMap[cid].delete(sid); else selMap[cid].add(sid);
+  if (isPool) renderPool(); else renderRegistered();
+  refreshActions();
+  document.querySelector(`${isPool?'#poolList':'#registeredList'} .tree-row[data-cid="${cid}"]`)?.classList.add('open');
+}
+
+function refreshActions() {
+  const lTotal = Object.values(leftSel).reduce((s, set) => s + set.size, 0);
+  const rTotal = Object.values(rightSel).reduce((s, set) => s + set.size, 0);
+  document.getElementById('btnAdd').disabled = lTotal === 0;
+  document.getElementById('btnRemove').disabled = rTotal === 0;
+}
+
+function refreshSummary() {
+  const total = Object.values(registered).reduce((s, arr) => s + arr.length, 0);
+  document.getElementById('totalCount').textContent = total;
+}
+
+// ── 추가 ──
+function doAdd() {
+  ALL_CLASSES.forEach(c => {
+    const set = leftSel[c.id];
+    if (!set || set.size === 0) return;
+    set.forEach(sid => {
+      const s = c.students.find(x => x.sid === sid);
+      if (!s) return;
+      if (!registered[c.name]) registered[c.name] = [];
+      if (!registered[c.name].some(r => r.sid === sid)) registered[c.name].push({...s});
+    });
+    if (registered[c.name]) registered[c.name].sort((a,b) => a.n - b.n);
+  });
+  leftSel = {};
+  render();
+}
+
+// ── 제외 (좌측으로 이동) ──
+function doRemove() {
+  ALL_CLASSES.forEach(c => {
+    const set = rightSel[c.id];
+    if (!set || set.size === 0) return;
+    registered[c.name] = (registered[c.name] || []).filter(s => !set.has(s.sid));
+    if (registered[c.name].length === 0) delete registered[c.name];
+  });
+  rightSel = {};
+  render();
+}
+
+// ── 저장 ──
+function onSave() {
+  const removed = getRemovedSids();
+  if (removed.length > 0) {
+    document.getElementById('confirmModal').classList.add('open');
+    lucide.createIcons();
+  } else {
+    commitSave();
+  }
+}
+function closeConfirm() { document.getElementById('confirmModal').classList.remove('open'); }
+function commitSave() {
+  const store = getStore();
+  const total = Object.values(registered).reduce((s, arr) => s + arr.length, 0);
+  store[DONG_NAME] = { count: total, classes: registered, savedAt: new Date().toISOString() };
+  localStorage.setItem('clipo_dong_students', JSON.stringify(store));
+  closeConfirm();
+  showToast('변경사항을 저장했어요');
+  setTimeout(() => location.href = 'creative_activity_list_v6_260507.html', 900);
+}
+
+// ── 토스트 ──
+let _toastTimer = null;
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  document.getElementById('toastMsg').textContent = msg;
+  t.classList.add('show');
+  lucide.createIcons();
+  clearTimeout(_toastTimer);
+  _toastTimer = setTimeout(() => t.classList.remove('show'), 2500);
+}
+</script>
+</body>
+</html>

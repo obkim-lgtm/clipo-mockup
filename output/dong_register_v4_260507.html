@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>동아리 학생 등록 - CLIPO</title>
+<link rel="icon" type="image/svg+xml" href="clipo_favicon.svg">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard-gov.min.css">
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<style>
+* { font-family: 'Pretendard GOV', -apple-system, sans-serif; box-sizing: border-box; margin: 0; padding: 0; }
+body { background: #f6f7f9; color: #222631; }
+
+/* ── 헤더 ── */
+.g-hd { height: 56px; background: #fff; border-bottom: 1px solid #d9d9d9; display: flex; align-items: center; padding: 0 20px 0 8px; position: fixed; top: 0; left: 0; right: 0; z-index: 200; }
+.g-hd-r { margin-left: auto; display: flex; align-items: center; gap: 6px; font-size: 14px; color: #3b3f4c; }
+.plan-badge { background: #416bff; color: #fff; font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 4px; }
+.hd-div { width: 1px; height: 14px; background: #d9d9d9; margin: 0 4px; }
+.credit-wrap { display: flex; align-items: center; gap: 4px; padding: 4px 10px; background: #f6f7f9; border-radius: 6px; font-size: 13px; font-weight: 600; color: #3b3f4c; }
+.user-btn { display: inline-flex; align-items: center; justify-content: center; gap: 4px; padding: 4px 10px; border: 1px solid #d9d9d9; border-radius: 6px; background: #fff; font-size: 13px; color: #3b3f4c; cursor: pointer; line-height: 1; }
+
+/* ── 사이드바 ── */
+.icon-sb { width: 56px; background: #fff; border-right: 1px solid #d9d9d9; position: fixed; top: 56px; bottom: 0; left: 0; display: flex; flex-direction: column; padding: 8px 0; z-index: 150; transition: width .2s ease; }
+.icon-sb.expanded { width: 200px; }
+.si { height: 40px; display: flex; align-items: center; border-radius: 8px; color: #6d7381; cursor: pointer; margin-bottom: 2px; position: relative; padding: 0 4px 0 16px; gap: 10px; white-space: nowrap; flex-shrink: 0; }
+.si:hover { background: #f1f3f5; }
+.si.active { background: #e9f2ff; color: #416bff; }
+.si-icon { width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.si-label { font-size: 13px; font-weight: 500; opacity: 0; transition: opacity .1s; overflow: hidden; }
+.icon-sb.expanded .si-label { opacity: 1; }
+.si-tip { position: absolute; left: 48px; top: 50%; transform: translateY(-50%); background: #222631; color: #fff; font-size: 11px; padding: 3px 8px; border-radius: 4px; white-space: nowrap; display: none; z-index: 300; pointer-events: none; }
+.si:hover .si-tip { display: block; }
+.icon-sb.expanded .si-tip { display: none !important; }
+.nav-bottom { margin-top: auto; width: 100%; }
+.nav-div { height: 1px; background: #f1f3f5; margin: 4px 0; }
+body.nav-expanded .main-shell { margin-left: 200px; transition: margin-left .2s ease; }
+
+/* ── 메인 ── */
+.main-shell { margin-left: 56px; margin-top: 56px; min-height: calc(100vh - 56px); }
+.main { max-width: 1200px; margin: 0 auto; padding: 32px 48px 48px; }
+
+.back-link { display: inline-flex; align-items: center; gap: 4px; font-size: 14px; color: #6d7381; text-decoration: none; margin-bottom: 12px; cursor: pointer; }
+.back-link:hover { color: #416bff; }
+
+.page-title { font-size: 26px; font-weight: 600; color: #222631; display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+.page-title .beta { font-size: 11px; font-weight: 600; background: #f1f3f5; color: #6d7381; padding: 2px 7px; border-radius: 4px; display: inline-flex; align-items: center; gap: 3px; }
+.page-sub { font-size: 14px; color: #6d7381; margin-bottom: 24px; }
+
+.two-col { display: grid; grid-template-columns: 280px 1fr; gap: 16px; align-items: start; }
+
+.card { background: #fff; border: 1px solid #d9d9d9; border-radius: 12px; padding: 24px; }
+
+.method-title { font-size: 20px; font-weight: 600; color: #222631; margin-bottom: 16px; }
+.method-group-label { font-size: 14px; font-weight: 500; color: #6d7381; margin-bottom: 8px; margin-top: 20px; }
+.method-group-label:first-of-type { margin-top: 0; }
+.method-option { display: flex; align-items: center; gap: 10px; padding: 12px 14px; border: 1px solid #d9d9d9; border-radius: 8px; cursor: pointer; transition: all .15s; margin-bottom: 8px; }
+.method-option:last-child { margin-bottom: 0; }
+.method-option:hover { border-color: #b3b3b3; }
+.method-option.selected { border-color: #416bff; background: #f4f8ff; }
+.method-radio { width: 16px; height: 16px; border: 1.5px solid #b3b6bd; border-radius: 50%; flex-shrink: 0; position: relative; }
+.method-option.selected .method-radio { border-color: #416bff; }
+.method-option.selected .method-radio::after { content:''; width: 8px; height: 8px; background: #416bff; border-radius: 50%; position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); }
+.method-label { font-size: 16px; color: #3b3f4c; font-weight: 500; }
+.method-option.selected .method-label { color: #222631; }
+
+.right-card { padding: 24px 28px; min-height: 520px; }
+.right-head { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 8px; }
+.right-title { font-size: 20px; font-weight: 600; color: #222631; }
+.right-sub { font-size: 14px; color: #6d7381; margin-bottom: 24px; }
+.btn-primary { display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 10px 18px; border: none; border-radius: 6px; background: #416bff; color: #fff; font-size: 14px; font-weight: 600; font-family: inherit; cursor: pointer; line-height: 1; white-space: nowrap; }
+.btn-primary:hover { background: #3151c4; }
+
+.empty-area { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 60px 24px; text-align: center; }
+.empty-illust { width: 96px; height: 96px; border-radius: 50%; background: #f1f3f5; display: flex; align-items: center; justify-content: center; margin-bottom: 18px; color: #b3b6bd; }
+.empty-msg { font-size: 16px; font-weight: 500; color: #3b3f4c; margin-bottom: 4px; }
+.empty-sub { font-size: 14px; color: #6d7381; }
+
+.class-group { border: 1px solid #d9d9d9; border-radius: 8px; margin-bottom: 12px; overflow: hidden; }
+.class-group:last-child { margin-bottom: 0; }
+.cg-head { display: flex; align-items: center; gap: 8px; padding: 14px 16px; cursor: pointer; user-select: none; }
+.cg-head:hover { background: #f6f7f9; }
+.cg-caret { width: 16px; height: 16px; color: #6d7381; transition: transform .2s; flex-shrink: 0; }
+.class-group.open .cg-caret { transform: rotate(90deg); }
+.cg-name { font-size: 16px; font-weight: 600; color: #222631; }
+.cg-count { font-size: 13px; font-weight: 600; padding: 2px 8px; background: #e9f2ff; color: #416bff; border-radius: 10px; }
+.cg-body { display: none; border-top: 1px solid #f1f3f5; }
+.class-group.open .cg-body { display: block; }
+.st-table { width: 100%; border-collapse: collapse; font-size: 14px; }
+.st-table th { background: #f6f7f9; padding: 10px 14px; text-align: left; font-weight: 600; color: #6d7381; font-size: 13px; }
+.st-table td { padding: 10px 14px; border-top: 1px solid #f1f3f5; color: #3b3f4c; }
+
+.upload-step-title { font-size: 14px; font-weight: 600; color: #3b3f4c; margin-bottom: 8px; margin-top: 20px; }
+.upload-step-title:first-of-type { margin-top: 0; }
+.confirm-acc { border: 1px solid #d9d9d9; border-radius: 6px; overflow: hidden; }
+.confirm-acc-head { display: flex; align-items: center; gap: 8px; padding: 12px 14px; cursor: pointer; user-select: none; }
+.confirm-acc-head:hover { background: #f6f7f9; }
+.confirm-acc.open .confirm-acc-head { border-bottom: 1px solid #f1f3f5; }
+.confirm-acc-icon { width: 16px; height: 16px; color: #6d7381; }
+.confirm-acc-title { flex: 1; font-size: 14px; font-weight: 500; color: #3b3f4c; }
+.confirm-acc-caret { width: 16px; height: 16px; color: #6d7381; transition: transform .2s; }
+.confirm-acc.open .confirm-acc-caret { transform: rotate(180deg); }
+.confirm-acc-body { display: none; padding: 12px 14px; max-height: 220px; overflow-y: auto; }
+.confirm-acc.open .confirm-acc-body { display: block; }
+.confirm-class-row { padding: 8px 0; }
+.confirm-class-row:not(:last-child) { border-bottom: 1px solid #f1f3f5; }
+.confirm-class-name { font-size: 13px; font-weight: 600; color: #6d7381; margin-bottom: 4px; }
+.confirm-class-students { font-size: 14px; color: #3b3f4c; line-height: 1.6; }
+
+.btn-block { display: flex; align-items: center; justify-content: center; gap: 6px; width: 100%; padding: 12px; border-radius: 6px; font-size: 14px; font-weight: 500; font-family: inherit; cursor: pointer; line-height: 1; border: 1px solid #d9d9d9; background: #fff; color: #3b3f4c; }
+.btn-block:hover { border-color: #416bff; color: #416bff; }
+
+.file-chip { display: flex; align-items: center; gap: 8px; padding: 10px 14px; border: 1px solid #d9d9d9; border-radius: 6px; margin-top: 10px; font-size: 14px; color: #3b3f4c; }
+.file-chip-name { flex: 1; }
+.file-chip-x { background: none; border: none; color: #6d7381; cursor: pointer; padding: 0; display: flex; }
+.file-chip-x:hover { color: #f2525f; }
+
+.upload-result-section { margin-top: 28px; }
+.upload-result-title { font-size: 16px; font-weight: 600; color: #222631; margin-bottom: 12px; }
+.upload-tab-row { display: flex; gap: 8px; margin-bottom: 10px; align-items: center; }
+.upload-tab { padding: 6px 12px; font-size: 13px; font-weight: 600; background: #e9f2ff; color: #416bff; border-radius: 4px; }
+.upload-table { width: 100%; border: 1px solid #d9d9d9; border-radius: 6px; overflow: hidden; border-collapse: collapse; font-size: 14px; }
+.upload-table th { background: #f6f7f9; padding: 10px 14px; text-align: left; font-weight: 600; color: #6d7381; font-size: 13px; border-bottom: 1px solid #e0e0e0; }
+.upload-table td { padding: 10px 14px; border-bottom: 1px solid #f1f3f5; color: #3b3f4c; }
+.upload-table tr:last-child td { border-bottom: none; }
+.upload-table tr.row-err td { background: #fff5f5; }
+.upload-err-msg { display: flex; align-items: flex-start; gap: 6px; padding: 10px 14px; background: #fff5f5; border: 1px solid #fecaca; border-radius: 6px; margin-top: 8px; font-size: 13px; color: #f2525f; line-height: 1.55; }
+
+.footer-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 24px; }
+.btn-cancel-lg { padding: 10px 20px; border: 1px solid #d9d9d9; border-radius: 6px; background: #fff; color: #3b3f4c; font-size: 14px; font-weight: 500; font-family: inherit; cursor: pointer; line-height: 1; }
+.btn-cancel-lg:hover { background: #f6f7f9; }
+.btn-save-lg { padding: 10px 24px; border: none; border-radius: 6px; background: #365eef; color: #fff; font-size: 14px; font-weight: 600; font-family: inherit; cursor: pointer; line-height: 1; }
+.btn-save-lg:hover { background: #3151c4; }
+.btn-save-lg:disabled { background: #dde1e8; color: #b3b6bd; cursor: not-allowed; }
+
+/* 모달 */
+.overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 300; align-items: center; justify-content: center; }
+.overlay.open { display: flex; }
+.modal-box { background: #fff; border-radius: 12px; width: 480px; max-width: calc(100vw - 48px); max-height: calc(100vh - 64px); display: flex; flex-direction: column; box-shadow: 0 0 1px #2226314D, 0 4px 8px #0000001A; overflow: hidden; }
+.modal-head { padding: 20px 24px 14px; display: flex; align-items: center; justify-content: space-between; }
+.modal-title { font-size: 20px; font-weight: 600; color: #222631; }
+.modal-x { background: none; border: none; cursor: pointer; color: #6d7381; padding: 4px; display: flex; }
+.modal-body { padding: 0 24px; overflow-y: auto; flex: 1; }
+.search-bar { position: relative; padding: 0 0 12px; }
+.search-bar input { width: 100%; padding: 10px 12px 10px 36px; border: 1px solid #d9d9d9; border-radius: 6px; font-size: 16px; font-family: inherit; color: #222631; outline: none; }
+.search-bar input:focus { border-color: #416bff; }
+.search-bar .si-icon-svg { position: absolute; left: 10px; top: 50%; transform: translateY(calc(-50% - 6px)); color: #b3b6bd; pointer-events: none; }
+.search-empty { padding: 32px 16px; text-align: center; font-size: 14px; color: #b3b6bd; }
+.modal-foot { padding: 14px 24px 20px; display: flex; align-items: center; gap: 8px; border-top: 1px solid #f1f3f5; }
+.modal-info { font-size: 13px; color: #6d7381; flex: 1; display: flex; align-items: center; gap: 4px; }
+.btn-modal-cancel { padding: 9px 18px; border: 1px solid #d9d9d9; border-radius: 6px; background: #fff; color: #3b3f4c; font-size: 14px; font-weight: 500; font-family: inherit; cursor: pointer; line-height: 1; }
+.btn-modal-confirm { padding: 9px 18px; border: none; border-radius: 6px; background: #416bff; color: #fff; font-size: 14px; font-weight: 600; font-family: inherit; cursor: pointer; line-height: 1; }
+.btn-modal-confirm:disabled { background: #dde1e8; color: #b3b6bd; cursor: not-allowed; }
+
+.tree-row { border-bottom: 1px solid #f1f3f5; }
+.tree-row:last-child { border-bottom: none; }
+.tree-class { display: flex; align-items: center; gap: 10px; padding: 12px 4px; cursor: pointer; user-select: none; }
+.tree-class:hover { background: #f6f7f9; }
+.tree-cb { width: 18px; height: 18px; border: 1.5px solid #c7cbd3; border-radius: 4px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; background: #fff; color: #fff; }
+.tree-cb.checked { background: #416bff; border-color: #416bff; }
+.tree-cb.indeterminate { background: #416bff; border-color: #416bff; position: relative; }
+.tree-cb.indeterminate::after { content:''; width: 10px; height: 2px; background: #fff; border-radius: 1px; position: absolute; }
+.tree-class-name { font-size: 16px; font-weight: 500; color: #222631; flex: 1; }
+.tree-caret { width: 16px; height: 16px; color: #6d7381; transition: transform .2s; }
+.tree-row.open .tree-caret { transform: rotate(180deg); }
+.tree-students { display: none; padding: 4px 0 8px 30px; }
+.tree-row.open .tree-students { display: block; }
+.tree-student { display: flex; align-items: center; gap: 10px; padding: 6px 4px; cursor: pointer; border-radius: 4px; }
+.tree-student:hover { background: #f6f7f9; }
+.tree-st-label { font-size: 14px; color: #3b3f4c; }
+
+/* 토스트 */
+.toast { position: fixed; bottom: 32px; left: 50%; transform: translateX(-50%) translateY(20px); background: #222631; color: #fff; padding: 12px 20px; border-radius: 8px; font-size: 14px; display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 4px 16px rgba(0,0,0,.2); opacity: 0; transition: opacity .2s, transform .2s; z-index: 400; pointer-events: none; line-height: 1; }
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+.toast-ic { display: inline-flex; align-items: center; justify-content: center; color: #1ab864; }
+
+footer { text-align: center; padding: 48px 0 24px; font-size: 13px; color: #6d7381; }
+footer a { color: #6d7381; text-decoration: none; margin: 0 8px; }
+</style>
+</head>
+<body>
+
+<header class="g-hd">
+  <button onclick="toggleNav()" style="width:36px;height:36px;border:none;background:none;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#3b3f4c;margin-right:8px">
+    <i data-lucide="menu" style="width:20px;height:20px"></i>
+  </button>
+  <svg width="76" height="16" viewBox="0 0 76 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M11.3613 4.03516H4.09668V11.9629H8.88281L8.88086 11.9648H15.6016V16H4.02539C1.80242 15.9998 0 14.223 0 12.0322V3.96777C0 1.77696 1.80242 0.000177874 4.02539 0H15.4561L11.3613 4.03516ZM22.0703 11.9648H33.5781V16H22.002C19.7788 16 17.9756 14.2231 17.9756 12.0322V0H22.0703V11.9648ZM40.0459 16H35.9521V0H40.0459V16ZM54.5381 0C56.4564 0 58.0138 1.53228 58.0186 3.42285L58.0166 3.4248V8.54297C58.014 10.4333 56.4567 11.9648 54.5361 11.9648H46.5107L42.416 16V0H54.5381ZM71.9746 0C74.0086 0.000134956 75.6887 1.49046 75.958 3.42285H76V12.5771H75.958C75.6887 14.5095 74.011 15.9999 71.9746 16H64.4238C62.3897 16 60.7098 14.5096 60.4404 12.5771C60.4145 12.398 60.3984 12.2184 60.3984 12.0322V3.96777C60.3984 3.78159 60.4145 3.60205 60.4404 3.42285C60.7098 1.49037 62.3873 0 64.4238 0H71.9746ZM64.4922 12.5771H71.9062V3.42285H64.4922V12.5771ZM46.5107 3.42285V8.54004H53.9238V3.42285H46.5107Z" fill="#365EEF"/>
+  </svg>
+  <div class="g-hd-r">
+    <span class="plan-badge">개인 유료</span>
+    <span style="font-size:13px;color:#6d7381">D-1710</span>
+    <div class="hd-div"></div>
+    <i data-lucide="bot" style="width:16px;height:16px;color:#416bff"></i>
+    <div class="credit-wrap">AI 크레딧 700</div>
+    <div class="hd-div"></div>
+    <button class="user-btn">test99 선생님(담임) <i data-lucide="chevron-down" style="width:14px;height:14px"></i></button>
+  </div>
+</header>
+
+<nav class="icon-sb" id="icon-sb">
+  <div class="si"><div class="si-icon"><i data-lucide="home" style="width:20px;height:20px"></i></div><span class="si-label">홈</span><span class="si-tip">홈</span></div>
+  <div class="si"><div class="si-icon"><i data-lucide="scissors" style="width:20px;height:20px"></i></div><span class="si-label">평가계획</span><span class="si-tip">평가계획</span></div>
+  <div class="si"><div class="si-icon"><i data-lucide="layout-grid" style="width:20px;height:20px"></i></div><span class="si-label">수업</span><span class="si-tip">수업</span></div>
+  <div class="si active"><div class="si-icon"><i data-lucide="notebook-pen" style="width:20px;height:20px"></i></div><span class="si-label">창의적 체험활동 <span style="font-size:10px;background:#416bff;color:#fff;padding:1px 5px;border-radius:3px;margin-left:2px">Beta</span></span><span class="si-tip">창의적 체험활동</span></div>
+  <div class="si"><div class="si-icon"><i data-lucide="zap" style="width:20px;height:20px"></i></div><span class="si-label">세특 간편 생성기</span><span class="si-tip">세특 간편 생성기</span></div>
+  <div class="si"><div class="si-icon"><i data-lucide="smile" style="width:20px;height:20px"></i></div><span class="si-label">행동특성 및 종합기록</span><span class="si-tip">행동특성 및 종합기록 지원</span></div>
+  <div class="si"><div class="si-icon"><i data-lucide="bar-chart-2" style="width:20px;height:20px"></i></div><span class="si-label">리포트</span><span class="si-tip">리포트</span></div>
+  <div class="si"><div class="si-icon"><i data-lucide="building-2" style="width:20px;height:20px"></i></div><span class="si-label">학교 설정</span><span class="si-tip">학교 설정</span></div>
+  <div class="nav-bottom">
+    <div class="nav-div"></div>
+    <div class="si"><div class="si-icon"><i data-lucide="file-down" style="width:20px;height:20px"></i></div><span class="si-label">매뉴얼 다운로드</span><span class="si-tip">매뉴얼 다운로드</span></div>
+    <div class="si"><div class="si-icon"><i data-lucide="credit-card" style="width:20px;height:20px"></i></div><span class="si-label">요금제</span><span class="si-tip">요금제</span></div>
+    <div class="si"><div class="si-icon"><i data-lucide="help-circle" style="width:20px;height:20px"></i></div><span class="si-label">고객센터</span><span class="si-tip">고객센터</span></div>
+  </div>
+</nav>
+
+<div class="main-shell">
+<main class="main">
+
+  <a class="back-link" onclick="goBack()">
+    <i data-lucide="chevron-left" style="width:14px;height:14px"></i> 이전으로
+  </a>
+
+  <h1 class="page-title">
+    동아리 학생 등록 : <span id="dongName">과학탐구부</span>
+    <span class="beta"><i data-lucide="lock" style="width:10px;height:10px"></i> Beta</span>
+  </h1>
+  <p class="page-sub">동아리에 참여할 학생을 등록해 주세요. 등록 후 활동 기록을 시작할 수 있어요.</p>
+
+  <div class="two-col">
+    <div class="card">
+      <p class="method-title">등록 방법</p>
+      <p class="method-group-label">직접 선택</p>
+      <div class="method-option selected" data-method="select" onclick="selectMethod('select')">
+        <div class="method-radio"></div>
+        <span class="method-label">학생 목록에서 선택</span>
+      </div>
+      <p class="method-group-label">엑셀 업로드</p>
+      <div class="method-option" data-method="upload" onclick="selectMethod('upload')">
+        <div class="method-radio"></div>
+        <span class="method-label">학생 명단 업로드</span>
+      </div>
+    </div>
+
+    <div class="card right-card">
+      <div id="paneSelect">
+        <div class="right-head">
+          <div><p class="right-title">학생 목록에서 선택</p></div>
+          <button class="btn-primary" onclick="openStudentModal()">
+            <i data-lucide="user-check" style="width:14px;height:14px"></i> 학생 목록
+          </button>
+        </div>
+        <p class="right-sub">학생 목록에서 학생을 선택하여 동아리에 배정해 주세요.</p>
+        <div id="selectContent">
+          <div class="empty-area" id="selectEmpty">
+            <div class="empty-illust"><i data-lucide="users" style="width:36px;height:36px"></i></div>
+            <p class="empty-msg">학생 목록에서 학생을 선택해 주세요.</p>
+            <p class="empty-sub">우측 상단의 "학생 목록 보기" 버튼을 눌러 학생을 추가하세요.</p>
+          </div>
+          <div id="selectedGroups" style="display:none"></div>
+        </div>
+      </div>
+
+      <div id="paneUpload" style="display:none">
+        <div class="right-head" style="margin-bottom:0">
+          <div><p class="right-title">학생 명단 업로드</p></div>
+        </div>
+        <p class="right-sub">엑셀 양식을 다운받아, 동아리에 등록할 대상 학생을 입력해 주세요.</p>
+
+        <p class="upload-step-title">1단계 : 엑셀 양식 다운로드</p>
+        <button class="btn-block" onclick="showToast('양식 파일 다운로드를 시작했어요')">
+          <i data-lucide="download" style="width:14px;height:14px"></i> 엑셀 양식 다운로드
+        </button>
+
+        <p class="upload-step-title">2단계 : 엑셀 파일 업로드</p>
+        <button class="btn-block" onclick="simulateUpload()">
+          <i data-lucide="upload" style="width:14px;height:14px"></i> 파일 업로드
+        </button>
+        <div class="file-chip" id="fileChip" style="display:none">
+          <i data-lucide="file" style="width:14px;height:14px;color:#6d7381"></i>
+          <span class="file-chip-name">동아리_학생_명단.xlsx</span>
+          <button class="file-chip-x" onclick="clearUpload()"><i data-lucide="x" style="width:14px;height:14px"></i></button>
+        </div>
+
+        <div class="upload-result-section" id="uploadResult" style="display:none">
+          <p class="upload-result-title">업로드 파일 확인</p>
+          <div id="uploadGroups"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer-actions">
+    <button class="btn-cancel-lg" onclick="goBack()">취소</button>
+    <button class="btn-save-lg" id="btnSave" disabled onclick="onSave()">저장</button>
+  </div>
+
+</main>
+</div>
+
+<footer>
+  <a href="#">회사소개</a><a href="#">이용약관</a><a href="#">개인정보처리방침</a><a href="#">고객센터</a>
+  <div style="margin-top:8px;">© 2026 Datadriven Inc. All rights reserved.</div>
+</footer>
+
+<div class="overlay" id="studentModal" onclick="if(event.target===this)closeStudentModal()">
+  <div class="modal-box">
+    <div class="modal-head">
+      <p class="modal-title">학생 목록</p>
+      <button class="modal-x" onclick="closeStudentModal()"><i data-lucide="x" style="width:18px;height:18px"></i></button>
+    </div>
+    <div class="modal-body">
+      <div class="search-bar">
+        <i data-lucide="search" class="si-icon-svg" style="width:15px;height:15px"></i>
+        <input type="text" id="treeSearch" placeholder="이름 또는 학번 검색" oninput="renderTree()">
+      </div>
+      <div id="treeBody"></div>
+    </div>
+    <div class="modal-foot">
+      <span class="modal-info">
+        <i data-lucide="info" style="width:13px;height:13px"></i>
+        학생 명단은 학교 설정에서 수정 가능합니다.
+      </span>
+      <button class="btn-modal-cancel" onclick="closeStudentModal()">취소</button>
+      <button class="btn-modal-confirm" id="btnAssign" onclick="confirmAssign()" disabled>배정 (0명)</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast">
+  <span class="toast-ic"><i data-lucide="check-circle-2" style="width:18px;height:18px"></i></span>
+  <span id="toastMsg"></span>
+</div>
+
+<script>
+lucide.createIcons();
+
+function toggleNav() {
+  document.getElementById('icon-sb').classList.toggle('expanded');
+  document.body.classList.toggle('nav-expanded');
+}
+
+function goBack() {
+  location.href = 'creative_activity_list_v6_260507.html';
+}
+
+(function() {
+  const p = new URLSearchParams(location.search);
+  const dong = p.get('dong');
+  if (dong) document.getElementById('dongName').textContent = dong;
+})();
+
+const CLASSES = [
+  { id:'1-1', name:'1학년 1반', students:[
+    {n:1,name:'김하나',sid:'10101'},{n:2,name:'이민수',sid:'10102'},
+    {n:3,name:'박서연',sid:'10103'},{n:4,name:'정유진',sid:'10104'}
+  ]},
+  { id:'1-2', name:'1학년 2반', students:[
+    {n:1,name:'최지호',sid:'10201'},{n:2,name:'한도윤',sid:'10202'},
+    {n:3,name:'윤서아',sid:'10203'},{n:4,name:'송하늘',sid:'10204'}
+  ]},
+  { id:'1-3', name:'1학년 3반', students:[
+    {n:1,name:'김하나',sid:'10301'},{n:2,name:'김두나',sid:'10302'},
+    {n:3,name:'김세나',sid:'10303'},{n:4,name:'김네나',sid:'10304'}
+  ]},
+  { id:'2-1', name:'2학년 1반', students:[
+    {n:1,name:'이주원',sid:'20101'},{n:2,name:'박서준',sid:'20102'},
+    {n:3,name:'장민하',sid:'20103'},{n:4,name:'오지유',sid:'20104'}
+  ]},
+  { id:'2-2', name:'2학년 2반', students:[
+    {n:1,name:'백하늘',sid:'20201'},{n:2,name:'문지호',sid:'20202'},
+    {n:3,name:'서나은',sid:'20203'},{n:4,name:'권유찬',sid:'20204'}
+  ]},
+  { id:'2-3', name:'2학년 3반', students:[
+    {n:1,name:'전소율',sid:'20301'},{n:2,name:'홍시우',sid:'20302'},
+    {n:3,name:'노예린',sid:'20303'},{n:4,name:'배지호',sid:'20304'}
+  ]}
+];
+
+let assigned = {};
+let pickerSel = {};
+let currentMethod = 'select';
+
+function selectMethod(m) {
+  currentMethod = m;
+  document.querySelectorAll('.method-option').forEach(o => o.classList.toggle('selected', o.dataset.method === m));
+  document.getElementById('paneSelect').style.display = m === 'select' ? 'block' : 'none';
+  document.getElementById('paneUpload').style.display = m === 'upload' ? 'block' : 'none';
+  refreshSaveBtn();
+}
+
+function openStudentModal() {
+  pickerSel = {};
+  Object.keys(assigned).forEach(cid => pickerSel[cid] = new Set(assigned[cid]));
+  renderTree();
+  document.getElementById('studentModal').classList.add('open');
+  lucide.createIcons();
+}
+function closeStudentModal() {
+  document.getElementById('studentModal').classList.remove('open');
+}
+
+function renderTree() {
+  const body = document.getElementById('treeBody');
+  const q = (document.getElementById('treeSearch')?.value || '').trim().toLowerCase();
+  const matched = CLASSES.map(c => ({
+    ...c,
+    matchedStudents: c.students.filter(s => !q || s.name.toLowerCase().includes(q) || s.sid.toLowerCase().includes(q) || c.name.toLowerCase().includes(q))
+  })).filter(c => !q || c.matchedStudents.length > 0);
+  if (matched.length === 0) {
+    body.innerHTML = `<div class="search-empty">검색 결과가 없어요</div>`;
+    updateAssignBtn();
+    return;
+  }
+  body.innerHTML = matched.map(c => {
+    const sel = pickerSel[c.id] ? pickerSel[c.id].size : 0;
+    const openByQuery = q ? 'open' : '';
+    return `
+    <div class="tree-row ${openByQuery}" data-cid="${c.id}">
+      <div class="tree-class" onclick="toggleClassRow(event,'${c.id}')">
+        <div class="tree-cb" data-cb="class" data-cid="${c.id}" onclick="event.stopPropagation();toggleClass('${c.id}')"></div>
+        <span class="tree-class-name">${c.name} (${sel}/${c.students.length}명)</span>
+        <i data-lucide="chevron-down" class="tree-caret"></i>
+      </div>
+      <div class="tree-students">
+        ${c.matchedStudents.map(s => `
+          <div class="tree-student" onclick="toggleStudent('${c.id}','${s.sid}')">
+            <div class="tree-cb" data-cb="st" data-cid="${c.id}" data-sid="${s.sid}"></div>
+            <span class="tree-st-label">${s.sid} ${s.name}</span>
+          </div>
+        `).join('')}
+      </div>
+    </div>`;
+  }).join('');
+  applyCbStates();
+  updateAssignBtn();
+  lucide.createIcons();
+}
+
+function applyCbStates() {
+  CLASSES.forEach(c => {
+    const sel = pickerSel[c.id] ? pickerSel[c.id].size : 0;
+    const cb = document.querySelector(`.tree-cb[data-cb="class"][data-cid="${c.id}"]`);
+    if (cb) {
+      cb.classList.remove('checked','indeterminate');
+      cb.innerHTML = '';
+      if (sel === c.students.length && sel > 0) { cb.classList.add('checked'); cb.innerHTML = '<i data-lucide="check" style="width:12px;height:12px"></i>'; }
+      else if (sel > 0) cb.classList.add('indeterminate');
+    }
+    c.students.forEach(s => {
+      const stCb = document.querySelector(`.tree-cb[data-cb="st"][data-cid="${c.id}"][data-sid="${s.sid}"]`);
+      if (stCb) {
+        const checked = !!pickerSel[c.id]?.has(s.sid);
+        stCb.classList.toggle('checked', checked);
+        stCb.innerHTML = checked ? '<i data-lucide="check" style="width:12px;height:12px"></i>' : '';
+      }
+    });
+  });
+}
+
+function toggleClassRow(e, cid) {
+  if (e.target.closest('.tree-cb')) return;
+  document.querySelector(`.tree-row[data-cid="${cid}"]`).classList.toggle('open');
+}
+
+function toggleClass(cid) {
+  const cls = CLASSES.find(c => c.id === cid);
+  if (!pickerSel[cid]) pickerSel[cid] = new Set();
+  if (pickerSel[cid].size === cls.students.length) pickerSel[cid].clear();
+  else cls.students.forEach(s => pickerSel[cid].add(s.sid));
+  renderTree();
+  document.querySelector(`.tree-row[data-cid="${cid}"]`)?.classList.add('open');
+}
+
+function toggleStudent(cid, sid) {
+  if (!pickerSel[cid]) pickerSel[cid] = new Set();
+  if (pickerSel[cid].has(sid)) pickerSel[cid].delete(sid);
+  else pickerSel[cid].add(sid);
+  renderTree();
+  document.querySelector(`.tree-row[data-cid="${cid}"]`)?.classList.add('open');
+}
+
+function updateAssignBtn() {
+  const total = Object.values(pickerSel).reduce((s, set) => s + set.size, 0);
+  const btn = document.getElementById('btnAssign');
+  btn.textContent = `배정 (${total}명)`;
+  btn.disabled = total === 0;
+}
+
+function confirmAssign() {
+  assigned = {};
+  Object.keys(pickerSel).forEach(cid => { if (pickerSel[cid].size > 0) assigned[cid] = new Set(pickerSel[cid]); });
+  closeStudentModal();
+  renderSelectedGroups();
+  refreshSaveBtn();
+  const total = Object.values(assigned).reduce((s, set) => s + set.size, 0);
+  showToast(`${total}명을 배정했어요`);
+}
+
+function renderSelectedGroups() {
+  const total = Object.values(assigned).reduce((s, set) => s + set.size, 0);
+  const empty = document.getElementById('selectEmpty');
+  const wrap = document.getElementById('selectedGroups');
+  if (total === 0) {
+    empty.style.display = 'flex';
+    wrap.style.display = 'none';
+    return;
+  }
+  empty.style.display = 'none';
+  wrap.style.display = 'block';
+  wrap.innerHTML = CLASSES.filter(c => assigned[c.id]?.size).map((c, idx) => {
+    const sel = c.students.filter(s => assigned[c.id].has(s.sid));
+    const [g, b] = c.id.split('-');
+    return `
+      <div class="class-group ${idx === 0 ? 'open' : ''}" data-cid="${c.id}">
+        <div class="cg-head" onclick="this.parentElement.classList.toggle('open')">
+          <i data-lucide="chevron-right" class="cg-caret"></i>
+          <span class="cg-name">${c.name}</span>
+          <span class="cg-count">${sel.length}명</span>
+        </div>
+        <div class="cg-body">
+          <table class="st-table">
+            <thead><tr><th style="width:60px">학년</th><th style="width:60px">반</th><th style="width:60px">번호</th><th>이름</th><th style="width:100px">ID</th></tr></thead>
+            <tbody>
+              ${sel.map(s => `<tr><td>${g}</td><td>${b}</td><td>${s.n}</td><td>${s.name}</td><td>${s.sid}</td></tr>`).join('')}
+            </tbody>
+          </table>
+        </div>
+      </div>`;
+  }).join('');
+  lucide.createIcons();
+}
+
+function simulateUpload() {
+  document.getElementById('fileChip').style.display = 'flex';
+  const groups = [
+    {
+      cname:'1학년 1반', count: 4, rows:[
+        {no:1,g:1,b:1,n:1,name:'김하나',sid:'10101',err:false},
+        {no:2,g:1,b:1,n:2,name:'이민수',sid:'10102',err:false},
+        {no:3,g:1,b:1,n:3,name:'박서연',sid:'10103',err:false},
+        {no:4,g:1,b:1,n:4,name:'정유진',sid:'10104',err:false}
+      ],
+      errMsg: null
+    },
+    {
+      cname:'1학년 2반', count: 5, rows:[
+        {no:1,g:1,b:2,n:1,name:'최지호',sid:'10201',err:false},
+        {no:2,g:1,b:2,n:2,name:'한도윤',sid:'10202',err:false},
+        {no:3,g:1,b:2,n:3,name:'윤서아',sid:'10203',err:false},
+        {no:4,g:1,b:2,n:4,name:'송하늘',sid:'10204',err:false},
+        {no:5,g:1,b:2,n:5,name:'박미상',sid:'10205',err:true}
+      ],
+      errMsg: '학생 목록에 등록되어 있지 않은 학생입니다. 학교 설정에서 먼저 학생을 등록해 주세요. (No.5)'
+    }
+  ];
+  const html = groups.map(g => `
+    <div style="margin-bottom:18px">
+      <div class="upload-tab-row"><span class="upload-tab">${g.cname}</span><span style="font-size:13px;color:#6d7381">${g.count}명</span></div>
+      <table class="upload-table">
+        <thead><tr><th style="width:50px">No.</th><th style="width:60px">학년</th><th style="width:60px">반</th><th style="width:60px">번호</th><th>이름</th><th style="width:100px">ID</th></tr></thead>
+        <tbody>${g.rows.map(r => `<tr class="${r.err?'row-err':''}"><td>${r.no}</td><td>${r.g}</td><td>${r.b}</td><td>${r.n}</td><td>${r.name}</td><td>${r.sid}</td></tr>`).join('')}</tbody>
+      </table>
+      ${g.errMsg ? `<div class="upload-err-msg"><i data-lucide="alert-circle" style="width:13px;height:13px;flex-shrink:0;margin-top:1px"></i><span>${g.errMsg}</span></div>` : ''}
+    </div>`).join('');
+  document.getElementById('uploadGroups').innerHTML = html;
+  document.getElementById('uploadResult').style.display = 'block';
+  refreshSaveBtn();
+  lucide.createIcons();
+}
+
+function clearUpload() {
+  document.getElementById('fileChip').style.display = 'none';
+  document.getElementById('uploadResult').style.display = 'none';
+  refreshSaveBtn();
+}
+
+function refreshSaveBtn() {
+  let ready = false;
+  if (currentMethod === 'select') {
+    ready = Object.values(assigned).reduce((s, set) => s + set.size, 0) > 0;
+  } else {
+    ready = document.getElementById('fileChip').style.display === 'flex';
+  }
+  document.getElementById('btnSave').disabled = !ready;
+}
+
+function onSave() {
+  // 저장할 학생 데이터 구성
+  const dongName = document.getElementById('dongName').textContent.trim();
+  let saveClasses = {};
+  if (currentMethod === 'select') {
+    CLASSES.forEach(c => {
+      if (assigned[c.id]?.size) {
+        saveClasses[c.name] = c.students.filter(s => assigned[c.id].has(s.sid));
+      }
+    });
+  } else {
+    // 엑셀 업로드: 정상 행만 등록
+    saveClasses['1학년 1반'] = [
+      {n:1,name:'김하나',sid:'10101'},{n:2,name:'이민수',sid:'10102'},
+      {n:3,name:'박서연',sid:'10103'},{n:4,name:'정유진',sid:'10104'}
+    ];
+    saveClasses['1학년 2반'] = [
+      {n:1,name:'최지호',sid:'10201'},{n:2,name:'한도윤',sid:'10202'},
+      {n:3,name:'윤서아',sid:'10203'},{n:4,name:'송하늘',sid:'10204'}
+    ];
+  }
+  const total = Object.values(saveClasses).reduce((s, arr) => s + arr.length, 0);
+  // localStorage 저장
+  let store = {};
+  try { store = JSON.parse(localStorage.getItem('clipo_dong_students') || '{}'); } catch(e) {}
+  store[dongName] = { count: total, classes: saveClasses, savedAt: new Date().toISOString() };
+  localStorage.setItem('clipo_dong_students', JSON.stringify(store));
+  showToast('동아리 학생을 등록했어요');
+  setTimeout(() => location.href = 'creative_activity_list_v6_260507.html?registered=' + encodeURIComponent(dongName), 1000);
+}
+
+let _toastTimer = null;
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  document.getElementById('toastMsg').textContent = msg;
+  t.classList.add('show');
+  lucide.createIcons();
+  clearTimeout(_toastTimer);
+  _toastTimer = setTimeout(() => t.classList.remove('show'), 2500);
+}
+</script>
+</body>
+</html>
