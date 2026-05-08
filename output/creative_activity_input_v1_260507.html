@@ -928,7 +928,7 @@ body.nav-expanded .sticky-cta{left:200px;transition:left .2s ease}
         </button>
         <button class="reg-card" onclick="pickRegisterType('keyword')">
           <div class="rc-icon"><i data-lucide="pencil" style="width:22px;height:22px"></i></div>
-          <div class="rc-title">학생 관찰 특성 키워드 (EXCEL)</div>
+          <div class="rc-title">학생 활동 특성 키워드 (EXCEL)</div>
           <div class="rc-desc">평소 학생을 관찰하며 기록한 메모를 특성 키워드로 일괄 등록</div>
           <div class="rc-match">
             <i data-lucide="link" style="width:14px;height:14px"></i>
@@ -2729,7 +2729,16 @@ function openRegisterModal(){
 }
 function pickRegisterType(type){
   closeModal('modal-register');
-  const labels = {survey:'학생 설문 응답', activity:'활동지·보고서', keyword:'학생 관찰 특성 키워드'};
+  const params = new URLSearchParams({ type: ACTIVITY_TYPE, cls: CLS });
+  if(type === 'keyword'){
+    location.href = 'creative_activity_keyword_upload_v1_260508.html?' + params.toString();
+    return;
+  }
+  if(type === 'survey'){
+    location.href = 'creative_activity_survey_upload_v1_260508.html?' + params.toString();
+    return;
+  }
+  const labels = {activity:'활동지·보고서'};
   showToast(`${labels[type]} 상세 페이지는 다음 단계에서 만듭니다`);
 }
 

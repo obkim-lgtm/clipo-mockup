@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>학생 설문 응답 등록 - CLIPO</title>
+<link rel="icon" type="image/svg+xml" href="clipo_favicon.svg">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard-gov.min.css">
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<style>
+* { font-family: 'Pretendard GOV', -apple-system, sans-serif; box-sizing: border-box; margin: 0; padding: 0; }
+body { background: #f6f7f9; color: #222631; }
+
+/* ── 헤더 ── */
+.g-hd { height: 56px; background: #fff; border-bottom: 1px solid #d9d9d9; display: flex; align-items: center; padding: 0 20px 0 8px; position: fixed; top: 0; left: 0; right: 0; z-index: 200; }
+.g-hd-r { margin-left: auto; display: flex; align-items: center; gap: 6px; font-size: 14px; color: #3b3f4c; }
+.plan-badge { background: #416bff; color: #fff; font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 4px; }
+.hd-div { width: 1px; height: 14px; background: #d9d9d9; margin: 0 4px; }
+.credit-wrap { display: flex; align-items: center; gap: 4px; padding: 4px 10px; background: #f6f7f9; border-radius: 6px; font-size: 13px; font-weight: 600; color: #3b3f4c; }
+.user-btn { display: inline-flex; align-items: center; justify-content: center; gap: 4px; padding: 4px 10px; border: 1px solid #d9d9d9; border-radius: 6px; background: #fff; font-size: 13px; color: #3b3f4c; cursor: pointer; line-height: 1; }
+
+/* ── 사이드바 ── */
+.icon-sb { width: 56px; background: #fff; border-right: 1px solid #d9d9d9; position: fixed; top: 56px; bottom: 0; left: 0; display: flex; flex-direction: column; padding: 8px 0; z-index: 150; transition: width .2s ease; }
+.icon-sb.expanded { width: 200px; }
+.si { height: 40px; display: flex; align-items: center; border-radius: 8px; color: #6d7381; cursor: pointer; margin-bottom: 2px; position: relative; padding: 0 4px 0 16px; gap: 10px; white-space: nowrap; flex-shrink: 0; }
+.si:hover { background: #f1f3f5; }
+.si.active { background: #e9f2ff; color: #416bff; }
+.si-icon { width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.si-label { font-size: 13px; font-weight: 500; opacity: 0; transition: opacity .1s; overflow: hidden; }
+.icon-sb.expanded .si-label { opacity: 1; }
+.si-tip { position: absolute; left: 48px; top: 50%; transform: translateY(-50%); background: #222631; color: #fff; font-size: 11px; padding: 3px 8px; border-radius: 4px; white-space: nowrap; display: none; z-index: 300; pointer-events: none; }
+.si:hover .si-tip { display: block; }
+.icon-sb.expanded .si-tip { display: none !important; }
+.nav-bottom { margin-top: auto; width: 100%; }
+.nav-div { height: 1px; background: #f1f3f5; margin: 4px 0; }
+body.nav-expanded .main-shell { margin-left: 200px; transition: margin-left .2s ease; }
+
+/* ── 메인 ── */
+.main-shell { margin-left: 56px; margin-top: 56px; min-height: calc(100vh - 56px); }
+.main { max-width: 960px; margin: 0 auto; padding: 32px 48px 48px; }
+
+.back-link { display: inline-flex; align-items: center; gap: 4px; font-size: 14px; color: #6d7381; text-decoration: none; margin-bottom: 12px; cursor: pointer; }
+.back-link:hover { color: #416bff; }
+
+.page-title { font-size: 24px; font-weight: 600; color: #222631; margin-bottom: 6px; line-height: 1.3; }
+.page-sub { font-size: 14px; color: #6d7381; margin-bottom: 24px; line-height: 1.55; }
+
+.card { background: #fff; border: 1px solid #d9d9d9; border-radius: 12px; padding: 28px 32px; margin-bottom: 16px; }
+.card:last-of-type { margin-bottom: 0; }
+
+.section-hd { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 14px; gap: 12px; }
+.section-title { font-size: 18px; font-weight: 600; color: #222631; line-height: 1.4; }
+.section-sub { font-size: 13px; color: #6d7381; margin-top: 4px; line-height: 1.4; }
+
+/* 접기 가능한 카드 */
+.collapse-toggle { cursor: pointer; user-select: none; align-items: center; margin-bottom: 0; }
+.collapse-toggle:hover .section-title { color: #416bff; }
+.collapse-caret { width: 20px; height: 20px; color: #6d7381; transition: transform .2s; flex-shrink: 0; }
+#existingCard.open .collapse-caret { transform: rotate(180deg); }
+#existingCard.open .collapse-toggle { margin-bottom: 14px; }
+.collapse-body { display: none; }
+#existingCard.open .collapse-body { display: block; }
+
+/* 업로드 단계 */
+.upload-step { margin-bottom: 24px; }
+.upload-step:last-child { margin-bottom: 0; }
+.upload-step-title { font-size: 15px; font-weight: 600; color: #222631; margin-bottom: 6px; display: flex; align-items: center; gap: 8px; }
+.upload-step-num { display: inline-flex; align-items: center; justify-content: center; width: 22px; height: 22px; border-radius: 50%; background: #eff3ff; color: #416bff; font-size: 12px; font-weight: 700; }
+.upload-step-desc { font-size: 13px; color: #6d7381; margin-bottom: 12px; line-height: 1.55; }
+
+.btn-block { display: flex; align-items: center; justify-content: center; gap: 6px; width: 100%; padding: 14px; border-radius: 8px; font-size: 14px; font-weight: 600; font-family: inherit; cursor: pointer; line-height: 1; border: 1px solid #d9d9d9; background: #fff; color: #3b3f4c; transition: all .15s; }
+.btn-block:hover { border-color: #416bff; color: #416bff; }
+.btn-block.primary { border-color: #416bff; color: #416bff; }
+.btn-block.primary:hover { background: #f4f8ff; }
+
+.dropzone { border: 2px dashed #c7cbd3; border-radius: 10px; padding: 36px 20px; text-align: center; background: #fafbfc; cursor: pointer; transition: all .15s; }
+.dropzone:hover { border-color: #416bff; background: #f4f8ff; }
+.dropzone.drag { border-color: #416bff; background: #eff3ff; }
+.dropzone-icon { width: 44px; height: 44px; border-radius: 50%; background: #fff; border: 1px solid #e5e7eb; display: inline-flex; align-items: center; justify-content: center; color: #6d7381; margin-bottom: 12px; }
+.dropzone-msg { font-size: 14px; font-weight: 500; color: #3b3f4c; margin-bottom: 4px; }
+.dropzone-sub { font-size: 13px; color: #6d7381; }
+.dropzone-link { color: #416bff; font-weight: 600; text-decoration: underline; cursor: pointer; }
+
+.file-chip { display: flex; align-items: center; gap: 10px; padding: 12px 14px; border: 1px solid #d9d9d9; border-radius: 8px; font-size: 14px; color: #3b3f4c; }
+.file-chip-icon { width: 32px; height: 32px; border-radius: 6px; background: #eff3ff; color: #416bff; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.file-chip-info { flex: 1; min-width: 0; }
+.file-chip-name { font-size: 14px; font-weight: 500; color: #222631; line-height: 1.3; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.file-chip-meta { font-size: 12px; color: #6d7381; line-height: 1.4; margin-top: 2px; }
+.file-chip-x { background: none; border: none; color: #6d7381; cursor: pointer; padding: 6px; display: flex; border-radius: 4px; }
+.file-chip-x:hover { background: #f1f3f5; color: #f2525f; }
+
+.template-cols { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; }
+.template-col-chip { font-size: 12px; padding: 4px 10px; background: #f1f3f5; color: #3b3f4c; border-radius: 12px; line-height: 1.4; }
+.template-col-chip.opt { background: #fff; border: 1px dashed #d9d9d9; color: #6d7381; }
+.template-col-chip.dyn { background: #eff3ff; color: #365eef; }
+
+/* 결과/현재 테이블 */
+.result-section { margin-top: 0; }
+.result-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; flex-wrap: wrap; gap: 10px; }
+.result-title { font-size: 15px; font-weight: 600; color: #222631; }
+.result-count { font-size: 13px; color: #6d7381; margin-top: 2px; }
+
+.diff-summary { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 10px; }
+.diff-pill { display: inline-flex; align-items: center; gap: 5px; padding: 5px 11px; border-radius: 14px; font-size: 12px; font-weight: 600; line-height: 1.4; }
+.diff-pill.add { background: #eff3ff; color: #365eef; }
+.diff-pill.changed { background: #fffbeb; color: #b45309; }
+.diff-pill.same { background: #f1f3f5; color: #6d7381; }
+
+.result-table-wrap { border: 1px solid #e5e7eb; border-radius: 8px; overflow-x: auto; overflow-y: hidden; }
+.result-table { border-collapse: separate; border-spacing: 0; font-size: 14px; min-width: 100%; }
+.result-table th { background: #f9fafb; padding: 10px 14px; text-align: center; font-weight: 600; color: #6d7381; font-size: 13px; border-bottom: 1px solid #e5e7eb; }
+.result-table td { padding: 12px 14px; text-align: center; border-bottom: 1px solid #f1f3f5; color: #3b3f4c; vertical-align: middle; background: #fff; }
+.result-table tbody tr { cursor: pointer; }
+.result-table tbody tr:last-child td { border-bottom: none; }
+.result-table tbody tr:hover td { background: #fafbfc; }
+
+/* 좌측 sticky 컬럼 (학번 / 이름 / 응답한 문항) */
+.col-sticky { position: sticky; background: #fff; z-index: 1; }
+.result-table th.col-sticky { background: #f9fafb; z-index: 2; }
+.result-table tbody tr:hover td.col-sticky { background: #fafbfc; }
+.col-sid { left: 0; min-width: 64px; width: 64px; }
+.col-name { left: 64px; min-width: 76px; width: 76px; }
+.col-cnt { left: 140px; min-width: 60px; width: 60px; box-shadow: 1px 0 0 #e5e7eb; }
+.result-table th.col-cnt { box-shadow: 1px 0 0 #e5e7eb; }
+.result-table th.col-sid, .result-table td.col-sid { padding-left: 10px; padding-right: 4px; }
+.result-table th.col-name, .result-table td.col-name { padding-left: 4px; padding-right: 4px; }
+.result-table th.col-cnt, .result-table td.col-cnt { padding-left: 4px; padding-right: 10px; }
+
+.col-q { min-width: 240px; width: 240px; }
+.col-q-th { cursor: help; }
+
+.kw-trunc { display: block; max-width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.q-cell-empty { color: #b3b6bd; }
+
+.footer-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 24px; }
+.btn-cancel-lg { padding: 12px 22px; border: 1px solid #d9d9d9; border-radius: 6px; background: #fff; color: #3b3f4c; font-size: 14px; font-weight: 500; font-family: inherit; cursor: pointer; line-height: 1; }
+.btn-cancel-lg:hover { background: #f6f7f9; }
+.btn-save-lg { padding: 12px 28px; border: none; border-radius: 6px; background: #416bff; color: #fff; font-size: 14px; font-weight: 600; font-family: inherit; cursor: pointer; line-height: 1; }
+.btn-save-lg:hover { background: #365eef; }
+.btn-save-lg:disabled { background: #dde1e8; color: #b3b6bd; cursor: not-allowed; }
+
+/* 모달 공통 */
+.modal-bg { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 500; align-items: center; justify-content: center; padding: 24px; }
+.modal-bg.show { display: flex; }
+.modal { background: #fff; border-radius: 12px; width: 480px; max-width: 100%; max-height: calc(100vh - 48px); display: flex; flex-direction: column; box-shadow: 0 4px 16px rgba(0,0,0,.16); overflow: hidden; position: relative; }
+.modal.lg { width: 640px; }
+.modal-hd { padding: 22px 24px 12px; }
+.modal-title { font-size: 18px; font-weight: 600; color: #222631; line-height: 1.4; }
+.modal-sub { font-size: 13px; color: #6d7381; line-height: 1.55; margin-top: 4px; }
+.modal-body { padding: 8px 24px 16px; overflow-y: auto; flex: 1; }
+.modal-ft { padding: 14px 24px 20px; display: flex; justify-content: flex-end; gap: 8px; border-top: 1px solid #f1f3f5; }
+.modal-x { background: none; border: none; cursor: pointer; color: #6d7381; padding: 4px; display: flex; position: absolute; top: 18px; right: 18px; border-radius: 4px; z-index: 1; }
+.modal-x:hover { background: #f1f3f5; }
+
+.modal-warn { display: flex; gap: 10px; padding: 14px 16px; background: #fff7ed; border: 1px solid #fed7aa; border-radius: 8px; font-size: 13px; color: #9a3412; line-height: 1.55; }
+.modal-warn-ic { color: #c2410c; flex-shrink: 0; margin-top: 1px; }
+
+.modal-summary { display: flex; align-items: center; gap: 14px; padding: 14px 16px; background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px; margin-top: 12px; }
+.modal-summary-block { flex: 1; }
+.modal-summary-label { font-size: 12px; color: #6d7381; margin-bottom: 4px; }
+.modal-summary-value { font-size: 16px; font-weight: 600; color: #222631; }
+.modal-summary-arrow { color: #b3b6bd; }
+
+.btn-modal-cancel { padding: 9px 18px; border: 1px solid #d9d9d9; border-radius: 6px; background: #fff; color: #3b3f4c; font-size: 14px; font-weight: 500; font-family: inherit; cursor: pointer; line-height: 1; }
+.btn-modal-cancel:hover { background: #f6f7f9; }
+.btn-modal-confirm { padding: 9px 18px; border: none; border-radius: 6px; background: #416bff; color: #fff; font-size: 14px; font-weight: 600; font-family: inherit; cursor: pointer; line-height: 1; }
+.btn-modal-confirm:hover { background: #365eef; }
+.btn-modal-confirm.warning { background: #f97316; }
+.btn-modal-confirm.warning:hover { background: #ea580c; }
+
+/* 응답 상세 모달 */
+.qa-row { padding: 14px 0; border-bottom: 1px solid #f1f3f5; }
+.qa-row:last-child { border-bottom: none; }
+.qa-q { font-size: 13px; font-weight: 600; color: #6d7381; margin-bottom: 6px; line-height: 1.5; }
+.qa-a { font-size: 14px; color: #222631; line-height: 1.6; white-space: pre-wrap; word-break: break-word; }
+.qa-empty { color: #b3b6bd; font-style: italic; }
+.qa-stu-meta { font-size: 13px; color: #6d7381; margin-top: 4px; }
+
+/* 목업 토글 */
+.mockup-toggle { position: fixed; bottom: 24px; right: 24px; background: #222631; color: #fff; border-radius: 24px; padding: 5px; display: inline-flex; align-items: center; gap: 2px; box-shadow: 0 8px 24px rgba(0,0,0,.2); z-index: 550; font-family: inherit; }
+.mt-label { padding: 4px 12px; color: #b3b6bd; font-size: 11px; font-weight: 700; letter-spacing: .05em; }
+.mt-btn { padding: 7px 14px; border: none; background: none; color: #b3b6bd; font-size: 13px; font-weight: 500; cursor: pointer; font-family: inherit; border-radius: 18px; line-height: 1; transition: all .15s; }
+.mt-btn:hover { color: #fff; }
+.mt-btn.active { background: #416bff; color: #fff; }
+
+/* 토스트 */
+.toast { position: fixed; bottom: 32px; left: 50%; transform: translateX(-50%) translateY(20px); background: #222631; color: #fff; padding: 12px 20px; border-radius: 8px; font-size: 14px; display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 4px 16px rgba(0,0,0,.2); opacity: 0; transition: opacity .2s, transform .2s; z-index: 600; pointer-events: none; line-height: 1; }
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+.toast-ic { display: inline-flex; align-items: center; justify-content: center; color: #1ab864; }
+</style>
+</head>
+<body>
+
+<header class="g-hd">
+  <button onclick="toggleNav()" style="width:36px;height:36px;border:none;background:none;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#3b3f4c;margin-right:8px">
+    <i data-lucide="menu" style="width:20px;height:20px"></i>
+  </button>
+  <svg width="76" height="16" viewBox="0 0 76 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M11.3613 4.03516H4.09668V11.9629H8.88281L8.88086 11.9648H15.6016V16H4.02539C1.80242 15.9998 0 14.223 0 12.0322V3.96777C0 1.77696 1.80242 0.000177874 4.02539 0H15.4561L11.3613 4.03516ZM22.0703 11.9648H33.5781V16H22.002C19.7788 16 17.9756 14.2231 17.9756 12.0322V0H22.0703V11.9648ZM40.0459 16H35.9521V0H40.0459V16ZM54.5381 0C56.4564 0 58.0138 1.53228 58.0186 3.42285L58.0166 3.4248V8.54297C58.014 10.4333 56.4567 11.9648 54.5361 11.9648H46.5107L42.416 16V0H54.5381ZM71.9746 0C74.0086 0.000134956 75.6887 1.49046 75.958 3.42285H76V12.5771H75.958C75.6887 14.5095 74.011 15.9999 71.9746 16H64.4238C62.3897 16 60.7098 14.5096 60.4404 12.5771C60.4145 12.398 60.3984 12.2184 60.3984 12.0322V3.96777C60.3984 3.78159 60.4145 3.60205 60.4404 3.42285C60.7098 1.49037 62.3873 0 64.4238 0H71.9746ZM64.4922 12.5771H71.9062V3.42285H64.4922V12.5771ZM46.5107 3.42285V8.54004H53.9238V3.42285H46.5107Z" fill="#365EEF"/>
+  </svg>
+  <div class="g-hd-r">
+    <span class="plan-badge">개인 유료</span>
+    <span style="font-size:13px;color:#6d7381">D-1710</span>
+    <div class="hd-div"></div>
+    <i data-lucide="bot" style="width:16px;height:16px;color:#416bff"></i>
+    <div class="credit-wrap">AI 크레딧 700</div>
+    <div class="hd-div"></div>
+    <button class="user-btn">test99 선생님(담임) <i data-lucide="chevron-down" style="width:14px;height:14px"></i></button>
+  </div>
+</header>
+
+<nav class="icon-sb" id="icon-sb">
+  <div class="si"><div class="si-icon"><i data-lucide="home" style="width:20px;height:20px"></i></div><span class="si-label">홈</span><span class="si-tip">홈</span></div>
+  <div class="si"><div class="si-icon"><i data-lucide="scissors" style="width:20px;height:20px"></i></div><span class="si-label">평가계획</span><span class="si-tip">평가계획</span></div>
+  <div class="si"><div class="si-icon"><i data-lucide="layout-grid" style="width:20px;height:20px"></i></div><span class="si-label">수업</span><span class="si-tip">수업</span></div>
+  <div class="si active"><div class="si-icon"><i data-lucide="notebook-pen" style="width:20px;height:20px"></i></div><span class="si-label">창의적 체험활동 <span style="font-size:10px;background:#416bff;color:#fff;padding:1px 5px;border-radius:3px;margin-left:2px">Beta</span></span><span class="si-tip">창의적 체험활동</span></div>
+  <div class="si"><div class="si-icon"><i data-lucide="zap" style="width:20px;height:20px"></i></div><span class="si-label">세특 간편 생성기</span><span class="si-tip">세특 간편 생성기</span></div>
+  <div class="si"><div class="si-icon"><i data-lucide="smile" style="width:20px;height:20px"></i></div><span class="si-label">행동특성 및 종합기록</span><span class="si-tip">행동특성 및 종합기록 지원</span></div>
+  <div class="si"><div class="si-icon"><i data-lucide="bar-chart-2" style="width:20px;height:20px"></i></div><span class="si-label">리포트</span><span class="si-tip">리포트</span></div>
+  <div class="si"><div class="si-icon"><i data-lucide="building-2" style="width:20px;height:20px"></i></div><span class="si-label">학교 설정</span><span class="si-tip">학교 설정</span></div>
+  <div class="nav-bottom">
+    <div class="nav-div"></div>
+    <div class="si"><div class="si-icon"><i data-lucide="file-down" style="width:20px;height:20px"></i></div><span class="si-label">매뉴얼 다운로드</span><span class="si-tip">매뉴얼 다운로드</span></div>
+    <div class="si"><div class="si-icon"><i data-lucide="credit-card" style="width:20px;height:20px"></i></div><span class="si-label">요금제</span><span class="si-tip">요금제</span></div>
+    <div class="si"><div class="si-icon"><i data-lucide="help-circle" style="width:20px;height:20px"></i></div><span class="si-label">고객센터</span><span class="si-tip">고객센터</span></div>
+  </div>
+</nav>
+
+<div class="main-shell">
+<main class="main">
+
+  <a class="back-link" onclick="goBack()">
+    <i data-lucide="chevron-left" style="width:14px;height:14px"></i> 이전으로
+  </a>
+
+  <h1 class="page-title">학생 설문 응답 등록 : <span id="pt-cls">2학년 1반</span></h1>
+  <p class="page-sub">학생들이 제출한 설문 응답을 엑셀로 일괄 등록할 수 있어요. 등록한 응답은 AI 분석 시 학생 활동 자료로 반영됩니다.</p>
+
+  <!-- ─── 현재 등록된 데이터 (재진입 시) ─── -->
+  <div class="card" id="existingCard" style="display:none">
+    <div class="section-hd collapse-toggle" onclick="toggleExisting()">
+      <div>
+        <div class="section-title">현재 등록된 설문 응답</div>
+        <div class="section-sub" id="existingMeta">8명 · 4문항 · 마지막 업로드 5월 8일</div>
+      </div>
+      <i data-lucide="chevron-down" class="collapse-caret"></i>
+    </div>
+    <div class="collapse-body">
+      <div class="result-table-wrap">
+        <table class="result-table">
+          <thead><tr id="existingHead"></tr></thead>
+          <tbody id="existingRows"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── 업로드 카드 ─── -->
+  <div class="card">
+    <div class="section-hd">
+      <div>
+        <div class="section-title" id="uploadSectionTitle">엑셀 파일 업로드</div>
+      </div>
+    </div>
+
+    <div class="upload-step">
+      <div class="upload-step-title"><span class="upload-step-num">1</span> 엑셀 양식 다운로드</div>
+      <div class="upload-step-desc">
+        아래 컬럼 구성으로 양식을 받아 학생 응답을 입력해 주세요. 문항 컬럼은 필요한 만큼 추가할 수 있어요.
+        <div class="template-cols">
+          <span class="template-col-chip">학년</span>
+          <span class="template-col-chip">반</span>
+          <span class="template-col-chip">번호</span>
+          <span class="template-col-chip">이름</span>
+          <span class="template-col-chip dyn">문항 1</span>
+          <span class="template-col-chip dyn">문항 2</span>
+          <span class="template-col-chip dyn">…</span>
+          <span class="template-col-chip dyn">문항 N</span>
+        </div>
+      </div>
+      <button class="btn-block primary" onclick="downloadTemplate()">
+        <i data-lucide="download" style="width:16px;height:16px"></i> 엑셀 양식 다운로드
+      </button>
+    </div>
+
+    <div class="upload-step">
+      <div class="upload-step-title"><span class="upload-step-num">2</span> 엑셀 파일 업로드</div>
+      <div class="upload-step-desc" id="step2Desc">작성한 엑셀을 업로드해 주세요. 학번이 일치하는 학생에게 응답이 등록됩니다.</div>
+
+      <div id="uploadEmpty">
+        <div class="dropzone" id="dropzone" onclick="onFilePicked()">
+          <div class="dropzone-icon"><i data-lucide="upload-cloud" style="width:24px;height:24px"></i></div>
+          <div class="dropzone-msg">파일을 끌어다 놓거나 <span class="dropzone-link">클릭해서 업로드</span></div>
+          <div class="dropzone-sub">.xlsx 파일만 가능 · 최대 10MB</div>
+        </div>
+      </div>
+
+      <div id="uploadFilled" style="display:none">
+        <div class="file-chip">
+          <div class="file-chip-icon"><i data-lucide="file-spreadsheet" style="width:18px;height:18px"></i></div>
+          <div class="file-chip-info">
+            <div class="file-chip-name" id="fileName">자율_설문응답_2학년1반.xlsx</div>
+            <div class="file-chip-meta" id="fileMeta">28KB · 방금 업로드</div>
+          </div>
+          <button class="file-chip-x" onclick="clearUpload()" title="업로드 취소"><i data-lucide="x" style="width:16px;height:16px"></i></button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 결과 -->
+    <div class="result-section" id="resultSection" style="display:none; margin-top:28px">
+      <div class="result-head">
+        <div>
+          <div class="result-title">적용 결과 미리보기</div>
+          <div class="result-count" id="resultCount">0명 · 0문항</div>
+        </div>
+      </div>
+      <div class="result-table-wrap">
+        <table class="result-table">
+          <thead><tr id="resultHead"></tr></thead>
+          <tbody id="resultRows"></tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="footer-actions">
+    <button class="btn-cancel-lg" onclick="goBack()">취소</button>
+    <button class="btn-save-lg" id="saveBtn" onclick="saveAndBack()" disabled>저장</button>
+  </div>
+
+</main>
+</div>
+
+<!-- ─── 교체 확인 다이얼로그 (재등록 시) ─── -->
+<div class="modal-bg" id="confirmModal">
+  <div class="modal">
+    <div class="modal-hd">
+      <div class="modal-title">기존 응답을 새 파일로 교체할까요?</div>
+      <div class="modal-sub">새 파일에 포함된 학생만 응답이 교체되고, 새 파일에 없는 학생의 기존 응답은 그대로 유지됩니다.</div>
+    </div>
+    <button class="modal-x" onclick="closeConfirmModal()"><i data-lucide="x" style="width:18px;height:18px"></i></button>
+    <div class="modal-body">
+      <div class="modal-warn">
+        <span class="modal-warn-ic"><i data-lucide="alert-triangle" style="width:16px;height:16px"></i></span>
+        <span>설문 응답은 <strong>누적이 아닌 교체</strong>입니다. 같은 학생의 기존 응답은 새 파일 응답으로 덮어씌워져요.</span>
+      </div>
+      <div class="modal-summary">
+        <div class="modal-summary-block">
+          <div class="modal-summary-label">기존</div>
+          <div class="modal-summary-value" id="confirmOld">8명 · 4문항</div>
+        </div>
+        <div class="modal-summary-arrow"><i data-lucide="arrow-right" style="width:18px;height:18px"></i></div>
+        <div class="modal-summary-block">
+          <div class="modal-summary-label">새 파일</div>
+          <div class="modal-summary-value" id="confirmNew">8명 · 4문항</div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-ft">
+      <button class="btn-modal-cancel" onclick="closeConfirmModal()">취소</button>
+      <button class="btn-modal-confirm warning" onclick="confirmReplace()"><i data-lucide="refresh-ccw" style="width:14px;height:14px"></i> 교체</button>
+    </div>
+  </div>
+</div>
+
+<!-- ─── 응답 상세 모달 ─── -->
+<div class="modal-bg" id="qaModal">
+  <div class="modal lg">
+    <div class="modal-hd">
+      <div class="modal-title" id="qaTitle">학생 응답 상세</div>
+      <div class="modal-sub qa-stu-meta" id="qaMeta">학번 · 이름</div>
+    </div>
+    <button class="modal-x" onclick="closeQaModal()"><i data-lucide="x" style="width:18px;height:18px"></i></button>
+    <div class="modal-body" id="qaBody"></div>
+    <div class="modal-ft">
+      <button class="btn-modal-confirm" onclick="closeQaModal()">닫기</button>
+    </div>
+  </div>
+</div>
+
+<!-- 목업 시나리오 토글 -->
+<div class="mockup-toggle" id="mockup-toggle">
+  <span class="mt-label">MOCKUP</span>
+  <button class="mt-btn" data-scenario="first" onclick="applyScenario('first')">최초 등록</button>
+  <button class="mt-btn" data-scenario="reentry" onclick="applyScenario('reentry')">재등록</button>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const _params = new URLSearchParams(location.search);
+const ACTIVITY_TYPE = _params.get('type') || '자율활동';
+const CLS = _params.get('cls') || '2학년 1반';
+let HAS_EXISTING = _params.get('has') === '1' || localStorage.getItem('clipo_survey_' + CLS) === '1';
+document.getElementById('pt-cls').textContent = CLS;
+
+// 설문 문항 (기존 + 새 파일 동일 가정 — 실제론 다를 수 있음)
+const SURVEY_QUESTIONS = [
+  '이번 학기 가장 인상 깊었던 자율활동은 무엇이었나요?',
+  '학급 자치 활동에서 본인이 맡은 역할과 그 경험을 적어주세요.',
+  '학기 동안 가장 성장했다고 느낀 점은 무엇인가요?',
+  '다음 학기에 도전해보고 싶은 활동이 있다면?'
+];
+
+// 기존 등록 응답 (재진입 mock)
+const EXISTING_ROWS = [
+  { sid:'20101', name:'김민수', answers:[
+    '학급 봉사활동 시간에 친구들과 협력하여 청소 구역을 정리한 것이 기억에 남습니다.',
+    '학급 회의 진행을 맡았고, 자유롭게 의견을 낼 수 있도록 분위기를 만들려고 노력했습니다.',
+    '친구들의 의견을 끝까지 듣고 종합하는 능력이 늘었다고 느꼈습니다.',
+    '독서 동아리에 참여해 책에 대한 다양한 시각을 나눠보고 싶습니다.'
+  ]},
+  { sid:'20102', name:'박서연', answers:[
+    '진로 탐색 시간에 직업 인터뷰를 준비한 것이 가장 인상 깊었어요.',
+    '환경 캠페인 부스 운영을 담당했습니다. 팀원들과 역할을 나누는 게 어려웠습니다.',
+    '꾸준히 끝까지 해내는 끈기가 늘었다고 생각합니다.',
+    ''
+  ]},
+  { sid:'20103', name:'이지호', answers:[
+    '학급 체육대회 응원 준비를 함께한 시간이 좋았습니다.',
+    '응원단장을 맡아 안무를 정리하고 친구들에게 알려주는 역할을 했어요.',
+    '리더로서 의견을 모으는 법을 배웠습니다.',
+    '봉사활동 동아리에 참여해 보고 싶습니다.'
+  ]},
+  { sid:'20104', name:'정유진', answers:[
+    '기후 환경 캠페인 활동이 가장 의미있었습니다.',
+    '캠페인 디자인을 맡아 포스터를 직접 제작했어요.',
+    '책임감을 갖고 끝까지 일을 마무리하는 자세가 길러졌어요.',
+    '학생자치회 임원에 도전해 보고 싶어요.'
+  ]},
+  { sid:'20105', name:'최도윤', answers:['','','','']},
+  { sid:'20106', name:'한지우', answers:[
+    '진로 멘토링 시간이 인상적이었습니다.',
+    '소그룹 토론 진행을 맡아서 팀원 의견을 정리했어요.',
+    '경청하는 자세가 좋아졌습니다.',
+    ''
+  ]},
+  { sid:'20107', name:'오서윤', answers:['','','','']},
+  { sid:'20108', name:'조하늘', answers:[
+    '학급 봉사활동에서 도서 정리를 함께 한 것이 인상적이었어요.',
+    '도서관 보조 역할을 맡았어요.',
+    '꼼꼼히 일을 정리하는 습관을 길렀어요.',
+    '글쓰기 동아리에 도전해 보고 싶어요.'
+  ]}
+];
+
+// 새 업로드 (재진입 시 머지 대상)
+const NEW_UPLOAD_ROWS = [
+  { sid:'20101', name:'김민수', answers:[
+    '학급 봉사활동에서 친구들과 협력해 청소 구역을 정리한 것 + 후배들에게 동아리 소개한 시간이 인상 깊었습니다.',
+    '학급 회의 진행을 맡았고, 의견 정리 어려운 순간도 있었지만 결론에 도달했을 때 뿌듯했습니다.',
+    '친구들 의견을 듣고 종합하는 능력이 늘었습니다.',
+    '독서 동아리 + 진로 동아리 참여를 고민 중입니다.'
+  ]},
+  { sid:'20105', name:'최도윤', answers:[
+    '음악 발표회 준비를 도운 시간이 가장 좋았습니다.',
+    '무대 음향을 담당했고, 친구들과 협업이 즐거웠어요.',
+    '협업할 때 차분하게 의견 조율하는 법을 배웠어요.',
+    '오케스트라 동아리에 도전해 보고 싶어요.'
+  ]},
+  { sid:'20109', name:'강하늘', answers:[
+    '과학 탐구 활동에서 직접 실험을 설계한 시간이 인상적이었어요.',
+    '실험 보조와 기록 담당을 맡았어요.',
+    '관찰을 꼼꼼히 기록하는 습관을 길렀어요.',
+    '과학 영재반에 도전해 보고 싶어요.'
+  ]}
+];
+
+const FIRST_TIME_ROWS = JSON.parse(JSON.stringify(EXISTING_ROWS));
+
+// 상태
+let mergedRows = [];
+
+function toggleNav() {
+  document.getElementById('icon-sb').classList.toggle('expanded');
+  document.body.classList.toggle('nav-expanded');
+}
+
+let toastTimer = null;
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.innerHTML = `<span class="toast-ic"><i data-lucide="check-circle" style="width:16px;height:16px"></i></span>${msg}`;
+  t.classList.add('show');
+  lucide.createIcons();
+  if (toastTimer) clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 2400);
+}
+
+function downloadTemplate() {
+  showToast('양식 파일을 다운로드했어요');
+}
+
+function answeredCount(answers) { return answers.filter(a => a && a.trim()).length; }
+
+function buildHeadRow() {
+  const fixed = `
+    <th class="col-sticky col-sid">학번</th>
+    <th class="col-sticky col-name">이름</th>
+    <th class="col-sticky col-cnt">응답수</th>`;
+  const qs = SURVEY_QUESTIONS.map((q, i) =>
+    `<th class="col-q col-q-th" title="${escapeAttr(q)}">문항 ${i+1}</th>`
+  ).join('');
+  return fixed + qs;
+}
+
+function buildBodyRow(r, onclickAttr) {
+  const cnt = answeredCount(r.answers);
+  const fixed = `
+    <td class="col-sticky col-sid">${r.sid}</td>
+    <td class="col-sticky col-name">${r.name}</td>
+    <td class="col-sticky col-cnt">${cnt}/${SURVEY_QUESTIONS.length}</td>`;
+  const qs = SURVEY_QUESTIONS.map((q, i) => {
+    const a = r.answers[i] || '';
+    return a
+      ? `<td class="col-q"><span class="kw-trunc" title="${escapeAttr(a)}">${escapeHtml(a)}</span></td>`
+      : `<td class="col-q q-cell-empty">—</td>`;
+  }).join('');
+  return `<tr ${onclickAttr || ''}>${fixed}${qs}</tr>`;
+}
+
+function init() {
+  const card = document.getElementById('existingCard');
+  if (HAS_EXISTING) {
+    card.style.display = '';
+    card.classList.remove('open');
+    document.getElementById('uploadSectionTitle').textContent = '새 파일로 교체';
+    document.getElementById('step2Desc').textContent = '새 엑셀을 업로드하면 기존 응답을 어떻게 처리할지 확인해드려요.';
+    renderExisting();
+  } else {
+    card.style.display = 'none';
+    document.getElementById('uploadSectionTitle').textContent = '엑셀 파일 업로드';
+    document.getElementById('step2Desc').textContent = '작성한 엑셀을 업로드해 주세요. 학번이 일치하는 학생에게 응답이 등록됩니다.';
+  }
+  document.querySelectorAll('.mt-btn').forEach(b => b.classList.toggle('active', b.dataset.scenario === (HAS_EXISTING ? 'reentry' : 'first')));
+  lucide.createIcons();
+}
+
+function applyScenario(scenario) {
+  HAS_EXISTING = (scenario === 'reentry');
+  document.getElementById('uploadEmpty').style.display = '';
+  document.getElementById('uploadFilled').style.display = 'none';
+  document.getElementById('resultSection').style.display = 'none';
+  document.getElementById('saveBtn').disabled = true;
+  closeConfirmModal();
+  closeQaModal();
+  mergedRows = [];
+  init();
+}
+
+function toggleExisting() {
+  document.getElementById('existingCard').classList.toggle('open');
+}
+
+function renderExisting() {
+  document.getElementById('existingHead').innerHTML = buildHeadRow();
+  document.getElementById('existingRows').innerHTML = EXISTING_ROWS.map((r, i) =>
+    buildBodyRow(r, `onclick="openQaModal('existing', ${i})"`)
+  ).join('');
+  document.getElementById('existingMeta').textContent = `${EXISTING_ROWS.length}명 · ${SURVEY_QUESTIONS.length}문항 · 마지막 업로드 5월 8일`;
+}
+
+function onFilePicked() {
+  document.getElementById('uploadEmpty').style.display = 'none';
+  document.getElementById('uploadFilled').style.display = '';
+  if (HAS_EXISTING) {
+    // 교체 확인 다이얼로그
+    document.getElementById('confirmOld').textContent = `${EXISTING_ROWS.length}명 · ${SURVEY_QUESTIONS.length}문항`;
+    document.getElementById('confirmNew').textContent = `${NEW_UPLOAD_ROWS.length}명 · ${SURVEY_QUESTIONS.length}문항`;
+    document.getElementById('confirmModal').classList.add('show');
+    lucide.createIcons();
+  } else {
+    mergedRows = FIRST_TIME_ROWS.map(r => ({...r, answers: [...r.answers]}));
+    renderResult();
+  }
+  lucide.createIcons();
+}
+
+function clearUpload() {
+  document.getElementById('uploadEmpty').style.display = '';
+  document.getElementById('uploadFilled').style.display = 'none';
+  document.getElementById('resultSection').style.display = 'none';
+  document.getElementById('saveBtn').disabled = true;
+  mergedRows = [];
+  lucide.createIcons();
+}
+
+function closeConfirmModal() {
+  document.getElementById('confirmModal').classList.remove('show');
+}
+
+function confirmReplace() {
+  closeConfirmModal();
+  applyMerge();
+  renderResult();
+}
+
+function applyMerge() {
+  // replace 로직: new 파일에 있는 학생만 응답 교체, 없는 학생은 그대로
+  const map = new Map(EXISTING_ROWS.map(r => [r.sid, JSON.parse(JSON.stringify(r))]));
+  NEW_UPLOAD_ROWS.forEach(nr => {
+    map.set(nr.sid, {...nr, answers: [...nr.answers]});
+  });
+  mergedRows = [...map.values()].sort((a,b) => a.sid.localeCompare(b.sid));
+}
+
+function renderResult() {
+  document.getElementById('resultHead').innerHTML = buildHeadRow();
+  document.getElementById('resultRows').innerHTML = mergedRows.map((r, i) =>
+    buildBodyRow(r, `onclick="openQaModal('result', ${i})"`)
+  ).join('');
+
+  document.getElementById('resultCount').textContent = `${mergedRows.length}명 · ${SURVEY_QUESTIONS.length}문항`;
+  document.getElementById('resultSection').style.display = '';
+  document.getElementById('saveBtn').disabled = false;
+  lucide.createIcons();
+}
+
+// ── 응답 상세 모달 ──
+function openQaModal(source, idx) {
+  const row = source === 'existing' ? EXISTING_ROWS[idx] : mergedRows[idx];
+  if (!row) return;
+  document.getElementById('qaTitle').textContent = row.name + ' 학생 설문 응답';
+  document.getElementById('qaMeta').textContent = `${row.sid} · ${ACTIVITY_TYPE} · ${CLS}`;
+  document.getElementById('qaBody').innerHTML = SURVEY_QUESTIONS.map((q, i) => {
+    const a = row.answers[i] || '';
+    return `<div class="qa-row">
+      <div class="qa-q">문항 ${i+1}. ${escapeHtml(q)}</div>
+      <div class="qa-a${a ? '' : ' qa-empty'}">${a ? escapeHtml(a) : '응답 없음'}</div>
+    </div>`;
+  }).join('');
+  document.getElementById('qaModal').classList.add('show');
+  lucide.createIcons();
+}
+
+function closeQaModal() {
+  document.getElementById('qaModal').classList.remove('show');
+}
+
+function escapeHtml(s) { return String(s).replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c])); }
+function escapeAttr(s) { return String(s).replace(/"/g, '&quot;'); }
+
+// 네비게이션
+function goBack() {
+  const params = new URLSearchParams({ type: ACTIVITY_TYPE, cls: CLS });
+  location.href = 'creative_activity_input_v1_260507.html?' + params.toString();
+}
+
+function saveAndBack() {
+  localStorage.setItem('clipo_survey_' + CLS, '1');
+  showToast(`${mergedRows.length}명의 설문 응답을 ${HAS_EXISTING ? '교체' : '등록'}했어요`);
+  setTimeout(() => {
+    const params = new URLSearchParams({ type: ACTIVITY_TYPE, cls: CLS, demo: '1' });
+    location.href = 'creative_activity_input_v1_260507.html?' + params.toString();
+  }, 700);
+}
+
+// drag & drop
+const dz = document.getElementById('dropzone');
+['dragenter','dragover'].forEach(ev => dz.addEventListener(ev, e => { e.preventDefault(); dz.classList.add('drag'); }));
+['dragleave','drop'].forEach(ev => dz.addEventListener(ev, e => { e.preventDefault(); dz.classList.remove('drag'); }));
+dz.addEventListener('drop', e => onFilePicked());
+
+init();
+lucide.createIcons();
+</script>
+
+</body>
+</html>
