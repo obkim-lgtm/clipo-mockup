@@ -274,7 +274,7 @@ body.nav-expanded .stu-sb{left:200px;transition:left .2s ease}
 <aside class="stu-sb">
   <div class="ss-hd">
     <span class="ss-total" id="ss-total-label">전체 0명</span>
-    <button onclick="ACTIVITY_TYPE==='동아리활동' ? location.href='dong_register_v2_260402.html' : openAddStudent()" style="display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border:1px solid #d9d9d9;border-radius:6px;background:#fff;color:#3b3f4c;font-size:12px;font-weight:500;font-family:inherit;cursor:pointer;white-space:nowrap" id="btn-student-manage">
+    <button onclick="goStudentManage()" style="display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border:1px solid #d9d9d9;border-radius:6px;background:#fff;color:#3b3f4c;font-size:12px;font-weight:500;font-family:inherit;cursor:pointer;white-space:nowrap" id="btn-student-manage">
       <i data-lucide="user-plus" style="width:13px;height:13px" id="btn-student-icon"></i> <span id="btn-student-label">학생 추가</span>
     </button>
   </div>
@@ -1291,11 +1291,37 @@ const ACTIVITY_TYPE = '동아리활동';
 document.querySelector('.sub-bc strong').textContent = '동아리활동 · 과학탐구부';
 document.getElementById('btn-student-label').textContent = '학생 관리';
 document.getElementById('btn-student-icon').setAttribute('data-lucide', 'users');
+
+// URL ?dong=동아리명 → localStorage에서 학생 데이터 로드
+const _dongName = _params.get('dong');
+function goStudentManage() {
+  location.href = 'dong_student_manage_v1_260507.html?dong=' + encodeURIComponent(_dongName || '과학탐구부');
+}
+if (_dongName) {
+  document.querySelector('.sub-bc strong').textContent = '동아리활동 · ' + _dongName;
+}
+let _localId = 1;
+try {
+  const _store = JSON.parse(localStorage.getItem('clipo_dong_students') || '{}');
+  const _data = _store[_dongName || '과학탐구부'];
+  if (_data && _data.classes) {
+    Object.keys(_data.classes).forEach(cname => {
+      _data.classes[cname].forEach(s => {
+        STUDENTS.push({id:_localId++,num:s.n,sid:s.sid,name:s.name,done:false,reachedTab:1,lastTab:1,files:[],manualTags:[],selectedTraitIdxs:[],draft:''});
+      });
+    });
+  }
+} catch(e) {}
+
 const _regRaw = sessionStorage.getItem('dong_registered_students');
 if (_regRaw) {
   const _regList = JSON.parse(_regRaw);
   sessionStorage.removeItem('dong_registered_students');
   _regList.forEach(s => STUDENTS.push({id:s.id,num:s.num,sid:s.sid,name:s.name,done:false,reachedTab:1,lastTab:1,files:[],manualTags:[],selectedTraitIdxs:[],draft:''}));
+  renderSidebar();
+  selectStudent(STUDENTS[0].id);
+} else if (STUDENTS.length > 0) {
+  // localStorage에서 로드된 학생들
   renderSidebar();
   selectStudent(STUDENTS[0].id);
 } else {
@@ -1313,6 +1339,7 @@ document.getElementById('ss-list').innerHTML =
 document.getElementById('empty-state').style.display = 'flex';
 document.getElementById('student-area').style.display = 'none';
 }
+
 lucide.createIcons();
 </script>
 </body>

@@ -1340,7 +1340,7 @@ if(ACTIVITY_TYPE === '동아리활동') {
   document.getElementById('btn-student-icon').setAttribute('data-lucide', 'users');
 }
 function showOb(){document.getElementById('ob-overlay').classList.add('show');lucide.createIcons();}
-function closeOb(){document.getElementById('ob-overlay').classList.remove('show');}
+function closeOb(){document.getElementById('ob-overlay').classList.remove('show');try{localStorage.setItem('clipo_creative_onboarding_seen','1');}catch(e){}}
 function pickMode(m){
   closeOb();
   if(m==='bulk'){ location.href='creative_activity_bulk_v5_260408.html'; }
@@ -1348,6 +1348,7 @@ function pickMode(m){
 }
 function finishOb(choice){closeOb();if(choice==='no'){const cur=STUDENTS.find(x=>x.id===curStudentId);if(cur){cur.reachedTab=Math.max(cur.reachedTab||1,2);cur.lastTab=2;cur.selectedTraitIdxs=[];cur.manualTags=[];}selectedTraits=new Set();manualTags=[];reachedTab=Math.max(reachedTab,2);goTab(2,true);try{renderTraitList();}catch(e){}showToast('활동 특성을 직접 입력해 보세요');}else{showToast('활동지를 업로드하면 AI가 특성을 추출해요');}}
 function maybeShowOb(){
+  try { if (localStorage.getItem('clipo_creative_onboarding_seen') === '1') return; } catch(e) {}
   if(!STUDENTS||STUDENTS.length===0) return;
   const hasAny = STUDENTS.some(s => s.done || (s.draft&&s.draft.trim()) || (s.files&&s.files.length) || (s.manualTags&&s.manualTags.length) || (s.selectedTraitIdxs&&s.selectedTraitIdxs.length));
   if(hasAny) return;
