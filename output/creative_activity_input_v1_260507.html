@@ -354,7 +354,8 @@ body.nav-expanded .sticky-cta{left:200px;transition:left .2s ease}
 .s3-table th:last-child, .s3-table td:last-child{padding-right:20px}
 
 .s3-col-sid{width:80px}
-.s3-col-name{width:90px}
+.s3-col-name{width:108px}
+.s3-stu-name{display:inline-flex;align-items:center;font-size:14px;font-weight:600;color:#222631;line-height:1.4;margin-bottom:8px}
 .s3-col-level{width:60px;text-align:center}
 .s3-col-kw{width:200px}
 .s3-col-bring{width:64px;padding:0!important;vertical-align:middle!important}
@@ -390,8 +391,6 @@ body.nav-expanded .sticky-cta{left:200px;transition:left .2s ease}
 
 /* dirty indicator */
 .dirty-dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:#f97316;margin-left:5px;vertical-align:middle;flex-shrink:0}
-.s3-name-btn{background:none;border:none;font-family:inherit;font-size:14px;font-weight:600;color:#416bff;cursor:pointer;padding:0;display:inline-flex;align-items:center;line-height:1.4;text-decoration:underline;text-decoration-style:dotted;text-decoration-color:#a1b8ff;text-underline-offset:3px}
-.s3-name-btn:hover{color:#365eef;text-decoration-style:solid;text-decoration-color:#365eef}
 .s3-mini-btn.ai.attention{border-color:#f97316;color:#c2410c;background:#fff7ed}
 .s3-mini-btn.ai.attention:hover{background:#ffedd5}
 
@@ -571,6 +570,7 @@ body.nav-expanded .sticky-cta{left:200px;transition:left .2s ease}
 .s2-group-cnt{font-size:12px;color:#6d7381;font-variant-numeric:tabular-nums}
 .s2-group-toggle{margin-left:auto;background:none;border:none;color:#6d7381;cursor:pointer;font-size:13px;font-family:inherit;display:inline-flex;align-items:center;gap:3px;padding:4px 8px;border-radius:6px;line-height:1}
 .s2-group-toggle:hover{background:#f1f3f5;color:#3b3f4c}
+.s2-kw-box{margin:0 4px 8px;padding:14px 18px;background:#fff;border:1px solid #e5e7eb;border-radius:12px;font-size:14px;color:#222631;line-height:1.6}
 
 .s2-item.candidate{background:#fafbfc;border-color:#f1f3f5}
 .s2-item.candidate .s2-item-content{color:#6d7381}
@@ -684,8 +684,8 @@ body.nav-expanded .sticky-cta{left:200px;transition:left .2s ease}
             <th class="col-sid">학번</th>
             <th class="col-name">이름</th>
             <th class="col-files">자료 수</th>
-            <th class="col-kw">키워드</th>
-            <th class="col-level">성적</th>
+            <th class="col-kw">특성 키워드</th>
+            <th class="col-level">활동 수준</th>
             <th class="col-action">관리</th>
           </tr>
         </thead>
@@ -742,7 +742,7 @@ body.nav-expanded .sticky-cta{left:200px;transition:left .2s ease}
             <tr>
               <th class="s3-col-sid">학번</th>
               <th class="s3-col-name">이름</th>
-              <th class="s3-col-level">수준</th>
+              <th class="s3-col-level">활동 수준</th>
               <th class="s3-col-ai">AI 생성 기록</th>
               <th class="s3-col-bring"></th>
               <th class="s3-col-edit">기록 편집</th>
@@ -795,15 +795,15 @@ body.nav-expanded .sticky-cta{left:200px;transition:left .2s ease}
         <div id="md-files" style="margin-top:8px"></div>
       </div>
       <div class="dp-section">
-        <div class="dp-label">키워드 <span class="hint">활동 자료에서 자동 추출되지만 직접 추가도 가능해요</span></div>
-        <textarea class="kw-textarea" id="md-kw-text" maxlength="500" oninput="updateKwCount();autoResizeKw()" onblur="commitKeywords()" placeholder="키워드를 콤마(,)로 구분해 자유롭게 입력하세요"></textarea>
+        <div class="dp-label">특성 키워드 <span class="hint">활동 자료에서 자동 추출되지만 직접 추가도 가능해요</span></div>
+        <textarea class="kw-textarea" id="md-kw-text" maxlength="500" oninput="updateKwCount();autoResizeKw()" onblur="commitKeywords()" placeholder="특성 키워드를 콤마(,)로 구분해 자유롭게 입력하세요"></textarea>
         <div class="kw-foot">
           <span class="kw-hint">콤마(,)로 구분해 여러 개 입력</span>
           <span class="kw-count" id="md-kw-count">0 / 500</span>
         </div>
       </div>
       <div class="dp-section" style="margin-bottom:0">
-        <div class="dp-label">성적 수준 <span class="hint">선택사항 — 미선택 시 미고려</span></div>
+        <div class="dp-label">활동 수준</div>
         <div class="level-chips" id="md-level-chips">
           <button class="level-chip" data-level="high" onclick="setLevel('high')">상</button>
           <button class="level-chip" data-level="mid" onclick="setLevel('mid')">중</button>
@@ -928,8 +928,8 @@ body.nav-expanded .sticky-cta{left:200px;transition:left .2s ease}
         </button>
         <button class="reg-card" onclick="pickRegisterType('keyword')">
           <div class="rc-icon"><i data-lucide="pencil" style="width:22px;height:22px"></i></div>
-          <div class="rc-title">학생 관찰 키워드 (EXCEL)</div>
-          <div class="rc-desc">평소 학생을 관찰하며 기록한 메모를 키워드로 일괄 등록</div>
+          <div class="rc-title">학생 관찰 특성 키워드 (EXCEL)</div>
+          <div class="rc-desc">평소 학생을 관찰하며 기록한 메모를 특성 키워드로 일괄 등록</div>
           <div class="rc-match">
             <i data-lucide="link" style="width:14px;height:14px"></i>
             <span>양식을 다운받아 작성 후 업로드</span>
@@ -968,8 +968,8 @@ body.nav-expanded .sticky-cta{left:200px;transition:left .2s ease}
       <button class="modal-x" onclick="closeDrawer()"><i data-lucide="x" style="width:18px;height:18px"></i></button>
     </div>
     <div class="drawer-tabs">
-      <button class="dr-tab active" data-tab="data" onclick="switchDrawerTab('data')">자료·키워드</button>
-      <button class="dr-tab" data-tab="items" onclick="switchDrawerTab('items')">추천 항목 <span class="dr-tab-cnt" id="dr-items-cnt">0/0</span></button>
+      <button class="dr-tab active" data-tab="data" onclick="switchDrawerTab('data')">학생 자료 입력</button>
+      <button class="dr-tab" data-tab="items" onclick="switchDrawerTab('items')">콘텐츠 요소 선택 <span class="dr-tab-cnt" id="dr-items-cnt">0/0</span></button>
     </div>
     <div class="drawer-banner" id="dr-banner" style="display:none">
       <div class="dr-banner-icon"><i data-lucide="alert-circle" style="width:18px;height:18px"></i></div>
@@ -1041,11 +1041,41 @@ body.nav-expanded .sticky-cta{left:200px;transition:left .2s ease}
   </div>
 </div>
 
+<!-- ── 전체 AI 분석 모달 (학생 선택) ── -->
+<div class="modal-bg" id="modal-analyze">
+  <div class="modal">
+    <div class="modal-hd">
+      <div>
+        <div class="modal-title" id="modal-analyze-title">전체 AI 분석</div>
+        <div class="modal-sub">분석할 학생을 선택해 주세요. 활동 자료가 등록된 학생만 분석할 수 있어요.</div>
+      </div>
+      <button class="modal-x" onclick="closeModal('modal-analyze')"><i data-lucide="x" style="width:18px;height:18px"></i></button>
+    </div>
+    <div class="modal-body">
+      <div class="stu-pick-section">
+        <div class="stu-pick-head">
+          <span class="stu-pick-title">학생 선택</span>
+          <span class="stu-pick-count" id="analyze-stu-pick-count">0/0명</span>
+        </div>
+        <label class="stu-pick-master">
+          <input type="checkbox" id="analyze-stu-pick-all" onchange="toggleAllAnalyzeStuPick(this.checked)">
+          <span>전체 선택</span>
+        </label>
+        <div class="stu-pick-list" id="analyze-stu-pick-list"></div>
+      </div>
+    </div>
+    <div class="modal-ft">
+      <button class="btn-secondary" onclick="closeModal('modal-analyze')">취소</button>
+      <button class="btn-primary" id="analyze-confirm-btn" onclick="confirmAnalyze()"><i data-lucide="sparkles" style="width:14px;height:14px"></i> 분석 시작</button>
+    </div>
+  </div>
+</div>
+
 <!-- ── 목업 시나리오 토글 (개발용) ── -->
 <div class="mockup-toggle" id="mockup-toggle">
   <span class="mt-label">MOCKUP</span>
   <button class="mt-btn" data-scenario="empty" onclick="applyScenario('empty')">빈 화면</button>
-  <button class="mt-btn" data-scenario="keywords-only" onclick="applyScenario('keywords-only')">키워드만</button>
+  <button class="mt-btn" data-scenario="keywords-only" onclick="applyScenario('keywords-only')">특성 키워드만</button>
   <button class="mt-btn" data-scenario="data" onclick="applyScenario('data')">자료 있음</button>
 </div>
 
@@ -1191,8 +1221,6 @@ STUDENTS.forEach(s => {
   s._dirtyLevel = null;
 });
 
-// 데모 자동 세팅 함수는 STEP2_DEFAULT_ITEMS / S3_MOCK_TEXTS 선언 이후 정의됨
-
 // 설문 응답 mock (가상 항목 클릭 시 표시)
 const SURVEY_MOCK = [
   {q:'이번 학기 가장 인상 깊었던 자율활동은 무엇이었나요?', a:'학급 봉사활동 시간에 친구들과 협력하여 청소 구역을 정리한 것이 기억에 남습니다. 처음에는 귀찮다고 생각했지만, 점차 우리 반을 깨끗하게 만든다는 보람을 느꼈습니다.'},
@@ -1276,26 +1304,6 @@ const STEP2_DEFAULT_ITEMS = [
 const STEP2_DATA = {};
 
 // 데모 자동 세팅: 자료/키워드 있는 학생은 step 2 분석 완료 + step 3 기록 생성된 것으로
-function autoPopulateForDemo(){
-  STUDENTS.forEach((s, i) => {
-    const hasData = s.files.length > 0 || s.keywords.length > 0;
-    if(!hasData) return;
-    const s2 = s.s2 || (s.s2 = {status:'idle', selectedIds:new Set(), customs:[]});
-    if(s2.status !== 'done'){
-      s2.status = 'done';
-      const data = STEP2_DATA[s.sid] || {items: STEP2_DEFAULT_ITEMS};
-      s2.selectedIds = new Set(data.items.filter(it=>it.source_origin==='stage1_recommended').map(it=>it.id));
-    }
-    const s3 = s.s3 || (s.s3 = {aiText:'', editText:'', generatedAt:null});
-    if(!s3.aiText){
-      s3.aiText = S3_MOCK_TEXTS[i % S3_MOCK_TEXTS.length];
-      s3.editText = s3.aiText;
-      s3.generatedAt = Date.now();
-    }
-  });
-}
-autoPopulateForDemo();
-
 // ───── 유틸 ─────
 function $(id){return document.getElementById(id)}
 function avatar(name){return name.charAt(0)}
@@ -1310,7 +1318,7 @@ function summaryText(s){
   if(s.files.length===0 && s.keywords.length===0) return '아직 입력된 자료가 없습니다';
   const parts = [];
   if(s.files.length) parts.push(s.files.length+'건 자료');
-  if(s.keywords.length) parts.push('키워드 '+s.keywords.length+'개');
+  if(s.keywords.length) parts.push('특성 키워드 '+s.keywords.length+'개');
   // 더 자세한 요약
   if(s.files.length){
     const types = new Set(s.files.map(f=>{
@@ -1335,7 +1343,7 @@ function srcBadgesHtml(s){
   s.files.forEach(f=>{ if(f.source==='bulk')set.add('bulk'); if(f.source==='individual')set.add('individual'); });
   s.keywords.forEach(k=>{ if(k.source==='bulk')set.add('bulk'); if(k.source==='individual')set.add('individual'); if(k.source==='keyword')set.add('keyword'); });
   if(set.size===0) return '<span class="src-empty">— 자료 없음</span>';
-  const labels = {bulk:'일괄', individual:'개별', keyword:'키워드'};
+  const labels = {bulk:'일괄', individual:'개별', keyword:'특성 키워드'};
   return Array.from(set).map(k=>'<span class="src-badge '+k+'">'+labels[k]+'</span>').join('');
 }
 
@@ -1396,14 +1404,16 @@ function openDetail(id){
 function closeDetailWithCheck(){
   closeModal('modal-detail');
   const s = STUDENTS.find(x=>x.id===curDetailId);
-  // 이번 모달 세션에서 변경이 발생했고, 이미 AI 기록이 있으면 재생성 권유
+  // Step 1은 자료 관리 단계 — 재생성 프롬프트 없이 dirty만 마킹 (Step 3에서 재생성 유도)
   if(s && s._editChanged && s.s3 && s.s3.aiText){
-    pendingDirtyId = s.id;
-    setTimeout(()=>{
-      $('dc-name').textContent = s.name;
-      $('modal-dirty-confirm').classList.add('show');
-      lucide.createIcons();
-    }, 200);
+    s.dirty = true;
+    s._editChanged = false;
+    const active = document.querySelector('.step-btn.active');
+    if(active){
+      const n = +active.id.split('-')[1];
+      if(n === 3) renderStep3();
+      else if(n === 2){ renderS2Sidebar(); renderS2Main(); refreshS2Cta(); }
+    }
   } else if(s) {
     s._editChanged = false;
   }
@@ -1569,8 +1579,8 @@ function renderDrawerBanner(s){
       btn: '저장 후 다시 분석'
     },
     kw: {
-      title: '키워드가 변경됐어요',
-      desc: '저장하고 바뀐 키워드로 추천 항목을 다시 분석할게요. 결과 검토 후 기록을 재생성하세요.',
+      title: '특성 키워드가 변경됐어요',
+      desc: '저장하고 바뀐 특성 키워드로 추천 항목을 다시 분석할게요. 결과 검토 후 기록을 재생성하세요.',
       btn: '저장 후 다시 분석'
     },
     items: {
@@ -1661,15 +1671,15 @@ function renderDrawerDataPane(s){
       <div id="dr-files" style="margin-top:8px">${filesHtml}</div>
     </div>
     <div class="dp-section">
-      <div class="dp-label">키워드 <span class="hint">활동 자료에서 자동 추출되지만 직접 추가도 가능해요</span></div>
-      <textarea class="kw-textarea" id="dr-kw-text" maxlength="500" oninput="updateDrKwCount();autoResizeDrKw()" onblur="commitDrawerKeywords()" placeholder="키워드를 콤마(,)로 구분해 자유롭게 입력하세요">${s.keywords.map(k=>k.text).join(', ')}</textarea>
+      <div class="dp-label">특성 키워드 <span class="hint">활동 자료에서 자동 추출되지만 직접 추가도 가능해요</span></div>
+      <textarea class="kw-textarea" id="dr-kw-text" maxlength="500" oninput="updateDrKwCount();autoResizeDrKw()" onblur="commitDrawerKeywords()" placeholder="특성 키워드를 콤마(,)로 구분해 자유롭게 입력하세요">${s.keywords.map(k=>k.text).join(', ')}</textarea>
       <div class="kw-foot">
         <span class="kw-hint">콤마(,)로 구분해 여러 개 입력</span>
         <span class="kw-count" id="dr-kw-count">0 / 500</span>
       </div>
     </div>
     <div class="dp-section" style="margin-bottom:0">
-      <div class="dp-label">성적 수준 <span class="hint">선택사항 — 미선택 시 미고려</span></div>
+      <div class="dp-label">활동 수준</div>
       <div class="level-chips" id="dr-level-chips">
         <button class="level-chip ${lev==='high'?'active':''}" data-level="high" onclick="setDrawerLevel('high')">상</button>
         <button class="level-chip ${lev==='mid'?'active':''}" data-level="mid" onclick="setDrawerLevel('mid')">중</button>
@@ -1722,7 +1732,7 @@ function renderDrawerItemsPane(s){
       <div class="s2-state-card">
         <div class="s2-state-icon" style="background:#f1f3f5;color:#6d7381"><i data-lucide="inbox" style="width:24px;height:24px"></i></div>
         <div class="s2-state-title">분석할 자료가 없어요</div>
-        <div class="s2-state-desc">먼저 자료·키워드 탭에서 자료를 추가해 주세요.</div>
+        <div class="s2-state-desc">먼저 학생 자료 입력 탭에서 자료를 추가해 주세요.</div>
       </div>`;
     return;
   }
@@ -1754,10 +1764,14 @@ function renderDrawerItemsPane(s){
   const candHtml = candItems.map(it=>renderS2ItemCard(s.id, it)).join('');
   const customHtml = s2.customs.map((c,i)=>renderS2CustomCard(s.id, c, i)).join('');
   $('dr-pane-items').innerHTML = `
-    <div class="s2-group-hd"><span class="s2-group-title">추천 항목</span><span class="s2-group-cnt">${recItems.length}개</span></div>
+    ${s.keywords.length ? `
+      <div class="s2-group-hd"><span class="s2-group-title">특성 키워드</span></div>
+      <div class="s2-kw-box">${s.keywords.map(k=>k.text).join(', ')}</div>
+    ` : ''}
+    <div class="s2-group-hd"><span class="s2-group-title">콘텐츠 요소 (추천)</span><span class="s2-group-cnt">${recItems.length}개</span></div>
     ${recHtml}
     ${candItems.length ? `
-      <div class="s2-group-hd"><span class="s2-group-title">추가 후보</span><span class="s2-group-cnt">${candItems.length}개</span></div>
+      <div class="s2-group-hd"><span class="s2-group-title">콘텐츠 요소 (추가 후보)</span><span class="s2-group-cnt">${candItems.length}개</span></div>
       <div style="display:flex;flex-direction:column;gap:8px">${candHtml}</div>
     ` : ''}
     <div class="s2-group-hd"><span class="s2-group-title">직접 추가</span><span class="s2-group-cnt">${s2.customs.length}개</span></div>
@@ -1974,6 +1988,8 @@ function goStep(n){
   $('cta-prev').disabled = n===1;
   if(n<3) $('cta-next').innerHTML = '다음 단계 <i data-lucide="arrow-right" style="width:14px;height:14px"></i>';
   else $('cta-next').innerHTML = '<i data-lucide="check" style="width:14px;height:14px"></i> 저장';
+  const stuBtn = $('btn-student-manage');
+  if(stuBtn) stuBtn.style.display = (n===1) ? '' : 'none';
   if(n===2) renderStep2();
   if(n===3) renderStep3();
   if(n===1) refreshProgress();
@@ -2053,7 +2069,7 @@ function renderS3Row(s){
   } else {
     const hasData = s.files.length>0 || s.keywords.length>0;
     aiCell = `<div class="s3-ai-box">
-      <div class="s3-text empty">${hasData ? '기록 생성 버튼을 눌러주세요.' : '키워드나 자료를 입력해주시면 AI 기록 생성이 됩니다.'}</div>
+      <div class="s3-text empty">${hasData ? '기록 생성 버튼을 눌러주세요.' : '특성 키워드나 자료를 입력해주시면 AI 기록 생성이 됩니다.'}</div>
       <div class="s3-cell-foot">
         <span class="s3-byte">0 Byte</span>
         ${hasData
@@ -2077,7 +2093,10 @@ function renderS3Row(s){
   const dirtyDot = s.dirty ? '<span class="dirty-dot" title="자료 변경됨 · 재생성 권장"></span>' : '';
   return `<tr ${s.dirty?'class="s3-row-dirty"':''}>
     <td class="s3-col-sid s3-cell-sid">${s.sid}</td>
-    <td class="s3-col-name"><button class="s3-name-btn" onclick="openDrawer(${s.id})">${s.name}${dirtyDot}</button></td>
+    <td class="s3-col-name">
+      <div class="s3-stu-name">${s.name}${dirtyDot}</div>
+      <button class="s3-mini-btn" onclick="openDrawer(${s.id})"><i data-lucide="edit-3" style="width:12px;height:12px"></i> 자료 수정</button>
+    </td>
     <td class="s3-col-level s3-cell-level">${levelLabel(s.level)}</td>
     <td class="s3-col-ai">${aiCell}</td>
     <td class="s3-col-bring"><button class="s3-bring-btn" onclick="bringToEdit(${s.id})" ${s3.aiText?'':'disabled'}><i data-lucide="arrow-right" style="width:14px;height:14px"></i><span>가져오기</span></button></td>
@@ -2112,7 +2131,7 @@ function populateStuPick(){
       <span class="stu-pick-name">${s.name}</span>
       ${tag}
     </label>`;
-  }).join('') || '<div style="padding:24px;text-align:center;color:#b3b6bd;font-size:13px">자료나 키워드가 등록된 학생이 없어요</div>';
+  }).join('') || '<div style="padding:24px;text-align:center;color:#b3b6bd;font-size:13px">자료나 특성 키워드가 등록된 학생이 없어요</div>';
   updateStuPickCount();
 }
 
@@ -2262,7 +2281,7 @@ function renderS2Sidebar(){
     const isActive = s.id === s2CurStudentId;
     let status = '';
     if(stState === 'empty') status = `<span class="s2-stu-status empty">자료없음</span>`;
-    else if(stState === 'keywords-only') status = `<span class="s2-stu-status idle">키워드만</span>`;
+    else if(stState === 'keywords-only') status = `<span class="s2-stu-status idle">특성 키워드만</span>`;
     else if(s2.status==='idle') status = `<span class="s2-stu-status idle">미분석</span>`;
     else if(s2.status==='analyzing') status = `<span class="s2-stu-status analyzing">분석중</span>`;
     else if(s2.status==='done'){
@@ -2288,7 +2307,7 @@ function renderS2Main(){
   const s = STUDENTS.find(x=>x.id===s2CurStudentId);
   if(!s){ $('s2-main').innerHTML=''; return; }
   const s2 = getS2(s);
-  const summary = `자료 ${s.files.length}건 · 키워드 ${s.keywords.length ? '기재' : '미기재'}${s.level?` · 성적 ${ {high:'상',mid:'중',low:'하'}[s.level]||'-'}`:''}`;
+  const summary = `자료 ${s.files.length}건 · 특성 키워드 ${s.keywords.length ? '기재' : '미기재'}${s.level?` · 활동 수준 ${ {high:'상',mid:'중',low:'하'}[s.level]||'-'}`:''}`;
   const stuHd = `<div class="s2-stu-hd">
     <div class="s2-stu-hd-info">
       <div class="s2-stu-hd-name-wrap">
@@ -2311,11 +2330,11 @@ function renderS2Main(){
   } else if(stState === 'keywords-only'){
     body = `<div class="s2-state-card">
       <div class="s2-state-icon" style="background:#f1f3f5;color:#6d7381"><i data-lucide="pencil" style="width:24px;height:24px"></i></div>
-      <div class="s2-state-title">키워드만 입력되어 있어요</div>
-      <div class="s2-state-desc">활동 자료가 없으면 AI 분석이 불필요합니다.<br>다음 단계에서 키워드를 기반으로 기록 초안이 생성됩니다.</div>
+      <div class="s2-state-title">특성 키워드만 입력되어 있어요</div>
+      <div class="s2-state-desc">활동 자료가 없으면 AI 분석이 불필요합니다.<br>다음 단계에서 특성 키워드를 기반으로 기록 초안이 생성됩니다.</div>
       <div class="s2-state-summary">
-        <div class="s2-state-summary-row"><strong>키워드</strong> ${s.keywords.length}개${s.keywords.length?` (${s.keywords.slice(0,5).map(k=>k.text).join(', ')}${s.keywords.length>5?' 외':''})`:''}</div>
-        ${s.level?`<div class="s2-state-summary-row"><strong>성적</strong> ${ {high:'상',mid:'중',low:'하'}[s.level]}</div>`:''}
+        <div class="s2-state-summary-row"><strong>특성 키워드</strong> ${s.keywords.length}개${s.keywords.length?` (${s.keywords.slice(0,5).map(k=>k.text).join(', ')}${s.keywords.length>5?' 외':''})`:''}</div>
+        ${s.level?`<div class="s2-state-summary-row"><strong>활동 수준</strong> ${ {high:'상',mid:'중',low:'하'}[s.level]}</div>`:''}
       </div>
     </div>`;
   } else if(s2.status==='idle'){
@@ -2326,8 +2345,8 @@ function renderS2Main(){
       <div class="s2-state-desc">AI가 입력된 자료를 분석해 기록에 들어갈 콘텐츠 요소를 추출합니다.</div>
       <div class="s2-state-summary">
         <div class="s2-state-summary-row"><strong>자료</strong> ${s.files.length}건</div>
-        <div class="s2-state-summary-row"><strong>키워드</strong> <span class="s2-summary-trunc" title="${kwText}">${kwText}</span></div>
-        ${s.level?`<div class="s2-state-summary-row"><strong>성적</strong> ${ {high:'상',mid:'중',low:'하'}[s.level]}</div>`:''}
+        <div class="s2-state-summary-row"><strong>특성 키워드</strong> <span class="s2-summary-trunc" title="${kwText}">${kwText}</span></div>
+        ${s.level?`<div class="s2-state-summary-row"><strong>활동 수준</strong> ${ {high:'상',mid:'중',low:'하'}[s.level]}</div>`:''}
       </div>
       <div><button class="btn-secondary-lg" onclick="startAnalyze(${s.id})"><i data-lucide="sparkles" style="width:16px;height:16px"></i> 개별 분석 시작</button></div>
     </div>`;
@@ -2353,14 +2372,20 @@ function renderS2Done(s){
   const customHtml = s2.customs.map((c,i)=>renderS2CustomCard(s.id, c, i)).join('');
 
   return `
+    ${s.keywords.length ? `
+      <div class="s2-group-hd">
+        <span class="s2-group-title">특성 키워드</span>
+      </div>
+      <div class="s2-kw-box">${s.keywords.map(k=>k.text).join(', ')}</div>
+    ` : ''}
     <div class="s2-group-hd">
-      <span class="s2-group-title">추천 항목</span>
+      <span class="s2-group-title">콘텐츠 요소 (추천)</span>
       <span class="s2-group-cnt">${recItems.length}개</span>
     </div>
     ${recHtml}
     ${candItems.length ? `
       <div class="s2-group-hd">
-        <span class="s2-group-title">추가 후보</span>
+        <span class="s2-group-title">콘텐츠 요소 (추가 후보)</span>
         <span class="s2-group-cnt">${candItems.length}개</span>
         <button class="s2-group-toggle" onclick="toggleCandidates()"><span>${getS2(s).candidatesCollapsed?'펼치기':'접기'}</span> <i data-lucide="${getS2(s).candidatesCollapsed?'chevron-down':'chevron-up'}" style="width:14px;height:14px"></i></button>
       </div>
@@ -2508,13 +2533,12 @@ function applyScenario(scenario){
     s.dirty = false;
     s._dirtyLevel = null;
   });
-  autoPopulateForDemo();
   s2CurStudentId = null;
   s3LastSaved = null;
   refreshAll();
   const active = document.querySelector('.step-btn.active');
   if(active && active.id === 'step-2') renderStep2();
-  const labels = {data:'자료 있음', 'keywords-only':'키워드만', empty:'빈 화면'};
+  const labels = {data:'자료 있음', 'keywords-only':'특성 키워드만', empty:'빈 화면'};
   showToast(`'${labels[scenario]}' 시나리오로 전환`);
 }
 function detectInitialScenario(){
@@ -2523,10 +2547,83 @@ function detectInitialScenario(){
   return hasFiles ? 'data' : (hasKw ? 'keywords-only' : 'empty');
 }
 function rerunAI(){
-  // 헤더의 [전체 분석 시작] / [전체 재분석]
+  // 헤더의 [전체 분석 시작] / [전체 재분석] → 학생 선택 모달
+  openAnalyzeModal();
+}
+
+let pendingAnalyzeMode = 'start'; // 'start' | 'rerun'
+function openAnalyzeModal(){
   const someDone = STUDENTS.some(s => getS2(s).status === 'done');
-  if(someDone) reanalyzeAll();
-  else startAnalyzeAll();
+  pendingAnalyzeMode = someDone ? 'rerun' : 'start';
+  const titleEl = document.getElementById('modal-analyze-title');
+  const btnEl = document.getElementById('analyze-confirm-btn');
+  if(pendingAnalyzeMode === 'rerun'){
+    titleEl.textContent = '전체 AI 재분석';
+    btnEl.innerHTML = '<i data-lucide="refresh-ccw" style="width:14px;height:14px"></i> 재분석';
+  } else {
+    titleEl.textContent = '전체 AI 분석';
+    btnEl.innerHTML = '<i data-lucide="sparkles" style="width:14px;height:14px"></i> 분석 시작';
+  }
+  populateAnalyzeStuPick();
+  document.getElementById('modal-analyze').classList.add('show');
+  lucide.createIcons();
+}
+
+function populateAnalyzeStuPick(){
+  const eligible = STUDENTS.filter(s2HasFiles);
+  const list = document.getElementById('analyze-stu-pick-list');
+  list.innerHTML = eligible.map(s => {
+    const status = getS2(s).status;
+    let tag = '';
+    if(status === 'done') tag = '<span class="stu-pick-tag exists">분석됨</span>';
+    else if(status === 'analyzing') tag = '<span class="stu-pick-tag">분석 중</span>';
+    return `<label class="stu-pick-row">
+      <input type="checkbox" class="analyze-stu-pick-cb" value="${s.id}" checked onchange="updateAnalyzeStuPickCount()">
+      <span class="stu-pick-sid">${s.sid}</span>
+      <span class="stu-pick-name">${s.name}</span>
+      ${tag}
+    </label>`;
+  }).join('') || '<div style="padding:24px;text-align:center;color:#b3b6bd;font-size:13px">분석할 활동 자료가 등록된 학생이 없어요</div>';
+  updateAnalyzeStuPickCount();
+}
+
+function updateAnalyzeStuPickCount(){
+  const cbs = document.querySelectorAll('.analyze-stu-pick-cb');
+  const checked = document.querySelectorAll('.analyze-stu-pick-cb:checked').length;
+  document.getElementById('analyze-stu-pick-count').textContent = `${checked}/${cbs.length}명`;
+  const master = document.getElementById('analyze-stu-pick-all');
+  master.checked = cbs.length > 0 && checked === cbs.length;
+  master.indeterminate = checked > 0 && checked < cbs.length;
+}
+
+function toggleAllAnalyzeStuPick(checked){
+  document.querySelectorAll('.analyze-stu-pick-cb').forEach(cb => cb.checked = checked);
+  updateAnalyzeStuPickCount();
+}
+
+function confirmAnalyze(){
+  const selectedIds = new Set(Array.from(document.querySelectorAll('.analyze-stu-pick-cb:checked')).map(cb => parseInt(cb.value)));
+  if(selectedIds.size === 0){ showToast('분석할 학생을 선택해 주세요'); return; }
+  closeModal('modal-analyze');
+  // rerun 모드: 선택된 학생을 idle로 리셋
+  if(pendingAnalyzeMode === 'rerun'){
+    STUDENTS.forEach(s => {
+      if(!selectedIds.has(s.id)) return;
+      if(!s2HasFiles(s)) return;
+      const s2 = getS2(s);
+      s2.status = 'idle';
+      s2.selectedIds.clear();
+    });
+    renderS2Sidebar();
+    renderS2Main();
+  }
+  let count = 0;
+  STUDENTS.forEach(s => {
+    if(!selectedIds.has(s.id)) return;
+    if(!s2HasFiles(s)) return;
+    if(getS2(s).status === 'idle'){ startAnalyze(s.id); count++; }
+  });
+  showToast(`${count}명 분석을 시작했어요`);
 }
 function skipStep2(){
   $('step-3').classList.remove('disabled');
@@ -2582,7 +2679,7 @@ function refreshS2Cta(){
     selectedTotal += s2.selectedIds.size + s2.customs.filter(c=>c.content && c.content.trim()).length;
   });
   if(analyzable === 0){
-    $('cta-progress').textContent = '분석할 자료가 없어요 — 키워드 기반으로 다음 단계 진행 가능';
+    $('cta-progress').textContent = '분석할 자료가 없어요 — 특성 키워드 기반으로 다음 단계 진행 가능';
   } else {
     $('cta-progress').textContent = `분석 완료 ${doneCount}/${analyzable}명 · 선택된 항목 ${selectedTotal}개`;
   }
@@ -2632,7 +2729,7 @@ function openRegisterModal(){
 }
 function pickRegisterType(type){
   closeModal('modal-register');
-  const labels = {survey:'학생 설문 응답', activity:'활동지·보고서', keyword:'학생 관찰 키워드'};
+  const labels = {survey:'학생 설문 응답', activity:'활동지·보고서', keyword:'학생 관찰 특성 키워드'};
   showToast(`${labels[type]} 상세 페이지는 다음 단계에서 만듭니다`);
 }
 
