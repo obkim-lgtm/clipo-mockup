@@ -393,6 +393,28 @@ body.nav-expanded .sticky-cta{left:200px;transition:left .2s ease}
 .s3-mini-btn.ai.attention{border-color:#f97316;color:#c2410c;background:#fff7ed}
 .s3-mini-btn.ai.attention:hover{background:#ffedd5}
 
+/* 드로어 (Step 3 학생 상세 작업창) */
+.drawer-bg{display:none;position:fixed;inset:0;background:rgba(34,38,49,.45);z-index:500;justify-content:flex-end}
+.drawer-bg.show{display:flex}
+.drawer{background:#fff;width:560px;max-width:calc(100vw - 40px);height:100%;display:flex;flex-direction:column;box-shadow:-12px 0 40px rgba(0,0,0,.16);animation:drawer-slide .25s ease-out}
+@keyframes drawer-slide{from{transform:translateX(100%)}to{transform:translateX(0)}}
+.drawer-hd{padding:18px 24px;border-bottom:1px solid #f1f3f5;display:flex;align-items:center;gap:12px}
+.drawer-info{flex:1;min-width:0}
+.drawer-name{font-size:18px;font-weight:700;color:#222631;line-height:1.3}
+.drawer-sub{font-size:13px;color:#6d7381;margin-top:3px}
+.drawer-tabs{display:flex;border-bottom:1px solid #e5e7eb;padding:0 24px;flex-shrink:0}
+.dr-tab{display:inline-flex;align-items:center;gap:6px;padding:14px 18px;border:none;background:none;color:#6d7381;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;border-bottom:2px solid transparent;line-height:1;transition:all .15s}
+.dr-tab:hover:not(.active){color:#3b3f4c}
+.dr-tab.active{color:#416bff;border-bottom-color:#416bff}
+.dr-tab-cnt{font-size:11px;background:#f1f3f5;color:#6d7381;padding:2px 7px;border-radius:10px;font-weight:600;line-height:1.4}
+.dr-tab.active .dr-tab-cnt{background:#eff3ff;color:#416bff}
+.drawer-body{flex:1;overflow-y:auto;padding:20px 24px}
+.drawer-banner{display:flex;align-items:center;gap:12px;padding:12px 24px;background:#fffbeb;border-bottom:1px solid #fde68a;flex-shrink:0}
+.dr-banner-icon{color:#c2410c;flex-shrink:0;display:inline-flex}
+.dr-banner-text{flex:1;display:flex;flex-direction:column;gap:1px;color:#92400e;font-size:13px;line-height:1.45;min-width:0}
+.dr-banner-text strong{font-weight:700;color:#7c2d12}
+.drawer-ft{padding:14px 24px;border-top:1px solid #f1f3f5;display:flex;justify-content:flex-end;gap:8px;flex-shrink:0}
+
 /* 분량 선택 모달 */
 .length-opt{display:flex;align-items:center;gap:10px;padding:12px 14px;border:1.5px solid #d9d9d9;border-radius:8px;margin-bottom:8px;cursor:pointer;transition:border-color .15s}
 .length-opt:hover{border-color:#b3b3b3}
@@ -647,7 +669,7 @@ body.nav-expanded .sticky-cta{left:200px;transition:left .2s ease}
         <span class="s2-title">콘텐츠 요소 선택</span>
         <span class="s2-ai-badge"><i data-lucide="sparkles" style="width:12px;height:12px"></i> AI 추천</span>
       </div>
-      <div class="s2-desc">활동 자료를 AI가 분석해 누가기록에 들어갈 콘텐츠 요소를 추출해드려요.</div>
+      <div class="s2-desc">활동 자료를 AI가 분석해 기록에 들어갈 콘텐츠 요소를 추출해드려요.</div>
       <button class="btn-primary" id="s2-rerun-btn" onclick="rerunAI()"><i data-lucide="sparkles" style="width:14px;height:14px"></i> 전체 분석 시작</button>
     </div>
 
@@ -883,6 +905,39 @@ body.nav-expanded .sticky-cta{left:200px;transition:left .2s ease}
   </div>
 </div>
 
+<!-- ── 학생 상세 드로어 (Step 3 전용) ── -->
+<div class="drawer-bg" id="drawer-detail">
+  <div class="drawer">
+    <div class="drawer-hd">
+      <div class="drawer-info">
+        <div class="drawer-name" id="dr-name">학생</div>
+        <div class="drawer-sub" id="dr-sub">—</div>
+      </div>
+      <button class="modal-x" onclick="closeDrawer()"><i data-lucide="x" style="width:18px;height:18px"></i></button>
+    </div>
+    <div class="drawer-tabs">
+      <button class="dr-tab active" data-tab="data" onclick="switchDrawerTab('data')">자료·키워드</button>
+      <button class="dr-tab" data-tab="items" onclick="switchDrawerTab('items')">추천 항목 <span class="dr-tab-cnt" id="dr-items-cnt">0/0</span></button>
+    </div>
+    <div class="drawer-banner" id="dr-banner" style="display:none">
+      <div class="dr-banner-icon"><i data-lucide="alert-circle" style="width:18px;height:18px"></i></div>
+      <div class="dr-banner-text">
+        <strong id="dr-banner-title">변경됐어요</strong>
+        <span id="dr-banner-desc">반영하시겠어요?</span>
+      </div>
+      <button class="btn-ai-outline" id="dr-banner-btn" onclick="cascadeFromDrawer()">반영</button>
+    </div>
+    <div class="drawer-body">
+      <div class="dr-tab-pane" data-tab="data" id="dr-pane-data"></div>
+      <div class="dr-tab-pane" data-tab="items" id="dr-pane-items" style="display:none"></div>
+    </div>
+    <div class="drawer-ft">
+      <button class="btn-secondary" onclick="closeDrawer()">닫기</button>
+      <button class="btn-primary" onclick="saveDrawer()">저장</button>
+    </div>
+  </div>
+</div>
+
 <!-- ── 자료 변경 후 재생성 권유 모달 ── -->
 <div class="modal-bg" id="modal-dirty-confirm">
   <div class="modal">
@@ -932,6 +987,57 @@ body.nav-expanded .sticky-cta{left:200px;transition:left .2s ease}
 
 <!-- 토스트 -->
 <div class="toast" id="toast"></div>
+
+<!-- ── 첫 진입 온보딩 팝업 (기능 안내) ── -->
+<div id="ob-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:900;align-items:center;justify-content:center">
+  <div style="background:#fff;border-radius:12px;width:640px;max-width:calc(100vw - 48px);box-shadow:0 12px 48px rgba(0,0,0,.18);position:relative;overflow:hidden">
+    <button onclick="closeOb()" style="position:absolute;top:14px;right:14px;width:32px;height:32px;border:none;background:none;cursor:pointer;color:#6d7381;display:flex;align-items:center;justify-content:center;border-radius:4px;z-index:2"><i data-lucide="x" style="width:18px;height:18px"></i></button>
+
+    <div style="padding:32px 28px 20px;text-align:center">
+      <div style="width:56px;height:56px;border-radius:50%;background:#e9f2ff;color:#365eef;display:flex;align-items:center;justify-content:center;margin:0 auto 14px"><i data-lucide="sparkles" style="width:26px;height:26px"></i></div>
+      <div style="font-size:20px;font-weight:700;color:#222631;line-height:1.4;margin-bottom:8px">학생 자료를 업로드하면<br>AI가 기록 초안을 만들어드려요</div>
+      <div style="font-size:14px;color:#6d7381;line-height:1.6">학생이 만든 자료(자기평가서·활동지·보고서 등)를 올리면<br>AI가 실제 수행한 내용을 분석해 활동 특성과 기록 초안을 자동 작성해요.</div>
+    </div>
+
+    <div style="padding:0 28px 24px">
+      <div style="display:grid;grid-template-columns:1fr auto 1fr auto 1fr;gap:8px;align-items:stretch">
+        <div class="ob-step">
+          <div class="ob-step-num">1</div>
+          <div class="ob-step-ic"><i data-lucide="upload" style="width:20px;height:20px"></i></div>
+          <div class="ob-step-title">학생 자료 업로드</div>
+          <div class="ob-step-desc">자기평가서·활동지·보고서를 PDF·JPG·PNG로 업로드</div>
+        </div>
+        <div class="ob-arrow"><i data-lucide="chevron-right" style="width:14px;height:14px"></i></div>
+        <div class="ob-step">
+          <div class="ob-step-num">2</div>
+          <div class="ob-step-ic"><i data-lucide="bot" style="width:20px;height:20px"></i></div>
+          <div class="ob-step-title">AI 자동 분석</div>
+          <div class="ob-step-desc">학생이 실제 수행한 내용을 추출해 활동 특성을 제안</div>
+        </div>
+        <div class="ob-arrow"><i data-lucide="chevron-right" style="width:14px;height:14px"></i></div>
+        <div class="ob-step">
+          <div class="ob-step-num">3</div>
+          <div class="ob-step-ic"><i data-lucide="file-text" style="width:20px;height:20px"></i></div>
+          <div class="ob-step-title">기록 초안 생성</div>
+          <div class="ob-step-desc">선택한 특성으로 AI가 기록 초안을 자연스럽게 작성</div>
+        </div>
+      </div>
+    </div>
+
+    <div style="padding:0 28px 24px">
+      <button onclick="startFromOnboarding()" style="width:100%;padding:12px;border:none;border-radius:6px;background:#365eef;color:#fff;font-size:15px;font-weight:600;font-family:inherit;cursor:pointer;line-height:1;display:inline-flex;align-items:center;justify-content:center;gap:6px"><i data-lucide="upload" style="width:14px;height:14px"></i> 자료 등록 시작하기</button>
+    </div>
+  </div>
+</div>
+<style>
+.ob-step{position:relative;padding:18px 12px 14px;background:#f6f7f9;border-radius:10px;text-align:center;display:flex;flex-direction:column;align-items:center}
+.ob-step-num{position:absolute;top:8px;left:10px;width:20px;height:20px;border-radius:50%;background:#365eef;color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center}
+.ob-step-ic{width:36px;height:36px;border-radius:8px;background:#fff;color:#365eef;display:flex;align-items:center;justify-content:center;margin-bottom:8px;border:1px solid #e0e3e8}
+.ob-step-title{font-size:14px;font-weight:600;color:#222631;margin-bottom:4px}
+.ob-step-desc{font-size:12px;color:#6d7381;line-height:1.45}
+.ob-arrow{display:flex;align-items:center;justify-content:center;color:#b3b6bd}
+#ob-overlay.show{display:flex !important}
+</style>
 
 <script>
 // ───── 더미 데이터 ─────
@@ -1018,7 +1124,10 @@ STUDENTS.forEach(s => {
   s.s2 = { status:'idle', selectedIds:new Set(), customs:[] };
   s.s3 = { aiText:'', editText:'', generatedAt:null };
   s.dirty = false;
+  s._dirtyLevel = null;
 });
+
+// 데모 자동 세팅 함수는 STEP2_DEFAULT_ITEMS / S3_MOCK_TEXTS 선언 이후 정의됨
 
 // Step 3 mock AI text (자율활동 톤)
 const S3_MOCK_TEXTS = [
@@ -1079,6 +1188,27 @@ const STEP2_DEFAULT_ITEMS = [
 
 // 학생별 데이터: 맥이 준 5개를 모든 학생에 동일하게 사용 (목업)
 const STEP2_DATA = {};
+
+// 데모 자동 세팅: 자료/키워드 있는 학생은 step 2 분석 완료 + step 3 기록 생성된 것으로
+function autoPopulateForDemo(){
+  STUDENTS.forEach((s, i) => {
+    const hasData = s.files.length > 0 || s.keywords.length > 0;
+    if(!hasData) return;
+    const s2 = s.s2 || (s.s2 = {status:'idle', selectedIds:new Set(), customs:[]});
+    if(s2.status !== 'done'){
+      s2.status = 'done';
+      const data = STEP2_DATA[s.sid] || {items: STEP2_DEFAULT_ITEMS};
+      s2.selectedIds = new Set(data.items.filter(it=>it.source_origin==='stage1_recommended').map(it=>it.id));
+    }
+    const s3 = s.s3 || (s.s3 = {aiText:'', editText:'', generatedAt:null});
+    if(!s3.aiText){
+      s3.aiText = S3_MOCK_TEXTS[i % S3_MOCK_TEXTS.length];
+      s3.editText = s3.aiText;
+      s3.generatedAt = Date.now();
+    }
+  });
+}
+autoPopulateForDemo();
 
 // ───── 유틸 ─────
 function $(id){return document.getElementById(id)}
@@ -1165,9 +1295,12 @@ function kwSummaryText(s){
   return rest > 0 ? `${head} <span class="kw-more">외 ${rest}</span>` : head;
 }
 
-// ───── 학생 상세 모달 ─────
+// ───── 학생 상세 모달 / 드로어 ─────
 let modalDetailOpenedDirty = false;
 let pendingDirtyId = null;
+let drawerCurTab = 'data';
+function isDrawerOpen(){ return document.getElementById('drawer-detail')?.classList.contains('show'); }
+function isModalOpenEl(){ return document.getElementById('modal-detail')?.classList.contains('show'); }
 function openDetail(id){
   curDetailId = id;
   const s = STUDENTS.find(x=>x.id===id);
@@ -1216,6 +1349,276 @@ function dirtyConfirmLater(){
     }
     pendingDirtyId = null;
   }
+}
+
+// ───── 드로어 (Step 3 학생 상세 작업창) ─────
+function openDrawer(id){
+  curDetailId = id;
+  const s = STUDENTS.find(x=>x.id===id);
+  modalDetailOpenedDirty = s ? !!s.dirty : false;
+  if(s) s._editChanged = false;
+  drawerCurTab = 'data';
+  $('drawer-detail').classList.add('show');
+  renderDrawer();
+  lucide.createIcons();
+}
+function closeDrawer(){
+  $('drawer-detail').classList.remove('show');
+  const active = document.querySelector('.step-btn.active');
+  if(active && active.id === 'step-3') renderStep3();
+  const s = STUDENTS.find(x=>x.id===curDetailId);
+  if(s && s._editChanged && s.s3 && s.s3.aiText){
+    pendingDirtyId = s.id;
+    setTimeout(()=>{
+      $('dc-name').textContent = s.name;
+      $('modal-dirty-confirm').classList.add('show');
+      lucide.createIcons();
+    }, 200);
+  } else if(s) {
+    s._editChanged = false;
+  }
+}
+function saveDrawer(){
+  commitDrawerKeywords();
+  showToast('저장되었습니다');
+  closeDrawer();
+}
+function switchDrawerTab(tab){
+  drawerCurTab = tab;
+  document.querySelectorAll('.dr-tab').forEach(t=>t.classList.toggle('active', t.dataset.tab===tab));
+  document.querySelectorAll('.dr-tab-pane').forEach(p=>p.style.display = (p.dataset.tab===tab?'':'none'));
+  lucide.createIcons();
+}
+function renderDrawer(){
+  const s = STUDENTS.find(x=>x.id===curDetailId);
+  if(!s) return;
+  $('dr-name').textContent = s.name;
+  $('dr-sub').textContent = `${s.sid} · ${ACTIVITY_TYPE}`;
+  refreshDrawerItemCount(s);
+  document.querySelectorAll('.dr-tab').forEach(t=>t.classList.toggle('active', t.dataset.tab===drawerCurTab));
+  document.querySelectorAll('.dr-tab-pane').forEach(p=>p.style.display = (p.dataset.tab===drawerCurTab?'':'none'));
+  renderDrawerDataPane(s);
+  renderDrawerItemsPane(s);
+  renderDrawerBanner(s);
+}
+function renderDrawerBanner(s){
+  const banner = $('dr-banner');
+  if(!banner) return;
+  if(!s || !s._dirtyLevel || !(s.s3 && s.s3.aiText)){
+    banner.style.display = 'none';
+    return;
+  }
+  const messages = {
+    file: {
+      title: '자료가 변경됐어요',
+      desc: '저장하고 추천 항목을 다시 분석할게요. 결과를 검토한 뒤 기록을 재생성하세요.',
+      btn: '저장 후 다시 분석'
+    },
+    kw: {
+      title: '키워드가 변경됐어요',
+      desc: '저장하고 바뀐 키워드로 추천 항목을 다시 분석할게요. 결과 검토 후 기록을 재생성하세요.',
+      btn: '저장 후 다시 분석'
+    },
+    items: {
+      title: '추천 항목이 변경됐어요',
+      desc: '저장하고 선택된 항목으로 기록을 다시 생성해요.',
+      btn: '저장 후 기록 재생성'
+    }
+  };
+  const m = messages[s._dirtyLevel];
+  $('dr-banner-title').textContent = m.title;
+  $('dr-banner-desc').textContent = m.desc;
+  $('dr-banner-btn').textContent = m.btn;
+  banner.style.display = '';
+  lucide.createIcons();
+}
+function cascadeFromDrawer(){
+  const s = STUDENTS.find(x=>x.id===curDetailId);
+  if(!s) return;
+  const level = s._dirtyLevel;
+  // 공통: 저장 (현재 dirty 해제)
+  s._dirtyLevel = null;
+  s._editChanged = false;
+  s.dirty = false;
+  if(level === 'items'){
+    // items 레벨: 저장 후 기록 재생성 (분량 모달)
+    showToast('변경 사항을 저장했어요');
+    renderDrawerBanner(s);
+    openLengthModal({type:'regen', sid:s.id});
+  } else {
+    // file 또는 kw: 저장 + 추천 항목 다시 분석 + 항목 탭 전환
+    showToast('변경 사항을 저장했어요. 추천 항목을 다시 분석할게요');
+    renderDrawerBanner(s);
+    // 추천 항목 탭으로 자동 전환
+    drawerCurTab = 'items';
+    document.querySelectorAll('.dr-tab').forEach(t=>t.classList.toggle('active', t.dataset.tab===drawerCurTab));
+    document.querySelectorAll('.dr-tab-pane').forEach(p=>p.style.display = (p.dataset.tab===drawerCurTab?'':'none'));
+    // step 2 재분석
+    const s2 = getS2(s);
+    s2.status = 'analyzing';
+    renderDrawerItemsPane(s);
+    lucide.createIcons();
+    setTimeout(()=>{
+      s2.status = 'done';
+      const data = STEP2_DATA[s.sid] || {items: STEP2_DEFAULT_ITEMS};
+      s2.selectedIds = new Set(data.items.filter(it=>it.source_origin==='stage1_recommended').map(it=>it.id));
+      // 재분석 완료 → step 3 기록은 여전히 stale → items 레벨 dirty 부여
+      if(s.s3 && s.s3.aiText){
+        s._dirtyLevel = 'items';
+        s._editChanged = true;
+      }
+      if(isDrawerOpen() && curDetailId === s.id){
+        renderDrawerItemsPane(s);
+        refreshDrawerItemCount(s);
+        renderDrawerBanner(s);
+      }
+      refreshS2Cta();
+      lucide.createIcons();
+    }, 1800);
+  }
+}
+function refreshDrawerItemCount(s){
+  if(!s) return;
+  const data = STEP2_DATA[s.sid] || {items: STEP2_DEFAULT_ITEMS};
+  const total = data.items.length + (s.s2?.customs?.length || 0);
+  const sel = (s.s2?.selectedIds?.size || 0) + (s.s2?.customs?.filter(c=>c.content && c.content.trim()).length || 0);
+  if($('dr-items-cnt')) $('dr-items-cnt').textContent = `${sel}/${total}`;
+}
+function renderDrawerDataPane(s){
+  const filesHtml = s.files.map((f,i)=>`<div class="file-row">
+    <i data-lucide="paperclip" style="width:16px;height:16px;color:#b3b6bd;flex-shrink:0"></i>
+    <div class="file-name">${f.name}</div>
+    ${f.size ? `<div class="file-meta">${f.size}</div>` : ''}
+    <button class="icon-btn" onclick="removeStudentFile(${s.id},${i})"><i data-lucide="x" style="width:14px;height:14px"></i></button>
+  </div>`).join('');
+  const lev = s.level || 'none';
+  $('dr-pane-data').innerHTML = `
+    <div class="dp-section">
+      <div class="dp-label">활동 자료 <span class="hint">${s.files.length}/5개</span></div>
+      <div class="mini-dropzone" onclick="pickIndFile()">
+        <i data-lucide="upload-cloud" style="width:24px;height:24px;color:#b3b6bd"></i>
+        <div class="mini-dz-text">자료 추가 업로드</div>
+        <div class="mini-dz-hint">DOCX · JPG · PNG · PDF · 최대 5개 / 20MB</div>
+      </div>
+      <div id="dr-files" style="margin-top:8px">${filesHtml}</div>
+    </div>
+    <div class="dp-section">
+      <div class="dp-label">키워드 <span class="hint">활동 자료에서 자동 추출되지만 직접 추가도 가능해요</span></div>
+      <textarea class="kw-textarea" id="dr-kw-text" maxlength="500" oninput="updateDrKwCount();autoResizeDrKw()" onblur="commitDrawerKeywords()" placeholder="키워드를 콤마(,)로 구분해 자유롭게 입력하세요">${s.keywords.map(k=>k.text).join(', ')}</textarea>
+      <div class="kw-foot">
+        <span class="kw-hint">콤마(,)로 구분해 여러 개 입력</span>
+        <span class="kw-count" id="dr-kw-count">0 / 500</span>
+      </div>
+    </div>
+    <div class="dp-section" style="margin-bottom:0">
+      <div class="dp-label">성적 수준 <span class="hint">선택사항 — 미선택 시 미고려</span></div>
+      <div class="level-chips" id="dr-level-chips">
+        <button class="level-chip ${lev==='high'?'active':''}" data-level="high" onclick="setDrawerLevel('high')">상</button>
+        <button class="level-chip ${lev==='mid'?'active':''}" data-level="mid" onclick="setDrawerLevel('mid')">중</button>
+        <button class="level-chip ${lev==='low'?'active':''}" data-level="low" onclick="setDrawerLevel('low')">하</button>
+        <button class="level-chip ${lev==='none'?'active':''}" data-level="none" onclick="setDrawerLevel('none')">고려 안함</button>
+      </div>
+    </div>
+  `;
+  updateDrKwCount();
+  autoResizeDrKw();
+  lucide.createIcons();
+}
+function updateDrKwCount(){
+  const ta = $('dr-kw-text'); const cnt = $('dr-kw-count');
+  if(!ta || !cnt) return;
+  const len = ta.value.length;
+  cnt.textContent = `${len} / 500`;
+  cnt.classList.toggle('over', len >= 500);
+}
+function autoResizeDrKw(){
+  const ta = $('dr-kw-text'); if(!ta) return;
+  ta.style.height = 'auto';
+  ta.style.height = Math.min(ta.scrollHeight, 280) + 'px';
+}
+function commitDrawerKeywords(){
+  const ta = $('dr-kw-text');
+  if(!ta || !curDetailId) return;
+  const s = STUDENTS.find(x=>x.id===curDetailId);
+  if(!s) return;
+  const parsed = ta.value.split(/[,，]/).map(x=>x.trim()).filter(Boolean);
+  const oldText = s.keywords.map(k=>k.text).join('|');
+  const newText = parsed.join('|');
+  s.keywords = parsed.map(text=>({text, source:'keyword'}));
+  if(oldText !== newText) markDirty(s, 'kw');
+}
+function setDrawerLevel(level){
+  const s = STUDENTS.find(x=>x.id===curDetailId);
+  if(!s) return;
+  const oldLevel = s.level;
+  s.level = level === 'none' ? null : level;
+  if(oldLevel !== s.level) markDirty(s, 'items');
+  document.querySelectorAll('#dr-level-chips .level-chip').forEach(c=>c.classList.toggle('active', c.dataset.level === level));
+}
+function renderDrawerItemsPane(s){
+  const hasData = s.files.length > 0 || s.keywords.length > 0;
+  const s2 = getS2(s);
+  if(!hasData){
+    $('dr-pane-items').innerHTML = `
+      <div class="s2-state-card">
+        <div class="s2-state-icon" style="background:#f1f3f5;color:#6d7381"><i data-lucide="inbox" style="width:24px;height:24px"></i></div>
+        <div class="s2-state-title">분석할 자료가 없어요</div>
+        <div class="s2-state-desc">먼저 자료·키워드 탭에서 자료를 추가해 주세요.</div>
+      </div>`;
+    return;
+  }
+  if(s2.status === 'idle'){
+    $('dr-pane-items').innerHTML = `
+      <div class="s2-state-card">
+        <div class="s2-state-icon"><i data-lucide="sparkles" style="width:24px;height:24px"></i></div>
+        <div class="s2-state-title">아직 AI 분석 전이에요</div>
+        <div class="s2-state-desc">자료를 분석해 추천 콘텐츠 요소를 추출해드릴게요.</div>
+        <div><button class="btn-secondary-lg" onclick="startAnalyzeFromDrawer(${s.id})"><i data-lucide="sparkles" style="width:16px;height:16px"></i> 분석 시작</button></div>
+      </div>`;
+    return;
+  }
+  if(s2.status === 'analyzing'){
+    $('dr-pane-items').innerHTML = `
+      <div class="s2-state-card s2-loading">
+        <div class="s2-spinner"></div>
+        <div class="s2-state-title">자료를 분석하고 있어요</div>
+        <div class="s2-state-desc">잠시만 기다려 주세요.</div>
+      </div>`;
+    return;
+  }
+  // done
+  const data = STEP2_DATA[s.sid] || { items: STEP2_DEFAULT_ITEMS };
+  const items = data.items;
+  const recItems = items.filter(it=>it.source_origin==='stage1_recommended');
+  const candItems = items.filter(it=>it.source_origin==='stage1_candidate');
+  const recHtml = recItems.map(it=>renderS2ItemCard(s.id, it)).join('');
+  const candHtml = candItems.map(it=>renderS2ItemCard(s.id, it)).join('');
+  const customHtml = s2.customs.map((c,i)=>renderS2CustomCard(s.id, c, i)).join('');
+  $('dr-pane-items').innerHTML = `
+    <div class="s2-group-hd"><span class="s2-group-title">추천 항목</span><span class="s2-group-cnt">${recItems.length}개</span></div>
+    ${recHtml}
+    ${candItems.length ? `
+      <div class="s2-group-hd"><span class="s2-group-title">추가 후보</span><span class="s2-group-cnt">${candItems.length}개</span></div>
+      <div style="display:flex;flex-direction:column;gap:8px">${candHtml}</div>
+    ` : ''}
+    <div class="s2-group-hd"><span class="s2-group-title">직접 추가</span><span class="s2-group-cnt">${s2.customs.length}개</span></div>
+    ${customHtml}
+    <button class="s2-add-btn" onclick="addCustomItem(${s.id})"><i data-lucide="plus" style="width:16px;height:16px"></i> 빈 카드 추가</button>
+  `;
+}
+function startAnalyzeFromDrawer(sid){
+  startAnalyze(sid);
+  const s = STUDENTS.find(x=>x.id===sid);
+  if(s) renderDrawerItemsPane(s);
+  setTimeout(()=>{
+    const s2 = STUDENTS.find(x=>x.id===sid);
+    if(s2 && isDrawerOpen()){
+      renderDrawerItemsPane(s2);
+      refreshDrawerItemCount(s2);
+      lucide.createIcons();
+    }
+  }, 1900);
+  lucide.createIcons();
 }
 function renderDetailModal(){
   const s = STUDENTS.find(x=>x.id===curDetailId);
@@ -1269,7 +1672,7 @@ function commitKeywords(){
   const oldText = s.keywords.map(k=>k.text).join('|');
   const newText = parsed.join('|');
   s.keywords = parsed.map(text => ({text, source:'keyword'}));
-  if(oldText !== newText) markDirty(s);
+  if(oldText !== newText) markDirty(s, 'kw');
   refreshAll();
 }
 function saveDetail(){
@@ -1285,23 +1688,32 @@ function pickIndFile(){
   if(!s) return;
   if(s.files.length>=5){ showToast('학생당 최대 5개까지 업로드 가능합니다'); return; }
   s.files.push({name:'추가자료_'+(s.files.length+1)+'.pdf',size:'1.2MB',type:'pdf',source:'individual',kindLabel:'개별'});
-  markDirty(s);
-  renderDetailModal();
+  markDirty(s, 'file');
+  if(isDrawerOpen()) renderDrawerDataPane(s);
+  else if(isModalOpenEl()) renderDetailModal();
   refreshAll();
 }
 function removeStudentFile(sid, idx){
   const s = STUDENTS.find(x=>x.id===sid);
   if(!s) return;
   s.files.splice(idx,1);
-  markDirty(s);
+  markDirty(s, 'file');
+  if(isDrawerOpen() && curDetailId === sid) renderDrawerDataPane(s);
+  else if(isModalOpenEl() && curDetailId === sid) renderDetailModal();
   refreshAll();
 }
-function markDirty(s){
-  // 모달 편집 중에는 즉시 dirty로 마크하지 않고 _editChanged 플래그만 세움
-  // [나중에] 클릭 시점에 s.dirty=true로 커밋
-  if((s.s2 && s.s2.status === 'done') || (s.s3 && s.s3.aiText)){
-    s._editChanged = true;
+function markDirty(s, level){
+  // level: 'file' (자료) > 'kw' (키워드) > 'items' (추천 항목)
+  // 분석/생성 결과가 있을 때만 의미 있음
+  if(!((s.s2 && s.s2.status === 'done') || (s.s3 && s.s3.aiText))) return;
+  s._editChanged = true;
+  if(!level) return;
+  const rank = {file:3, kw:2, items:1};
+  if(!s._dirtyLevel || rank[level] > rank[s._dirtyLevel]){
+    s._dirtyLevel = level;
   }
+  // 드로어 열려 있으면 banner 즉시 갱신
+  if(isDrawerOpen() && curDetailId === s.id) renderDrawerBanner(s);
 }
 
 // ───── 학생 추가 (학교 등록 학생 중 학급 추가 가능자) ─────
@@ -1431,6 +1843,13 @@ function renderStep3(){
       s3.aiText = S3_MOCK_TEXTS[i % S3_MOCK_TEXTS.length];
       s3.editText = s3.aiText;
       s3.generatedAt = Date.now();
+      // 기록이 있다 = 분석도 됐다. step 2도 done + 추천 항목 자동 체크
+      const s2 = getS2(s);
+      if(s2.status !== 'done'){
+        s2.status = 'done';
+        const data = STEP2_DATA[s.sid] || {items: STEP2_DEFAULT_ITEMS};
+        s2.selectedIds = new Set(data.items.filter(it=>it.source_origin==='stage1_recommended').map(it=>it.id));
+      }
     }
   });
   $('s3-count').textContent = STUDENTS.length;
@@ -1483,7 +1902,7 @@ function renderS3Row(s){
   const dirtyDot = s.dirty ? '<span class="dirty-dot" title="자료 변경됨 · 재생성 권장"></span>' : '';
   return `<tr ${s.dirty?'class="s3-row-dirty"':''}>
     <td class="s3-col-sid s3-cell-sid">${s.sid}</td>
-    <td class="s3-col-name"><button class="s3-name-btn" onclick="openDetail(${s.id})">${s.name}${dirtyDot}</button></td>
+    <td class="s3-col-name"><button class="s3-name-btn" onclick="openDrawer(${s.id})">${s.name}${dirtyDot}</button></td>
     <td class="s3-col-level s3-cell-level">${levelLabel(s.level)}</td>
     <td class="s3-col-ai">${aiCell}</td>
     <td class="s3-col-bring"><button class="s3-bring-btn" onclick="bringToEdit(${s.id})" ${s3.aiText?'':'disabled'}><i data-lucide="arrow-right" style="width:14px;height:14px"></i><span>가져오기</span></button></td>
@@ -1514,6 +1933,7 @@ function confirmLength(){
         s3.aiText = pickMockText(s);
         s3.generatedAt = Date.now();
         s.dirty = false;
+        s._dirtyLevel = null;
         if(!s3.editText) s3.editText = s3.aiText;
         n++;
       }
@@ -1527,6 +1947,7 @@ function confirmLength(){
       s3.aiText = pickMockText(s);
       s3.generatedAt = Date.now();
       s.dirty = false;
+      s._dirtyLevel = null;
       if(!s3.editText) s3.editText = s3.aiText;
       renderStep3();
       showToast(scope.type === 'regen' ? '기록을 재생성했어요' : '기록을 생성했어요');
@@ -1685,7 +2106,7 @@ function renderS2Main(){
     body = `<div class="s2-state-card">
       <div class="s2-state-icon"><i data-lucide="sparkles" style="width:24px;height:24px"></i></div>
       <div class="s2-state-title">${s.name} 학생 자료를 분석할 준비가 됐어요</div>
-      <div class="s2-state-desc">AI가 입력된 자료를 분석해 누가기록에 들어갈 콘텐츠 요소를 추출합니다.</div>
+      <div class="s2-state-desc">AI가 입력된 자료를 분석해 기록에 들어갈 콘텐츠 요소를 추출합니다.</div>
       <div class="s2-state-summary">
         <div class="s2-state-summary-row"><strong>자료</strong> ${s.files.length}건</div>
         <div class="s2-state-summary-row"><strong>키워드</strong> <span class="s2-summary-trunc" title="${kwText}">${kwText}</span></div>
@@ -1779,8 +2200,15 @@ function toggleS2Item(sid, itemId){
   const s2 = getS2(s);
   if(s2.selectedIds.has(itemId)) s2.selectedIds.delete(itemId);
   else s2.selectedIds.add(itemId);
-  renderS2Sidebar();
-  renderS2Main();
+  // 추천 항목 변경도 dirty 트리거 (재생성 영향)
+  if(s.s3 && s.s3.aiText) markDirty(s, 'items');
+  if(isDrawerOpen() && curDetailId === sid){
+    renderDrawerItemsPane(s);
+    refreshDrawerItemCount(s);
+  } else {
+    renderS2Sidebar();
+    renderS2Main();
+  }
   refreshS2Cta();
   lucide.createIcons();
 }
@@ -1802,6 +2230,7 @@ function startAnalyze(sid){
   setTimeout(()=>{
     s2.status = 'done';
     s.dirty = false;
+    s._dirtyLevel = null;
     // 추천 항목 자동 체크
     const data = STEP2_DATA[s.sid] || {items: STEP2_DEFAULT_ITEMS.slice(0,5)};
     s2.selectedIds = new Set(data.items.filter(it=>it.source_origin==='stage1_recommended').map(it=>it.id));
@@ -1860,7 +2289,9 @@ function applyScenario(scenario){
     s.s2 = { status:'idle', selectedIds:new Set(), customs:[] };
     s.s3 = { aiText:'', editText:'', generatedAt:null };
     s.dirty = false;
+    s._dirtyLevel = null;
   });
+  autoPopulateForDemo();
   s2CurStudentId = null;
   s3LastSaved = null;
   refreshAll();
@@ -1888,20 +2319,34 @@ function addCustomItem(sid){
   const s = STUDENTS.find(x=>x.id===sid);
   if(!s) return;
   getS2(s).customs.push({content:''});
-  renderS2Main();
+  if(s.s3 && s.s3.aiText) markDirty(s, 'items');
+  if(isDrawerOpen() && curDetailId === sid){
+    renderDrawerItemsPane(s);
+    refreshDrawerItemCount(s);
+  } else {
+    renderS2Main();
+  }
   lucide.createIcons();
 }
 function updateCustom(sid, idx, content){
   const s = STUDENTS.find(x=>x.id===sid);
   if(!s) return;
   getS2(s).customs[idx].content = content;
+  if(s.s3 && s.s3.aiText) markDirty(s, 'items');
   refreshS2Cta();
+  if(isDrawerOpen() && curDetailId === sid) refreshDrawerItemCount(s);
 }
 function removeCustom(sid, idx){
   const s = STUDENTS.find(x=>x.id===sid);
   if(!s) return;
   getS2(s).customs.splice(idx, 1);
-  renderS2Main();
+  if(s.s3 && s.s3.aiText) markDirty(s, 'items');
+  if(isDrawerOpen() && curDetailId === sid){
+    renderDrawerItemsPane(s);
+    refreshDrawerItemCount(s);
+  } else {
+    renderS2Main();
+  }
   refreshS2Cta();
   lucide.createIcons();
 }
@@ -1998,6 +2443,20 @@ function toggleNav(){
 
 refreshAll();
 lucide.createIcons();
+
+// ── 온보딩 팝업 ──
+function showOb(){document.getElementById('ob-overlay').classList.add('show');lucide.createIcons();}
+function closeOb(){document.getElementById('ob-overlay').classList.remove('show');try{localStorage.setItem('clipo_creative_onboarding_seen','1');}catch(e){}}
+function startFromOnboarding(){ closeOb(); if(typeof openRegisterModal==='function') openRegisterModal(); }
+(function maybeShowOb(){
+  const force = new URLSearchParams(location.search).get('ob') === '1';
+  if (!force) {
+    try { if (localStorage.getItem('clipo_creative_onboarding_seen') === '1') return; } catch(e) {}
+  }
+  // 첫 진입은 빈 화면 시나리오로 깔아 두기
+  if (typeof applyScenario === 'function') applyScenario('empty');
+  setTimeout(showOb, 300);
+})();
 </script>
 </body>
 </html>
