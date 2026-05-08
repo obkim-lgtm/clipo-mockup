@@ -417,6 +417,24 @@ body.nav-expanded .sticky-cta{left:200px;transition:left .2s ease}
 .dr-banner-text strong{font-weight:700;color:#7c2d12}
 .drawer-ft{padding:14px 24px;border-top:1px solid #f1f3f5;display:flex;justify-content:flex-end;gap:8px;flex-shrink:0}
 
+/* 설문 응답 모달 (가상 항목) — 드로어 위에 떠야 하므로 z-index 더 높게 */
+#modal-survey{z-index:700}
+.file-row.clickable{cursor:pointer;transition:all .15s}
+.file-row.clickable:hover{background:#f4f8ff;border-color:#c7d6ff}
+.file-view-hint{font-size:12px;color:#416bff;font-weight:500;flex-shrink:0;margin-right:6px}
+/* 드로어 푸시뷰 (설문 응답 보기) */
+.dr-back-btn{display:inline-flex;align-items:center;gap:4px;background:none;border:none;color:#416bff;font-size:14px;font-weight:600;cursor:pointer;padding:6px 10px 6px 4px;margin:-2px 0 14px;border-radius:6px;font-family:inherit;line-height:1;transition:background .15s}
+.dr-back-btn:hover{background:#eff3ff}
+.sv-meta{padding:0 0 14px;border-bottom:1px solid #e5e7eb;margin-bottom:6px}
+.sv-meta-title{font-size:16px;font-weight:600;color:#222631;line-height:1.4}
+.sv-meta-sub{font-size:13px;color:#6d7381;margin-top:4px}
+.sv-qa{padding:14px 0;border-bottom:1px solid #f1f3f5}
+.sv-qa:first-child{padding-top:0}
+.sv-qa:last-child{border-bottom:none;padding-bottom:0}
+.sv-q{font-size:14px;font-weight:600;color:#222631;margin-bottom:8px;line-height:1.55;display:flex;align-items:flex-start;gap:6px}
+.sv-q-num{color:#416bff;font-weight:700;flex-shrink:0}
+.sv-a{font-size:14px;color:#3b3f4c;line-height:1.7;background:#f9fafb;border-radius:8px;padding:12px 14px;white-space:pre-wrap}
+
 /* 분량 선택 모달 */
 .length-opt{display:flex;align-items:center;gap:10px;padding:12px 14px;border:1.5px solid #d9d9d9;border-radius:8px;margin-bottom:8px;cursor:pointer;transition:border-color .15s}
 .length-opt:hover{border-color:#b3b3b3}
@@ -424,6 +442,23 @@ body.nav-expanded .sticky-cta{left:200px;transition:left .2s ease}
 .length-opt input{accent-color:#416bff;width:16px;height:16px}
 .length-opt span{font-size:14px;color:#222631}
 .length-opt em{font-style:normal;color:#6d7381;font-size:13px;margin-left:4px}
+
+/* 학생 선택 (Step3 일괄 생성) */
+.stu-pick-section{margin-bottom:20px}
+.stu-pick-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.stu-pick-title{font-size:14px;font-weight:600;color:#3b3f4c}
+.stu-pick-count{font-size:13px;color:#6d7381;font-weight:500}
+.stu-pick-master{display:flex;align-items:center;gap:8px;padding:10px 14px;background:#f6f7f9;border-radius:8px;cursor:pointer;user-select:none;margin-bottom:6px;font-size:14px;color:#3b3f4c;border:1px solid #e5e7eb}
+.stu-pick-master input{accent-color:#416bff;width:16px;height:16px;cursor:pointer}
+.stu-pick-list{max-height:240px;overflow-y:auto;border:1px solid #e5e7eb;border-radius:8px}
+.stu-pick-row{display:flex;align-items:center;gap:10px;padding:9px 14px;cursor:pointer;border-bottom:1px solid #f1f3f5}
+.stu-pick-row:last-child{border-bottom:none}
+.stu-pick-row:hover{background:#f9fafb}
+.stu-pick-row input{accent-color:#416bff;width:16px;height:16px;cursor:pointer}
+.stu-pick-sid{font-size:13px;color:#6d7381;font-variant-numeric:tabular-nums;width:56px}
+.stu-pick-name{font-size:14px;color:#222631;font-weight:500;flex:1}
+.stu-pick-tag{font-size:11px;color:#6d7381;padding:2px 7px;background:#f1f3f5;border-radius:10px}
+.stu-pick-tag.exists{color:#416bff;background:#e9f2ff}
 
 /* placeholder 영역 (사용 안 함) */
 .placeholder-card{background:#fff;border:1.5px dashed #d9d9d9;border-radius:12px;padding:60px 24px;text-align:center;color:#b3b6bd}
@@ -651,7 +686,6 @@ body.nav-expanded .sticky-cta{left:200px;transition:left .2s ease}
             <th class="col-files">자료 수</th>
             <th class="col-kw">키워드</th>
             <th class="col-level">성적</th>
-            <th class="col-status">상태</th>
             <th class="col-action">관리</th>
           </tr>
         </thead>
@@ -906,6 +940,23 @@ body.nav-expanded .sticky-cta{left:200px;transition:left .2s ease}
   </div>
 </div>
 
+<!-- ── 설문 응답 모달 (가상 항목 클릭 시) ── -->
+<div class="modal-bg" id="modal-survey">
+  <div class="modal lg">
+    <div class="modal-hd">
+      <div>
+        <div class="modal-title" id="sv-title">설문 응답</div>
+        <div class="modal-sub" id="sv-sub">—</div>
+      </div>
+      <button class="modal-x" onclick="closeModal('modal-survey')"><i data-lucide="x" style="width:18px;height:18px"></i></button>
+    </div>
+    <div class="modal-body" id="sv-body"></div>
+    <div class="modal-ft">
+      <button class="btn-secondary" onclick="closeModal('modal-survey')">닫기</button>
+    </div>
+  </div>
+</div>
+
 <!-- ── 학생 상세 드로어 (Step 3 전용) ── -->
 <div class="drawer-bg" id="drawer-detail">
   <div class="drawer">
@@ -961,12 +1012,24 @@ body.nav-expanded .sticky-cta{left:200px;transition:left .2s ease}
   <div class="modal">
     <div class="modal-hd">
       <div>
-        <div class="modal-title">AI 기록 생성 분량</div>
-        <div class="modal-sub">기록 생성 분량을 선택해 주세요. 입력하신 내용에 따라 실제 생성 분량은 달라질 수 있습니다.</div>
+        <div class="modal-title">전체 AI 기록 생성</div>
+        <div class="modal-sub">기록을 생성할 학생과 분량을 선택해 주세요. 입력하신 내용에 따라 실제 생성 분량은 달라질 수 있습니다.</div>
       </div>
       <button class="modal-x" onclick="closeModal('modal-length')"><i data-lucide="x" style="width:18px;height:18px"></i></button>
     </div>
     <div class="modal-body">
+      <div class="stu-pick-section" id="stu-pick-section" style="display:none">
+        <div class="stu-pick-head">
+          <span class="stu-pick-title">학생 선택</span>
+          <span class="stu-pick-count" id="stu-pick-count">0/0명</span>
+        </div>
+        <label class="stu-pick-master">
+          <input type="checkbox" id="stu-pick-all" onchange="toggleAllStuPick(this.checked)">
+          <span>전체 선택</span>
+        </label>
+        <div class="stu-pick-list" id="stu-pick-list"></div>
+      </div>
+      <div class="stu-pick-title" style="margin-bottom:8px;font-size:14px;font-weight:600;color:#3b3f4c">기록 분량</div>
       <label class="length-opt"><input type="radio" name="s3-length" value="300-400"><span>300~400자 <em>(900~1,200 Byte)</em></span></label>
       <label class="length-opt"><input type="radio" name="s3-length" value="400-500" checked><span>400~500자 <em>(1,200~1,500 Byte)</em></span></label>
       <label class="length-opt"><input type="radio" name="s3-length" value="500-600"><span>500~600자 <em>(1,500~1,800 Byte)</em></span></label>
@@ -1130,6 +1193,28 @@ STUDENTS.forEach(s => {
 
 // 데모 자동 세팅 함수는 STEP2_DEFAULT_ITEMS / S3_MOCK_TEXTS 선언 이후 정의됨
 
+// 설문 응답 mock (가상 항목 클릭 시 표시)
+const SURVEY_MOCK = [
+  {q:'이번 학기 가장 인상 깊었던 자율활동은 무엇이었나요?', a:'학급 봉사활동 시간에 친구들과 협력하여 청소 구역을 정리한 것이 기억에 남습니다. 처음에는 귀찮다고 생각했지만, 점차 우리 반을 깨끗하게 만든다는 보람을 느꼈습니다.'},
+  {q:'학급 자치 활동에서 본인이 맡은 역할과 그 경험을 적어주세요.', a:'학급 회의 진행을 맡았고, 친구들이 자유롭게 의견을 낼 수 있도록 분위기를 만들려고 노력했습니다. 의견 정리가 어려웠던 적도 있지만 다 같이 한 가지 결론에 도달했을 때 뿌듯했습니다.'},
+  {q:'학기 동안 가장 성장했다고 느낀 점은 무엇인가요?', a:'친구들의 의견을 끝까지 듣고 종합하는 능력이 늘었다고 느꼈습니다. 전엔 제 주장만 했는데, 이제는 다른 친구들이 어떻게 생각하는지 먼저 묻습니다.'},
+  {q:'다음 학기에 도전해보고 싶은 활동이 있다면?', a:'독서 동아리에 참여해 친구들과 함께 책에 대한 다양한 시각을 나눠보고 싶습니다.'}
+];
+function openSurveyResponse(sid, fileIdx){
+  const s = STUDENTS.find(x=>x.id===sid);
+  if(!s) return;
+  $('sv-title').textContent = `설문 응답 — ${s.name} · ${s.sid}`;
+  $('sv-sub').textContent = '학기말 자율활동 설문 · 2026-04-15 응답';
+  $('sv-body').innerHTML = SURVEY_MOCK.map((qa, i) => `
+    <div class="sv-qa">
+      <div class="sv-q"><span class="sv-q-num">Q${i+1}.</span><span>${qa.q}</span></div>
+      <div class="sv-a">${qa.a}</div>
+    </div>
+  `).join('');
+  $('modal-survey').classList.add('show');
+  lucide.createIcons();
+}
+
 // Step 3 mock AI text (자율활동 톤)
 const S3_MOCK_TEXTS = [
   '학급 봉사활동 시간에 청소 구역 정리와 분리수거를 책임감 있게 도맡아 수행하며, 또래 친구들이 함께 참여할 수 있도록 안내하는 모습이 인상적임. 미술 자화상 그리기 활동에서 다양한 색감을 활용하여 자신의 모습을 창의적으로 표현하였으며, 독서활동에서 학기 중 5권의 책을 꾸준히 읽고 독서록을 성실히 작성하여 사고력과 분석력이 향상되고 있음. 학급 공동체 안에서 자기 역할을 적극적으로 찾아 실천하는 자기주도성과 배려심이 돋보임.',
@@ -1270,7 +1355,6 @@ function renderSummary(){
       <td class="cell-files">${filesText}</td>
       <td class="cell-kw">${kwText}</td>
       <td class="cell-level">${levelLabel(s.level)}</td>
-      <td><span class="status-pill ${st}"><span class="status-dot"></span>${statusLabel(st)}</span></td>
       <td class="col-action">${action}</td>
     </tr>`;
   }).join('');
@@ -1290,16 +1374,15 @@ function levelLabel(lev){
   return {high:'상', mid:'중', low:'하'}[lev] || '<span class="col-empty">—</span>';
 }
 function kwSummaryText(s){
-  const kws = s.keywords.map(k=>k.text);
-  const head = kws.slice(0,2).join(', ');
-  const rest = kws.length - 2;
-  return rest > 0 ? `${head} <span class="kw-more">외 ${rest}</span>` : head;
+  return s.keywords.map(k=>k.text).join(', ');
 }
 
 // ───── 학생 상세 모달 / 드로어 ─────
 let modalDetailOpenedDirty = false;
 let pendingDirtyId = null;
 let drawerCurTab = 'data';
+let drawerSubView = null; // null | 'survey'
+let drawerSurveyFileIdx = null;
 function isDrawerOpen(){ return document.getElementById('drawer-detail')?.classList.contains('show'); }
 function isModalOpenEl(){ return document.getElementById('modal-detail')?.classList.contains('show'); }
 function openDetail(id){
@@ -1359,6 +1442,8 @@ function openDrawer(id){
   modalDetailOpenedDirty = s ? !!s.dirty : false;
   if(s) s._editChanged = false;
   drawerCurTab = 'data';
+  drawerSubView = null;
+  drawerSurveyFileIdx = null;
   $('drawer-detail').classList.add('show');
   renderDrawer();
   lucide.createIcons();
@@ -1395,12 +1480,80 @@ function renderDrawer(){
   if(!s) return;
   $('dr-name').textContent = s.name;
   $('dr-sub').textContent = `${s.sid} · ${ACTIVITY_TYPE}`;
+  const tabsEl = document.querySelector('.drawer-tabs');
+  const ftEl = document.querySelector('.drawer-ft');
+  const bannerEl = $('dr-banner');
+  // 서브뷰 (푸시뷰) 모드
+  if(drawerSubView === 'survey'){
+    if(tabsEl) tabsEl.style.display = 'none';
+    if(bannerEl) bannerEl.style.display = 'none';
+    if(ftEl) ftEl.style.display = 'none';
+    document.querySelectorAll('.dr-tab-pane').forEach(p=>p.style.display='none');
+    let svPane = $('dr-pane-survey');
+    if(!svPane){
+      svPane = document.createElement('div');
+      svPane.className = 'dr-tab-pane dr-pane-survey';
+      svPane.id = 'dr-pane-survey';
+      document.querySelector('.drawer-body').appendChild(svPane);
+    }
+    svPane.style.display = '';
+    renderDrawerSurveyView(s);
+    return;
+  }
+  // 기본 (탭) 모드
+  if(tabsEl) tabsEl.style.display = '';
+  if(ftEl) ftEl.style.display = '';
+  const svPane = $('dr-pane-survey');
+  if(svPane) svPane.style.display = 'none';
   refreshDrawerItemCount(s);
   document.querySelectorAll('.dr-tab').forEach(t=>t.classList.toggle('active', t.dataset.tab===drawerCurTab));
-  document.querySelectorAll('.dr-tab-pane').forEach(p=>p.style.display = (p.dataset.tab===drawerCurTab?'':'none'));
+  document.querySelectorAll('.dr-tab-pane').forEach(p=>{
+    if(p.id === 'dr-pane-survey') return;
+    p.style.display = (p.dataset.tab===drawerCurTab?'':'none');
+  });
   renderDrawerDataPane(s);
   renderDrawerItemsPane(s);
   renderDrawerBanner(s);
+}
+function renderDrawerSurveyView(s){
+  if(drawerSurveyFileIdx == null) return;
+  const f = s.files[drawerSurveyFileIdx];
+  const svPane = $('dr-pane-survey');
+  if(!svPane) return;
+  svPane.innerHTML = `
+    <button class="dr-back-btn" onclick="backFromSurvey()">
+      <i data-lucide="chevron-left" style="width:16px;height:16px"></i>
+      <span>학생 자료로 돌아가기</span>
+    </button>
+    <div class="sv-meta">
+      <div class="sv-meta-title">${f?.name || '설문 응답'}</div>
+      <div class="sv-meta-sub">학기말 자율활동 설문 · 2026-04-15 응답</div>
+    </div>
+    <div class="sv-list">
+      ${SURVEY_MOCK.map((qa,i)=>`
+        <div class="sv-qa">
+          <div class="sv-q"><span class="sv-q-num">Q${i+1}.</span><span>${qa.q}</span></div>
+          <div class="sv-a">${qa.a}</div>
+        </div>
+      `).join('')}
+    </div>
+  `;
+  lucide.createIcons();
+  // 스크롤을 맨 위로
+  const body = document.querySelector('.drawer-body');
+  if(body) body.scrollTop = 0;
+}
+function showSurveyInDrawer(sid, fileIdx){
+  if(curDetailId !== sid) curDetailId = sid;
+  drawerSubView = 'survey';
+  drawerSurveyFileIdx = fileIdx;
+  renderDrawer();
+}
+function backFromSurvey(){
+  drawerSubView = null;
+  drawerSurveyFileIdx = null;
+  renderDrawer();
+  lucide.createIcons();
 }
 function renderDrawerBanner(s){
   const banner = $('dr-banner');
@@ -1486,12 +1639,16 @@ function refreshDrawerItemCount(s){
   if($('dr-items-cnt')) $('dr-items-cnt').textContent = `${sel}/${total}`;
 }
 function renderDrawerDataPane(s){
-  const filesHtml = s.files.map((f,i)=>`<div class="file-row">
-    <i data-lucide="paperclip" style="width:16px;height:16px;color:#b3b6bd;flex-shrink:0"></i>
-    <div class="file-name">${f.name}</div>
-    ${f.size ? `<div class="file-meta">${f.size}</div>` : ''}
-    <button class="icon-btn" onclick="removeStudentFile(${s.id},${i})"><i data-lucide="x" style="width:14px;height:14px"></i></button>
-  </div>`).join('');
+  const filesHtml = s.files.map((f,i)=>{
+    const isVirtual = f.type === 'survey';
+    return `<div class="file-row${isVirtual?' clickable':''}" ${isVirtual?`onclick="showSurveyInDrawer(${s.id},${i})"`:''}>
+      <i data-lucide="${isVirtual?'list-checks':'paperclip'}" style="width:16px;height:16px;color:${isVirtual?'#7c3aed':'#b3b6bd'};flex-shrink:0"></i>
+      <div class="file-name">${f.name}</div>
+      ${f.size ? `<div class="file-meta">${f.size}</div>` : ''}
+      ${isVirtual ? '<span class="file-view-hint">보기</span>' : ''}
+      <button class="icon-btn" onclick="event.stopPropagation();removeStudentFile(${s.id},${i})"><i data-lucide="x" style="width:14px;height:14px"></i></button>
+    </div>`;
+  }).join('');
   const lev = s.level || 'none';
   $('dr-pane-data').innerHTML = `
     <div class="dp-section">
@@ -1531,6 +1688,7 @@ function updateDrKwCount(){
   const len = ta.value.length;
   cnt.textContent = `${len} / 500`;
   cnt.classList.toggle('over', len >= 500);
+  scheduleAutoSave();
 }
 function autoResizeDrKw(){
   const ta = $('dr-kw-text'); if(!ta) return;
@@ -1628,12 +1786,16 @@ function renderDetailModal(){
   $('md-name').textContent = s.name;
   $('md-sub').textContent = s.sid + ' · ' + ACTIVITY_TYPE;
   $('md-files-cnt').textContent = s.files.length + '/5개';
-  $('md-files').innerHTML = s.files.map((f,i)=>`<div class="file-row">
-    <i data-lucide="paperclip" style="width:16px;height:16px;color:#b3b6bd;flex-shrink:0"></i>
-    <div class="file-name">${f.name}</div>
-    ${f.size ? `<div class="file-meta">${f.size}</div>` : ''}
-    <button class="icon-btn" onclick="removeStudentFile(${s.id},${i});renderDetailModal()"><i data-lucide="x" style="width:14px;height:14px"></i></button>
-  </div>`).join('');
+  $('md-files').innerHTML = s.files.map((f,i)=>{
+    const isVirtual = f.type === 'survey';
+    return `<div class="file-row${isVirtual?' clickable':''}" ${isVirtual?`onclick="openSurveyResponse(${s.id},${i})"`:''}>
+      <i data-lucide="${isVirtual?'list-checks':'paperclip'}" style="width:16px;height:16px;color:${isVirtual?'#7c3aed':'#b3b6bd'};flex-shrink:0"></i>
+      <div class="file-name">${f.name}</div>
+      ${f.size ? `<div class="file-meta">${f.size}</div>` : ''}
+      ${isVirtual ? '<span class="file-view-hint">보기</span>' : ''}
+      <button class="icon-btn" onclick="event.stopPropagation();removeStudentFile(${s.id},${i});renderDetailModal()"><i data-lucide="x" style="width:14px;height:14px"></i></button>
+    </div>`;
+  }).join('');
   $('md-kw-text').value = s.keywords.map(k=>k.text).join(', ');
   updateKwCount();
   autoResizeKw();
@@ -1657,6 +1819,7 @@ function updateKwCount(){
   const len = ta.value.length;
   cnt.textContent = `${len} / 500`;
   cnt.classList.toggle('over', len >= 500);
+  scheduleAutoSave();
 }
 function autoResizeKw(){
   const ta = $('md-kw-text');
@@ -1704,6 +1867,7 @@ function removeStudentFile(sid, idx){
   refreshAll();
 }
 function markDirty(s, level){
+  scheduleAutoSave();
   // level: 'file' (자료) > 'kw' (키워드) > 'items' (추천 항목)
   // 분석/생성 결과가 있을 때만 의미 있음
   if(!((s.s2 && s.s2.status === 'done') || (s.s3 && s.s3.aiText))) return;
@@ -1835,6 +1999,16 @@ function fmtSavedTime(){
   return `${String(d.getMonth()+1).padStart(2,'0')}/${String(d.getDate()).padStart(2,'0')} ${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')} 저장됨`;
 }
 let s3LastSaved = null;
+let s3AutoSaveTimer = null;
+function scheduleAutoSave(){
+  clearTimeout(s3AutoSaveTimer);
+  const lbl = $('s3-saved');
+  if(lbl) lbl.textContent = '저장 중...';
+  s3AutoSaveTimer = setTimeout(()=>{
+    s3LastSaved = fmtSavedTime();
+    if($('s3-saved')) $('s3-saved').textContent = s3LastSaved;
+  }, 1200);
+}
 function renderStep3(){
   // 데모: 자료/키워드 있는 학생만 자동 채움. 빈 화면 시나리오는 AI 생성 전 상태로 유지
   STUDENTS.forEach((s, i) => {
@@ -1915,8 +2089,45 @@ let s3LengthChoice = '400-500';
 function openLengthModal(scope){
   pendingGenerate = scope;
   document.querySelectorAll('input[name="s3-length"]').forEach(r=>r.checked = (r.value === s3LengthChoice));
+  const section = document.getElementById('stu-pick-section');
+  if (scope.type === 'all') {
+    section.style.display = 'block';
+    populateStuPick();
+  } else {
+    section.style.display = 'none';
+  }
   $('modal-length').classList.add('show');
   lucide.createIcons();
+}
+
+function populateStuPick(){
+  const eligible = STUDENTS.filter(s => s.files.length > 0 || s.keywords.length > 0);
+  const list = document.getElementById('stu-pick-list');
+  list.innerHTML = eligible.map(s => {
+    const s3 = getS3(s);
+    const tag = s3.aiText ? (s.dirty ? '<span class="stu-pick-tag">변경됨</span>' : '<span class="stu-pick-tag exists">생성됨</span>') : '';
+    return `<label class="stu-pick-row">
+      <input type="checkbox" class="stu-pick-cb" value="${s.id}" checked onchange="updateStuPickCount()">
+      <span class="stu-pick-sid">${s.sid}</span>
+      <span class="stu-pick-name">${s.name}</span>
+      ${tag}
+    </label>`;
+  }).join('') || '<div style="padding:24px;text-align:center;color:#b3b6bd;font-size:13px">자료나 키워드가 등록된 학생이 없어요</div>';
+  updateStuPickCount();
+}
+
+function updateStuPickCount(){
+  const cbs = document.querySelectorAll('.stu-pick-cb');
+  const checked = document.querySelectorAll('.stu-pick-cb:checked').length;
+  document.getElementById('stu-pick-count').textContent = `${checked}/${cbs.length}명`;
+  const master = document.getElementById('stu-pick-all');
+  master.checked = cbs.length > 0 && checked === cbs.length;
+  master.indeterminate = checked > 0 && checked < cbs.length;
+}
+
+function toggleAllStuPick(checked){
+  document.querySelectorAll('.stu-pick-cb').forEach(cb => cb.checked = checked);
+  updateStuPickCount();
 }
 function confirmLength(){
   const sel = document.querySelector('input[name="s3-length"]:checked');
@@ -1926,8 +2137,11 @@ function confirmLength(){
   const scope = pendingGenerate;
   pendingGenerate = null;
   if(scope.type === 'all'){
+    const selectedIds = new Set(Array.from(document.querySelectorAll('.stu-pick-cb:checked')).map(cb => parseInt(cb.value)));
+    if (selectedIds.size === 0) { showToast('생성할 학생을 선택해 주세요'); return; }
     let n = 0;
     STUDENTS.forEach(s=>{
+      if (!selectedIds.has(s.id)) return;
       if(s.files.length===0 && s.keywords.length===0) return;
       const s3 = getS3(s);
       if(!s3.aiText || s.dirty){
@@ -1988,10 +2202,12 @@ function updateS3Edit(sid, text, ta){
       editFoot.innerHTML = `<span class="s3-byte ${over?'over':''}">${bytes} Byte</span>${over ? '<span class="s3-byte-error">1,500byte 초과되었습니다.</span>' : ''}`;
     }
   }
+  scheduleAutoSave();
 }
 function saveAllRecords(){
+  clearTimeout(s3AutoSaveTimer);
   s3LastSaved = fmtSavedTime();
-  $('s3-saved').textContent = s3LastSaved;
+  if($('s3-saved')) $('s3-saved').textContent = s3LastSaved;
   showToast('전체 기록을 저장했어요');
 }
 function exportNEIS(){ showToast('NEIS 양식으로 내보내기 (mock)'); }
@@ -2321,6 +2537,7 @@ function addCustomItem(sid){
   if(!s) return;
   getS2(s).customs.push({content:''});
   if(s.s3 && s.s3.aiText) markDirty(s, 'items');
+  else scheduleAutoSave();
   if(isDrawerOpen() && curDetailId === sid){
     renderDrawerItemsPane(s);
     refreshDrawerItemCount(s);
@@ -2444,6 +2661,45 @@ function toggleNav(){
 
 refreshAll();
 lucide.createIcons();
+
+// 목업 토글 드래그 (MOCKUP 라벨 잡고 이동)
+(function setupMockupDrag(){
+  const toggle = document.getElementById('mockup-toggle');
+  if(!toggle) return;
+  const handle = toggle.querySelector('.mt-label');
+  if(!handle) return;
+  handle.style.cursor = 'move';
+  handle.title = '드래그해서 이동';
+  let dragging = false, offX = 0, offY = 0;
+  handle.addEventListener('mousedown', (e)=>{
+    dragging = true;
+    const rect = toggle.getBoundingClientRect();
+    offX = e.clientX - rect.left;
+    offY = e.clientY - rect.top;
+    toggle.style.right = 'auto';
+    toggle.style.bottom = 'auto';
+    toggle.style.left = rect.left + 'px';
+    toggle.style.top = rect.top + 'px';
+    document.body.style.userSelect = 'none';
+    e.preventDefault();
+  });
+  document.addEventListener('mousemove', (e)=>{
+    if(!dragging) return;
+    let x = e.clientX - offX;
+    let y = e.clientY - offY;
+    const w = toggle.offsetWidth, h = toggle.offsetHeight;
+    x = Math.max(8, Math.min(window.innerWidth - w - 8, x));
+    y = Math.max(8, Math.min(window.innerHeight - h - 8, y));
+    toggle.style.left = x + 'px';
+    toggle.style.top = y + 'px';
+  });
+  document.addEventListener('mouseup', ()=>{
+    if(dragging){
+      dragging = false;
+      document.body.style.userSelect = '';
+    }
+  });
+})();
 
 // ── 온보딩 팝업 ──
 function showOb(){document.getElementById('ob-overlay').classList.add('show');lucide.createIcons();}
