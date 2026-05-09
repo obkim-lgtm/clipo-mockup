@@ -172,6 +172,11 @@ body{background:#fff;color:#222631;overflow:hidden;height:100vh}
 .ec-correctness.correct{background:#e6f6ec;color:#1a7c4d}
 .ec-correctness.review{background:#fef6e6;color:#a16207}
 .ec-correctness.open{background:#f1f3f5;color:#6d7381}
+.ec-level{display:inline-flex;align-items:center;justify-content:center;height:24px;padding:0 10px;border-radius:100px;font-size:12px;font-weight:700;line-height:1;flex-shrink:0;gap:4px;white-space:nowrap}
+.ec-level.lv-correct, .ec-level.lv-high{background:#e6f6ec;color:#15803d}
+.ec-level.lv-mid{background:#fef6e6;color:#a16207}
+.ec-level.lv-wrong, .ec-level.lv-low{background:#fde7e9;color:#b91c1c}
+.ec-level.lv-score{background:#eff3ff;color:#365eef}
 .ec-grade{display:inline-flex;align-items:center;justify-content:center;width:30px;height:26px;border-radius:6px;font-size:13px;font-weight:700;line-height:1;flex-shrink:0}
 .ec-grade.high{background:#e6f6ec;color:#1a7c4d}
 .ec-grade.mid{background:#fef6e6;color:#a16207}
@@ -761,12 +766,14 @@ function switchTab(tab) {
 }
 
 // ══════ 사회과 문항·채점요소 데이터 ══════
+// AI 자동 라벨: 답 있음 → 정답/오답, 답 없음(서술형) → 상/중/하
+var LEVEL_LABEL = { correct: '정답', wrong: '오답', high: '상', mid: '중', low: '하' };
+
 var INSTRUCTIONS = [
   {
     label: '1-1',
     summary: '내가 경험한 주변의 장소 4곳 쓰기',
-    correctness: 'correct',
-    correctnessText: '조건 충족',
+    level: 'correct',
     studentAnswer: '「모현 도서관」, 「익산역」, 「배산 체육 공원」, 「롯데시네마」',
     explanation: '지시문의 조건대로 익산 지역의 실제 장소인 「모현 도서관」, 「익산역」, 「배산 체육 공원」, 「롯데시네마」 4곳을 정확하게 나열했어요.',
     feedback: '익산 지역의 실제 장소 4곳을 조건에 맞게 잘 작성했어요.'
@@ -774,8 +781,7 @@ var INSTRUCTIONS = [
   {
     label: '1-2',
     summary: '1번에서 적은 장소 중 2곳을 골라 표 완성하기',
-    correctness: 'open',
-    correctnessText: '서술형',
+    level: 'high',
     studentAnswer: '익산역(기차 타는 곳, 서울행 경험, 빠르고 좋음), 배산 체육 공원(운동·여가 활동, 동생과 방문, 즐길 수 있어 좋음)',
     explanation: '선택한 두 장소 「익산역」과 「배산 체육 공원」에 대해 장소의 기능(기차를 타는 곳 / 운동·여가 활동을 하는 곳), 경험(서울에 가기 위해 기차를 탔다 / 동생이랑 같이 여가 활동을 하러 갔다), 느낌(빠르게 갈 수 있어 좋다 / 즐길 수 있어서 좋다)을 구체적인 문장으로 서술했어요.',
     feedback: '각 장소에서 겪은 일과 느낀 점을 생생하게 잘 표현했어요. 특히 장소의 특징과 자신의 경험을 잘 연결지어 설명한 점이 훌륭합니다.'
@@ -783,8 +789,7 @@ var INSTRUCTIONS = [
   {
     label: '2-1',
     summary: '우리 집 중심으로 주변 장소 5곳 그림지도로 그리기',
-    correctness: 'correct',
-    correctnessText: '조건 충족',
+    level: 'correct',
     studentAnswer: '「모현 도서관」, 「익산 경찰서」, 「익산 가온 초등학교」, 「배산 체육 공원」, 「배산」 5곳의 명칭과 그림',
     explanation: '우리 집을 중심으로 「모현 도서관」, 「익산 경찰서」, 「익산 가온 초등학교」, 「배산 체육 공원」, 「배산」 5곳의 실제 장소를 명칭과 함께 그림으로 정확히 표현했어요. 특히 경찰 마크나 운동장 트랙처럼 장소의 특징을 시각적으로 잘 나타냈어요.',
     feedback: '우리 집 주변의 장소들을 위치에 맞게 그림지도로 아주 잘 나타냈어요. 각 건물의 특징을 살려 그린 점이 인상적입니다.'
@@ -792,8 +797,7 @@ var INSTRUCTIONS = [
   {
     label: '2-2',
     summary: '우리가 사는 곳에 대한 생각·느낌을 한마디로 표현',
-    correctness: 'review',
-    correctnessText: '보완 필요',
+    level: 'mid',
     studentAnswer: '우리가 사는 곳은 「즐거운 놀이공원」이다. 왜냐하면 「우리가 사는 곳은 재미있는 곳이 많기 때문이다.」',
     explanation: '고장을 「즐거운 놀이공원」이라는 비유적 표현으로 나타냈어요. 다만 이유로 제시한 「재미있는 곳이 많기 때문이다」라는 서술은 비유 대상인 놀이공원의 구체적 속성과 고장의 특징을 긴밀하게 연결하기보다는 다소 일반적·단순한 수준에 머물렀어요.',
     feedback: '고장을 놀이공원에 비유한 점이 재미있어요. 다음에는 놀이공원의 어떤 점이 우리 고장의 어떤 장소와 닮았는지 조금 더 구체적으로 이유를 적어 본다면 더욱 멋진 글이 될 것 같아요.'
@@ -842,6 +846,7 @@ function renderInstructionCards(){
     return '<div class="eval-card" data-kind="instruction" data-idx="' + i + '">'
       +   '<div class="ec-header editable-header" onclick="openInstructionEditModal(' + i + ')" title="문항 제목 수정">'
       +     '<span class="ec-label">' + escHtml(it.label) + '</span>'
+      +     '<span class="ec-level lv-' + it.level + '">' + LEVEL_LABEL[it.level] + '</span>'
       +     '<span class="ec-summary">' + escHtml(it.summary) + '</span>'
       +     '<i class="ec-header-edit-icon" data-lucide="pencil-line" style="width:16px;height:16px"></i>'
       +   '</div>'
@@ -858,8 +863,8 @@ function renderElementCards(){
   pane.innerHTML = ELEMENTS.map(function(el, i){
     return '<div class="eval-card" data-kind="element" data-idx="' + i + '">'
       +   '<div class="ec-header">'
+      +     '<span class="ec-level lv-score">' + el.score + '점</span>'
       +     '<span class="ec-summary">' + escHtml(el.name) + '</span>'
-      +     '<span class="ec-score">' + el.score + '<span class="ec-score-max"> / ' + el.maxScore + '점</span></span>'
       +   '</div>'
       +   editableBlock('채점 근거', el.explanation)
       +   editableBlock('피드백', el.feedback)
