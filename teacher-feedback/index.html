@@ -89,8 +89,9 @@
   /* 목업 내부 UI */
   .mock-frame { border: 1.5px solid var(--line); border-radius: 14px; overflow: hidden; }
   .mock-tabbar { display: flex; gap: 4px; padding: 10px 14px 0; background: #F1F5F9; border-bottom: 1px solid var(--line); }
-  .mock-tab { padding: 8px 14px; font-size: 13px; font-weight: 600; color: var(--ink-3); border-radius: 8px 8px 0 0; }
-  .mock-tab.active { background: #fff; color: var(--brand); }
+  .mock-tab { padding: 8px 14px; font-size: 13px; font-weight: 600; color: var(--ink-3); border-radius: 8px 8px 0 0; cursor: pointer; transition: color 0.15s, background 0.15s; }
+  .mock-tab:not(.active):hover { color: var(--ink); background: rgba(255,255,255,0.6); }
+  .mock-tab.active { background: #fff; color: var(--brand); cursor: default; }
   .mock-content { padding: 24px; background: #fff; }
 
   .mock-label { font-size: 13px; font-weight: 700; color: var(--ink-2); margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
@@ -279,7 +280,7 @@
       <div class="mock-frame">
         <div class="mock-tabbar">
           <div class="mock-tab active">자유 입력</div>
-          <div class="mock-tab">채점 자료 업로드</div>
+          <div class="mock-tab" onclick="closeModal('modal-a'); setTimeout(()=>openModal('modal-b'), 150);">채점 자료 업로드</div>
         </div>
         <div class="mock-content">
           <div class="mock-label">📝 내 피드백 스타일 알려주기</div>
@@ -307,7 +308,7 @@
     <div class="modal-body">
       <div class="mock-frame">
         <div class="mock-tabbar">
-          <div class="mock-tab">자유 입력</div>
+          <div class="mock-tab" onclick="closeModal('modal-b'); setTimeout(()=>openModal('modal-a'), 150);">자유 입력</div>
           <div class="mock-tab active">채점 자료 업로드</div>
         </div>
         <div class="mock-content">
