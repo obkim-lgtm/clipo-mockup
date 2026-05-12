@@ -54,6 +54,16 @@ body{background:#fff;color:#222631;overflow:hidden;height:100vh}
 
 /* ══════ 메인 영역 (102+68=170px 아래) ══════ */
 .main-wrap{display:flex;position:fixed;top:170px;left:0;right:0;bottom:0}
+body.banner-visible .main-wrap{top:214px}
+
+/* 업데이트 안내 배너 (구 채점 화면 → 새 화면 전환 안내) */
+.update-banner{position:fixed;top:170px;left:0;right:0;height:44px;display:none;align-items:center;padding:0 24px;background:#eef3ff;border-bottom:1px solid #d1ddff;z-index:199;gap:12px}
+body.banner-visible .update-banner{display:flex}
+.update-banner-icon{color:#3151c4;flex-shrink:0;display:inline-flex}
+.update-banner-text{font-size:14px;color:#3151c4;flex:1;line-height:1.4;font-weight:500}
+.update-banner-text strong{font-weight:700}
+.update-banner-close{width:32px;height:32px;display:inline-flex;align-items:center;justify-content:center;border:none;background:none;cursor:pointer;color:#3151c4;border-radius:100px;flex-shrink:0;font-family:inherit}
+.update-banner-close:hover{background:#dde7ff}
 
 /* ══════ 뷰어 (좌) ══════ */
 .viewer{flex:1;display:flex;flex-direction:column;min-width:0;position:relative;background:#dde1e8}
@@ -301,6 +311,13 @@ body{background:#fff;color:#222631;overflow:hidden;height:100vh}
   </div>
 </div>
 
+<!-- 업데이트 안내 배너 (구 채점 화면) -->
+<div class="update-banner" id="updateBanner">
+  <span class="update-banner-icon"><i data-lucide="sparkles" style="width:18px;height:18px"></i></span>
+  <span class="update-banner-text"><strong>이 화면은 이전 채점 결과예요.</strong> 다시 채점하면 새로워진 화면으로 전환됩니다.</span>
+  <button class="update-banner-close" onclick="dismissUpdateBanner()" title="다시 보지 않기"><i data-lucide="x" style="width:18px;height:18px"></i></button>
+</div>
+
 <!-- ══════ 메인 영역 ══════ -->
 <div class="main-wrap" id="mainWrap">
 
@@ -524,7 +541,7 @@ body{background:#fff;color:#222631;overflow:hidden;height:100vh}
 <script>
 // ══════ URL 파라미터 ══════
 var urlParams = new URLSearchParams(location.search);
-var studentId = urlParams.get('id') || '10101';
+var studentId = urlParams.get('id') || '10106';
 var studentName = urlParams.get('name') || '김현재';
 var evalPlan = urlParams.get('eval') || 'A';
 var classNum = urlParams.get('classNum') || '1';
@@ -532,14 +549,15 @@ var fromUrl = urlParams.get('from') || '';
 
 // ══════ 더미: 학생 리스트 ══════
 var STUDENT_LIST = [
-  {id:'10101', name:'김현재', status:'확인 필요', statusCls:'need'},
-  {id:'10102', name:'인라인', status:'완료', statusCls:'done', link:'scoring_elementary_inline_v1_260506.html'},
-  {id:'10103', name:'박수진', status:'완료', statusCls:'done'},
-  {id:'10104', name:'최유진', status:'완료', statusCls:'done'},
-  {id:'10105', name:'정현우', status:'미채점', statusCls:'none'},
-  {id:'10106', name:'한가람', status:'미채점', statusCls:'none'},
-  {id:'10107', name:'오세훈', status:'미채점', statusCls:'none'},
-  {id:'10108', name:'한지우', status:'진행 중', statusCls:'progress'}
+  {id:'10101', name:'김채점', status:'확인 필요', statusCls:'need', link:'scoring_elementary_v2_260511.html'},
+  {id:'10102', name:'미제출', status:'미제출', statusCls:'progress', link:'scoring_elementary_v2_260511.html'},
+  {id:'10103', name:'채점전', status:'AI 채점 전', statusCls:'none', link:'scoring_elementary_v2_260511.html'},
+  {id:'10104', name:'채점실패', status:'AI 채점 실패', statusCls:'need', link:'scoring_elementary_v2_260511.html'},
+  {id:'10105', name:'이전채점', status:'이전 채점', statusCls:'none'},
+  {id:'10106', name:'김현재', status:'확인 필요', statusCls:'need'},
+  {id:'10107', name:'인라인', status:'완료', statusCls:'done', link:'scoring_elementary_inline_v1_260506.html'},
+  {id:'10108', name:'한가람', status:'미채점', statusCls:'none'},
+  {id:'10109', name:'오세훈', status:'미채점', statusCls:'none'}
 ];
 var BASE_FILE = 'scoring_elementary_v1_260506.html';
 var currentStudentIdx = STUDENT_LIST.findIndex(function(s){ return s.id === studentId; });
@@ -885,6 +903,20 @@ syncSelectedStudent();
 renderDropdown();
 renderInstructionCards();
 renderElementCards();
+
+// ══════ 업데이트 안내 배너 ══════
+var BANNER_DISMISS_KEY = 'clipo_old_ui_banner_dismissed';
+function showUpdateBanner(){
+  if(localStorage.getItem(BANNER_DISMISS_KEY) === '1') return;
+  document.body.classList.add('banner-visible');
+}
+function dismissUpdateBanner(){
+  localStorage.setItem(BANNER_DISMISS_KEY, '1');
+  document.body.classList.remove('banner-visible');
+  if(typeof showToast === 'function') showToast('success', '다음부터 이 안내가 보이지 않아요.');
+}
+showUpdateBanner();
+
 lucide.createIcons();
 updateTotal();
 </script>
