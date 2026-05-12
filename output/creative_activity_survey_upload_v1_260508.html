@@ -235,25 +235,6 @@ body.nav-expanded .main-shell { margin-left: 200px; transition: margin-left .2s 
   <h1 class="page-title">학생 설문 응답 등록 : <span id="pt-cls">2학년 1반</span></h1>
   <p class="page-sub">학생들이 제출한 설문 응답을 엑셀로 일괄 등록할 수 있어요. 등록한 응답은 AI 분석 시 학생 활동 자료로 반영됩니다.</p>
 
-  <!-- ─── 현재 등록된 데이터 (재진입 시) ─── -->
-  <div class="card" id="existingCard" style="display:none">
-    <div class="section-hd collapse-toggle" onclick="toggleExisting()">
-      <div>
-        <div class="section-title">현재 등록된 설문 응답</div>
-        <div class="section-sub" id="existingMeta">8명 · 4문항 · 마지막 업로드 5월 8일</div>
-      </div>
-      <i data-lucide="chevron-down" class="collapse-caret"></i>
-    </div>
-    <div class="collapse-body">
-      <div class="result-table-wrap">
-        <table class="result-table">
-          <thead><tr id="existingHead"></tr></thead>
-          <tbody id="existingRows"></tbody>
-        </table>
-      </div>
-    </div>
-  </div>
-
   <!-- ─── 업로드 카드 ─── -->
   <div class="card">
     <div class="section-hd">
@@ -332,38 +313,6 @@ body.nav-expanded .main-shell { margin-left: 200px; transition: margin-left .2s 
 </main>
 </div>
 
-<!-- ─── 교체 확인 다이얼로그 (재등록 시) ─── -->
-<div class="modal-bg" id="confirmModal">
-  <div class="modal">
-    <div class="modal-hd">
-      <div class="modal-title">기존 응답을 새 파일로 교체할까요?</div>
-      <div class="modal-sub">새 파일에 포함된 학생만 응답이 교체되고, 새 파일에 없는 학생의 기존 응답은 그대로 유지됩니다.</div>
-    </div>
-    <button class="modal-x" onclick="closeConfirmModal()"><i data-lucide="x" style="width:18px;height:18px"></i></button>
-    <div class="modal-body">
-      <div class="modal-warn">
-        <span class="modal-warn-ic"><i data-lucide="alert-triangle" style="width:16px;height:16px"></i></span>
-        <span>설문 응답은 <strong>누적이 아닌 교체</strong>입니다. 같은 학생의 기존 응답은 새 파일 응답으로 덮어씌워져요.</span>
-      </div>
-      <div class="modal-summary">
-        <div class="modal-summary-block">
-          <div class="modal-summary-label">기존</div>
-          <div class="modal-summary-value" id="confirmOld">8명 · 4문항</div>
-        </div>
-        <div class="modal-summary-arrow"><i data-lucide="arrow-right" style="width:18px;height:18px"></i></div>
-        <div class="modal-summary-block">
-          <div class="modal-summary-label">새 파일</div>
-          <div class="modal-summary-value" id="confirmNew">8명 · 4문항</div>
-        </div>
-      </div>
-    </div>
-    <div class="modal-ft">
-      <button class="btn-modal-cancel" onclick="closeConfirmModal()">취소</button>
-      <button class="btn-modal-confirm warning" onclick="confirmReplace()"><i data-lucide="refresh-ccw" style="width:14px;height:14px"></i> 교체</button>
-    </div>
-  </div>
-</div>
-
 <!-- ─── 응답 상세 모달 ─── -->
 <div class="modal-bg" id="qaModal">
   <div class="modal lg">
@@ -379,20 +328,12 @@ body.nav-expanded .main-shell { margin-left: 200px; transition: margin-left .2s 
   </div>
 </div>
 
-<!-- 목업 시나리오 토글 -->
-<div class="mockup-toggle" id="mockup-toggle">
-  <span class="mt-label">MOCKUP</span>
-  <button class="mt-btn" data-scenario="first" onclick="applyScenario('first')">최초 등록</button>
-  <button class="mt-btn" data-scenario="reentry" onclick="applyScenario('reentry')">재등록</button>
-</div>
-
 <div class="toast" id="toast"></div>
 
 <script>
 const _params = new URLSearchParams(location.search);
 const ACTIVITY_TYPE = _params.get('type') || '자율활동';
 const CLS = _params.get('cls') || '2학년 1반';
-let HAS_EXISTING = _params.get('has') === '1' || localStorage.getItem('clipo_survey_' + CLS) === '1';
 document.getElementById('pt-cls').textContent = CLS;
 
 // 설문 문항 (기존 + 새 파일 동일 가정 — 실제론 다를 수 있음)
@@ -520,59 +461,14 @@ function buildBodyRow(r, onclickAttr) {
 }
 
 function init() {
-  const card = document.getElementById('existingCard');
-  if (HAS_EXISTING) {
-    card.style.display = '';
-    card.classList.remove('open');
-    document.getElementById('uploadSectionTitle').textContent = '새 파일로 교체';
-    document.getElementById('step2Desc').textContent = '새 엑셀을 업로드하면 기존 응답을 어떻게 처리할지 확인해드려요.';
-    renderExisting();
-  } else {
-    card.style.display = 'none';
-    document.getElementById('uploadSectionTitle').textContent = '엑셀 파일 업로드';
-    document.getElementById('step2Desc').textContent = '작성한 엑셀을 업로드해 주세요. 학번이 일치하는 학생에게 응답이 등록됩니다.';
-  }
-  document.querySelectorAll('.mt-btn').forEach(b => b.classList.toggle('active', b.dataset.scenario === (HAS_EXISTING ? 'reentry' : 'first')));
   lucide.createIcons();
-}
-
-function applyScenario(scenario) {
-  HAS_EXISTING = (scenario === 'reentry');
-  document.getElementById('uploadEmpty').style.display = '';
-  document.getElementById('uploadFilled').style.display = 'none';
-  document.getElementById('resultSection').style.display = 'none';
-  document.getElementById('saveBtn').disabled = true;
-  closeConfirmModal();
-  closeQaModal();
-  mergedRows = [];
-  init();
-}
-
-function toggleExisting() {
-  document.getElementById('existingCard').classList.toggle('open');
-}
-
-function renderExisting() {
-  document.getElementById('existingHead').innerHTML = buildHeadRow();
-  document.getElementById('existingRows').innerHTML = EXISTING_ROWS.map((r, i) =>
-    buildBodyRow(r, `onclick="openQaModal('existing', ${i})"`)
-  ).join('');
-  document.getElementById('existingMeta').textContent = `${EXISTING_ROWS.length}명 · ${SURVEY_QUESTIONS.length}문항 · 마지막 업로드 5월 8일`;
 }
 
 function onFilePicked() {
   document.getElementById('uploadEmpty').style.display = 'none';
   document.getElementById('uploadFilled').style.display = '';
-  if (HAS_EXISTING) {
-    // 교체 확인 다이얼로그
-    document.getElementById('confirmOld').textContent = `${EXISTING_ROWS.length}명 · ${SURVEY_QUESTIONS.length}문항`;
-    document.getElementById('confirmNew').textContent = `${NEW_UPLOAD_ROWS.length}명 · ${SURVEY_QUESTIONS.length}문항`;
-    document.getElementById('confirmModal').classList.add('show');
-    lucide.createIcons();
-  } else {
-    mergedRows = FIRST_TIME_ROWS.map(r => ({...r, answers: [...r.answers]}));
-    renderResult();
-  }
+  mergedRows = FIRST_TIME_ROWS.map(r => ({...r, answers: [...r.answers]}));
+  renderResult();
   lucide.createIcons();
 }
 
@@ -585,23 +481,9 @@ function clearUpload() {
   lucide.createIcons();
 }
 
-function closeConfirmModal() {
-  document.getElementById('confirmModal').classList.remove('show');
-}
-
-function confirmReplace() {
-  closeConfirmModal();
-  applyMerge();
-  renderResult();
-}
-
 function applyMerge() {
-  // replace 로직: new 파일에 있는 학생만 응답 교체, 없는 학생은 그대로
-  const map = new Map(EXISTING_ROWS.map(r => [r.sid, JSON.parse(JSON.stringify(r))]));
-  NEW_UPLOAD_ROWS.forEach(nr => {
-    map.set(nr.sid, {...nr, answers: [...nr.answers]});
-  });
-  mergedRows = [...map.values()].sort((a,b) => a.sid.localeCompare(b.sid));
+  // 전체 교체: 새 파일 응답이 곧 전체 응답
+  mergedRows = NEW_UPLOAD_ROWS.map(r => ({...r, answers: [...r.answers]})).sort((a,b) => a.sid.localeCompare(b.sid));
 }
 
 function renderResult() {
@@ -618,7 +500,7 @@ function renderResult() {
 
 // ── 응답 상세 모달 ──
 function openQaModal(source, idx) {
-  const row = source === 'existing' ? EXISTING_ROWS[idx] : mergedRows[idx];
+  const row = mergedRows[idx];
   if (!row) return;
   document.getElementById('qaTitle').textContent = row.name + ' 학생 설문 응답';
   document.getElementById('qaMeta').textContent = `${row.sid} · ${ACTIVITY_TYPE} · ${CLS}`;
@@ -647,8 +529,8 @@ function goBack() {
 }
 
 function saveAndBack() {
-  localStorage.setItem('clipo_survey_' + CLS, '1');
-  showToast(`${mergedRows.length}명의 설문 응답을 ${HAS_EXISTING ? '교체' : '등록'}했어요`);
+  try { localStorage.setItem('clipo_survey_' + CLS, '1'); } catch(e) {}
+  showToast(`${mergedRows.length}명의 설문 응답을 등록했어요`);
   setTimeout(() => {
     const params = new URLSearchParams({ type: ACTIVITY_TYPE, cls: CLS, demo: '1' });
     location.href = 'creative_activity_input_v1_260507.html?' + params.toString();

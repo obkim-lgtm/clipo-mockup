@@ -2,6 +2,7 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>창의적 체험활동 - 학생 자료 입력 - CLIPO</title>
 <link rel="icon" type="image/svg+xml" href="clipo_favicon.svg">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard-gov.min.css">
@@ -278,8 +279,12 @@ body.nav-expanded .sticky-cta{left:200px;transition:left .2s ease}
 
 /* 자료 등록 카드 (모달 안) */
 .reg-cards{display:grid;grid-template-columns:repeat(3, 1fr);gap:12px}
-.reg-card{padding:20px;border:1px solid #e5e7eb;border-radius:12px;cursor:pointer;display:flex;flex-direction:column;gap:10px;transition:all .15s;background:#fff;text-align:left;font-family:inherit}
+.reg-card{padding:20px;border:1px solid #e5e7eb;border-radius:12px;cursor:pointer;display:flex;flex-direction:column;gap:10px;transition:all .15s;background:#fff;text-align:left;font-family:inherit;position:relative}
 .reg-card:hover{border-color:#416bff;box-shadow:0 4px 12px rgba(65,107,255,0.08)}
+.reg-card.registered{border-color:#c7d6ff}
+.reg-card.registered:hover{border-color:#416bff}
+.rc-registered{display:none;position:absolute;top:14px;right:14px;align-items:center;gap:3px;padding:3px 8px;background:#e9f2ff;color:#365eef;font-size:11px;font-weight:600;border-radius:10px;line-height:1}
+.reg-card.registered .rc-registered{display:inline-flex}
 .rc-icon{width:44px;height:44px;border-radius:10px;background:#f4f8ff;color:#416bff;display:inline-flex;align-items:center;justify-content:center;line-height:1;flex-shrink:0}
 .rc-title{font-size:16px;font-weight:600;color:#222631;line-height:1.3}
 .rc-desc{font-size:14px;color:#3b3f4c;line-height:1.55;flex:1}
@@ -458,6 +463,30 @@ body.nav-expanded .sticky-cta{left:200px;transition:left .2s ease}
 .stu-pick-name{font-size:14px;color:#222631;font-weight:500;flex:1}
 .stu-pick-tag{font-size:11px;color:#6d7381;padding:2px 7px;background:#f1f3f5;border-radius:10px}
 .stu-pick-tag.exists{color:#416bff;background:#e9f2ff}
+.stu-pick-tag.disabled{color:#f97316;background:#fff3e0}
+.stu-pick-tag.warn{color:#92400e;background:#fef3c7}
+.stu-pick-tag.analyzed{color:#15803d;background:#dcfce7}
+.stu-pick-tag.muted{color:#6d7381;background:#f1f3f5}
+.stu-pick-tag .dot{width:6px;height:6px;border-radius:50%;background:currentColor;display:inline-block;margin-right:5px;vertical-align:1px}
+.stu-pick-tag-blank{color:#dde1e8;font-size:13px}
+
+/* 학생 picker 헤더/컬럼 정렬 */
+.stu-pick-header{display:flex;align-items:center;gap:10px;padding:8px 14px;font-size:12px;font-weight:600;color:#6d7381;background:#fafbfc;border-bottom:1px solid #f1f3f5;text-transform:none}
+.stu-pick-header-spacer{width:16px;flex-shrink:0}
+.stu-pick-header-col.sid{width:56px;flex-shrink:0}
+.stu-pick-header-col.name{flex:1}
+.stu-pick-header-col.data{width:90px;flex-shrink:0;text-align:center}
+.stu-pick-header-col.gen{width:80px;flex-shrink:0;text-align:center}
+.stu-pick-col{display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.stu-pick-col.data{width:90px}
+.stu-pick-col.gen{width:80px}
+
+/* 수정 방향 프롬프트 */
+.s3-prompt-textarea{width:100%;min-height:72px;max-height:160px;padding:10px 12px;border:1px solid #d9d9d9;border-radius:8px;font-family:inherit;font-size:14px;color:#222631;line-height:1.55;resize:vertical;outline:none;box-sizing:border-box}
+.s3-prompt-textarea:focus{border-color:#416bff}
+.s3-prompt-textarea::placeholder{color:#b3b6bd}
+.stu-pick-row.disabled{opacity:.55;cursor:not-allowed}
+.stu-pick-row.disabled input{cursor:not-allowed}
 
 /* placeholder 영역 (사용 안 함) */
 .placeholder-card{background:#fff;border:1.5px dashed #d9d9d9;border-radius:12px;padding:60px 24px;text-align:center;color:#b3b6bd}
@@ -562,7 +591,7 @@ body.nav-expanded .sticky-cta{left:200px;transition:left .2s ease}
 .s2-stu-status.idle{background:#f1f3f5;color:#6d7381}
 .s2-stu-status.analyzing{background:#fef3c7;color:#b45309}
 .s2-stu-status.done{background:#dcfce7;color:#15803d}
-.s2-stu-status.empty{background:#fee2e2;color:#b91c1c}
+.s2-stu-status.empty{background:#fff3e0;color:#f97316}
 
 /* 추천/후보 그룹 */
 .s2-group-hd{display:flex;align-items:center;gap:8px;padding:6px 4px;margin-top:4px}
@@ -674,7 +703,7 @@ body.nav-expanded .sticky-cta{left:200px;transition:left .2s ease}
           <div class="ch-sub" id="ph-progress">학생 0명 등록 · 자료 등록 시 AI가 자동 매칭합니다</div>
         </div>
         <div class="ch-actions">
-          <button class="btn-primary" onclick="openRegisterModal()"><i data-lucide="plus" style="width:14px;height:14px"></i> 자료 등록</button>
+          <button class="btn-primary" id="btn-data-add" onclick="openRegisterModal()"><i data-lucide="plus" style="width:14px;height:14px"></i> 자료 등록</button>
         </div>
       </div>
       <div class="table-wrap">
@@ -733,7 +762,7 @@ body.nav-expanded .sticky-cta{left:200px;transition:left .2s ease}
         <span class="s3-saved" id="s3-saved">저장된 적 없음</span>
         <div class="s3-actions">
           <button class="btn-primary" id="s3-genall-btn" onclick="generateAllRecords()"><i data-lucide="sparkles" style="width:14px;height:14px"></i> 전체 기록 생성</button>
-          <button class="btn-excel" onclick="exportNEIS()"><i data-lucide="download" style="width:14px;height:14px"></i> 엑셀 내보내기</button>
+          <button class="btn-excel" id="btn-export-excel" onclick="exportNEIS()"><i data-lucide="download" style="width:14px;height:14px"></i> 엑셀 내보내기</button>
         </div>
       </div>
       <div class="s3-table-wrap">
@@ -790,7 +819,7 @@ body.nav-expanded .sticky-cta{left:200px;transition:left .2s ease}
         <div class="mini-dropzone" onclick="pickIndFile()">
           <i data-lucide="upload-cloud" style="width:24px;height:24px;color:#b3b6bd"></i>
           <div class="mini-dz-text">자료 추가 업로드</div>
-          <div class="mini-dz-hint">DOCX · JPG · PNG · PDF · 최대 5개 / 20MB</div>
+          <div class="mini-dz-hint">DOCX · JPG · PNG · PDF · 최대 3개 / 20MB</div>
         </div>
         <div id="md-files" style="margin-top:8px"></div>
       </div>
@@ -839,39 +868,6 @@ body.nav-expanded .sticky-cta{left:200px;transition:left .2s ease}
   </div>
 </div>
 
-<!-- ── 추가/덮어쓰기 확인 모달 ── -->
-<div class="modal-bg" id="modal-overwrite">
-  <div class="modal">
-    <div class="modal-hd">
-      <div>
-        <div class="modal-title">기존 자료에 어떻게 반영할까요?</div>
-        <div class="modal-sub" id="mo-sub">이미 학생별로 자료가 등록되어 있어요</div>
-      </div>
-      <button class="modal-x" onclick="closeModal('modal-overwrite')"><i data-lucide="x" style="width:18px;height:18px"></i></button>
-    </div>
-    <div class="modal-body">
-      <label style="display:flex;gap:12px;padding:14px;border:1.5px solid #416bff;border-radius:10px;background:#f4f8ff;cursor:pointer;margin-bottom:8px">
-        <input type="radio" name="ow-mode" value="append" checked style="accent-color:#416bff;margin-top:2px">
-        <div>
-          <div style="font-size:14px;font-weight:600;color:#222631;margin-bottom:2px">추가하기</div>
-          <div style="font-size:13px;color:#6d7381;line-height:1.5">기존 자료에 새 자료를 추가합니다. 같은 학생에게 여러 자료가 누적돼요.</div>
-        </div>
-      </label>
-      <label style="display:flex;gap:12px;padding:14px;border:1.5px solid #d9d9d9;border-radius:10px;cursor:pointer">
-        <input type="radio" name="ow-mode" value="overwrite" style="accent-color:#416bff;margin-top:2px">
-        <div>
-          <div style="font-size:14px;font-weight:600;color:#222631;margin-bottom:2px">덮어쓰기</div>
-          <div style="font-size:13px;color:#6d7381;line-height:1.5">기존 자료를 모두 지우고 새 자료로 교체합니다.</div>
-        </div>
-      </label>
-    </div>
-    <div class="modal-ft">
-      <button class="btn-secondary" onclick="closeModal('modal-overwrite')">취소</button>
-      <button class="btn-primary" onclick="confirmOverwrite()">계속 진행</button>
-    </div>
-  </div>
-</div>
-
 <!-- ── 학생 추가 모달 (학급 등록 가능 학생 선택) ── -->
 <div class="modal-bg" id="modal-add-stu">
   <div class="modal">
@@ -904,29 +900,32 @@ body.nav-expanded .sticky-cta{left:200px;transition:left .2s ease}
       <button class="modal-x" onclick="closeModal('modal-register')"><i data-lucide="x" style="width:18px;height:18px"></i></button>
     </div>
     <div class="modal-body">
+      <div style="display:flex;align-items:flex-start;gap:8px;padding:12px 14px;background:#fffbeb;border:1px solid #fde68a;border-radius:8px;margin-bottom:16px;font-size:13px;color:#92400e;line-height:1.55">
+        <i data-lucide="info" style="width:14px;height:14px;flex-shrink:0;margin-top:2px"></i>
+        <div><strong>유형별 1개 파일</strong>만 업로드할 수 있어요. 동일 유형 재업로드 시 기존 자료가 삭제되고 새 자료로 교체됩니다.</div>
+      </div>
       <div class="reg-cards">
-        <button class="reg-card" onclick="pickRegisterType('survey')">
+        <button class="reg-card" data-type="survey" onclick="pickRegisterType('survey')">
           <div class="rc-icon"><i data-lucide="file-spreadsheet" style="width:22px;height:22px"></i></div>
           <div class="rc-title">학생 설문 응답 (EXCEL)</div>
-          <div class="rc-desc">구글 설문 등으로 받은 학기말 학생 응답을 엑셀로 일괄 등록</div>
+          <div class="rc-desc">구글 설문 등으로 받은 학생 응답 자료를 엑셀로 일괄 등록</div>
           <div class="rc-match">
             <i data-lucide="link" style="width:14px;height:14px"></i>
             <span>학번·이름이 포함된 설문 응답 결과 업로드</span>
           </div>
+          <span class="rc-registered"><i data-lucide="check" style="width:11px;height:11px"></i> 등록됨</span>
         </button>
-        <button class="reg-card" onclick="pickRegisterType('activity')">
+        <button class="reg-card" data-type="activity" onclick="pickRegisterType('activity')">
           <div class="rc-icon"><i data-lucide="file-text" style="width:22px;height:22px"></i></div>
           <div class="rc-title">활동지·보고서 (PDF)</div>
-          <div class="rc-desc">학기 중 진행한 활동의 보고서나 결과물을 일괄 등록</div>
+          <div class="rc-desc">학급 단위로 일괄 스캔한 PDF 1개 업로드</div>
           <div class="rc-match">
             <i data-lucide="link" style="width:14px;height:14px"></i>
-            <div class="rc-match-multi">
-              <span>· PDF 학급 스캔본</span>
-              <span>· 폴더 학생별 파일</span>
-            </div>
+            <span>PDF 학급 스캔본 1개</span>
           </div>
+          <span class="rc-registered"><i data-lucide="check" style="width:11px;height:11px"></i> 등록됨</span>
         </button>
-        <button class="reg-card" onclick="pickRegisterType('keyword')">
+        <button class="reg-card" data-type="keyword" onclick="pickRegisterType('keyword')">
           <div class="rc-icon"><i data-lucide="pencil" style="width:22px;height:22px"></i></div>
           <div class="rc-title">학생 활동 특성 키워드 (EXCEL)</div>
           <div class="rc-desc">평소 학생을 관찰하며 기록한 메모를 특성 키워드로 일괄 등록</div>
@@ -934,8 +933,24 @@ body.nav-expanded .sticky-cta{left:200px;transition:left .2s ease}
             <i data-lucide="link" style="width:14px;height:14px"></i>
             <span>양식을 다운받아 작성 후 업로드</span>
           </div>
+          <span class="rc-registered"><i data-lucide="check" style="width:11px;height:11px"></i> 등록됨</span>
         </button>
       </div>
+    </div>
+  </div>
+</div>
+
+<!-- ── 재업로드 덮어쓰기 확인 모달 ── -->
+<div class="modal-bg" id="modal-overwrite">
+  <div class="modal" style="max-width:420px">
+    <div style="padding:32px 28px 24px;text-align:center">
+      <div style="width:56px;height:56px;border-radius:50%;background:#fffbeb;color:#f59e0b;display:flex;align-items:center;justify-content:center;margin:0 auto 16px"><i data-lucide="alert-triangle" style="width:26px;height:26px"></i></div>
+      <div style="font-size:18px;font-weight:700;color:#222631;line-height:1.5;margin-bottom:8px">이미 등록된 <span id="ow-type-label">자료</span>가 있어요</div>
+      <div style="font-size:14px;color:#6d7381;line-height:1.6">새로 업로드하면 기존 <strong id="ow-type-label-2">자료</strong>가 모두 삭제되고<br>새 자료로 교체됩니다. 계속할까요?</div>
+    </div>
+    <div style="padding:0 28px 24px;display:flex;gap:8px">
+      <button onclick="closeModal('modal-overwrite')" style="flex:1;padding:11px;border:1px solid #d9d9d9;border-radius:6px;background:#fff;color:#3b3f4c;font-size:14px;font-weight:500;font-family:inherit;cursor:pointer;line-height:1">취소</button>
+      <button onclick="confirmOverwriteUpload()" style="flex:1;padding:11px;border:none;border-radius:6px;background:#f97316;color:#fff;font-size:14px;font-weight:600;font-family:inherit;cursor:pointer;line-height:1">교체</button>
     </div>
   </div>
 </div>
@@ -1018,6 +1033,17 @@ body.nav-expanded .sticky-cta{left:200px;transition:left .2s ease}
       <button class="modal-x" onclick="closeModal('modal-length')"><i data-lucide="x" style="width:18px;height:18px"></i></button>
     </div>
     <div class="modal-body">
+      <div id="s3-credit-notice" style="display:none;align-items:flex-start;gap:8px;padding:12px 14px;background:#f4f8ff;border:1px solid #c7d6ff;border-radius:8px;margin-bottom:10px;font-size:13px;color:#3151c4;line-height:1.55">
+        <i data-lucide="info" style="width:14px;height:14px;flex-shrink:0;margin-top:2px"></i>
+        <div>AI 기록 생성은 <strong>학생당 1 크레딧</strong>이 사용됩니다. 자료나 특성 키워드가 없는 학생은 생성할 수 없어요.</div>
+      </div>
+      <div id="s3-analyze-warning" style="display:none;align-items:flex-start;gap:8px;padding:12px 14px;background:#fffbeb;border:1px solid #fde68a;border-radius:8px;margin-bottom:16px;font-size:13px;color:#92400e;line-height:1.55">
+        <i data-lucide="alert-triangle" style="width:14px;height:14px;flex-shrink:0;margin-top:2px"></i>
+        <div style="flex:1">
+          <div><strong>분석 안 된 학생</strong>은 업로드된 자료가 기록에 반영되지 않아요. 더 정확한 기록을 위해 <strong>2단계에서 먼저 분석</strong>하는 걸 권장합니다.</div>
+          <a onclick="openStep2InNewTab(event)" style="display:inline-flex;align-items:center;gap:4px;margin-top:6px;font-size:13px;font-weight:600;color:#92400e;text-decoration:underline;cursor:pointer">2단계에서 분석하기 <i data-lucide="external-link" style="width:13px;height:13px"></i></a>
+        </div>
+      </div>
       <div class="stu-pick-section" id="stu-pick-section" style="display:none">
         <div class="stu-pick-head">
           <span class="stu-pick-title">학생 선택</span>
@@ -1025,7 +1051,7 @@ body.nav-expanded .sticky-cta{left:200px;transition:left .2s ease}
         </div>
         <label class="stu-pick-master">
           <input type="checkbox" id="stu-pick-all" onchange="toggleAllStuPick(this.checked)">
-          <span>전체 선택</span>
+          <span>전체 선택 (생성 가능한 학생만)</span>
         </label>
         <div class="stu-pick-list" id="stu-pick-list"></div>
       </div>
@@ -1033,10 +1059,17 @@ body.nav-expanded .sticky-cta{left:200px;transition:left .2s ease}
       <label class="length-opt"><input type="radio" name="s3-length" value="300-400"><span>300~400자 <em>(900~1,200 Byte)</em></span></label>
       <label class="length-opt"><input type="radio" name="s3-length" value="400-500" checked><span>400~500자 <em>(1,200~1,500 Byte)</em></span></label>
       <label class="length-opt"><input type="radio" name="s3-length" value="500-600"><span>500~600자 <em>(1,500~1,800 Byte)</em></span></label>
+
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-top:20px;margin-bottom:8px">
+        <span style="font-size:14px;font-weight:600;color:#3b3f4c">요청사항 <span style="font-weight:500;color:#6d7381">(선택)</span></span>
+        <span id="s3-prompt-count" style="font-size:12px;color:#b3b6bd">0 / 200</span>
+      </div>
+      <textarea id="s3-prompt-input" class="s3-prompt-textarea" placeholder="예) 협력적 태도와 리더십을 더 강조해 주세요. 학생이 주도적으로 진행한 부분을 부각해 주세요." maxlength="200" oninput="updateS3PromptCount()"></textarea>
+      <div style="font-size:12px;color:#6d7381;margin-top:6px;line-height:1.5">AI가 기록을 생성할 때 반영할 내용을 적어 주세요. 강조하고 싶은 키워드, 톤 & 매너, 특정 활동에 대한 디테일 등을 입력하면 결과에 반영됩니다. 비워두면 기본 지침으로 생성돼요.</div>
     </div>
     <div class="modal-ft">
       <button class="btn-secondary" onclick="closeModal('modal-length')">취소</button>
-      <button class="btn-primary" onclick="confirmLength()"><i data-lucide="sparkles" style="width:14px;height:14px"></i> 생성</button>
+      <button class="btn-primary" id="s3-confirm-btn" onclick="confirmLength()"><i data-lucide="sparkles" style="width:14px;height:14px"></i> 생성 · <span id="s3-credit-count">0</span> 크레딧</button>
     </div>
   </div>
 </div>
@@ -1047,11 +1080,15 @@ body.nav-expanded .sticky-cta{left:200px;transition:left .2s ease}
     <div class="modal-hd">
       <div>
         <div class="modal-title" id="modal-analyze-title">전체 AI 분석</div>
-        <div class="modal-sub">분석할 학생을 선택해 주세요. 활동 자료가 등록된 학생만 분석할 수 있어요.</div>
+        <div class="modal-sub">분석할 학생을 선택해 주세요.</div>
       </div>
       <button class="modal-x" onclick="closeModal('modal-analyze')"><i data-lucide="x" style="width:18px;height:18px"></i></button>
     </div>
     <div class="modal-body">
+      <div style="display:flex;align-items:flex-start;gap:8px;padding:12px 14px;background:#f4f8ff;border:1px solid #c7d6ff;border-radius:8px;margin-bottom:16px;font-size:13px;color:#3151c4;line-height:1.55">
+        <i data-lucide="info" style="width:14px;height:14px;flex-shrink:0;margin-top:2px"></i>
+        <div>AI 분석은 <strong>학생당 1 크레딧</strong>이 사용됩니다. 설문 응답 또는 활동지·보고서가 없는 학생은 분석할 수 없어요.</div>
+      </div>
       <div class="stu-pick-section">
         <div class="stu-pick-head">
           <span class="stu-pick-title">학생 선택</span>
@@ -1059,14 +1096,14 @@ body.nav-expanded .sticky-cta{left:200px;transition:left .2s ease}
         </div>
         <label class="stu-pick-master">
           <input type="checkbox" id="analyze-stu-pick-all" onchange="toggleAllAnalyzeStuPick(this.checked)">
-          <span>전체 선택</span>
+          <span>전체 선택 (분석 가능한 학생만)</span>
         </label>
         <div class="stu-pick-list" id="analyze-stu-pick-list"></div>
       </div>
     </div>
     <div class="modal-ft">
       <button class="btn-secondary" onclick="closeModal('modal-analyze')">취소</button>
-      <button class="btn-primary" id="analyze-confirm-btn" onclick="confirmAnalyze()"><i data-lucide="sparkles" style="width:14px;height:14px"></i> 분석 시작</button>
+      <button class="btn-primary" id="analyze-confirm-btn" onclick="confirmAnalyze()"><i data-lucide="sparkles" style="width:14px;height:14px"></i> 분석 시작 · <span id="analyze-credit-count">0</span> 크레딧</button>
     </div>
   </div>
 </div>
@@ -1081,6 +1118,47 @@ body.nav-expanded .sticky-cta{left:200px;transition:left .2s ease}
 
 <!-- 토스트 -->
 <div class="toast" id="toast"></div>
+
+<!-- ── 온보딩 가이드 투어 ── -->
+<div id="tour-overlay">
+  <div id="tour-spotlight"></div>
+  <div id="tour-tooltip">
+    <div class="tour-tt-head">
+      <span class="tour-tt-step" id="tour-tt-step">1 / 9</span>
+      <button class="tour-tt-close" onclick="endTour()" title="투어 종료"><i data-lucide="x" style="width:14px;height:14px"></i></button>
+    </div>
+    <div class="tour-tt-title" id="tour-tt-title">제목</div>
+    <div class="tour-tt-desc" id="tour-tt-desc">설명</div>
+    <div class="tour-tt-foot">
+      <button class="tour-tt-skip" onclick="endTour()">건너뛰기</button>
+      <div class="tour-tt-actions">
+        <button class="tour-tt-prev" id="tour-tt-prev" onclick="tourPrev()">이전</button>
+        <button class="tour-tt-next" id="tour-tt-next" onclick="tourNext()">다음 →</button>
+      </div>
+    </div>
+  </div>
+</div>
+<style>
+#tour-overlay{display:none;position:fixed;inset:0;z-index:850;pointer-events:none}
+#tour-overlay.active{display:block}
+#tour-spotlight{position:absolute;border-radius:10px;box-shadow:0 0 0 9999px rgba(15,23,42,.55),0 0 0 4px #416bff,0 0 20px rgba(65,107,255,.45);transition:top .25s ease,left .25s ease,width .25s ease,height .25s ease;pointer-events:none}
+#tour-tooltip{position:absolute;width:340px;max-width:calc(100vw - 32px);background:#fff;border-radius:12px;padding:16px 18px 14px;box-shadow:0 12px 32px rgba(0,0,0,.2);pointer-events:auto;transition:top .25s ease,left .25s ease}
+.tour-tt-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
+.tour-tt-step{font-size:12px;font-weight:600;color:#416bff;background:#e9f2ff;padding:2px 8px;border-radius:10px}
+.tour-tt-close{background:none;border:none;cursor:pointer;color:#6d7381;padding:2px;display:flex;border-radius:4px}
+.tour-tt-close:hover{background:#f6f7f9}
+.tour-tt-title{font-size:16px;font-weight:600;color:#222631;margin-bottom:6px;line-height:1.4}
+.tour-tt-desc{font-size:14px;color:#3b3f4c;line-height:1.55;margin-bottom:14px}
+.tour-tt-foot{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.tour-tt-skip{background:none;border:none;cursor:pointer;color:#6d7381;font-size:13px;font-family:inherit;padding:6px 0;text-decoration:underline}
+.tour-tt-actions{display:flex;gap:8px}
+.tour-tt-prev,.tour-tt-next{padding:8px 14px;border-radius:6px;font-size:13px;font-weight:600;font-family:inherit;cursor:pointer;line-height:1;border:none}
+.tour-tt-prev{background:#fff;border:1px solid #d9d9d9;color:#3b3f4c}
+.tour-tt-prev:hover{background:#f6f7f9}
+.tour-tt-prev:disabled{opacity:.4;cursor:not-allowed}
+.tour-tt-next{background:#416bff;color:#fff}
+.tour-tt-next:hover{background:#365eef}
+</style>
 
 <!-- ── 첫 진입 온보딩 팝업 (기능 안내) ── -->
 <div id="ob-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:900;align-items:center;justify-content:center">
@@ -1099,27 +1177,30 @@ body.nav-expanded .sticky-cta{left:200px;transition:left .2s ease}
           <div class="ob-step-num">1</div>
           <div class="ob-step-ic"><i data-lucide="upload" style="width:20px;height:20px"></i></div>
           <div class="ob-step-title">학생 자료 업로드</div>
-          <div class="ob-step-desc">자기평가서·활동지·보고서를 PDF·JPG·PNG로 업로드</div>
+          <div class="ob-step-desc">자기평가서·활동지·보고서를<br>PDF·EXCEL로 업로드</div>
+          <span class="ob-btn-chip"><i data-lucide="plus" style="width:10px;height:10px"></i> 자료 등록</span>
         </div>
         <div class="ob-arrow"><i data-lucide="chevron-right" style="width:14px;height:14px"></i></div>
         <div class="ob-step">
           <div class="ob-step-num">2</div>
           <div class="ob-step-ic"><i data-lucide="bot" style="width:20px;height:20px"></i></div>
           <div class="ob-step-title">AI 자동 분석</div>
-          <div class="ob-step-desc">학생이 실제 수행한 내용을 추출해 활동 특성을 제안</div>
+          <div class="ob-step-desc">자료에서 학생이 실제 수행한<br>내용을 추출해 특성 제안</div>
+          <span class="ob-btn-chip"><i data-lucide="sparkles" style="width:10px;height:10px"></i> 전체 분석 시작</span>
         </div>
         <div class="ob-arrow"><i data-lucide="chevron-right" style="width:14px;height:14px"></i></div>
         <div class="ob-step">
           <div class="ob-step-num">3</div>
           <div class="ob-step-ic"><i data-lucide="file-text" style="width:20px;height:20px"></i></div>
           <div class="ob-step-title">기록 초안 생성</div>
-          <div class="ob-step-desc">선택한 특성으로 AI가 기록 초안을 자연스럽게 작성</div>
+          <div class="ob-step-desc">선택한 특성으로 AI가<br>기록 초안을 자연스럽게 작성</div>
+          <span class="ob-btn-chip"><i data-lucide="sparkles" style="width:10px;height:10px"></i> 전체 기록 생성</span>
         </div>
       </div>
     </div>
 
     <div style="padding:0 28px 24px">
-      <button onclick="startFromOnboarding()" style="width:100%;padding:12px;border:none;border-radius:6px;background:#365eef;color:#fff;font-size:15px;font-weight:600;font-family:inherit;cursor:pointer;line-height:1;display:inline-flex;align-items:center;justify-content:center;gap:6px"><i data-lucide="upload" style="width:14px;height:14px"></i> 자료 등록 시작하기</button>
+      <button onclick="startFromOnboarding()" style="width:100%;padding:12px;border:none;border-radius:6px;background:#365eef;color:#fff;font-size:15px;font-weight:600;font-family:inherit;cursor:pointer;line-height:1;display:inline-flex;align-items:center;justify-content:center;gap:6px"><i data-lucide="play-circle" style="width:16px;height:16px"></i> 온보딩 시작하기</button>
     </div>
   </div>
 </div>
@@ -1128,7 +1209,8 @@ body.nav-expanded .sticky-cta{left:200px;transition:left .2s ease}
 .ob-step-num{position:absolute;top:8px;left:10px;width:20px;height:20px;border-radius:50%;background:#365eef;color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center}
 .ob-step-ic{width:36px;height:36px;border-radius:8px;background:#fff;color:#365eef;display:flex;align-items:center;justify-content:center;margin-bottom:8px;border:1px solid #e0e3e8}
 .ob-step-title{font-size:14px;font-weight:600;color:#222631;margin-bottom:4px}
-.ob-step-desc{font-size:12px;color:#6d7381;line-height:1.45}
+.ob-step-desc{font-size:12px;color:#6d7381;line-height:1.45;margin-bottom:10px}
+.ob-btn-chip{display:inline-flex;align-items:center;gap:4px;padding:4px 8px;background:#fff;border:1px solid #c7d6ff;color:#365eef;border-radius:14px;font-size:11px;font-weight:600;line-height:1;margin-top:auto}
 .ob-arrow{display:flex;align-items:center;justify-content:center;color:#b3b6bd}
 #ob-overlay.show{display:flex !important}
 </style>
@@ -1150,50 +1232,35 @@ if(ACTIVITY_TYPE === '동아리활동'){
 let STUDENTS = [
   {id:1, sid:'20101', name:'김민수', level:'high', files:[
     {name:'학기말_자율설문 (행)', type:'survey', source:'bulk', kindLabel:'설문'},
-    {name:'봉사보고서_김민수.pdf', size:'2.4MB', type:'pdf', source:'bulk', kindLabel:'활동지'},
-    {name:'독서록_총정리.docx', size:'820KB', type:'docx', source:'individual', kindLabel:'개별'},
-    {name:'미술_자화상_김민수.jpg', size:'1.8MB', type:'jpg', source:'bulk', kindLabel:'활동지'}
-  ], keywords:[{text:'봉사 리더십',source:'bulk'},{text:'창의력',source:'bulk'},{text:'협력적 태도',source:'keyword'},{text:'책임감',source:'keyword'}]},
-  {id:2, sid:'20102', name:'박서연', level:'mid', files:[
-    {name:'학기말_자율설문 (행)', type:'survey', source:'bulk', kindLabel:'설문'},
-    {name:'독서감상문_4월_박서연.pdf', size:'1.1MB', type:'pdf', source:'bulk', kindLabel:'활동지'},
-    {name:'봉사일지_박서연.pdf', size:'960KB', type:'pdf', source:'bulk', kindLabel:'활동지'},
-    {name:'자율탐구_박서연.docx', size:'540KB', type:'docx', source:'individual', kindLabel:'개별'}
-  ], keywords:[{text:'독서활동 우수',source:'bulk'},{text:'글쓰기 능력',source:'keyword'},{text:'친구들과 협력',source:'keyword'}]},
+    {name:'2학년1반_활동지_스캔본.pdf', size:'12.4MB', type:'pdf', source:'bulk', kindLabel:'활동지'},
+    {name:'학생관찰키워드 (행)', type:'keyword', source:'bulk', kindLabel:'키워드'}
+  ], keywords:[{text:'봉사 리더십',source:'bulk'},{text:'창의력',source:'bulk'},{text:'협력적 태도',source:'bulk'},{text:'책임감',source:'bulk'}]},
+  {id:2, sid:'20102', name:'박서연', level:'mid', files:[], keywords:[]},
   {id:3, sid:'20103', name:'이지호', files:[
     {name:'학기말_자율설문 (행)', type:'survey', source:'bulk', kindLabel:'설문'},
-    {name:'봉사보고서_이지호.pdf', size:'1.2MB', type:'pdf', source:'bulk', kindLabel:'활동지'},
-    {name:'활동지_이지호.docx', size:'380KB', type:'docx', source:'individual', kindLabel:'개별'}
+    {name:'2학년1반_활동지_스캔본.pdf', size:'12.4MB', type:'pdf', source:'bulk', kindLabel:'활동지'}
   ], keywords:[]},
   {id:4, sid:'20104', name:'최유진', level:'high', files:[
-    {name:'미술_자화상_최유진.jpg', size:'2.1MB', type:'jpg', source:'individual', kindLabel:'개별'},
-    {name:'미술_정물화_최유진.jpg', size:'1.6MB', type:'jpg', source:'individual', kindLabel:'개별'},
-    {name:'미술_풍경화_최유진.jpg', size:'1.9MB', type:'jpg', source:'individual', kindLabel:'개별'},
-    {name:'봉사보고서_최유진.pdf', size:'1.5MB', type:'pdf', source:'bulk', kindLabel:'활동지'}
-  ], keywords:[{text:'창의적 표현',source:'keyword'},{text:'미적 감수성',source:'keyword'}]},
+    {name:'2학년1반_활동지_스캔본.pdf', size:'12.4MB', type:'pdf', source:'bulk', kindLabel:'활동지'},
+    {name:'학생관찰키워드 (행)', type:'keyword', source:'bulk', kindLabel:'키워드'}
+  ], keywords:[{text:'창의적 표현',source:'bulk'},{text:'미적 감수성',source:'bulk'}]},
   {id:5, sid:'20105', name:'정우진', files:[
-    {name:'봉사보고서_정우진.pdf', size:'1.3MB', type:'pdf', source:'bulk', kindLabel:'활동지'},
-    {name:'활동지_정우진.docx', size:'420KB', type:'docx', source:'individual', kindLabel:'개별'},
-    {name:'독서감상문_정우진.pdf', size:'880KB', type:'pdf', source:'bulk', kindLabel:'활동지'}
-  ], keywords:[]},
+    {name:'2학년1반_활동지_스캔본.pdf', size:'12.4MB', type:'pdf', source:'bulk', kindLabel:'활동지'}
+  ], keywords:[], demoSkipAutoAnalyze:true},
   {id:6, sid:'20106', name:'한지민', level:'mid', files:[
     {name:'학기말_자율설문 (행)', type:'survey', source:'bulk', kindLabel:'설문'},
-    {name:'독서감상문_봄_한지민.pdf', size:'920KB', type:'pdf', source:'bulk', kindLabel:'활동지'},
-    {name:'봉사보고서_한지민.pdf', size:'1.4MB', type:'pdf', source:'bulk', kindLabel:'활동지'},
-    {name:'자율탐구_한지민.docx', size:'620KB', type:'docx', source:'individual', kindLabel:'개별'}
-  ], keywords:[{text:'사고력',source:'keyword'}]},
+    {name:'학생관찰키워드 (행)', type:'keyword', source:'bulk', kindLabel:'키워드'}
+  ], keywords:[{text:'사고력',source:'bulk'}]},
   {id:7, sid:'20107', name:'유태성', level:'low', files:[
-    {name:'봉사보고서_유태성.pdf', size:'1.1MB', type:'pdf', source:'bulk', kindLabel:'활동지'},
-    {name:'독서감상문_유태성.pdf', size:'780KB', type:'pdf', source:'bulk', kindLabel:'활동지'},
-    {name:'활동지_유태성.docx', size:'460KB', type:'docx', source:'individual', kindLabel:'개별'}
+    {name:'학기말_자율설문 (행)', type:'survey', source:'bulk', kindLabel:'설문'},
+    {name:'2학년1반_활동지_스캔본.pdf', size:'12.4MB', type:'pdf', source:'bulk', kindLabel:'활동지'},
+    {name:'학생관찰키워드 (행)', type:'keyword', source:'bulk', kindLabel:'키워드'}
   ], keywords:[
     {text:'배려심',source:'bulk'},{text:'성실함',source:'bulk'},{text:'리더십',source:'bulk'}
   ]},
   {id:8, sid:'20108', name:'송예린', files:[
     {name:'학기말_자율설문 (행)', type:'survey', source:'bulk', kindLabel:'설문'},
-    {name:'봉사보고서_송예린.pdf', size:'1.4MB', type:'pdf', source:'bulk', kindLabel:'활동지'},
-    {name:'독서록_송예린.docx', size:'710KB', type:'docx', source:'individual', kindLabel:'개별'},
-    {name:'미술_자화상_송예린.jpg', size:'1.7MB', type:'jpg', source:'bulk', kindLabel:'활동지'}
+    {name:'2학년1반_활동지_스캔본.pdf', size:'12.4MB', type:'pdf', source:'bulk', kindLabel:'활동지'}
   ], keywords:[]},
 ];
 
@@ -1662,7 +1729,7 @@ function renderDrawerDataPane(s){
   const lev = s.level || 'none';
   $('dr-pane-data').innerHTML = `
     <div class="dp-section">
-      <div class="dp-label">활동 자료 <span class="hint">${s.files.length}/5개</span></div>
+      <div class="dp-label">활동 자료 <span class="hint">${s.files.length}/3개</span></div>
       <div class="mini-dropzone" onclick="pickIndFile()">
         <i data-lucide="upload-cloud" style="width:24px;height:24px;color:#b3b6bd"></i>
         <div class="mini-dz-text">자료 추가 업로드</div>
@@ -1799,7 +1866,7 @@ function renderDetailModal(){
   $('md-avatar').textContent = avatar(s.name);
   $('md-name').textContent = s.name;
   $('md-sub').textContent = s.sid + ' · ' + ACTIVITY_TYPE;
-  $('md-files-cnt').textContent = s.files.length + '/5개';
+  $('md-files-cnt').textContent = s.files.length + '/3개';
   $('md-files').innerHTML = s.files.map((f,i)=>{
     const isVirtual = f.type === 'survey';
     return `<div class="file-row${isVirtual?' clickable':''}" ${isVirtual?`onclick="openSurveyResponse(${s.id},${i})"`:''}>
@@ -1864,7 +1931,7 @@ function pickIndFile(){
   if(!curDetailId) return;
   const s = STUDENTS.find(x=>x.id===curDetailId);
   if(!s) return;
-  if(s.files.length>=5){ showToast('학생당 최대 5개까지 업로드 가능합니다'); return; }
+  if(s.files.length>=3){ showToast('학생당 최대 3개까지 업로드 가능합니다'); return; }
   s.files.push({name:'추가자료_'+(s.files.length+1)+'.pdf',size:'1.2MB',type:'pdf',source:'individual',kindLabel:'개별'});
   markDirty(s, 'file');
   if(isDrawerOpen()) renderDrawerDataPane(s);
@@ -1988,6 +2055,8 @@ function goStep(n){
   $('cta-prev').disabled = n===1;
   if(n<3) $('cta-next').innerHTML = '다음 단계 <i data-lucide="arrow-right" style="width:14px;height:14px"></i>';
   else $('cta-next').innerHTML = '<i data-lucide="check" style="width:14px;height:14px"></i> 저장';
+  // 투어 진행 중이면 단계에 맞춰 스톱 인덱스 동기화
+  if (typeof syncTourToStep === 'function') syncTourToStep(n);
   const stuBtn = $('btn-student-manage');
   if(stuBtn) stuBtn.style.display = (n===1) ? '' : 'none';
   if(n===2) renderStep2();
@@ -2026,11 +2095,12 @@ function scheduleAutoSave(){
   }, 1200);
 }
 function renderStep3(){
-  // 데모: 자료/키워드 있는 학생만 자동 채움. 빈 화면 시나리오는 AI 생성 전 상태로 유지
+  // 데모: 설문/활동지가 있어 분석 가능한 학생만 자동 채움. 키워드만/빈화면은 AI 생성 전 상태로 유지
   STUDENTS.forEach((s, i) => {
     const s3 = getS3(s);
-    const hasData = s.files.length > 0 || s.keywords.length > 0;
-    if(!s3.aiText && hasData){
+    if (s.demoSkipAutoAnalyze) return; // 분석필요 케이스 데모용
+    if (window._tourActive) return; // 투어 중엔 자동 채움 금지 (사용자가 직접 트리거)
+    if(!s3.aiText && s2HasFiles(s)){
       s3.aiText = S3_MOCK_TEXTS[i % S3_MOCK_TEXTS.length];
       s3.editText = s3.aiText;
       s3.generatedAt = Date.now();
@@ -2095,7 +2165,7 @@ function renderS3Row(s){
     <td class="s3-col-sid s3-cell-sid">${s.sid}</td>
     <td class="s3-col-name">
       <div class="s3-stu-name">${s.name}${dirtyDot}</div>
-      <button class="s3-mini-btn" onclick="openDrawer(${s.id})"><i data-lucide="edit-3" style="width:12px;height:12px"></i> 자료 수정</button>
+      <button class="s3-mini-btn" onclick="openDrawer(${s.id})"><i data-lucide="edit-3" style="width:12px;height:12px"></i> 수정</button>
     </td>
     <td class="s3-col-level s3-cell-level">${levelLabel(s.level)}</td>
     <td class="s3-col-ai">${aiCell}</td>
@@ -2109,52 +2179,128 @@ function openLengthModal(scope){
   pendingGenerate = scope;
   document.querySelectorAll('input[name="s3-length"]').forEach(r=>r.checked = (r.value === s3LengthChoice));
   const section = document.getElementById('stu-pick-section');
+  const notice = document.getElementById('s3-credit-notice');
+  const submitBtn = document.getElementById('s3-confirm-btn');
   if (scope.type === 'all') {
     section.style.display = 'block';
+    if (notice) notice.style.display = 'flex';
+    if (submitBtn) submitBtn.innerHTML = '<i data-lucide="sparkles" style="width:14px;height:14px"></i> 생성 · <span id="s3-credit-count">0</span> 크레딧';
     populateStuPick();
   } else {
     section.style.display = 'none';
+    if (notice) notice.style.display = 'none';
+    if (submitBtn) submitBtn.innerHTML = '<i data-lucide="sparkles" style="width:14px;height:14px"></i> 생성 · 1 크레딧';
   }
+  // 프롬프트 초기화
+  const promptEl = document.getElementById('s3-prompt-input');
+  if (promptEl) { promptEl.value = ''; updateS3PromptCount(); }
   $('modal-length').classList.add('show');
   lucide.createIcons();
 }
 
+function s3CanGenerate(s){
+  return s.files.length > 0 || s.keywords.length > 0;
+}
+function s3IsUnanalyzed(s){
+  // 설문/활동지가 있는데 2단계 분석이 안 된 학생
+  return s2HasFiles(s) && getS2(s).status !== 'done';
+}
+
+function dataStatusOf(s){
+  if (s2HasFiles(s)) return getS2(s).status === 'done' ? 'analyzed' : 'needs-analysis';
+  return 'no-data';
+}
+function dataStatusTag(s){
+  const st = dataStatusOf(s);
+  if (st === 'analyzed') return '<span class="stu-pick-tag analyzed"><span class="dot"></span>분석됨</span>';
+  if (st === 'needs-analysis') return '<span class="stu-pick-tag warn"><span class="dot"></span>분석필요</span>';
+  return '<span class="stu-pick-tag muted"><span class="dot"></span>자료없음</span>';
+}
+
 function populateStuPick(){
-  const eligible = STUDENTS.filter(s => s.files.length > 0 || s.keywords.length > 0);
+  // 모든 학생 학번순 표시: [자료 상태] + [생성 상태] 분리
+  const sorted = STUDENTS.slice().sort((a,b) => a.sid.localeCompare(b.sid));
   const list = document.getElementById('stu-pick-list');
-  list.innerHTML = eligible.map(s => {
+  if (sorted.length === 0) {
+    list.innerHTML = '<div style="padding:24px;text-align:center;color:#b3b6bd;font-size:13px">등록된 학생이 없어요</div>';
+    updateStuPickCount();
+    return;
+  }
+  // 헤더 행
+  const header = `<div class="stu-pick-header">
+    <span class="stu-pick-header-spacer"></span>
+    <span class="stu-pick-header-col sid">학번</span>
+    <span class="stu-pick-header-col name">이름</span>
+    <span class="stu-pick-header-col data">자료</span>
+    <span class="stu-pick-header-col gen">생성</span>
+  </div>`;
+  const rows = sorted.map(s => {
     const s3 = getS3(s);
-    const tag = s3.aiText ? (s.dirty ? '<span class="stu-pick-tag">변경됨</span>' : '<span class="stu-pick-tag exists">생성됨</span>') : '';
-    return `<label class="stu-pick-row">
-      <input type="checkbox" class="stu-pick-cb" value="${s.id}" checked onchange="updateStuPickCount()">
+    const canGen = s3CanGenerate(s);
+    const dataTag = dataStatusTag(s);
+    let genTag = '';
+    if (!canGen) genTag = '<span class="stu-pick-tag disabled">생성 불가</span>';
+    else if (s3.aiText) genTag = s.dirty ? '<span class="stu-pick-tag">변경됨</span>' : '<span class="stu-pick-tag exists">생성됨</span>';
+    else genTag = '<span class="stu-pick-tag-blank">—</span>';
+    const disabledCls = canGen ? '' : 'disabled';
+    return `<label class="stu-pick-row ${disabledCls}" ${canGen ? '' : 'title="자료나 특성 키워드가 없어 생성할 수 없습니다"'}>
+      <input type="checkbox" class="stu-pick-cb" value="${s.id}" data-unanalyzed="${s3IsUnanalyzed(s)?'1':'0'}" ${canGen ? 'checked' : 'disabled'} onchange="updateStuPickCount()">
       <span class="stu-pick-sid">${s.sid}</span>
       <span class="stu-pick-name">${s.name}</span>
-      ${tag}
+      <span class="stu-pick-col data">${dataTag}</span>
+      <span class="stu-pick-col gen">${genTag}</span>
     </label>`;
-  }).join('') || '<div style="padding:24px;text-align:center;color:#b3b6bd;font-size:13px">자료나 특성 키워드가 등록된 학생이 없어요</div>';
+  }).join('');
+  list.innerHTML = header + rows;
   updateStuPickCount();
 }
 
 function updateStuPickCount(){
-  const cbs = document.querySelectorAll('.stu-pick-cb');
+  const cbs = document.querySelectorAll('.stu-pick-cb:not(:disabled)');
   const checked = document.querySelectorAll('.stu-pick-cb:checked').length;
   document.getElementById('stu-pick-count').textContent = `${checked}/${cbs.length}명`;
+  const creditEl = document.getElementById('s3-credit-count');
+  if (creditEl) creditEl.textContent = checked;
   const master = document.getElementById('stu-pick-all');
   master.checked = cbs.length > 0 && checked === cbs.length;
   master.indeterminate = checked > 0 && checked < cbs.length;
+  const btn = document.getElementById('s3-confirm-btn');
+  if (btn && pendingGenerate?.type === 'all') btn.disabled = checked === 0;
+  // 선택된 학생 중 분석 안 된 학생이 있으면 경고 노출
+  const hasUnanalyzedSelected = Array.from(document.querySelectorAll('.stu-pick-cb:checked')).some(cb => cb.dataset.unanalyzed === '1');
+  const warn = document.getElementById('s3-analyze-warning');
+  if (warn) warn.style.display = hasUnanalyzedSelected ? 'flex' : 'none';
 }
 
 function toggleAllStuPick(checked){
-  document.querySelectorAll('.stu-pick-cb').forEach(cb => cb.checked = checked);
+  // 생성 가능한 학생만 토글
+  document.querySelectorAll('.stu-pick-cb:not(:disabled)').forEach(cb => cb.checked = checked);
   updateStuPickCount();
+}
+
+function updateS3PromptCount(){
+  const el = document.getElementById('s3-prompt-input');
+  const counter = document.getElementById('s3-prompt-count');
+  if (!el || !counter) return;
+  counter.textContent = `${el.value.length} / 200`;
+}
+
+function openStep2InNewTab(e){
+  if (e) e.preventDefault();
+  const params = new URLSearchParams(location.search);
+  params.set('step', '2');
+  window.open(location.pathname + '?' + params.toString(), '_blank');
 }
 function confirmLength(){
   const sel = document.querySelector('input[name="s3-length"]:checked');
   if(sel) s3LengthChoice = sel.value;
+  const promptEl = document.getElementById('s3-prompt-input');
+  const promptText = promptEl ? promptEl.value.trim() : '';
   closeModal('modal-length');
   if(!pendingGenerate) return;
   const scope = pendingGenerate;
   pendingGenerate = null;
+  const promptSuffix = promptText ? ' · 요청사항 반영' : '';
   if(scope.type === 'all'){
     const selectedIds = new Set(Array.from(document.querySelectorAll('.stu-pick-cb:checked')).map(cb => parseInt(cb.value)));
     if (selectedIds.size === 0) { showToast('생성할 학생을 선택해 주세요'); return; }
@@ -2173,7 +2319,7 @@ function confirmLength(){
       }
     });
     renderStep3();
-    showToast(`${n}명 기록을 생성했어요`);
+    showToast(`${n}명 기록을 생성했어요${promptSuffix}`);
   } else {
     const s = STUDENTS.find(x=>x.id===scope.sid);
     if(s){
@@ -2184,7 +2330,7 @@ function confirmLength(){
       s._dirtyLevel = null;
       if(!s3.editText) s3.editText = s3.aiText;
       renderStep3();
-      showToast(scope.type === 'regen' ? '기록을 재생성했어요' : '기록을 생성했어요');
+      showToast((scope.type === 'regen' ? '기록을 재생성했어요' : '기록을 생성했어요') + promptSuffix);
     }
   }
 }
@@ -2251,11 +2397,12 @@ function refreshS3Cta(){
 }
 
 // ───── STEP 2 렌더 ─────
-function s2HasFiles(s){ return s.files.length>0; }
+function s2HasFiles(s){ return s.files.some(f => f.kindLabel === '설문' || f.kindLabel === '활동지'); }
 function s2State(s){
-  if(s.files.length===0 && s.keywords.length===0) return 'empty';
-  if(s.files.length===0) return 'keywords-only';
-  return 'analyzable';
+  // 설문/활동지가 있어야 분석 가능
+  if(s2HasFiles(s)) return 'analyzable';
+  // 키워드만 있는 경우와 완전 빈 경우 구분 (사이드바 태그는 동일하지만 메인 패널 안내가 다름)
+  return s.keywords.length > 0 ? 'keywords-only' : 'empty';
 }
 function getS2(s){
   if(!s.s2) s.s2 = {status:'idle', selectedIds:new Set(), customs:[]};
@@ -2281,14 +2428,9 @@ function renderS2Sidebar(){
     const isActive = s.id === s2CurStudentId;
     let status = '';
     if(stState === 'empty') status = `<span class="s2-stu-status empty">자료없음</span>`;
-    else if(stState === 'keywords-only') status = `<span class="s2-stu-status idle">특성 키워드만</span>`;
     else if(s2.status==='idle') status = `<span class="s2-stu-status idle">미분석</span>`;
     else if(s2.status==='analyzing') status = `<span class="s2-stu-status analyzing">분석중</span>`;
-    else if(s2.status==='done'){
-      const data = STEP2_DATA[s.sid] || {recommended_count:5};
-      const total = (data.items?.length || data.recommended_count) + (s2.customs.length);
-      status = `<span class="s2-stu-status done">${s2.selectedIds.size}/${total}</span>`;
-    }
+    else if(s2.status==='done') status = `<span class="s2-stu-status done">분석됨</span>`;
     const dirtyDot = s.dirty ? '<span class="dirty-dot" title="자료 변경됨 · 재분석 권장"></span>' : '';
     return `<div class="s2-stu-row ${isActive?'active':''}" onclick="selectS2Student(${s.id})">
       <span class="s2-stu-name">${s.name}${dirtyDot}</span>
@@ -2336,6 +2478,7 @@ function renderS2Main(){
         <div class="s2-state-summary-row"><strong>특성 키워드</strong> ${s.keywords.length}개${s.keywords.length?` (${s.keywords.slice(0,5).map(k=>k.text).join(', ')}${s.keywords.length>5?' 외':''})`:''}</div>
         ${s.level?`<div class="s2-state-summary-row"><strong>활동 수준</strong> ${ {high:'상',mid:'중',low:'하'}[s.level]}</div>`:''}
       </div>
+      <div><button class="btn-primary-lg" onclick="skipStep2()">3단계로 이동 <i data-lucide="arrow-right" style="width:16px;height:16px"></i></button></div>
     </div>`;
   } else if(s2.status==='idle'){
     const kwText = s.keywords.length ? s.keywords.map(k=>k.text).join(', ') : '—';
@@ -2378,6 +2521,7 @@ function renderS2Done(s){
       </div>
       <div class="s2-kw-box">${s.keywords.map(k=>k.text).join(', ')}</div>
     ` : ''}
+    <div id="s2-recs">
     <div class="s2-group-hd">
       <span class="s2-group-title">콘텐츠 요소 (추천)</span>
       <span class="s2-group-cnt">${recItems.length}개</span>
@@ -2391,6 +2535,7 @@ function renderS2Done(s){
       </div>
       <div id="s2-cand-wrap" style="display:${getS2(s).candidatesCollapsed?'none':'flex'};flex-direction:column;gap:8px">${candHtml}</div>
     ` : ''}
+    </div>
     <div class="s2-group-hd">
       <span class="s2-group-title">직접 추가</span>
       <span class="s2-group-cnt">${s2.customs.length}개</span>
@@ -2511,6 +2656,14 @@ function reanalyzeAll(){
 }
 function applyScenario(scenario){
   document.querySelectorAll('.mt-btn').forEach(b=>b.classList.toggle('active', b.dataset.scenario === scenario));
+  // localStorage 플래그 동기화
+  if (scenario === 'data') {
+    setTypeFlag('survey', true); setTypeFlag('activity', true); setTypeFlag('keyword', true);
+  } else if (scenario === 'keywords-only') {
+    setTypeFlag('survey', false); setTypeFlag('activity', false); setTypeFlag('keyword', true);
+  } else if (scenario === 'empty') {
+    setTypeFlag('survey', false); setTypeFlag('activity', false); setTypeFlag('keyword', false);
+  }
   STUDENTS.forEach((s, i) => {
     const orig = STUDENTS_FULL[i] || {files:[], keywords:[], level:null};
     if(scenario === 'data'){
@@ -2559,10 +2712,10 @@ function openAnalyzeModal(){
   const btnEl = document.getElementById('analyze-confirm-btn');
   if(pendingAnalyzeMode === 'rerun'){
     titleEl.textContent = '전체 AI 재분석';
-    btnEl.innerHTML = '<i data-lucide="refresh-ccw" style="width:14px;height:14px"></i> 재분석';
+    btnEl.innerHTML = '<i data-lucide="refresh-ccw" style="width:14px;height:14px"></i> 재분석 · <span id="analyze-credit-count">0</span> 크레딧';
   } else {
     titleEl.textContent = '전체 AI 분석';
-    btnEl.innerHTML = '<i data-lucide="sparkles" style="width:14px;height:14px"></i> 분석 시작';
+    btnEl.innerHTML = '<i data-lucide="sparkles" style="width:14px;height:14px"></i> 분석 시작 · <span id="analyze-credit-count">0</span> 크레딧';
   }
   populateAnalyzeStuPick();
   document.getElementById('modal-analyze').classList.add('show');
@@ -2570,20 +2723,44 @@ function openAnalyzeModal(){
 }
 
 function populateAnalyzeStuPick(){
-  const eligible = STUDENTS.filter(s2HasFiles);
+  // 모든 학생 학번순 표시 — Step 3 모달과 동일한 컬럼 구조
+  const sorted = STUDENTS.slice().sort((a,b) => a.sid.localeCompare(b.sid));
   const list = document.getElementById('analyze-stu-pick-list');
-  list.innerHTML = eligible.map(s => {
+  if (STUDENTS.length === 0) {
+    list.innerHTML = '<div style="padding:24px;text-align:center;color:#b3b6bd;font-size:13px">등록된 학생이 없어요</div>';
+    updateAnalyzeStuPickCount();
+    return;
+  }
+  const header = `<div class="stu-pick-header">
+    <span class="stu-pick-header-spacer"></span>
+    <span class="stu-pick-header-col sid">학번</span>
+    <span class="stu-pick-header-col name">이름</span>
+    <span class="stu-pick-header-col data">자료</span>
+    <span class="stu-pick-header-col gen">분석</span>
+  </div>`;
+  const rows = sorted.map(s => {
+    const canAnalyze = s2HasFiles(s);
     const status = getS2(s).status;
-    let tag = '';
-    if(status === 'done') tag = '<span class="stu-pick-tag exists">분석됨</span>';
-    else if(status === 'analyzing') tag = '<span class="stu-pick-tag">분석 중</span>';
-    return `<label class="stu-pick-row">
-      <input type="checkbox" class="analyze-stu-pick-cb" value="${s.id}" checked onchange="updateAnalyzeStuPickCount()">
+    // 자료 컬럼: 있음 / 없음
+    const dataTag = canAnalyze
+      ? '<span class="stu-pick-tag analyzed"><span class="dot"></span>있음</span>'
+      : '<span class="stu-pick-tag muted"><span class="dot"></span>없음</span>';
+    // 분석 컬럼: 분석됨 / 분석 중 / 미분석 / —
+    let analyzeTag = '';
+    if (!canAnalyze) analyzeTag = '<span class="stu-pick-tag-blank">—</span>';
+    else if (status === 'done') analyzeTag = '<span class="stu-pick-tag exists">분석됨</span>';
+    else if (status === 'analyzing') analyzeTag = '<span class="stu-pick-tag warn">분석 중</span>';
+    else analyzeTag = '<span class="stu-pick-tag">미분석</span>';
+    const disabledCls = canAnalyze ? '' : 'disabled';
+    return `<label class="stu-pick-row ${disabledCls}" ${canAnalyze ? '' : 'title="자료가 없어 분석할 수 없습니다"'}>
+      <input type="checkbox" class="analyze-stu-pick-cb" value="${s.id}" ${canAnalyze ? 'checked' : 'disabled'} onchange="updateAnalyzeStuPickCount()">
       <span class="stu-pick-sid">${s.sid}</span>
       <span class="stu-pick-name">${s.name}</span>
-      ${tag}
+      <span class="stu-pick-col data">${dataTag}</span>
+      <span class="stu-pick-col gen">${analyzeTag}</span>
     </label>`;
-  }).join('') || '<div style="padding:24px;text-align:center;color:#b3b6bd;font-size:13px">분석할 활동 자료가 등록된 학생이 없어요</div>';
+  }).join('');
+  list.innerHTML = header + rows;
   updateAnalyzeStuPickCount();
 }
 
@@ -2591,9 +2768,12 @@ function updateAnalyzeStuPickCount(){
   const cbs = document.querySelectorAll('.analyze-stu-pick-cb');
   const checked = document.querySelectorAll('.analyze-stu-pick-cb:checked').length;
   document.getElementById('analyze-stu-pick-count').textContent = `${checked}/${cbs.length}명`;
+  const creditEl = document.getElementById('analyze-credit-count');
+  if (creditEl) creditEl.textContent = checked;
   const master = document.getElementById('analyze-stu-pick-all');
   master.checked = cbs.length > 0 && checked === cbs.length;
   master.indeterminate = checked > 0 && checked < cbs.length;
+  document.getElementById('analyze-confirm-btn').disabled = checked === 0;
 }
 
 function toggleAllAnalyzeStuPick(checked){
@@ -2724,10 +2904,53 @@ function refreshAll(){
   }
 }
 function openRegisterModal(){
+  // 등록된 유형 카드에 표시
+  document.querySelectorAll('.reg-card[data-type]').forEach(card => {
+    const t = card.dataset.type;
+    card.classList.toggle('registered', hasFileOfType(t));
+  });
   $('modal-register').classList.add('show');
   lucide.createIcons();
 }
+const TYPE_LABELS = { survey:'학생 설문 응답', activity:'활동지·보고서', keyword:'학생 활동 특성 키워드' };
+const TYPE_KIND = { survey:'설문', activity:'활동지', keyword:'키워드' };
+const TYPE_FLAG_KEY = { survey:'clipo_survey_', activity:'clipo_activity_', keyword:'clipo_keyword_' };
+function hasFileOfType(type){
+  try { return localStorage.getItem(TYPE_FLAG_KEY[type] + CLS) === '1'; } catch(e) { return false; }
+}
+function setTypeFlag(type, val){ try { localStorage.setItem(TYPE_FLAG_KEY[type] + CLS, val ? '1' : '0'); } catch(e) {} }
+// 페이지 첫 진입 시 STUDENTS 기준으로 플래그 초기화 (이후엔 사용자 액션이 source)
+(function initTypeFlagsFromMock(){
+  ['survey','activity','keyword'].forEach(type => {
+    try {
+      const key = TYPE_FLAG_KEY[type] + CLS;
+      if (localStorage.getItem(key) === null) {
+        const kind = TYPE_KIND[type];
+        const has = STUDENTS.some(s => s.files.some(f => f.kindLabel === kind));
+        localStorage.setItem(key, has ? '1' : '0');
+      }
+    } catch(e) {}
+  });
+})();
+let pendingRegisterType = null;
 function pickRegisterType(type){
+  if (hasFileOfType(type)) {
+    pendingRegisterType = type;
+    document.getElementById('ow-type-label').textContent = TYPE_LABELS[type];
+    document.getElementById('ow-type-label-2').textContent = TYPE_LABELS[type];
+    closeModal('modal-register');
+    document.getElementById('modal-overwrite').classList.add('show');
+    lucide.createIcons();
+    return;
+  }
+  doRegisterTypeUpload(type);
+}
+function confirmOverwriteUpload(){
+  closeModal('modal-overwrite');
+  if (pendingRegisterType) doRegisterTypeUpload(pendingRegisterType);
+  pendingRegisterType = null;
+}
+function doRegisterTypeUpload(type){
   closeModal('modal-register');
   const params = new URLSearchParams({ type: ACTIVITY_TYPE, cls: CLS });
   if(type === 'keyword'){
@@ -2738,8 +2961,7 @@ function pickRegisterType(type){
     location.href = 'creative_activity_survey_upload_v1_260508.html?' + params.toString();
     return;
   }
-  const labels = {activity:'활동지·보고서'};
-  showToast(`${labels[type]} 상세 페이지는 다음 단계에서 만듭니다`);
+  showToast('활동지·보고서 상세 페이지는 다음 단계에서 만듭니다');
 }
 
 // ───── 모달 / 토스트 ─────
@@ -2767,6 +2989,15 @@ function toggleNav(){
 
 refreshAll();
 lucide.createIcons();
+
+// URL ?step=N 으로 진입 시 해당 단계로 자동 이동
+(function() {
+  const initStep = parseInt(new URLSearchParams(location.search).get('step'));
+  if (initStep === 2 || initStep === 3) {
+    const btn = document.getElementById('step-' + initStep);
+    if (btn && !btn.classList.contains('disabled')) goStep(initStep);
+  }
+})();
 
 // 목업 토글 드래그 (MOCKUP 라벨 잡고 이동)
 (function setupMockupDrag(){
@@ -2810,7 +3041,222 @@ lucide.createIcons();
 // ── 온보딩 팝업 ──
 function showOb(){document.getElementById('ob-overlay').classList.add('show');lucide.createIcons();}
 function closeOb(){document.getElementById('ob-overlay').classList.remove('show');try{localStorage.setItem('clipo_creative_onboarding_seen','1');}catch(e){}}
-function startFromOnboarding(){ closeOb(); if(typeof openRegisterModal==='function') openRegisterModal(); }
+function startFromOnboarding(){ closeOb(); startTour(); }
+
+// ── 가이드 투어 ──
+const TOUR_STOPS = [
+  // Step 1 (2 stops)
+  { step:1, selector:'#btn-data-add', title:'① 자료 등록', desc:'우상단 [자료 등록] 버튼으로 설문 응답·활동지·키워드 엑셀을 일괄 업로드해요. [다음]을 누르면 등록된 모습을 보여드릴게요.', placement:'bottom', advance:'tourSimulateRegister()' },
+  { step:1, selector:'.summary-table tbody tr:first-child .btn-row-add, .summary-table tbody tr:first-child .btn-row', title:'개별 학생 자료 수정', desc:'특정 학생의 자료만 수정·추가하려면 학생 행의 [+ 자료] 또는 [수정] 버튼을 누르세요. [다음]을 누르면 2단계로 이동해요.', placement:'left', advance:'tourGoStep(2)' },
+  // Step 2 (2 stops)
+  { step:2, selector:'#s2-rerun-btn', title:'② AI 분석', desc:'우상단 [전체 분석 시작]으로 업로드된 자료를 AI가 한 번에 분석합니다. 특성 키워드만 있는 학생은 분석을 생략할 수 있어요.', placement:'bottom', advance:'tourSimulateAnalyze()' },
+  { step:2, selector:'#s2-recs', title:'콘텐츠 요소 선택', desc:'AI 분석 결과에서 기록에 반영할 항목을 학생별로 체크해 주세요. 직접 추가 입력도 가능해요. [다음]을 누르면 3단계로 이동합니다.', placement:'top', advance:'tourGoStep(3)' },
+  // Step 3 (3 stops)
+  { step:3, selector:'#s3-genall-btn', title:'③ 기록 생성', desc:'우상단 [전체 기록 생성]으로 학생별 기록 초안을 일괄 생성해요. 학생당 1 크레딧이 사용됩니다.', placement:'bottom', advance:'tourSimulateGenerate()' },
+  { step:3, selector:'#s3-rows tr:first-child', extendNext:1, title:'기록 검토·수정', desc:'AI가 만든 초안(좌측)을 확인하고 우측 편집 영역에 옮겨 직접 수정·완성해 주세요. 행별 [수정]으로 자료·키워드도 다시 손볼 수 있어요.', placement:'top' },
+  { step:3, selector:'#btn-export-excel', title:'엑셀 다운로드', desc:'완성된 기록을 [엑셀 내보내기]로 다운로드해 나이스에 붙여 넣으세요.', placement:'bottom-left', advance:'tourFinish()' }
+];
+let tourIdx = -1;
+function startTour(){
+  tourIdx = 0;
+  window._tourActive = true;
+  // 빈 상태로 시작 — 각 단계에서 [다음] 누르면 데이터가 채워지는 흐름
+  if (typeof applyScenario === 'function') applyScenario('empty');
+  STUDENTS.forEach(s => {
+    const s2 = getS2(s);
+    s2.status = 'idle';
+    s2.selectedIds = new Set();
+    const s3 = getS3(s);
+    s3.aiText = '';
+    s3.editText = '';
+    s3.generatedAt = null;
+  });
+  goStep(1);
+  document.getElementById('tour-overlay').classList.add('active');
+  showTourStop();
+}
+
+// 투어 — Step 1 자료 등록 시뮬레이션 (자료 있음 시나리오로 전환)
+function tourSimulateRegister(){
+  if (typeof applyScenario === 'function') applyScenario('data');
+  // 분석/기록은 다시 비움 (applyScenario가 STUDENT 데이터를 갱신할 때 s2/s3는 초기화됨)
+  STUDENTS.forEach(s => {
+    const s2 = getS2(s);
+    s2.status = 'idle';
+    s2.selectedIds = new Set();
+    const s3 = getS3(s);
+    s3.aiText = '';
+    s3.editText = '';
+    s3.generatedAt = null;
+  });
+  if (typeof refreshAll === 'function') refreshAll();
+  setTimeout(() => {
+    tourIdx++;
+    showTourStop();
+  }, 100);
+}
+
+// 투어 — Step 2 분석 시뮬레이션
+function tourSimulateAnalyze(){
+  STUDENTS.forEach(s => {
+    if (s.demoSkipAutoAnalyze) return;
+    if (!s2HasFiles(s)) return;
+    const s2 = getS2(s);
+    s2.status = 'done';
+    const data = STEP2_DATA[s.sid] || { items: STEP2_DEFAULT_ITEMS };
+    if (s2.selectedIds.size === 0) {
+      s2.selectedIds = new Set(data.items.filter(it => it.source_origin === 'stage1_recommended').map(it => it.id));
+    }
+  });
+  if (typeof renderStep2 === 'function') renderStep2();
+  setTimeout(() => {
+    tourIdx++;
+    showTourStop();
+  }, 100);
+}
+
+// 투어 — Step 3 기록 생성 시뮬레이션 (aiText만, editText는 비워둠)
+function tourSimulateGenerate(){
+  STUDENTS.forEach((s, i) => {
+    if (s.demoSkipAutoAnalyze) return;
+    if (!s2HasFiles(s) && s.keywords.length === 0) return;
+    const s3 = getS3(s);
+    s3.aiText = S3_MOCK_TEXTS[i % S3_MOCK_TEXTS.length];
+    s3.generatedAt = Date.now();
+    // editText는 비워둠 — 사용자가 [가져오기]로 옮기거나 직접 입력
+  });
+  if (typeof renderStep3 === 'function') renderStep3();
+  setTimeout(() => {
+    tourIdx++;
+    showTourStop();
+  }, 100);
+}
+
+// 투어 완료 → 목록 페이지로 이동
+function tourFinish(){
+  endTour();
+  showToast('온보딩 투어를 마쳤어요. 목록으로 이동합니다.');
+  setTimeout(() => { location.href = 'creative_activity_list_v6_260507.html'; }, 900);
+}
+
+// 투어 전용 단계 이동 — disabled 잠금을 풀고 goStep
+function tourGoStep(n){
+  for (let i = 1; i <= n; i++) {
+    const btn = document.getElementById('step-' + i);
+    if (btn) btn.classList.remove('disabled');
+  }
+  goStep(n);
+}
+function endTour(){
+  tourIdx = -1;
+  window._tourActive = false;
+  document.getElementById('tour-overlay').classList.remove('active');
+}
+function tourPrev(){
+  if(tourIdx > 0){
+    tourIdx--;
+    const prev = TOUR_STOPS[tourIdx];
+    if (prev && prev.step) goStep(prev.step);
+    setTimeout(showTourStop, 80);
+  }
+}
+function tourNext(){
+  const cur = TOUR_STOPS[tourIdx];
+  // 단계 전환 액션이 있는 스톱이면 액션만 실행 — 단계 변경은 goStep 훅에서 투어 인덱스 동기화
+  if (cur && cur.advance) {
+    try { eval(cur.advance); } catch(e) {}
+    return;
+  }
+  if (tourIdx < TOUR_STOPS.length - 1) {
+    tourIdx++;
+    setTimeout(showTourStop, 80);
+  } else {
+    endTour();
+    showToast('온보딩 투어를 마쳤어요. 직접 시작해 보세요!');
+  }
+}
+// 페이지의 단계 변경(고스텝)에 투어 인덱스 동기화
+function syncTourToStep(n){
+  if (tourIdx < 0) return;
+  const cur = TOUR_STOPS[tourIdx];
+  if (!cur || cur.step === n) return;
+  // 새 단계의 첫 스톱으로 이동
+  const newIdx = TOUR_STOPS.findIndex(stop => stop.step === n);
+  if (newIdx >= 0) {
+    tourIdx = newIdx;
+    setTimeout(showTourStop, 150);
+  }
+}
+function positionTourSpot(stop, target){
+  const spot = document.getElementById('tour-spotlight');
+  const tt = document.getElementById('tour-tooltip');
+  const rect = target.getBoundingClientRect();
+  // 측정값이 비정상이면 다시 시도
+  if (rect.width === 0 && rect.height === 0) {
+    setTimeout(() => positionTourSpot(stop, target), 100);
+    return;
+  }
+  // extendNext: 다음 형제 요소들까지 spotlight 확장 (예: 첫 두 행만 강조)
+  let bottom = rect.bottom;
+  if (stop.extendNext) {
+    let el = target;
+    for (let i = 0; i < stop.extendNext; i++) {
+      el = el.nextElementSibling;
+      if (el) {
+        const r = el.getBoundingClientRect();
+        if (r.bottom > bottom) bottom = r.bottom;
+      }
+    }
+  }
+  spot.style.display = '';
+  const pad = 6;
+  spot.style.left = (rect.left - pad) + 'px';
+  spot.style.top = (rect.top - pad) + 'px';
+  spot.style.width = (rect.width + pad*2) + 'px';
+  spot.style.height = (bottom - rect.top + pad*2) + 'px';
+  // 툴팁 위치
+  const ttW = 340, ttH = 180, gap = 14;
+  let ttLeft = rect.left;
+  let ttTop = rect.bottom + gap;
+  const place = stop.placement || 'bottom';
+  if (place === 'top') { ttTop = rect.top - ttH - gap; ttLeft = rect.left; }
+  else if (place === 'left') { ttLeft = rect.left - ttW - gap; ttTop = rect.top; }
+  else if (place === 'right') { ttLeft = rect.right + gap; ttTop = rect.top; }
+  else if (place === 'bottom-left') { ttTop = rect.bottom + gap; ttLeft = rect.right - ttW; }
+  ttLeft = Math.max(16, Math.min(window.innerWidth - ttW - 16, ttLeft));
+  ttTop = Math.max(16, Math.min(window.innerHeight - ttH - 16, ttTop));
+  tt.style.left = ttLeft + 'px';
+  tt.style.top = ttTop + 'px';
+  tt.style.transform = 'none';
+}
+
+function showTourStop(){
+  const stop = TOUR_STOPS[tourIdx];
+  if (!stop) return;
+  const target = document.querySelector(stop.selector);
+  const spot = document.getElementById('tour-spotlight');
+  const tt = document.getElementById('tour-tooltip');
+  document.getElementById('tour-tt-step').textContent = `${tourIdx + 1} / ${TOUR_STOPS.length}`;
+  document.getElementById('tour-tt-title').textContent = stop.title;
+  document.getElementById('tour-tt-desc').textContent = stop.desc;
+  document.getElementById('tour-tt-prev').disabled = (tourIdx === 0);
+  document.getElementById('tour-tt-next').textContent = (tourIdx === TOUR_STOPS.length - 1) ? '완료' : '다음 →';
+
+  if (!target) {
+    spot.style.display = 'none';
+    tt.style.left = '50%';
+    tt.style.top = '50%';
+    tt.style.transform = 'translate(-50%,-50%)';
+    lucide.createIcons();
+    return;
+  }
+  // 1) 먼저 스크롤로 타겟을 중앙에 위치 (instant)
+  target.scrollIntoView({ behavior:'auto', block:'center', inline:'nearest' });
+  // 2) 레이아웃 stabilize 후 측정·배치
+  requestAnimationFrame(() => requestAnimationFrame(() => positionTourSpot(stop, target)));
+  lucide.createIcons();
+}
+window.addEventListener('resize', () => { if (tourIdx >= 0) showTourStop(); });
 (function maybeShowOb(){
   const force = new URLSearchParams(location.search).get('ob') === '1';
   if (!force) {
@@ -2821,5 +3267,25 @@ function startFromOnboarding(){ closeOb(); if(typeof openRegisterModal==='functi
   setTimeout(showOb, 300);
 })();
 </script>
+
+<!-- ── PC 전용 안내 ── -->
+<div class="pc-only-notice">
+  <div class="pc-only-inner">
+    <div class="pc-only-icon"><i data-lucide="monitor" style="width:36px;height:36px"></i></div>
+    <h2>PC에서 이용해 주세요</h2>
+    <p>창의적 체험활동 기록 작성은 자료 관리·AI 분석·기록 편집이 필요해<br>PC 환경에 최적화돼 있어요. 데스크톱·노트북에서 다시 접속해 주세요.</p>
+    <a href="creative_activity_list_v6_260507.html" class="pc-only-btn">목록으로 돌아가기</a>
+  </div>
+</div>
+<style>
+.pc-only-notice { display: none; position: fixed; inset: 0; background: #f6f7f9; z-index: 9999; align-items: center; justify-content: center; padding: 32px; }
+@media (max-width: 1023px) { .pc-only-notice { display: flex; } body { overflow: hidden; } }
+.pc-only-inner { text-align: center; max-width: 420px; }
+.pc-only-icon { width: 72px; height: 72px; border-radius: 50%; background: #e9f2ff; color: #365eef; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 20px; }
+.pc-only-inner h2 { font-size: 22px; font-weight: 700; color: #222631; margin-bottom: 12px; line-height: 1.4; }
+.pc-only-inner p { font-size: 15px; color: #6d7381; line-height: 1.7; margin-bottom: 24px; }
+.pc-only-btn { display: inline-flex; align-items: center; justify-content: center; padding: 11px 20px; border-radius: 6px; background: #365eef; color: #fff; font-size: 14px; font-weight: 600; text-decoration: none; }
+.pc-only-btn:hover { background: #3151c4; }
+</style>
 </body>
 </html>
