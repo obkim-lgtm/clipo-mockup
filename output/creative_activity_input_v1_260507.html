@@ -819,7 +819,7 @@ body.nav-expanded .sticky-cta{left:200px;transition:left .2s ease}
         <div class="mini-dropzone" onclick="pickIndFile()">
           <i data-lucide="upload-cloud" style="width:24px;height:24px;color:#b3b6bd"></i>
           <div class="mini-dz-text">자료 추가 업로드</div>
-          <div class="mini-dz-hint">DOCX · JPG · PNG · PDF · 최대 3개 / 20MB</div>
+          <div class="mini-dz-hint">PDF 1개 · 엑셀 1개 · 최대 2개 / 20MB</div>
         </div>
         <div id="md-files" style="margin-top:8px"></div>
       </div>
@@ -1235,8 +1235,7 @@ if(ACTIVITY_TYPE === '동아리활동'){
 let STUDENTS = [
   {id:1, sid:'20101', name:'김민수', level:'high', files:[
     {name:'학기말_자율설문 (행)', type:'survey', source:'bulk', kindLabel:'설문'},
-    {name:'2학년1반_활동지_스캔본.pdf', size:'12.4MB', type:'pdf', source:'bulk', kindLabel:'활동지'},
-    {name:'학생관찰키워드 (행)', type:'keyword', source:'bulk', kindLabel:'키워드'}
+    {name:'2학년1반_활동지_스캔본.pdf', size:'12.4MB', type:'pdf', source:'bulk', kindLabel:'활동지'}
   ], keywords:[{text:'봉사 리더십',source:'bulk'},{text:'창의력',source:'bulk'},{text:'협력적 태도',source:'bulk'},{text:'책임감',source:'bulk'}]},
   {id:2, sid:'20102', name:'박서연', level:'mid', files:[], keywords:[]},
   {id:3, sid:'20103', name:'이지호', files:[
@@ -1244,20 +1243,17 @@ let STUDENTS = [
     {name:'2학년1반_활동지_스캔본.pdf', size:'12.4MB', type:'pdf', source:'bulk', kindLabel:'활동지'}
   ], keywords:[]},
   {id:4, sid:'20104', name:'최유진', level:'high', files:[
-    {name:'2학년1반_활동지_스캔본.pdf', size:'12.4MB', type:'pdf', source:'bulk', kindLabel:'활동지'},
-    {name:'학생관찰키워드 (행)', type:'keyword', source:'bulk', kindLabel:'키워드'}
+    {name:'2학년1반_활동지_스캔본.pdf', size:'12.4MB', type:'pdf', source:'bulk', kindLabel:'활동지'}
   ], keywords:[{text:'창의적 표현',source:'bulk'},{text:'미적 감수성',source:'bulk'}]},
   {id:5, sid:'20105', name:'정우진', files:[
     {name:'2학년1반_활동지_스캔본.pdf', size:'12.4MB', type:'pdf', source:'bulk', kindLabel:'활동지'}
   ], keywords:[], demoSkipAutoAnalyze:true},
   {id:6, sid:'20106', name:'한지민', level:'mid', files:[
-    {name:'학기말_자율설문 (행)', type:'survey', source:'bulk', kindLabel:'설문'},
-    {name:'학생관찰키워드 (행)', type:'keyword', source:'bulk', kindLabel:'키워드'}
+    {name:'학기말_자율설문 (행)', type:'survey', source:'bulk', kindLabel:'설문'}
   ], keywords:[{text:'사고력',source:'bulk'}]},
   {id:7, sid:'20107', name:'유태성', level:'low', files:[
     {name:'학기말_자율설문 (행)', type:'survey', source:'bulk', kindLabel:'설문'},
-    {name:'2학년1반_활동지_스캔본.pdf', size:'12.4MB', type:'pdf', source:'bulk', kindLabel:'활동지'},
-    {name:'학생관찰키워드 (행)', type:'keyword', source:'bulk', kindLabel:'키워드'}
+    {name:'2학년1반_활동지_스캔본.pdf', size:'12.4MB', type:'pdf', source:'bulk', kindLabel:'활동지'}
   ], keywords:[
     {text:'배려심',source:'bulk'},{text:'성실함',source:'bulk'},{text:'리더십',source:'bulk'}
   ]},
@@ -1732,7 +1728,7 @@ function renderDrawerDataPane(s){
   const lev = s.level || 'none';
   $('dr-pane-data').innerHTML = `
     <div class="dp-section">
-      <div class="dp-label">활동 자료 <span class="hint">${s.files.length}/3개</span></div>
+      <div class="dp-label">활동 자료 <span class="hint">${s.files.length}/2개</span></div>
       <div class="mini-dropzone" onclick="pickIndFile()">
         <i data-lucide="upload-cloud" style="width:24px;height:24px;color:#b3b6bd"></i>
         <div class="mini-dz-text">자료 추가 업로드</div>
@@ -1869,7 +1865,7 @@ function renderDetailModal(){
   $('md-avatar').textContent = avatar(s.name);
   $('md-name').textContent = s.name;
   $('md-sub').textContent = s.sid + ' · ' + ACTIVITY_TYPE;
-  $('md-files-cnt').textContent = s.files.length + '/3개';
+  $('md-files-cnt').textContent = s.files.length + '/2개';
   $('md-files').innerHTML = s.files.map((f,i)=>{
     const isVirtual = f.type === 'survey';
     return `<div class="file-row${isVirtual?' clickable':''}" ${isVirtual?`onclick="openSurveyResponse(${s.id},${i})"`:''}>
@@ -1934,7 +1930,7 @@ function pickIndFile(){
   if(!curDetailId) return;
   const s = STUDENTS.find(x=>x.id===curDetailId);
   if(!s) return;
-  if(s.files.length>=3){ showToast('학생당 최대 3개까지 업로드 가능합니다'); return; }
+  if(s.files.length>=2){ showToast('학생당 최대 2개까지 업로드 가능합니다 (PDF 1, 엑셀 1)'); return; }
   s.files.push({name:'추가자료_'+(s.files.length+1)+'.pdf',size:'1.2MB',type:'pdf',source:'individual',kindLabel:'개별'});
   markDirty(s, 'file');
   if(isDrawerOpen()) renderDrawerDataPane(s);
@@ -2935,8 +2931,14 @@ function setTypeFlag(type, val){ try { localStorage.setItem(TYPE_FLAG_KEY[type] 
     try {
       const key = TYPE_FLAG_KEY[type] + CLS;
       if (localStorage.getItem(key) === null) {
-        const kind = TYPE_KIND[type];
-        const has = STUDENTS.some(s => s.files.some(f => f.kindLabel === kind));
+        let has;
+        if (type === 'keyword') {
+          // 키워드는 파일이 아닌 keywords 배열로 저장됨
+          has = STUDENTS.some(s => s.keywords && s.keywords.length > 0);
+        } else {
+          const kind = TYPE_KIND[type];
+          has = STUDENTS.some(s => s.files.some(f => f.kindLabel === kind));
+        }
         localStorage.setItem(key, has ? '1' : '0');
       }
     } catch(e) {}
