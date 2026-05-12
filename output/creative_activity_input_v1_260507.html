@@ -1028,7 +1028,6 @@ body.nav-expanded .sticky-cta{left:200px;transition:left .2s ease}
     <div class="modal-hd">
       <div>
         <div class="modal-title">전체 AI 기록 생성</div>
-        <div class="modal-sub">기록을 생성할 학생과 분량을 선택해 주세요. 입력하신 내용에 따라 실제 생성 분량은 달라질 수 있습니다.</div>
       </div>
       <button class="modal-x" onclick="closeModal('modal-length')"><i data-lucide="x" style="width:18px;height:18px"></i></button>
     </div>
@@ -1060,12 +1059,16 @@ body.nav-expanded .sticky-cta{left:200px;transition:left .2s ease}
       <label class="length-opt"><input type="radio" name="s3-length" value="400-500" checked><span>400~500자 <em>(1,200~1,500 Byte)</em></span></label>
       <label class="length-opt"><input type="radio" name="s3-length" value="500-600"><span>500~600자 <em>(1,500~1,800 Byte)</em></span></label>
 
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-top:20px;margin-bottom:8px">
-        <span style="font-size:14px;font-weight:600;color:#3b3f4c">요청사항 <span style="font-weight:500;color:#6d7381">(선택)</span></span>
-        <span id="s3-prompt-count" style="font-size:12px;color:#b3b6bd">0 / 200</span>
+      <div id="s3-prompt-section" style="display:none">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-top:20px;margin-bottom:8px">
+          <span style="font-size:14px;font-weight:600;color:#3b3f4c">요청사항 <span style="font-weight:500;color:#6d7381">(선택)</span></span>
+          <span id="s3-prompt-count" style="font-size:12px;color:#b3b6bd">0 / 200</span>
+        </div>
+        <div id="s3-regen-hint" style="font-size:13px;color:#6d7381;margin-bottom:8px;line-height:1.55">
+          이전 결과에서 마음에 안 드는 부분이나 바꾸고 싶은 방향을 적어주시면 그에 맞춰 다시 생성해드려요.
+        </div>
+        <textarea id="s3-prompt-input" class="s3-prompt-textarea" placeholder="예) 협력적 태도와 리더십을 더 강조해 주세요." maxlength="200" oninput="updateS3PromptCount()"></textarea>
       </div>
-      <textarea id="s3-prompt-input" class="s3-prompt-textarea" placeholder="예) 협력적 태도와 리더십을 더 강조해 주세요. 학생이 주도적으로 진행한 부분을 부각해 주세요." maxlength="200" oninput="updateS3PromptCount()"></textarea>
-      <div style="font-size:12px;color:#6d7381;margin-top:6px;line-height:1.5">AI가 기록을 생성할 때 반영할 내용을 적어 주세요. 강조하고 싶은 키워드, 톤 & 매너, 특정 활동에 대한 디테일 등을 입력하면 결과에 반영됩니다. 비워두면 기본 지침으로 생성돼요.</div>
     </div>
     <div class="modal-ft">
       <button class="btn-secondary" onclick="closeModal('modal-length')">취소</button>
@@ -2181,6 +2184,7 @@ function openLengthModal(scope){
   const section = document.getElementById('stu-pick-section');
   const notice = document.getElementById('s3-credit-notice');
   const submitBtn = document.getElementById('s3-confirm-btn');
+  const warn = document.getElementById('s3-analyze-warning');
   if (scope.type === 'all') {
     section.style.display = 'block';
     if (notice) notice.style.display = 'flex';
@@ -2189,13 +2193,19 @@ function openLengthModal(scope){
   } else {
     section.style.display = 'none';
     if (notice) notice.style.display = 'none';
+    if (warn) warn.style.display = 'none';
     if (submitBtn) submitBtn.innerHTML = '<i data-lucide="sparkles" style="width:14px;height:14px"></i> 생성 · 1 크레딧';
   }
   // 프롬프트 초기화
   const promptEl = document.getElementById('s3-prompt-input');
   if (promptEl) { promptEl.value = ''; updateS3PromptCount(); }
+  // 요청사항 영역: 개별 재생성에서만 노출
+  const promptSection = document.getElementById('s3-prompt-section');
+  const showPrompt = scope.type === 'regen';
+  if (promptSection) promptSection.style.display = showPrompt ? '' : 'none';
   $('modal-length').classList.add('show');
   lucide.createIcons();
+  if (showPrompt && promptEl) setTimeout(() => promptEl.focus(), 200);
 }
 
 function s3CanGenerate(s){
