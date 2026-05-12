@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>과제 결과 보기 | CLIPO</title>
+<link rel="icon" type="image/svg+xml" href="clipo_favicon.svg">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard-gov.min.css">
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<style>
+*{font-family:'Pretendard GOV',-apple-system,sans-serif;box-sizing:border-box;margin:0;padding:0}
+body{background:#f6f7f9;color:#3b3f4c;min-height:100vh}
+
+/* ══════ 글로벌 헤더 (학생용, 56px) ══════ */
+.global-header{height:56px;background:#fff;display:flex;align-items:center;justify-content:space-between;position:fixed;top:0;left:0;right:0;z-index:210;padding:0 20px 0 8px;border-bottom:1px solid #dde1e8}
+.gh-left{display:flex;align-items:center;gap:8px}
+.gh-menu-btn{width:40px;height:40px;display:inline-flex;align-items:center;justify-content:center;border:none;background:none;cursor:pointer;color:#3b3f4c;border-radius:4px}
+.gh-menu-btn:hover{background:#f6f7f9}
+.gh-logo{display:flex;align-items:center;text-decoration:none}
+.gh-product-tag{display:inline-flex;align-items:center;height:18px;margin-left:12px;padding-left:12px;border-left:1px solid #e5e7eb;color:#6d7381;font-size:14px;font-weight:600;line-height:1}
+.gh-right{display:flex;align-items:center;gap:12px;padding-right:12px}
+.gh-user{display:inline-flex;align-items:center;gap:3px;font-size:16px;font-weight:500;color:#365eef;cursor:pointer;border:none;background:none;padding:0;line-height:1}
+.gh-user:hover{color:#3151c4}
+
+/* ══════ 사이드바 (학생용, 56px) ══════ */
+.sidebar{position:fixed;top:56px;left:0;bottom:0;width:56px;background:#fff;border-right:1px solid #dde1e8;display:flex;flex-direction:column;align-items:center;padding:8px 0;z-index:100}
+.sb-item{width:40px;height:40px;display:inline-flex;align-items:center;justify-content:center;border-radius:4px;color:#6d7381;cursor:pointer;border:none;background:none;margin-bottom:4px}
+.sb-item:hover{background:#f6f7f9;color:#3b3f4c}
+.sb-item.active{background:#e9f2ff;color:#365eef}
+
+/* ══════ 메인 컨텐츠 ══════ */
+.main{margin-left:56px;margin-top:56px;display:flex;flex-direction:column;align-items:center}
+
+/* ══════ 페이지 헤더 ══════ */
+.page-header-wrap{width:100%;max-width:1248px;padding:0 16px;display:flex;align-items:center;justify-content:center}
+.page-header{width:100%;display:flex;align-items:center;justify-content:space-between;padding:20px 0}
+.ph-left{flex:1;display:flex;flex-direction:column;gap:8px}
+.btn-back{display:inline-flex;align-items:center;gap:4px;font-size:15px;font-weight:500;color:#3b3f4c;background:none;border:none;cursor:pointer;padding:0;line-height:1;font-family:inherit;align-self:flex-start}
+.btn-back:hover{color:#222631}
+.page-title{font-size:20px;font-weight:700;color:#3b3f4c;line-height:1.25}
+.page-desc{font-size:14px;font-weight:500;color:#3b3f4c;line-height:1.55}
+.ph-right{display:inline-flex;align-items:center;gap:12px}
+.btn-download{display:inline-flex;align-items:center;justify-content:center;gap:8px;height:40px;padding:0 16px;border-radius:100px;background:#365eef;border:1px solid transparent;color:#fff;font-size:15px;font-weight:500;cursor:pointer;font-family:inherit;line-height:1}
+.btn-download:hover{background:#3151c4}
+
+/* ══════ 컨텐츠 영역 (좌: 뷰어, 우: 결과) ══════ */
+.content-wrap{width:100%;max-width:1280px;display:flex;align-items:flex-start;border-top:1px solid #dde1e8}
+
+/* ══════ 좌측 뷰어 ══════ */
+.viewer{flex:1;min-width:0;display:flex;flex-direction:column;align-self:stretch}
+.viewer-tabbar{background:#3b3f4c;padding:8px 20px 0;display:flex;align-items:flex-end;gap:0;min-height:44px}
+.viewer-tab{display:inline-flex;align-items:center;height:36px;padding:8px 16px;max-width:164px;min-width:64px;border-radius:8px 8px 0 0;background:#535865;color:#fff;font-size:14px;font-weight:400;cursor:pointer;border:none;font-family:inherit;line-height:1.25;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.viewer-tab.active{background:#fff;color:#3b3f4c}
+.viewer-tab:hover:not(.active){background:#6b7280}
+.viewer-tab-sep{width:1px;height:16px;background:rgba(255,255,255,.2);align-self:center;margin:0 4px}
+.viewer-info{background:#535865;height:56px;display:flex;align-items:center;justify-content:center;padding:12px;color:#fff;font-size:14px;font-weight:400}
+.viewer-body{flex:1;background:#fff;padding:40px;min-height:520px;overflow-y:auto}
+.viewer-body img{display:block;width:100%;max-width:680px;margin:0 auto 16px;height:auto;box-shadow:0 2px 8px rgba(0,0,0,.08)}
+.viewer-body p{font-size:15px;color:#3b3f4c;line-height:1.55;margin-bottom:0}
+
+/* ══════ 우측 결과 영역 ══════ */
+.result-panel{flex:1;min-width:0;max-width:560px;border-left:1px solid #dde1e8;display:flex;flex-direction:column;align-self:stretch}
+
+/* alert: 공개 기간 */
+.alert-period{background:#e9f2ff;padding:12px 16px;display:flex;align-items:flex-start;gap:8px}
+.alert-period-icon{color:#3151c4;flex-shrink:0;display:inline-flex;margin-top:1px}
+.alert-period-text{font-size:15px;font-weight:500;color:#3151c4;line-height:1.25}
+
+/* 결과 본문 */
+.result-body{background:#fff;padding:24px 24px 80px;display:flex;flex-direction:column;gap:40px;flex:1}
+
+.result-section{display:flex;flex-direction:column;gap:16px}
+.result-section-title{font-size:18px;font-weight:600;color:#3b3f4c;line-height:1.25}
+
+/* 성취기준 */
+.standards-box{background:#f6f7f9;border-radius:6px;padding:20px;display:flex;flex-direction:column;gap:12px}
+.standards-box ol{margin:0;padding-left:22px;font-size:15px;font-weight:600;color:#3b3f4c;line-height:1.55}
+.standards-box li{padding-left:4px}
+
+/* 채점기준 테이블 */
+.rubric-table{width:100%;border-collapse:collapse;table-layout:fixed}
+.rubric-table thead th{background:#f6f7f9;font-size:15px;font-weight:600;color:#3b3f4c;text-align:center;padding:8px 12px;height:40px;border-bottom:1px solid #dde1e8;vertical-align:middle}
+.rubric-table thead th:first-child{border-top-left-radius:8px;width:30%}
+.rubric-table thead th:last-child{border-top-right-radius:8px;width:80px}
+.rubric-table tbody td{padding:8px 12px;font-size:15px;color:#3b3f4c;line-height:1.55;border-bottom:1px solid #dde1e8;vertical-align:middle;text-align:center;min-height:40px}
+.rubric-table tbody td.crit-name{font-weight:500;vertical-align:middle}
+.rubric-table tbody td.crit-detail{text-align:left;font-weight:500}
+.rubric-table tbody td.score{text-align:center;font-weight:500;width:80px}
+.rubric-table tbody tr.selected td.crit-detail{color:#365eef;font-weight:600}
+.rubric-table tbody tr.selected td.score{color:#365eef;font-weight:600}
+.crit-detail-row{display:flex;align-items:center;gap:8px}
+.crit-check{width:18px;height:18px;border-radius:50%;background:#365eef;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;color:#fff}
+
+/* 채점 결과 박스 */
+.score-box{background:#f4f8ff;border-radius:6px;padding:28px 20px;display:flex;align-items:center;justify-content:center;gap:20px}
+.score-col{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px}
+.score-badge{display:inline-flex;align-items:center;justify-content:center;height:24px;padding:0 10px;border:1px solid #ccdfff;border-radius:100px;background:#e9f2ff;color:#3151c4;font-size:14px;font-weight:500;line-height:1}
+.score-value{font-size:18px;font-weight:600;color:#3b3f4c;line-height:1.25;text-align:center;display:inline-flex;align-items:baseline;gap:4px}
+.score-value .max{font-size:18px;font-weight:600;color:#3b3f4c}
+.score-sep{width:1px;align-self:stretch;background:#dde1e8}
+.grade-caption{font-size:14px;color:#6d7381;line-height:1.55;font-weight:400}
+
+/* 선생님 피드백 */
+.feedback-box{background:#f4f8ff;border-radius:6px;padding:20px;min-height:160px}
+.feedback-box p{font-size:15px;font-weight:500;color:#3b3f4c;line-height:1.55}
+
+/* 반응형 */
+@media (max-width:960px){
+  .content-wrap{flex-direction:column}
+  .result-panel{max-width:none;width:100%;border-left:none;border-top:1px solid #dde1e8}
+}
+</style>
+</head>
+<body>
+
+<!-- ══════ 학생용 글로벌 헤더 ══════ -->
+<div class="global-header">
+  <div class="gh-left">
+    <button class="gh-menu-btn"><i data-lucide="menu" style="width:24px;height:24px"></i></button>
+    <a class="gh-logo" href="#" aria-label="CLIPO">
+      <svg width="76" height="16" viewBox="0 0 76 16" fill="none"><path d="M11.3613 4.03516H4.09668V11.9629H8.88281L8.88086 11.9648H15.6016V16H4.02539C1.80242 15.9998 0 14.223 0 12.0322V3.96777C0 1.77696 1.80242 0.000177874 4.02539 0H15.4561L11.3613 4.03516ZM22.0703 11.9648H33.5781V16H22.002C19.7788 16 17.9756 14.2231 17.9756 12.0322V0H22.0703V11.9648ZM40.0459 16H35.9521V0H40.0459V16ZM54.5381 0C56.4564 0 58.0138 1.53228 58.0186 3.42285L58.0166 3.4248V8.54297C58.014 10.4333 56.4567 11.9648 54.5361 11.9648H46.5107L42.416 16V0H54.5381ZM71.9746 0C74.0086 0.000134956 75.6887 1.49046 75.958 3.42285H76V12.5771H75.958C75.6887 14.5095 74.011 15.9999 71.9746 16H64.4238C62.3897 16 60.7098 14.5096 60.4404 12.5771C60.4145 12.398 60.3984 12.2184 60.3984 12.0322V3.96777C60.3984 3.78159 60.4145 3.60205 60.4404 3.42285C60.7098 1.49037 62.3873 0 64.4238 0H71.9746ZM64.4922 12.5771H71.9062V3.42285H64.4922V12.5771ZM46.5107 3.42285V8.54004H53.9238V3.42285H46.5107Z" fill="#365EEF"/></svg>
+    </a>
+    <span class="gh-product-tag">초등</span>
+  </div>
+  <div class="gh-right">
+    <button class="gh-user">김채점 학생<i data-lucide="chevron-down" style="width:20px;height:20px"></i></button>
+  </div>
+</div>
+
+<!-- ══════ 사이드바 (학생용) ══════ -->
+<aside class="sidebar">
+  <button class="sb-item" title="홈"><i data-lucide="home" style="width:20px;height:20px"></i></button>
+  <button class="sb-item active" title="과제"><i data-lucide="notebook-pen" style="width:20px;height:20px"></i></button>
+  <button class="sb-item" title="리포트"><i data-lucide="bar-chart-2" style="width:20px;height:20px"></i></button>
+</aside>
+
+<!-- ══════ 메인 ══════ -->
+<main class="main">
+
+  <!-- 페이지 헤더 -->
+  <div class="page-header-wrap">
+    <div class="page-header">
+      <div class="ph-left">
+        <button class="btn-back" onclick="history.back()">
+          <i data-lucide="chevron-left" style="width:18px;height:18px"></i>
+          이전으로
+        </button>
+        <h1 class="page-title">과제 결과 보기</h1>
+        <p class="page-desc">선생님이 채점한 결과를 확인해 보세요. 다음 과제에는 어떤 점을 더 보완하면 좋을지도 함께 살펴봐요.</p>
+      </div>
+      <div class="ph-right">
+        <button class="btn-download">
+          <i data-lucide="download" style="width:20px;height:20px"></i>
+          결과 다운로드
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 컨텐츠 (뷰어 + 결과 공개) -->
+  <div class="content-wrap">
+
+    <!-- 좌측: 과제물 뷰어 -->
+    <section class="viewer">
+      <div class="viewer-tabbar">
+        <button class="viewer-tab active">클리포를 통한 제출</button>
+        <div class="viewer-tab-sep"></div>
+        <button class="viewer-tab">10101_김채점_과제.jpg</button>
+        <button class="viewer-tab">10101_김채점_과제2.jpg</button>
+      </div>
+      <div class="viewer-info">03/21 14:00 업로드</div>
+      <div class="viewer-body">
+        <img src="social_eval_p1.png" alt="사회과 평가지 1페이지" onerror="this.style.display='none'">
+        <img src="social_eval_p2.png" alt="사회과 평가지 2페이지" onerror="this.style.display='none'">
+      </div>
+    </section>
+
+    <!-- 우측: 결과 공개 영역 -->
+    <section class="result-panel">
+
+      <!-- 공개 기간 alert -->
+      <div class="alert-period">
+        <span class="alert-period-icon"><i data-lucide="info" style="width:18px;height:18px"></i></span>
+        <span class="alert-period-text">결과 확인 가능 기간 : 26.05.10 14:00 ~ 26.06.30 14:00</span>
+      </div>
+
+      <div class="result-body">
+
+        <!-- 성취기준 -->
+        <div class="result-section">
+          <h2 class="result-section-title">성취기준</h2>
+          <div class="standards-box">
+            <ol>
+              <li>우리 고장의 모습과 변화에 대해 다양한 자료를 활용하여 탐구할 수 있다.</li>
+              <li>우리 고장의 장소와 공간을 인식하고 그림지도로 표현할 수 있다.</li>
+              <li>우리 고장의 가치와 정체성을 자신의 시각으로 표현할 수 있다.</li>
+            </ol>
+          </div>
+        </div>
+
+        <!-- 채점기준 -->
+        <div class="result-section">
+          <h2 class="result-section-title">채점기준</h2>
+          <table class="rubric-table">
+            <thead>
+              <tr>
+                <th>채점 기준</th>
+                <th>항목명</th>
+                <th>배점</th>
+              </tr>
+            </thead>
+            <tbody>
+              <!-- 1. 장소 인식 및 특징 파악 능력 -->
+              <tr>
+                <td class="crit-name" rowspan="3">장소 인식 및 특징 파악 능력</td>
+                <td class="crit-detail">익산 지역 실제 장소 4곳을 정확히 나열하고 경험·느낌을 구체적으로 서술함</td>
+                <td class="score">10</td>
+              </tr>
+              <tr class="selected">
+                <td class="crit-detail"><div class="crit-detail-row"><span class="crit-check"><i data-lucide="check" style="width:12px;height:12px"></i></span>장소는 잘 나열했으나 경험·느낌 서술이 다소 부족함</div></td>
+                <td class="score">8</td>
+              </tr>
+              <tr>
+                <td class="crit-detail">장소 나열이 부정확하거나 서술이 매우 부족함</td>
+                <td class="score">5</td>
+              </tr>
+              <!-- 2. 공간 구성 및 시각화 표현력 -->
+              <tr class="selected">
+                <td class="crit-name" rowspan="3">공간 구성 및 시각화 표현력</td>
+                <td class="crit-detail"><div class="crit-detail-row"><span class="crit-check"><i data-lucide="check" style="width:12px;height:12px"></i></span>주변 장소 5곳을 방향·위치를 고려해 정확히 배치하고 특징을 시각적으로 잘 표현함</div></td>
+                <td class="score">20</td>
+              </tr>
+              <tr>
+                <td class="crit-detail">장소 배치는 가능하나 특징 표현이 단순함</td>
+                <td class="score">10</td>
+              </tr>
+              <tr>
+                <td class="crit-detail">지도 구성이 부정확하거나 표현이 매우 단순함</td>
+                <td class="score">5</td>
+              </tr>
+              <!-- 3. 고장에 대한 가치 인식 및 태도 -->
+              <tr>
+                <td class="crit-name" rowspan="3">고장에 대한 가치 인식 및 태도</td>
+                <td class="crit-detail">비유적 표현을 활용해 고장의 가치를 구체적·창의적으로 서술함</td>
+                <td class="score">20</td>
+              </tr>
+              <tr>
+                <td class="crit-detail">비유는 사용했으나 이유 연결이 다소 일반적임</td>
+                <td class="score">10</td>
+              </tr>
+              <tr class="selected">
+                <td class="crit-detail"><div class="crit-detail-row"><span class="crit-check"><i data-lucide="check" style="width:12px;height:12px"></i></span>비유적 표현이 없거나 이유 서술이 매우 부족함</div></td>
+                <td class="score">5</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- 선택된 항목 표시 마킹 — 첫 행에 적용 -->
+        <!-- 채점 결과 -->
+        <div class="result-section">
+          <h2 class="result-section-title">채점 결과</h2>
+          <div style="display:flex;flex-direction:column;gap:12px">
+            <div class="score-box">
+              <div class="score-col">
+                <span class="score-badge">환산점수(등급)</span>
+                <span class="score-value">66점 (C)</span>
+              </div>
+              <div class="score-sep"></div>
+              <div class="score-col">
+                <span class="score-badge">총점</span>
+                <span class="score-value">33점 <span class="max">/ 50점</span></span>
+              </div>
+            </div>
+            <p class="grade-caption">※ A등급 : 90~100점, B등급 : 80~89점, C등급 : 70~79점, D등급 : 60~69점, F등급 : 60점 미만</p>
+          </div>
+        </div>
+
+        <!-- 선생님 피드백 -->
+        <div class="result-section">
+          <h2 class="result-section-title">선생님 피드백</h2>
+          <div class="feedback-box">
+            <p>우리 고장의 장소들을 정확히 알고 있고 그림지도도 아주 잘 표현했어요. 다음에는 고장에 대한 느낌이나 가치를 「우리 고장은 ○○ 같다」처럼 비유를 써 보고, 왜 그렇게 느끼는지 이유도 함께 적어 보면 훨씬 멋진 글이 될 거예요. 늘 성실하게 과제를 해 주는 모습이 인상적이에요!</p>
+          </div>
+        </div>
+
+      </div>
+    </section>
+  </div>
+</main>
+
+<script>
+  lucide.createIcons();
+</script>
+</body>
+</html>

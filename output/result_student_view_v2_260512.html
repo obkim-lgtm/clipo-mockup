@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>과제 결과 보기 | CLIPO</title>
+<link rel="icon" type="image/svg+xml" href="clipo_favicon.svg">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard-gov.min.css">
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<style>
+*{font-family:'Pretendard GOV',-apple-system,sans-serif;box-sizing:border-box;margin:0;padding:0}
+body{background:#fef9f3;color:#3b3f4c;min-height:100vh}
+
+/* ══════ 헤더 (학생용) ══════ */
+.global-header{height:56px;background:#fff;display:flex;align-items:center;justify-content:space-between;position:fixed;top:0;left:0;right:0;z-index:210;padding:0 20px 0 8px;border-bottom:1px solid #f1e7d6}
+.gh-left{display:flex;align-items:center;gap:8px}
+.gh-menu-btn{width:40px;height:40px;display:inline-flex;align-items:center;justify-content:center;border:none;background:none;cursor:pointer;color:#3b3f4c;border-radius:8px}
+.gh-menu-btn:hover{background:#fef3e6}
+.gh-product-tag{display:inline-flex;align-items:center;height:18px;margin-left:12px;padding-left:12px;border-left:1px solid #e5e7eb;color:#6d7381;font-size:14px;font-weight:600;line-height:1}
+.gh-right{display:flex;align-items:center;gap:12px;padding-right:12px}
+.gh-user{display:inline-flex;align-items:center;gap:3px;font-size:16px;font-weight:500;color:#365eef;cursor:pointer;border:none;background:none;padding:0;line-height:1}
+.gh-user:hover{color:#3151c4}
+
+/* ══════ 사이드바 ══════ */
+.sidebar{position:fixed;top:56px;left:0;bottom:0;width:56px;background:#fff;border-right:1px solid #f1e7d6;display:flex;flex-direction:column;align-items:center;padding:8px 0;z-index:100}
+.sb-item{width:40px;height:40px;display:inline-flex;align-items:center;justify-content:center;border-radius:10px;color:#6d7381;cursor:pointer;border:none;background:none;margin-bottom:4px}
+.sb-item:hover{background:#fef3e6;color:#3b3f4c}
+.sb-item.active{background:#e9f2ff;color:#365eef}
+
+/* ══════ 메인 ══════ */
+.main{margin-left:56px;margin-top:56px;padding:32px 24px 80px;display:flex;justify-content:center}
+.container{width:100%;max-width:880px;display:flex;flex-direction:column;gap:20px}
+
+/* ══════ 인사 헤더 ══════ */
+.greeting{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;margin-bottom:4px}
+.greeting-left{flex:1;min-width:0}
+.btn-back{display:inline-flex;align-items:center;gap:4px;font-size:15px;font-weight:500;color:#6d7381;background:none;border:none;cursor:pointer;padding:0;line-height:1;font-family:inherit;margin-bottom:14px}
+.btn-back:hover{color:#3b3f4c}
+.greeting-title{font-size:26px;font-weight:700;color:#3b3f4c;line-height:1.3;margin-bottom:8px}
+.greeting-title .wave{display:inline-block;font-size:30px}
+.greeting-sub{font-size:15px;color:#6d7381;line-height:1.5;font-weight:500}
+.btn-download{display:inline-flex;align-items:center;justify-content:center;gap:8px;height:44px;padding:0 20px;border-radius:100px;background:#fff;border:1.5px solid #ffd591;color:#c2410c;font-size:15px;font-weight:600;cursor:pointer;font-family:inherit;line-height:1;flex-shrink:0;box-shadow:0 2px 8px rgba(255,213,145,.3)}
+.btn-download:hover{background:#fff7eb}
+
+/* ══════ 점수 hero 카드 ══════ */
+.score-hero{background:linear-gradient(135deg,#dbeafe 0%,#e0e7ff 100%);border-radius:24px;padding:36px 32px;display:flex;align-items:center;gap:32px;position:relative;overflow:hidden;box-shadow:0 4px 20px rgba(54,94,239,.08)}
+.score-hero::before{content:"";position:absolute;top:-30px;right:-30px;width:140px;height:140px;background:rgba(255,255,255,.4);border-radius:50%}
+.score-hero::after{content:"";position:absolute;bottom:-40px;left:-30px;width:120px;height:120px;background:rgba(255,255,255,.3);border-radius:50%}
+.score-info{flex:1;position:relative;z-index:2}
+.score-eyebrow{font-size:14px;font-weight:600;color:#3151c4;line-height:1;margin-bottom:8px;display:inline-flex;align-items:center;gap:6px}
+.score-headline{font-size:22px;font-weight:700;color:#1e3a8a;line-height:1.3;margin-bottom:20px}
+.score-main{display:flex;align-items:baseline;gap:8px;margin-bottom:16px}
+.score-main .num{font-size:64px;font-weight:800;color:#1e3a8a;line-height:1;letter-spacing:-1.5px}
+.score-main .unit{font-size:24px;font-weight:600;color:#1e3a8a;line-height:1}
+.score-main .sep{font-size:24px;font-weight:600;color:#6d7381;line-height:1;margin:0 4px}
+.score-main .max{font-size:24px;font-weight:600;color:#6d7381;line-height:1}
+.score-progress{width:100%;max-width:340px;height:12px;background:rgba(255,255,255,.6);border-radius:100px;overflow:hidden;margin-bottom:8px}
+.score-progress-fill{height:100%;background:linear-gradient(to right,#3b82f6,#6366f1);border-radius:100px;transition:width .6s ease}
+.score-percent{font-size:13px;font-weight:600;color:#3151c4;line-height:1}
+.score-grade{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;position:relative;z-index:2;flex-shrink:0}
+.medal{width:120px;height:120px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:60px;background:#fff;box-shadow:0 6px 20px rgba(0,0,0,.08)}
+.medal-grade{font-size:32px;font-weight:800;color:#3151c4;line-height:1}
+.grade-caption{font-size:13px;color:#6d7381;line-height:1.5;margin-top:4px;text-align:center}
+
+/* ══════ 공개 기간 작은 안내 ══════ */
+.period-bar{display:inline-flex;align-items:center;gap:6px;font-size:13px;color:#6d7381;padding:6px 12px;background:#fff;border-radius:100px;border:1px solid #f1e7d6;align-self:flex-start;line-height:1}
+.period-bar .ico{color:#365eef;display:inline-flex}
+
+/* ══════ 섹션 카드 공통 ══════ */
+.card{background:#fff;border-radius:20px;padding:28px;border:1px solid #f1e7d6;box-shadow:0 2px 10px rgba(0,0,0,.03)}
+.card-hd{display:flex;align-items:center;gap:10px;margin-bottom:20px}
+.card-emoji{font-size:24px;line-height:1}
+.card-title{font-size:20px;font-weight:700;color:#3b3f4c;line-height:1.25}
+
+/* ══════ 성취기준 ══════ */
+.standards-list{display:flex;flex-direction:column;gap:10px}
+.standards-item{display:flex;align-items:flex-start;gap:12px;padding:14px 16px;background:#fef3e6;border-radius:14px;font-size:16px;color:#3b3f4c;line-height:1.55;font-weight:500}
+.standards-num{display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:50%;background:#fff;color:#c2410c;font-size:14px;font-weight:700;line-height:1;flex-shrink:0}
+
+/* ══════ 내 답안 ══════ */
+.answer-viewer{background:#f6f7f9;border-radius:14px;padding:24px;display:flex;flex-direction:column;gap:16px;max-height:480px;overflow-y:auto}
+.answer-viewer img{display:block;width:100%;max-width:680px;margin:0 auto;height:auto;border-radius:10px;box-shadow:0 2px 8px rgba(0,0,0,.06)}
+.answer-toggle{display:inline-flex;align-items:center;gap:4px;font-size:14px;font-weight:600;color:#365eef;cursor:pointer;background:none;border:none;padding:0;line-height:1;align-self:flex-start;margin-top:-10px;margin-bottom:14px}
+.answer-toggle:hover{color:#3151c4}
+
+/* ══════ 문항별 결과 카드 ══════ */
+.item-list{display:flex;flex-direction:column;gap:14px}
+.item-card{border-radius:16px;overflow:hidden;border:1.5px solid var(--ac-bg)}
+.item-card.ac-blue{--ac:#3b82f6;--ac-bg:#dbeafe;--ac-soft:#eff6ff;--ac-text:#1e3a8a}
+.item-card.ac-teal{--ac:#14b8a6;--ac-bg:#ccfbf1;--ac-soft:#f0fdfa;--ac-text:#134e4a}
+.item-card.ac-orange{--ac:#f97316;--ac-bg:#ffedd5;--ac-soft:#fff7ed;--ac-text:#9a3412}
+.item-card.ac-purple{--ac:#a855f7;--ac-bg:#f3e8ff;--ac-soft:#faf5ff;--ac-text:#6b21a8}
+.item-hd{background:var(--ac-bg);padding:14px 18px;display:flex;align-items:center;gap:10px}
+.item-label{display:inline-flex;align-items:center;justify-content:center;height:28px;min-width:48px;padding:0 12px;border-radius:100px;background:var(--ac);color:#fff;font-size:14px;font-weight:700;line-height:1;flex-shrink:0}
+.item-level{display:inline-flex;align-items:center;justify-content:center;height:24px;padding:0 10px;border-radius:100px;font-size:13px;font-weight:700;line-height:1;flex-shrink:0}
+.item-level.lv-correct,.item-level.lv-high{background:#d1fae5;color:#065f46}
+.item-level.lv-mid{background:#fef3c7;color:#92400e}
+.item-level.lv-low,.item-level.lv-wrong{background:#fee2e2;color:#991b1b}
+.item-summary{flex:1;font-size:16px;font-weight:600;color:var(--ac-text);line-height:1.4}
+.item-body{padding:16px 18px;background:#fff;display:flex;flex-direction:column;gap:12px}
+.item-block{display:flex;flex-direction:column;gap:6px}
+.item-block-lbl{font-size:13px;font-weight:700;color:var(--ac);line-height:1;display:inline-flex;align-items:center;gap:5px}
+.item-block-text{font-size:16px;color:#3b3f4c;line-height:1.65}
+.item-block.feedback .item-block-text{background:var(--ac-soft);border-radius:10px;padding:12px 14px}
+
+/* ══════ 채점기준 테이블 (간략) ══════ */
+.rubric-table{width:100%;border-collapse:separate;border-spacing:0;border-radius:14px;overflow:hidden;border:1px solid #f1e7d6}
+.rubric-table thead th{background:#fef3e6;font-size:14px;font-weight:700;color:#c2410c;text-align:center;padding:12px;height:44px}
+.rubric-table thead th:first-child{text-align:left;padding-left:18px}
+.rubric-table tbody td{padding:12px;font-size:15px;color:#3b3f4c;line-height:1.5;border-top:1px solid #f1e7d6;vertical-align:middle}
+.rubric-table tbody td.crit-name{font-weight:600;width:32%;padding-left:18px}
+.rubric-table tbody td.crit-detail{font-weight:500}
+.rubric-table tbody td.score{text-align:center;font-weight:600;width:80px}
+.rubric-table tbody tr.got td{background:#f4f8ff}
+.rubric-table tbody tr.got td.crit-detail{color:#1e3a8a;font-weight:600}
+.rubric-table tbody tr.got td.score{color:#1e3a8a;font-weight:700}
+.rubric-detail{display:flex;align-items:flex-start;gap:8px}
+.rubric-check{width:18px;height:18px;border-radius:50%;background:#3b82f6;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;color:#fff;margin-top:2px}
+
+/* ══════ 선생님 피드백 ══════ */
+.teacher-fb-box{background:#fef3e6;border-radius:14px;padding:24px;display:flex;gap:16px;align-items:flex-start}
+.teacher-avatar{width:48px;height:48px;border-radius:50%;background:#ffd591;display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0}
+.teacher-fb-content{flex:1}
+.teacher-fb-name{font-size:14px;font-weight:700;color:#c2410c;margin-bottom:4px;line-height:1}
+.teacher-fb-text{font-size:16px;color:#3b3f4c;line-height:1.65;font-weight:500}
+
+/* 반응형 */
+@media (max-width:720px){
+  .main{padding:20px 16px 60px}
+  .greeting{flex-direction:column;align-items:stretch;gap:12px}
+  .btn-download{align-self:flex-start}
+  .score-hero{flex-direction:column;text-align:center;padding:28px 24px;gap:24px}
+  .score-info{width:100%}
+  .score-main{justify-content:center}
+  .greeting-title{font-size:22px}
+  .greeting-title .wave{font-size:24px}
+  .card{padding:20px}
+  .medal{width:100px;height:100px;font-size:50px}
+}
+</style>
+</head>
+<body>
+
+<!-- 헤더 -->
+<div class="global-header">
+  <div class="gh-left">
+    <button class="gh-menu-btn"><i data-lucide="menu" style="width:24px;height:24px"></i></button>
+    <a class="gh-logo" href="#" aria-label="CLIPO">
+      <svg width="76" height="16" viewBox="0 0 76 16" fill="none"><path d="M11.3613 4.03516H4.09668V11.9629H8.88281L8.88086 11.9648H15.6016V16H4.02539C1.80242 15.9998 0 14.223 0 12.0322V3.96777C0 1.77696 1.80242 0.000177874 4.02539 0H15.4561L11.3613 4.03516ZM22.0703 11.9648H33.5781V16H22.002C19.7788 16 17.9756 14.2231 17.9756 12.0322V0H22.0703V11.9648ZM40.0459 16H35.9521V0H40.0459V16ZM54.5381 0C56.4564 0 58.0138 1.53228 58.0186 3.42285L58.0166 3.4248V8.54297C58.014 10.4333 56.4567 11.9648 54.5361 11.9648H46.5107L42.416 16V0H54.5381ZM71.9746 0C74.0086 0.000134956 75.6887 1.49046 75.958 3.42285H76V12.5771H75.958C75.6887 14.5095 74.011 15.9999 71.9746 16H64.4238C62.3897 16 60.7098 14.5096 60.4404 12.5771C60.4145 12.398 60.3984 12.2184 60.3984 12.0322V3.96777C60.3984 3.78159 60.4145 3.60205 60.4404 3.42285C60.7098 1.49037 62.3873 0 64.4238 0H71.9746ZM64.4922 12.5771H71.9062V3.42285H64.4922V12.5771ZM46.5107 3.42285V8.54004H53.9238V3.42285H46.5107Z" fill="#365EEF"/></svg>
+    </a>
+    <span class="gh-product-tag">초등</span>
+  </div>
+  <div class="gh-right">
+    <button class="gh-user">김채점 학생<i data-lucide="chevron-down" style="width:20px;height:20px"></i></button>
+  </div>
+</div>
+
+<aside class="sidebar">
+  <button class="sb-item" title="홈"><i data-lucide="home" style="width:20px;height:20px"></i></button>
+  <button class="sb-item active" title="과제"><i data-lucide="notebook-pen" style="width:20px;height:20px"></i></button>
+  <button class="sb-item" title="리포트"><i data-lucide="bar-chart-2" style="width:20px;height:20px"></i></button>
+</aside>
+
+<main class="main">
+  <div class="container">
+
+    <!-- 인사 헤더 -->
+    <div class="greeting">
+      <div class="greeting-left">
+        <button class="btn-back" onclick="history.back()">
+          <i data-lucide="chevron-left" style="width:18px;height:18px"></i>이전으로
+        </button>
+        <h1 class="greeting-title">
+          김채점 친구, 사회과 평가 결과가 나왔어요! <span class="wave">🎉</span>
+        </h1>
+        <p class="greeting-sub">내가 어떻게 잘했고, 다음에 어떤 점을 더 보완하면 좋을지 같이 살펴봐요.</p>
+      </div>
+      <button class="btn-download">
+        <i data-lucide="download" style="width:18px;height:18px"></i>결과 다운로드
+      </button>
+    </div>
+
+    <span class="period-bar">
+      <span class="ico"><i data-lucide="calendar" style="width:14px;height:14px"></i></span>
+      결과 확인 가능 기간 · 26.05.10 ~ 26.06.30
+    </span>
+
+    <!-- 점수 hero -->
+    <div class="score-hero">
+      <div class="score-info">
+        <div class="score-eyebrow"><i data-lucide="award" style="width:14px;height:14px"></i>나의 점수</div>
+        <div class="score-headline">사회과 — 우리 고장의 모습</div>
+        <div class="score-main">
+          <span class="num">33</span>
+          <span class="unit">점</span>
+          <span class="sep">/</span>
+          <span class="max">50점</span>
+        </div>
+        <div class="score-progress"><div class="score-progress-fill" style="width:66%"></div></div>
+        <div class="score-percent">66% 달성</div>
+      </div>
+      <div class="score-grade">
+        <div class="medal">🥉</div>
+        <div class="medal-grade">C 등급</div>
+        <div class="grade-caption">A 90 · B 80 · C 70<br>D 60 · F 60 미만</div>
+      </div>
+    </div>
+
+    <!-- 평가 목표 -->
+    <section class="card">
+      <div class="card-hd">
+        <span class="card-emoji">📚</span>
+        <h2 class="card-title">이번 평가에서 배운 것들</h2>
+      </div>
+      <ol class="standards-list">
+        <li class="standards-item"><span class="standards-num">1</span>우리 고장의 모습과 변화에 대해 다양한 자료를 활용하여 탐구할 수 있다.</li>
+        <li class="standards-item"><span class="standards-num">2</span>우리 고장의 장소와 공간을 인식하고 그림지도로 표현할 수 있다.</li>
+        <li class="standards-item"><span class="standards-num">3</span>우리 고장의 가치와 정체성을 자신의 시각으로 표현할 수 있다.</li>
+      </ol>
+    </section>
+
+    <!-- 내 답안 -->
+    <section class="card">
+      <div class="card-hd">
+        <span class="card-emoji">✏️</span>
+        <h2 class="card-title">내가 쓴 답</h2>
+      </div>
+      <div class="answer-viewer">
+        <img src="social_eval_p1.png" alt="내 답안 1페이지" onerror="this.style.display='none'">
+        <img src="social_eval_p2.png" alt="내 답안 2페이지" onerror="this.style.display='none'">
+      </div>
+    </section>
+
+    <!-- 문항별 결과 -->
+    <section class="card">
+      <div class="card-hd">
+        <span class="card-emoji">📝</span>
+        <h2 class="card-title">문항별로 어떻게 했나요?</h2>
+      </div>
+      <div class="item-list">
+
+        <div class="item-card ac-blue">
+          <div class="item-hd">
+            <span class="item-label">1-1</span>
+            <span class="item-level lv-correct">정답</span>
+            <span class="item-summary">내가 경험한 주변의 장소 4곳 쓰기</span>
+          </div>
+          <div class="item-body">
+            <div class="item-block feedback">
+              <span class="item-block-lbl"><i data-lucide="message-circle-heart" style="width:13px;height:13px"></i>피드백</span>
+              <div class="item-block-text">익산 지역의 실제 장소를 조건에 맞게 4곳 모두 바르게 썼어요.</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="item-card ac-teal">
+          <div class="item-hd">
+            <span class="item-label">1-2</span>
+            <span class="item-level lv-mid">중</span>
+            <span class="item-summary">1번에서 적은 장소 중 2곳을 골라 표 완성하기</span>
+          </div>
+          <div class="item-body">
+            <div class="item-block feedback">
+              <span class="item-block-lbl"><i data-lucide="message-circle-heart" style="width:13px;height:13px"></i>피드백</span>
+              <div class="item-block-text">장소의 이름과 기능은 잘 썼어요. 그 장소에서 있었던 일이나 느낀 점을 조금 더 자세히 써 보면 훨씬 풍부한 설명이 될 거예요!</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="item-card ac-orange">
+          <div class="item-hd">
+            <span class="item-label">2-1</span>
+            <span class="item-level lv-correct">정답</span>
+            <span class="item-summary">우리 집 중심으로 주변 장소 5곳 그림지도로 그리기</span>
+          </div>
+          <div class="item-body">
+            <div class="item-block feedback">
+              <span class="item-block-lbl"><i data-lucide="message-circle-heart" style="width:13px;height:13px"></i>피드백</span>
+              <div class="item-block-text">집 주변 장소들의 위치를 잘 파악하고 배치했어요. 각 건물의 특징도 살려 그린 점이 정말 잘했어요!</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="item-card ac-purple">
+          <div class="item-hd">
+            <span class="item-label">2-2</span>
+            <span class="item-level lv-low">하</span>
+            <span class="item-summary">우리가 사는 곳에 대한 생각·느낌을 한마디로 표현</span>
+          </div>
+          <div class="item-body">
+            <div class="item-block feedback">
+              <span class="item-block-lbl"><i data-lucide="message-circle-heart" style="width:13px;height:13px"></i>피드백</span>
+              <div class="item-block-text">우리 고장이 좋다는 마음이 느껴져요. 왜 행복한지 이유도 함께 쓰고, 「우리 고장은 ○○ 같다」처럼 비유를 사용해 보면 더 멋진 표현이 될 거예요!</div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- 채점기준 -->
+    <section class="card">
+      <div class="card-hd">
+        <span class="card-emoji">📐</span>
+        <h2 class="card-title">어떤 기준으로 채점됐어요?</h2>
+      </div>
+      <table class="rubric-table">
+        <thead>
+          <tr>
+            <th>채점 기준</th>
+            <th>항목명</th>
+            <th>배점</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- 1. 장소 인식 -->
+          <tr>
+            <td class="crit-name" rowspan="3">장소 인식 및 특징 파악 능력</td>
+            <td class="crit-detail">익산 지역 실제 장소 4곳을 정확히 나열하고 경험·느낌을 구체적으로 서술함</td>
+            <td class="score">10</td>
+          </tr>
+          <tr class="got">
+            <td class="crit-detail"><div class="rubric-detail"><span class="rubric-check"><i data-lucide="check" style="width:12px;height:12px"></i></span><span>장소는 잘 나열했으나 경험·느낌 서술이 다소 부족함</span></div></td>
+            <td class="score">8</td>
+          </tr>
+          <tr>
+            <td class="crit-detail">장소 나열이 부정확하거나 서술이 매우 부족함</td>
+            <td class="score">5</td>
+          </tr>
+          <!-- 2. 공간 구성 -->
+          <tr class="got">
+            <td class="crit-name" rowspan="3">공간 구성 및 시각화 표현력</td>
+            <td class="crit-detail"><div class="rubric-detail"><span class="rubric-check"><i data-lucide="check" style="width:12px;height:12px"></i></span><span>주변 장소 5곳을 방향·위치를 고려해 정확히 배치하고 특징을 시각적으로 잘 표현함</span></div></td>
+            <td class="score">20</td>
+          </tr>
+          <tr>
+            <td class="crit-detail">장소 배치는 가능하나 특징 표현이 단순함</td>
+            <td class="score">10</td>
+          </tr>
+          <tr>
+            <td class="crit-detail">지도 구성이 부정확하거나 표현이 매우 단순함</td>
+            <td class="score">5</td>
+          </tr>
+          <!-- 3. 가치 인식 -->
+          <tr>
+            <td class="crit-name" rowspan="3">고장에 대한 가치 인식 및 태도</td>
+            <td class="crit-detail">비유적 표현을 활용해 고장의 가치를 구체적·창의적으로 서술함</td>
+            <td class="score">20</td>
+          </tr>
+          <tr>
+            <td class="crit-detail">비유는 사용했으나 이유 연결이 다소 일반적임</td>
+            <td class="score">10</td>
+          </tr>
+          <tr class="got">
+            <td class="crit-detail"><div class="rubric-detail"><span class="rubric-check"><i data-lucide="check" style="width:12px;height:12px"></i></span><span>비유적 표현이 없거나 이유 서술이 매우 부족함</span></div></td>
+            <td class="score">5</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- 선생님 피드백 -->
+    <section class="card">
+      <div class="card-hd">
+        <span class="card-emoji">💬</span>
+        <h2 class="card-title">선생님의 한마디</h2>
+      </div>
+      <div class="teacher-fb-box">
+        <div class="teacher-avatar">👩‍🏫</div>
+        <div class="teacher-fb-content">
+          <div class="teacher-fb-name">홍길동 선생님</div>
+          <p class="teacher-fb-text">우리 고장의 장소들을 정확히 알고 그림지도도 아주 잘 표현했어요. 다음에는 고장에 대한 느낌이나 가치를 「우리 고장은 ○○ 같다」처럼 비유를 써 보고, 왜 그렇게 느끼는지 이유도 함께 적어 보면 훨씬 멋진 글이 될 거예요. 늘 성실하게 과제를 해 주는 모습이 인상적이에요! 🌟</p>
+        </div>
+      </div>
+    </section>
+
+  </div>
+</main>
+
+<script>
+  lucide.createIcons();
+</script>
+</body>
+</html>
