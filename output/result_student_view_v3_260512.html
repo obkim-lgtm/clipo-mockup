@@ -77,10 +77,21 @@ body{background:#fef9f3;color:#3b3f4c;min-height:100vh}
 .standards-num{display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:50%;background:#fff;color:#c2410c;font-size:14px;font-weight:700;line-height:1;flex-shrink:0}
 
 /* ══════ 내 답안 ══════ */
-.answer-viewer{background:#f6f7f9;border-radius:14px;padding:24px;display:flex;flex-direction:column;gap:16px;max-height:480px;overflow-y:auto}
-.answer-viewer img{display:block;width:100%;max-width:680px;margin:0 auto;height:auto;border-radius:10px;box-shadow:0 2px 8px rgba(0,0,0,.06)}
-.answer-toggle{display:inline-flex;align-items:center;gap:4px;font-size:14px;font-weight:600;color:#365eef;cursor:pointer;background:none;border:none;padding:0;line-height:1;align-self:flex-start;margin-top:-10px;margin-bottom:14px}
-.answer-toggle:hover{color:#3151c4}
+.answer-files{display:flex;flex-direction:column;gap:16px}
+.answer-file{background:#f6f7f9;border-radius:14px;overflow:hidden;border:1px solid #f1e7d6}
+.answer-file-hd{display:flex;align-items:center;gap:10px;padding:12px 16px;background:#fff;border-bottom:1px solid #f1e7d6}
+.answer-file-icon{color:#365eef;display:inline-flex;flex-shrink:0}
+.answer-file-name{font-size:14px;font-weight:600;color:#3b3f4c;line-height:1.25;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.answer-file-date{font-size:13px;font-weight:500;color:#9ca3af;line-height:1.25;flex-shrink:0}
+.answer-file-body{padding:20px;display:flex;flex-direction:column;gap:12px;max-height:600px;overflow-y:auto}
+.answer-file-body img{display:block;width:100%;max-width:680px;margin:0 auto;height:auto;border-radius:8px;box-shadow:0 2px 8px rgba(0,0,0,.06)}
+
+@media (max-width:720px){
+  .answer-file-hd{padding:10px 14px;gap:8px}
+  .answer-file-name{font-size:13px}
+  .answer-file-date{font-size:12px}
+  .answer-file-body{padding:14px;max-height:480px}
+}
 
 /* ══════ 문항별 결과 카드 ══════ */
 .item-list{display:flex;flex-direction:column;gap:14px}
@@ -225,6 +236,19 @@ body{background:#fef9f3;color:#3b3f4c;min-height:100vh}
   body{background:#fff}
   .main{margin:0;padding:0}
 }
+
+/* ══════ 공개 옵션 토글 (parent iframe postMessage 기반) ══════ */
+body.hide-score [data-share="score"]{display:none}
+body.hide-standards [data-share="standards"]{display:none}
+body.hide-inst-ground [data-share="inst-ground"]{display:none}
+body.hide-inst-feedback [data-share="inst-feedback"]{display:none}
+body.hide-rubric [data-share="rubric"]{display:none}
+body.hide-elem-ground [data-share="elem-ground"]{display:none}
+body.hide-elem-feedback [data-share="elem-feedback"]{display:none}
+body.hide-teacher [data-share="teacher"]{display:none}
+/* 근거+피드백 둘 다 hide면 카드 자체 hide */
+body.hide-inst-ground.hide-inst-feedback [data-share="inst-card"]{display:none}
+body.hide-elem-ground.hide-elem-feedback [data-share="elem-card"]{display:none}
 </style>
 </head>
 <body>
@@ -274,7 +298,7 @@ body{background:#fef9f3;color:#3b3f4c;min-height:100vh}
     </span>
 
     <!-- 점수 hero -->
-    <div class="score-hero">
+    <div class="score-hero" data-share="score">
       <div class="score-info">
         <div class="score-eyebrow"><i data-lucide="award" style="width:14px;height:14px"></i>나의 점수</div>
         <div class="score-headline">사회과 — 우리 고장의 모습</div>
@@ -294,7 +318,7 @@ body{background:#fef9f3;color:#3b3f4c;min-height:100vh}
     </div>
 
     <!-- 평가 목표 -->
-    <section class="card">
+    <section class="card" data-share="standards">
       <div class="card-hd">
         <span class="card-emoji">📚</span>
         <h2 class="card-title">이번 평가에서 배운 것들</h2>
@@ -312,14 +336,35 @@ body{background:#fef9f3;color:#3b3f4c;min-height:100vh}
         <span class="card-emoji">✏️</span>
         <h2 class="card-title">내가 쓴 답</h2>
       </div>
-      <div class="answer-viewer">
-        <img src="social_eval_p1.png" alt="내 답안 1페이지" onerror="this.style.display='none'">
-        <img src="social_eval_p2.png" alt="내 답안 2페이지" onerror="this.style.display='none'">
+      <div class="answer-files">
+
+        <div class="answer-file">
+          <div class="answer-file-hd">
+            <span class="answer-file-icon"><i data-lucide="file-image" style="width:18px;height:18px"></i></span>
+            <span class="answer-file-name">사회과_평가지_앞면.jpg</span>
+            <span class="answer-file-date">03/21 14:00 제출</span>
+          </div>
+          <div class="answer-file-body">
+            <img src="social_eval_p1.png" alt="사회과 평가지 앞면" onerror="this.style.display='none'">
+          </div>
+        </div>
+
+        <div class="answer-file">
+          <div class="answer-file-hd">
+            <span class="answer-file-icon"><i data-lucide="file-image" style="width:18px;height:18px"></i></span>
+            <span class="answer-file-name">사회과_평가지_뒷면.jpg</span>
+            <span class="answer-file-date">03/21 14:02 제출</span>
+          </div>
+          <div class="answer-file-body">
+            <img src="social_eval_p2.png" alt="사회과 평가지 뒷면" onerror="this.style.display='none'">
+          </div>
+        </div>
+
       </div>
     </section>
 
     <!-- 문항별 결과 -->
-    <section class="card">
+    <section class="card" data-share="inst-card">
       <div class="card-hd">
         <span class="card-emoji">📝</span>
         <h2 class="card-title">문항별로 어떻게 했나요?</h2>
@@ -333,11 +378,11 @@ body{background:#fef9f3;color:#3b3f4c;min-height:100vh}
             <span class="item-level lv-correct">정답</span>
           </div>
           <div class="item-body">
-            <div class="item-block ground">
+            <div class="item-block ground" data-share="inst-ground">
               <span class="item-block-lbl"><i data-lucide="search" style="width:13px;height:13px"></i>채점 근거</span>
               <div class="item-block-text">지시문 조건대로 익산 지역의 실제 장소인 「중앙 시장」, 「익산역」, 「솜리 어린이 도서관」, 「이마트」 4곳을 정확하게 나열했어요.</div>
             </div>
-            <div class="item-block feedback">
+            <div class="item-block feedback" data-share="inst-feedback">
               <span class="item-block-lbl"><i data-lucide="message-circle-heart" style="width:13px;height:13px"></i>피드백</span>
               <div class="item-block-text">익산 지역의 실제 장소를 조건에 맞게 4곳 모두 바르게 썼어요.</div>
             </div>
@@ -351,11 +396,11 @@ body{background:#fef9f3;color:#3b3f4c;min-height:100vh}
             <span class="item-level lv-mid">중</span>
           </div>
           <div class="item-body">
-            <div class="item-block ground">
+            <div class="item-block ground" data-share="inst-ground">
               <span class="item-block-lbl"><i data-lucide="search" style="width:13px;height:13px"></i>채점 근거</span>
               <div class="item-block-text">선택한 두 장소의 이름과 기능은 작성했으나, 개인적인 경험과 느낌 서술이 간략해 장소의 특징을 구체적으로 연결 짓는 부분이 다소 부족했어요.</div>
             </div>
-            <div class="item-block feedback">
+            <div class="item-block feedback" data-share="inst-feedback">
               <span class="item-block-lbl"><i data-lucide="message-circle-heart" style="width:13px;height:13px"></i>피드백</span>
               <div class="item-block-text">장소의 이름과 기능은 잘 썼어요. 그 장소에서 있었던 일이나 느낀 점을 조금 더 자세히 써 보면 훨씬 풍부한 설명이 될 거예요!</div>
             </div>
@@ -369,11 +414,11 @@ body{background:#fef9f3;color:#3b3f4c;min-height:100vh}
             <span class="item-level lv-correct">정답</span>
           </div>
           <div class="item-body">
-            <div class="item-block ground">
+            <div class="item-block ground" data-share="inst-ground">
               <span class="item-block-lbl"><i data-lucide="search" style="width:13px;height:13px"></i>채점 근거</span>
               <div class="item-block-text">우리 집을 중심으로 「중앙 시장」, 「솜리 어린이 도서관」, 「익산역」, 「이마트」, 「가온 초등학교」 5곳을 방향과 거리감을 고려해 지도에 배치했어요.</div>
             </div>
-            <div class="item-block feedback">
+            <div class="item-block feedback" data-share="inst-feedback">
               <span class="item-block-lbl"><i data-lucide="message-circle-heart" style="width:13px;height:13px"></i>피드백</span>
               <div class="item-block-text">집 주변 장소들의 위치를 잘 파악하고 배치했어요. 각 건물의 특징도 살려 그린 점이 정말 잘했어요!</div>
             </div>
@@ -387,11 +432,11 @@ body{background:#fef9f3;color:#3b3f4c;min-height:100vh}
             <span class="item-level lv-low">하</span>
           </div>
           <div class="item-body">
-            <div class="item-block ground">
+            <div class="item-block ground" data-share="inst-ground">
               <span class="item-block-lbl"><i data-lucide="search" style="width:13px;height:13px"></i>채점 근거</span>
               <div class="item-block-text">우리가 사는 곳을 「행복한 곳」이라고 단정적으로 표현했으나, 비유적 표현 없이 짧은 문장에 그쳐 이유나 근거가 제시되지 않았어요.</div>
             </div>
-            <div class="item-block feedback">
+            <div class="item-block feedback" data-share="inst-feedback">
               <span class="item-block-lbl"><i data-lucide="message-circle-heart" style="width:13px;height:13px"></i>피드백</span>
               <div class="item-block-text">우리 고장이 좋다는 마음이 느껴져요. 왜 행복한지 이유도 함께 쓰고, 「우리 고장은 ○○ 같다」처럼 비유를 사용해 보면 더 멋진 표현이 될 거예요!</div>
             </div>
@@ -402,7 +447,7 @@ body{background:#fef9f3;color:#3b3f4c;min-height:100vh}
     </section>
 
     <!-- 채점기준 -->
-    <section class="card">
+    <section class="card" data-share="rubric">
       <div class="card-hd">
         <span class="card-emoji">📐</span>
         <h2 class="card-title">어떤 기준으로 채점됐어요?</h2>
@@ -465,7 +510,7 @@ body{background:#fef9f3;color:#3b3f4c;min-height:100vh}
     </section>
 
     <!-- 채점 항목별 결과 -->
-    <section class="card">
+    <section class="card" data-share="elem-card">
       <div class="card-hd">
         <span class="card-emoji">📊</span>
         <h2 class="card-title">채점 항목별로는 어땠나요?</h2>
@@ -478,11 +523,11 @@ body{background:#fef9f3;color:#3b3f4c;min-height:100vh}
             <span class="item-score">8 / 10점</span>
           </div>
           <div class="item-body">
-            <div class="item-block ground">
+            <div class="item-block ground" data-share="elem-ground">
               <span class="item-block-lbl"><i data-lucide="search" style="width:13px;height:13px"></i>채점 근거</span>
               <div class="item-block-text">익산 지역의 실제 장소 4곳을 정확히 제시했으나, 장소별 기능 설명은 잘 했고 개인적 경험·느낌 서술이 다소 단편적으로 작성되어 깊이가 부족했어요.</div>
             </div>
-            <div class="item-block feedback">
+            <div class="item-block feedback" data-share="elem-feedback">
               <span class="item-block-lbl"><i data-lucide="message-circle-heart" style="width:13px;height:13px"></i>피드백</span>
               <div class="item-block-text">우리 고장의 장소들을 잘 알고 있어요. 각 장소에서 있었던 일과 그때의 느낌을 조금 더 자세히 써 보면 훨씬 풍부한 표현이 될 거예요!</div>
             </div>
@@ -495,11 +540,11 @@ body{background:#fef9f3;color:#3b3f4c;min-height:100vh}
             <span class="item-score">20 / 20점</span>
           </div>
           <div class="item-body">
-            <div class="item-block ground">
+            <div class="item-block ground" data-share="elem-ground">
               <span class="item-block-lbl"><i data-lucide="search" style="width:13px;height:13px"></i>채점 근거</span>
               <div class="item-block-text">우리 집을 중심으로 주변 장소 5곳의 명칭을 모두 기입했고, 각 건물의 고유한 특징을 시각적으로 잘 나타내 완성도 높은 그림지도를 제출했어요.</div>
             </div>
-            <div class="item-block feedback">
+            <div class="item-block feedback" data-share="elem-feedback">
               <span class="item-block-lbl"><i data-lucide="message-circle-heart" style="width:13px;height:13px"></i>피드백</span>
               <div class="item-block-text">집 주변 장소들의 위치 관계를 잘 파악하고, 각 건물의 특징을 그림으로 상세히 묘사한 점이 매우 우수해요!</div>
             </div>
@@ -512,11 +557,11 @@ body{background:#fef9f3;color:#3b3f4c;min-height:100vh}
             <span class="item-score">5 / 20점</span>
           </div>
           <div class="item-body">
-            <div class="item-block ground">
+            <div class="item-block ground" data-share="elem-ground">
               <span class="item-block-lbl"><i data-lucide="search" style="width:13px;height:13px"></i>채점 근거</span>
               <div class="item-block-text">고장을 「행복한 곳」이라는 단정적 표현에 그쳐 비유적 표현 없이 짧게 서술했어요. 이유나 근거가 제시되지 않아 과제 의도에 충분히 부합하지 않았어요.</div>
             </div>
-            <div class="item-block feedback">
+            <div class="item-block feedback" data-share="elem-feedback">
               <span class="item-block-lbl"><i data-lucide="message-circle-heart" style="width:13px;height:13px"></i>피드백</span>
               <div class="item-block-text">우리 고장을 좋아하는 마음이 느껴져요. 「우리 고장은 ○○ 같다」처럼 비유를 써보고, 왜 그렇게 느끼는지 이유도 함께 적어 보세요!</div>
             </div>
@@ -527,7 +572,7 @@ body{background:#fef9f3;color:#3b3f4c;min-height:100vh}
     </section>
 
     <!-- 선생님 피드백 -->
-    <section class="card">
+    <section class="card" data-share="teacher">
       <div class="card-hd">
         <span class="card-emoji">💬</span>
         <h2 class="card-title">선생님의 한마디</h2>
@@ -546,6 +591,20 @@ body{background:#fef9f3;color:#3b3f4c;min-height:100vh}
 
 <script>
   lucide.createIcons();
+
+  // 부모 iframe(채점 화면 공개 모달)에서 옵션 토글 신호 받기
+  window.addEventListener('message', function(e){
+    if(!e.data || e.data.type !== 'share-opts') return;
+    var o = e.data.opts || {};
+    document.body.classList.toggle('hide-score', o.score === false);
+    document.body.classList.toggle('hide-standards', o.standards === false);
+    document.body.classList.toggle('hide-inst-ground', o.inst_ground === false);
+    document.body.classList.toggle('hide-inst-feedback', o.inst_feedback === false);
+    document.body.classList.toggle('hide-rubric', o.rubric === false);
+    document.body.classList.toggle('hide-elem-ground', o.elem_ground === false);
+    document.body.classList.toggle('hide-elem-feedback', o.elem_feedback === false);
+    document.body.classList.toggle('hide-teacher', o.teacher === false);
+  });
 </script>
 </body>
 </html>
