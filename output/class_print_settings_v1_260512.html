@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>1학년 1반 채점 결과 출력 | CLIPO</title>
+<link rel="icon" type="image/svg+xml" href="clipo_favicon.svg">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard-gov.min.css">
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<style>
+*{font-family:'Pretendard GOV',-apple-system,sans-serif;box-sizing:border-box;margin:0;padding:0}
+body{background:#f6f7f9;color:#222631;min-height:100vh}
+
+/* 헤더 */
+.global-header{height:56px;background:#fff;display:flex;align-items:center;justify-content:space-between;position:fixed;top:0;left:0;right:0;z-index:210;padding:0 20px 0 8px;border-bottom:1px solid #f1f3f5}
+.gh-left{display:flex;align-items:center;gap:8px}
+.gh-menu-btn{width:40px;height:40px;display:inline-flex;align-items:center;justify-content:center;border:none;background:none;cursor:pointer;color:#3b3f4c;border-radius:4px}
+.gh-menu-btn:hover{background:#f6f7f9}
+.gh-product-tag{display:inline-flex;align-items:center;height:18px;margin-left:12px;padding-left:12px;border-left:1px solid #e5e7eb;color:#6d7381;font-size:14px;font-weight:600;line-height:1}
+.gh-right{display:flex;align-items:center;gap:12px;padding-right:12px}
+.gh-plan{display:inline-flex;align-items:center;height:22px;padding:0 10px;border-radius:100px;background:#e9f2ff;border:1px solid #ccdfff;font-size:12px;font-weight:500;color:#3151c4;line-height:1}
+.gh-dday{font-size:14px;font-weight:500;color:#6d7381;line-height:1}
+.gh-credit{display:inline-flex;align-items:center;gap:6px;font-size:14px;font-weight:500;color:#3b3f4c;line-height:1}
+.gh-sep{width:0;height:14px;border-left:1px solid #dde1e8}
+.gh-user{display:inline-flex;align-items:center;gap:3px;font-size:14px;font-weight:500;color:#3b3f4c;cursor:pointer;border:none;background:none;padding:0;line-height:1}
+.gh-user:hover{color:#365eef}
+
+.sub-nav{height:54px;background:#fff;border-bottom:1px solid #dde1e8;display:flex;align-items:flex-end;padding:0 24px;position:fixed;top:56px;left:0;right:0;z-index:205}
+.sub-nav-item{position:relative;display:inline-flex;align-items:center;justify-content:center;height:54px;padding:0 16px;font-size:15px;font-weight:500;color:#6d7381;cursor:pointer;text-decoration:none;line-height:1;background:none;border:none;font-family:inherit}
+.sub-nav-item:hover{color:#222631}
+.sub-nav-item.active{color:#365eef;font-weight:600}
+.sub-nav-item.active::after{content:"";position:absolute;left:12px;right:12px;bottom:-1px;height:2px;background:#365eef;border-radius:2px 2px 0 0}
+
+.sidebar{position:fixed;top:110px;left:0;bottom:0;width:56px;background:#fff;border-right:1px solid #dde1e8;display:flex;flex-direction:column;align-items:center;padding:8px 0;z-index:100;gap:4px}
+.sb-item{width:40px;height:40px;display:inline-flex;align-items:center;justify-content:center;border-radius:6px;color:#6d7381;cursor:pointer;border:none;background:none}
+.sb-item:hover{background:#f6f7f9;color:#3b3f4c}
+.sb-item.active{background:#e9f2ff;color:#365eef}
+
+.main{margin-left:56px;margin-top:110px;padding:24px;display:flex;justify-content:center}
+.container{width:100%;max-width:1248px;display:flex;flex-direction:column;gap:20px}
+
+/* 페이지 헤더 */
+.page-header{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.ph-left{flex:1;display:flex;flex-direction:column;gap:8px;min-width:0}
+.btn-back{display:inline-flex;align-items:center;gap:4px;font-size:15px;font-weight:500;color:#3b3f4c;background:none;border:none;cursor:pointer;padding:0;line-height:1;font-family:inherit;align-self:flex-start;margin-bottom:6px}
+.btn-back:hover{color:#222631}
+.page-title{font-size:22px;font-weight:700;color:#222631;line-height:1.3}
+.page-desc{font-size:14px;color:#3b3f4c;line-height:1.55}
+.ph-right{display:inline-flex;gap:10px;flex-shrink:0}
+.btn-outline{display:inline-flex;align-items:center;justify-content:center;gap:6px;height:40px;padding:0 16px;border-radius:100px;background:#fff;border:1px solid #ccdfff;color:#3151c4;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;line-height:1}
+.btn-outline:hover{background:#f4f8ff;border-color:#a3c3ff}
+.btn-primary{display:inline-flex;align-items:center;justify-content:center;gap:6px;height:40px;padding:0 16px;border-radius:100px;background:#365eef;border:1px solid #365eef;color:#fff;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;line-height:1}
+.btn-primary:hover{background:#3151c4;border-color:#3151c4}
+
+/* 미리보기 카드 */
+.preview-card{background:#fff;border:1px solid #eaecf0;border-radius:14px;padding:24px;display:flex;flex-direction:column;gap:16px}
+.preview-hd{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.preview-title{font-size:18px;font-weight:700;color:#222631;line-height:1.3}
+
+/* 학생 선택 + 액션 */
+.student-bar{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.student-select{flex:1;min-width:280px;height:42px;padding:0 14px;border:1px solid #dde1e8;border-radius:8px;font-size:14px;font-weight:600;font-family:inherit;color:#222631;background:#fff;outline:none;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:8px;position:relative}
+.student-select:hover{border-color:#a3c3ff}
+.student-select:focus{border-color:#365eef}
+.student-select select{flex:1;border:none;background:none;outline:none;font:inherit;color:inherit;cursor:pointer;-webkit-appearance:none;appearance:none;padding-right:24px;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236d7381' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'></polyline></svg>");background-repeat:no-repeat;background-position:right 4px center;background-size:14px}
+.student-select option:disabled{color:#9ca3af}
+
+/* PDF 미리보기 프레임 (학생 화면 iframe) */
+.pdf-frame{background:#3b3f4c;border-radius:10px;padding:24px;display:flex;justify-content:center;min-height:720px}
+.pdf-iframe{width:100%;max-width:920px;height:980px;border:0;border-radius:8px;background:#fff;box-shadow:0 8px 30px rgba(0,0,0,.2)}
+
+/* ══════ 모달 ══════ */
+.modal-overlay{position:fixed;inset:0;background:rgba(34,38,49,.5);display:none;align-items:center;justify-content:center;z-index:1000;padding:24px}
+.modal-overlay.show{display:flex}
+.modal{background:#fff;border-radius:16px;max-width:560px;width:100%;max-height:calc(100vh - 48px);display:flex;flex-direction:column;overflow:hidden;box-shadow:0 12px 40px rgba(0,0,0,.18)}
+.modal-hd{display:flex;align-items:center;justify-content:space-between;padding:20px 24px;border-bottom:1px solid #eaecf0;flex-shrink:0}
+.modal-title{font-size:18px;font-weight:700;color:#222631;line-height:1.3}
+.modal-close{width:32px;height:32px;display:inline-flex;align-items:center;justify-content:center;border:none;background:none;cursor:pointer;color:#6d7381;border-radius:100px}
+.modal-close:hover{background:#f6f7f9}
+.modal-body{padding:20px 24px;overflow-y:auto;display:flex;flex-direction:column;gap:12px}
+.modal-ft{display:flex;justify-content:flex-end;align-items:center;padding:16px 24px;border-top:1px solid #eaecf0;gap:8px;flex-shrink:0;background:#f9fafb}
+.btn-modal-cancel{display:inline-flex;align-items:center;justify-content:center;height:40px;padding:0 18px;border-radius:100px;background:#fff;border:1px solid #dde1e8;color:#3b3f4c;font-size:15px;font-weight:600;cursor:pointer;font-family:inherit;line-height:1}
+.btn-modal-cancel:hover{border-color:#a3c3ff;color:#365eef}
+.btn-modal-save{display:inline-flex;align-items:center;justify-content:center;gap:6px;height:40px;padding:0 18px;border-radius:100px;background:#365eef;border:none;color:#fff;font-size:15px;font-weight:600;cursor:pointer;font-family:inherit;line-height:1}
+.btn-modal-save:hover{background:#3151c4}
+
+.opt-list{display:flex;flex-direction:column;gap:8px}
+.opt-row{display:flex;align-items:center;gap:10px;padding:10px 12px;border:1px solid #eaecf0;border-radius:10px;background:#fff;cursor:pointer;transition:border-color .12s,background .12s}
+.opt-row:hover{border-color:#a3c3ff;background:#fafbff}
+.opt-row.checked{border-color:#a3c3ff;background:#f4f8ff}
+.opt-row .box{width:18px;height:18px;border:2px solid #dde1e8;border-radius:4px;display:inline-flex;align-items:center;justify-content:center;background:#fff;color:#fff;transition:all .12s;flex-shrink:0}
+.opt-row.checked .box{background:#365eef;border-color:#365eef}
+.opt-row-text{font-size:14px;color:#222631;line-height:1}
+
+.modal-section-lbl{font-size:13px;font-weight:700;color:#6d7381;letter-spacing:.02em}
+
+/* 데모 모드 스위처 */
+.demo-mode-switcher{position:fixed;bottom:18px;right:18px;display:inline-flex;align-items:center;gap:4px;padding:6px 8px;background:#1f2937;color:#e5e7eb;border-radius:100px;font-family:'Pretendard GOV',inherit;z-index:500;box-shadow:0 4px 20px rgba(0,0,0,.25)}
+.demo-mode-label{font-size:10px;font-weight:800;letter-spacing:.08em;color:#9ca3af;padding:0 8px 0 6px}
+.demo-mode-btn{display:inline-flex;align-items:center;justify-content:center;height:26px;padding:0 12px;border-radius:100px;background:transparent;border:none;color:#9ca3af;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;line-height:1;transition:all .15s}
+.demo-mode-btn:hover{color:#fff}
+.demo-mode-btn.active{background:#3b82f6;color:#fff}
+
+/* 토스트 */
+.toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(12px);padding:14px 22px;border-radius:100px;font-size:15px;font-weight:500;line-height:1.4;box-shadow:0 4px 12px rgba(0,0,0,.15);opacity:0;transition:all .25s;z-index:900;pointer-events:none;display:flex;align-items:center;gap:10px;min-width:280px}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.toast.success{background:#319d64;color:#fff}
+.toast.loading{background:#365eef;color:#fff}
+
+@media print{
+  .global-header,.sub-nav,.sidebar,.page-header,.preview-hd,.student-bar,.demo-mode-switcher,.btn-back{display:none}
+  .main{margin:0;padding:0}
+  .preview-card,.pdf-frame{background:#fff;padding:0;border:none;box-shadow:none}
+}
+/* 반응형 */
+@media (max-width:960px){
+  .main{padding:18px 14px}
+  .page-title{font-size:20px}
+  .ph-right{flex-wrap:wrap}
+  .pdf-iframe{height:840px}
+  .pdf-frame{padding:18px;min-height:640px}
+}
+@media (max-width:720px){
+  .global-header{height:52px;padding:0 12px 0 4px}
+  .gh-product-tag{margin-left:8px;padding-left:8px;font-size:13px}
+  .gh-plan,.gh-dday,.gh-credit,.gh-sep{display:none}
+  .gh-user{font-size:13px}
+  .sub-nav{top:52px;height:48px;padding:0 12px}
+  .sub-nav-item{padding:0 10px;font-size:14px;height:48px}
+  .sidebar{top:100px;width:48px}
+  .sb-item{width:36px;height:36px}
+  .main{margin-left:48px;margin-top:100px;padding:14px 10px}
+  .container{gap:14px}
+  .page-header{flex-direction:column;align-items:stretch;gap:10px}
+  .page-title{font-size:18px}
+  .ph-right{justify-content:flex-start;flex-wrap:wrap}
+  .btn-outline,.btn-primary{height:38px;font-size:13px;padding:0 14px}
+  .preview-card{padding:18px;border-radius:12px}
+  .preview-title{font-size:16px}
+  .student-bar{gap:8px}
+  .student-select{min-width:200px}
+  .pdf-frame{padding:12px;min-height:500px}
+  .pdf-iframe{height:680px}
+  .demo-mode-switcher{bottom:12px;right:12px;padding:4px 6px}
+  .demo-mode-btn{height:24px;padding:0 10px;font-size:11px}
+  .demo-mode-label{font-size:9px;padding:0 4px}
+  .modal{max-width:calc(100vw - 32px)}
+}
+@media (max-width:420px){
+  .sidebar{display:none}
+  .main{margin-left:0;padding:12px 10px}
+  .gh-menu-btn{width:36px;height:36px}
+  .page-title{font-size:17px}
+  .pdf-iframe{height:560px}
+}
+</style>
+</head>
+<body>
+
+<!-- 헤더 -->
+<div class="global-header">
+  <div class="gh-left">
+    <button class="gh-menu-btn"><i data-lucide="menu" style="width:24px;height:24px"></i></button>
+    <a class="gh-logo" href="#" aria-label="CLIPO">
+      <svg width="76" height="16" viewBox="0 0 76 16" fill="none"><path d="M11.3613 4.03516H4.09668V11.9629H8.88281L8.88086 11.9648H15.6016V16H4.02539C1.80242 15.9998 0 14.223 0 12.0322V3.96777C0 1.77696 1.80242 0.000177874 4.02539 0H15.4561L11.3613 4.03516ZM22.0703 11.9648H33.5781V16H22.002C19.7788 16 17.9756 14.2231 17.9756 12.0322V0H22.0703V11.9648ZM40.0459 16H35.9521V0H40.0459V16ZM54.5381 0C56.4564 0 58.0138 1.53228 58.0186 3.42285L58.0166 3.4248V8.54297C58.014 10.4333 56.4567 11.9648 54.5361 11.9648H46.5107L42.416 16V0H54.5381ZM71.9746 0C74.0086 0.000134956 75.6887 1.49046 75.958 3.42285H76V12.5771H75.958C75.6887 14.5095 74.011 15.9999 71.9746 16H64.4238C62.3897 16 60.7098 14.5096 60.4404 12.5771C60.4145 12.398 60.3984 12.2184 60.3984 12.0322V3.96777C60.3984 3.78159 60.4145 3.60205 60.4404 3.42285C60.7098 1.49037 62.3873 0 64.4238 0H71.9746ZM64.4922 12.5771H71.9062V3.42285H64.4922V12.5771ZM46.5107 3.42285V8.54004H53.9238V3.42285H46.5107Z" fill="#365EEF"/></svg>
+    </a>
+    <span class="gh-product-tag">초등</span>
+  </div>
+  <div class="gh-right">
+    <span class="gh-plan">개인 유료</span>
+    <span class="gh-dday">D-30</span>
+    <span class="gh-credit"><i data-lucide="bot" style="width:20px;height:20px"></i>AI 크레딧 900</span>
+    <div class="gh-sep"></div>
+    <button class="gh-user">홍길동 선생님(대표교사)<i data-lucide="chevron-down" style="width:22px;height:22px"></i></button>
+  </div>
+</div>
+
+<nav class="sub-nav">
+  <button class="sub-nav-item">수업 홈</button>
+  <button class="sub-nav-item">수행평가 설계</button>
+  <button class="sub-nav-item">과제물 관리</button>
+  <button class="sub-nav-item active">수행평가 채점</button>
+  <button class="sub-nav-item">세부능력 및 특기사항 지원</button>
+</nav>
+
+<aside class="sidebar">
+  <button class="sb-item" title="홈"><i data-lucide="home" style="width:20px;height:20px"></i></button>
+  <button class="sb-item" title="평가계획"><i data-lucide="scissors" style="width:20px;height:20px"></i></button>
+  <button class="sb-item active" title="수업"><i data-lucide="layout-grid" style="width:20px;height:20px"></i></button>
+  <button class="sb-item" title="창의적 체험활동"><i data-lucide="notebook-pen" style="width:20px;height:20px"></i></button>
+  <button class="sb-item" title="리포트"><i data-lucide="bar-chart-2" style="width:20px;height:20px"></i></button>
+</aside>
+
+<main class="main">
+  <div class="container">
+
+    <!-- 페이지 헤더 -->
+    <div class="page-header">
+      <div class="ph-left">
+        <button class="btn-back" onclick="history.back()">
+          <i data-lucide="chevron-left" style="width:18px;height:18px"></i>이전으로
+        </button>
+        <h1 class="page-title">1학년 1반 채점 결과 출력</h1>
+        <p class="page-desc">출력할 학생과 항목을 선택하세요. 개별 피드백 자료로 활용할 수 있어요.</p>
+      </div>
+      <div class="ph-right">
+        <button class="btn-outline" onclick="openOptModal()">
+          <i data-lucide="settings" style="width:16px;height:16px"></i>출력 항목 설정
+        </button>
+        <button class="btn-primary" onclick="printAll()">
+          <i data-lucide="printer" style="width:16px;height:16px"></i>전체 학생 출력
+        </button>
+      </div>
+    </div>
+
+    <!-- 미리보기 카드 -->
+    <section class="preview-card">
+      <div class="preview-hd">
+        <h2 class="preview-title">출력 미리보기</h2>
+      </div>
+
+      <!-- 학생 선택 + 액션 -->
+      <div class="student-bar">
+        <div class="student-select">
+          <select id="studentSelect" onchange="renderPreview()"></select>
+        </div>
+        <button class="btn-outline" onclick="downloadAssignment()">
+          <i data-lucide="download" style="width:16px;height:16px"></i>과제물 다운로드
+        </button>
+        <button class="btn-primary" onclick="printSingle()">
+          <i data-lucide="printer" style="width:16px;height:16px"></i>학생 개별 출력
+        </button>
+      </div>
+
+      <!-- PDF 미리보기 (학생 결과 화면 iframe) -->
+      <div class="pdf-frame">
+        <iframe class="pdf-iframe" id="pdfIframe" src="result_student_view_v3_260512.html" title="PDF 출력 미리보기"></iframe>
+      </div>
+    </section>
+
+  </div>
+</main>
+
+<!-- 출력 항목 설정 모달 -->
+<div class="modal-overlay" id="optModal" onclick="if(event.target===this)closeOptModal()">
+  <div class="modal">
+    <div class="modal-hd">
+      <span class="modal-title">출력 항목 설정</span>
+      <button class="modal-close" onclick="closeOptModal()"><i data-lucide="x" style="width:18px;height:18px"></i></button>
+    </div>
+    <div class="modal-body">
+      <p style="font-size:14px;color:#6d7381;line-height:1.55;margin:0">PDF에 포함할 항목을 선택하세요. 학생에게 없는 항목은 자동으로 빠집니다.</p>
+      <span class="modal-section-lbl">공통 항목</span>
+      <div class="opt-list" id="optList">
+        <label class="opt-row checked" data-key="standards" onclick="toggleOpt(this)"><span class="box"><i data-lucide="check" style="width:12px;height:12px"></i></span><span class="opt-row-text">성취기준</span></label>
+        <label class="opt-row checked" data-key="rubric" onclick="toggleOpt(this)"><span class="box"><i data-lucide="check" style="width:12px;height:12px"></i></span><span class="opt-row-text">채점기준</span></label>
+        <label class="opt-row checked" data-key="score" onclick="toggleOpt(this)"><span class="box"><i data-lucide="check" style="width:12px;height:12px"></i></span><span class="opt-row-text">점수 (총점/등급)</span></label>
+        <label class="opt-row checked" data-key="teacher" onclick="toggleOpt(this)"><span class="box"><i data-lucide="check" style="width:12px;height:12px"></i></span><span class="opt-row-text">선생님 종합 피드백</span></label>
+        <label class="opt-row checked" data-key="inst_ground" onclick="toggleOpt(this)"><span class="box"><i data-lucide="check" style="width:12px;height:12px"></i></span><span class="opt-row-text">문항별 채점근거</span></label>
+        <label class="opt-row checked" data-key="inst_feedback" onclick="toggleOpt(this)"><span class="box"><i data-lucide="check" style="width:12px;height:12px"></i></span><span class="opt-row-text">문항별 피드백</span></label>
+        <label class="opt-row" data-key="elem_ground" onclick="toggleOpt(this)"><span class="box"><i data-lucide="check" style="width:12px;height:12px"></i></span><span class="opt-row-text">채점요소별 채점근거</span></label>
+        <label class="opt-row" data-key="elem_feedback" onclick="toggleOpt(this)"><span class="box"><i data-lucide="check" style="width:12px;height:12px"></i></span><span class="opt-row-text">채점요소별 피드백</span></label>
+      </div>
+    </div>
+    <div class="modal-ft">
+      <button class="btn-modal-cancel" onclick="closeOptModal()">취소</button>
+      <button class="btn-modal-save" onclick="applyOpts()"><i data-lucide="check" style="width:14px;height:14px"></i>적용</button>
+    </div>
+  </div>
+</div>
+
+<!-- 데모 모드 스위처 -->
+<div class="demo-mode-switcher">
+  <span class="demo-mode-label">DEMO</span>
+  <button class="demo-mode-btn" data-mode="new" onclick="setDemoMode(this)">신규</button>
+  <button class="demo-mode-btn active" data-mode="mixed" onclick="setDemoMode(this)">섞임</button>
+  <button class="demo-mode-btn" data-mode="old" onclick="setDemoMode(this)">기존</button>
+</div>
+
+<div class="toast" id="toast">
+  <i id="toastIcon" data-lucide="circle-check-big" style="width:18px;height:18px;flex-shrink:0"></i>
+  <span id="toastMsg"></span>
+</div>
+
+<script>
+// 학생 데이터
+var ITEMS_NEW  = {standards:true, rubric:true, score:true, teacher:true, inst_ground:true,  inst_feedback:true,  elem_ground:true,  elem_feedback:true};
+var ITEMS_OLD  = {standards:true, rubric:true, score:true, teacher:true, inst_ground:false, inst_feedback:false, elem_ground:false, elem_feedback:false};
+var ITEMS_NONE = {standards:false,rubric:false,score:false,teacher:false,inst_ground:false, inst_feedback:false, elem_ground:false, elem_feedback:false};
+
+var STUDENTS = [
+  {id:'10101', name:'김피드백', status:'완료',     items:ITEMS_NEW},
+  {id:'10102', name:'김채점',   status:'완료',     items:ITEMS_NEW},
+  {id:'10103', name:'미제출',   status:'미제출',   items:ITEMS_NONE},
+  {id:'10104', name:'채점전',   status:'미채점',   items:ITEMS_NONE},
+  {id:'10105', name:'채점실패', status:'채점 실패', items:ITEMS_NONE},
+  {id:'10106', name:'이전채점', status:'완료',     items:ITEMS_OLD},
+  {id:'10107', name:'김현재',   status:'완료',     items:ITEMS_OLD},
+  {id:'10108', name:'인라인',   status:'완료',     items:ITEMS_NEW},
+  {id:'10109', name:'한가람',   status:'미채점',   items:ITEMS_NONE},
+  {id:'10110', name:'오세훈',   status:'미채점',   items:ITEMS_NONE}
+];
+
+var DEMO_MODE = 'mixed';
+var MIXED_OLD_NAMES = ['이전채점','김현재'];
+
+var BULK_OPTS = {standards:true, rubric:true, score:true, teacher:true, inst_ground:true, inst_feedback:true, elem_ground:false, elem_feedback:false};
+
+function applyDemoMode(){
+  STUDENTS.forEach(function(s){
+    if(s.status === '미제출' || s.status === '미채점' || s.status === '채점 실패'){ s.items = ITEMS_NONE; return; }
+    if(DEMO_MODE === 'new') s.items = ITEMS_NEW;
+    else if(DEMO_MODE === 'old') s.items = ITEMS_OLD;
+    else s.items = MIXED_OLD_NAMES.indexOf(s.name) >= 0 ? ITEMS_OLD : ITEMS_NEW;
+  });
+  populateStudentSelect();
+  renderPreview();
+}
+
+function setDemoMode(btn){
+  DEMO_MODE = btn.getAttribute('data-mode');
+  document.querySelectorAll('.demo-mode-btn').forEach(function(b){ b.classList.remove('active'); });
+  btn.classList.add('active');
+  applyDemoMode();
+}
+
+function populateStudentSelect(){
+  var sel = document.getElementById('studentSelect');
+  var prevValue = sel.value;
+  sel.innerHTML = STUDENTS.map(function(s){
+    var disabled = s.items === ITEMS_NONE ? ' disabled' : '';
+    return '<option value="'+s.id+'"'+disabled+'>'+s.id+' '+s.name+' ('+s.status+')</option>';
+  }).join('');
+  // 이전 선택 유지하거나 첫 번째 가능한 학생 선택
+  var firstSelectable = STUDENTS.find(function(s){ return s.items !== ITEMS_NONE; });
+  sel.value = (prevValue && STUDENTS.find(function(s){return s.id===prevValue;}) && STUDENTS.find(function(s){return s.id===prevValue;}).items !== ITEMS_NONE)
+              ? prevValue
+              : (firstSelectable ? firstSelectable.id : '');
+}
+
+// iframe에 학생 데이터 + 옵션 전달 (학생 데이터는 v3 기본값, 옵션만 postMessage)
+function sendPreviewOpts(){
+  var iframe = document.getElementById('pdfIframe');
+  if(!iframe || !iframe.contentWindow) return;
+  var sel = document.getElementById('studentSelect');
+  var s = STUDENTS.find(function(x){ return x.id === sel.value; });
+  // 학생의 items와 BULK_OPTS의 교집합만 노출 (없는 데이터는 무조건 hide)
+  var opts = {};
+  ['standards','rubric','score','teacher','inst_ground','inst_feedback','elem_ground','elem_feedback'].forEach(function(k){
+    opts[k] = s ? (s.items[k] && BULK_OPTS[k]) : false;
+  });
+  iframe.contentWindow.postMessage({type:'share-opts', opts:opts}, '*');
+}
+
+function renderPreview(){
+  // 학생 변경 또는 옵션 변경 시 iframe에 옵션 전달
+  sendPreviewOpts();
+}
+
+// iframe 로드 완료 시 초기 옵션 전달
+document.addEventListener('DOMContentLoaded', function(){
+  var iframe = document.getElementById('pdfIframe');
+  if(iframe){ iframe.addEventListener('load', sendPreviewOpts); }
+});
+
+// 출력 항목 설정 모달
+function openOptModal(){
+  document.getElementById('optModal').classList.add('show');
+  lucide.createIcons();
+}
+function closeOptModal(){ document.getElementById('optModal').classList.remove('show'); }
+function toggleOpt(el){
+  el.classList.toggle('checked');
+  var key = el.getAttribute('data-key');
+  BULK_OPTS[key] = el.classList.contains('checked');
+}
+function applyOpts(){
+  closeOptModal();
+  renderPreview();
+  showToast('success', '출력 항목 설정이 적용됐어요.');
+}
+
+// 액션
+function printAll(){
+  var graded = STUDENTS.filter(function(s){ return s.items !== ITEMS_NONE; }).length;
+  showToast('loading', '학급 전체 '+graded+'명의 PDF를 생성하고 있어요...');
+  setTimeout(function(){ showToast('success', '학급 전체 '+graded+'명의 PDF 다운로드가 완료됐어요.'); }, 1500);
+}
+function printSingle(){
+  var s = STUDENTS.find(function(x){ return x.id === document.getElementById('studentSelect').value; });
+  showToast('success', (s ? s.name+' ' : '') + '학생 PDF를 인쇄합니다.');
+}
+function downloadAssignment(){
+  var s = STUDENTS.find(function(x){ return x.id === document.getElementById('studentSelect').value; });
+  showToast('success', (s ? s.name+' ' : '') + '학생의 과제물 원본을 다운로드합니다.');
+}
+
+// 토스트
+var toastTimer = null;
+function showToast(type, msg){
+  if(toastTimer) clearTimeout(toastTimer);
+  var t = document.getElementById('toast');
+  var ic = document.getElementById('toastIcon');
+  var m = document.getElementById('toastMsg');
+  t.className = 'toast ' + type + ' show';
+  ic.setAttribute('data-lucide', type === 'loading' ? 'loader' : 'circle-check-big');
+  m.textContent = msg;
+  lucide.createIcons();
+  if(type !== 'loading') toastTimer = setTimeout(function(){ t.classList.remove('show'); }, 2400);
+}
+
+document.addEventListener('keydown', function(e){
+  if(e.key === 'Escape' && document.getElementById('optModal').classList.contains('show')){
+    closeOptModal();
+  }
+});
+
+applyDemoMode();
+lucide.createIcons();
+</script>
+</body>
+</html>

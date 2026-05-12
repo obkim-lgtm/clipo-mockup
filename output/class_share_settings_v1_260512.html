@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>1학년 1반 클리포 공개 설정 | CLIPO</title>
+<link rel="icon" type="image/svg+xml" href="clipo_favicon.svg">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard-gov.min.css">
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<style>
+*{font-family:'Pretendard GOV',-apple-system,sans-serif;box-sizing:border-box;margin:0;padding:0}
+body{background:#f6f7f9;color:#222631;min-height:100vh}
+
+/* 헤더 */
+.global-header{height:56px;background:#fff;display:flex;align-items:center;justify-content:space-between;position:fixed;top:0;left:0;right:0;z-index:210;padding:0 20px 0 8px;border-bottom:1px solid #f1f3f5}
+.gh-left{display:flex;align-items:center;gap:8px}
+.gh-menu-btn{width:40px;height:40px;display:inline-flex;align-items:center;justify-content:center;border:none;background:none;cursor:pointer;color:#3b3f4c;border-radius:4px}
+.gh-menu-btn:hover{background:#f6f7f9}
+.gh-product-tag{display:inline-flex;align-items:center;height:18px;margin-left:12px;padding-left:12px;border-left:1px solid #e5e7eb;color:#6d7381;font-size:14px;font-weight:600;line-height:1}
+.gh-right{display:flex;align-items:center;gap:12px;padding-right:12px}
+.gh-plan{display:inline-flex;align-items:center;height:22px;padding:0 10px;border-radius:100px;background:#e9f2ff;border:1px solid #ccdfff;font-size:12px;font-weight:500;color:#3151c4;line-height:1}
+.gh-dday{font-size:14px;font-weight:500;color:#6d7381;line-height:1}
+.gh-credit{display:inline-flex;align-items:center;gap:6px;font-size:14px;font-weight:500;color:#3b3f4c;line-height:1}
+.gh-sep{width:0;height:14px;border-left:1px solid #dde1e8}
+.gh-user{display:inline-flex;align-items:center;gap:3px;font-size:14px;font-weight:500;color:#3b3f4c;cursor:pointer;border:none;background:none;padding:0;line-height:1}
+.gh-user:hover{color:#365eef}
+
+.sub-nav{height:54px;background:#fff;border-bottom:1px solid #dde1e8;display:flex;align-items:flex-end;padding:0 24px;position:fixed;top:56px;left:0;right:0;z-index:205}
+.sub-nav-item{position:relative;display:inline-flex;align-items:center;justify-content:center;height:54px;padding:0 16px;font-size:15px;font-weight:500;color:#6d7381;cursor:pointer;text-decoration:none;line-height:1;background:none;border:none;font-family:inherit}
+.sub-nav-item:hover{color:#222631}
+.sub-nav-item.active{color:#365eef;font-weight:600}
+.sub-nav-item.active::after{content:"";position:absolute;left:12px;right:12px;bottom:-1px;height:2px;background:#365eef;border-radius:2px 2px 0 0}
+
+.sidebar{position:fixed;top:110px;left:0;bottom:0;width:56px;background:#fff;border-right:1px solid #dde1e8;display:flex;flex-direction:column;align-items:center;padding:8px 0;z-index:100;gap:4px}
+.sb-item{width:40px;height:40px;display:inline-flex;align-items:center;justify-content:center;border-radius:6px;color:#6d7381;cursor:pointer;border:none;background:none}
+.sb-item:hover{background:#f6f7f9;color:#3b3f4c}
+.sb-item.active{background:#e9f2ff;color:#365eef}
+
+.main{margin-left:56px;margin-top:110px;padding:24px;display:flex;justify-content:center}
+.container{width:100%;max-width:1248px;display:flex;flex-direction:column;gap:20px}
+
+/* 페이지 헤더 */
+.page-header{display:flex;flex-direction:column;gap:8px}
+.btn-back{display:inline-flex;align-items:center;gap:4px;font-size:15px;font-weight:500;color:#3b3f4c;background:none;border:none;cursor:pointer;padding:0;line-height:1;font-family:inherit;align-self:flex-start;margin-bottom:6px}
+.btn-back:hover{color:#222631}
+.page-title{font-size:22px;font-weight:700;color:#222631;line-height:1.3}
+.page-desc{font-size:14px;color:#3b3f4c;line-height:1.55}
+
+/* 카드 공통 */
+.card{background:#fff;border:1px solid #eaecf0;border-radius:14px;padding:24px;display:flex;flex-direction:column;gap:16px}
+.card-hd{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+.card-hd-left{flex:1;display:flex;flex-direction:column;gap:4px;min-width:0}
+.card-title{font-size:18px;font-weight:700;color:#222631;line-height:1.3}
+.card-desc{font-size:13px;color:#6d7381;line-height:1.55}
+.card-count-badge{display:inline-flex;align-items:center;height:24px;padding:0 10px;border-radius:100px;background:#e9f2ff;color:#3151c4;font-size:13px;font-weight:600;line-height:1;flex-shrink:0}
+
+/* 학생 테이블 */
+.student-table{width:100%;border-collapse:collapse;table-layout:fixed}
+.student-table thead th{background:#f6f7f9;font-size:13px;font-weight:700;color:#3b3f4c;text-align:center;padding:10px 8px;height:44px;border-bottom:1px solid #dde1e8}
+.student-table tbody td{padding:12px 8px;font-size:13px;color:#3b3f4c;line-height:1.4;text-align:center;border-bottom:1px solid #eaecf0;vertical-align:middle}
+.student-table tbody tr:last-child td{border-bottom:none}
+.student-table tbody tr.disabled td{color:#cbd0d8;background:#fafbfc}
+.col-check{width:44px}
+.col-id{width:70px}
+.col-name{width:80px;text-align:left;padding-left:14px;font-weight:600}
+.col-item{width:74px;font-size:12px}
+.col-period{width:170px;font-size:12px}
+.col-state{width:90px;font-weight:600}
+.student-table thead th.col-item{font-size:12px;padding:8px 4px;line-height:1.25}
+
+/* 체크박스 */
+.tbl-checkbox{display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border:2px solid #dde1e8;border-radius:5px;background:#fff;color:#fff;cursor:pointer;transition:all .12s}
+.tbl-checkbox.checked{background:#365eef;border-color:#365eef}
+.tbl-checkbox.disabled{background:#f6f7f9;border-color:#e5e7eb;cursor:not-allowed;opacity:.6}
+.tbl-checkbox.disabled.checked{background:#cbd0d8;border-color:#cbd0d8}
+.item-mark{color:#365eef;font-weight:700}
+.disabled .item-mark{color:#cbd0d8}
+.dash{color:#cbd0d8}
+.state-pub{color:#16a34a;font-weight:700;font-size:12px}
+.state-soon{color:#9ca3af;font-weight:600;font-size:12px}
+.state-expired{color:#dc2626;font-weight:600;font-size:12px}
+
+/* 공개 설정 변경 */
+.bulk-opts{display:flex;flex-wrap:wrap;gap:12px;align-items:center}
+.opt-checkbox{display:inline-flex;align-items:center;gap:8px;cursor:pointer;padding:6px 12px;border-radius:8px;transition:background .12s}
+.opt-checkbox:hover{background:#f6f7f9}
+.opt-checkbox .box{width:20px;height:20px;border:2px solid #dde1e8;border-radius:5px;background:#fff;color:#fff;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .12s}
+.opt-checkbox.checked .box{background:#365eef;border-color:#365eef}
+.opt-checkbox .lbl{font-size:14px;font-weight:500;color:#222631;line-height:1}
+
+/* 공개 기간 — 시작/종료 세로 스택 + 옆에 즉시/무기한 체크박스 */
+.period-dt-stack{display:flex;flex-direction:column;gap:14px;max-width:560px}
+.period-dt-field{display:flex;flex-direction:column;gap:6px}
+.period-dt-lbl{font-size:13px;font-weight:600;color:#6d7381;line-height:1}
+.period-dt-input-row{display:flex;align-items:center;gap:14px}
+.period-dt-input{flex:1;max-width:340px;height:40px;padding:0 12px;border:1px solid #dde1e8;border-radius:8px;font-size:14px;font-family:inherit;color:#222631;outline:none;line-height:1;background:#fff}
+.period-dt-input:focus{border-color:#365eef}
+.period-dt-input:disabled{background:#f6f7f9;color:#9ca3af;cursor:not-allowed}
+.period-dt-check{display:inline-flex;align-items:center;gap:8px;cursor:pointer;font-size:14px;font-weight:500;color:#6d7381;user-select:none;line-height:1;padding:8px 14px;border-radius:8px;transition:background .12s}
+.period-dt-check:hover{background:#f6f7f9}
+.period-dt-check .dt-check-box{width:18px;height:18px;border:2px solid #dde1e8;border-radius:4px;display:inline-flex;align-items:center;justify-content:center;background:#fff;color:#fff;transition:all .12s;flex-shrink:0}
+.period-dt-check.checked{color:#365eef;font-weight:700}
+.period-dt-check.checked .dt-check-box{background:#365eef;border-color:#365eef}
+
+/* 푸터 액션 */
+.footer-actions{display:flex;justify-content:flex-end;gap:8px;padding:8px 0}
+.btn-action{display:inline-flex;align-items:center;justify-content:center;gap:6px;height:44px;padding:0 18px;border-radius:100px;font-size:15px;font-weight:600;cursor:pointer;font-family:inherit;line-height:1}
+.btn-preview{background:#fff;border:1px solid #ccdfff;color:#3151c4}
+.btn-preview:hover{background:#f4f8ff;border-color:#a3c3ff}
+.btn-save{background:#365eef;border:1px solid #365eef;color:#fff}
+.btn-save:hover{background:#3151c4;border-color:#3151c4}
+.state-cancelled{color:#dc2626;font-weight:600;font-size:12px}
+
+/* ══════ 모달 ══════ */
+.modal-overlay{position:fixed;inset:0;background:rgba(34,38,49,.5);display:none;align-items:center;justify-content:center;z-index:1000;padding:24px}
+.modal-overlay.show{display:flex}
+.modal{background:#fff;border-radius:16px;max-width:520px;width:100%;max-height:calc(100vh - 48px);display:flex;flex-direction:column;overflow:hidden;box-shadow:0 12px 40px rgba(0,0,0,.18)}
+.modal-hd{display:flex;align-items:center;justify-content:space-between;padding:20px 24px;border-bottom:1px solid #eaecf0;flex-shrink:0}
+.modal-title{font-size:18px;font-weight:700;color:#222631;line-height:1.3}
+.modal-close{width:32px;height:32px;display:inline-flex;align-items:center;justify-content:center;border:none;background:none;cursor:pointer;color:#6d7381;border-radius:100px}
+.modal-close:hover{background:#f6f7f9;color:#222631}
+.modal-body{padding:20px 24px;overflow-y:auto;display:flex;flex-direction:column;gap:14px}
+.modal-ft{display:flex;justify-content:flex-end;align-items:center;padding:16px 24px;border-top:1px solid #eaecf0;gap:8px;flex-shrink:0;background:#f9fafb}
+.btn-modal-cancel{display:inline-flex;align-items:center;justify-content:center;height:40px;padding:0 18px;border-radius:100px;background:#fff;border:1px solid #dde1e8;color:#3b3f4c;font-size:15px;font-weight:600;cursor:pointer;font-family:inherit;line-height:1}
+.btn-modal-cancel:hover{border-color:#a3c3ff;color:#365eef}
+.btn-modal-save{display:inline-flex;align-items:center;justify-content:center;gap:6px;height:40px;padding:0 18px;border-radius:100px;background:#365eef;border:none;color:#fff;font-size:15px;font-weight:600;cursor:pointer;font-family:inherit;line-height:1}
+.btn-modal-save.danger{background:#dc2626}
+.btn-modal-save.danger:hover{background:#b91c1c}
+.alert-warning{display:flex;align-items:flex-start;gap:10px;padding:14px 16px;border-radius:10px;background:#fff5f5;border-left:3px solid #dc2626}
+.alert-warning i{color:#dc2626;flex-shrink:0;margin-top:1px}
+.alert-warning-text{font-size:14px;color:#3b3f4c;line-height:1.6}
+.alert-warning-text strong{color:#dc2626;font-weight:700}
+.alert-info{display:flex;align-items:flex-start;gap:10px;padding:14px 16px;border-radius:10px;background:#f4f8ff;border-left:3px solid #365eef}
+.alert-info i{color:#365eef;flex-shrink:0;margin-top:1px}
+.alert-info-text{font-size:14px;color:#3b3f4c;line-height:1.6}
+.alert-info-text strong{color:#3151c4;font-weight:700}
+.modal-body p{font-size:14px;color:#3b3f4c;line-height:1.55;margin:0}
+.checkbox-row-modal{display:inline-flex;align-items:center;gap:8px;cursor:pointer;user-select:none;padding:4px 0}
+.checkbox-row-modal .box{width:18px;height:18px;border:2px solid #dde1e8;border-radius:4px;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;background:#fff;color:#fff;transition:all .12s}
+.checkbox-row-modal.checked .box{background:#365eef;border-color:#365eef}
+.checkbox-row-modal-text{font-size:14px;color:#3b3f4c;line-height:1.4}
+
+/* 데모 모드 스위처 (우측 하단) */
+.demo-mode-switcher{position:fixed;bottom:18px;right:18px;display:inline-flex;align-items:center;gap:4px;padding:6px 8px;background:#1f2937;color:#e5e7eb;border-radius:100px;font-family:'Pretendard GOV',inherit;z-index:500;box-shadow:0 4px 20px rgba(0,0,0,.25)}
+.demo-mode-label{font-size:10px;font-weight:800;letter-spacing:.08em;color:#9ca3af;padding:0 8px 0 6px}
+.demo-mode-btn{display:inline-flex;align-items:center;justify-content:center;height:26px;padding:0 12px;border-radius:100px;background:transparent;border:none;color:#9ca3af;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;line-height:1;transition:all .15s}
+.demo-mode-btn:hover{color:#fff}
+.demo-mode-btn.active{background:#3b82f6;color:#fff}
+
+/* 토스트 */
+.toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(12px);padding:14px 22px;border-radius:100px;font-size:15px;font-weight:500;line-height:1.4;box-shadow:0 4px 12px rgba(0,0,0,.15);opacity:0;transition:all .25s;z-index:900;pointer-events:none;display:flex;align-items:center;gap:10px;min-width:280px}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.toast.success{background:#319d64;color:#fff}
+.toast.loading{background:#365eef;color:#fff}
+
+/* 반응형 */
+@media (max-width:960px){
+  .main{padding:18px 14px}
+  .page-title{font-size:20px}
+}
+@media (max-width:720px){
+  .global-header{height:52px;padding:0 12px 0 4px}
+  .gh-product-tag{margin-left:8px;padding-left:8px;font-size:13px}
+  .gh-plan,.gh-dday,.gh-credit,.gh-sep{display:none}
+  .gh-user{font-size:13px}
+  .sub-nav{top:52px;height:48px;padding:0 12px}
+  .sub-nav-item{padding:0 10px;font-size:14px;height:48px}
+  .sidebar{top:100px;width:48px}
+  .sb-item{width:36px;height:36px}
+  .main{margin-left:48px;margin-top:100px;padding:14px 10px}
+  .container{gap:14px}
+  .page-title{font-size:18px}
+  .card{padding:18px;border-radius:12px}
+  .card-title{font-size:16px}
+  .student-table{min-width:1100px}
+  .footer-actions{flex-direction:column;align-items:stretch}
+  .btn-action{width:100%}
+  .period-dt-input-row{flex-wrap:wrap;gap:8px}
+  .period-dt-input{max-width:none}
+  .demo-mode-switcher{bottom:12px;right:12px;padding:4px 6px}
+  .demo-mode-btn{height:24px;padding:0 10px;font-size:11px}
+  .demo-mode-label{font-size:9px;padding:0 4px}
+  .modal{max-width:calc(100vw - 32px)}
+}
+@media (max-width:420px){
+  .sidebar{display:none}
+  .main{margin-left:0;padding:12px 10px}
+  .gh-menu-btn{width:36px;height:36px}
+  .page-title{font-size:17px}
+}
+</style>
+</head>
+<body>
+
+<!-- 헤더 -->
+<div class="global-header">
+  <div class="gh-left">
+    <button class="gh-menu-btn"><i data-lucide="menu" style="width:24px;height:24px"></i></button>
+    <a class="gh-logo" href="#" aria-label="CLIPO">
+      <svg width="76" height="16" viewBox="0 0 76 16" fill="none"><path d="M11.3613 4.03516H4.09668V11.9629H8.88281L8.88086 11.9648H15.6016V16H4.02539C1.80242 15.9998 0 14.223 0 12.0322V3.96777C0 1.77696 1.80242 0.000177874 4.02539 0H15.4561L11.3613 4.03516ZM22.0703 11.9648H33.5781V16H22.002C19.7788 16 17.9756 14.2231 17.9756 12.0322V0H22.0703V11.9648ZM40.0459 16H35.9521V0H40.0459V16ZM54.5381 0C56.4564 0 58.0138 1.53228 58.0186 3.42285L58.0166 3.4248V8.54297C58.014 10.4333 56.4567 11.9648 54.5361 11.9648H46.5107L42.416 16V0H54.5381ZM71.9746 0C74.0086 0.000134956 75.6887 1.49046 75.958 3.42285H76V12.5771H75.958C75.6887 14.5095 74.011 15.9999 71.9746 16H64.4238C62.3897 16 60.7098 14.5096 60.4404 12.5771C60.4145 12.398 60.3984 12.2184 60.3984 12.0322V3.96777C60.3984 3.78159 60.4145 3.60205 60.4404 3.42285C60.7098 1.49037 62.3873 0 64.4238 0H71.9746ZM64.4922 12.5771H71.9062V3.42285H64.4922V12.5771ZM46.5107 3.42285V8.54004H53.9238V3.42285H46.5107Z" fill="#365EEF"/></svg>
+    </a>
+    <span class="gh-product-tag">초등</span>
+  </div>
+  <div class="gh-right">
+    <span class="gh-plan">개인 유료</span>
+    <span class="gh-dday">D-30</span>
+    <span class="gh-credit"><i data-lucide="bot" style="width:20px;height:20px"></i>AI 크레딧 900</span>
+    <div class="gh-sep"></div>
+    <button class="gh-user">홍길동 선생님(대표교사)<i data-lucide="chevron-down" style="width:22px;height:22px"></i></button>
+  </div>
+</div>
+
+<nav class="sub-nav">
+  <button class="sub-nav-item">수업 홈</button>
+  <button class="sub-nav-item">수행평가 설계</button>
+  <button class="sub-nav-item">과제물 관리</button>
+  <button class="sub-nav-item active">수행평가 채점</button>
+  <button class="sub-nav-item">세부능력 및 특기사항 지원</button>
+</nav>
+
+<aside class="sidebar">
+  <button class="sb-item" title="홈"><i data-lucide="home" style="width:20px;height:20px"></i></button>
+  <button class="sb-item" title="평가계획"><i data-lucide="scissors" style="width:20px;height:20px"></i></button>
+  <button class="sb-item active" title="수업"><i data-lucide="layout-grid" style="width:20px;height:20px"></i></button>
+  <button class="sb-item" title="창의적 체험활동"><i data-lucide="notebook-pen" style="width:20px;height:20px"></i></button>
+  <button class="sb-item" title="리포트"><i data-lucide="bar-chart-2" style="width:20px;height:20px"></i></button>
+</aside>
+
+<main class="main">
+  <div class="container">
+
+    <div class="page-header">
+      <button class="btn-back" onclick="history.back()">
+        <i data-lucide="chevron-left" style="width:18px;height:18px"></i>이전으로
+      </button>
+      <h1 class="page-title">1학년 1반 클리포 공개 설정</h1>
+      <p class="page-desc">공유할 학생, 공개 항목, 공개 기간을 설정하고 저장하면 학생이 바로 확인할 수 있어요.</p>
+    </div>
+
+    <!-- 공개 현황 -->
+    <section class="card">
+      <div class="card-hd">
+        <div class="card-hd-left">
+          <h2 class="card-title">공개 현황</h2>
+          <p class="card-desc">채점이 완료된 학생만 선택할 수 있어요. 미채점 학생은 채점 후 추가 공유할 수 있어요. 표의 '-' 항목은 해당 학생에게 데이터가 없어 공개할 수 없는 항목이에요.</p>
+        </div>
+        <span class="card-count-badge" id="selectedCountBadge">5명 / 10명</span>
+      </div>
+      <div style="overflow-x:auto">
+      <table class="student-table">
+        <thead>
+          <tr>
+            <th class="col-check"><span class="tbl-checkbox" id="headerCheck" onclick="toggleAll(this)"><i data-lucide="check" style="width:13px;height:13px"></i></span></th>
+            <th class="col-id">학번</th>
+            <th class="col-name" style="text-align:left;padding-left:14px">이름</th>
+            <th class="col-item">성취기준</th>
+            <th class="col-item">채점기준</th>
+            <th class="col-item">점수</th>
+            <th class="col-item">선생님<br>피드백</th>
+            <th class="col-item">문항별<br>근거</th>
+            <th class="col-item">문항별<br>피드백</th>
+            <th class="col-item">채점요소별<br>근거</th>
+            <th class="col-item">채점요소별<br>피드백</th>
+            <th class="col-period">공개 기간</th>
+            <th class="col-state">공개 상태</th>
+          </tr>
+        </thead>
+        <tbody id="studentTbody"></tbody>
+      </table>
+      </div>
+    </section>
+
+    <!-- 공개 설정 변경 -->
+    <section class="card">
+      <div class="card-hd">
+        <div class="card-hd-left">
+          <h2 class="card-title">공개 설정 변경</h2>
+          <p class="card-desc">위에서 선택한 <strong id="selectedCountText">5명</strong>에게 아래 항목을 일괄 적용합니다.</p>
+        </div>
+        <span class="card-count-badge" id="optCountBadge">6개 / 8개</span>
+      </div>
+      <div class="bulk-opts" id="bulkOpts">
+        <label class="opt-checkbox checked" data-key="standards" onclick="toggleBulkOpt(this)"><span class="box"><i data-lucide="check" style="width:13px;height:13px"></i></span><span class="lbl">성취기준</span></label>
+        <label class="opt-checkbox checked" data-key="rubric" onclick="toggleBulkOpt(this)"><span class="box"><i data-lucide="check" style="width:13px;height:13px"></i></span><span class="lbl">채점기준</span></label>
+        <label class="opt-checkbox checked" data-key="score" onclick="toggleBulkOpt(this)"><span class="box"><i data-lucide="check" style="width:13px;height:13px"></i></span><span class="lbl">점수 (총점/등급)</span></label>
+        <label class="opt-checkbox checked" data-key="teacher" onclick="toggleBulkOpt(this)"><span class="box"><i data-lucide="check" style="width:13px;height:13px"></i></span><span class="lbl">선생님 종합 피드백</span></label>
+        <label class="opt-checkbox checked" data-key="inst_ground" onclick="toggleBulkOpt(this)"><span class="box"><i data-lucide="check" style="width:13px;height:13px"></i></span><span class="lbl">문항별 채점근거</span></label>
+        <label class="opt-checkbox checked" data-key="inst_feedback" onclick="toggleBulkOpt(this)"><span class="box"><i data-lucide="check" style="width:13px;height:13px"></i></span><span class="lbl">문항별 피드백</span></label>
+        <label class="opt-checkbox" data-key="elem_ground" onclick="toggleBulkOpt(this)"><span class="box"><i data-lucide="check" style="width:13px;height:13px"></i></span><span class="lbl">채점요소별 채점근거</span></label>
+        <label class="opt-checkbox" data-key="elem_feedback" onclick="toggleBulkOpt(this)"><span class="box"><i data-lucide="check" style="width:13px;height:13px"></i></span><span class="lbl">채점요소별 피드백</span></label>
+      </div>
+    </section>
+
+    <!-- 공개 기간 -->
+    <section class="card">
+      <div class="card-hd">
+        <div class="card-hd-left">
+          <h2 class="card-title">공개 기간</h2>
+          <p class="card-desc">위에서 선택한 <strong id="selectedCountText2">5명</strong>에게 아래 공개 기간을 일괄 적용합니다.</p>
+        </div>
+      </div>
+      <div class="period-dt-stack">
+        <div class="period-dt-field">
+          <span class="period-dt-lbl">시작일시</span>
+          <div class="period-dt-input-row">
+            <input type="datetime-local" class="period-dt-input" id="periodStart" disabled value="">
+            <label class="period-dt-check checked" id="periodNowCheck" onclick="toggleNow(this)">
+              <span class="dt-check-box"><i data-lucide="check" style="width:13px;height:13px"></i></span>
+              <span>즉시</span>
+            </label>
+          </div>
+        </div>
+        <div class="period-dt-field">
+          <span class="period-dt-lbl">종료일시</span>
+          <div class="period-dt-input-row">
+            <input type="datetime-local" class="period-dt-input" id="periodEnd" disabled value="">
+            <label class="period-dt-check checked" id="periodUntilCheck" onclick="toggleUntil(this)">
+              <span class="dt-check-box"><i data-lucide="check" style="width:13px;height:13px"></i></span>
+              <span>무기한</span>
+            </label>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 푸터 -->
+    <div class="footer-actions">
+      <button class="btn-action btn-preview" onclick="previewStudent()">
+        <i data-lucide="eye" style="width:18px;height:18px"></i>학생 화면 미리보기
+      </button>
+      <button class="btn-action btn-save" onclick="saveShareSettings()">
+        <i data-lucide="check" style="width:18px;height:18px"></i>공유 설정 저장
+      </button>
+    </div>
+
+  </div>
+</main>
+
+<!-- 진입 시 안내 모달 (기존+새 채점 섞임) -->
+<div class="modal-overlay" id="mixedInfoModal" onclick="if(event.target===this)dismissMixedInfo()">
+  <div class="modal">
+    <div class="modal-hd">
+      <span class="modal-title">기존 채점과 새 채점이 섞여있어요</span>
+      <button class="modal-close" onclick="dismissMixedInfo()"><i data-lucide="x" style="width:18px;height:18px"></i></button>
+    </div>
+    <div class="modal-body">
+      <div class="alert-info">
+        <i data-lucide="info" style="width:18px;height:18px"></i>
+        <span class="alert-info-text">이 학급에는 <strong>이전 버전으로 채점된 학생</strong>과 <strong>새로 채점된 학생</strong>이 함께 있어요. 새 항목(문항별·채점요소별 근거·피드백)은 새로 채점된 학생에게만 데이터가 있습니다.</span>
+      </div>
+      <p>표에서 <span style="color:#cbd0d8;font-weight:700">'-'</span>로 표시된 항목은 해당 학생에게 데이터가 없어 공개할 수 없는 항목이에요. 이전 채점 학생도 새 항목을 함께 공개하려면 <strong>다시 채점</strong>해 주세요.</p>
+      <label class="checkbox-row-modal" id="mixedDismissCheck" onclick="toggleMixedDismiss(this)">
+        <span class="box"><i data-lucide="check" style="width:11px;height:11px"></i></span>
+        <span class="checkbox-row-modal-text">다시 보지 않기</span>
+      </label>
+    </div>
+    <div class="modal-ft">
+      <button class="btn-modal-save" onclick="dismissMixedInfo()"><i data-lucide="check" style="width:14px;height:14px"></i>확인</button>
+    </div>
+  </div>
+</div>
+
+<!-- 데모 모드 스위처 -->
+<div class="demo-mode-switcher">
+  <span class="demo-mode-label">DEMO</span>
+  <button class="demo-mode-btn" data-mode="new" onclick="setDemoMode(this)">신규</button>
+  <button class="demo-mode-btn active" data-mode="mixed" onclick="setDemoMode(this)">섞임</button>
+  <button class="demo-mode-btn" data-mode="old" onclick="setDemoMode(this)">기존</button>
+</div>
+
+<div class="toast" id="toast">
+  <i id="toastIcon" data-lucide="circle-check-big" style="width:18px;height:18px;flex-shrink:0"></i>
+  <span id="toastMsg"></span>
+</div>
+
+<script>
+// 학생 데이터 — items: 학생별 채점 데이터 보유 여부 (false면 해당 항목 없음, '-' 표시)
+// 공통 4개: standards(성취기준) / rubric(채점기준표) / score(점수) / teacher(선생님 종합 피드백)
+// 추가 4개: inst_ground(문항별 근거) / inst_feedback(문항별 피드백) / elem_ground(채점요소별 근거) / elem_feedback(채점요소별 피드백)
+// 기존 채점 학생(이전채점·김현재 v1)은 추가 4개 데이터 없음 → false
+var ITEMS_NEW  = {standards:true, rubric:true, score:true, teacher:true, inst_ground:true,  inst_feedback:true,  elem_ground:true,  elem_feedback:true};
+var ITEMS_OLD  = {standards:true, rubric:true, score:true, teacher:true, inst_ground:false, inst_feedback:false, elem_ground:false, elem_feedback:false};
+var ITEMS_NONE = {standards:false,rubric:false,score:false,teacher:false,inst_ground:false, inst_feedback:false, elem_ground:false, elem_feedback:false};
+
+var STUDENTS = [
+  {id:'10101', name:'김피드백', selectable:true,  checked:true,  items:ITEMS_NEW,  period:'26.04.08 ~ 무기한',     state:'공개'},
+  {id:'10102', name:'김채점',   selectable:true,  checked:true,  items:ITEMS_NEW,  period:'26.04.08 ~ 26.12.31',  state:'공개'},
+  {id:'10103', name:'미제출',   selectable:false, checked:false, items:ITEMS_NONE, period:'-',                    state:'미채점'},
+  {id:'10104', name:'채점전',   selectable:false, checked:false, items:ITEMS_NONE, period:'-',                    state:'미채점'},
+  {id:'10105', name:'채점실패', selectable:false, checked:false, items:ITEMS_NONE, period:'-',                    state:'미채점'},
+  {id:'10106', name:'이전채점', selectable:true,  checked:true,  items:ITEMS_OLD,  period:'26.04.08 ~ 무기한',     state:'공개'},
+  {id:'10107', name:'김현재',   selectable:true,  checked:true,  items:ITEMS_OLD,  period:'26.04.08 ~ 26.06.30',  state:'공개 예정'},
+  {id:'10108', name:'인라인',   selectable:true,  checked:true,  items:ITEMS_NEW,  period:'26.04.08 ~ 26.05.10',  state:'공개 만료'},
+  {id:'10109', name:'한가람',   selectable:false, checked:false, items:ITEMS_NONE, period:'-',                    state:'미채점'},
+  {id:'10110', name:'오세훈',   selectable:false, checked:false, items:ITEMS_NONE, period:'-',                    state:'미채점'}
+];
+
+// 일괄 적용 옵션 — 8개 (채점요소별 근거·피드백은 기본 해제)
+var BULK_OPTS = {standards:true, rubric:true, score:true, teacher:true, inst_ground:true, inst_feedback:true, elem_ground:false, elem_feedback:false};
+var BULK_OPT_KEYS = ['standards','rubric','score','teacher','inst_ground','inst_feedback','elem_ground','elem_feedback'];
+
+function renderTable(){
+  var tbody = document.getElementById('studentTbody');
+  tbody.innerHTML = STUDENTS.map(function(s, i){
+    var checkClass = 'tbl-checkbox' + (s.checked ? ' checked' : '') + (s.selectable ? '' : ' disabled');
+    var rowClass = s.selectable ? '' : 'disabled';
+    // 항목 마크: 학생에게 그 항목 데이터가 있고 + 일괄 적용 옵션이 켜져있고 + 학생이 체크돼있어야 ✓
+    function itemMark(key){
+      if(!s.selectable || !s.checked) return '<span class="dash">-</span>';
+      if(!s.items[key]) return '<span class="dash">-</span>'; // 학생에게 그 항목 데이터 없음
+      return BULK_OPTS[key] ? '<span class="item-mark">✓</span>' : '<span class="dash">-</span>';
+    }
+    var stateCls = s.state === '공개' ? 'state-pub'
+                 : s.state === '공개 만료' ? 'state-expired'
+                 : s.state === '공개 취소됨' ? 'state-cancelled'
+                 : 'state-soon';
+    return '<tr class="'+rowClass+'">'
+      +'<td class="col-check"><span class="'+checkClass+'" onclick="toggleStudent('+i+',this)"><i data-lucide="check" style="width:13px;height:13px"></i></span></td>'
+      +'<td class="col-id">'+s.id+'</td>'
+      +'<td class="col-name" style="text-align:left;padding-left:14px">'+s.name+'</td>'
+      +'<td class="col-item">'+itemMark('standards')+'</td>'
+      +'<td class="col-item">'+itemMark('rubric')+'</td>'
+      +'<td class="col-item">'+itemMark('score')+'</td>'
+      +'<td class="col-item">'+itemMark('teacher')+'</td>'
+      +'<td class="col-item">'+itemMark('inst_ground')+'</td>'
+      +'<td class="col-item">'+itemMark('inst_feedback')+'</td>'
+      +'<td class="col-item">'+itemMark('elem_ground')+'</td>'
+      +'<td class="col-item">'+itemMark('elem_feedback')+'</td>'
+      +'<td class="col-period">'+s.period+'</td>'
+      +'<td class="col-state"><span class="'+stateCls+'">'+s.state+'</span></td>'
+      +'</tr>';
+  }).join('');
+  lucide.createIcons();
+  updateCounts();
+}
+
+function toggleStudent(idx, el){
+  var s = STUDENTS[idx];
+  if(!s.selectable) return;
+  s.checked = !s.checked;
+  renderTable();
+}
+
+function toggleAll(el){
+  var allChecked = STUDENTS.filter(function(s){ return s.selectable; }).every(function(s){ return s.checked; });
+  STUDENTS.forEach(function(s){ if(s.selectable) s.checked = !allChecked; });
+  renderTable();
+}
+
+function updateCounts(){
+  var selected = STUDENTS.filter(function(s){ return s.selectable && s.checked; }).length;
+  var total = STUDENTS.length;
+  document.getElementById('selectedCountBadge').textContent = selected + '명 / ' + total + '명';
+  document.getElementById('selectedCountText').textContent = selected + '명';
+  document.getElementById('selectedCountText2').textContent = selected + '명';
+  // 헤더 체크박스
+  var hc = document.getElementById('headerCheck');
+  var selectableCount = STUDENTS.filter(function(s){ return s.selectable; }).length;
+  if(selected === selectableCount && selected > 0){
+    hc.classList.add('checked');
+  } else {
+    hc.classList.remove('checked');
+  }
+  // 옵션 카운트
+  var optChecked = BULK_OPT_KEYS.filter(function(k){ return BULK_OPTS[k]; }).length;
+  document.getElementById('optCountBadge').textContent = optChecked + '개 / 8개';
+}
+
+function toggleBulkOpt(el){
+  var key = el.getAttribute('data-key');
+  el.classList.toggle('checked');
+  BULK_OPTS[key] = el.classList.contains('checked');
+  renderTable();
+}
+
+function toggleNow(el){
+  var checked = el.classList.toggle('checked');
+  var input = document.getElementById('periodStart');
+  input.disabled = checked;
+  if(checked){
+    input.value = '';
+  } else {
+    var now = new Date();
+    now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+    input.value = now.toISOString().slice(0,16);
+  }
+}
+function toggleUntil(el){
+  var checked = el.classList.toggle('checked');
+  var input = document.getElementById('periodEnd');
+  input.disabled = checked;
+  if(checked){
+    input.value = '';
+  } else {
+    input.value = '2026-12-31T23:59';
+  }
+}
+
+function previewStudent(){
+  window.open('result_student_view_v3_260512.html', '_blank');
+}
+
+function saveShareSettings(){
+  var selected = STUDENTS.filter(function(s){ return s.selectable && s.checked; }).length;
+  showToast('success', selected + '명에게 공개 설정이 저장됐어요. 학생들이 바로 결과를 확인할 수 있어요.');
+  setTimeout(function(){
+    location.href = 'class_scoring_detail_v1_260512.html';
+  }, 1500);
+}
+
+// Esc 키
+document.addEventListener('keydown', function(e){
+  if(e.key !== 'Escape') return;
+  if(document.getElementById('mixedInfoModal').classList.contains('show')) dismissMixedInfo();
+});
+
+var toastTimer = null;
+function showToast(type, msg){
+  if(toastTimer) clearTimeout(toastTimer);
+  var t = document.getElementById('toast');
+  var ic = document.getElementById('toastIcon');
+  var m = document.getElementById('toastMsg');
+  t.className = 'toast ' + type + ' show';
+  ic.setAttribute('data-lucide', type === 'loading' ? 'loader' : 'circle-check-big');
+  m.textContent = msg;
+  lucide.createIcons();
+  if(type !== 'loading') toastTimer = setTimeout(function(){ t.classList.remove('show'); }, 2800);
+}
+
+// ══════ 진입 시 안내 모달 (기존+새 채점 섞임 케이스) ══════
+var MIXED_INFO_KEY = 'clipo_class_share_mixed_info_dismissed';
+var _mixedDismiss = false;
+
+function toggleMixedDismiss(el){
+  el.classList.toggle('checked');
+  _mixedDismiss = el.classList.contains('checked');
+}
+function dismissMixedInfo(){
+  if(_mixedDismiss){
+    localStorage.setItem(MIXED_INFO_KEY, '1');
+  }
+  document.getElementById('mixedInfoModal').classList.remove('show');
+}
+function checkMixedInfo(){
+  if(localStorage.getItem(MIXED_INFO_KEY) === '1') return;
+  var hasNew = STUDENTS.some(function(s){ return s.selectable && s.items === ITEMS_NEW; });
+  var hasOld = STUDENTS.some(function(s){ return s.selectable && s.items === ITEMS_OLD; });
+  if(hasNew && hasOld){
+    document.getElementById('mixedInfoModal').classList.add('show');
+    lucide.createIcons();
+  }
+}
+
+// ══════ 데모 모드 (신규 / 섞임 / 기존) ══════
+var DEMO_MODE = 'mixed';
+var MIXED_OLD_NAMES = ['이전채점','김현재']; // 섞임 모드에서 기존 채점으로 처리할 학생
+
+function applyDemoMode(){
+  STUDENTS.forEach(function(s){
+    if(!s.selectable){ s.items = ITEMS_NONE; return; }
+    if(DEMO_MODE === 'new') s.items = ITEMS_NEW;
+    else if(DEMO_MODE === 'old') s.items = ITEMS_OLD;
+    else s.items = MIXED_OLD_NAMES.indexOf(s.name) >= 0 ? ITEMS_OLD : ITEMS_NEW;
+  });
+
+  // 모드별 일괄 적용 옵션 디폴트
+  // - 신규/섞임: 공통 4 + 문항별 2 = 6개 ON, 채점요소별 2개 OFF
+  // - 기존: 공통 4개만 ON, 추가 4개 모두 OFF (기존 채점엔 데이터 없음)
+  if(DEMO_MODE === 'old'){
+    BULK_OPTS = {standards:true, rubric:true, score:true, teacher:true,
+                 inst_ground:false, inst_feedback:false, elem_ground:false, elem_feedback:false};
+  } else {
+    BULK_OPTS = {standards:true, rubric:true, score:true, teacher:true,
+                 inst_ground:true, inst_feedback:true, elem_ground:false, elem_feedback:false};
+  }
+  // UI 체크박스 동기화
+  document.querySelectorAll('#bulkOpts .opt-checkbox').forEach(function(el){
+    var key = el.getAttribute('data-key');
+    el.classList.toggle('checked', BULK_OPTS[key] === true);
+  });
+
+  renderTable();
+}
+
+function setDemoMode(btn){
+  DEMO_MODE = btn.getAttribute('data-mode');
+  document.querySelectorAll('.demo-mode-btn').forEach(function(b){ b.classList.remove('active'); });
+  btn.classList.add('active');
+  applyDemoMode();
+  // 모달 동작:
+  // - 섞임 모드: 모달 강제 노출 (데모 목적, localStorage 무시)
+  // - 신규/기존 모드: 모달 닫기
+  var modal = document.getElementById('mixedInfoModal');
+  if(DEMO_MODE === 'mixed'){
+    _mixedDismiss = false;
+    document.getElementById('mixedDismissCheck').classList.remove('checked');
+    modal.classList.add('show');
+    lucide.createIcons();
+  } else {
+    modal.classList.remove('show');
+  }
+}
+
+applyDemoMode();
+lucide.createIcons();
+checkMixedInfo();
+</script>
+</body>
+</html>
