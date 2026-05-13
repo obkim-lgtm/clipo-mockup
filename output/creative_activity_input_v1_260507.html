@@ -1733,8 +1733,8 @@ function renderDrawerBanner(s){
     },
     items: {
       title: '추천 항목이 변경됐어요',
-      desc: '저장하고 선택된 항목으로 기록을 다시 생성해요.',
-      btn: '저장 후 기록 재생성'
+      desc: '저장하고 선택된 항목으로 기록을 생성해요.',
+      btn: '저장 후 기록 생성'
     }
   };
   const m = messages[s._dirtyLevel];
@@ -1753,9 +1753,10 @@ function cascadeFromDrawer(){
   s._editChanged = false;
   s.dirty = false;
   if(level === 'items'){
-    // items 레벨: 저장 후 기록 재생성 (분량 모달)
+    // items 레벨: 저장 후 기록 생성 (분량 모달). 드로어는 닫고 length modal만 노출
     showToast('변경 사항을 저장했어요');
     renderDrawerBanner(s);
+    closeDrawer();
     openLengthModal({type:'regen', sid:s.id});
   } else {
     // file 또는 kw: 저장 + 추천 항목 다시 분석 + 항목 탭 전환
