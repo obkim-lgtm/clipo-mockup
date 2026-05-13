@@ -3370,7 +3370,15 @@ function showTourStop(){
 }
 window.addEventListener('resize', () => { if (tourIdx >= 0) showTourStop(); });
 (function maybeShowOb(){
-  const force = new URLSearchParams(location.search).get('ob') === '1';
+  const params = new URLSearchParams(location.search);
+  // ?tour=1: 인트로 모달 건너뛰고 곧장 튜토리얼 시작
+  if (params.get('tour') === '1') {
+    if (typeof applyScenario === 'function') applyScenario('empty');
+    try { localStorage.setItem('clipo_creative_onboarding_seen', '1'); } catch(e) {}
+    if (typeof startTour === 'function') setTimeout(startTour, 300);
+    return;
+  }
+  const force = params.get('ob') === '1';
   if (!force) {
     try { if (localStorage.getItem('clipo_creative_onboarding_seen') === '1') return; } catch(e) {}
   }
