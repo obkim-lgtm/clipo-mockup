@@ -837,10 +837,10 @@ body.nav-expanded .sticky-cta{left:200px;transition:left .2s ease}
       </div>
       <div class="dp-section">
         <div class="dp-label">활동 내용 <span class="hint">활동 자료에서 자동 추출되지만 직접 추가도 가능해요</span></div>
-        <textarea class="kw-textarea" id="md-kw-text" maxlength="500" oninput="updateKwCount();autoResizeKw()" onblur="commitKeywords()" placeholder="활동 내용을 콤마(,)로 구분해 자유롭게 입력하세요"></textarea>
+        <textarea class="kw-textarea" id="md-kw-text" maxlength="1000" oninput="updateKwCount();autoResizeKw()" onblur="commitKeywords()" placeholder="활동 내용을 콤마(,)로 구분해 자유롭게 입력하세요"></textarea>
         <div class="kw-foot">
           <span class="kw-hint">콤마(,)로 구분해 여러 개 입력</span>
-          <span class="kw-count" id="md-kw-count">0 / 500</span>
+          <span class="kw-count" id="md-kw-count">0 / 1000</span>
         </div>
       </div>
       <div class="dp-section" style="margin-bottom:0">
@@ -1827,10 +1827,10 @@ function renderDrawerDataPane(s){
     </div>
     <div class="dp-section">
       <div class="dp-label">활동 내용 <span class="hint">${liveCount > 0 ? '<span style="color:#15803d;font-weight:500">활동 자료가 있어 AI가 다음 단계에서 자동 추출해요 — 직접 입력은 선택사항</span>' : '<span style="color:#b45309;font-weight:500">활동 자료가 없어요. 직접 입력한 활동 내용만 기록 생성에 활용돼요</span>'}</span></div>
-      <textarea class="kw-textarea" id="dr-kw-text" maxlength="500" oninput="updateDrKwCount();autoResizeDrKw()" onblur="commitDrawerKeywords()" placeholder="${liveCount > 0 ? '추가로 메모할 내용이 있을 때만 입력 (콤마로 구분)' : '활동 내용을 콤마(,)로 구분해 자유롭게 입력하세요'}">${s.keywords.map(k=>k.text).join(', ')}</textarea>
+      <textarea class="kw-textarea" id="dr-kw-text" maxlength="1000" oninput="updateDrKwCount();autoResizeDrKw()" onblur="commitDrawerKeywords()" placeholder="${liveCount > 0 ? '추가로 메모할 내용이 있을 때만 입력 (콤마로 구분)' : '활동 내용을 콤마(,)로 구분해 자유롭게 입력하세요'}">${s.keywords.map(k=>k.text).join(', ')}</textarea>
       <div class="kw-foot">
         <span class="kw-hint">콤마(,)로 구분해 여러 개 입력</span>
-        <span class="kw-count" id="dr-kw-count">0 / 500</span>
+        <span class="kw-count" id="dr-kw-count">0 / 1000</span>
       </div>
     </div>
     <div class="dp-section" style="margin-bottom:0">
@@ -1851,7 +1851,7 @@ function updateDrKwCount(){
   const ta = $('dr-kw-text'); const cnt = $('dr-kw-count');
   if(!ta || !cnt) return;
   const len = ta.value.length;
-  cnt.textContent = `${len} / 500`;
+  cnt.textContent = `${len} / 1000`;
   cnt.classList.toggle('over', len >= 500);
   scheduleAutoSave();
 }
@@ -1986,7 +1986,7 @@ function updateKwCount(){
   const cnt = $('md-kw-count');
   if(!ta || !cnt) return;
   const len = ta.value.length;
-  cnt.textContent = `${len} / 500`;
+  cnt.textContent = `${len} / 1000`;
   cnt.classList.toggle('over', len >= 500);
   scheduleAutoSave();
 }
