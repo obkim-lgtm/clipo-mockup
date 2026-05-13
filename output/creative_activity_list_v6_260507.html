@@ -496,7 +496,18 @@
   function openDelModal(e, item) {
     e.stopPropagation();
     targetCard = item.closest('.card');
-    document.getElementById('delTitle').textContent = targetCard.querySelector('.card-class').textContent + '을 삭제하시겠습니까?';
+    const title = targetCard.querySelector('.card-class').textContent.trim();
+    const isDong = !!targetCard.querySelector('.b-dong');
+    const isJayul = !!targetCard.querySelector('.b-jayul');
+    const isJinro = !!targetCard.querySelector('.b-jinro');
+    let msg;
+    if (isDong) {
+      msg = `${title} 동아리를 삭제하시겠습니까?`;
+    } else {
+      const typeLabel = isJayul ? '자율활동' : (isJinro ? '진로활동' : '활동');
+      msg = `${typeLabel} ${title}을 삭제하시겠습니까?`;
+    }
+    document.getElementById('delTitle').textContent = msg;
     document.querySelectorAll('.card-dropdown.open').forEach(d => d.classList.remove('open'));
     document.getElementById('delModal').classList.add('open');
     lucide.createIcons();
