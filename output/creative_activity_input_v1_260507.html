@@ -285,10 +285,6 @@ body.nav-expanded .sticky-cta{left:200px;transition:left .2s ease}
 .reg-cards{display:grid;grid-template-columns:repeat(3, 1fr);gap:12px}
 .reg-card{padding:20px;border:1px solid #e5e7eb;border-radius:12px;cursor:pointer;display:flex;flex-direction:column;gap:10px;transition:all .15s;background:#fff;text-align:left;font-family:inherit;position:relative}
 .reg-card:hover{border-color:#416bff;box-shadow:0 4px 12px rgba(65,107,255,0.08)}
-.reg-card.registered{border-color:#c7d6ff}
-.reg-card.registered:hover{border-color:#416bff}
-.rc-registered{display:none;position:absolute;top:14px;right:14px;align-items:center;gap:3px;padding:3px 8px;background:#e9f2ff;color:#365eef;font-size:11px;font-weight:600;border-radius:10px;line-height:1}
-.reg-card.registered .rc-registered{display:inline-flex}
 .rc-icon{width:44px;height:44px;border-radius:10px;background:#f4f8ff;color:#416bff;display:inline-flex;align-items:center;justify-content:center;line-height:1;flex-shrink:0}
 .rc-title{font-size:16px;font-weight:600;color:#222631;line-height:1.3}
 .rc-desc{font-size:14px;color:#3b3f4c;line-height:1.55;flex:1}
@@ -917,7 +913,6 @@ body.nav-expanded .sticky-cta{left:200px;transition:left .2s ease}
             <i data-lucide="link" style="width:14px;height:14px"></i>
             <span>학번·이름이 포함된 설문 응답 결과 업로드</span>
           </div>
-          <span class="rc-registered"><i data-lucide="check" style="width:11px;height:11px"></i> 등록됨</span>
         </button>
         <button class="reg-card" data-type="activity" onclick="pickRegisterType('activity')">
           <div class="rc-icon"><i data-lucide="file-text" style="width:22px;height:22px"></i></div>
@@ -927,7 +922,6 @@ body.nav-expanded .sticky-cta{left:200px;transition:left .2s ease}
             <i data-lucide="link" style="width:14px;height:14px"></i>
             <span>PDF 학급 스캔본 1개</span>
           </div>
-          <span class="rc-registered"><i data-lucide="check" style="width:11px;height:11px"></i> 등록됨</span>
         </button>
         <button class="reg-card" data-type="keyword" onclick="pickRegisterType('keyword')">
           <div class="rc-icon"><i data-lucide="pencil" style="width:22px;height:22px"></i></div>
@@ -937,7 +931,6 @@ body.nav-expanded .sticky-cta{left:200px;transition:left .2s ease}
             <i data-lucide="link" style="width:14px;height:14px"></i>
             <span>양식을 다운받아 작성 후 업로드</span>
           </div>
-          <span class="rc-registered"><i data-lucide="check" style="width:11px;height:11px"></i> 등록됨</span>
         </button>
       </div>
     </div>
@@ -3014,11 +3007,6 @@ function refreshAll(){
   }
 }
 function openRegisterModal(){
-  // 등록된 유형 카드에 표시
-  document.querySelectorAll('.reg-card[data-type]').forEach(card => {
-    const t = card.dataset.type;
-    card.classList.toggle('registered', hasFileOfType(t));
-  });
   $('modal-register').classList.add('show');
   lucide.createIcons();
 }
