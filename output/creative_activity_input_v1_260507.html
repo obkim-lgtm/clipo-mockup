@@ -282,7 +282,15 @@ body.nav-expanded .sticky-cta{left:200px;transition:left .2s ease}
 .modal.xl{max-width:860px}
 
 /* 자료 등록 카드 (모달 안) */
-.reg-cards{display:grid;grid-template-columns:repeat(3, 1fr);gap:12px}
+.reg-cards{display:grid;grid-template-columns:repeat(2, 1fr);gap:12px}
+.reg-section-label{font-size:13px;font-weight:600;color:#6d7381;margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.reg-section-tag{font-size:11px;font-weight:500;color:#6d7381;background:#f1f3f5;padding:2px 6px;border-radius:8px}
+.reg-card-aux{padding:14px 18px !important;flex-direction:row !important;gap:12px !important;background:#fafbfc !important;align-items:flex-start;width:100%}
+.reg-card-aux:hover{border-color:#b3b3b3 !important;background:#f6f7f9 !important;box-shadow:none !important}
+.rc-icon-sm{width:32px;height:32px;border-radius:6px;background:#f1f3f5;color:#6d7381;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px}
+.rc-title-sm{font-size:14px;font-weight:600;color:#3b3f4c;line-height:1.4;margin-bottom:3px}
+.rc-desc-sm{font-size:13px;color:#6d7381;line-height:1.55}
+.rc-desc-sm strong{color:#3b3f4c;font-weight:600}
 .reg-card{padding:20px;border:1px solid #e5e7eb;border-radius:12px;cursor:pointer;display:flex;flex-direction:column;gap:10px;transition:all .15s;background:#fff;text-align:left;font-family:inherit;position:relative}
 .reg-card:hover{border-color:#416bff;box-shadow:0 4px 12px rgba(65,107,255,0.08)}
 .rc-icon{width:44px;height:44px;border-radius:10px;background:#f4f8ff;color:#416bff;display:inline-flex;align-items:center;justify-content:center;line-height:1;flex-shrink:0}
@@ -904,6 +912,7 @@ body.nav-expanded .sticky-cta{left:200px;transition:left .2s ease}
         <i data-lucide="info" style="width:14px;height:14px;flex-shrink:0;margin-top:2px"></i>
         <div><strong>유형별 1개 파일</strong>만 업로드할 수 있어요. 동일 유형 재업로드 시 기존 자료가 삭제되고 새 자료로 교체됩니다.</div>
       </div>
+      <div class="reg-section-label">활동 자료 (AI가 자동 분석)</div>
       <div class="reg-cards">
         <button class="reg-card" data-type="survey" onclick="pickRegisterType('survey')">
           <div class="rc-icon"><i data-lucide="file-spreadsheet" style="width:22px;height:22px"></i></div>
@@ -923,16 +932,15 @@ body.nav-expanded .sticky-cta{left:200px;transition:left .2s ease}
             <span>PDF 학급 스캔본 1개</span>
           </div>
         </button>
-        <button class="reg-card" data-type="keyword" onclick="pickRegisterType('keyword')">
-          <div class="rc-icon"><i data-lucide="pencil" style="width:22px;height:22px"></i></div>
-          <div class="rc-title">학생 활동 특성 키워드 (EXCEL)</div>
-          <div class="rc-desc">평소 학생을 관찰하며 기록한 메모를 특성 키워드로 일괄 등록</div>
-          <div class="rc-match">
-            <i data-lucide="link" style="width:14px;height:14px"></i>
-            <span>양식을 다운받아 작성 후 업로드</span>
-          </div>
-        </button>
       </div>
+      <div class="reg-section-label" style="margin-top:16px">보조 입력 <span class="reg-section-tag">선택</span></div>
+      <button class="reg-card reg-card-aux" data-type="keyword" onclick="pickRegisterType('keyword')">
+        <div class="rc-icon-sm"><i data-lucide="pencil" style="width:16px;height:16px"></i></div>
+        <div style="flex:1">
+          <div class="rc-title-sm">학생 활동 특성 키워드 (EXCEL)</div>
+          <div class="rc-desc-sm">관찰 메모를 키워드로 직접 등록. <strong>활동 자료가 있으면 AI가 자동 추출하니 안 써도 돼요.</strong></div>
+        </div>
+      </button>
     </div>
   </div>
 </div>
@@ -1794,8 +1802,8 @@ function renderDrawerDataPane(s){
       <div id="dr-files" style="margin-top:8px">${filesHtml}</div>
     </div>
     <div class="dp-section">
-      <div class="dp-label">특성 키워드 <span class="hint">활동 자료에서 자동 추출되지만 직접 추가도 가능해요</span></div>
-      <textarea class="kw-textarea" id="dr-kw-text" maxlength="500" oninput="updateDrKwCount();autoResizeDrKw()" onblur="commitDrawerKeywords()" placeholder="특성 키워드를 콤마(,)로 구분해 자유롭게 입력하세요">${s.keywords.map(k=>k.text).join(', ')}</textarea>
+      <div class="dp-label">특성 키워드 <span class="hint">${liveCount > 0 ? '<span style="color:#15803d;font-weight:500">활동 자료가 있어 AI가 다음 단계에서 자동 추출해요 — 직접 입력은 선택사항</span>' : '<span style="color:#b45309;font-weight:500">활동 자료가 없어요. 직접 입력한 키워드만 기록 생성에 활용돼요</span>'}</span></div>
+      <textarea class="kw-textarea" id="dr-kw-text" maxlength="500" oninput="updateDrKwCount();autoResizeDrKw()" onblur="commitDrawerKeywords()" placeholder="${liveCount > 0 ? '추가로 메모할 내용이 있을 때만 입력 (콤마로 구분)' : '특성 키워드를 콤마(,)로 구분해 자유롭게 입력하세요'}">${s.keywords.map(k=>k.text).join(', ')}</textarea>
       <div class="kw-foot">
         <span class="kw-hint">콤마(,)로 구분해 여러 개 입력</span>
         <span class="kw-count" id="dr-kw-count">0 / 500</span>
