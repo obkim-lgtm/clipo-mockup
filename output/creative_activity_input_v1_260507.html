@@ -1569,6 +1569,11 @@ function openDrawer(id){
   drawerCurTab = 'data';
   drawerSubView = null;
   drawerSurveyFileIdx = null;
+  // 1단계 진입은 자료 입력만 — 기록 항목 탭 숨김. 3단계는 둘 다 노출.
+  const activeStep = document.querySelector('.step-btn.active');
+  const fromStep3 = activeStep && activeStep.id === 'step-3';
+  const itemsTab = document.querySelector('.dr-tab[data-tab="items"]');
+  if (itemsTab) itemsTab.style.display = fromStep3 ? '' : 'none';
   $('drawer-detail').classList.add('show');
   renderDrawer();
   lucide.createIcons();
