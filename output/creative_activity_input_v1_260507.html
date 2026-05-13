@@ -1793,8 +1793,9 @@ function cascadeFromDrawer(){
 function refreshDrawerItemCount(s){
   if(!s) return;
   const data = STEP2_DATA[s.sid] || {items: STEP2_DEFAULT_ITEMS};
-  const total = data.items.length + (s.s2?.customs?.length || 0);
-  const sel = (s.s2?.selectedIds?.size || 0) + (s.s2?.customs?.filter(c=>c.content && c.content.trim()).length || 0);
+  const savedCustomCnt = (s.s2?.customs?.filter(c=>c.saved).length) || 0;
+  const total = data.items.length + savedCustomCnt;
+  const sel = (s.s2?.selectedIds?.size || 0) + savedCustomCnt;
   if($('dr-items-cnt')) $('dr-items-cnt').textContent = `${sel}/${total}`;
 }
 function renderDrawerDataPane(s){
@@ -1933,9 +1934,9 @@ function renderDrawerItemsPane(s){
       <div class="s2-group-hd"><span class="s2-group-title">기록 항목 (추가 후보)</span><span class="s2-group-cnt">${candItems.length}개</span></div>
       <div style="display:flex;flex-direction:column;gap:8px">${candHtml}</div>
     ` : ''}
-    <div class="s2-group-hd"><span class="s2-group-title">직접 추가</span><span class="s2-group-cnt">${s2.customs.length}개</span></div>
+    <div class="s2-group-hd"><span class="s2-group-title">직접 추가</span><span class="s2-group-cnt">${s2.customs.filter(c=>c.saved).length} / 1</span></div>
     ${customHtml}
-    <button class="s2-add-btn" onclick="addCustomItem(${s.id})"><i data-lucide="plus" style="width:16px;height:16px"></i> 빈 카드 추가</button>
+    ${s2.customs.length === 0 ? `<button class="s2-add-btn" onclick="addCustomItem(${s.id})"><i data-lucide="plus" style="width:16px;height:16px"></i> 직접 추가 (1개)</button>` : ''}
   `;
 }
 function startAnalyzeFromDrawer(sid){
@@ -2695,10 +2696,10 @@ function renderS2Done(s){
     </div>
     <div class="s2-group-hd">
       <span class="s2-group-title">직접 추가</span>
-      <span class="s2-group-cnt">${s2.customs.length}개</span>
+      <span class="s2-group-cnt">${s2.customs.filter(c=>c.saved).length} / 1</span>
     </div>
     ${customHtml}
-    <button class="s2-add-btn" onclick="addCustomItem(${s.id})"><i data-lucide="plus" style="width:16px;height:16px"></i> 빈 카드 추가</button>
+    ${s2.customs.length === 0 ? `<button class="s2-add-btn" onclick="addCustomItem(${s.id})"><i data-lucide="plus" style="width:16px;height:16px"></i> 직접 추가 (1개)</button>` : ''}
   `;
 }
 function renderS2ItemCard(sid, item){
@@ -2730,12 +2731,32 @@ function renderS2ItemCard(sid, item){
   </div>`;
 }
 function renderS2CustomCard(sid, c, idx){
-  return `<div class="s2-custom-card">
+  const len = (c.content || '').length;
+  if(!c.saved){
+    // 편집 중
+    return `<div class="s2-custom-card">
+      <div style="display:flex;align-items:center;gap:8px">
+        <span class="s2-custom-tag">직접 추가</span>
+        <button class="btn-x-link" onclick="cancelCustomEdit(${sid}, ${idx})" style="margin-left:auto">취소</button>
+      </div>
+      <textarea class="s2-custom-textarea" maxlength="100" placeholder="기억나는 학생 활동·특성을 자유롭게 입력하세요 (최대 100자)" oninput="updateCustom(${sid}, ${idx}, this.value)">${c.content||''}</textarea>
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:8px">
+        <span class="s2-custom-count" id="s2-cc-${sid}-${idx}" style="font-size:12px;color:#b3b6bd;font-variant-numeric:tabular-nums">${len} / 100</span>
+        <button class="s2-custom-save-btn" id="s2-cs-${sid}-${idx}" onclick="saveCustomItem(${sid}, ${idx})" ${len === 0 ? 'disabled' : ''} style="padding:7px 16px;border:none;border-radius:6px;background:${len === 0 ? '#e5e7eb' : '#365eef'};color:${len === 0 ? '#9ca3af' : '#fff'};font-size:13px;font-weight:600;font-family:inherit;cursor:${len === 0 ? 'not-allowed' : 'pointer'};line-height:1">저장</button>
+      </div>
+    </div>`;
+  }
+  // 저장됨 — 자동 반영, 체크박스 없음
+  return `<div class="s2-custom-card" style="background:#fffaeb;border-color:#fcd34d">
     <div style="display:flex;align-items:center;gap:8px">
       <span class="s2-custom-tag">직접 추가</span>
-      <button class="btn-x-link" onclick="removeCustom(${sid}, ${idx})" style="margin-left:auto">삭제</button>
+      <span style="font-size:12px;color:#15803d;font-weight:600;display:inline-flex;align-items:center;gap:3px"><i data-lucide="check-circle" style="width:13px;height:13px"></i> 기록에 반영됨</span>
+      <div style="margin-left:auto;display:flex;gap:8px">
+        <button class="btn-x-link" onclick="editCustomItem(${sid}, ${idx})">수정</button>
+        <button class="btn-x-link" onclick="removeCustom(${sid}, ${idx})">삭제</button>
+      </div>
     </div>
-    <textarea class="s2-custom-textarea" placeholder="기억나는 학생 활동·특성을 자유롭게 입력하세요" oninput="updateCustom(${sid}, ${idx}, this.value)">${c.content||''}</textarea>
+    <div style="font-size:14px;color:#222631;line-height:1.6;padding:8px 0">${(c.content||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}</div>
   </div>`;
 }
 function toggleS2Item(sid, itemId){
@@ -2969,7 +2990,9 @@ function skipStep2(){
 function addCustomItem(sid){
   const s = STUDENTS.find(x=>x.id===sid);
   if(!s) return;
-  getS2(s).customs.push({content:''});
+  const s2 = getS2(s);
+  if(s2.customs.length >= 1) return;  // 직접 추가는 1개만
+  s2.customs.push({content:'', saved:false});
   if(s.s3 && s.s3.aiText) markDirty(s, 'items');
   else scheduleAutoSave();
   if(isDrawerOpen() && curDetailId === sid){
@@ -2984,9 +3007,74 @@ function updateCustom(sid, idx, content){
   const s = STUDENTS.find(x=>x.id===sid);
   if(!s) return;
   getS2(s).customs[idx].content = content;
+  // 카운트와 저장 버튼 활성화만 즉시 반영 (전체 렌더링 없이)
+  const len = (content || '').length;
+  const cntEl = document.getElementById(`s2-cc-${sid}-${idx}`);
+  const btnEl = document.getElementById(`s2-cs-${sid}-${idx}`);
+  if(cntEl) cntEl.textContent = `${len} / 100`;
+  if(btnEl){
+    btnEl.disabled = len === 0;
+    btnEl.style.background = len === 0 ? '#e5e7eb' : '#365eef';
+    btnEl.style.color = len === 0 ? '#9ca3af' : '#fff';
+    btnEl.style.cursor = len === 0 ? 'not-allowed' : 'pointer';
+  }
+}
+function saveCustomItem(sid, idx){
+  const s = STUDENTS.find(x=>x.id===sid);
+  if(!s) return;
+  const s2 = getS2(s);
+  const c = s2.customs[idx];
+  if(!c || !(c.content||'').trim()) return;
+  c.saved = true;
+  delete c._origContent;
   if(s.s3 && s.s3.aiText) markDirty(s, 'items');
+  else scheduleAutoSave();
   refreshS2Cta();
-  if(isDrawerOpen() && curDetailId === sid) refreshDrawerItemCount(s);
+  if(isDrawerOpen() && curDetailId === sid){
+    renderDrawerItemsPane(s);
+    refreshDrawerItemCount(s);
+  } else {
+    renderS2Main();
+  }
+  lucide.createIcons();
+  showToast('직접 추가 항목이 저장됐어요');
+}
+function editCustomItem(sid, idx){
+  const s = STUDENTS.find(x=>x.id===sid);
+  if(!s) return;
+  const c = getS2(s).customs[idx];
+  if(!c) return;
+  c._origContent = c.content;  // 취소 시 복구용
+  c.saved = false;
+  if(isDrawerOpen() && curDetailId === sid){
+    renderDrawerItemsPane(s);
+    refreshDrawerItemCount(s);
+  } else {
+    renderS2Main();
+  }
+  lucide.createIcons();
+}
+function cancelCustomEdit(sid, idx){
+  const s = STUDENTS.find(x=>x.id===sid);
+  if(!s) return;
+  const c = getS2(s).customs[idx];
+  if(!c) return;
+  if(c._origContent !== undefined){
+    // 이전 저장 상태가 있으면 되돌림
+    c.content = c._origContent;
+    c.saved = true;
+    delete c._origContent;
+    if(isDrawerOpen() && curDetailId === sid){
+      renderDrawerItemsPane(s);
+      refreshDrawerItemCount(s);
+    } else {
+      renderS2Main();
+    }
+    lucide.createIcons();
+  } else {
+    // 새로 추가하던 거면 제거
+    removeCustom(sid, idx);
+  }
 }
 function removeCustom(sid, idx){
   const s = STUDENTS.find(x=>x.id===sid);
@@ -3013,7 +3101,7 @@ function refreshS2Cta(){
     analyzable++;
     const s2 = getS2(s);
     if(s2.status === 'done') doneCount++;
-    selectedTotal += s2.selectedIds.size + s2.customs.filter(c=>c.content && c.content.trim()).length;
+    selectedTotal += s2.selectedIds.size + s2.customs.filter(c=>c.saved).length;
   });
   if(analyzable === 0){
     $('cta-progress').textContent = '분석할 자료가 없어요 — 활동 내용 기반으로 다음 단계 진행 가능';
