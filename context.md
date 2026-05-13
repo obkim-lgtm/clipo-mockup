@@ -180,6 +180,23 @@
 - `purple` → 보조 레이블, 배지
 - `gray` → 텍스트, 비활성, 구분선
 
+## 모든 mockup HTML 필수 요소 (체크리스트)
+
+새 mockup 파일을 만들거나 기존 파일을 수정할 때 **반드시 확인**:
+
+1. **파비콘 태그** — `<head>` 안에 다음 한 줄 필수:
+   ```html
+   <link rel="icon" type="image/png" href="clipo_favicon.png">
+   ```
+   - 파일: `output/clipo_favicon.png` (CLIPO 캐릭터 이모지형, 2026-05-13~)
+   - 이전 `clipo_favicon.svg`는 deprecated. **새 mockup엔 png만 사용.**
+   - 누락 일괄 점검 명령: `grep -L "clipo_favicon" output/*.html`
+2. **Pretendard GOV** 폰트 CDN 임포트
+3. **헤더·좌측 사이드바** (NB v2.0 스펙 적용 — 채점/수업/홈 화면. 창체는 NB v1)
+4. **본문 텍스트 16px 이상** (절대 규칙)
+
+---
+
 ## 고정 요소
 
 > ⚠️ **NB v2.0 적용 범위**: 수행평가 채점 등 신규 화면부터 적용.
