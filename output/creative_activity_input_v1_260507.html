@@ -678,7 +678,7 @@ body.nav-expanded .sticky-cta{left:200px;transition:left .2s ease}
   <!-- 페이지 타이틀 블록 -->
   <div class="page-title-block">
     <h1 class="pt-title" id="pt-title">자율활동 : 2학년 1반</h1>
-    <p class="pt-desc">학생 활동 자료나 활동 내용을 기반으로 AI Assistant가 창의적 체험 활동 기록 초안을 만들어 드립니다.</p>
+    <p class="pt-desc">학생 활동 자료·내용을 등록하면 AI가 분석해 기록 초안을 만들어 드려요.</p>
   </div>
 
   <!-- 스텝 버튼 바 + 우측 보조 액션 -->
@@ -746,7 +746,6 @@ body.nav-expanded .sticky-cta{left:200px;transition:left .2s ease}
       <div class="s2-title-wrap">
         <span class="s2-title">AI 자료 분석</span>
       </div>
-      <div class="s2-desc">활동 자료를 AI가 분석해 기록에 들어갈 항목을 추출해드려요.</div>
       <button class="btn-primary" id="s2-rerun-btn" onclick="rerunAI()"><i data-lucide="sparkles" style="width:14px;height:14px"></i> 전체 분석 시작</button>
     </div>
 
@@ -1934,7 +1933,7 @@ function renderDrawerItemsPane(s){
       <div class="s2-group-hd"><span class="s2-group-title">기록 항목 (추가 후보)</span><span class="s2-group-cnt">${candItems.length}개</span></div>
       <div style="display:flex;flex-direction:column;gap:8px">${candHtml}</div>
     ` : ''}
-    <div class="s2-group-hd"><span class="s2-group-title">직접 추가</span><span class="s2-group-cnt">${s2.customs.filter(c=>c.saved).length} / 1</span></div>
+    <div class="s2-group-hd"><span class="s2-group-title">직접 추가</span></div>
     ${customHtml}
     ${s2.customs.length === 0 ? `<button class="s2-add-btn" onclick="addCustomItem(${s.id})"><i data-lucide="plus" style="width:16px;height:16px"></i> 직접 추가 (1개)</button>` : ''}
   `;
@@ -2696,7 +2695,6 @@ function renderS2Done(s){
     </div>
     <div class="s2-group-hd">
       <span class="s2-group-title">직접 추가</span>
-      <span class="s2-group-cnt">${s2.customs.filter(c=>c.saved).length} / 1</span>
     </div>
     ${customHtml}
     ${s2.customs.length === 0 ? `<button class="s2-add-btn" onclick="addCustomItem(${s.id})"><i data-lucide="plus" style="width:16px;height:16px"></i> 직접 추가 (1개)</button>` : ''}
@@ -2741,7 +2739,8 @@ function renderS2CustomCard(sid, c, idx){
       </div>
       <textarea class="s2-custom-textarea" maxlength="100" placeholder="기억나는 학생 활동·특성을 자유롭게 입력하세요 (최대 100자)" oninput="updateCustom(${sid}, ${idx}, this.value)">${c.content||''}</textarea>
       <div style="display:flex;justify-content:space-between;align-items:center;gap:8px">
-        <span class="s2-custom-count" id="s2-cc-${sid}-${idx}" style="font-size:12px;color:#b3b6bd;font-variant-numeric:tabular-nums">${len} / 100</span>
+        <span class="s2-custom-limit-msg" id="s2-cm-${sid}-${idx}" style="font-size:12px;color:#f2525f;font-weight:500;display:${len >= 100 ? 'inline' : 'none'}">최대 100자까지 입력할 수 있어요</span>
+        <span class="s2-custom-count" id="s2-cc-${sid}-${idx}" style="font-size:12px;color:${len >= 100 ? '#f2525f' : '#b3b6bd'};font-weight:${len >= 100 ? '600' : '400'};font-variant-numeric:tabular-nums;margin-left:auto">${len} / 100</span>
         <button class="s2-custom-save-btn" id="s2-cs-${sid}-${idx}" onclick="saveCustomItem(${sid}, ${idx})" ${len === 0 ? 'disabled' : ''} style="padding:7px 16px;border:none;border-radius:6px;background:${len === 0 ? '#e5e7eb' : '#365eef'};color:${len === 0 ? '#9ca3af' : '#fff'};font-size:13px;font-weight:600;font-family:inherit;cursor:${len === 0 ? 'not-allowed' : 'pointer'};line-height:1">저장</button>
       </div>
     </div>`;
@@ -3010,8 +3009,14 @@ function updateCustom(sid, idx, content){
   // 카운트와 저장 버튼 활성화만 즉시 반영 (전체 렌더링 없이)
   const len = (content || '').length;
   const cntEl = document.getElementById(`s2-cc-${sid}-${idx}`);
+  const msgEl = document.getElementById(`s2-cm-${sid}-${idx}`);
   const btnEl = document.getElementById(`s2-cs-${sid}-${idx}`);
-  if(cntEl) cntEl.textContent = `${len} / 100`;
+  if(cntEl){
+    cntEl.textContent = `${len} / 100`;
+    cntEl.style.color = len >= 100 ? '#f2525f' : '#b3b6bd';
+    cntEl.style.fontWeight = len >= 100 ? '600' : '400';
+  }
+  if(msgEl) msgEl.style.display = len >= 100 ? 'inline' : 'none';
   if(btnEl){
     btnEl.disabled = len === 0;
     btnEl.style.background = len === 0 ? '#e5e7eb' : '#365eef';
