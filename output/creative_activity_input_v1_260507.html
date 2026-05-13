@@ -2530,9 +2530,18 @@ function refreshS3Cta(){
   // [전체 기록 생성] vs [전체 재생성]
   const allGenerated = STUDENTS.every(s => getS3(s).aiText || (s.files.length===0 && s.keywords.length===0));
   const btn = $('s3-genall-btn');
-  if(btn) btn.innerHTML = (allGenerated && generated > 0)
-    ? '<i data-lucide="refresh-ccw" style="width:14px;height:14px"></i> 전체 재생성'
-    : '<i data-lucide="sparkles" style="width:14px;height:14px"></i> 전체 기록 생성';
+  if(btn){
+    btn.innerHTML = (allGenerated && generated > 0)
+      ? '<i data-lucide="refresh-ccw" style="width:14px;height:14px"></i> 전체 재생성'
+      : '<i data-lucide="sparkles" style="width:14px;height:14px"></i> 전체 기록 생성';
+    // 모든 학생이 자료·활동 내용 둘 다 없으면 비활성
+    const hasAnyData = STUDENTS.some(s => s.files.length > 0 || s.keywords.length > 0);
+    btn.disabled = !hasAnyData;
+    btn.style.opacity = hasAnyData ? '' : '0.4';
+    btn.style.cursor = hasAnyData ? '' : 'not-allowed';
+    btn.title = hasAnyData ? '' : '자료 또는 활동 내용을 1명 이상 등록해야 생성할 수 있어요';
+    if(window.lucide) lucide.createIcons();
+  }
 }
 
 // ───── STEP 2 렌더 ─────
