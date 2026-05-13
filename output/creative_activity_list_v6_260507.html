@@ -71,6 +71,13 @@
     footer { text-align: center; padding: 48px 0 24px; font-size: 13px; color: #6d7381; }
     footer a { color: #6d7381; text-decoration: none; margin: 0 8px; }
 
+    /* ── MOCKUP 토글 ── */
+    .mockup-toggle{position:fixed;bottom:24px;right:24px;background:#222631;color:#fff;border-radius:24px;padding:5px;display:inline-flex;align-items:center;gap:2px;box-shadow:0 8px 24px rgba(0,0,0,.2);z-index:550;font-family:inherit}
+    .mt-label{padding:0 8px 0 10px;font-size:11px;font-weight:700;color:#b3b6bd;letter-spacing:0.5px}
+    .mt-btn{padding:7px 14px;border:none;background:none;color:#b3b6bd;font-size:13px;font-weight:500;cursor:pointer;font-family:inherit;border-radius:18px;line-height:1;transition:all .15s}
+    .mt-btn:hover{color:#fff}
+    .mt-btn.active{background:#416bff;color:#fff}
+
     /* ── 반응형 ── */
     @media (max-width: 1023px) {
       .list-main { padding: 32px 32px; }
@@ -186,6 +193,19 @@
     </button>
   </div>
 
+  <!-- 빈 상태 (활동 0개일 때) -->
+  <div id="empty-state" style="display:none;text-align:center;padding:80px 24px 60px;">
+    <div style="width:96px;height:96px;border-radius:50%;background:#e9f2ff;color:#416bff;display:inline-flex;align-items:center;justify-content:center;margin-bottom:20px">
+      <i data-lucide="notebook-pen" style="width:44px;height:44px"></i>
+    </div>
+    <h2 style="font-size:22px;font-weight:700;color:#222631;margin-bottom:10px;line-height:1.4">아직 등록된 활동이 없어요</h2>
+    <p style="font-size:15px;color:#6d7381;line-height:1.7;margin-bottom:28px">자율·진로·동아리 활동 카드를 만들어 기록을 시작해 보세요.<br>튜토리얼로 사용 흐름을 미리 살펴보실 수 있어요.</p>
+    <div style="display:inline-flex;gap:10px;flex-wrap:wrap;justify-content:center">
+      <button onclick="openOnboardingDemo()" style="display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:11px 20px;border:1px solid #365eef;border-radius:6px;background:#fff;color:#365eef;font-size:14px;font-weight:600;font-family:inherit;cursor:pointer;line-height:1"><i data-lucide="play-circle" style="width:15px;height:15px"></i> 튜토리얼 시작</button>
+      <button onclick="openAddModal()" style="display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:11px 22px;border:none;border-radius:6px;background:#365eef;color:#fff;font-size:14px;font-weight:600;font-family:inherit;cursor:pointer;line-height:1"><i data-lucide="plus" style="width:15px;height:15px"></i> 활동 추가</button>
+    </div>
+  </div>
+
   <!-- 2026학년도 -->
   <section data-year="2026" style="margin-bottom:40px;">
     <div style="display:flex;align-items:center;gap:8px;margin-bottom:16px;">
@@ -252,7 +272,7 @@
           <span class="badge-type" style="background:#1f2937;color:#fff;letter-spacing:0.5px">DEMO</span>
           <i data-lucide="play-circle" style="width:18px;height:18px;color:#416bff"></i>
         </div>
-        <p class="card-class" style="color:#416bff">사용법 가이드 투어</p>
+        <p class="card-class" style="color:#416bff">사용법 튜토리얼</p>
         <div class="divider"></div>
         <div style="font-size:14px;color:#3b3f4c;line-height:1.55">자료 등록부터 기록 다운로드까지<br><strong style="color:#222631">3단계 흐름을 한 번에 익혀보세요.</strong></div>
       </div>
@@ -280,6 +300,14 @@
   </section>
 </main>
 </div><!-- /list-main-shell -->
+
+<!-- 목업 시나리오 토글 -->
+<div class="mockup-toggle" id="mockup-toggle">
+  <span class="mt-label">MOCKUP</span>
+  <button class="mt-btn active" data-scenario="hasData" onclick="setListScenario('hasData')">데이터 있음</button>
+  <button class="mt-btn" data-scenario="empty" onclick="setListScenario('empty')">데이터 없음</button>
+</div>
+
 <footer><a href="#">회사소개</a><a href="#">이용약관</a><a href="#">개인정보처리방침</a><a href="#">고객센터</a><div style="margin-top:8px;">© 2026 Datadriven Inc. All rights reserved.</div></footer>
 
 <!-- 삭제 확인 모달 -->
@@ -428,6 +456,23 @@
     }
   })();
   refreshDongCards();
+
+  function setListScenario(scenario){
+    document.querySelectorAll('.mt-btn').forEach(b => b.classList.toggle('active', b.dataset.scenario === scenario));
+    const empty = document.getElementById('empty-state');
+    const isEmpty = scenario === 'empty';
+    if (empty) empty.style.display = isEmpty ? 'block' : 'none';
+    // 학년도 섹션 + 페이지 헤더의 활동 추가 버튼 토글
+    document.querySelectorAll('section[data-year]').forEach(sec => {
+      // 2025는 원래 숨김 상태라 데이터 있음 모드에서만 hasData 적용해도 hidden 유지
+      if (sec.dataset.year === '2025') return;
+      sec.style.display = isEmpty ? 'none' : '';
+    });
+    // 페이지 우상단 활동 추가 버튼은 빈 상태에선 가리기 (중앙 CTA로 유도)
+    const headerAddBtn = document.querySelector('.list-main .btn-primary');
+    if (headerAddBtn) headerAddBtn.style.display = isEmpty ? 'none' : '';
+    if (isEmpty) lucide.createIcons();
+  }
 
   // 등록 직후 토스트
   (function() {
