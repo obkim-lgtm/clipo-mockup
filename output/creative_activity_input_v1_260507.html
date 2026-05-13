@@ -226,6 +226,10 @@ body.nav-expanded .sticky-cta{left:200px;transition:left .2s ease}
 .mini-dz-text{font-size:14px;color:#6d7381;margin-top:6px}
 .mini-dz-hint{font-size:12px;color:#b3b6bd;margin-top:3px}
 .file-row{display:flex;align-items:center;gap:10px;padding:10px 12px;border:1px solid #e5e7eb;border-radius:8px;margin-top:8px;background:#fafbfc}
+.file-row.pending-delete{background:#fff5f5;border-color:#fecaca}
+.file-pending-tag{font-size:11px;font-weight:600;color:#f2525f;background:#fee2e2;padding:3px 8px;border-radius:10px;line-height:1;margin-left:auto}
+.btn-undo{padding:6px 10px;border:1px solid #d9d9d9;border-radius:6px;background:#fff;color:#3b3f4c;font-size:12px;font-weight:500;font-family:inherit;cursor:pointer;line-height:1}
+.btn-undo:hover{border-color:#416bff;color:#416bff}
 .file-row .bf-type{width:36px;height:36px;font-size:11px;border-radius:6px}
 .file-row .file-name{flex:1;font-size:14px;color:#222631;font-weight:500}
 .file-row .file-meta{font-size:12px;color:#6d7381}
@@ -955,6 +959,21 @@ body.nav-expanded .sticky-cta{left:200px;transition:left .2s ease}
   </div>
 </div>
 
+<!-- ── 드로어 저장 시 일괄 삭제 확인 모달 ── -->
+<div class="modal-bg" id="modal-drawer-del" style="z-index:700">
+  <div class="modal" style="max-width:400px">
+    <div style="padding:32px 28px 20px;text-align:center">
+      <div style="width:56px;height:56px;border-radius:50%;background:#fee2e2;color:#f2525f;display:flex;align-items:center;justify-content:center;margin:0 auto 16px"><i data-lucide="trash-2" style="width:24px;height:24px"></i></div>
+      <div style="font-size:18px;font-weight:700;color:#222631;line-height:1.5;margin-bottom:8px"><span id="dr-del-count" style="color:#f2525f">0</span>개 자료를 삭제하고 저장할까요?</div>
+      <div style="font-size:14px;color:#6d7381;line-height:1.6">삭제된 자료는 복구할 수 없어요.</div>
+    </div>
+    <div style="padding:0 28px 24px;display:flex;gap:8px">
+      <button onclick="cancelDrawerDel()" style="flex:1;padding:11px;border:1px solid #f2525f;border-radius:6px;background:#fff;color:#f2525f;font-size:14px;font-weight:500;font-family:inherit;cursor:pointer;line-height:1">취소</button>
+      <button onclick="confirmDrawerSave()" style="flex:1;padding:11px;border:none;border-radius:6px;background:#f2525f;color:#fff;font-size:14px;font-weight:600;font-family:inherit;cursor:pointer;line-height:1">삭제 후 저장</button>
+    </div>
+  </div>
+</div>
+
 <!-- ── 설문 응답 모달 (가상 항목 클릭 시) ── -->
 <div class="modal-bg" id="modal-survey">
   <div class="modal lg">
@@ -1278,6 +1297,23 @@ const KEYWORDS_FALLBACK = [
 if(!IS_DEMO){
   // 기본은 empty state (학생 명단만, 자료/키워드/성적 없음)
   STUDENTS = STUDENTS.map(s => ({...s, files:[], keywords:[], level:null}));
+} else {
+  // demo=1 (업로드 페이지 → 입력 페이지 복귀): localStorage 플래그 기준으로 등록된 유형만 노출
+  try {
+    const surveyDone = localStorage.getItem('clipo_survey_' + CLS) === '1';
+    const activityDone = localStorage.getItem('clipo_activity_' + CLS) === '1';
+    const keywordDone = localStorage.getItem('clipo_keyword_' + CLS) === '1';
+    STUDENTS = STUDENTS.map(s => ({
+      ...s,
+      files: s.files.filter(f => {
+        if (f.kindLabel === '설문') return surveyDone;
+        if (f.kindLabel === '활동지') return activityDone;
+        return true; // 개별 등 그 외 파일은 유지
+      }),
+      keywords: keywordDone ? s.keywords : [],
+      level: (surveyDone || activityDone || keywordDone) ? s.level : null
+    }));
+  } catch(e) {}
 }
 // Step2 / Step3 상태 초기화 (학생별)
 STUDENTS.forEach(s => {
@@ -1421,9 +1457,9 @@ function renderSummary(){
     const filesText = s.files.length>0 ? `${s.files.length}건` : '<span class="col-empty">—</span>';
     const kwText = s.keywords.length>0 ? kwSummaryText(s) : '<span class="col-empty">—</span>';
     const action = (st==='none' || st==='low')
-      ? '<button class="btn-row-add" onclick="event.stopPropagation();openDetail('+s.id+')"><i data-lucide="plus" style="width:12px;height:12px"></i> 자료</button>'
-      : '<button class="btn-row" onclick="event.stopPropagation();openDetail('+s.id+')">수정</button>';
-    return `<tr class="row-clickable" onclick="openDetail(${s.id})">
+      ? '<button class="btn-row-add" onclick="event.stopPropagation();openDrawer('+s.id+')"><i data-lucide="plus" style="width:12px;height:12px"></i> 자료</button>'
+      : '<button class="btn-row" onclick="event.stopPropagation();openDrawer('+s.id+')">수정</button>';
+    return `<tr class="row-clickable" onclick="openDrawer(${s.id})">
       <td class="cell-sid">${s.sid}</td>
       <td class="cell-name">${s.name}</td>
       <td class="cell-files">${filesText}</td>
@@ -1459,14 +1495,7 @@ let drawerSubView = null; // null | 'survey'
 let drawerSurveyFileIdx = null;
 function isDrawerOpen(){ return document.getElementById('drawer-detail')?.classList.contains('show'); }
 function isModalOpenEl(){ return document.getElementById('modal-detail')?.classList.contains('show'); }
-function openDetail(id){
-  curDetailId = id;
-  const s = STUDENTS.find(x=>x.id===id);
-  modalDetailOpenedDirty = s ? !!s.dirty : false;
-  renderDetailModal();
-  $('modal-detail').classList.add('show');
-  lucide.createIcons();
-}
+// 모달 진입 함수는 더 이상 사용하지 않음 — openDrawer로 통합 (Step 3와 일관성)
 function closeDetailWithCheck(){
   closeModal('modal-detail');
   const s = STUDENTS.find(x=>x.id===curDetailId);
@@ -1526,6 +1555,9 @@ function openDrawer(id){
 }
 function closeDrawer(){
   $('drawer-detail').classList.remove('show');
+  // 저장 없이 닫으면 staging된 삭제 상태 폐기 (실수 클릭 방지)
+  const sCurrent = STUDENTS.find(x=>x.id===curDetailId);
+  if (sCurrent) sCurrent.files.forEach(f => { delete f._pendingDelete; });
   const active = document.querySelector('.step-btn.active');
   if(active && active.id === 'step-3') renderStep3();
   const s = STUDENTS.find(x=>x.id===curDetailId);
@@ -1541,9 +1573,31 @@ function closeDrawer(){
   }
 }
 function saveDrawer(){
+  const s = STUDENTS.find(x=>x.id===curDetailId);
+  if (s) {
+    const pendCnt = getPendingDeleteCount(s);
+    if (pendCnt > 0) {
+      // 삭제 예정 파일이 있으면 한 번 확인
+      document.getElementById('dr-del-count').textContent = pendCnt;
+      document.getElementById('modal-drawer-del').classList.add('show');
+      lucide.createIcons();
+      return;
+    }
+  }
+  doSaveDrawer();
+}
+function doSaveDrawer(){
+  const s = STUDENTS.find(x=>x.id===curDetailId);
+  if (s) commitPendingDeletes(s);
   commitDrawerKeywords();
+  refreshAll();
   showToast('저장되었습니다');
   closeDrawer();
+}
+function cancelDrawerDel(){ document.getElementById('modal-drawer-del').classList.remove('show'); }
+function confirmDrawerSave(){
+  document.getElementById('modal-drawer-del').classList.remove('show');
+  doSaveDrawer();
 }
 function switchDrawerTab(tab){
   drawerCurTab = tab;
@@ -1717,22 +1771,32 @@ function refreshDrawerItemCount(s){
 function renderDrawerDataPane(s){
   const filesHtml = s.files.map((f,i)=>{
     const isVirtual = f.type === 'survey';
+    const isPending = !!f._pendingDelete;
+    if (isPending) {
+      return `<div class="file-row pending-delete">
+        <i data-lucide="paperclip" style="width:16px;height:16px;color:#b3b6bd;flex-shrink:0"></i>
+        <div class="file-name" style="text-decoration:line-through;color:#b3b6bd">${f.name}</div>
+        <span class="file-pending-tag">삭제 예정</span>
+        <button class="btn-undo" onclick="event.stopPropagation();undoFilePendingDelete(${s.id},${i})">되돌리기</button>
+      </div>`;
+    }
     return `<div class="file-row${isVirtual?' clickable':''}" ${isVirtual?`onclick="showSurveyInDrawer(${s.id},${i})"`:''}>
       <i data-lucide="${isVirtual?'list-checks':'paperclip'}" style="width:16px;height:16px;color:${isVirtual?'#7c3aed':'#b3b6bd'};flex-shrink:0"></i>
       <div class="file-name">${f.name}</div>
       ${f.size ? `<div class="file-meta">${f.size}</div>` : ''}
       ${isVirtual ? '<span class="file-view-hint">보기</span>' : ''}
-      <button class="icon-btn" onclick="event.stopPropagation();removeStudentFile(${s.id},${i})"><i data-lucide="x" style="width:14px;height:14px"></i></button>
+      <button class="icon-btn" onclick="event.stopPropagation();markFilePendingDelete(${s.id},${i})"><i data-lucide="x" style="width:14px;height:14px"></i></button>
     </div>`;
   }).join('');
+  const liveCount = s.files.filter(f => !f._pendingDelete).length;
   const lev = s.level || 'none';
   $('dr-pane-data').innerHTML = `
     <div class="dp-section">
-      <div class="dp-label">활동 자료 <span class="hint">${s.files.length}/2개</span></div>
+      <div class="dp-label">활동 자료 <span class="hint">${liveCount}/2개</span></div>
       <div class="mini-dropzone" onclick="pickIndFile()">
         <i data-lucide="upload-cloud" style="width:24px;height:24px;color:#b3b6bd"></i>
         <div class="mini-dz-text">자료 추가 업로드</div>
-        <div class="mini-dz-hint">DOCX · JPG · PNG · PDF · 최대 5개 / 20MB</div>
+        <div class="mini-dz-hint">PDF 1개 · 엑셀 1개 · 최대 2개 / 20MB</div>
       </div>
       <div id="dr-files" style="margin-top:8px">${filesHtml}</div>
     </div>
@@ -1873,7 +1937,7 @@ function renderDetailModal(){
       <div class="file-name">${f.name}</div>
       ${f.size ? `<div class="file-meta">${f.size}</div>` : ''}
       ${isVirtual ? '<span class="file-view-hint">보기</span>' : ''}
-      <button class="icon-btn" onclick="event.stopPropagation();removeStudentFile(${s.id},${i});renderDetailModal()"><i data-lucide="x" style="width:14px;height:14px"></i></button>
+      <button class="icon-btn" onclick="event.stopPropagation();askRemoveStudentFile(${s.id},${i})"><i data-lucide="x" style="width:14px;height:14px"></i></button>
     </div>`;
   }).join('');
   $('md-kw-text').value = s.keywords.map(k=>k.text).join(', ');
@@ -1930,12 +1994,35 @@ function pickIndFile(){
   if(!curDetailId) return;
   const s = STUDENTS.find(x=>x.id===curDetailId);
   if(!s) return;
-  if(s.files.length>=2){ showToast('학생당 최대 2개까지 업로드 가능합니다 (PDF 1, 엑셀 1)'); return; }
-  s.files.push({name:'추가자료_'+(s.files.length+1)+'.pdf',size:'1.2MB',type:'pdf',source:'individual',kindLabel:'개별'});
+  const liveCount = s.files.filter(f => !f._pendingDelete).length;
+  if(liveCount>=2){ showToast('학생당 최대 2개까지 업로드 가능합니다 (PDF 1, 엑셀 1)'); return; }
+  s.files.push({name:'추가자료_'+(liveCount+1)+'.pdf',size:'1.2MB',type:'pdf',source:'individual',kindLabel:'개별'});
   markDirty(s, 'file');
   if(isDrawerOpen()) renderDrawerDataPane(s);
   else if(isModalOpenEl()) renderDetailModal();
   refreshAll();
+}
+
+// 파일 삭제 staging — 즉시 삭제하지 않고 표시만, 저장 시 일괄 처리
+function markFilePendingDelete(sid, idx){
+  const s = STUDENTS.find(x=>x.id===sid);
+  if(!s || !s.files[idx]) return;
+  s.files[idx]._pendingDelete = true;
+  markDirty(s, 'file');
+  if(isDrawerOpen() && curDetailId === sid) renderDrawerDataPane(s);
+  // 메인 summary table은 저장 전까지 변경 없음
+}
+function undoFilePendingDelete(sid, idx){
+  const s = STUDENTS.find(x=>x.id===sid);
+  if(!s || !s.files[idx]) return;
+  delete s.files[idx]._pendingDelete;
+  if(isDrawerOpen() && curDetailId === sid) renderDrawerDataPane(s);
+}
+function getPendingDeleteCount(s){
+  return s.files.filter(f => f._pendingDelete).length;
+}
+function commitPendingDeletes(s){
+  s.files = s.files.filter(f => !f._pendingDelete);
 }
 function removeStudentFile(sid, idx){
   const s = STUDENTS.find(x=>x.id===sid);
@@ -1945,6 +2032,23 @@ function removeStudentFile(sid, idx){
   if(isDrawerOpen() && curDetailId === sid) renderDrawerDataPane(s);
   else if(isModalOpenEl() && curDetailId === sid) renderDetailModal();
   refreshAll();
+}
+let _pendingFileDel = null;
+function askRemoveStudentFile(sid, idx){
+  const s = STUDENTS.find(x=>x.id===sid);
+  if(!s || !s.files[idx]) return;
+  _pendingFileDel = { sid, idx };
+  document.getElementById('fd-name').textContent = s.files[idx].name;
+  document.getElementById('modal-file-del').classList.add('show');
+  lucide.createIcons();
+}
+function confirmFileDel(){
+  if (!_pendingFileDel) return;
+  const { sid, idx } = _pendingFileDel;
+  _pendingFileDel = null;
+  closeModal('modal-file-del');
+  removeStudentFile(sid, idx);
+  showToast('자료를 삭제했어요');
 }
 function markDirty(s, level){
   scheduleAutoSave();
