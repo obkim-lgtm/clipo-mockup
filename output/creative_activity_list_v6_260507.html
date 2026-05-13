@@ -200,9 +200,8 @@
       <i data-lucide="notebook-pen" style="width:44px;height:44px"></i>
     </div>
     <h2 style="font-size:22px;font-weight:700;color:#222631;margin-bottom:10px;line-height:1.4">아직 등록된 활동이 없어요</h2>
-    <p style="font-size:15px;color:#6d7381;line-height:1.7;margin-bottom:28px">자율·진로·동아리 활동 카드를 만들어 기록을 시작해 보세요.<br>튜토리얼로 사용 흐름을 미리 살펴보실 수 있어요.</p>
+    <p style="font-size:15px;color:#6d7381;line-height:1.7;margin-bottom:28px">자율·진로·동아리 활동 카드를 만들어 기록을 시작해 보세요.</p>
     <div style="display:inline-flex;gap:10px;flex-wrap:wrap;justify-content:center">
-      <button onclick="openOnboardingDemo()" style="display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:11px 20px;border:1px solid #365eef;border-radius:6px;background:#fff;color:#365eef;font-size:14px;font-weight:600;font-family:inherit;cursor:pointer;line-height:1"><i data-lucide="play-circle" style="width:15px;height:15px"></i> 튜토리얼 시작</button>
       <button onclick="openAddModal()" style="display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:11px 22px;border:none;border-radius:6px;background:#365eef;color:#fff;font-size:14px;font-weight:600;font-family:inherit;cursor:pointer;line-height:1"><i data-lucide="plus" style="width:15px;height:15px"></i> 활동 추가</button>
     </div>
   </div>
@@ -269,6 +268,16 @@
       </div>
       <!-- 데모 트리거 카드 (목업 전용) -->
       <div class="card demo-card" onclick="openOnboardingDemo()" style="border:1.5px dashed #c7d6ff;background:#f6f9ff;cursor:pointer;">
+        <div style="display:flex;align-items:center;justify-content:space-between;">
+          <span class="badge-type" style="background:#1f2937;color:#fff;letter-spacing:0.5px">DEMO</span>
+          <i data-lucide="sparkles" style="width:18px;height:18px;color:#416bff"></i>
+        </div>
+        <p class="card-class" style="color:#416bff">튜토리얼 전 적용할 팝업</p>
+        <div class="divider"></div>
+        <div style="font-size:14px;color:#3b3f4c;line-height:1.55">튜토리얼 적용 전에<br><strong style="color:#222631">자료 업로드 유도하려고 띄울 화면임.</strong></div>
+      </div>
+      <!-- 데모 트리거 카드 - 튜토리얼 (목업 전용) -->
+      <div class="card demo-card" onclick="openTutorialDemo()" style="border:1.5px dashed #c7d6ff;background:#f6f9ff;cursor:pointer;">
         <div style="display:flex;align-items:center;justify-content:space-between;">
           <span class="badge-type" style="background:#1f2937;color:#fff;letter-spacing:0.5px">DEMO</span>
           <i data-lucide="play-circle" style="width:18px;height:18px;color:#416bff"></i>
@@ -399,6 +408,10 @@
   }
 
   function openOnboardingDemo() {
+    try { localStorage.removeItem('clipo_creative_onboarding_seen'); } catch(e) {}
+    location.href = 'creative_activity_input_v1_260507.html?type=' + encodeURIComponent('자율활동') + '&cls=' + encodeURIComponent('2학년 1반') + '&ob=1';
+  }
+  function openTutorialDemo() {
     try { localStorage.removeItem('clipo_creative_onboarding_seen'); } catch(e) {}
     location.href = 'creative_activity_input_v1_260507.html?type=' + encodeURIComponent('자율활동') + '&cls=' + encodeURIComponent('2학년 1반') + '&tour=1';
   }

@@ -145,8 +145,9 @@ body.nav-expanded .main-shell { margin-left: 200px; transition: margin-left .2s 
 .search-bar input:focus { border-color: #416bff; }
 .search-bar .si-icon-svg { position: absolute; left: 10px; top: 50%; transform: translateY(calc(-50% - 6px)); color: #b3b6bd; pointer-events: none; }
 .search-empty { padding: 32px 16px; text-align: center; font-size: 14px; color: #b3b6bd; }
-.modal-foot { padding: 14px 24px 20px; display: flex; align-items: center; gap: 8px; border-top: 1px solid #f1f3f5; }
-.modal-info { font-size: 13px; color: #6d7381; flex: 1; display: flex; align-items: center; gap: 4px; }
+.modal-foot { padding: 14px 24px 20px; display: flex; flex-direction: column; align-items: stretch; gap: 12px; border-top: 1px solid #f1f3f5; }
+.modal-info { font-size: 13px; color: #6d7381; display: flex; align-items: center; gap: 4px; }
+.modal-foot-acts { display: flex; align-items: center; justify-content: flex-end; gap: 8px; }
 .btn-modal-cancel { padding: 9px 18px; border: 1px solid #d9d9d9; border-radius: 6px; background: #fff; color: #3b3f4c; font-size: 14px; font-weight: 500; font-family: inherit; cursor: pointer; line-height: 1; }
 .btn-modal-confirm { padding: 9px 18px; border: none; border-radius: 6px; background: #416bff; color: #fff; font-size: 14px; font-weight: 600; font-family: inherit; cursor: pointer; line-height: 1; }
 .btn-modal-confirm:disabled { background: #dde1e8; color: #b3b6bd; cursor: not-allowed; }
@@ -250,7 +251,7 @@ footer a { color: #6d7381; text-decoration: none; margin: 0 8px; }
             <i data-lucide="user-check" style="width:14px;height:14px"></i> 학생 목록
           </button>
         </div>
-        <p class="right-sub">학생 목록에서 학생을 선택하여 동아리에 배정해 주세요.</p>
+        <p class="right-sub">학생 목록에서 학생을 선택하여 동아리에 등록해 주세요.</p>
         <div id="selectContent">
           <div class="empty-area" id="selectEmpty">
             <div class="empty-illust"><i data-lucide="users" style="width:36px;height:36px"></i></div>
@@ -319,10 +320,12 @@ footer a { color: #6d7381; text-decoration: none; margin: 0 8px; }
     <div class="modal-foot">
       <span class="modal-info">
         <i data-lucide="info" style="width:13px;height:13px"></i>
-        학생 명단은 학교 설정에서 수정 가능합니다.
+        학생 명단은 <a href="#" target="_blank" style="color:#416bff;text-decoration:none;font-weight:500">학교설정 &gt; 학생 ↗</a>에서 수정할 수 있어요.
       </span>
-      <button class="btn-modal-cancel" onclick="closeStudentModal()">취소</button>
-      <button class="btn-modal-confirm" id="btnAssign" onclick="confirmAssign()" disabled>배정 (0명)</button>
+      <div class="modal-foot-acts">
+        <button class="btn-modal-cancel" onclick="closeStudentModal()">취소</button>
+        <button class="btn-modal-confirm" id="btnAssign" onclick="confirmAssign()" disabled>등록 (0명)</button>
+      </div>
     </div>
   </div>
 </div>
@@ -483,7 +486,7 @@ function toggleStudent(cid, sid) {
 function updateAssignBtn() {
   const total = Object.values(pickerSel).reduce((s, set) => s + set.size, 0);
   const btn = document.getElementById('btnAssign');
-  btn.textContent = `배정 (${total}명)`;
+  btn.textContent = `등록 (${total}명)`;
   btn.disabled = total === 0;
 }
 
@@ -494,7 +497,7 @@ function confirmAssign() {
   renderSelectedGroups();
   refreshSaveBtn();
   const total = Object.values(assigned).reduce((s, set) => s + set.size, 0);
-  showToast(`${total}명을 배정했어요`);
+  showToast(`${total}명을 등록했어요`);
 }
 
 function renderSelectedGroups() {
