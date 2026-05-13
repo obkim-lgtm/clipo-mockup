@@ -608,6 +608,14 @@ body.nav-expanded .sticky-cta{left:200px;transition:left .2s ease}
 .s2-group-toggle{margin-left:auto;background:none;border:none;color:#6d7381;cursor:pointer;font-size:13px;font-family:inherit;display:inline-flex;align-items:center;gap:3px;padding:4px 8px;border-radius:6px;line-height:1}
 .s2-group-toggle:hover{background:#f1f3f5;color:#3b3f4c}
 .s2-kw-box{margin:0 4px 8px;padding:14px 18px;background:#fff;border:1px solid #e5e7eb;border-radius:12px;font-size:14px;color:#222631;line-height:1.6}
+.s2-summary{margin:0 4px 12px;padding:18px 20px;background:linear-gradient(135deg,#f4f8ff 0%,#fafbff 100%);border:1px solid #d6e3ff;border-radius:12px;display:flex;flex-direction:column;gap:12px}
+.s2-summary-hd{display:flex;align-items:center;gap:6px}
+.s2-summary-badge{display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:600;color:#416bff;background:#fff;border:1px solid #c7d6ff;padding:3px 10px;border-radius:20px;line-height:1.4}
+.s2-summary-title{font-size:14px;font-weight:600;color:#222631}
+.s2-summary-narr{font-size:14px;line-height:1.7;color:#222631}
+.s2-summary-hl{display:flex;flex-direction:column;gap:6px;margin:0;padding:0;list-style:none}
+.s2-summary-hl li{display:flex;align-items:flex-start;gap:8px;font-size:14px;line-height:1.5;color:#3b3f4c}
+.s2-summary-hl li::before{content:'';flex-shrink:0;width:5px;height:5px;border-radius:50%;background:#416bff;margin-top:8px}
 
 .s2-item.candidate{background:#fafbfc;border-color:#f1f3f5}
 .s2-item.candidate .s2-item-content{color:#6d7381}
@@ -1403,6 +1411,16 @@ const STEP2_DEFAULT_ITEMS = [
   }
 ];
 
+// AI 학생 특성 요약 (목업: 모든 학생 동일 데이터로 노출)
+const STEP2_DEFAULT_SUMMARY = {
+  narrative: '학생이 주도적으로 화장품 유효 성분 농도와 보습 효과의 상관관계를 탐구하고, 정량적인 데이터 분석을 통해 결론을 도출하는 과정을 보여줍니다. 진로와 연계된 학술적 의미를 고찰하고 향후 발전 방향을 제시하는 능력이 돋보입니다.',
+  highlights: [
+    '히알루론산 농도에 따른 수분 지속률 정량 분석',
+    "보습 효과의 '한계효과' 및 복합 성분 '시너지 효과' 실증",
+    '데이터 기반 결론 도출 및 화학적 원리 이해 심화',
+    '피부 안전성과 효능을 고려한 화장품 연구원으로의 진로 구체화'
+  ]
+};
 // 학생별 데이터: 맥이 준 5개를 모든 학생에 동일하게 사용 (목업)
 const STEP2_DATA = {};
 
@@ -2624,8 +2642,20 @@ function renderS2Done(s){
   const recHtml = recItems.map(it=>renderS2ItemCard(s.id, it)).join('');
   const candHtml = candItems.map(it=>renderS2ItemCard(s.id, it)).join('');
   const customHtml = s2.customs.map((c,i)=>renderS2CustomCard(s.id, c, i)).join('');
+  const summary = data.summary || STEP2_DEFAULT_SUMMARY;
+  const summaryHtml = (summary && (summary.narrative || (summary.highlights||[]).length)) ? `
+    <div class="s2-summary">
+      <div class="s2-summary-hd">
+        <span class="s2-summary-badge"><i data-lucide="sparkles" style="width:12px;height:12px"></i> AI 요약</span>
+        <span class="s2-summary-title">학생 특성 한눈에 보기</span>
+      </div>
+      ${summary.narrative ? `<div class="s2-summary-narr">${summary.narrative}</div>` : ''}
+      ${(summary.highlights||[]).length ? `<ul class="s2-summary-hl">${summary.highlights.map(h=>`<li>${h}</li>`).join('')}</ul>` : ''}
+    </div>
+  ` : '';
 
   return `
+    ${summaryHtml}
     ${s.keywords.length ? `
       <div class="s2-group-hd">
         <span class="s2-group-title">특성 키워드</span>
