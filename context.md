@@ -559,3 +559,4 @@
 ## 작업 이력
 - **2026-04-29** — 수업 만들기 모달 v2 + 명단 모델 변경 (학적반은 학급 참조, 이동반은 현행 유지). `output/class_create_v1_260429.html` 신규.
 - **2026-04-29** — UI 안티 패턴 섹션 신설 (button-in-button 금지). Radio Card로 묶었다가 안내 박스의 "학교설정" 링크가 라디오 wrapper에 갇히는 사고를 계기로 추가.
+- **2026-05-13** — 파비콘 svg → png 교체 (`clipo_favicon.png`). 클리포 목업인지 헷갈린다는 피드백 반영. 27개 mockup html의 `<link rel="icon">` 일괄 갱신. CLAUDE.md 파비콘 지침도 png로 갱신.
