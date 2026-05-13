@@ -382,6 +382,7 @@ body.nav-expanded .sticky-cta{left:200px;transition:left .2s ease}
 .s3-text{font-size:13px;color:#222631;line-height:1.65;flex:1;overflow-y:auto;max-height:240px;white-space:pre-wrap}
 .s3-text.empty{color:#b3b6bd}
 .s3-textarea{width:100%;border:none;outline:none;resize:none;font-family:inherit;font-size:13px;line-height:1.65;color:#222631;flex:1;min-height:160px;background:transparent;padding:0}
+.s3-textarea::placeholder{color:#b3b6bd}
 .s3-cell-foot{display:flex;align-items:center;justify-content:space-between;gap:6px;padding-top:10px;margin-top:10px;border-top:1px solid #f1f3f5;flex-shrink:0}
 .s3-byte{font-size:12px;color:#6d7381;font-variant-numeric:tabular-nums}
 .s3-byte.over{color:#f2525f;font-weight:600}
@@ -487,7 +488,7 @@ body.nav-expanded .sticky-cta{left:200px;transition:left .2s ease}
 .stu-pick-col.gen{width:80px}
 
 /* 수정 방향 프롬프트 */
-.s3-prompt-textarea{width:100%;min-height:72px;max-height:160px;padding:10px 12px;border:1px solid #d9d9d9;border-radius:8px;font-family:inherit;font-size:14px;color:#222631;line-height:1.55;resize:vertical;outline:none;box-sizing:border-box}
+.s3-prompt-textarea{width:100%;min-height:72px;max-height:240px;padding:10px 12px;border:1px solid #d9d9d9;border-radius:8px;font-family:inherit;font-size:14px;color:#222631;line-height:1.55;resize:none;outline:none;box-sizing:border-box;overflow-y:auto}
 .s3-prompt-textarea:focus{border-color:#416bff}
 .s3-prompt-textarea::placeholder{color:#b3b6bd}
 .stu-pick-row.disabled{opacity:.55;cursor:not-allowed}
@@ -836,7 +837,7 @@ body.nav-expanded .sticky-cta{left:200px;transition:left .2s ease}
       </div>
       <div class="dp-section">
         <div class="dp-label">활동 내용 <span class="hint">활동 자료에서 자동 추출되지만 직접 추가도 가능해요</span></div>
-        <textarea class="kw-textarea" id="md-kw-text" maxlength="1000" oninput="updateKwCount();autoResizeKw()" onblur="commitKeywords()" placeholder="활동 내용을 콤마(,)로 구분해 자유롭게 입력하세요"></textarea>
+        <textarea class="kw-textarea" id="md-kw-text" maxlength="1000" oninput="updateKwCount();autoResizeKw()" onblur="commitKeywords()" placeholder="예) 협력적, 적극적, 발표 잘함"></textarea>
         <div class="kw-foot">
           <span class="kw-hint"></span>
           <span class="kw-count" id="md-kw-count">0 / 1000</span>
@@ -1055,7 +1056,7 @@ body.nav-expanded .sticky-cta{left:200px;transition:left .2s ease}
   <div class="modal">
     <div class="modal-hd">
       <div>
-        <div class="modal-title">전체 AI 기록 생성</div>
+        <div class="modal-title" id="s3-length-title">전체 AI 기록 생성</div>
       </div>
       <button class="modal-x" onclick="closeModal('modal-length')"><i data-lucide="x" style="width:18px;height:18px"></i></button>
     </div>
@@ -1088,14 +1089,15 @@ body.nav-expanded .sticky-cta{left:200px;transition:left .2s ease}
       <label class="length-opt"><input type="radio" name="s3-length" value="500-600"><span>500~600자 <em>(1,500~1,800 Byte)</em></span></label>
 
       <div id="s3-prompt-section" style="display:none">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-top:20px;margin-bottom:8px">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-top:20px;margin-bottom:8px;gap:8px">
           <span style="font-size:14px;font-weight:600;color:#3b3f4c">요청사항 <span style="font-weight:500;color:#6d7381">(선택)</span></span>
-          <span id="s3-prompt-count" style="font-size:12px;color:#b3b6bd">0 / 200</span>
+          <span id="s3-prompt-count" style="font-size:12px;color:#b3b6bd;font-variant-numeric:tabular-nums">0 / 200</span>
         </div>
         <div id="s3-regen-hint" style="font-size:13px;color:#6d7381;margin-bottom:8px;line-height:1.55">
           이전 결과에서 마음에 안 드는 부분이나 바꾸고 싶은 방향을 적어주시면 그에 맞춰 다시 생성해드려요.
         </div>
-        <textarea id="s3-prompt-input" class="s3-prompt-textarea" placeholder="예) 협력적 태도와 리더십을 더 강조해 주세요." maxlength="200" oninput="updateS3PromptCount()"></textarea>
+        <textarea id="s3-prompt-input" class="s3-prompt-textarea" placeholder="예) 협력적 태도와 리더십을 더 강조해 주세요." maxlength="200" oninput="updateS3PromptCount();autoResizeS3Prompt(this)"></textarea>
+        <div id="s3-prompt-limit-msg" style="font-size:12px;color:#f2525f;font-weight:500;margin-top:6px;display:none">최대 200자까지 입력할 수 있어요</div>
       </div>
     </div>
     <div class="modal-ft">
@@ -1626,9 +1628,16 @@ function confirmDrawerSave(){
   doSaveDrawer();
 }
 function switchDrawerTab(tab){
+  // 다른 탭으로 이동 전 키워드 textarea 변경 사항 commit (blur 누락 방지)
+  if(typeof commitDrawerKeywords === 'function') commitDrawerKeywords();
   drawerCurTab = tab;
   document.querySelectorAll('.dr-tab').forEach(t=>t.classList.toggle('active', t.dataset.tab===tab));
   document.querySelectorAll('.dr-tab-pane').forEach(p=>p.style.display = (p.dataset.tab===tab?'':'none'));
+  // items 탭 진입 시 최신 데이터 기준으로 재렌더 (자료/내용 추가 직후에도 즉시 반영)
+  if(tab === 'items'){
+    const s = STUDENTS.find(x=>x.id===curDetailId);
+    if(s) renderDrawerItemsPane(s);
+  }
   lucide.createIcons();
 }
 function renderDrawer(){
@@ -1685,7 +1694,6 @@ function renderDrawerSurveyView(s){
     </button>
     <div class="sv-meta">
       <div class="sv-meta-title">${f?.name || '설문 응답'}</div>
-      <div class="sv-meta-sub">학기말 자율활동 설문 · 2026-04-15 응답</div>
     </div>
     <div class="sv-list">
       ${SURVEY_MOCK.map((qa,i)=>`
@@ -1716,7 +1724,10 @@ function backFromSurvey(){
 function renderDrawerBanner(s){
   const banner = $('dr-banner');
   if(!banner) return;
-  if(!s || !s._dirtyLevel || !(s.s3 && s.s3.aiText)){
+  // banner는 (a) AI 기록이 이미 생성된 학생, 또는 (b) 2단계 분석이 완료된 학생에게만 노출
+  const analyzed = s && s.s2 && s.s2.status === 'done';
+  const hasRecord = s && s.s3 && s.s3.aiText;
+  if(!s || !s._dirtyLevel || (!hasRecord && !analyzed)){
     banner.style.display = 'none';
     return;
   }
@@ -1754,10 +1765,12 @@ function cascadeFromDrawer(){
   s.dirty = false;
   if(level === 'items'){
     // items 레벨: 저장 후 기록 생성 (분량 모달). 드로어는 닫고 length modal만 노출
+    // 최초 생성(aiText 없음)이면 'one'(분량만), 이미 있으면 'regen'(분량+요청사항)
     showToast('변경 사항을 저장했어요');
     renderDrawerBanner(s);
     closeDrawer();
-    openLengthModal({type:'regen', sid:s.id});
+    const isFirstGen = !(s.s3 && s.s3.aiText);
+    openLengthModal({type: isFirstGen ? 'one' : 'regen', sid:s.id});
   } else {
     // file 또는 kw: 저장 + 추천 항목 다시 분석 + 항목 탭 전환
     showToast('변경 사항을 저장했어요. 추천 항목을 다시 분석할게요');
@@ -1832,7 +1845,7 @@ function renderDrawerDataPane(s){
     </div>
     <div class="dp-section">
       <div class="dp-label">활동 내용 <span class="hint">${liveCount > 0 ? '<span style="color:#15803d;font-weight:500">활동 자료가 있어 AI가 다음 단계에서 자동 추출해요 — 직접 입력은 선택사항</span>' : '<span style="color:#b45309;font-weight:500">활동 자료가 없어요. 직접 입력한 활동 내용만 기록 생성에 활용돼요</span>'}</span></div>
-      <textarea class="kw-textarea" id="dr-kw-text" maxlength="1000" oninput="updateDrKwCount();autoResizeDrKw()" onblur="commitDrawerKeywords()" placeholder="${liveCount > 0 ? '추가로 메모할 내용이 있을 때만 입력 (콤마로 구분)' : '활동 내용을 콤마(,)로 구분해 자유롭게 입력하세요'}">${s.keywords.map(k=>k.text).join(', ')}</textarea>
+      <textarea class="kw-textarea" id="dr-kw-text" maxlength="1000" oninput="updateDrKwCount();autoResizeDrKw()" onblur="commitDrawerKeywords()" placeholder="${liveCount > 0 ? '추가로 메모할 내용이 있을 때만 입력 (콤마로 구분)' : '예) 협력적, 적극적, 발표 잘함'}">${s.keywords.map(k=>k.text).join(', ')}</textarea>
       <div class="kw-foot">
         <span class="kw-hint"></span>
         <span class="kw-count" id="dr-kw-count">0 / 1000</span>
@@ -1897,12 +1910,19 @@ function renderDrawerItemsPane(s){
     return;
   }
   if(s2.status === 'idle'){
+    const hasFiles = s.files.filter(f => !f._pendingDelete).length > 0;
     $('dr-pane-items').innerHTML = `
       <div class="s2-state-card">
         <div class="s2-state-icon"><i data-lucide="sparkles" style="width:24px;height:24px"></i></div>
         <div class="s2-state-title">아직 AI 분석 전이에요</div>
-        <div class="s2-state-desc">자료를 분석해 추천 항목을 추출해드릴게요.</div>
-        <div><button class="btn-secondary-lg" onclick="startAnalyzeFromDrawer(${s.id})"><i data-lucide="sparkles" style="width:16px;height:16px"></i> 분석 시작</button></div>
+        <div class="s2-state-desc">${hasFiles ? '자료를 분석해 추천 항목을 추출해 드릴게요.' : '활동 내용만 있어요. 다음 단계에서 활동 내용 기반으로 기록 초안을 생성합니다.'}</div>
+        ${hasFiles ? `
+          <div style="display:flex;align-items:center;justify-content:center;gap:6px;padding:10px 14px;background:#f4f8ff;border:1px solid #c7d6ff;border-radius:8px;font-size:13px;color:#3151c4;line-height:1.5;margin:8px auto 12px;max-width:320px">
+            <i data-lucide="info" style="width:14px;height:14px;flex-shrink:0"></i>
+            <span>분석 실행 시 <strong>1 크레딧</strong>이 차감돼요</span>
+          </div>
+          <div><button class="btn-secondary-lg" onclick="startAnalyzeFromDrawer(${s.id})"><i data-lucide="sparkles" style="width:16px;height:16px"></i> 분석 시작</button></div>
+        ` : ''}
       </div>`;
     return;
   }
@@ -2272,12 +2292,12 @@ function renderS3Row(s){
   } else {
     const hasData = s.files.length>0 || s.keywords.length>0;
     aiCell = `<div class="s3-ai-box">
-      <div class="s3-text empty">${hasData ? '기록 생성 버튼을 눌러주세요.' : '활동 내용이나 자료를 입력해주시면 AI 기록 생성이 됩니다.'}</div>
+      <div class="s3-text empty">${hasData ? '기록 생성 버튼을 눌러 AI 기록 초안을 확인해 보세요.' : '자료·활동 내용을 등록하면 AI가 기록 초안을 만들어 드려요.'}</div>
       <div class="s3-cell-foot">
         <span class="s3-byte">0 Byte</span>
         ${hasData
           ? `<button class="s3-genrow-btn" onclick="generateOne(${s.id})"><i data-lucide="sparkles" style="width:12px;height:12px"></i> 기록 생성</button>`
-          : `<button class="s3-mini-btn" onclick="goStep(1)"><i data-lucide="edit-3" style="width:12px;height:12px"></i> 입력</button>`}
+          : `<button class="s3-mini-btn" onclick="openDrawer(${s.id})"><i data-lucide="edit-3" style="width:12px;height:12px"></i> 입력</button>`}
       </div>
     </div>`;
   }
@@ -2315,6 +2335,8 @@ function openLengthModal(scope){
   const notice = document.getElementById('s3-credit-notice');
   const submitBtn = document.getElementById('s3-confirm-btn');
   const warn = document.getElementById('s3-analyze-warning');
+  const titleEl = document.getElementById('s3-length-title');
+  if (titleEl) titleEl.textContent = scope.type === 'all' ? '전체 AI 기록 생성' : 'AI 기록 생성';
   if (scope.type === 'all') {
     section.style.display = 'block';
     if (notice) notice.style.display = 'flex';
@@ -2328,7 +2350,7 @@ function openLengthModal(scope){
   }
   // 프롬프트 초기화
   const promptEl = document.getElementById('s3-prompt-input');
-  if (promptEl) { promptEl.value = ''; updateS3PromptCount(); }
+  if (promptEl) { promptEl.value = ''; updateS3PromptCount(); autoResizeS3Prompt(promptEl); }
   // 요청사항 영역: 개별 재생성에서만 노출
   const promptSection = document.getElementById('s3-prompt-section');
   const showPrompt = scope.type === 'regen';
@@ -2421,8 +2443,18 @@ function toggleAllStuPick(checked){
 function updateS3PromptCount(){
   const el = document.getElementById('s3-prompt-input');
   const counter = document.getElementById('s3-prompt-count');
+  const msg = document.getElementById('s3-prompt-limit-msg');
   if (!el || !counter) return;
-  counter.textContent = `${el.value.length} / 200`;
+  const len = el.value.length;
+  counter.textContent = `${len} / 200`;
+  counter.style.color = len >= 200 ? '#f2525f' : '#b3b6bd';
+  counter.style.fontWeight = len >= 200 ? '600' : '400';
+  if (msg) msg.style.display = len >= 200 ? 'block' : 'none';
+}
+function autoResizeS3Prompt(ta){
+  if(!ta) return;
+  ta.style.height = 'auto';
+  ta.style.height = Math.min(ta.scrollHeight, 240) + 'px';
 }
 
 function openStep2InNewTab(e){
