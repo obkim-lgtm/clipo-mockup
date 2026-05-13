@@ -503,6 +503,15 @@
     const newName = document.getElementById('dongInput').value.trim();
     if (!newName) return;
     const oldName = editTargetCard.querySelector('.card-class').textContent.trim();
+    // 자기 자신 제외 동아리명 중복 검증
+    const otherDongNames = Array.from(document.querySelectorAll('.badge-type.b-dong'))
+      .map(b => b.closest('.card'))
+      .filter(card => card && card !== editTargetCard)
+      .map(card => card.querySelector('.card-class')?.textContent.trim());
+    if (otherDongNames.includes(newName)) {
+      showToast(`'${newName}' 동아리가 이미 등록되어 있어요`);
+      return;
+    }
     // localStorage 동아리명 키 이전
     const store = getDongStore();
     if (store[oldName]) {
@@ -629,6 +638,19 @@
     const title = currentType === 'dong'
       ? document.getElementById('dongInput').value.trim()
       : `${document.getElementById('gradeSelect').value}학년 ${document.getElementById('banSelect').value}`;
+    // 중복 검증 (한 계정 내 동일 동아리명 / 동일 학급+유형 1개)
+    const existingNames = Array.from(document.querySelectorAll(`.badge-type.${typeClass}`)).map(b => {
+      const card = b.closest('.card');
+      const t = card ? card.querySelector('.card-class')?.textContent.trim() : '';
+      return t;
+    });
+    if (existingNames.includes(title)) {
+      const msg = currentType === 'dong'
+        ? `'${title}' 동아리가 이미 등록되어 있어요`
+        : `'${title}' ${typeLabel}이 이미 등록되어 있어요`;
+      showToast(msg);
+      return;
+    }
     const today = new Date();
     const card = document.createElement('div');
     card.className = 'card';
