@@ -2353,7 +2353,7 @@ function dataStatusOf(s){
 function dataStatusTag(s){
   const st = dataStatusOf(s);
   if (st === 'analyzed') return '<span class="stu-pick-tag analyzed"><span class="dot"></span>분석됨</span>';
-  if (st === 'needs-analysis') return '<span class="stu-pick-tag warn"><span class="dot"></span>분석필요</span>';
+  if (st === 'needs-analysis') return '<span class="stu-pick-tag warn"><span class="dot"></span>분석 필요</span>';
   return '<span class="stu-pick-tag muted"><span class="dot"></span>자료없음</span>';
 }
 
@@ -2372,16 +2372,16 @@ function populateStuPick(){
     <span class="stu-pick-header-col sid">학번</span>
     <span class="stu-pick-header-col name">이름</span>
     <span class="stu-pick-header-col data">자료</span>
-    <span class="stu-pick-header-col gen">생성</span>
+    <span class="stu-pick-header-col gen">AI 생성</span>
   </div>`;
   const rows = sorted.map(s => {
     const s3 = getS3(s);
     const canGen = s3CanGenerate(s);
     const dataTag = dataStatusTag(s);
     let genTag = '';
-    if (!canGen) genTag = '<span class="stu-pick-tag disabled">생성 불가</span>';
-    else if (s3.aiText) genTag = s.dirty ? '<span class="stu-pick-tag">변경됨</span>' : '<span class="stu-pick-tag exists">생성됨</span>';
-    else genTag = '<span class="stu-pick-tag-blank">—</span>';
+    if (!canGen) genTag = '<span class="stu-pick-tag disabled"><span class="dot"></span>생성불가</span>';
+    else if (s3.aiText) genTag = s.dirty ? '<span class="stu-pick-tag warn"><span class="dot"></span>변경됨</span>' : '<span class="stu-pick-tag exists"><span class="dot"></span>생성됨</span>';
+    else genTag = '<span class="stu-pick-tag muted"><span class="dot"></span>생성 전</span>';
     const disabledCls = canGen ? '' : 'disabled';
     return `<label class="stu-pick-row ${disabledCls}" ${canGen ? '' : 'title="자료나 활동 내용이 없어 생성할 수 없습니다"'}>
       <input type="checkbox" class="stu-pick-cb" value="${s.id}" data-unanalyzed="${s3IsUnanalyzed(s)?'1':'0'}" ${canGen ? 'checked' : 'disabled'} onchange="updateStuPickCount()">
