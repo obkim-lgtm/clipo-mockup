@@ -1013,7 +1013,7 @@ body.nav-expanded .sticky-cta{left:200px;transition:left .2s ease}
     </div>
     <div class="drawer-tabs">
       <button class="dr-tab active" data-tab="data" onclick="switchDrawerTab('data')">학생 자료 입력</button>
-      <button class="dr-tab" data-tab="items" onclick="switchDrawerTab('items')">기록 항목 선택 <span class="dr-tab-cnt" id="dr-items-cnt">0/0</span></button>
+      <button class="dr-tab" data-tab="items" onclick="switchDrawerTab('items')">AI 자료 분석 <span class="dr-tab-cnt" id="dr-items-cnt">0/0</span></button>
     </div>
     <div class="drawer-banner" id="dr-banner" style="display:none">
       <div class="dr-banner-icon"><i data-lucide="alert-circle" style="width:18px;height:18px"></i></div>
@@ -1039,7 +1039,7 @@ body.nav-expanded .sticky-cta{left:200px;transition:left .2s ease}
   <div class="modal">
     <div class="modal-hd">
       <div>
-        <div class="modal-title"><span id="dc-name">학생</span> 자료가 변경되었어요</div>
+        <div class="modal-title">자료가 변경되었어요</div>
         <div class="modal-sub">변경된 자료를 반영해 AI 기록을 다시 생성할까요? 지금 다시 생성하지 않으면 기존 결과가 유지됩니다.</div>
       </div>
       <button class="modal-x" onclick="dirtyConfirmLater()"><i data-lucide="x" style="width:18px;height:18px"></i></button>
@@ -1539,7 +1539,9 @@ function dirtyConfirmRegen(){
   if(pendingDirtyId){
     const s = STUDENTS.find(x=>x.id===pendingDirtyId);
     if(s) s._editChanged = false;
-    openLengthModal({type:'regen', sid:pendingDirtyId});
+    // 자료/내용 변경된 경우 'one'(분량만), 그 외 'regen'(분량+요청사항)
+    const dataChanged = s && !!s._dataChangedSinceGen;
+    openLengthModal({type: dataChanged ? 'one' : 'regen', sid:pendingDirtyId});
     pendingDirtyId = null;
   }
 }
@@ -1592,8 +1594,8 @@ function closeDrawer(){
   if(s && s._editChanged && s.s3 && s.s3.aiText){
     pendingDirtyId = s.id;
     setTimeout(()=>{
-      $('dc-name').textContent = s.name;
-      $('modal-dirty-confirm').classList.add('show');
+      const modal = $('modal-dirty-confirm');
+      if(modal) modal.classList.add('show');
       lucide.createIcons();
     }, 200);
   } else if(s) {
@@ -1765,42 +1767,34 @@ function cascadeFromDrawer(){
   s.dirty = false;
   if(level === 'items'){
     // items 레벨: 저장 후 기록 생성 (분량 모달). 드로어는 닫고 length modal만 노출
-    // 최초 생성(aiText 없음)이면 'one'(분량만), 이미 있으면 'regen'(분량+요청사항)
+    // (1) 최초 생성(aiText 없음) → 'one' (분량만)
+    // (2) 자료/내용 변경 후 재분석된 케이스 → 'one' (사실상 새 생성)
+    // (3) 순수하게 항목 체크만 바꾼 재생성 → 'regen' (요청사항 포함)
     showToast('변경 사항을 저장했어요');
     renderDrawerBanner(s);
     closeDrawer();
-    const isFirstGen = !(s.s3 && s.s3.aiText);
-    openLengthModal({type: isFirstGen ? 'one' : 'regen', sid:s.id});
+    const noPriorRecord = !(s.s3 && s.s3.aiText);
+    const dataChanged = !!s._dataChangedSinceGen;
+    const useOne = noPriorRecord || dataChanged;
+    openLengthModal({type: useOne ? 'one' : 'regen', sid:s.id});
   } else {
-    // file 또는 kw: 저장 + 추천 항목 다시 분석 + 항목 탭 전환
-    showToast('변경 사항을 저장했어요. 추천 항목을 다시 분석할게요');
+    // file 또는 kw: 저장 + AI 자료 분석 탭으로 이동 (분석은 사용자가 직접 실행)
+    // 자료가 변경됐다는 플래그 → 분석 완료 후 banner에서 [기록 생성] 누를 때 'one'(분량만)으로 처리
+    s._dataChangedSinceGen = true;
+    showToast('변경 사항을 저장했어요. 분석을 다시 실행해 주세요');
     renderDrawerBanner(s);
-    // 추천 항목 탭으로 자동 전환
+    // AI 자료 분석 탭으로 전환
     drawerCurTab = 'items';
     document.querySelectorAll('.dr-tab').forEach(t=>t.classList.toggle('active', t.dataset.tab===drawerCurTab));
     document.querySelectorAll('.dr-tab-pane').forEach(p=>p.style.display = (p.dataset.tab===drawerCurTab?'':'none'));
-    // step 2 재분석
+    // 분석 결과 리셋 → idle 상태로 (사용자가 직접 [분석 시작] 클릭, 크레딧 차감 확인)
     const s2 = getS2(s);
-    s2.status = 'analyzing';
+    s2.status = 'idle';
+    s2.selectedIds = new Set();
     renderDrawerItemsPane(s);
+    refreshDrawerItemCount(s);
+    refreshS2Cta();
     lucide.createIcons();
-    setTimeout(()=>{
-      s2.status = 'done';
-      const data = STEP2_DATA[s.sid] || {items: STEP2_DEFAULT_ITEMS};
-      s2.selectedIds = new Set(data.items.filter(it=>it.source_origin==='stage1_recommended').map(it=>it.id));
-      // 재분석 완료 → step 3 기록은 여전히 stale → items 레벨 dirty 부여
-      if(s.s3 && s.s3.aiText){
-        s._dirtyLevel = 'items';
-        s._editChanged = true;
-      }
-      if(isDrawerOpen() && curDetailId === s.id){
-        renderDrawerItemsPane(s);
-        refreshDrawerItemCount(s);
-        renderDrawerBanner(s);
-      }
-      refreshS2Cta();
-      lucide.createIcons();
-    }, 1800);
   }
 }
 function refreshDrawerItemCount(s){
@@ -1833,6 +1827,8 @@ function renderDrawerDataPane(s){
   }).join('');
   const liveCount = s.files.filter(f => !f._pendingDelete).length;
   const lev = s.level || 'none';
+  const s2 = getS2(s);
+  const showAnalyzePrompt = liveCount > 0 && s2.status === 'idle';
   $('dr-pane-data').innerHTML = `
     <div class="dp-section">
       <div class="dp-label">활동 자료 <span class="hint">${liveCount}/2개</span></div>
@@ -1842,6 +1838,15 @@ function renderDrawerDataPane(s){
         <div class="mini-dz-hint">PDF 1개 · 엑셀 1개 · 최대 2개 / 20MB</div>
       </div>
       <div id="dr-files" style="margin-top:8px">${filesHtml}</div>
+      ${showAnalyzePrompt ? `
+        <div style="display:flex;align-items:center;gap:10px;padding:12px 14px;background:#f4f8ff;border:1px solid #c7d6ff;border-radius:8px;margin-top:10px">
+          <i data-lucide="sparkles" style="width:16px;height:16px;color:#416bff;flex-shrink:0"></i>
+          <div style="flex:1;font-size:13px;color:#3151c4;line-height:1.5">
+            자료를 분석하면 AI가 기록에 들어갈 추천 항목을 추출해 드려요. <span style="color:#6d7381">(1 크레딧 차감)</span>
+          </div>
+          <button class="btn-ai-outline" onclick="startAnalyzeFromDrawer(${s.id})" style="flex-shrink:0"><i data-lucide="sparkles" style="width:14px;height:14px"></i> 분석 실행</button>
+        </div>
+      ` : ''}
     </div>
     <div class="dp-section">
       <div class="dp-label">활동 내용 <span class="hint">${liveCount > 0 ? '<span style="color:#15803d;font-weight:500">활동 자료가 있어 AI가 다음 단계에서 자동 추출해요 — 직접 입력은 선택사항</span>' : '<span style="color:#b45309;font-weight:500">활동 자료가 없어요. 직접 입력한 활동 내용만 기록 생성에 활용돼요</span>'}</span></div>
@@ -2107,6 +2112,8 @@ function markDirty(s, level){
   if(!((s.s2 && s.s2.status === 'done') || (s.s3 && s.s3.aiText))) return;
   s._editChanged = true;
   if(!level) return;
+  // 자료·내용이 바뀌면 'fresh-gen' 모드로 표시 — 이후 기록 생성 시 요청사항 영역 숨김
+  if(level === 'file' || level === 'kw') s._dataChangedSinceGen = true;
   const rank = {file:3, kw:2, items:1};
   if(!s._dirtyLevel || rank[level] > rank[s._dirtyLevel]){
     s._dirtyLevel = level;
@@ -2500,6 +2507,7 @@ function confirmLength(){
       s3.generatedAt = Date.now();
       s.dirty = false;
       s._dirtyLevel = null;
+      delete s._dataChangedSinceGen;
       if(!s3.editText) s3.editText = s3.aiText;
       renderStep3();
       showToast((scope.type === 'regen' ? '기록을 재생성했어요' : '기록을 생성했어요') + promptSuffix);
@@ -2840,9 +2848,20 @@ function startAnalyze(sid){
     // 추천 항목 자동 체크
     const data = STEP2_DATA[s.sid] || {items: STEP2_DEFAULT_ITEMS.slice(0,5)};
     s2.selectedIds = new Set(data.items.filter(it=>it.source_origin==='stage1_recommended').map(it=>it.id));
+    // 분석 완료 후 기존 AI 기록이 있다면 items 레벨 dirty 부여 → "재생성 필요" banner
+    if(s.s3 && s.s3.aiText){
+      s._dirtyLevel = 'items';
+      s._editChanged = true;
+    }
     if(s.id === s2CurStudentId){ renderS2Main(); }
     renderS2Sidebar();
     refreshS2Cta();
+    // 드로어 열려 있으면 banner / items 갱신
+    if(typeof isDrawerOpen === 'function' && isDrawerOpen() && curDetailId === s.id){
+      if(typeof renderDrawerBanner === 'function') renderDrawerBanner(s);
+      if(typeof renderDrawerItemsPane === 'function') renderDrawerItemsPane(s);
+      if(typeof refreshDrawerItemCount === 'function') refreshDrawerItemCount(s);
+    }
     lucide.createIcons();
   }, 1800);
 }
