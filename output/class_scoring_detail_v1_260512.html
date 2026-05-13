@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>1학년 1반 채점 현황 | CLIPO</title>
-<link rel="icon" type="image/svg+xml" href="clipo_favicon.svg">
+<link rel="icon" type="image/png" href="clipo_favicon.png">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard-gov.min.css">
 <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
 <style>
@@ -91,7 +91,8 @@ body{background:#f6f7f9;color:#222631;min-height:100vh}
 .col-ai-score{width:90px;color:#6d7381}
 .col-final{width:100px;font-weight:600;color:#222631}
 .col-status{width:110px}
-.col-action{width:120px}
+.col-action{width:200px}
+.col-action-group{display:inline-flex;gap:10px;align-items:center;justify-content:center}
 .muted{color:#9ca3af}
 
 /* 상태 뱃지 */
@@ -104,6 +105,8 @@ body{background:#f6f7f9;color:#222631;min-height:100vh}
 /* 학생 채점 링크 */
 .btn-detail{display:inline-flex;align-items:center;gap:4px;font-size:14px;font-weight:500;color:#3151c4;background:none;border:none;cursor:pointer;padding:0;line-height:1;font-family:inherit}
 .btn-detail:hover{color:#365eef}
+.btn-detail-sub{color:#6d7381}
+.btn-detail-sub:hover{color:#3b3f4c}
 
 /* ══════ 모달 ══════ */
 .modal-overlay{position:fixed;inset:0;background:rgba(34,38,49,.5);display:none;align-items:center;justify-content:center;z-index:1000;padding:24px}
@@ -388,7 +391,10 @@ function renderTable(){
       +'<td class="col-ai-score">'+aiScoreCell+'</td>'
       +'<td class="col-final">'+finalCell+'</td>'
       +'<td class="col-status"><span class="status-badge '+s.statusCls+'">'+s.status+'</span></td>'
-      +'<td class="col-action"><button class="btn-detail" onclick="openStudentScoring(\''+s.id+'\',\''+s.name+'\',\''+(s.link||'scoring_elementary_v2_260511.html')+'\')"><i data-lucide="user-round" style="width:14px;height:14px"></i>상세 보기</button></td>'
+      +'<td class="col-action"><div class="col-action-group">'
+      +'<button class="btn-detail" onclick="openStudentScoring(\''+s.id+'\',\''+s.name+'\',\''+(s.link||'scoring_elementary_v2_260511.html')+'\')"><i data-lucide="user-round" style="width:14px;height:14px"></i>상세 보기</button>'
+      +'<button class="btn-detail btn-detail-sub" onclick="openStudentView(\''+s.id+'\',\''+s.name+'\')"><i data-lucide="eye" style="width:14px;height:14px"></i>학생 화면</button>'
+      +'</div></td>'
       +'</tr>';
   }).join('');
   lucide.createIcons();
@@ -397,6 +403,11 @@ function renderTable(){
 function openStudentScoring(id, name, link){
   var url = link + '?id=' + id + '&name=' + encodeURIComponent(name);
   location.href = url;
+}
+
+function openStudentView(id, name){
+  // 학생 시점 결과 화면 (현재는 김피드백 데이터 고정)
+  location.href = 'result_student_view_v3_260512.html?id=' + id + '&name=' + encodeURIComponent(name);
 }
 
 // ══════ 3단계 액션 (목업) ══════
