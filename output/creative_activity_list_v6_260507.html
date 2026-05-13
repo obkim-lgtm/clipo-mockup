@@ -622,7 +622,20 @@
     document.querySelectorAll('.type-btn').forEach((b,i) => b.classList.toggle('selected', ['jayul','jinro','dong'][i] === type));
     document.getElementById('classField').style.display = type !== 'dong' ? 'block' : 'none';
     document.getElementById('dongField').style.display  = type === 'dong' ? 'block' : 'none';
+    // 유형 전환 시 학급 dropdown의 '등록됨' 상태 재계산
+    if (type !== 'dong' && document.getElementById('gradeSelect').value) {
+      onGradeChange();
+    }
     updateSubmit();
+  }
+  function getRegisteredClassTitles(typeClass, year) {
+    const set = new Set();
+    document.querySelectorAll(`section[data-year="${year}"] .badge-type.${typeClass}`).forEach(b => {
+      const card = b.closest('.card');
+      const t = card ? card.querySelector('.card-class')?.textContent.trim() : '';
+      if (t) set.add(t);
+    });
+    return set;
   }
   function onYearChange() {
     const year = document.getElementById('yearSelect').value;
@@ -645,7 +658,13 @@
       bSel.disabled = true;
     } else {
       const bans = (CLASS_DATA[year] && CLASS_DATA[year][grade]) || [];
-      bSel.innerHTML = '<option value="">반</option>' + bans.map(b => `<option value="${b}">${b}</option>`).join('');
+      const typeClass = { jayul:'b-jayul', jinro:'b-jinro', dong:'b-dong' }[currentType];
+      const taken = getRegisteredClassTitles(typeClass, year);
+      bSel.innerHTML = '<option value="">반</option>' + bans.map(b => {
+        const title = `${grade}학년 ${b}`;
+        const isTaken = taken.has(title);
+        return `<option value="${b}"${isTaken ? ' disabled' : ''}>${b}${isTaken ? ' (등록됨)' : ''}</option>`;
+      }).join('');
       bSel.disabled = false;
       bSel.value = '';
     }
