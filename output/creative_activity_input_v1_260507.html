@@ -142,8 +142,10 @@ body.nav-expanded .sticky-cta{left:200px;transition:left .2s ease}
 .col-survey{width:80px;text-align:center;white-space:nowrap}
 .col-pdf{width:80px;text-align:center;white-space:nowrap}
 .cell-survey,.cell-pdf{text-align:center}
-.ox-mark{display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:50%}
+.ox-mark{display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:50%;position:relative;cursor:help}
 .ox-ok{background:#dcfce7;color:#15803d}
+.ox-mark[data-tip]:hover::after{content:attr(data-tip);position:absolute;bottom:calc(100% + 6px);left:50%;transform:translateX(-50%);background:#222631;color:#fff;font-size:12px;font-weight:500;padding:8px 12px;border-radius:6px;white-space:pre-line;text-align:left;line-height:1.5;min-width:200px;max-width:320px;z-index:200;pointer-events:none;box-shadow:0 4px 12px rgba(0,0,0,.22)}
+.ox-mark[data-tip]:hover::before{content:'';position:absolute;bottom:calc(100% + 1px);left:50%;transform:translateX(-50%);border:5px solid transparent;border-top-color:#222631;z-index:200;pointer-events:none}
 .col-kw{max-width:0}
 .col-level{width:80px}
 .col-status{width:100px}
@@ -436,6 +438,14 @@ body.nav-expanded .sticky-cta{left:200px;transition:left .2s ease}
 #modal-survey{z-index:700}
 .file-row.clickable{cursor:pointer;transition:all .15s}
 .file-row.clickable:hover{background:#f4f8ff;border-color:#c7d6ff}
+.file-row-detail{align-items:flex-start;padding:12px 14px}
+.file-row-detail .file-row-main{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.file-row-detail .file-name{font-size:14px;color:#222631;font-weight:500;line-height:1.4;flex:initial}
+.file-row-detail .file-name .file-meta{font-weight:400;margin-left:6px}
+.file-row-detail .file-match-meta{font-size:12px;color:#6d7381;display:inline-flex;align-items:center;gap:4px;font-weight:400}
+.file-row-detail .file-match-meta::before{content:'✓ ';color:#15803d;font-weight:600}
+.btn-file-download{display:inline-flex;align-items:center;gap:4px;padding:5px 10px;border:1px solid #d9d9d9;border-radius:5px;background:#fff;color:#3b3f4c;font-size:12px;font-weight:500;cursor:pointer;font-family:inherit;line-height:1;transition:all .15s;flex-shrink:0}
+.btn-file-download:hover{border-color:#416bff;color:#416bff;background:#f4f8ff}
 .file-view-hint{font-size:12px;color:#416bff;font-weight:500;flex-shrink:0;margin-right:6px}
 /* 드로어 푸시뷰 (설문 응답 보기) */
 .dr-back-btn{display:inline-flex;align-items:center;gap:4px;background:none;border:none;color:#416bff;font-size:14px;font-weight:600;cursor:pointer;padding:6px 10px 6px 4px;margin:-2px 0 14px;border-radius:6px;font-family:inherit;line-height:1;transition:background .15s}
@@ -1489,10 +1499,18 @@ function renderSummary(){
   const tbody = $('summary-rows');
   tbody.innerHTML = STUDENTS.map(s=>{
     const st = statusOf(s);
-    const hasSurvey = s.files.some(f => f.kindLabel === '설문');
-    const hasPdf = s.files.some(f => f.kindLabel === '활동지' || f.kindLabel === '개별');
-    const okCell = '<span class="ox-mark ox-ok" title="등록됨"><i data-lucide="check" style="width:14px;height:14px"></i></span>';
-    const noCell = '<span class="col-empty">—</span>';
+    const surveyFile = s.files.find(f => f.kindLabel === '설문');
+    const pdfFile = s.files.find(f => f.kindLabel === '활동지' || f.kindLabel === '개별');
+    const hasSurvey = !!surveyFile;
+    const hasPdf = !!pdfFile;
+    const surveyTip = hasSurvey ? `${surveyFile.name}\n✓ 매칭: ${s.name} 학생 응답 행 추출됨` : '';
+    const pdfTip = hasPdf ? `${pdfFile.name}\n✓ 매칭: ${s.name} 학생 ${pdfFile.kindLabel === '활동지' ? '영역' : '개별 자료'} 추출됨` : '';
+    const surveyCell = hasSurvey
+      ? `<span class="ox-mark ox-ok" data-tip="${surveyTip}"><i data-lucide="check" style="width:14px;height:14px"></i></span>`
+      : '<span class="col-empty">—</span>';
+    const pdfCell = hasPdf
+      ? `<span class="ox-mark ox-ok" data-tip="${pdfTip}"><i data-lucide="check" style="width:14px;height:14px"></i></span>`
+      : '<span class="col-empty">—</span>';
     const kwText = s.keywords.length>0 ? kwSummaryText(s) : '<span class="col-empty">—</span>';
     const action = (st==='none')
       ? '<button class="btn-row-add" onclick="event.stopPropagation();openDrawer('+s.id+')"><i data-lucide="plus" style="width:12px;height:12px"></i> 자료</button>'
@@ -1500,8 +1518,8 @@ function renderSummary(){
     return `<tr class="row-clickable" onclick="openDrawer(${s.id})">
       <td class="cell-sid">${s.sid}</td>
       <td class="cell-name">${s.name}</td>
-      <td class="cell-survey">${hasSurvey ? okCell : noCell}</td>
-      <td class="cell-pdf">${hasPdf ? okCell : noCell}</td>
+      <td class="cell-survey">${surveyCell}</td>
+      <td class="cell-pdf">${pdfCell}</td>
       <td class="cell-kw">${kwText}</td>
       <td class="cell-level">${levelLabel(s.level)}</td>
       <td class="col-action">${action}</td>
@@ -1816,11 +1834,16 @@ function refreshDrawerItemCount(s){
 function renderDrawerDataPane(s){
   const renderFileRow = (f, i) => {
     const isVirtual = f.type === 'survey';
-    return `<div class="file-row${isVirtual?' clickable':''}" ${isVirtual?`onclick="showSurveyInDrawer(${s.id},${i})"`:''}>
-      <i data-lucide="${isVirtual?'list-checks':'paperclip'}" style="width:16px;height:16px;color:${isVirtual?'#7c3aed':'#b3b6bd'};flex-shrink:0"></i>
-      <div class="file-name">${f.name}</div>
-      ${f.size ? `<div class="file-meta">${f.size}</div>` : ''}
-      ${isVirtual ? '<span class="file-view-hint">보기</span>' : ''}
+    const matchLabel = isVirtual
+      ? `매칭: ${s.name} 학생 응답 행 추출됨`
+      : (f.kindLabel === '활동지' ? `매칭: ${s.name} 학생 영역 추출됨` : `개별 업로드 자료`);
+    return `<div class="file-row file-row-detail${isVirtual?' clickable':''}" ${isVirtual?`onclick="showSurveyInDrawer(${s.id},${i})"`:''}>
+      <i data-lucide="${isVirtual?'list-checks':'paperclip'}" style="width:16px;height:16px;color:${isVirtual?'#7c3aed':'#b3b6bd'};flex-shrink:0;margin-top:2px"></i>
+      <div class="file-row-main">
+        <div class="file-name">${f.name}${f.size ? ` <span class="file-meta">${f.size}</span>` : ''}</div>
+        <div class="file-match-meta">${matchLabel}</div>
+      </div>
+      <button class="btn-file-download" onclick="event.stopPropagation();downloadFileSim('${f.name.replace(/'/g,"\\'")}')" title="다운로드"><i data-lucide="download" style="width:14px;height:14px"></i> 다운로드</button>
       <button class="icon-btn" onclick="event.stopPropagation();markFilePendingDelete(${s.id},${i})"><i data-lucide="x" style="width:14px;height:14px"></i></button>
     </div>`;
   };
@@ -1841,8 +1864,9 @@ function renderDrawerDataPane(s){
     <div class="dp-section">
       <div class="dp-label">설문 응답 <span class="hint">EXCEL ${surveyFiles.length > 0 ? '등록됨' : '미등록'}</span></div>
       ${surveyFiles.length > 0 ? `<div>${surveyHtml}</div>` : `
-        <div style="padding:12px 14px;background:#f6f7f9;border:1px dashed #d9d9d9;border-radius:8px;font-size:13px;color:#6d7381;line-height:1.55">
-          설문 응답은 <strong>학급 단위 일괄 업로드</strong>로만 등록할 수 있어요. 우상단 [자료 등록] 모달에서 처리해 주세요.
+        <div style="display:flex;align-items:center;gap:12px;padding:12px 14px;background:#f6f7f9;border:1px dashed #d9d9d9;border-radius:8px;font-size:13px;color:#6d7381;line-height:1.55">
+          <div style="flex:1">설문 응답은 <strong>학급 단위 일괄 업로드</strong>로만 등록할 수 있어요.</div>
+          <button class="btn-ai-outline" onclick="goBulkRegister()" style="flex-shrink:0"><i data-lucide="upload" style="width:14px;height:14px"></i> 자료 등록 모달 열기</button>
         </div>`}
     </div>
     <div class="dp-section">
@@ -1864,7 +1888,7 @@ function renderDrawerDataPane(s){
       ` : ''}
     </div>
     <div class="dp-section">
-      <div class="dp-label">활동 내용 <span class="hint">${liveCount > 0 ? '<span style="color:#15803d;font-weight:500">활동 자료가 있어 AI가 다음 단계에서 자동 추출해요 — 직접 입력은 선택사항</span>' : '<span style="color:#b45309;font-weight:500">활동 자료가 없어요. 직접 입력한 활동 내용만 기록 생성에 활용돼요</span>'}</span></div>
+      <div class="dp-label">활동 내용 <span class="hint">${liveCount > 0 ? '<span style="color:#6d7381;font-weight:400">자료가 있어 AI가 자동 추출해요 — 직접 입력은 선택사항</span>' : '<span style="color:#b45309;font-weight:500">활동 자료가 없어요. 직접 입력한 활동 내용만 기록 생성에 활용돼요</span>'}</span></div>
       <textarea class="kw-textarea" id="dr-kw-text" maxlength="1000" oninput="updateDrKwCount();autoResizeDrKw()" onblur="commitDrawerKeywords()" placeholder="${liveCount > 0 ? '추가로 메모할 내용이 있을 때만 입력 (콤마로 구분)' : '예) 협력적, 적극적, 발표 잘함'}">${s.keywords.map(k=>k.text).join(', ')}</textarea>
       <div class="kw-foot">
         <span class="kw-hint"></span>
@@ -2060,6 +2084,14 @@ function saveDetail(){
 }
 
 // ───── 학생 자료 추가/제거 (학생 상세 모달용) ─────
+function downloadFileSim(name){
+  showToast(`${name} 다운로드를 시작했어요`);
+}
+function goBulkRegister(){
+  // 드로어를 닫고 자료 등록 모달을 즉시 노출
+  closeDrawer();
+  setTimeout(()=>{ if(typeof openRegisterModal === 'function') openRegisterModal(); }, 200);
+}
 function pickIndFile(){
   if(!curDetailId) return;
   const s = STUDENTS.find(x=>x.id===curDetailId);
