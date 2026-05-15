@@ -393,7 +393,7 @@ body.nav-expanded .sticky-cta{left:200px;transition:left .2s ease}
 .s3-mini-btn.ai{border-color:#416bff;color:#416bff}
 .s3-mini-btn.ai:hover{background:#f4f8ff}
 .s3-mini-btn:disabled{opacity:.45;cursor:not-allowed}
-.s3-genrow-btn{display:inline-flex;align-items:center;justify-content:center;gap:5px;padding:8px 14px;border:1px solid #416bff;border-radius:6px;background:#416bff;color:#fff;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;line-height:1;transition:background .15s}
+.s3-genrow-btn{display:inline-flex;align-items:center;justify-content:center;gap:4px;padding:5px 10px;border:1px solid #416bff;border-radius:5px;background:#416bff;color:#fff;font-size:12px;font-weight:500;cursor:pointer;font-family:inherit;line-height:1;transition:background .15s}
 .s3-genrow-btn:hover{background:#365eef}
 
 .s3-bring-btn{display:inline-flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:14px 6px;border:1px solid #d9d9d9;border-radius:8px;background:#fff;color:#3b3f4c;font-size:11px;font-weight:500;cursor:pointer;font-family:inherit;line-height:1.4;width:48px;margin:0 auto}
@@ -535,6 +535,9 @@ body.nav-expanded .sticky-cta{left:200px;transition:left .2s ease}
 .s2-stu-hd-type{display:inline-flex;align-items:center;padding:3px 8px;background:#eff3ff;color:#416bff;border-radius:4px;font-size:12px;font-weight:600;line-height:1.4}
 .s2-stu-hd-meta{font-size:13px;color:#6d7381;margin-top:6px}
 .s2-stu-hd-acts{display:flex;gap:6px;flex-shrink:0}
+.s2-stu-footer{position:sticky;bottom:8px;background:rgba(255,255,255,.92);backdrop-filter:saturate(180%) blur(8px);-webkit-backdrop-filter:saturate(180%) blur(8px);border-top:1px solid #e5e7eb;padding:12px 4px;display:flex;align-items:center;justify-content:flex-end;gap:12px;margin-top:16px;z-index:10}
+.s2-stu-footer-meta{font-size:13px;color:#6d7381;font-variant-numeric:tabular-nums;margin-right:auto;padding-left:4px}
+.s2-stu-save-next{display:inline-flex;align-items:center;gap:6px}
 .btn-text-action{display:inline-flex;align-items:center;justify-content:center;padding:6px 12px;border:none;background:none;color:#3b3f4c;font-size:13px;font-weight:500;cursor:pointer;font-family:inherit;line-height:1}
 .btn-text-action:hover{color:#416bff}
 
@@ -831,7 +834,7 @@ body.nav-expanded .sticky-cta{left:200px;transition:left .2s ease}
         <div class="mini-dropzone" onclick="pickIndFile()">
           <i data-lucide="upload-cloud" style="width:24px;height:24px;color:#b3b6bd"></i>
           <div class="mini-dz-text">자료 추가 업로드</div>
-          <div class="mini-dz-hint">PDF 1개 · 엑셀 1개 · 최대 2개 / 20MB</div>
+          <div class="mini-dz-hint">PDF 1개 · 최대 20MB</div>
         </div>
         <div id="md-files" style="margin-top:8px"></div>
       </div>
@@ -1142,6 +1145,11 @@ body.nav-expanded .sticky-cta{left:200px;transition:left .2s ease}
 </div>
 
 <!-- ── 목업 시나리오 토글 (개발용) ── -->
+<div class="mockup-toggle" id="release-toggle" style="bottom: 150px">
+  <span class="mt-label">RELEASE</span>
+  <button class="mt-btn active" data-release="604" onclick="applyRelease('604')">6/4 타깃</button>
+  <button class="mt-btn" data-release="after" onclick="applyRelease('after')">후속 배포</button>
+</div>
 <div class="mockup-toggle" id="mockup-toggle">
   <span class="mt-label">MOCKUP</span>
   <button class="mt-btn" data-scenario="empty" onclick="applyScenario('empty')">빈 화면</button>
@@ -1603,17 +1611,7 @@ function closeDrawer(){
   }
 }
 function saveDrawer(){
-  const s = STUDENTS.find(x=>x.id===curDetailId);
-  if (s) {
-    const pendCnt = getPendingDeleteCount(s);
-    if (pendCnt > 0) {
-      // 삭제 예정 파일이 있으면 한 번 확인
-      document.getElementById('dr-del-count').textContent = pendCnt;
-      document.getElementById('modal-drawer-del').classList.add('show');
-      lucide.createIcons();
-      return;
-    }
-  }
+  // staging 패턴 제거 — 파일 삭제는 즉시 반영됨, 저장은 곧장 진행
   doSaveDrawer();
 }
 function doSaveDrawer(){
@@ -1808,15 +1806,6 @@ function refreshDrawerItemCount(s){
 function renderDrawerDataPane(s){
   const filesHtml = s.files.map((f,i)=>{
     const isVirtual = f.type === 'survey';
-    const isPending = !!f._pendingDelete;
-    if (isPending) {
-      return `<div class="file-row pending-delete">
-        <i data-lucide="paperclip" style="width:16px;height:16px;color:#b3b6bd;flex-shrink:0"></i>
-        <div class="file-name" style="text-decoration:line-through;color:#b3b6bd">${f.name}</div>
-        <span class="file-pending-tag">삭제 예정</span>
-        <button class="btn-undo" onclick="event.stopPropagation();undoFilePendingDelete(${s.id},${i})">되돌리기</button>
-      </div>`;
-    }
     return `<div class="file-row${isVirtual?' clickable':''}" ${isVirtual?`onclick="showSurveyInDrawer(${s.id},${i})"`:''}>
       <i data-lucide="${isVirtual?'list-checks':'paperclip'}" style="width:16px;height:16px;color:${isVirtual?'#7c3aed':'#b3b6bd'};flex-shrink:0"></i>
       <div class="file-name">${f.name}</div>
@@ -1825,17 +1814,22 @@ function renderDrawerDataPane(s){
       <button class="icon-btn" onclick="event.stopPropagation();markFilePendingDelete(${s.id},${i})"><i data-lucide="x" style="width:14px;height:14px"></i></button>
     </div>`;
   }).join('');
-  const liveCount = s.files.filter(f => !f._pendingDelete).length;
+  const liveCount = s.files.length;
+  const pdfCount = s.files.filter(f => f.kindLabel === '활동지' || f.kindLabel === '개별').length;
   const lev = s.level || 'none';
   const s2 = getS2(s);
-  const showAnalyzePrompt = liveCount > 0 && s2.status === 'idle';
+  // 분석 안내 배너는 3단계 컨텍스트에서만 노출 (1단계는 자료 입력 단계라 분석 안내 불필요)
+  const activeStepEl = document.querySelector('.step-btn.active');
+  const fromStep3 = activeStepEl && activeStepEl.id === 'step-3';
+  const showAnalyzePrompt = fromStep3 && liveCount > 0 && s2.status === 'idle';
+  const dropzoneDisabled = pdfCount >= 1;
   $('dr-pane-data').innerHTML = `
     <div class="dp-section">
-      <div class="dp-label">활동 자료 <span class="hint">${liveCount}/2개</span></div>
-      <div class="mini-dropzone" onclick="pickIndFile()">
+      <div class="dp-label">활동 자료 <span class="hint">PDF ${pdfCount}/1개</span></div>
+      <div class="mini-dropzone${dropzoneDisabled ? ' disabled' : ''}" onclick="pickIndFile()" style="${dropzoneDisabled ? 'opacity:0.45;cursor:not-allowed;pointer-events:auto' : ''}">
         <i data-lucide="upload-cloud" style="width:24px;height:24px;color:#b3b6bd"></i>
         <div class="mini-dz-text">자료 추가 업로드</div>
-        <div class="mini-dz-hint">PDF 1개 · 엑셀 1개 · 최대 2개 / 20MB</div>
+        <div class="mini-dz-hint">PDF 1개 · 최대 20MB</div>
       </div>
       <div id="dr-files" style="margin-top:8px">${filesHtml}</div>
       ${showAnalyzePrompt ? `
@@ -2049,9 +2043,10 @@ function pickIndFile(){
   if(!curDetailId) return;
   const s = STUDENTS.find(x=>x.id===curDetailId);
   if(!s) return;
-  const liveCount = s.files.filter(f => !f._pendingDelete).length;
-  if(liveCount>=2){ showToast('학생당 최대 2개까지 업로드 가능합니다 (PDF 1, 엑셀 1)'); return; }
-  s.files.push({name:'추가자료_'+(liveCount+1)+'.pdf',size:'1.2MB',type:'pdf',source:'individual',kindLabel:'개별'});
+  // 정책: 학생당 PDF 1개 (학급 일괄 PDF '활동지' 또는 드로어 개별 PDF 중 하나만)
+  const hasPdf = s.files.some(f => !f._pendingDelete && (f.kindLabel === '활동지' || f.kindLabel === '개별'));
+  if(hasPdf){ showToast('이미 PDF 자료가 등록되어 있어요. 기존 자료를 삭제 후 다시 등록해 주세요'); return; }
+  s.files.push({name:'추가자료_'+(s.files.length+1)+'.pdf',size:'1.2MB',type:'pdf',source:'individual',kindLabel:'개별'});
   markDirty(s, 'file');
   if(isDrawerOpen()) renderDrawerDataPane(s);
   else if(isModalOpenEl()) renderDetailModal();
@@ -2060,25 +2055,18 @@ function pickIndFile(){
 
 // 파일 삭제 staging — 즉시 삭제하지 않고 표시만, 저장 시 일괄 처리
 function markFilePendingDelete(sid, idx){
+  // 즉시 삭제 (staging 패턴 제거 — 단순화)
   const s = STUDENTS.find(x=>x.id===sid);
   if(!s || !s.files[idx]) return;
-  s.files[idx]._pendingDelete = true;
+  s.files.splice(idx, 1);
   markDirty(s, 'file');
   if(isDrawerOpen() && curDetailId === sid) renderDrawerDataPane(s);
-  // 메인 summary table은 저장 전까지 변경 없음
+  refreshAll();
+  showToast('자료를 삭제했어요');
 }
-function undoFilePendingDelete(sid, idx){
-  const s = STUDENTS.find(x=>x.id===sid);
-  if(!s || !s.files[idx]) return;
-  delete s.files[idx]._pendingDelete;
-  if(isDrawerOpen() && curDetailId === sid) renderDrawerDataPane(s);
-}
-function getPendingDeleteCount(s){
-  return s.files.filter(f => f._pendingDelete).length;
-}
-function commitPendingDeletes(s){
-  s.files = s.files.filter(f => !f._pendingDelete);
-}
+function undoFilePendingDelete(){ /* deprecated: 즉시 삭제 정책으로 변경됨 */ }
+function getPendingDeleteCount(){ return 0; }
+function commitPendingDeletes(){ /* no-op */ }
 function removeStudentFile(sid, idx){
   const s = STUDENTS.find(x=>x.id===sid);
   if(!s) return;
@@ -2304,7 +2292,7 @@ function renderS3Row(s){
         <span class="s3-byte">0 Byte</span>
         ${hasData
           ? `<button class="s3-genrow-btn" onclick="generateOne(${s.id})"><i data-lucide="sparkles" style="width:12px;height:12px"></i> 기록 생성</button>`
-          : `<button class="s3-mini-btn" onclick="openDrawer(${s.id})"><i data-lucide="edit-3" style="width:12px;height:12px"></i> 입력</button>`}
+          : (window.currentRelease === 'after' ? `<button class="s3-mini-btn" onclick="openDrawer(${s.id})"><i data-lucide="edit-3" style="width:12px;height:12px"></i> 입력</button>` : `<a href="#" onclick="event.preventDefault();goStep(1)" style="font-size:12px;color:#416bff;text-decoration:underline;font-weight:500;cursor:pointer">1단계에서 자료 입력 →</a>`)}
       </div>
     </div>`;
   }
@@ -2325,7 +2313,7 @@ function renderS3Row(s){
     <td class="s3-col-sid s3-cell-sid">${s.sid}</td>
     <td class="s3-col-name">
       <div class="s3-stu-name">${s.name}${dirtyDot}</div>
-      <button class="s3-mini-btn" onclick="openDrawer(${s.id})"><i data-lucide="edit-3" style="width:12px;height:12px"></i> 수정</button>
+      ${window.currentRelease === 'after' ? `<button class="s3-mini-btn" onclick="openDrawer(${s.id})"><i data-lucide="edit-3" style="width:12px;height:12px"></i> 수정</button>` : ''}
     </td>
     <td class="s3-col-level s3-cell-level">${levelLabel(s.level)}</td>
     <td class="s3-col-ai">${aiCell}</td>
@@ -2699,6 +2687,27 @@ function renderS2Main(){
   }
   $('s2-main').innerHTML = stuHd + body;
 }
+function saveAndNextS2(sid){
+  const s = STUDENTS.find(x=>x.id===sid);
+  if(!s) return;
+  const s2 = getS2(s);
+  if(s2.unsavedChanges){
+    s2.unsavedChanges = false;
+    showToast(`${s.name} 학생 변경 사항을 저장했어요`);
+  }
+  // 다음 학생으로 이동
+  const idx = STUDENTS.findIndex(x => x.id === sid);
+  const next = STUDENTS[idx + 1];
+  if(next){
+    selectS2Student(next.id);
+    // 학생 패널 상단으로 스크롤
+    const main = document.getElementById('s2-main');
+    if(main) main.scrollIntoView({behavior:'smooth', block:'start'});
+  } else {
+    // 마지막 학생 → 3단계로 안내
+    showToast('모든 학생 검토가 끝났어요. 다음 단계로 진행하세요');
+  }
+}
 function renderS2Done(s){
   const s2 = getS2(s);
   const data = STEP2_DATA[s.sid] || { items: STEP2_DEFAULT_ITEMS.slice(0,5) };
@@ -2748,6 +2757,18 @@ function renderS2Done(s){
     </div>
     ${customHtml}
     ${s2.customs.length === 0 ? `<button class="s2-add-btn" onclick="addCustomItem(${s.id})"><i data-lucide="plus" style="width:16px;height:16px"></i> 직접 추가 (1개)</button>` : ''}
+    ${(()=>{
+      const idx = STUDENTS.findIndex(x => x.id === s.id);
+      const isLast = idx === STUDENTS.length - 1;
+      const btnLabel = isLast ? '저장 후 마치기' : '저장 후 다음 학생';
+      const iconName = isLast ? 'check' : 'arrow-right';
+      return `<div style="display:flex;align-items:center;justify-content:space-between;margin-top:24px;padding-top:16px;border-top:1px solid #f1f3f5">
+        <span style="font-size:13px;color:#6d7381;font-variant-numeric:tabular-nums">${idx+1} / ${STUDENTS.length}명</span>
+        <button class="btn-primary" style="display:inline-flex;align-items:center;gap:6px" onclick="saveAndNextS2(${s.id})">
+          저장 후 ${isLast ? '마치기' : '다음 학생'} <i data-lucide="${iconName}" style="width:14px;height:14px"></i>
+        </button>
+      </div>`;
+    })()}
   `;
 }
 function renderS2ItemCard(sid, item){
@@ -2814,6 +2835,8 @@ function toggleS2Item(sid, itemId){
   const s2 = getS2(s);
   if(s2.selectedIds.has(itemId)) s2.selectedIds.delete(itemId);
   else s2.selectedIds.add(itemId);
+  // 미저장 변경 플래그 (학생 패널 헤더 [저장] 버튼 활성화)
+  s2.unsavedChanges = true;
   // 추천 항목 변경도 dirty 트리거 (재생성 영향)
   if(s.s3 && s.s3.aiText) markDirty(s, 'items');
   if(isDrawerOpen() && curDetailId === sid){
@@ -2825,6 +2848,17 @@ function toggleS2Item(sid, itemId){
   }
   refreshS2Cta();
   lucide.createIcons();
+}
+function saveS2Student(sid){
+  const s = STUDENTS.find(x=>x.id===sid);
+  if(!s) return;
+  const s2 = getS2(s);
+  if(!s2.unsavedChanges) return;
+  s2.unsavedChanges = false;
+  renderS2Main();
+  renderS2Sidebar();
+  lucide.createIcons();
+  showToast(`${s.name} 학생 변경 사항을 저장했어요`);
 }
 function toggleCandidates(){
   const s = STUDENTS.find(x=>x.id===s2CurStudentId);
@@ -2845,9 +2879,10 @@ function startAnalyze(sid){
     s2.status = 'done';
     s.dirty = false;
     s._dirtyLevel = null;
-    // 추천 항목 자동 체크
+    // 추천 항목 자동 체크 (분석 직후엔 미저장 변경 없음 — 사용자가 체크하면 그때 dirty)
     const data = STEP2_DATA[s.sid] || {items: STEP2_DEFAULT_ITEMS.slice(0,5)};
     s2.selectedIds = new Set(data.items.filter(it=>it.source_origin==='stage1_recommended').map(it=>it.id));
+    s2.unsavedChanges = false;
     // 분석 완료 후 기존 AI 기록이 있다면 items 레벨 dirty 부여 → "재생성 필요" banner
     if(s.s3 && s.s3.aiText){
       s._dirtyLevel = 'items';
@@ -2892,8 +2927,18 @@ function reanalyzeAll(){
   });
   startAnalyzeAll();
 }
+// 릴리스 버전 토글 (6/4 1차 vs 후속)
+window.currentRelease = window.currentRelease || '604';
+function applyRelease(release){
+  window.currentRelease = release;
+  document.querySelectorAll('#release-toggle .mt-btn').forEach(b=>b.classList.toggle('active', b.dataset.release === release));
+  // Step 3 행 다시 렌더 (수정/입력 버튼 노출 변경 반영)
+  const active = document.querySelector('.step-btn.active');
+  if(active && active.id === 'step-3' && typeof renderStep3 === 'function') renderStep3();
+  if(window.lucide) lucide.createIcons();
+}
 function applyScenario(scenario){
-  document.querySelectorAll('.mt-btn').forEach(b=>b.classList.toggle('active', b.dataset.scenario === scenario));
+  document.querySelectorAll('#mockup-toggle .mt-btn').forEach(b=>b.classList.toggle('active', b.dataset.scenario === scenario));
   // localStorage 플래그 동기화
   if (scenario === 'data') {
     setTypeFlag('survey', true); setTypeFlag('activity', true); setTypeFlag('keyword', true);
@@ -3296,7 +3341,7 @@ function toggleNav(){
 // 목업 토글 초기 active 상태 (현재 데이터로 추정)
 (function initMockupToggle(){
   const initial = detectInitialScenario();
-  if(initial) document.querySelectorAll('.mt-btn').forEach(b=>b.classList.toggle('active', b.dataset.scenario === initial));
+  if(initial) document.querySelectorAll('#mockup-toggle .mt-btn').forEach(b=>b.classList.toggle('active', b.dataset.scenario === initial));
 })();
 
 refreshAll();
