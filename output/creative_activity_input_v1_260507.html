@@ -3356,42 +3356,44 @@ lucide.createIcons();
   }
 })();
 
-// 목업 토글 드래그 (MOCKUP 라벨 잡고 이동)
-(function setupMockupDrag(){
-  const toggle = document.getElementById('mockup-toggle');
-  if(!toggle) return;
-  const handle = toggle.querySelector('.mt-label');
-  if(!handle) return;
-  handle.style.cursor = 'move';
-  handle.title = '드래그해서 이동';
-  let dragging = false, offX = 0, offY = 0;
-  handle.addEventListener('mousedown', (e)=>{
-    dragging = true;
-    const rect = toggle.getBoundingClientRect();
-    offX = e.clientX - rect.left;
-    offY = e.clientY - rect.top;
-    toggle.style.right = 'auto';
-    toggle.style.bottom = 'auto';
-    toggle.style.left = rect.left + 'px';
-    toggle.style.top = rect.top + 'px';
-    document.body.style.userSelect = 'none';
-    e.preventDefault();
-  });
-  document.addEventListener('mousemove', (e)=>{
-    if(!dragging) return;
-    let x = e.clientX - offX;
-    let y = e.clientY - offY;
-    const w = toggle.offsetWidth, h = toggle.offsetHeight;
-    x = Math.max(8, Math.min(window.innerWidth - w - 8, x));
-    y = Math.max(8, Math.min(window.innerHeight - h - 8, y));
-    toggle.style.left = x + 'px';
-    toggle.style.top = y + 'px';
-  });
-  document.addEventListener('mouseup', ()=>{
-    if(dragging){
-      dragging = false;
-      document.body.style.userSelect = '';
-    }
+// 토글 드래그 (라벨 잡고 이동) — MOCKUP / RELEASE 두 토글 모두 적용
+(function setupToggleDrag(){
+  ['mockup-toggle','release-toggle'].forEach(id => {
+    const toggle = document.getElementById(id);
+    if(!toggle) return;
+    const handle = toggle.querySelector('.mt-label');
+    if(!handle) return;
+    handle.style.cursor = 'move';
+    handle.title = '드래그해서 이동';
+    let dragging = false, offX = 0, offY = 0;
+    handle.addEventListener('mousedown', (e)=>{
+      dragging = true;
+      const rect = toggle.getBoundingClientRect();
+      offX = e.clientX - rect.left;
+      offY = e.clientY - rect.top;
+      toggle.style.right = 'auto';
+      toggle.style.bottom = 'auto';
+      toggle.style.left = rect.left + 'px';
+      toggle.style.top = rect.top + 'px';
+      document.body.style.userSelect = 'none';
+      e.preventDefault();
+    });
+    document.addEventListener('mousemove', (e)=>{
+      if(!dragging) return;
+      let x = e.clientX - offX;
+      let y = e.clientY - offY;
+      const w = toggle.offsetWidth, h = toggle.offsetHeight;
+      x = Math.max(8, Math.min(window.innerWidth - w - 8, x));
+      y = Math.max(8, Math.min(window.innerHeight - h - 8, y));
+      toggle.style.left = x + 'px';
+      toggle.style.top = y + 'px';
+    });
+    document.addEventListener('mouseup', ()=>{
+      if(dragging){
+        dragging = false;
+        document.body.style.userSelect = '';
+      }
+    });
   });
 })();
 
