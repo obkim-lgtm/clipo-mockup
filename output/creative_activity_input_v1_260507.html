@@ -444,7 +444,8 @@ body.nav-expanded .sticky-cta{left:200px;transition:left .2s ease}
 .file-row-detail .file-name .file-meta{font-weight:400;margin-left:6px}
 .file-row-detail .file-match-meta{font-size:12px;color:#6d7381;display:inline-flex;align-items:center;gap:4px;font-weight:400}
 .file-row-detail .file-match-meta::before{content:'✓ ';color:#15803d;font-weight:600}
-.btn-file-download{display:inline-flex;align-items:center;gap:4px;padding:5px 10px;border:1px solid #d9d9d9;border-radius:5px;background:#fff;color:#3b3f4c;font-size:12px;font-weight:500;cursor:pointer;font-family:inherit;line-height:1;transition:all .15s;flex-shrink:0}
+.btn-file-download{display:inline-flex;align-items:center;gap:4px;padding:5px 10px;border:1px solid #d9d9d9;border-radius:5px;background:#fff;color:#3b3f4c;font-size:12px;font-weight:500;cursor:pointer;font-family:inherit;line-height:1;transition:all .15s;flex-shrink:0;align-self:center}
+.file-row-detail .icon-btn{align-self:center}
 .btn-file-download:hover{border-color:#416bff;color:#416bff;background:#f4f8ff}
 .file-view-hint{font-size:12px;color:#416bff;font-weight:500;flex-shrink:0;margin-right:6px}
 /* 드로어 푸시뷰 (설문 응답 보기) */
@@ -1837,13 +1838,16 @@ function renderDrawerDataPane(s){
     const matchLabel = isVirtual
       ? `매칭: ${s.name} 학생 응답 행 추출됨`
       : (f.kindLabel === '활동지' ? `매칭: ${s.name} 학생 영역 추출됨` : `개별 업로드 자료`);
-    return `<div class="file-row file-row-detail${isVirtual?' clickable':''}" ${isVirtual?`onclick="showSurveyInDrawer(${s.id},${i})"`:''}>
+    const actionBtn = isVirtual
+      ? `<button class="btn-file-download" onclick="event.stopPropagation();showSurveyInDrawer(${s.id},${i})" title="응답 보기"><i data-lucide="eye" style="width:14px;height:14px"></i> 보기</button>`
+      : `<button class="btn-file-download" onclick="event.stopPropagation();downloadFileSim('${f.name.replace(/'/g,"\\'")}')" title="다운로드"><i data-lucide="download" style="width:14px;height:14px"></i> 다운로드</button>`;
+    return `<div class="file-row file-row-detail">
       <i data-lucide="${isVirtual?'list-checks':'paperclip'}" style="width:16px;height:16px;color:${isVirtual?'#7c3aed':'#b3b6bd'};flex-shrink:0;margin-top:2px"></i>
       <div class="file-row-main">
         <div class="file-name">${f.name}${f.size ? ` <span class="file-meta">${f.size}</span>` : ''}</div>
         <div class="file-match-meta">${matchLabel}</div>
       </div>
-      <button class="btn-file-download" onclick="event.stopPropagation();downloadFileSim('${f.name.replace(/'/g,"\\'")}')" title="다운로드"><i data-lucide="download" style="width:14px;height:14px"></i> 다운로드</button>
+      ${actionBtn}
       <button class="icon-btn" onclick="event.stopPropagation();markFilePendingDelete(${s.id},${i})"><i data-lucide="x" style="width:14px;height:14px"></i></button>
     </div>`;
   };
