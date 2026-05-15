@@ -139,6 +139,11 @@ body.nav-expanded .sticky-cta{left:200px;transition:left .2s ease}
 .col-sid{width:80px}
 .col-name{width:120px}
 .col-files{width:90px}
+.col-survey{width:80px;text-align:center;white-space:nowrap}
+.col-pdf{width:80px;text-align:center;white-space:nowrap}
+.cell-survey,.cell-pdf{text-align:center}
+.ox-mark{display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:50%}
+.ox-ok{background:#dcfce7;color:#15803d}
 .col-kw{max-width:0}
 .col-level{width:80px}
 .col-status{width:100px}
@@ -729,7 +734,8 @@ body.nav-expanded .sticky-cta{left:200px;transition:left .2s ease}
           <tr>
             <th class="col-sid">학번</th>
             <th class="col-name">이름</th>
-            <th class="col-files">자료 수</th>
+            <th class="col-survey">설문</th>
+            <th class="col-pdf">활동지</th>
             <th class="col-kw">활동 내용</th>
             <th class="col-level">활동 수준</th>
             <th class="col-action">관리</th>
@@ -1483,7 +1489,10 @@ function renderSummary(){
   const tbody = $('summary-rows');
   tbody.innerHTML = STUDENTS.map(s=>{
     const st = statusOf(s);
-    const filesText = s.files.length>0 ? `${s.files.length}건` : '<span class="col-empty">—</span>';
+    const hasSurvey = s.files.some(f => f.kindLabel === '설문');
+    const hasPdf = s.files.some(f => f.kindLabel === '활동지' || f.kindLabel === '개별');
+    const okCell = '<span class="ox-mark ox-ok" title="등록됨"><i data-lucide="check" style="width:14px;height:14px"></i></span>';
+    const noCell = '<span class="col-empty">—</span>';
     const kwText = s.keywords.length>0 ? kwSummaryText(s) : '<span class="col-empty">—</span>';
     const action = (st==='none')
       ? '<button class="btn-row-add" onclick="event.stopPropagation();openDrawer('+s.id+')"><i data-lucide="plus" style="width:12px;height:12px"></i> 자료</button>'
@@ -1491,7 +1500,8 @@ function renderSummary(){
     return `<tr class="row-clickable" onclick="openDrawer(${s.id})">
       <td class="cell-sid">${s.sid}</td>
       <td class="cell-name">${s.name}</td>
-      <td class="cell-files">${filesText}</td>
+      <td class="cell-survey">${hasSurvey ? okCell : noCell}</td>
+      <td class="cell-pdf">${hasPdf ? okCell : noCell}</td>
       <td class="cell-kw">${kwText}</td>
       <td class="cell-level">${levelLabel(s.level)}</td>
       <td class="col-action">${action}</td>
@@ -1804,7 +1814,7 @@ function refreshDrawerItemCount(s){
   if($('dr-items-cnt')) $('dr-items-cnt').textContent = `${sel}/${total}`;
 }
 function renderDrawerDataPane(s){
-  const filesHtml = s.files.map((f,i)=>{
+  const renderFileRow = (f, i) => {
     const isVirtual = f.type === 'survey';
     return `<div class="file-row${isVirtual?' clickable':''}" ${isVirtual?`onclick="showSurveyInDrawer(${s.id},${i})"`:''}>
       <i data-lucide="${isVirtual?'list-checks':'paperclip'}" style="width:16px;height:16px;color:${isVirtual?'#7c3aed':'#b3b6bd'};flex-shrink:0"></i>
@@ -1813,9 +1823,13 @@ function renderDrawerDataPane(s){
       ${isVirtual ? '<span class="file-view-hint">보기</span>' : ''}
       <button class="icon-btn" onclick="event.stopPropagation();markFilePendingDelete(${s.id},${i})"><i data-lucide="x" style="width:14px;height:14px"></i></button>
     </div>`;
-  }).join('');
+  };
+  const surveyFiles = s.files.map((f,i)=>({f,i})).filter(x => x.f.kindLabel === '설문');
+  const pdfFiles = s.files.map((f,i)=>({f,i})).filter(x => x.f.kindLabel === '활동지' || x.f.kindLabel === '개별');
+  const surveyHtml = surveyFiles.map(x => renderFileRow(x.f, x.i)).join('');
+  const pdfHtml = pdfFiles.map(x => renderFileRow(x.f, x.i)).join('');
   const liveCount = s.files.length;
-  const pdfCount = s.files.filter(f => f.kindLabel === '활동지' || f.kindLabel === '개별').length;
+  const pdfCount = pdfFiles.length;
   const lev = s.level || 'none';
   const s2 = getS2(s);
   // 분석 안내 배너는 3단계 컨텍스트에서만 노출 (1단계는 자료 입력 단계라 분석 안내 불필요)
@@ -1825,13 +1839,20 @@ function renderDrawerDataPane(s){
   const dropzoneDisabled = pdfCount >= 1;
   $('dr-pane-data').innerHTML = `
     <div class="dp-section">
-      <div class="dp-label">활동 자료 <span class="hint">PDF ${pdfCount}/1개</span></div>
+      <div class="dp-label">설문 응답 <span class="hint">EXCEL ${surveyFiles.length > 0 ? '등록됨' : '미등록'}</span></div>
+      ${surveyFiles.length > 0 ? `<div>${surveyHtml}</div>` : `
+        <div style="padding:12px 14px;background:#f6f7f9;border:1px dashed #d9d9d9;border-radius:8px;font-size:13px;color:#6d7381;line-height:1.55">
+          설문 응답은 <strong>학급 단위 일괄 업로드</strong>로만 등록할 수 있어요. 우상단 [자료 등록] 모달에서 처리해 주세요.
+        </div>`}
+    </div>
+    <div class="dp-section">
+      <div class="dp-label">활동지·보고서 <span class="hint">PDF ${pdfCount}/1개</span></div>
       <div class="mini-dropzone${dropzoneDisabled ? ' disabled' : ''}" onclick="pickIndFile()" style="${dropzoneDisabled ? 'opacity:0.45;cursor:not-allowed;pointer-events:auto' : ''}">
         <i data-lucide="upload-cloud" style="width:24px;height:24px;color:#b3b6bd"></i>
-        <div class="mini-dz-text">자료 추가 업로드</div>
+        <div class="mini-dz-text">PDF 추가 업로드</div>
         <div class="mini-dz-hint">PDF 1개 · 최대 20MB</div>
       </div>
-      <div id="dr-files" style="margin-top:8px">${filesHtml}</div>
+      <div style="margin-top:8px">${pdfHtml}</div>
       ${showAnalyzePrompt ? `
         <div style="display:flex;align-items:center;gap:10px;padding:12px 14px;background:#f4f8ff;border:1px solid #c7d6ff;border-radius:8px;margin-top:10px">
           <i data-lucide="sparkles" style="width:16px;height:16px;color:#416bff;flex-shrink:0"></i>
