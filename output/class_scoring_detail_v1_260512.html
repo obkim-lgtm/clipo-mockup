@@ -107,6 +107,8 @@ body{background:#f6f7f9;color:#222631;min-height:100vh}
 .btn-detail:hover{color:#365eef}
 .btn-detail-sub{color:#6d7381}
 .btn-detail-sub:hover{color:#3b3f4c}
+.btn-detail.disabled{color:#c2c7d0;cursor:not-allowed;pointer-events:none}
+.btn-detail.disabled:hover{color:#c2c7d0}
 
 /* ══════ 모달 ══════ */
 .modal-overlay{position:fixed;inset:0;background:rgba(34,38,49,.5);display:none;align-items:center;justify-content:center;z-index:1000;padding:24px}
@@ -274,11 +276,11 @@ body{background:#f6f7f9;color:#222631;min-height:100vh}
       <div class="step-card">
         <div class="step-card-head">
           <span class="step-card-num">3단계 · 채점 결과 공개</span>
-          <span class="step-card-title">학생에게 결과 공유</span>
+          <span class="step-card-title">학생에게 공개</span>
         </div>
-        <p class="step-card-desc">선생님의 채점 결과와 피드백을 학생에게 공유합니다. 학급 단위로 한 번에 공개됩니다.</p>
+        <p class="step-card-desc">선생님의 채점 결과와 피드백을 학생에게 공개합니다. 학급 단위로 한 번에 진행돼요.</p>
         <button class="step-btn secondary" onclick="bulkShareToStudents()">
-          <i data-lucide="send" style="width:16px;height:16px"></i>학생에게 결과 공개
+          <i data-lucide="send" style="width:16px;height:16px"></i>학생에게 공개
         </button>
       </div>
     </section>
@@ -326,7 +328,7 @@ body{background:#f6f7f9;color:#222631;min-height:100vh}
 <div class="modal-overlay" id="bulkMethodModal" onclick="if(event.target===this)closeBulkMethodModal()">
   <div class="modal">
     <div class="modal-hd">
-      <span class="modal-title">학생에게 결과 공개</span>
+      <span class="modal-title">학생에게 공개</span>
       <button class="modal-close" onclick="closeBulkMethodModal()"><i data-lucide="x" style="width:18px;height:18px"></i></button>
     </div>
     <div class="modal-body">
@@ -373,9 +375,8 @@ var STUDENTS = [
   {id:'10105', name:'채점실패', aiStatus:'실패',      aiScore:'-', finalScore:'-', status:'확인 필요', statusCls:'need',     link:'scoring_elementary_v2_260511.html'},
   {id:'10106', name:'이전채점', aiStatus:'채점 완료', aiScore:33, finalScore:33, status:'완료',     statusCls:'done',     link:'scoring_elementary_v1_260506.html'},
   {id:'10107', name:'김현재',   aiStatus:'채점 중',   aiScore:33, finalScore:'-', status:'진행 중',  statusCls:'progress', link:'scoring_elementary_v1_260506.html'},
-  {id:'10108', name:'인라인',   aiStatus:'채점 완료', aiScore:33, finalScore:33, status:'완료',     statusCls:'done',     link:'scoring_elementary_inline_v1_260506.html'},
-  {id:'10109', name:'한가람',   aiStatus:'-',         aiScore:'-', finalScore:'-', status:'미채점',   statusCls:'none'},
-  {id:'10110', name:'오세훈',   aiStatus:'-',         aiScore:'-', finalScore:'-', status:'미채점',   statusCls:'none'}
+  {id:'10108', name:'한가람',   aiStatus:'-',         aiScore:'-', finalScore:'-', status:'미채점',   statusCls:'none'},
+  {id:'10109', name:'오세훈',   aiStatus:'-',         aiScore:'-', finalScore:'-', status:'미채점',   statusCls:'none'}
 ];
 
 function renderTable(){
@@ -384,6 +385,11 @@ function renderTable(){
     var aiStatusCls = s.aiStatus === '-' ? 'muted' : '';
     var aiScoreCell = s.aiScore === '-' ? '<span class="muted">-</span>' : '('+s.aiScore+')';
     var finalCell = s.finalScore === '-' ? '<span class="muted">-</span>' : s.finalScore;
+    // 학생 화면 활성화 조건: 최종 점수가 확정된 경우만 (채점전·진행 중·확인 필요는 비활성)
+    var studentViewDisabled = s.finalScore === '-';
+    var studentViewBtn = studentViewDisabled
+      ? '<button class="btn-detail btn-detail-sub disabled" title="채점이 완료된 학생만 학생 화면을 확인할 수 있어요" disabled><i data-lucide="eye-off" style="width:14px;height:14px"></i>학생 화면</button>'
+      : '<button class="btn-detail btn-detail-sub" onclick="openStudentView(\''+s.id+'\',\''+s.name+'\')"><i data-lucide="eye" style="width:14px;height:14px"></i>학생 화면</button>';
     return '<tr>'
       +'<td class="col-id">'+s.id+'</td>'
       +'<td class="col-name" style="text-align:left;padding-left:20px">'+s.name+'</td>'
@@ -393,7 +399,7 @@ function renderTable(){
       +'<td class="col-status"><span class="status-badge '+s.statusCls+'">'+s.status+'</span></td>'
       +'<td class="col-action"><div class="col-action-group">'
       +'<button class="btn-detail" onclick="openStudentScoring(\''+s.id+'\',\''+s.name+'\',\''+(s.link||'scoring_elementary_v2_260511.html')+'\')"><i data-lucide="user-round" style="width:14px;height:14px"></i>상세 보기</button>'
-      +'<button class="btn-detail btn-detail-sub" onclick="openStudentView(\''+s.id+'\',\''+s.name+'\')"><i data-lucide="eye" style="width:14px;height:14px"></i>학생 화면</button>'
+      +studentViewBtn
       +'</div></td>'
       +'</tr>';
   }).join('');
