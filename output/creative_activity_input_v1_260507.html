@@ -736,7 +736,7 @@ body.nav-expanded .sticky-cta{left:200px;transition:left .2s ease}
           <div class="ch-sub" id="ph-progress">학생 0명 등록 · 자료 등록 시 AI가 자동 매칭합니다</div>
         </div>
         <div class="ch-actions">
-          <button class="btn-primary" id="btn-data-add" onclick="openRegisterModal()"><i data-lucide="plus" style="width:14px;height:14px"></i> 자료 등록</button>
+          <button class="btn-primary" id="btn-data-add" onclick="openRegisterModal()"><i data-lucide="plus" style="width:14px;height:14px"></i> 일괄 자료 등록</button>
         </div>
       </div>
       <div class="table-wrap">
@@ -926,7 +926,7 @@ body.nav-expanded .sticky-cta{left:200px;transition:left .2s ease}
   <div class="modal xl">
     <div class="modal-hd">
       <div>
-        <div class="modal-title">자료 등록</div>
+        <div class="modal-title">일괄 자료 등록</div>
         <div class="modal-sub">자료를 올리면 학번·이름을 기준으로 학생별 자동 매칭되어, 활동 자료와 활동 내용을 일괄 등록할 수 있어요.</div>
       </div>
       <button class="modal-x" onclick="closeModal('modal-register')"><i data-lucide="x" style="width:18px;height:18px"></i></button>
@@ -1258,7 +1258,7 @@ body.nav-expanded .sticky-cta{left:200px;transition:left .2s ease}
     </div>
 
     <div style="padding:0 28px 24px">
-      <button onclick="startFromOnboarding()" style="width:100%;padding:12px;border:none;border-radius:6px;background:#365eef;color:#fff;font-size:15px;font-weight:600;font-family:inherit;cursor:pointer;line-height:1;display:inline-flex;align-items:center;justify-content:center;gap:6px"><i data-lucide="upload" style="width:16px;height:16px"></i> 자료 등록 시작</button>
+      <button onclick="startFromOnboarding()" style="width:100%;padding:12px;border:none;border-radius:6px;background:#365eef;color:#fff;font-size:15px;font-weight:600;font-family:inherit;cursor:pointer;line-height:1;display:inline-flex;align-items:center;justify-content:center;gap:6px"><i data-lucide="upload" style="width:16px;height:16px"></i> 일괄 자료 등록 시작</button>
     </div>
   </div>
 </div>
@@ -1870,7 +1870,7 @@ function renderDrawerDataPane(s){
       ${surveyFiles.length > 0 ? `<div>${surveyHtml}</div>` : `
         <div style="display:flex;align-items:center;gap:12px;padding:12px 14px;background:#f6f7f9;border:1px dashed #d9d9d9;border-radius:8px;font-size:13px;color:#6d7381;line-height:1.55">
           <div style="flex:1">설문 응답은 <strong>학급 단위 일괄 업로드</strong>로만 등록할 수 있어요.</div>
-          <button class="btn-ai-outline" onclick="goBulkRegister()" style="flex-shrink:0"><i data-lucide="upload" style="width:14px;height:14px"></i> 자료 등록 모달 열기</button>
+          <button class="btn-ai-outline" onclick="goBulkRegister()" style="flex-shrink:0"><i data-lucide="upload" style="width:14px;height:14px"></i> 일괄 자료 등록</button>
         </div>`}
     </div>
     <div class="dp-section">
@@ -1892,7 +1892,7 @@ function renderDrawerDataPane(s){
       ` : ''}
     </div>
     <div class="dp-section">
-      <div class="dp-label">활동 내용 <span class="hint">${liveCount > 0 ? '<span style="color:#6d7381;font-weight:400">자료가 있어 AI가 자동 추출해요 — 직접 입력은 선택사항</span>' : '<span style="color:#b45309;font-weight:500">활동 자료가 없어요. 직접 입력한 활동 내용만 기록 생성에 활용돼요</span>'}</span></div>
+      <div class="dp-label">활동 내용 <span style="font-size:12px;font-weight:500;color:#6d7381;background:#f1f3f5;padding:2px 7px;border-radius:4px;margin-left:4px">직접 입력</span> <span class="hint">${liveCount > 0 ? '<span style="color:#6d7381;font-weight:400">자료가 있어 AI가 자동 추출해요 — 직접 입력은 선택사항</span>' : '<span style="color:#b45309;font-weight:500">활동 자료가 없어요. 직접 입력한 활동 내용만 기록 생성에 활용돼요</span>'}</span></div>
       <textarea class="kw-textarea" id="dr-kw-text" maxlength="1000" oninput="updateDrKwCount();autoResizeDrKw()" onblur="commitDrawerKeywords()" placeholder="${liveCount > 0 ? '추가로 메모할 내용이 있을 때만 입력 (콤마로 구분)' : '예) 협력적, 적극적, 발표 잘함'}">${s.keywords.map(k=>k.text).join(', ')}</textarea>
       <div class="kw-foot">
         <span class="kw-hint"></span>
@@ -1992,15 +1992,11 @@ function renderDrawerItemsPane(s){
   const candHtml = candItems.map(it=>renderS2ItemCard(s.id, it)).join('');
   const customHtml = s2.customs.map((c,i)=>renderS2CustomCard(s.id, c, i)).join('');
   $('dr-pane-items').innerHTML = `
+    <div class="s2-group-hd"><span class="s2-group-title">AI 분석 내용</span><span class="s2-group-cnt">${items.length}개 (추천 ${recItems.length})</span></div>
+    <div style="display:flex;flex-direction:column;gap:8px">${recHtml}${candHtml}</div>
     ${s.keywords.length ? `
-      <div class="s2-group-hd"><span class="s2-group-title">활동 내용</span></div>
+      <div class="s2-group-hd"><span class="s2-group-title">활동 내용 <span style="font-size:12px;font-weight:500;color:#6d7381;background:#f1f3f5;padding:2px 7px;border-radius:4px;margin-left:4px">직접 입력</span></span></div>
       <div class="s2-kw-box">${s.keywords.map(k=>k.text).join(', ')}</div>
-    ` : ''}
-    <div class="s2-group-hd"><span class="s2-group-title">기록 항목 (추천)</span><span class="s2-group-cnt">${recItems.length}개</span></div>
-    ${recHtml}
-    ${candItems.length ? `
-      <div class="s2-group-hd"><span class="s2-group-title">기록 항목 (추가 후보)</span><span class="s2-group-cnt">${candItems.length}개</span></div>
-      <div style="display:flex;flex-direction:column;gap:8px">${candHtml}</div>
     ` : ''}
     <div class="s2-group-hd"><span class="s2-group-title">직접 추가</span></div>
     ${customHtml}
@@ -2664,13 +2660,8 @@ function renderS2Sidebar(){
     // 자료(설문/활동지) 없으면 활동 내용 유무와 관계없이 '자료 없음'
     if(!s2HasFiles(s)) status = `<span class="s2-stu-status empty">자료 없음</span>`;
     else if(s2.status==='analyzing') status = `<span class="s2-stu-status analyzing">분석 중</span>`;
-    else if(s2.status==='done'){
-      const data = STEP2_DATA[s.sid] || { items: STEP2_DEFAULT_ITEMS.slice(0,5) };
-      const recCnt = data.items.filter(it=>it.source_origin==='stage1_recommended').length;
-      const totalCnt = data.items.length;
-      status = `<span class="s2-stu-status done">${recCnt}/${totalCnt}</span>`;
-    }
-    else status = `<span class="s2-stu-status idle">미분석</span>`;
+    else if(s2.status==='done') status = `<span class="s2-stu-status done">분석 완료</span>`;
+    else status = `<span class="s2-stu-status idle">분석 필요</span>`;
     const dirtyDot = s.dirty ? '<span class="dirty-dot" title="자료 변경됨 · 재분석 권장"></span>' : '';
     return `<div class="s2-stu-row ${isActive?'active':''}" onclick="selectS2Student(${s.id})">
       <span class="s2-stu-name">${s.name}${dirtyDot}</span>
@@ -2788,27 +2779,19 @@ function renderS2Done(s){
 
   return `
     ${summaryHtml}
+    <div id="s2-recs">
+    <div class="s2-group-hd">
+      <span class="s2-group-title">AI 분석 내용</span>
+      <span class="s2-group-cnt">${items.length}개 (추천 ${recItems.length})</span>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:8px">${recHtml}${candHtml}</div>
+    </div>
     ${s.keywords.length ? `
       <div class="s2-group-hd">
-        <span class="s2-group-title">활동 내용</span>
+        <span class="s2-group-title">활동 내용 <span style="font-size:12px;font-weight:500;color:#6d7381;background:#f1f3f5;padding:2px 7px;border-radius:4px;margin-left:4px">직접 입력</span></span>
       </div>
       <div class="s2-kw-box">${s.keywords.map(k=>k.text).join(', ')}</div>
     ` : ''}
-    <div id="s2-recs">
-    <div class="s2-group-hd">
-      <span class="s2-group-title">기록 항목 (추천)</span>
-      <span class="s2-group-cnt">${recItems.length}개</span>
-    </div>
-    ${recHtml}
-    ${candItems.length ? `
-      <div class="s2-group-hd">
-        <span class="s2-group-title">기록 항목 (추가 후보)</span>
-        <span class="s2-group-cnt">${candItems.length}개</span>
-        <button class="s2-group-toggle" onclick="toggleCandidates()"><span>${getS2(s).candidatesCollapsed?'펼치기':'접기'}</span> <i data-lucide="${getS2(s).candidatesCollapsed?'chevron-down':'chevron-up'}" style="width:14px;height:14px"></i></button>
-      </div>
-      <div id="s2-cand-wrap" style="display:${getS2(s).candidatesCollapsed?'none':'flex'};flex-direction:column;gap:8px">${candHtml}</div>
-    ` : ''}
-    </div>
     <div class="s2-group-hd">
       <span class="s2-group-title">직접 추가</span>
     </div>
