@@ -215,6 +215,7 @@ body{background:#fff;color:#222631;overflow:hidden;height:100vh}
 .btn-formula{display:inline-flex;align-items:center;justify-content:center;gap:4px;height:32px;padding:0 14px;border-radius:100px;background:#fff;border:1px solid #dde1e8;color:#3b3f4c;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;line-height:1}
 .btn-formula:hover{border-color:#a3c3ff;color:#365eef}
 .teacher-fb-save{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-top:12px;flex-wrap:wrap}
+.teacher-fb-save-left{display:inline-flex;align-items:center;gap:4px;flex-wrap:wrap}
 .teacher-fb-save-right{display:inline-flex;align-items:center;gap:8px;flex-wrap:wrap}
 .btn-rerun-text{display:inline-flex;align-items:center;justify-content:center;gap:6px;height:42px;padding:0 18px;background:#fff;border:1px solid #ccdfff;border-radius:100px;color:#3151c4;font-size:15px;font-weight:600;cursor:pointer;font-family:inherit;line-height:1}
 .btn-rerun-text:hover{background:#f4f8ff;border-color:#a3c3ff}
@@ -225,6 +226,79 @@ body{background:#fff;color:#222631;overflow:hidden;height:100vh}
 .btn-share-student:disabled:hover,.btn-share-student.disabled:hover{background:#f6f7f9;border-color:#eaecf0;color:#9ca3af}
 .btn-preview-student{display:inline-flex;align-items:center;justify-content:center;gap:6px;background:#fff;border:1px solid #dde1e8;border-radius:100px;height:42px;padding:0 18px;font-size:15px;font-weight:600;color:#3b3f4c;cursor:pointer;font-family:inherit;line-height:1}
 .btn-preview-student:hover{background:#f4f8ff;border-color:#a3c3ff;color:#365eef}
+
+/* ══════ AI 채점 로그 Drawer (히스토리 학생 전용) ══════ */
+.history-drawer-overlay{position:fixed;inset:0;background:rgba(34,38,49,.35);display:none;z-index:1100;opacity:0;transition:opacity .2s}
+.history-drawer-overlay.show{display:block;opacity:1}
+.history-drawer{position:fixed;top:0;right:0;width:680px;max-width:96vw;height:100vh;max-height:100vh;background:#f6f7f9;display:flex;flex-direction:column;z-index:1101;transform:translateX(100%);transition:transform .25s ease;box-shadow:-8px 0 30px rgba(0,0,0,.18);overflow:hidden}
+.history-drawer.show{transform:translateX(0)}
+.history-drawer-hd{flex-shrink:0;display:flex;align-items:center;justify-content:space-between;padding:18px 22px;background:#fff;border-bottom:1px solid #eaecf0}
+.history-drawer-hd-left{display:flex;flex-direction:column;gap:2px}
+.history-drawer-title{font-size:17px;font-weight:700;color:#222631;line-height:1.3}
+.history-drawer-sub{font-size:13px;color:#6d7381;line-height:1.4}
+.history-drawer-body{flex:1 1 0;min-height:0;height:0;overflow-y:auto;padding:18px 22px;display:flex;flex-direction:column;gap:12px}
+.history-drawer-body > *{flex-shrink:0}
+.history-drawer-info{display:flex;align-self:stretch;width:100%;gap:8px;padding:12px 14px;border-radius:10px;background:#f1f3f5;font-size:13px;color:#3b3f4c;line-height:1.55}
+.history-drawer-info > span{flex:1;min-width:0}
+.history-drawer-info > svg,.history-drawer-info > i{flex-shrink:0}
+.history-drawer-info i{color:#6d7381;flex-shrink:0;margin-top:1px}
+.history-card{background:#fff;border:1px solid #eaecf0;border-radius:12px;overflow:hidden;transition:border-color .12s}
+.history-card.current{border-color:#cdd3dc}
+.history-card-hd{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:14px 16px;cursor:pointer;user-select:none}
+.history-card-hd:hover{background:#f9fafc}
+.history-card-hd-left{display:flex;flex-direction:column;gap:4px;min-width:0;flex:1}
+.history-card-hd-top{display:inline-flex;align-items:center;gap:8px;flex-wrap:wrap}
+.history-card-round{font-size:15px;font-weight:700;color:#3b3f4c;line-height:1.2}
+.history-card-current-badge{display:inline-flex;align-items:center;height:20px;padding:0 8px;border-radius:100px;background:#6d7381;color:#fff;font-size:11px;font-weight:700;line-height:1}
+.history-card-meta{display:inline-flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:13px;color:#9ca3af;line-height:1.3}
+.history-card-meta-sep{color:#dde1e8}
+.history-card-score{display:inline-flex;align-items:baseline;gap:2px;font-size:14px;font-weight:600;color:#6d7381;line-height:1;flex-shrink:0}
+.history-card-score .num{font-size:18px;font-weight:800;color:#3b3f4c}
+.history-card-chevron{flex-shrink:0;color:#9ca3af;transition:transform .18s}
+.history-card.expanded .history-card-chevron{transform:rotate(180deg)}
+.history-card-body{display:none;border-top:1px solid #eaecf0;padding:16px;background:#fafbfc;flex-direction:column;gap:12px}
+.history-card.expanded .history-card-body{display:flex}
+
+/* ── 채점 패널 미니어처 (우측 패널과 동일 UX, 회색조) ── */
+.h-pn-total{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border-radius:10px;background:#f1f3f5;border:1px solid #e6e9ee}
+.h-pn-total-lbl{font-size:13px;font-weight:600;color:#6d7381;line-height:1}
+.h-pn-total-val{display:inline-flex;align-items:baseline;gap:2px;color:#3b3f4c;font-weight:700}
+.h-pn-total-val .num{font-size:22px;letter-spacing:-.5px}
+.h-pn-total-val .max{font-size:13px;color:#9ca3af;margin-left:4px;font-weight:600}
+.h-pn-section{background:#fff;border:1px solid #eaecf0;border-radius:10px;padding:12px;display:flex;flex-direction:column;gap:10px}
+.h-pn-section-hd{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.h-pn-section-title{font-size:13px;font-weight:700;color:#3b3f4c;line-height:1.2;display:inline-flex;align-items:center;gap:6px}
+.h-pn-section-title i{color:#9ca3af}
+.h-rubric-row{display:flex;justify-content:space-between;align-items:center;padding:9px 11px;border-radius:7px;background:#f6f7f9;font-size:13px;color:#3b3f4c;line-height:1.3;gap:8px}
+.h-rubric-row .name{color:#3b3f4c;flex:1;min-width:0}
+.h-rubric-row .score-list{display:inline-flex;gap:4px;flex-shrink:0}
+.h-rubric-row .sc{display:inline-flex;align-items:center;justify-content:center;height:24px;min-width:30px;padding:0 8px;border-radius:6px;background:#fff;border:1px solid #dde1e8;color:#9ca3af;font-size:12px;font-weight:600;line-height:1}
+.h-rubric-row .sc.selected{background:#6d7381;color:#fff;border-color:#6d7381}
+.h-view-toggle{display:inline-flex;background:#f1f3f5;border-radius:8px;padding:3px;gap:2px}
+.h-vt-btn{display:inline-flex;align-items:center;justify-content:center;height:26px;padding:0 12px;border-radius:6px;background:transparent;border:none;color:#9ca3af;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;line-height:1;transition:all .12s}
+.h-vt-btn.active{background:#fff;color:#3b3f4c;box-shadow:0 1px 2px rgba(0,0,0,.06)}
+.h-vt-btn:hover:not(.active){color:#6d7381}
+.h-fb-list{display:flex;flex-direction:column;gap:8px}
+.h-fb-item{padding:11px 12px;border:1px solid #eaecf0;border-radius:8px;background:#fff;display:flex;flex-direction:column;gap:8px}
+.h-fb-item-hd{display:inline-flex;align-items:center;gap:8px;flex-wrap:wrap}
+.h-fb-item-tag{display:inline-flex;align-items:center;justify-content:center;height:22px;padding:0 8px;border-radius:100px;background:#f1f3f5;color:#6d7381;font-size:11px;font-weight:700;line-height:1}
+.h-fb-item-summary{font-size:13px;font-weight:600;color:#3b3f4c;line-height:1.4}
+.h-fb-item-block{display:flex;flex-direction:column;gap:4px}
+.h-fb-item-block-lbl{font-size:11px;font-weight:700;color:#9ca3af;letter-spacing:.04em;text-transform:uppercase;line-height:1.2}
+.h-fb-item-block-text{font-size:13px;color:#3b3f4c;line-height:1.55;padding:8px 10px;background:#f6f7f9;border-radius:6px;white-space:pre-wrap}
+.h-teacher-fb{font-size:13px;color:#3b3f4c;line-height:1.65;padding:12px 14px;background:#f6f7f9;border-radius:8px;white-space:pre-wrap;font-family:inherit;font-weight:500}
+.history-empty{padding:32px 20px;text-align:center;color:#9ca3af;font-size:13px;line-height:1.6}
+
+/* AI 피드백 헤더 [이전 채점 보기] 버튼 (히스토리 학생만 노출) */
+.btn-history-log{display:none;align-items:center;justify-content:center;gap:6px;height:34px;padding:0 14px;border-radius:100px;background:#eef3ff;border:1px solid #ccdfff;color:#3151c4;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;line-height:1;margin-right:8px}
+.btn-history-log:hover{background:#dce6ff;border-color:#a3c3ff}
+.btn-history-log.visible{display:inline-flex}
+
+/* 페이지 하단 [다시 채점] 옆 "이전 결과 보기" 텍스트 링크 (히스토리 학생만) */
+.history-text-link{display:none;align-items:center;gap:5px;font-size:14px;font-weight:600;color:#3151c4;background:none;border:none;cursor:pointer;font-family:inherit;line-height:1;padding:6px 10px;border-radius:8px;text-decoration:underline;text-underline-offset:3px;text-decoration-color:#a3c3ff}
+.history-text-link.visible{display:inline-flex}
+.history-text-link:hover{color:#365eef;background:#f4f8ff;text-decoration-color:#365eef}
+
 /* 미리보기 전용 모달 (액션 없음) — share-preview 컴포넌트와 동일 비주얼 */
 .modal.preview-modal{width:98vw;max-width:1640px;height:94vh;max-height:980px}
 .preview-body{flex:1;min-height:0;display:flex;flex-direction:row;padding:16px;background:#f6f7f9;gap:16px;overflow:hidden}
@@ -311,10 +385,10 @@ body{background:#fff;color:#222631;overflow:hidden;height:100vh}
 .modal-title{font-size:18px;font-weight:700;color:#222631;line-height:1.3}
 .modal-close{width:32px;height:32px;display:inline-flex;align-items:center;justify-content:center;border:none;background:none;cursor:pointer;color:#6d7381;border-radius:100px}
 .modal-close:hover{background:#f6f7f9;color:#222631}
-.modal-body{padding:20px 24px;overflow-y:auto;display:flex;flex-direction:column;gap:16px}
+.modal-body{padding:20px 24px;overflow-y:auto;display:flex;flex-direction:column;gap:24px}
 .modal-ft{display:flex;justify-content:space-between;align-items:center;padding:16px 24px;border-top:1px solid #eaecf0;gap:12px;flex-shrink:0;background:#f9fafb}
 .modal-actions{display:inline-flex;gap:8px}
-.field{display:flex;flex-direction:column;gap:6px}
+.field{display:flex;flex-direction:column;gap:12px}
 .field-lbl{font-size:14px;font-weight:600;color:#3b3f4c;line-height:1}
 .field-input{width:100%;padding:10px 12px;border:1px solid #dde1e8;border-radius:10px;font-size:16px;font-family:inherit;color:#222631;outline:none;line-height:1.5;font-weight:600}
 .field-input:focus{border-color:#365eef}
@@ -383,6 +457,7 @@ select.field-input{appearance:none;-webkit-appearance:none;background-image:url(
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
 .toast.success{background:#319d64;color:#fff}
 .toast.error{background:#db3e51;color:#fff}
+.toast.warning{background:#c2410c;color:#fff}
 .toast.loading{background:#365eef;color:#fff}
 
 /* ══════ 빈 상태 (미제출·채점전·채점실패 공용) ══════ */
@@ -390,6 +465,26 @@ select.field-input{appearance:none;-webkit-appearance:none;background-image:url(
 .empty-state-icon{color:#9ca3af;margin-bottom:4px}
 .empty-state-title{font-size:16px;font-weight:600;color:#3b3f4c;line-height:1.4}
 .empty-state-sub{font-size:14px;color:#6d7381;line-height:1.5;text-align:center}
+.empty-state-cta{display:inline-flex;align-items:center;justify-content:center;gap:6px;height:42px;padding:0 22px;margin-top:14px;border-radius:100px;background:#365eef;border:none;color:#fff;font-size:15px;font-weight:600;cursor:pointer;font-family:inherit;line-height:1;transition:background .15s}
+.empty-state-cta:hover{background:#3151c4}
+
+/* ══════ 루브릭 기반 AI 결과 (미제출 학생 전용) ══════ */
+.rai-list{display:flex;flex-direction:column;gap:12px}
+.rai-card{background:#fff;border:1px solid #eaecf0;border-radius:12px;overflow:hidden}
+.rai-card-hd{display:flex;align-items:center;gap:10px;padding:14px 16px;background:#fafbfd;border-bottom:1px solid #eaecf0}
+.rai-tag{display:inline-flex;align-items:center;justify-content:center;height:26px;padding:0 12px;border-radius:100px;background:#365eef;color:#fff;font-size:13px;font-weight:700;line-height:1;flex-shrink:0}
+.rai-name{font-size:16px;font-weight:700;color:#222631;line-height:1.3;flex:1;min-width:0}
+.rai-card-body{padding:16px;display:flex;flex-direction:column;gap:14px}
+.rai-sec{display:flex;flex-direction:column;gap:6px}
+.rai-sec-lbl{font-size:13px;font-weight:700;color:#3b3f4c;line-height:1.2;display:inline-flex;align-items:center;gap:4px;flex-wrap:wrap}
+.rai-sec-lbl-sub{font-size:12px;font-weight:500;color:#9ca3af}
+.rai-sec-text{font-size:15px;color:#3b3f4c;line-height:1.65;padding:12px 14px;background:#f6f7f9;border-radius:8px;white-space:pre-wrap}
+.rai-sec-text.editable{background:#fff;border:1px solid #dde1e8;cursor:text}
+.rai-sec-text.editable:focus{outline:none;border-color:#365eef}
+.rai-footer{display:flex;justify-content:flex-end;padding:4px 0 0 0}
+.rai-regen-btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;height:38px;padding:0 16px;border-radius:100px;background:#fff;border:1px solid #ccdfff;color:#3151c4;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;line-height:1}
+.rai-regen-btn:hover{background:#f4f8ff;border-color:#a3c3ff}
+.rai-regen-btn i{color:#3151c4}
 .empty-state.error{background:#fff5f5;border-color:#fecaca}
 .empty-state.error .empty-state-icon{color:#dc2626}
 .empty-state.error .empty-state-title{color:#b91c1c}
@@ -604,9 +699,14 @@ select.field-input{appearance:none;-webkit-appearance:none;background-image:url(
           <i data-lucide="bot" style="width:20px;height:20px;color:#365eef"></i>
           <span class="pn-section-title">AI 피드백</span>
         </div>
-        <div class="view-toggle" role="tablist">
-          <button class="vt-btn active" id="tab-instruction" onclick="switchTab('instruction')">문항별</button>
-          <button class="vt-btn" id="tab-rubric" onclick="switchTab('rubric')">채점요소별</button>
+        <div class="pn-section-hd-right" style="display:inline-flex;align-items:center">
+          <button class="btn-history-log" id="btnHistoryLog" onclick="openHistoryDrawer()" title="이전 차수 채점 결과 보기">
+            <i data-lucide="history" style="width:15px;height:15px"></i>이전 채점 보기
+          </button>
+          <div class="view-toggle" role="tablist">
+            <button class="vt-btn active" id="tab-instruction" onclick="switchTab('instruction')">문항별</button>
+            <button class="vt-btn" id="tab-rubric" onclick="switchTab('rubric')">채점요소별</button>
+          </div>
         </div>
       </div>
 
@@ -633,9 +733,14 @@ select.field-input{appearance:none;-webkit-appearance:none;background-image:url(
         <button class="btn-formula"><i data-lucide="sigma" style="width:14px;height:14px"></i>수식 입력</button>
       </div>
       <div class="teacher-fb-save">
-        <button class="btn-rerun-text" onclick="rerunAi()">
-          <i data-lucide="rotate-ccw" style="width:16px;height:16px"></i>다시 채점
-        </button>
+        <div class="teacher-fb-save-left">
+          <button class="btn-rerun-text" onclick="rerunAi()">
+            <i data-lucide="rotate-ccw" style="width:16px;height:16px"></i>다시 채점
+          </button>
+          <button class="history-text-link" id="historyTextLink" onclick="openHistoryDrawer()" title="이전 차수 채점 결과 보기">
+            <i data-lucide="history" style="width:14px;height:14px"></i>이전 결과 보기
+          </button>
+        </div>
         <div class="teacher-fb-save-right">
           <button class="btn-preview-student" onclick="openPreviewModal()">
             <i data-lucide="eye" style="width:16px;height:16px"></i>미리보기
@@ -928,6 +1033,21 @@ select.field-input{appearance:none;-webkit-appearance:none;background-image:url(
   </div>
 </div>
 
+<!-- AI 채점 로그 Drawer (히스토리 학생 전용) -->
+<div class="history-drawer-overlay" id="historyDrawerOverlay" onclick="closeHistoryDrawer()"></div>
+<aside class="history-drawer" id="historyDrawer" aria-hidden="true">
+  <div class="history-drawer-hd">
+    <div class="history-drawer-hd-left">
+      <span class="history-drawer-title">AI 채점 로그</span>
+      <span class="history-drawer-sub" id="historyDrawerSub">차수별 AI 채점 결과 (읽기 전용)</span>
+    </div>
+    <button class="modal-close" onclick="closeHistoryDrawer()" aria-label="닫기"><i data-lucide="x" style="width:18px;height:18px"></i></button>
+  </div>
+  <div class="history-drawer-body" id="historyDrawerBody">
+    <!-- JS로 렌더링 -->
+  </div>
+</aside>
+
 <!-- 미리보기 전용 모달 (개별 채점용 — 공개 액션 없음) -->
 <div class="modal-overlay" id="previewModal" onclick="if(event.target===this)closePreviewModal()">
   <div class="modal preview-modal">
@@ -986,7 +1106,8 @@ var STUDENT_LIST = [
   {id:'10103', name:'미제출', status:'미제출', statusCls:'progress'},
   {id:'10104', name:'채점전', status:'AI 채점 전', statusCls:'none'},
   {id:'10105', name:'채점실패', status:'AI 채점 실패', statusCls:'need'},
-  {id:'10106', name:'이전채점', status:'이전 채점', statusCls:'none', legacy:true}
+  {id:'10106', name:'이전채점', status:'이전 채점', statusCls:'none', legacy:true},
+  {id:'10107', name:'히스토리', status:'완료', statusCls:'done', history:true}
 ];
 var BASE_FILE = 'scoring_elementary_v2_260511.html';
 var currentStudentIdx = STUDENT_LIST.findIndex(function(s){ return s.id === studentId; });
@@ -1419,13 +1540,26 @@ function openPreviewModal(){
     document.getElementById('previewModalTitle').textContent = s.name + ' 학생 화면 미리보기';
   }
   var frame = document.getElementById('previewFrame');
-  if(frame && !frame.getAttribute('src')){
-    frame.setAttribute('src', 'result_student_view_v3_260512.html?preview=1');
-  }
+  // 학생 상태에 따라 iframe URL 분기 (미제출은 답안·문항별 결과 숨김)
+  var src = 'result_student_view_v3_260512.html?preview=1';
+  var isMissing = (typeof _isNotSubmitted !== 'undefined') && _isNotSubmitted;
+  if(isMissing) src += '&missing=1';
+  if(frame){ frame.setAttribute('src', src); }
+  // 미제출 학생: 표시 항목 체크박스 중 답안·문항별 자동 OFF + 비활성
+  applyPreviewMissingDefaults(isMissing);
   document.getElementById('previewModal').classList.add('show');
-  // 모달 열린 직후 현재 체크 상태로 iframe 동기화
   setTimeout(sendPreviewOpts, 120);
   lucide.createIcons();
+}
+
+function applyPreviewMissingDefaults(isMissing){
+  var keysToDisable = ['inst_ground','inst_feedback'];
+  document.querySelectorAll('#previewModal .preview-opt-list .checkbox-row').forEach(function(el){
+    var key = el.getAttribute('data-key');
+    var shouldDisable = isMissing && keysToDisable.indexOf(key) !== -1;
+    el.classList.toggle('disabled', shouldDisable);
+    if(shouldDisable) el.classList.remove('checked');
+  });
 }
 function closePreviewModal(){ document.getElementById('previewModal').classList.remove('show'); }
 
@@ -1754,20 +1888,23 @@ function applyNotSubmittedUI(){
   var btnApplyMS = document.querySelector('.btn-ai-apply');
   if(btnApplyMS) btnApplyMS.style.display = 'none';
 
-  // AI 피드백 카드 영역: empty state
+  // AI 피드백 카드 영역: empty state + 루브릭 AI CTA
   var emptyHtml = '<div class="empty-state">'
-    +'<i data-lucide="clipboard-x" class="empty-state-icon" style="width:36px;height:36px"></i>'
-    +'<div class="empty-state-title">AI 채점이 진행되지 않았어요</div>'
-    +'<div class="empty-state-sub">과제가 제출되지 않아 채점할 내용이 없습니다.</div>'
+    +'<i data-lucide="list-checks" class="empty-state-icon" style="width:36px;height:36px"></i>'
+    +'<div class="empty-state-title">루브릭 기반 AI로 피드백을 만들 수 있어요</div>'
+    +'<div class="empty-state-sub">과제물이 없어 학생 답안 분석은 불가하지만,<br>채점요소별 점수와 채점기준을 토대로 일반적인 AI 피드백을 만들 수 있어요.</div>'
+    +'<button class="empty-state-cta" onclick="runRubricAi()"><i data-lucide="list-checks" style="width:16px;height:16px"></i>루브릭 기반 AI 실행</button>'
     +'</div>';
   document.getElementById('pane-instruction').innerHTML = emptyHtml;
   document.getElementById('pane-rubric').innerHTML = emptyHtml;
 
-  // 다시 채점 / 보기 토글 숨김
-  var rerun = document.querySelector('.btn-rerun-text');
-  if(rerun) rerun.style.display = 'none';
+  // 보기 토글 숨김 (탭 분기 제거 — 루브릭 AI 결과는 채점요소 단위 단일)
   var vt = document.querySelector('.view-toggle');
   if(vt) vt.style.display = 'none';
+
+  // 채점 전이라 하단 [다시 채점] 버튼 숨김 — empty state CTA가 단일 진입점
+  var rerun = document.querySelector('.btn-rerun-text');
+  if(rerun) rerun.style.display = 'none';
 
   // 선생님 직접 피드백 placeholder 조정
   var ta = document.getElementById('teacherFeedback');
@@ -1775,6 +1912,79 @@ function applyNotSubmittedUI(){
 
   lucide.createIcons();
 }
+
+// ══════ 루브릭 기반 AI (미제출 학생 전용) ══════
+// AI 작성 근거 = AI 아님, 채점기준 텍스트 그대로
+// AI 피드백 = 채점기준 텍스트를 입력으로 AI 생성 (학생 답안 못 봤으니 일반론 톤)
+var RUBRIC_AI_RESULT = [
+  {
+    name: '장소 인식 및 특징 파악 능력',
+    score: 2, max: 10,
+    ground: '제시된 장소 인식 및 특징 파악 능력 기준 중 가장 낮은 단계로 평가됨.\n• 우리 고장의 주요 장소를 정확히 식별하지 못하거나 누락이 있음\n• 장소별 특징을 구체적으로 서술하지 못함',
+    feedback: '우리 고장의 장소들을 떠올려 보고, 각 장소가 어떤 곳인지 한두 문장씩 적어 보면 좋겠어요. 도서관, 시장, 공원 같은 가까운 장소부터 시작해 보세요. 친구들이 자주 가는 장소도 함께 떠올리면 도움이 돼요.'
+  },
+  {
+    name: '공간 구성 및 시각화 표현력',
+    score: 5, max: 25,
+    ground: '제시된 공간 구성 및 시각화 표현력 기준 중 낮은 단계로 평가됨.\n• 그림지도나 도식적 표현이 거의 없음\n• 장소 간 위치 관계가 표현되지 않음',
+    feedback: '우리 고장을 그림지도로 표현해 보면 어떨까요? 종이에 우리 집을 가운데에 두고, 주변 장소들을 위치에 맞게 그려 보세요. 거리감은 정확하지 않아도 괜찮고, 어떤 장소가 어디에 있는지 표현하는 게 핵심이에요.'
+  },
+  {
+    name: '고장에 대한 가치 인식 및 태도',
+    score: 3, max: 15,
+    ground: '제시된 고장에 대한 가치 인식 및 태도 기준 중 낮은 단계로 평가됨.\n• 고장에 대한 자기 느낌이나 의미가 표현되지 않음',
+    feedback: '우리 고장에서 좋아하는 곳이나 자랑하고 싶은 곳이 있나요? 왜 좋아하는지, 그 장소에서 어떤 경험을 했는지 한 줄씩 적어 보면 우리 고장에 대한 자기 생각이 정리될 거예요.'
+  }
+];
+
+function runRubricAi(){
+  // 전제 조건: 모든 채점요소에 점수가 선택되어야 실행 가능
+  var rubricRows = document.querySelectorAll('.rubric-box .rubric-row');
+  var missing = 0;
+  rubricRows.forEach(function(row){
+    if(!row.querySelector('.score-btn.selected')) missing++;
+  });
+  if(missing > 0){
+    showToast('warning', '채점요소별 점수를 모두 선택한 뒤 실행해 주세요.');
+    return;
+  }
+  showToast('loading', '루브릭 기반 AI가 피드백을 만들고 있어요...');
+  setTimeout(function(){
+    renderRubricAiResult();
+    showToast('success', 'AI 피드백이 생성됐어요.');
+  }, 1400);
+}
+
+function renderRubricAiResult(){
+  var html = RUBRIC_AI_RESULT.map(function(r){
+    return '<div class="rai-card">'
+      +  '<div class="rai-card-hd">'
+      +    '<span class="rai-tag">'+r.score+' / '+r.max+'</span>'
+      +    '<span class="rai-name">'+r.name+'</span>'
+      +  '</div>'
+      +  '<div class="rai-card-body">'
+      +    '<div class="rai-sec">'
+      +      '<span class="rai-sec-lbl">AI 작성 근거 <span class="rai-sec-lbl-sub">· 채점기준 기반</span></span>'
+      +      '<div class="rai-sec-text">'+r.ground.replace(/\n/g, '<br>')+'</div>'
+      +    '</div>'
+      +    '<div class="rai-sec">'
+      +      '<span class="rai-sec-lbl">AI 피드백</span>'
+      +      '<div class="rai-sec-text editable" contenteditable="true">'+r.feedback+'</div>'
+      +    '</div>'
+      +  '</div>'
+      +'</div>';
+  }).join('');
+  var footer = '<div class="rai-footer">'
+    + '<button class="rai-regen-btn" onclick="runRubricAi()">'
+    +   '<i data-lucide="rotate-ccw" style="width:14px;height:14px"></i>AI 피드백 재생성'
+    + '</button>'
+    + '</div>';
+  var wrap = '<div class="rai-list">'+html+footer+'</div>';
+  document.getElementById('pane-rubric').innerHTML = wrap;
+  document.getElementById('pane-instruction').innerHTML = wrap;
+  lucide.createIcons();
+}
+
 
 // ══════ AI 채점 전 학생 UI (과제는 제출됨) ══════
 function applyNotGradedUI(){
@@ -1795,11 +2005,12 @@ function applyNotGradedUI(){
   var btnApply = document.querySelector('.btn-ai-apply');
   if(btnApply) btnApply.style.display = 'none';
 
-  // AI 피드백 카드 영역: empty state with CTA 안내
+  // AI 피드백 카드 영역: empty state + CTA 버튼 (메인 진입점)
   var emptyHtml = '<div class="empty-state">'
     +'<i data-lucide="sparkles" class="empty-state-icon" style="width:36px;height:36px"></i>'
     +'<div class="empty-state-title">AI 채점을 아직 실행하지 않았어요</div>'
-    +'<div class="empty-state-sub">아래 [AI 채점 실행] 버튼을 눌러 AI 채점을 시작해 보세요.</div>'
+    +'<div class="empty-state-sub">AI가 점수와 피드백을 자동으로 만들어줘요.</div>'
+    +'<button class="empty-state-cta" onclick="rerunAi()"><i data-lucide="wand-sparkles" style="width:16px;height:16px"></i>AI 채점 실행</button>'
     +'</div>';
   document.getElementById('pane-instruction').innerHTML = emptyHtml;
   document.getElementById('pane-rubric').innerHTML = emptyHtml;
@@ -1808,12 +2019,222 @@ function applyNotGradedUI(){
   var vt = document.querySelector('.view-toggle');
   if(vt) vt.style.display = 'none';
 
-  // 다시 채점 → AI 채점 실행 라벨 변경
+  // 채점 전에는 하단 [다시 채점] 버튼 숨김 — empty state CTA가 단일 진입점
   var rerunBtn = document.querySelector('.btn-rerun-text');
-  if(rerunBtn){
-    rerunBtn.innerHTML = '<i data-lucide="wand-sparkles" style="width:16px;height:16px"></i>AI 채점 실행';
-  }
+  if(rerunBtn){ rerunBtn.style.display = 'none'; }
 
+  // 선생님 한마디 placeholder — AI 실행 전이라 초안 없음
+  var ta = document.getElementById('teacherFeedback');
+  if(ta) ta.placeholder = 'AI 채점을 실행하면 초안이 자동으로 채워져요. 또는 직접 작성하셔도 돼요.';
+
+  lucide.createIcons();
+}
+
+// ══════ AI 채점 로그 (히스토리 학생 전용 — 차수별 누적) ══════
+// 우측 채점 패널과 동일한 정보 구조: 총점 + 채점요소별 점수 + 문항별/채점요소별 피드백 + 선생님 한마디
+var HISTORY_LOG = [
+  {
+    round: 3, isCurrent: true,
+    at: '2026.05.18 14:23', level: '보통',
+    total: 33, max: 50,
+    rubrics: [
+      {name:'장소 인식 및 특징 파악 능력', options:[2,4,6,8], selected:8},
+      {name:'공간 구성 및 시각화 표현력', options:[5,10,20], selected:20},
+      {name:'고장에 대한 가치 인식 및 태도', options:[5,10,20], selected:5}
+    ],
+    instructions: [
+      {label:'1-1', level:'정답', summary:'우리 고장의 장소 4곳 정리', ground:'익산의 실제 장소(공공기관·놀이공원·역사문화공간·교육공간) 4곳을 정확히 적었어요.', feedback:'다음에는 각 장소의 특징도 한 줄씩 함께 적어 보세요.'},
+      {label:'2-1', level:'상', summary:'그림지도로 장소 표현', ground:'위치 관계와 건물의 특징을 잘 살려 표현했어요.', feedback:'색칠이나 라벨링을 추가하면 더 풍부해져요.'}
+    ],
+    elements: [
+      {name:'장소 인식 및 특징 파악 능력', score:8, max:10, ground:'장소 인식은 정확하고 특징을 비교적 잘 파악했어요.', feedback:'각 장소의 고유한 특징을 한 줄씩 정리해 두면 더 좋아요.'},
+      {name:'공간 구성 및 시각화 표현력', score:20, max:25, ground:'그림지도의 공간 구성과 시각화 표현이 풍부해요.', feedback:'범례·방향 표시를 추가하면 더 명확해져요.'},
+      {name:'고장에 대한 가치 인식 및 태도', score:5, max:15, ground:'가치 인식은 다소 표면적으로 드러났어요.', feedback:'「왜 좋은 곳일까?」를 한 문장으로 적어 보면 좋아요.'}
+    ],
+    teacherNote: '✨ 잘한 점\n• 우리 고장의 장소들을 정확히 알고 그림지도로 잘 표현했어요\n• 글에 자기 생각을 솔직하게 담아낸 점이 인상적이에요\n\n🎯 다음에 해볼 도전\n• 「우리 고장은 ○○ 같다」처럼 비유를 활용해 보기\n• 그렇게 느끼는 이유도 함께 적어 보기\n\n💬 종합 의견\n우리 고장의 장소들을 잘 정리하고 자기 생각도 솔직하게 담았어요. 다음에는 비유를 써 보면 훨씬 멋진 글이 될 거예요. 🌟'
+  },
+  {
+    round: 2, isCurrent: false,
+    at: '2026.05.17 09:10', level: '엄격',
+    total: 28, max: 50,
+    rubrics: [
+      {name:'장소 인식 및 특징 파악 능력', options:[2,4,6,8], selected:6},
+      {name:'공간 구성 및 시각화 표현력', options:[5,10,20], selected:18},
+      {name:'고장에 대한 가치 인식 및 태도', options:[5,10,20], selected:4}
+    ],
+    instructions: [
+      {label:'1-1', level:'정답', summary:'우리 고장의 장소 4곳 정리', ground:'장소를 4곳 적었지만, 일부 특징 설명은 일반적이에요.', feedback:'각 장소의 차별점을 더 명확히 적어 보세요.'},
+      {label:'2-1', level:'중', summary:'그림지도로 장소 표현', ground:'표현은 시도했으나 구체성·정확성에서 보완이 필요해요.', feedback:'위치 관계를 더 정확히 표시해 보세요.'}
+    ],
+    elements: [
+      {name:'장소 인식 및 특징 파악 능력', score:6, max:10, ground:'엄격 모드 — 특징 묘사의 구체성 부족.', feedback:'각 장소의 고유 특징을 명확히 적어 주세요.'},
+      {name:'공간 구성 및 시각화 표현력', score:18, max:25, ground:'시각화 표현은 좋으나 정확성에서 일부 감점.', feedback:'방향·축척 정보 보완이 필요해요.'},
+      {name:'고장에 대한 가치 인식 및 태도', score:4, max:15, ground:'가치 인식이 구체적 사례 없이 추상적이에요.', feedback:'구체적 사례 1-2개를 들어 설명해 보세요.'}
+    ],
+    teacherNote: '✨ 잘한 점\n• 우리 고장의 장소들을 정리하려는 시도가 보여요\n\n🎯 다음에 해볼 도전\n• 장소의 특징을 더 자세히 묘사하기\n• 왜 그 장소가 우리 고장에 중요한지 이유 적기\n\n💬 종합 의견\n장소 정리는 좋지만, 각 장소의 특징과 의미를 더 자세히 적어 보면 좋겠어요.'
+  },
+  {
+    round: 1, isCurrent: false,
+    at: '2026.05.15 11:02', level: '보통',
+    total: 36, max: 50,
+    rubrics: [
+      {name:'장소 인식 및 특징 파악 능력', options:[2,4,6,8], selected:8},
+      {name:'공간 구성 및 시각화 표현력', options:[5,10,20], selected:20},
+      {name:'고장에 대한 가치 인식 및 태도', options:[5,10,20], selected:5}
+    ],
+    instructions: [
+      {label:'1-1', level:'정답', summary:'우리 고장의 장소 4곳 정리', ground:'장소를 빠짐없이 정확하게 적었어요.', feedback:'특징 설명도 추가해 보세요.'},
+      {label:'2-1', level:'상', summary:'그림지도로 장소 표현', ground:'그림지도가 매우 정확하고 풍부해요.', feedback:'추가 표현 요소도 시도해 보세요.'}
+    ],
+    elements: [
+      {name:'장소 인식 및 특징 파악 능력', score:9, max:10, ground:'장소 인식이 매우 우수해요.', feedback:'특징 설명까지 함께 적으면 완벽해요.'},
+      {name:'공간 구성 및 시각화 표현력', score:22, max:25, ground:'시각화가 매우 잘 되어 있어요.', feedback:'세부 표시(범례·방향)도 추가해 보세요.'},
+      {name:'고장에 대한 가치 인식 및 태도', score:5, max:15, ground:'가치 인식은 단편적으로 표현됐어요.', feedback:'느낌·이유를 함께 적어 보세요.'}
+    ],
+    teacherNote: '✨ 잘한 점\n• 그림지도가 매우 정확하고 풍부해요\n• 장소를 빠짐없이 정리한 점이 좋아요\n\n🎯 다음에 해볼 도전\n• 장소에 대한 자기 생각이나 느낌도 함께 적어 보기\n\n💬 종합 의견\n그림지도 표현이 아주 좋아요! 다음에는 장소에 대한 자기만의 느낌도 함께 적어 보면 더 좋겠어요.'
+  }
+];
+
+function renderHistoryDrawer(){
+  var body = document.getElementById('historyDrawerBody');
+  if(!body) return;
+  if(!HISTORY_LOG || HISTORY_LOG.length === 0){
+    body.innerHTML = '<div class="history-empty">아직 채점 이력이 없어요.</div>';
+    return;
+  }
+  var html = '<div class="history-drawer-info">'
+    +'<i data-lucide="info" style="width:14px;height:14px"></i>'
+    +'<span>AI 채점을 다시 실행할 때마다 차수가 누적돼요. 이전 차수 결과는 <strong>읽기 전용</strong>이라 수정·되돌리기는 할 수 없어요.</span>'
+    +'</div>';
+  html += HISTORY_LOG.map(function(h, idx){
+    var expanded = h.isCurrent ? 'expanded' : '';
+    var curBadge = h.isCurrent ? '<span class="history-card-current-badge">현재</span>' : '';
+    return '<div class="history-card '+(h.isCurrent?'current ':'')+expanded+'" data-idx="'+idx+'">'
+      +  '<div class="history-card-hd" onclick="toggleHistoryCard(this)">'
+      +    '<div class="history-card-hd-left">'
+      +      '<div class="history-card-hd-top"><span class="history-card-round">'+h.round+'차 채점</span>'+curBadge+'</div>'
+      +      '<div class="history-card-meta">'
+      +        '<span>'+h.at+'</span>'
+      +        '<span class="history-card-meta-sep">·</span>'
+      +        '<span>채점 수준 '+h.level+'</span>'
+      +      '</div>'
+      +    '</div>'
+      +    '<div class="history-card-score"><span class="num">'+h.total+'</span><span>/ '+h.max+'</span></div>'
+      +    '<i data-lucide="chevron-down" class="history-card-chevron" style="width:18px;height:18px"></i>'
+      +  '</div>'
+      +  '<div class="history-card-body">'
+      +     renderHistoryBody(h, idx)
+      +  '</div>'
+      +'</div>';
+  }).join('');
+  body.innerHTML = html;
+  lucide.createIcons();
+}
+
+function renderHistoryBody(h, idx){
+  // 1) 총점 박스
+  var totalHtml = '<div class="h-pn-total">'
+    + '<span class="h-pn-total-lbl">총점</span>'
+    + '<span class="h-pn-total-val"><span class="num">'+h.total+'</span><span class="max">/ '+h.max+'</span></span>'
+    + '</div>';
+
+  // 2) 채점 결과 (채점기준표 미니어처)
+  var rubricRows = h.rubrics.map(function(r){
+    var scList = r.options.map(function(opt){
+      var cls = (opt === r.selected) ? 'sc selected' : 'sc';
+      return '<span class="'+cls+'">'+opt+'</span>';
+    }).join('');
+    return '<div class="h-rubric-row"><span class="name">'+r.name+'</span><span class="score-list">'+scList+'</span></div>';
+  }).join('');
+  var rubricSection = '<div class="h-pn-section">'
+    + '<div class="h-pn-section-hd"><span class="h-pn-section-title"><i data-lucide="circle-check-big" style="width:14px;height:14px"></i>채점 결과</span></div>'
+    + rubricRows
+    + '</div>';
+
+  // 3) AI 피드백 (탭 + 내용)
+  var instId = 'h-pane-inst-'+idx;
+  var rubId  = 'h-pane-rub-'+idx;
+  var instHtml = (h.instructions||[]).map(function(it){
+    return '<div class="h-fb-item">'
+      + '<div class="h-fb-item-hd"><span class="h-fb-item-tag">'+it.label+'</span><span class="h-fb-item-tag">'+it.level+'</span><span class="h-fb-item-summary">'+it.summary+'</span></div>'
+      + '<div class="h-fb-item-block"><span class="h-fb-item-block-lbl">채점 근거</span><div class="h-fb-item-block-text">'+it.ground+'</div></div>'
+      + '<div class="h-fb-item-block"><span class="h-fb-item-block-lbl">피드백</span><div class="h-fb-item-block-text">'+it.feedback+'</div></div>'
+      + '</div>';
+  }).join('');
+  var elemHtml = (h.elements||[]).map(function(el){
+    return '<div class="h-fb-item">'
+      + '<div class="h-fb-item-hd"><span class="h-fb-item-tag">'+el.score+' / '+el.max+'</span><span class="h-fb-item-summary">'+el.name+'</span></div>'
+      + '<div class="h-fb-item-block"><span class="h-fb-item-block-lbl">채점 근거</span><div class="h-fb-item-block-text">'+el.ground+'</div></div>'
+      + '<div class="h-fb-item-block"><span class="h-fb-item-block-lbl">피드백</span><div class="h-fb-item-block-text">'+el.feedback+'</div></div>'
+      + '</div>';
+  }).join('');
+  var fbSection = '<div class="h-pn-section">'
+    + '<div class="h-pn-section-hd">'
+    +   '<span class="h-pn-section-title"><i data-lucide="bot" style="width:14px;height:14px"></i>AI 피드백</span>'
+    +   '<div class="h-view-toggle" role="tablist">'
+    +     '<button class="h-vt-btn active" data-target="'+instId+'" onclick="switchHistoryTab(this)">문항별</button>'
+    +     '<button class="h-vt-btn" data-target="'+rubId+'" onclick="switchHistoryTab(this)">채점요소별</button>'
+    +   '</div>'
+    + '</div>'
+    + '<div class="h-fb-list" id="'+instId+'">'+instHtml+'</div>'
+    + '<div class="h-fb-list" id="'+rubId+'" style="display:none">'+elemHtml+'</div>'
+    + '</div>';
+
+  // 4) 선생님 한마디
+  var teacherSection = '<div class="h-pn-section">'
+    + '<div class="h-pn-section-hd"><span class="h-pn-section-title"><i data-lucide="pen-line" style="width:14px;height:14px"></i>선생님 한마디 (AI 초안)</span></div>'
+    + '<div class="h-teacher-fb">'+h.teacherNote+'</div>'
+    + '</div>';
+
+  return totalHtml + rubricSection + fbSection + teacherSection;
+}
+
+function switchHistoryTab(btn){
+  var card = btn.closest('.history-card-body');
+  if(!card) return;
+  card.querySelectorAll('.h-vt-btn').forEach(function(b){ b.classList.remove('active'); });
+  btn.classList.add('active');
+  var targetId = btn.getAttribute('data-target');
+  card.querySelectorAll('.h-fb-list').forEach(function(l){ l.style.display = 'none'; });
+  var target = card.querySelector('#'+targetId);
+  if(target) target.style.display = 'flex';
+}
+
+function toggleHistoryCard(hd){
+  var card = hd.closest('.history-card');
+  if(card) card.classList.toggle('expanded');
+}
+
+function openHistoryDrawer(){
+  var s = (typeof _curStudent !== 'undefined') ? _curStudent : null;
+  if(s && s.name){
+    document.getElementById('historyDrawerSub').textContent = s.name + ' 학생 · 차수별 AI 채점 결과 (읽기 전용)';
+  }
+  renderHistoryDrawer();
+  document.getElementById('historyDrawerOverlay').classList.add('show');
+  document.getElementById('historyDrawer').classList.add('show');
+  document.getElementById('historyDrawer').setAttribute('aria-hidden','false');
+}
+function closeHistoryDrawer(){
+  document.getElementById('historyDrawerOverlay').classList.remove('show');
+  document.getElementById('historyDrawer').classList.remove('show');
+  document.getElementById('historyDrawer').setAttribute('aria-hidden','true');
+}
+document.addEventListener('keydown', function(e){
+  if(e.key !== 'Escape') return;
+  if(document.getElementById('historyDrawer').classList.contains('show')) closeHistoryDrawer();
+});
+
+// ══════ 히스토리 학생 UI (AI 채점 로그 보기 진입점 노출) ══════
+function applyHistoryUI(){
+  renderInstructionCards();
+  renderElementCards();
+  autoSelectAiScores();
+  // 두 진입점 노출
+  var btn = document.getElementById('btnHistoryLog');
+  if(btn) btn.classList.add('visible');
+  var link = document.getElementById('historyTextLink');
+  if(link) link.classList.add('visible');
   lucide.createIcons();
 }
 
@@ -1881,6 +2302,10 @@ function applyFailedUI(){
     rerunBtn.innerHTML = '<i data-lucide="rotate-cw" style="width:16px;height:16px"></i>다시 시도';
   }
 
+  // 선생님 한마디 placeholder — AI 채점 실패라 초안 없음
+  var ta = document.getElementById('teacherFeedback');
+  if(ta) ta.placeholder = 'AI 채점에 실패해 초안을 만들지 못했어요. 다시 시도하거나 직접 작성해 주세요.';
+
   lucide.createIcons();
 }
 
@@ -1892,6 +2317,7 @@ var _isNotSubmitted = _curStudent && _curStudent.status === '미제출';
 var _isNotGraded = _curStudent && _curStudent.status === 'AI 채점 전';
 var _isFailed = _curStudent && _curStudent.status === 'AI 채점 실패';
 var _isLegacy = _curStudent && _curStudent.legacy === true;
+var _isHistory = _curStudent && _curStudent.history === true;
 if(_isNotSubmitted){
   applyNotSubmittedUI();
 } else if(_isNotGraded){
@@ -1900,6 +2326,9 @@ if(_isNotSubmitted){
   applyFailedUI();
 } else if(_isLegacy){
   applyLegacyUI();
+} else if(_isHistory){
+  applyHistoryUI();
+  fillTeacherFeedbackDraft();
 } else {
   renderInstructionCards();
   renderElementCards();
