@@ -126,10 +126,13 @@ body{background:#fff;color:#222631;overflow:hidden;height:100vh}
 .score-btns{display:inline-flex;gap:8px;align-items:center}
 .score-btn{min-width:40px;height:32px;padding:0 10px;border-radius:100px;font-size:14px;font-weight:600;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;border:1px solid #dde1e8;background:#fff;color:#3b3f4c;transition:all .12s;line-height:1;font-family:inherit}
 .score-btn:hover{border-color:#a3c3ff;background:#f4f8ff;color:#365eef}
-.score-btn.ai-suggest{background:repeating-linear-gradient(-45deg,#fff,#fff 4px,rgba(54,94,239,.18) 4px,rgba(54,94,239,.18) 6px);border:1.5px solid #365eef;color:#365eef}
-.score-btn.ai-suggest:hover{background:repeating-linear-gradient(-45deg,#eef3ff,#eef3ff 4px,rgba(54,94,239,.3) 4px,rgba(54,94,239,.3) 6px)}
+.score-btn.ai-suggest{background:repeating-linear-gradient(-45deg,#f0f9ff,#f0f9ff 4px,#bae6fd 4px,#bae6fd 7px);border:1.5px solid #38bdf8;color:#0284c7}
+.score-btn.ai-suggest:hover{background:repeating-linear-gradient(-45deg,#e0f2fe,#e0f2fe 4px,#7dd3fc 4px,#7dd3fc 7px);border-color:#0ea5e9;color:#0369a1}
 .score-btn.selected,
 .score-btn.ai-suggest.selected{background:#365eef !important;color:#fff;border-color:#365eef;background-image:none !important}
+/* 채점 안 됐을 때(채점전·채점실패) ai-suggest 시각을 일반 버튼처럼 — 데이터(클래스)는 유지, 표시만 제어 */
+body.before-ai-rerun .score-btn.ai-suggest{background:#fff;border:1px solid #dde1e8;color:#3b3f4c}
+body.before-ai-rerun .score-btn.ai-suggest:hover{background:#f4f8ff;border-color:#a3c3ff;color:#365eef}
 
 .ai-notice{font-size:14px;color:#6d7381;line-height:1.5;margin-top:16px;display:flex;align-items:flex-start;gap:6px}
 
@@ -226,6 +229,8 @@ body{background:#fff;color:#222631;overflow:hidden;height:100vh}
 .btn-share-student:disabled:hover,.btn-share-student.disabled:hover{background:#f6f7f9;border-color:#eaecf0;color:#9ca3af}
 .btn-preview-student{display:inline-flex;align-items:center;justify-content:center;gap:6px;background:#fff;border:1px solid #dde1e8;border-radius:100px;height:42px;padding:0 18px;font-size:15px;font-weight:600;color:#3b3f4c;cursor:pointer;font-family:inherit;line-height:1}
 .btn-preview-student:hover{background:#f4f8ff;border-color:#a3c3ff;color:#365eef}
+.btn-preview-student:disabled,.btn-preview-student.disabled{background:#f6f7f9;color:#9ca3af;cursor:not-allowed;border-color:#eaecf0}
+.btn-preview-student:disabled:hover,.btn-preview-student.disabled:hover{background:#f6f7f9;color:#9ca3af;border-color:#eaecf0}
 
 /* ══════ AI 채점 로그 Drawer (히스토리 학생 전용) ══════ */
 .history-drawer-overlay{position:fixed;inset:0;background:rgba(34,38,49,.35);display:none;z-index:1100;opacity:0;transition:opacity .2s}
@@ -485,7 +490,6 @@ select.field-input{appearance:none;-webkit-appearance:none;background-image:url(
 .rai-regen-btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;height:38px;padding:0 16px;border-radius:100px;background:#fff;border:1px solid #ccdfff;color:#3151c4;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;line-height:1}
 .rai-regen-btn:hover{background:#f4f8ff;border-color:#a3c3ff}
 .rai-regen-btn i{color:#3151c4}
-.empty-state.error{background:#fff5f5;border-color:#fecaca}
 .empty-state.error .empty-state-icon{color:#dc2626}
 .empty-state.error .empty-state-title{color:#b91c1c}
 .viewer-empty{flex:1;display:flex;align-items:center;justify-content:center;padding:40px 20px}
@@ -727,7 +731,7 @@ select.field-input{appearance:none;-webkit-appearance:none;background-image:url(
           </button>
         </div>
       </div>
-      <textarea id="teacherFeedback" class="teacher-fb-ta" oninput="updateCharCount();updateTfRevertVis()" placeholder="AI 초안이 채워져 있어요. 자유롭게 수정해 학생에게 전달할 메시지로 다듬어 보세요."></textarea>
+      <textarea id="teacherFeedback" class="teacher-fb-ta" oninput="updateCharCount();updateTfRevertVis();updatePreviewBtnState()" placeholder="AI 초안이 채워져 있어요. 자유롭게 수정해 학생에게 전달할 메시지로 다듬어 보세요."></textarea>
       <div class="teacher-fb-bottom">
         <span class="char-count" id="charCount">0자 / 0 byte</span>
         <button class="btn-formula"><i data-lucide="sigma" style="width:14px;height:14px"></i>수식 입력</button>
@@ -1168,11 +1172,13 @@ function selectScore(btn, rubricId, value){
   scores[rubricId] = value;
   updateTotal();
   if(typeof updateShareBtnState === 'function') updateShareBtnState();
+  if(typeof updatePreviewBtnState === 'function') updatePreviewBtnState();
 }
 function resetScores(){
   document.querySelectorAll('.score-btn').forEach(function(b){ b.classList.remove('selected'); });
   scores = {}; updateTotal();
   if(typeof updateShareBtnState === 'function') updateShareBtnState();
+  if(typeof updatePreviewBtnState === 'function') updatePreviewBtnState();
   showToast('success','점수가 초기화되었습니다.');
 }
 // 채점 완료 학생 진입 시: AI 추천 점수를 자동으로 selected 처리
@@ -1489,8 +1495,42 @@ function doRerunAi(mode){
   var label = mode === 'append' ? '이어쓰기로 AI 채점을 실행하고 있어요...' : 'AI 채점을 실행하고 있어요...';
   showToast('loading', label);
   setTimeout(function(){
+    // 채점전·채점실패였던 상태 해제 → 점수 표 빗금(AI 추천 점수) 노출
+    document.body.classList.remove('before-ai-rerun');
+    var btnApplyR = document.querySelector('.btn-ai-apply');
+    if(btnApplyR){ btnApplyR.style.display = ''; btnApplyR.classList.remove('applied'); }
+
+    // 결과 카드 렌더링 (채점전이었으면 empty state → 결과로 전환)
+    renderInstructionCards();
+    renderElementCards();
+    // ★ 자동 selected 처리 안 함 — AI 예상점수는 빗금으로만 표시,
+    //   교사가 확정하려면 점수 클릭 또는 [AI 점수 적용] 버튼 사용
+    // autoSelectAiScores();
+
+    // 보기 토글 복원
+    var vt = document.querySelector('.view-toggle');
+    if(vt) vt.style.display = '';
+
+    // 하단 [다시 채점] 버튼 복원 (채점전 상태에서 숨겼던 것)
+    var rerunBtn = document.querySelector('.btn-rerun-text');
+    if(rerunBtn){
+      rerunBtn.style.display = '';
+      rerunBtn.innerHTML = '<i data-lucide="rotate-ccw" style="width:16px;height:16px"></i>다시 채점';
+    }
+
+    // 선생님 한마디 placeholder 복원 + AI 초안 자동 채움 (이어쓰기 모드는 기존 내용 유지)
+    var ta = document.getElementById('teacherFeedback');
+    if(ta){
+      ta.placeholder = 'AI 초안이 채워져 있어요. 자유롭게 수정해 학생에게 전달할 메시지로 다듬어 보세요.';
+    }
+    if(mode !== 'append'){
+      fillTeacherFeedbackDraft();
+    }
+
+    lucide.createIcons();
+    updatePreviewBtnState();
     showToast('success', mode === 'append' ? 'AI 채점이 완료됐어요. (수정한 내용은 유지)' : 'AI 채점이 완료됐어요.');
-  },1800);
+  },1400);
 }
 
 // ══════ 글자수 ══════
@@ -1592,6 +1632,21 @@ function updateShareBtnState(){
   var hasScore = document.querySelectorAll('.score-btn.selected').length > 0;
   btn.disabled = !hasScore;
   btn.title = !hasScore ? '채점 결과 점수를 1개 이상 선택해야 공개할 수 있어요.' : '';
+}
+
+// 미리보기 버튼: 학생에게 보일 콘텐츠가 하나라도 있으면 활성
+// (점수 1개 이상 선택 OR 선생님 한마디에 입력 내용 OR 루브릭 AI 결과 카드 존재)
+function updatePreviewBtnState(){
+  var btn = document.querySelector('.btn-preview-student');
+  if(!btn) return;
+  var hasScore = document.querySelectorAll('.rubric-box .score-btn.selected').length > 0;
+  var ta = document.getElementById('teacherFeedback');
+  var hasFeedback = !!(ta && ta.value && ta.value.trim().length > 0);
+  var hasRubricAi = document.querySelectorAll('.rai-card').length > 0;
+  var enabled = hasScore || hasFeedback || hasRubricAi;
+  btn.disabled = !enabled;
+  btn.classList.toggle('disabled', !enabled);
+  btn.title = !enabled ? '학생에게 보일 내용이 없어요. 점수를 선택하거나 피드백을 입력해 보세요.' : '';
 }
 function updateShareConfirmBtnState(){
   var btn = document.querySelector('#shareModal .btn-modal-save');
@@ -1951,6 +2006,7 @@ function runRubricAi(){
   showToast('loading', '루브릭 기반 AI가 피드백을 만들고 있어요...');
   setTimeout(function(){
     renderRubricAiResult();
+    updatePreviewBtnState();
     showToast('success', 'AI 피드백이 생성됐어요.');
   }, 1400);
 }
@@ -1998,10 +2054,8 @@ function applyNotGradedUI(){
   // 총점: 점수 없음
   document.getElementById('totalScoreVal').textContent = '— / 50';
 
-  // 채점 결과 표: AI 추천 표시 제거 + "AI 점수 적용" 버튼 숨김 (수동 채점은 가능)
-  document.querySelectorAll('.score-btn').forEach(function(b){
-    b.classList.remove('ai-suggest');
-  });
+  // 채점 결과 표: ai-suggest 클래스는 보존(데이터 유지) + body 플래그로 시각만 일반 버튼처럼
+  document.body.classList.add('before-ai-rerun');
   var btnApply = document.querySelector('.btn-ai-apply');
   if(btnApply) btnApply.style.display = 'none';
 
@@ -2276,18 +2330,17 @@ function applyFailedUI(){
   // 총점: 점수 없음
   document.getElementById('totalScoreVal').textContent = '— / 50';
 
-  // 채점 결과 표: AI 추천 표시 제거 + "AI 점수 적용" 버튼 숨김 (수동 채점은 가능)
-  document.querySelectorAll('.score-btn').forEach(function(b){
-    b.classList.remove('ai-suggest');
-  });
+  // 채점 결과 표: ai-suggest 클래스는 보존 + body 플래그로 시각만 일반 버튼처럼 (다시 시도하면 빗금 노출)
+  document.body.classList.add('before-ai-rerun');
   var btnApply = document.querySelector('.btn-ai-apply');
   if(btnApply) btnApply.style.display = 'none';
 
-  // AI 피드백 카드 영역: 에러 상태
+  // AI 피드백 카드 영역: 에러 상태 + 다시 시도 CTA
   var errorHtml = '<div class="empty-state error">'
     +'<i data-lucide="alert-triangle" class="empty-state-icon" style="width:36px;height:36px"></i>'
     +'<div class="empty-state-title">AI 채점에 실패했어요</div>'
-    +'<div class="empty-state-sub">아래 [AI 채점 다시 시도] 버튼을 눌러 다시 채점해 주세요.</div>'
+    +'<div class="empty-state-sub">잠시 후 다시 시도해 주세요.</div>'
+    +'<button class="empty-state-cta" onclick="rerunAi()"><i data-lucide="rotate-cw" style="width:16px;height:16px"></i>AI 채점 다시 시도</button>'
     +'</div>';
   document.getElementById('pane-instruction').innerHTML = errorHtml;
   document.getElementById('pane-rubric').innerHTML = errorHtml;
@@ -2296,11 +2349,9 @@ function applyFailedUI(){
   var vt = document.querySelector('.view-toggle');
   if(vt) vt.style.display = 'none';
 
-  // 다시 채점 → AI 채점 다시 시도
+  // 하단 [다시 채점] 버튼 숨김 — error state CTA가 단일 진입점
   var rerunBtn = document.querySelector('.btn-rerun-text');
-  if(rerunBtn){
-    rerunBtn.innerHTML = '<i data-lucide="rotate-cw" style="width:16px;height:16px"></i>다시 시도';
-  }
+  if(rerunBtn){ rerunBtn.style.display = 'none'; }
 
   // 선생님 한마디 placeholder — AI 채점 실패라 초안 없음
   var ta = document.getElementById('teacherFeedback');
@@ -2341,6 +2392,7 @@ if(_isNotSubmitted){
   }
 }
 updateShareBtnState();
+updatePreviewBtnState();
 lucide.createIcons();
 </script>
 </body>
