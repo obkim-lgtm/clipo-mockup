@@ -1591,19 +1591,45 @@ function openPreviewModal(){
   if(isMissing) src += '&missing=1';
   if(frame){ frame.setAttribute('src', src); }
   // 미제출 학생: 표시 항목 체크박스 중 답안·문항별 자동 OFF + 비활성
-  applyPreviewMissingDefaults(isMissing);
+  applyPreviewItemAvailability();
   document.getElementById('previewModal').classList.add('show');
   setTimeout(sendPreviewOpts, 120);
   lucide.createIcons();
 }
 
-function applyPreviewMissingDefaults(isMissing){
-  var keysToDisable = ['inst_ground','inst_feedback'];
+function applyPreviewItemAvailability(){
+  // 데이터(콘텐츠) 유무에 따라 표시 항목 체크박스 활성/비활성 결정
+  // 내용이 없으면 공개 자체가 불가능하므로 사용자가 켜지 못하게 막음
+  var hasScore = document.querySelectorAll('.rubric-box .score-btn.selected').length > 0;
+  var ta = document.getElementById('teacherFeedback');
+  var hasTeacher = !!(ta && ta.value && ta.value.trim().length > 0);
+
+  // 문항별 결과: pane-instruction 안에 empty-state가 아닌 콘텐츠 카드가 있는지
+  var instPane = document.getElementById('pane-instruction');
+  var hasInst = !!(instPane && !instPane.querySelector('.empty-state')
+                   && instPane.querySelector('.ec-block,.item-block,.rai-card'));
+
+  // 채점요소별 결과: pane-rubric 콘텐츠 또는 루브릭 AI 결과
+  var rubPane = document.getElementById('pane-rubric');
+  var hasElem = !!(rubPane && !rubPane.querySelector('.empty-state')
+                   && rubPane.querySelector('.ec-block,.item-block,.rai-card'))
+                || document.querySelectorAll('.rai-card').length > 0;
+
+  var availability = {
+    score: hasScore,
+    standards: true,
+    inst_ground: hasInst,
+    inst_feedback: hasInst,
+    rubric: true,
+    elem_ground: hasElem,
+    elem_feedback: hasElem,
+    teacher: hasTeacher
+  };
   document.querySelectorAll('#previewModal .preview-opt-list .checkbox-row').forEach(function(el){
     var key = el.getAttribute('data-key');
-    var shouldDisable = isMissing && keysToDisable.indexOf(key) !== -1;
-    el.classList.toggle('disabled', shouldDisable);
-    if(shouldDisable) el.classList.remove('checked');
+    var ok = availability[key] !== false;
+    el.classList.toggle('disabled', !ok);
+    if(!ok) el.classList.remove('checked');
   });
 }
 function closePreviewModal(){ document.getElementById('previewModal').classList.remove('show'); }
