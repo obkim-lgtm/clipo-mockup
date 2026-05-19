@@ -473,6 +473,16 @@ select.field-input{appearance:none;-webkit-appearance:none;background-image:url(
 .empty-state-cta{display:inline-flex;align-items:center;justify-content:center;gap:6px;height:42px;padding:0 22px;margin-top:14px;border-radius:100px;background:#365eef;border:none;color:#fff;font-size:15px;font-weight:600;cursor:pointer;font-family:inherit;line-height:1;transition:background .15s}
 .empty-state-cta:hover{background:#3151c4}
 
+/* ══════ 루브릭 기반 AI 섹션 (일반 학생 옵션, 미제출 학생 메인) ══════ */
+.pn-section-badge-optional{display:inline-flex;align-items:center;height:20px;padding:0 8px;border-radius:100px;background:#e0f2fe;color:#0284c7;font-size:11px;font-weight:700;line-height:1;margin-left:6px}
+.btn-rubric-ai-run{display:inline-flex;align-items:center;justify-content:center;gap:5px;height:32px;padding:0 14px;border-radius:100px;background:#fff;border:1px solid #7dd3fc;color:#0284c7;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;line-height:1}
+.btn-rubric-ai-run:hover{background:#f0f9ff;border-color:#38bdf8}
+.btn-rubric-ai-run i{color:#0284c7}
+.btn-rubric-ai-regen{display:inline-flex;align-items:center;justify-content:center;gap:5px;height:32px;padding:0 14px;border-radius:100px;background:#fff;border:1px solid #dde1e8;color:#3b3f4c;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;line-height:1}
+.btn-rubric-ai-regen:hover{background:#f6f7f9;border-color:#b3b3b3}
+.rubric-ai-intro{padding:16px 18px;background:#f0f9ff;border:1px dashed #bae6fd;border-radius:10px;font-size:14px;color:#0c4a6e;line-height:1.6}
+.rubric-ai-intro p{margin:0}
+
 /* ══════ 루브릭 기반 AI 결과 (미제출 학생 전용) ══════ */
 .rai-list{display:flex;flex-direction:column;gap:12px}
 .rai-card{background:#fff;border:1px solid #eaecf0;border-radius:12px;overflow:hidden}
@@ -718,6 +728,27 @@ select.field-input{appearance:none;-webkit-appearance:none;background-image:url(
       <div class="eval-tab-pane" id="pane-rubric"></div>
     </div>
 
+    <!-- 루브릭 기반 AI 피드백 (보조 — 분석 AI와 별도) -->
+    <div class="pn-section white-bg" id="rubricAiSection">
+      <div class="pn-section-hd">
+        <div class="pn-section-hd-left">
+          <i data-lucide="list-checks" style="width:20px;height:20px;color:#0284c7"></i>
+          <span class="pn-section-title">루브릭 기반 AI 피드백</span>
+          <span class="pn-section-badge-optional">선택</span>
+        </div>
+        <div class="pn-section-hd-right" id="rubricAiActionGroup">
+          <button class="btn-rubric-ai-run" id="btnRubricAiRun" onclick="runRubricAi()">
+            <i data-lucide="wand-sparkles" style="width:14px;height:14px"></i>실행
+          </button>
+        </div>
+      </div>
+      <div id="rubricAiPane">
+        <div class="rubric-ai-intro">
+          <p>분석 AI 피드백이 학생에게 어려울 때, <strong>채점기준 기반의 짧고 쉬운 톤</strong>으로 추가 피드백을 만들 수 있어요.</p>
+        </div>
+      </div>
+    </div>
+
     <!-- 선생님 종합 피드백 -->
     <div class="pn-section white-bg">
       <div class="pn-section-hd">
@@ -939,7 +970,8 @@ select.field-input{appearance:none;-webkit-appearance:none;background-image:url(
             <label class="checkbox-row checked" data-key="inst_feedback" onclick="togglePdfOpt(this)"><span class="checkbox-box"><i data-lucide="check" style="width:12px;height:12px"></i></span><span class="checkbox-text">문항별 피드백</span></label>
             <label class="checkbox-row checked" data-key="rubric" onclick="togglePdfOpt(this)"><span class="checkbox-box"><i data-lucide="check" style="width:12px;height:12px"></i></span><span class="checkbox-text">채점기준표</span></label>
             <label class="checkbox-row checked" data-key="elem_ground" onclick="togglePdfOpt(this)"><span class="checkbox-box"><i data-lucide="check" style="width:12px;height:12px"></i></span><span class="checkbox-text">채점요소별 채점근거</span></label>
-            <label class="checkbox-row checked" data-key="elem_feedback" onclick="togglePdfOpt(this)"><span class="checkbox-box"><i data-lucide="check" style="width:12px;height:12px"></i></span><span class="checkbox-text">채점요소별 피드백</span></label>
+            <label class="checkbox-row checked" data-key="elem_feedback_analysis" onclick="togglePdfOpt(this)"><span class="checkbox-box"><i data-lucide="check" style="width:12px;height:12px"></i></span><span class="checkbox-text">채점요소별 피드백 (분석 AI)</span></label>
+            <label class="checkbox-row checked" data-key="elem_feedback_rubric" onclick="togglePdfOpt(this)"><span class="checkbox-box"><i data-lucide="check" style="width:12px;height:12px"></i></span><span class="checkbox-text">채점요소별 피드백 (루브릭 AI)</span></label>
             <label class="checkbox-row checked" data-key="teacher" onclick="togglePdfOpt(this)"><span class="checkbox-box"><i data-lucide="check" style="width:12px;height:12px"></i></span><span class="checkbox-text">선생님 한마디</span></label>
           </div>
         </div>
@@ -988,7 +1020,8 @@ select.field-input{appearance:none;-webkit-appearance:none;background-image:url(
             <label class="checkbox-row checked" data-key="inst_feedback" onclick="toggleShareOpt(this)"><span class="checkbox-box"><i data-lucide="check" style="width:12px;height:12px"></i></span><span class="checkbox-text">문항별 피드백</span></label>
             <label class="checkbox-row checked" data-key="rubric" onclick="toggleShareOpt(this)"><span class="checkbox-box"><i data-lucide="check" style="width:12px;height:12px"></i></span><span class="checkbox-text">채점기준표</span></label>
             <label class="checkbox-row checked" data-key="elem_ground" onclick="toggleShareOpt(this)"><span class="checkbox-box"><i data-lucide="check" style="width:12px;height:12px"></i></span><span class="checkbox-text">채점요소별 채점근거</span></label>
-            <label class="checkbox-row checked" data-key="elem_feedback" onclick="toggleShareOpt(this)"><span class="checkbox-box"><i data-lucide="check" style="width:12px;height:12px"></i></span><span class="checkbox-text">채점요소별 피드백</span></label>
+            <label class="checkbox-row checked" data-key="elem_feedback_analysis" onclick="toggleShareOpt(this)"><span class="checkbox-box"><i data-lucide="check" style="width:12px;height:12px"></i></span><span class="checkbox-text">채점요소별 피드백 (분석 AI)</span></label>
+            <label class="checkbox-row checked" data-key="elem_feedback_rubric" onclick="toggleShareOpt(this)"><span class="checkbox-box"><i data-lucide="check" style="width:12px;height:12px"></i></span><span class="checkbox-text">채점요소별 피드백 (루브릭 AI)</span></label>
             <label class="checkbox-row checked" data-key="teacher" onclick="toggleShareOpt(this)"><span class="checkbox-box"><i data-lucide="check" style="width:12px;height:12px"></i></span><span class="checkbox-text">선생님 한마디</span></label>
           </div>
         </div>
@@ -1071,7 +1104,8 @@ select.field-input{appearance:none;-webkit-appearance:none;background-image:url(
           <label class="checkbox-row checked" data-key="inst_feedback" onclick="togglePreviewOpt(this)"><span class="checkbox-box"><i data-lucide="check" style="width:12px;height:12px"></i></span><span class="checkbox-text">문항별 피드백</span></label>
           <label class="checkbox-row checked" data-key="rubric" onclick="togglePreviewOpt(this)"><span class="checkbox-box"><i data-lucide="check" style="width:12px;height:12px"></i></span><span class="checkbox-text">채점기준표</span></label>
           <label class="checkbox-row checked" data-key="elem_ground" onclick="togglePreviewOpt(this)"><span class="checkbox-box"><i data-lucide="check" style="width:12px;height:12px"></i></span><span class="checkbox-text">채점요소별 채점근거</span></label>
-          <label class="checkbox-row checked" data-key="elem_feedback" onclick="togglePreviewOpt(this)"><span class="checkbox-box"><i data-lucide="check" style="width:12px;height:12px"></i></span><span class="checkbox-text">채점요소별 피드백</span></label>
+          <label class="checkbox-row checked" data-key="elem_feedback_analysis" onclick="togglePreviewOpt(this)"><span class="checkbox-box"><i data-lucide="check" style="width:12px;height:12px"></i></span><span class="checkbox-text">채점요소별 피드백 (분석 AI)</span></label>
+          <label class="checkbox-row checked" data-key="elem_feedback_rubric" onclick="togglePreviewOpt(this)"><span class="checkbox-box"><i data-lucide="check" style="width:12px;height:12px"></i></span><span class="checkbox-text">채점요소별 피드백 (루브릭 AI)</span></label>
           <label class="checkbox-row checked" data-key="teacher" onclick="togglePreviewOpt(this)"><span class="checkbox-box"><i data-lucide="check" style="width:12px;height:12px"></i></span><span class="checkbox-text">선생님 한마디</span></label>
         </div>
       </div>
@@ -1615,6 +1649,8 @@ function applyPreviewItemAvailability(){
                    && rubPane.querySelector('.ec-block,.item-block,.rai-card'))
                 || document.querySelectorAll('.rai-card').length > 0;
 
+  // 루브릭 AI 결과 존재 여부 (rubric AI section)
+  var hasRubricAi = document.querySelectorAll('.rai-card').length > 0;
   var availability = {
     score: hasScore,
     standards: true,
@@ -1622,7 +1658,8 @@ function applyPreviewItemAvailability(){
     inst_feedback: hasInst,
     rubric: true,
     elem_ground: hasElem,
-    elem_feedback: hasElem,
+    elem_feedback_analysis: hasElem,
+    elem_feedback_rubric: hasRubricAi,
     teacher: hasTeacher
   };
   document.querySelectorAll('#previewModal .preview-opt-list .checkbox-row').forEach(function(el){
@@ -1974,19 +2011,20 @@ function applyNotSubmittedUI(){
   var btnApplyMS = document.querySelector('.btn-ai-apply');
   if(btnApplyMS) btnApplyMS.style.display = 'none';
 
-  // AI 피드백 카드 영역: empty state + 루브릭 AI CTA
+  // 분석 AI 섹션은 사용 불가 안내 (메인 진입점은 별도 [루브릭 기반 AI] 섹션)
   var emptyHtml = '<div class="empty-state">'
-    +'<i data-lucide="list-checks" class="empty-state-icon" style="width:36px;height:36px"></i>'
-    +'<div class="empty-state-title">루브릭 기반 AI로 피드백을 만들 수 있어요</div>'
-    +'<div class="empty-state-sub">과제물이 없어 학생 답안 분석은 불가하지만,<br>채점요소별 점수와 채점기준을 토대로 일반적인 AI 피드백을 만들 수 있어요.</div>'
-    +'<button class="empty-state-cta" onclick="runRubricAi()"><i data-lucide="list-checks" style="width:16px;height:16px"></i>루브릭 기반 AI 실행</button>'
+    +'<i data-lucide="file-x-2" class="empty-state-icon" style="width:36px;height:36px"></i>'
+    +'<div class="empty-state-title">분석 AI는 사용할 수 없어요</div>'
+    +'<div class="empty-state-sub">과제물이 없어 학생 답안을 분석할 수 없어요.<br>아래 <strong>루브릭 기반 AI</strong>로 피드백을 만들어 보세요.</div>'
     +'</div>';
   document.getElementById('pane-instruction').innerHTML = emptyHtml;
   document.getElementById('pane-rubric').innerHTML = emptyHtml;
 
-  // 보기 토글 숨김 (탭 분기 제거 — 루브릭 AI 결과는 채점요소 단위 단일)
+  // 보기 토글 + 이전 채점 보기 숨김
   var vt = document.querySelector('.view-toggle');
   if(vt) vt.style.display = 'none';
+  var hl = document.getElementById('btnHistoryLog');
+  if(hl) hl.classList.remove('visible');
 
   // 채점 전이라 하단 [다시 채점] 버튼 숨김 — empty state CTA가 단일 진입점
   var rerun = document.querySelector('.btn-rerun-text');
@@ -2061,14 +2099,21 @@ function renderRubricAiResult(){
       +  '</div>'
       +'</div>';
   }).join('');
-  var footer = '<div class="rai-footer">'
-    + '<button class="rai-regen-btn" onclick="runRubricAi()">'
-    +   '<i data-lucide="rotate-ccw" style="width:14px;height:14px"></i>AI 피드백 재생성'
-    + '</button>'
-    + '</div>';
-  var wrap = '<div class="rai-list">'+html+footer+'</div>';
-  document.getElementById('pane-rubric').innerHTML = wrap;
-  document.getElementById('pane-instruction').innerHTML = wrap;
+  var wrap = '<div class="rai-list">'+html+'</div>';
+  // 일반 학생: 별도 섹션(rubricAiPane)에 렌더 + 헤더 액션 버튼 [재생성]으로 전환
+  var pane = document.getElementById('rubricAiPane');
+  if(pane) pane.innerHTML = wrap;
+  var actionGroup = document.getElementById('rubricAiActionGroup');
+  if(actionGroup){
+    actionGroup.innerHTML = '<button class="btn-rubric-ai-regen" onclick="runRubricAi()">'
+      + '<i data-lucide="rotate-ccw" style="width:14px;height:14px"></i>재생성'
+      + '</button>';
+  }
+  // 미제출 학생일 때만 분석 AI 섹션(pane-instruction/rubric)도 같은 결과로 채움 (legacy 흐름 유지)
+  if(typeof _isNotSubmitted !== 'undefined' && _isNotSubmitted){
+    document.getElementById('pane-rubric').innerHTML = wrap;
+    document.getElementById('pane-instruction').innerHTML = wrap;
+  }
   lucide.createIcons();
 }
 

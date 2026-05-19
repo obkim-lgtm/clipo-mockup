@@ -281,7 +281,8 @@ body{background:#f6f7f9;color:#222631;min-height:100vh}
             <th class="col-item">문항별<br>근거</th>
             <th class="col-item">문항별<br>피드백</th>
             <th class="col-item">채점요소별<br>근거</th>
-            <th class="col-item">채점요소별<br>피드백</th>
+            <th class="col-item">채점요소별 피드백<br>(분석 AI)</th>
+            <th class="col-item">채점요소별 피드백<br>(루브릭 AI)</th>
             <th class="col-period">공개 기간</th>
             <th class="col-state">공개 상태</th>
           </tr>
@@ -308,7 +309,8 @@ body{background:#f6f7f9;color:#222631;min-height:100vh}
         <label class="opt-checkbox checked" data-key="inst_ground" onclick="toggleBulkOpt(this)"><span class="box"><i data-lucide="check" style="width:13px;height:13px"></i></span><span class="lbl">문항별 채점근거</span></label>
         <label class="opt-checkbox checked" data-key="inst_feedback" onclick="toggleBulkOpt(this)"><span class="box"><i data-lucide="check" style="width:13px;height:13px"></i></span><span class="lbl">문항별 피드백</span></label>
         <label class="opt-checkbox" data-key="elem_ground" onclick="toggleBulkOpt(this)"><span class="box"><i data-lucide="check" style="width:13px;height:13px"></i></span><span class="lbl">채점요소별 채점근거</span></label>
-        <label class="opt-checkbox" data-key="elem_feedback" onclick="toggleBulkOpt(this)"><span class="box"><i data-lucide="check" style="width:13px;height:13px"></i></span><span class="lbl">채점요소별 피드백</span></label>
+        <label class="opt-checkbox" data-key="elem_feedback_analysis" onclick="toggleBulkOpt(this)"><span class="box"><i data-lucide="check" style="width:13px;height:13px"></i></span><span class="lbl">채점요소별 피드백 <span style="font-weight:500;color:#6d7381">(분석 AI)</span></span></label>
+        <label class="opt-checkbox" data-key="elem_feedback_rubric" onclick="toggleBulkOpt(this)"><span class="box"><i data-lucide="check" style="width:13px;height:13px"></i></span><span class="lbl">채점요소별 피드백 <span style="font-weight:500;color:#0284c7">(루브릭 AI)</span></span></label>
       </div>
     </section>
 
@@ -376,7 +378,8 @@ body{background:#f6f7f9;color:#222631;min-height:100vh}
           <label class="checkbox-row checked" data-key="inst_feedback" onclick="togglePreviewOpt(this)"><span class="checkbox-box"><i data-lucide="check" style="width:12px;height:12px"></i></span><span class="checkbox-text">문항별 피드백</span></label>
           <label class="checkbox-row checked" data-key="rubric" onclick="togglePreviewOpt(this)"><span class="checkbox-box"><i data-lucide="check" style="width:12px;height:12px"></i></span><span class="checkbox-text">채점기준표</span></label>
           <label class="checkbox-row checked" data-key="elem_ground" onclick="togglePreviewOpt(this)"><span class="checkbox-box"><i data-lucide="check" style="width:12px;height:12px"></i></span><span class="checkbox-text">채점요소별 채점근거</span></label>
-          <label class="checkbox-row checked" data-key="elem_feedback" onclick="togglePreviewOpt(this)"><span class="checkbox-box"><i data-lucide="check" style="width:12px;height:12px"></i></span><span class="checkbox-text">채점요소별 피드백</span></label>
+          <label class="checkbox-row checked" data-key="elem_feedback_analysis" onclick="togglePreviewOpt(this)"><span class="checkbox-box"><i data-lucide="check" style="width:12px;height:12px"></i></span><span class="checkbox-text">채점요소별 피드백 (분석 AI)</span></label>
+          <label class="checkbox-row checked" data-key="elem_feedback_rubric" onclick="togglePreviewOpt(this)"><span class="checkbox-box"><i data-lucide="check" style="width:12px;height:12px"></i></span><span class="checkbox-text">채점요소별 피드백 (루브릭 AI)</span></label>
           <label class="checkbox-row checked" data-key="teacher" onclick="togglePreviewOpt(this)"><span class="checkbox-box"><i data-lucide="check" style="width:12px;height:12px"></i></span><span class="checkbox-text">선생님 한마디</span></label>
         </div>
       </div>
@@ -412,9 +415,9 @@ body{background:#f6f7f9;color:#222631;min-height:100vh}
 // 공통 4개: standards(성취기준) / rubric(채점기준표) / score(점수) / teacher(선생님 종합 피드백)
 // 추가 4개: inst_ground(문항별 근거) / inst_feedback(문항별 피드백) / elem_ground(채점요소별 근거) / elem_feedback(채점요소별 피드백)
 // 기존 채점 학생(이전채점 v1)은 추가 4개 데이터 없음 → false
-var ITEMS_NEW  = {standards:true, rubric:true, score:true, teacher:true, inst_ground:true,  inst_feedback:true,  elem_ground:true,  elem_feedback:true};
-var ITEMS_OLD  = {standards:true, rubric:true, score:true, teacher:true, inst_ground:false, inst_feedback:false, elem_ground:false, elem_feedback:false};
-var ITEMS_NONE = {standards:false,rubric:false,score:false,teacher:false,inst_ground:false, inst_feedback:false, elem_ground:false, elem_feedback:false};
+var ITEMS_NEW  = {standards:true, rubric:true, score:true, teacher:true, inst_ground:true,  inst_feedback:true,  elem_ground:true,  elem_feedback_analysis:true, elem_feedback_rubric:true};
+var ITEMS_OLD  = {standards:true, rubric:true, score:true, teacher:true, inst_ground:false, inst_feedback:false, elem_ground:false, elem_feedback_analysis:false, elem_feedback_rubric:false};
+var ITEMS_NONE = {standards:false,rubric:false,score:false,teacher:false,inst_ground:false, inst_feedback:false, elem_ground:false, elem_feedback_analysis:false, elem_feedback_rubric:false};
 
 var STUDENTS = [
   {id:'10101', name:'김피드백', selectable:true,  checked:true,  items:ITEMS_NEW,  period:'26.04.08 ~ 무기한',     state:'공개'},
@@ -425,8 +428,8 @@ var STUDENTS = [
 ];
 
 // 일괄 적용 옵션 — 8개 (채점요소별 근거·피드백은 기본 해제)
-var BULK_OPTS = {standards:true, rubric:true, score:true, teacher:true, inst_ground:true, inst_feedback:true, elem_ground:false, elem_feedback:false};
-var BULK_OPT_KEYS = ['standards','rubric','score','teacher','inst_ground','inst_feedback','elem_ground','elem_feedback'];
+var BULK_OPTS = {standards:true, rubric:true, score:true, teacher:true, inst_ground:true, inst_feedback:true, elem_ground:false, elem_feedback_analysis:false, elem_feedback_rubric:false};
+var BULK_OPT_KEYS = ['standards','rubric','score','teacher','inst_ground','inst_feedback','elem_ground','elem_feedback_analysis','elem_feedback_rubric'];
 
 function renderTable(){
   var tbody = document.getElementById('studentTbody');
@@ -454,7 +457,8 @@ function renderTable(){
       +'<td class="col-item">'+itemMark('inst_ground')+'</td>'
       +'<td class="col-item">'+itemMark('inst_feedback')+'</td>'
       +'<td class="col-item">'+itemMark('elem_ground')+'</td>'
-      +'<td class="col-item">'+itemMark('elem_feedback')+'</td>'
+      +'<td class="col-item">'+itemMark('elem_feedback_analysis')+'</td>'
+      +'<td class="col-item">'+itemMark('elem_feedback_rubric')+'</td>'
       +'<td class="col-period">'+s.period+'</td>'
       +'<td class="col-state"><span class="'+stateCls+'">'+s.state+'</span></td>'
       +'</tr>';
@@ -601,10 +605,10 @@ function applyDemoMode(){
   // - 기존: 공통 4개만 ON, 추가 4개 모두 OFF (기존 채점엔 데이터 없음)
   if(DEMO_MODE === 'old'){
     BULK_OPTS = {standards:true, rubric:true, score:true, teacher:true,
-                 inst_ground:false, inst_feedback:false, elem_ground:false, elem_feedback:false};
+                 inst_ground:false, inst_feedback:false, elem_ground:false, elem_feedback_analysis:false, elem_feedback_rubric:false};
   } else {
     BULK_OPTS = {standards:true, rubric:true, score:true, teacher:true,
-                 inst_ground:true, inst_feedback:true, elem_ground:false, elem_feedback:false};
+                 inst_ground:true, inst_feedback:true, elem_ground:false, elem_feedback_analysis:false, elem_feedback_rubric:false};
   }
   // UI 체크박스 동기화
   document.querySelectorAll('#bulkOpts .opt-checkbox').forEach(function(el){

@@ -259,7 +259,8 @@ body{background:#f6f7f9;color:#222631;min-height:100vh}
         <label class="opt-row checked" data-key="inst_ground" onclick="toggleOpt(this)"><span class="box"><i data-lucide="check" style="width:12px;height:12px"></i></span><span class="opt-row-text">문항별 채점근거</span></label>
         <label class="opt-row checked" data-key="inst_feedback" onclick="toggleOpt(this)"><span class="box"><i data-lucide="check" style="width:12px;height:12px"></i></span><span class="opt-row-text">문항별 피드백</span></label>
         <label class="opt-row" data-key="elem_ground" onclick="toggleOpt(this)"><span class="box"><i data-lucide="check" style="width:12px;height:12px"></i></span><span class="opt-row-text">채점요소별 채점근거</span></label>
-        <label class="opt-row" data-key="elem_feedback" onclick="toggleOpt(this)"><span class="box"><i data-lucide="check" style="width:12px;height:12px"></i></span><span class="opt-row-text">채점요소별 피드백</span></label>
+        <label class="opt-row" data-key="elem_feedback_analysis" onclick="toggleOpt(this)"><span class="box"><i data-lucide="check" style="width:12px;height:12px"></i></span><span class="opt-row-text">채점요소별 피드백 (분석 AI)</span></label>
+        <label class="opt-row" data-key="elem_feedback_rubric" onclick="toggleOpt(this)"><span class="box"><i data-lucide="check" style="width:12px;height:12px"></i></span><span class="opt-row-text">채점요소별 피드백 (루브릭 AI)</span></label>
       </div>
     </div>
     <div class="modal-ft">
@@ -284,9 +285,9 @@ body{background:#f6f7f9;color:#222631;min-height:100vh}
 
 <script>
 // 학생 데이터
-var ITEMS_NEW  = {standards:true, rubric:true, score:true, teacher:true, inst_ground:true,  inst_feedback:true,  elem_ground:true,  elem_feedback:true};
-var ITEMS_OLD  = {standards:true, rubric:true, score:true, teacher:true, inst_ground:false, inst_feedback:false, elem_ground:false, elem_feedback:false};
-var ITEMS_NONE = {standards:false,rubric:false,score:false,teacher:false,inst_ground:false, inst_feedback:false, elem_ground:false, elem_feedback:false};
+var ITEMS_NEW  = {standards:true, rubric:true, score:true, teacher:true, inst_ground:true,  inst_feedback:true,  elem_ground:true,  elem_feedback_analysis:true, elem_feedback_rubric:true};
+var ITEMS_OLD  = {standards:true, rubric:true, score:true, teacher:true, inst_ground:false, inst_feedback:false, elem_ground:false, elem_feedback_analysis:false, elem_feedback_rubric:false};
+var ITEMS_NONE = {standards:false,rubric:false,score:false,teacher:false,inst_ground:false, inst_feedback:false, elem_ground:false, elem_feedback_analysis:false, elem_feedback_rubric:false};
 
 var STUDENTS = [
   {id:'10101', name:'김피드백', status:'완료',     items:ITEMS_NEW},
@@ -299,7 +300,7 @@ var STUDENTS = [
 var DEMO_MODE = 'mixed';
 var MIXED_OLD_NAMES = ['이전채점'];
 
-var BULK_OPTS = {standards:true, rubric:true, score:true, teacher:true, inst_ground:true, inst_feedback:true, elem_ground:false, elem_feedback:false};
+var BULK_OPTS = {standards:true, rubric:true, score:true, teacher:true, inst_ground:true, inst_feedback:true, elem_ground:false, elem_feedback_analysis:false, elem_feedback_rubric:false};
 
 function applyDemoMode(){
   STUDENTS.forEach(function(s){
@@ -341,7 +342,7 @@ function sendPreviewOpts(){
   var s = STUDENTS.find(function(x){ return x.id === sel.value; });
   // 학생의 items와 BULK_OPTS의 교집합만 노출 (없는 데이터는 무조건 hide)
   var opts = {};
-  ['standards','rubric','score','teacher','inst_ground','inst_feedback','elem_ground','elem_feedback'].forEach(function(k){
+  ['standards','rubric','score','teacher','inst_ground','inst_feedback','elem_ground','elem_feedback_analysis','elem_feedback_rubric'].forEach(function(k){
     opts[k] = s ? (s.items[k] && BULK_OPTS[k]) : false;
   });
   opts.answer = false; // PDF 출력에서는 과제물(내가 쓴 답) 미표시
