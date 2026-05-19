@@ -1433,8 +1433,10 @@ var SCORING_LEVEL_LABELS_FIRST = ['관대하게','보통','엄격하게'];
 var SCORING_LEVEL_LABELS_RERUN = ['이전보다 관대','이전과 유사','이전보다 엄격'];
 // 최초 실행(이전 AI 채점 결과 없음) 학생 — 라벨에 "이전" 단어 제거
 var FIRST_RUN_STUDENTS = ['채점전','채점실패'];
+// 페이지 안에서 채점 실행한 적 있는지 — 실행 후엔 더 이상 'first run'이 아님
+var _hasGradedOnce = FIRST_RUN_STUDENTS.indexOf(studentName) === -1;
 function isFirstRunStudent(){
-  return FIRST_RUN_STUDENTS.indexOf(studentName) !== -1;
+  return !_hasGradedOnce;
 }
 
 function updateScoringLevelLabels(){
@@ -1495,6 +1497,9 @@ function doRerunAi(mode){
   var label = mode === 'append' ? '이어쓰기로 AI 채점을 실행하고 있어요...' : 'AI 채점을 실행하고 있어요...';
   showToast('loading', label);
   setTimeout(function(){
+    // 채점 실행 완료 — 이후 [다시 채점]엔 덮어쓰기/이어쓰기 모드 선택 노출
+    _hasGradedOnce = true;
+
     // 채점전·채점실패였던 상태 해제 → 점수 표 빗금(AI 추천 점수) 노출
     document.body.classList.remove('before-ai-rerun');
     var btnApplyR = document.querySelector('.btn-ai-apply');
