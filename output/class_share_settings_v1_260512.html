@@ -115,6 +115,27 @@ body{background:#f6f7f9;color:#222631;min-height:100vh}
 .modal-overlay{position:fixed;inset:0;background:rgba(34,38,49,.5);display:none;align-items:center;justify-content:center;z-index:1000;padding:24px}
 .modal-overlay.show{display:flex}
 .modal{background:#fff;border-radius:16px;max-width:520px;width:100%;max-height:calc(100vh - 48px);display:flex;flex-direction:column;overflow:hidden;box-shadow:0 12px 40px rgba(0,0,0,.18)}
+
+/* ══════ 미리보기 모달 ══════ */
+.modal.preview-modal{width:98vw;max-width:1640px;height:94vh;max-height:980px;max-width:1640px}
+.preview-body{flex:1;min-height:0;display:flex;flex-direction:row;padding:16px;background:#f6f7f9;gap:16px;overflow:hidden}
+.preview-settings{width:240px;flex-shrink:0;display:flex;flex-direction:column;gap:12px;background:#fff;border-radius:12px;border:1px solid #eaecf0;padding:16px;overflow-y:auto}
+.preview-settings .modal-section-lbl{font-size:13px;font-weight:700;color:#222631;line-height:1.4;margin-bottom:4px}
+.preview-settings-hint{font-size:12px;color:#6d7381;line-height:1.5}
+.preview-preview-wrap{flex:1;min-width:0;display:flex;flex-direction:column;gap:10px}
+.preview-frame-lbl{font-size:13px;font-weight:600;color:#6d7381;display:flex;align-items:center;gap:6px;line-height:1}
+.preview-frame{flex:1;width:100%;border:0;border-radius:10px;background:#fff;box-shadow:0 1px 4px rgba(0,0,0,.06)}
+.preview-opt-list{display:flex;flex-direction:column;gap:8px}
+.preview-opt-list .checkbox-row{display:flex;align-items:center;gap:8px;padding:10px 12px;border-radius:10px;border:1px solid #eaecf0;background:#fff;width:100%;cursor:pointer;transition:border-color .12s,background .12s}
+.preview-opt-list .checkbox-row:hover{border-color:#a3c3ff;background:#fafbff}
+.preview-opt-list .checkbox-row.checked{border-color:#a3c3ff;background:#f4f8ff}
+.preview-opt-list .checkbox-row .checkbox-box{width:18px;height:18px;border:2px solid #dde1e8;border-radius:5px;background:#fff;color:#fff;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .12s}
+.preview-opt-list .checkbox-row.checked .checkbox-box{background:#365eef;border-color:#365eef}
+.preview-opt-list .checkbox-text{font-size:14px;color:#222631;font-weight:500}
+@media (max-width:900px){
+  .preview-body{flex-direction:column}
+  .preview-settings{width:100%;max-height:36%}
+}
 .modal-hd{display:flex;align-items:center;justify-content:space-between;padding:20px 24px;border-bottom:1px solid #eaecf0;flex-shrink:0}
 .modal-title{font-size:18px;font-weight:700;color:#222631;line-height:1.3}
 .modal-close{width:32px;height:32px;display:inline-flex;align-items:center;justify-content:center;border:none;background:none;cursor:pointer;color:#6d7381;border-radius:100px}
@@ -336,26 +357,39 @@ body{background:#f6f7f9;color:#222631;min-height:100vh}
   </div>
 </main>
 
-<!-- 진입 시 안내 모달 (기존+새 채점 섞임) -->
-<div class="modal-overlay" id="mixedInfoModal" onclick="if(event.target===this)dismissMixedInfo()">
-  <div class="modal">
+<!-- 학생 화면 미리보기 모달 (페이지 내 표시) -->
+<div class="modal-overlay" id="previewModal" onclick="if(event.target===this)closePreviewModal()">
+  <div class="modal preview-modal">
     <div class="modal-hd">
-      <span class="modal-title">기존 채점과 새 채점이 섞여있어요</span>
-      <button class="modal-close" onclick="dismissMixedInfo()"><i data-lucide="x" style="width:18px;height:18px"></i></button>
+      <span class="modal-title">학생 화면 미리보기</span>
+      <button class="modal-close" onclick="closePreviewModal()"><i data-lucide="x" style="width:18px;height:18px"></i></button>
     </div>
-    <div class="modal-body">
-      <div class="alert-info">
-        <i data-lucide="info" style="width:18px;height:18px"></i>
-        <span class="alert-info-text">이 학급에는 <strong>이전 버전으로 채점된 학생</strong>과 <strong>새로 채점된 학생</strong>이 함께 있어요. 새 항목(문항별·채점요소별 근거·피드백)은 새로 채점된 학생에게만 데이터가 있습니다.</span>
+    <div class="preview-body">
+      <!-- 좌측: 표시 항목 체크 -->
+      <div class="preview-settings">
+        <span class="modal-section-lbl">표시 항목</span>
+        <p class="preview-settings-hint">항목을 켜고 끄면서 학생 화면을 확인해 보세요. 실제 공개는 일어나지 않아요.</p>
+        <div class="preview-opt-list">
+          <label class="checkbox-row checked" data-key="score" onclick="togglePreviewOpt(this)"><span class="checkbox-box"><i data-lucide="check" style="width:12px;height:12px"></i></span><span class="checkbox-text">점수 (총점/등급)</span></label>
+          <label class="checkbox-row checked" data-key="standards" onclick="togglePreviewOpt(this)"><span class="checkbox-box"><i data-lucide="check" style="width:12px;height:12px"></i></span><span class="checkbox-text">성취기준</span></label>
+          <label class="checkbox-row checked" data-key="inst_ground" onclick="togglePreviewOpt(this)"><span class="checkbox-box"><i data-lucide="check" style="width:12px;height:12px"></i></span><span class="checkbox-text">문항별 채점근거</span></label>
+          <label class="checkbox-row checked" data-key="inst_feedback" onclick="togglePreviewOpt(this)"><span class="checkbox-box"><i data-lucide="check" style="width:12px;height:12px"></i></span><span class="checkbox-text">문항별 피드백</span></label>
+          <label class="checkbox-row checked" data-key="rubric" onclick="togglePreviewOpt(this)"><span class="checkbox-box"><i data-lucide="check" style="width:12px;height:12px"></i></span><span class="checkbox-text">채점기준표</span></label>
+          <label class="checkbox-row checked" data-key="elem_ground" onclick="togglePreviewOpt(this)"><span class="checkbox-box"><i data-lucide="check" style="width:12px;height:12px"></i></span><span class="checkbox-text">채점요소별 채점근거</span></label>
+          <label class="checkbox-row checked" data-key="elem_feedback" onclick="togglePreviewOpt(this)"><span class="checkbox-box"><i data-lucide="check" style="width:12px;height:12px"></i></span><span class="checkbox-text">채점요소별 피드백</span></label>
+          <label class="checkbox-row checked" data-key="teacher" onclick="togglePreviewOpt(this)"><span class="checkbox-box"><i data-lucide="check" style="width:12px;height:12px"></i></span><span class="checkbox-text">선생님 한마디</span></label>
+        </div>
       </div>
-      <p>표에서 <span style="color:#cbd0d8;font-weight:700">'-'</span>로 표시된 항목은 해당 학생에게 데이터가 없어 공개할 수 없는 항목이에요. 이전 채점 학생도 새 항목을 함께 공개하려면 <strong>다시 채점</strong>해 주세요.</p>
-      <label class="checkbox-row-modal" id="mixedDismissCheck" onclick="toggleMixedDismiss(this)">
-        <span class="box"><i data-lucide="check" style="width:11px;height:11px"></i></span>
-        <span class="checkbox-row-modal-text">다시 보지 않기</span>
-      </label>
+      <!-- 우측: 미리보기 -->
+      <div class="preview-preview-wrap">
+        <div class="preview-frame-lbl"><i data-lucide="eye" style="width:14px;height:14px"></i>학생이 보게 될 화면 (공개되지 않습니다)</div>
+        <iframe class="preview-frame" id="previewFrame" src="" title="학생 화면 미리보기"></iframe>
+      </div>
     </div>
-    <div class="modal-ft">
-      <button class="btn-modal-save" onclick="dismissMixedInfo()"><i data-lucide="check" style="width:14px;height:14px"></i>확인</button>
+    <div class="modal-ft" style="justify-content:flex-end">
+      <div class="modal-actions">
+        <button class="btn-modal-cancel" onclick="closePreviewModal()">닫기</button>
+      </div>
     </div>
   </div>
 </div>
@@ -377,22 +411,17 @@ body{background:#f6f7f9;color:#222631;min-height:100vh}
 // 학생 데이터 — items: 학생별 채점 데이터 보유 여부 (false면 해당 항목 없음, '-' 표시)
 // 공통 4개: standards(성취기준) / rubric(채점기준표) / score(점수) / teacher(선생님 종합 피드백)
 // 추가 4개: inst_ground(문항별 근거) / inst_feedback(문항별 피드백) / elem_ground(채점요소별 근거) / elem_feedback(채점요소별 피드백)
-// 기존 채점 학생(이전채점·김현재 v1)은 추가 4개 데이터 없음 → false
+// 기존 채점 학생(이전채점 v1)은 추가 4개 데이터 없음 → false
 var ITEMS_NEW  = {standards:true, rubric:true, score:true, teacher:true, inst_ground:true,  inst_feedback:true,  elem_ground:true,  elem_feedback:true};
 var ITEMS_OLD  = {standards:true, rubric:true, score:true, teacher:true, inst_ground:false, inst_feedback:false, elem_ground:false, elem_feedback:false};
 var ITEMS_NONE = {standards:false,rubric:false,score:false,teacher:false,inst_ground:false, inst_feedback:false, elem_ground:false, elem_feedback:false};
 
 var STUDENTS = [
   {id:'10101', name:'김피드백', selectable:true,  checked:true,  items:ITEMS_NEW,  period:'26.04.08 ~ 무기한',     state:'공개'},
-  {id:'10102', name:'김채점',   selectable:true,  checked:true,  items:ITEMS_NEW,  period:'26.04.08 ~ 26.12.31',  state:'공개'},
   {id:'10103', name:'미제출',   selectable:false, checked:false, items:ITEMS_NONE, period:'-',                    state:'미채점'},
   {id:'10104', name:'채점전',   selectable:false, checked:false, items:ITEMS_NONE, period:'-',                    state:'미채점'},
   {id:'10105', name:'채점실패', selectable:false, checked:false, items:ITEMS_NONE, period:'-',                    state:'미채점'},
-  {id:'10106', name:'이전채점', selectable:true,  checked:true,  items:ITEMS_OLD,  period:'26.04.08 ~ 무기한',     state:'공개'},
-  {id:'10107', name:'김현재',   selectable:true,  checked:true,  items:ITEMS_OLD,  period:'26.04.08 ~ 26.06.30',  state:'공개 예정'},
-  {id:'10108', name:'인라인',   selectable:true,  checked:true,  items:ITEMS_NEW,  period:'26.04.08 ~ 26.05.10',  state:'공개 만료'},
-  {id:'10109', name:'한가람',   selectable:false, checked:false, items:ITEMS_NONE, period:'-',                    state:'미채점'},
-  {id:'10110', name:'오세훈',   selectable:false, checked:false, items:ITEMS_NONE, period:'-',                    state:'미채점'}
+  {id:'10106', name:'이전채점', selectable:true,  checked:true,  items:ITEMS_OLD,  period:'26.04.08 ~ 무기한',     state:'공개'}
 ];
 
 // 일괄 적용 옵션 — 8개 (채점요소별 근거·피드백은 기본 해제)
@@ -497,8 +526,42 @@ function toggleUntil(el){
 }
 
 function previewStudent(){
-  window.open('result_student_view_v3_260512.html', '_blank');
+  openPreviewModal();
 }
+
+// ══════ 학생 화면 미리보기 모달 ══════
+function openPreviewModal(){
+  var frame = document.getElementById('previewFrame');
+  if(frame && !frame.getAttribute('src')){
+    frame.setAttribute('src', 'result_student_view_v3_260512.html?preview=1');
+  }
+  document.getElementById('previewModal').classList.add('show');
+  setTimeout(sendPreviewOpts, 120);
+  lucide.createIcons();
+}
+function closePreviewModal(){ document.getElementById('previewModal').classList.remove('show'); }
+function getPreviewOpts(){
+  var opts = {};
+  document.querySelectorAll('#previewModal .preview-opt-list .checkbox-row').forEach(function(el){
+    var key = el.getAttribute('data-key');
+    if(key) opts[key] = el.classList.contains('checked');
+  });
+  return opts;
+}
+function sendPreviewOpts(){
+  var iframe = document.getElementById('previewFrame');
+  if(!iframe || !iframe.contentWindow) return;
+  iframe.contentWindow.postMessage({type:'share-opts', opts:getPreviewOpts()}, '*');
+}
+function togglePreviewOpt(el){
+  if(el.classList.contains('disabled')) return;
+  el.classList.toggle('checked');
+  sendPreviewOpts();
+}
+document.addEventListener('DOMContentLoaded', function(){
+  var prevIframe = document.getElementById('previewFrame');
+  if(prevIframe){ prevIframe.addEventListener('load', sendPreviewOpts); }
+});
 
 function saveShareSettings(){
   var selected = STUDENTS.filter(function(s){ return s.selectable && s.checked; }).length;
@@ -507,12 +570,6 @@ function saveShareSettings(){
     location.href = 'class_scoring_detail_v1_260512.html';
   }, 1500);
 }
-
-// Esc 키
-document.addEventListener('keydown', function(e){
-  if(e.key !== 'Escape') return;
-  if(document.getElementById('mixedInfoModal').classList.contains('show')) dismissMixedInfo();
-});
 
 var toastTimer = null;
 function showToast(type, msg){
@@ -527,33 +584,9 @@ function showToast(type, msg){
   if(type !== 'loading') toastTimer = setTimeout(function(){ t.classList.remove('show'); }, 2800);
 }
 
-// ══════ 진입 시 안내 모달 (기존+새 채점 섞임 케이스) ══════
-var MIXED_INFO_KEY = 'clipo_class_share_mixed_info_dismissed';
-var _mixedDismiss = false;
-
-function toggleMixedDismiss(el){
-  el.classList.toggle('checked');
-  _mixedDismiss = el.classList.contains('checked');
-}
-function dismissMixedInfo(){
-  if(_mixedDismiss){
-    localStorage.setItem(MIXED_INFO_KEY, '1');
-  }
-  document.getElementById('mixedInfoModal').classList.remove('show');
-}
-function checkMixedInfo(){
-  if(localStorage.getItem(MIXED_INFO_KEY) === '1') return;
-  var hasNew = STUDENTS.some(function(s){ return s.selectable && s.items === ITEMS_NEW; });
-  var hasOld = STUDENTS.some(function(s){ return s.selectable && s.items === ITEMS_OLD; });
-  if(hasNew && hasOld){
-    document.getElementById('mixedInfoModal').classList.add('show');
-    lucide.createIcons();
-  }
-}
-
 // ══════ 데모 모드 (신규 / 섞임 / 기존) ══════
 var DEMO_MODE = 'mixed';
-var MIXED_OLD_NAMES = ['이전채점','김현재']; // 섞임 모드에서 기존 채점으로 처리할 학생
+var MIXED_OLD_NAMES = ['이전채점']; // 섞임 모드에서 기존 채점으로 처리할 학생
 
 function applyDemoMode(){
   STUDENTS.forEach(function(s){
@@ -587,23 +620,10 @@ function setDemoMode(btn){
   document.querySelectorAll('.demo-mode-btn').forEach(function(b){ b.classList.remove('active'); });
   btn.classList.add('active');
   applyDemoMode();
-  // 모달 동작:
-  // - 섞임 모드: 모달 강제 노출 (데모 목적, localStorage 무시)
-  // - 신규/기존 모드: 모달 닫기
-  var modal = document.getElementById('mixedInfoModal');
-  if(DEMO_MODE === 'mixed'){
-    _mixedDismiss = false;
-    document.getElementById('mixedDismissCheck').classList.remove('checked');
-    modal.classList.add('show');
-    lucide.createIcons();
-  } else {
-    modal.classList.remove('show');
-  }
 }
 
 applyDemoMode();
 lucide.createIcons();
-checkMixedInfo();
 </script>
 </body>
 </html>

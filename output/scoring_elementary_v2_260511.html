@@ -216,13 +216,26 @@ body{background:#fff;color:#222631;overflow:hidden;height:100vh}
 .btn-formula:hover{border-color:#a3c3ff;color:#365eef}
 .teacher-fb-save{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-top:12px;flex-wrap:wrap}
 .teacher-fb-save-right{display:inline-flex;align-items:center;gap:8px;flex-wrap:wrap}
-.btn-rerun-text{display:inline-flex;align-items:center;justify-content:center;gap:6px;height:42px;padding:0 18px;background:#fff;border:1px solid #dde1e8;border-radius:100px;color:#3b3f4c;font-size:15px;font-weight:600;cursor:pointer;font-family:inherit;line-height:1}
-.btn-rerun-text:hover{background:#f6f7f9;border-color:#b3b3b3;color:#222631}
-.btn-rerun-text i{color:#6d7381}
+.btn-rerun-text{display:inline-flex;align-items:center;justify-content:center;gap:6px;height:42px;padding:0 18px;background:#fff;border:1px solid #ccdfff;border-radius:100px;color:#3151c4;font-size:15px;font-weight:600;cursor:pointer;font-family:inherit;line-height:1}
+.btn-rerun-text:hover{background:#f4f8ff;border-color:#a3c3ff}
+.btn-rerun-text i{color:#3151c4}
 .btn-share-student{display:inline-flex;align-items:center;justify-content:center;gap:6px;background:#fff;border:1px solid #ccdfff;border-radius:100px;height:42px;padding:0 18px;font-size:15px;font-weight:600;color:#3151c4;cursor:pointer;font-family:inherit;line-height:1}
 .btn-share-student:hover{background:#f4f8ff;border-color:#a3c3ff}
 .btn-share-student:disabled,.btn-share-student.disabled{background:#f6f7f9;border-color:#eaecf0;color:#9ca3af;cursor:not-allowed}
 .btn-share-student:disabled:hover,.btn-share-student.disabled:hover{background:#f6f7f9;border-color:#eaecf0;color:#9ca3af}
+.btn-preview-student{display:inline-flex;align-items:center;justify-content:center;gap:6px;background:#fff;border:1px solid #dde1e8;border-radius:100px;height:42px;padding:0 18px;font-size:15px;font-weight:600;color:#3b3f4c;cursor:pointer;font-family:inherit;line-height:1}
+.btn-preview-student:hover{background:#f4f8ff;border-color:#a3c3ff;color:#365eef}
+/* 미리보기 전용 모달 (액션 없음) — share-preview 컴포넌트와 동일 비주얼 */
+.modal.preview-modal{width:98vw;max-width:1640px;height:94vh;max-height:980px}
+.preview-body{flex:1;min-height:0;display:flex;flex-direction:row;padding:16px;background:#f6f7f9;gap:16px;overflow:hidden}
+.preview-settings{width:240px;flex-shrink:0;display:flex;flex-direction:column;gap:12px;background:#fff;border-radius:12px;border:1px solid #eaecf0;padding:16px;overflow-y:auto}
+.preview-settings .modal-section-lbl{font-size:13px;font-weight:700;color:#222631;line-height:1.4;margin-bottom:4px}
+.preview-settings-hint{font-size:12px;color:#6d7381;line-height:1.5}
+.preview-preview-wrap{flex:1;min-width:0;display:flex;flex-direction:column;gap:10px}
+@media (max-width:900px){
+  .preview-body{flex-direction:column}
+  .preview-settings{width:100%;max-height:36%}
+}
 .btn-modal-save:disabled{background:#cfd3da;cursor:not-allowed}
 .btn-modal-save:disabled:hover{background:#cfd3da}
 .btn-save-next{display:inline-flex;align-items:center;justify-content:center;gap:6px;background:#365eef;border:none;border-radius:100px;height:42px;padding:0 22px;font-size:15px;font-weight:600;color:#fff;cursor:pointer;font-family:inherit;line-height:1}
@@ -624,8 +637,8 @@ select.field-input{appearance:none;-webkit-appearance:none;background-image:url(
           <i data-lucide="rotate-ccw" style="width:16px;height:16px"></i>다시 채점
         </button>
         <div class="teacher-fb-save-right">
-          <button class="btn-share-student" onclick="openMethodModal()">
-            <i data-lucide="send" style="width:16px;height:16px"></i>학생에게 공개
+          <button class="btn-preview-student" onclick="openPreviewModal()">
+            <i data-lucide="eye" style="width:16px;height:16px"></i>미리보기
           </button>
           <button class="btn-save-next" onclick="saveAndNext()">
             <i data-lucide="check" style="width:16px;height:16px"></i>저장 후 다음
@@ -712,10 +725,29 @@ select.field-input{appearance:none;-webkit-appearance:none;background-image:url(
           </div>
         </div>
       </div>
+      <div class="field" id="rerunModeField">
+        <span class="field-lbl">기존 결과 처리</span>
+        <div class="modal-radio-group">
+          <label class="modal-radio-item selected" data-mode="overwrite" onclick="selectRerunMode(this)">
+            <div class="radio-ring checked"></div>
+            <div class="modal-radio-content">
+              <span class="modal-radio-text">덮어쓰기</span>
+              <span class="modal-radio-desc">모든 AI 채점 결과를 새로 생성해요. 직접 수정한 내용은 사라져요.</span>
+            </div>
+          </label>
+          <label class="modal-radio-item" data-mode="append" onclick="selectRerunMode(this)">
+            <div class="radio-ring"></div>
+            <div class="modal-radio-content">
+              <span class="modal-radio-text">이어쓰기</span>
+              <span class="modal-radio-desc">직접 수정한 내용은 그대로 두고, 비어 있거나 손대지 않은 영역만 새로 생성해요.</span>
+            </div>
+          </label>
+        </div>
+      </div>
       <div class="modal-info">
         <i data-lucide="info" class="modal-info-icon" style="width:16px;height:16px"></i>
         <div class="modal-info-text">
-          <strong>다시 실행하면 AI 채점 결과가 모두 새로 생성돼요.</strong>
+          <strong>다시 실행하면 선택한 방식에 따라 AI 채점 결과가 갱신돼요.</strong>
           <ul class="modal-info-list">
             <li>채점요소별 점수 · 채점 근거 · 피드백</li>
             <li>문항별 채점 근거 · 피드백</li>
@@ -725,7 +757,7 @@ select.field-input{appearance:none;-webkit-appearance:none;background-image:url(
       </div>
       <div class="modal-warning" id="rerunWarning" style="display:none">
         <i data-lucide="alert-triangle" class="modal-warning-icon" style="width:16px;height:16px"></i>
-        <span class="modal-warning-text"><strong>수정한 내용이 있어요.</strong> 다시 채점하면 직접 수정한 내용이 모두 사라져요.</span>
+        <span class="modal-warning-text"><strong>수정한 내용이 있어요.</strong> [덮어쓰기]로 실행하면 직접 수정한 내용이 모두 사라져요.</span>
       </div>
     </div>
     <div class="modal-ft" style="justify-content:flex-end">
@@ -881,7 +913,7 @@ select.field-input{appearance:none;-webkit-appearance:none;background-image:url(
 
       <!-- 우측: 학생 화면 미리보기 -->
       <div class="share-preview">
-        <div class="share-preview-lbl"><i data-lucide="eye" style="width:14px;height:14px"></i>학생이 보게 될 화면 미리보기</div>
+        <div class="share-preview-lbl"><i data-lucide="eye" style="width:14px;height:14px"></i>학생이 보게 될 화면 (공개 시 표시되는 모습)</div>
         <iframe class="share-preview-frame" src="result_student_view_v3_260512.html" title="학생 화면 미리보기"></iframe>
       </div>
 
@@ -891,6 +923,43 @@ select.field-input{appearance:none;-webkit-appearance:none;background-image:url(
       <div class="modal-actions">
         <button class="btn-modal-cancel" onclick="closeShareModal()">취소</button>
         <button class="btn-modal-save" onclick="confirmShare()"><i data-lucide="send" style="width:14px;height:14px"></i>학생에게 공개</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 미리보기 전용 모달 (개별 채점용 — 공개 액션 없음) -->
+<div class="modal-overlay" id="previewModal" onclick="if(event.target===this)closePreviewModal()">
+  <div class="modal preview-modal">
+    <div class="modal-hd">
+      <span class="modal-title" id="previewModalTitle">학생 화면 미리보기</span>
+      <button class="modal-close" onclick="closePreviewModal()"><i data-lucide="x" style="width:18px;height:18px"></i></button>
+    </div>
+    <div class="preview-body">
+      <!-- 좌측: 표시 항목 체크 -->
+      <div class="preview-settings">
+        <span class="modal-section-lbl">표시 항목</span>
+        <p class="preview-settings-hint">항목을 켜고 끄면서 학생 화면을 확인해 보세요. 실제 공개는 일어나지 않아요.</p>
+        <div class="preview-opt-list share-opt-list">
+          <label class="checkbox-row checked" data-key="score" onclick="togglePreviewOpt(this)"><span class="checkbox-box"><i data-lucide="check" style="width:12px;height:12px"></i></span><span class="checkbox-text">점수 (총점/등급)</span></label>
+          <label class="checkbox-row checked" data-key="standards" onclick="togglePreviewOpt(this)"><span class="checkbox-box"><i data-lucide="check" style="width:12px;height:12px"></i></span><span class="checkbox-text">성취기준</span></label>
+          <label class="checkbox-row checked" data-key="inst_ground" onclick="togglePreviewOpt(this)"><span class="checkbox-box"><i data-lucide="check" style="width:12px;height:12px"></i></span><span class="checkbox-text">문항별 채점근거</span></label>
+          <label class="checkbox-row checked" data-key="inst_feedback" onclick="togglePreviewOpt(this)"><span class="checkbox-box"><i data-lucide="check" style="width:12px;height:12px"></i></span><span class="checkbox-text">문항별 피드백</span></label>
+          <label class="checkbox-row checked" data-key="rubric" onclick="togglePreviewOpt(this)"><span class="checkbox-box"><i data-lucide="check" style="width:12px;height:12px"></i></span><span class="checkbox-text">채점기준표</span></label>
+          <label class="checkbox-row checked" data-key="elem_ground" onclick="togglePreviewOpt(this)"><span class="checkbox-box"><i data-lucide="check" style="width:12px;height:12px"></i></span><span class="checkbox-text">채점요소별 채점근거</span></label>
+          <label class="checkbox-row checked" data-key="elem_feedback" onclick="togglePreviewOpt(this)"><span class="checkbox-box"><i data-lucide="check" style="width:12px;height:12px"></i></span><span class="checkbox-text">채점요소별 피드백</span></label>
+          <label class="checkbox-row checked" data-key="teacher" onclick="togglePreviewOpt(this)"><span class="checkbox-box"><i data-lucide="check" style="width:12px;height:12px"></i></span><span class="checkbox-text">선생님 한마디</span></label>
+        </div>
+      </div>
+      <!-- 우측: 미리보기 -->
+      <div class="preview-preview-wrap">
+        <div class="share-preview-lbl"><i data-lucide="eye" style="width:14px;height:14px"></i>학생이 보게 될 화면 (공개되지 않습니다)</div>
+        <iframe class="share-preview-frame" id="previewFrame" src="" title="학생 화면 미리보기"></iframe>
+      </div>
+    </div>
+    <div class="modal-ft" style="justify-content:flex-end">
+      <div class="modal-actions">
+        <button class="btn-modal-cancel" onclick="closePreviewModal()">닫기</button>
       </div>
     </div>
   </div>
@@ -913,17 +982,13 @@ var fromUrl = urlParams.get('from') || '';
 
 // ══════ 학생 리스트 ══════
 var STUDENT_LIST = [
-  {id:'10101', name:'김피드백', status:'확인 필요', statusCls:'need', link:'scoring_elementary_v2_260511.html'},
-  {id:'10102', name:'김채점', status:'확인 필요', statusCls:'need', link:'scoring_elementary_v2_260511.html'},
-  {id:'10103', name:'미제출', status:'미제출', statusCls:'progress', link:'scoring_elementary_v2_260511.html'},
-  {id:'10104', name:'채점전', status:'AI 채점 전', statusCls:'none', link:'scoring_elementary_v2_260511.html'},
-  {id:'10105', name:'채점실패', status:'AI 채점 실패', statusCls:'need', link:'scoring_elementary_v2_260511.html'},
-  {id:'10106', name:'이전채점', status:'이전 채점', statusCls:'none'},
-  {id:'10107', name:'김현재', status:'확인 필요', statusCls:'need', link:'scoring_elementary_v1_260506.html'},
-  {id:'10108', name:'한가람', status:'미채점', statusCls:'none'},
-  {id:'10109', name:'오세훈', status:'미채점', statusCls:'none'}
+  {id:'10101', name:'김피드백', status:'확인 필요', statusCls:'need'},
+  {id:'10103', name:'미제출', status:'미제출', statusCls:'progress'},
+  {id:'10104', name:'채점전', status:'AI 채점 전', statusCls:'none'},
+  {id:'10105', name:'채점실패', status:'AI 채점 실패', statusCls:'need'},
+  {id:'10106', name:'이전채점', status:'이전 채점', statusCls:'none', legacy:true}
 ];
-var BASE_FILE = 'scoring_elementary_v1_260506.html';
+var BASE_FILE = 'scoring_elementary_v2_260511.html';
 var currentStudentIdx = STUDENT_LIST.findIndex(function(s){ return s.id === studentId; });
 if (currentStudentIdx < 0) currentStudentIdx = 0;
 
@@ -1075,7 +1140,7 @@ function editableBlock(label, value){
     +'<div class="ec-block-lbl-row">'
     + labelHtml
     +'<div class="ec-block-lbl-spacer"></div>'
-    +'<button class="revert-btn" onclick="revertBlock(this)"><i data-lucide="rotate-ccw" style="width:11px;height:11px"></i>되돌리기</button>'
+    +'<button class="revert-btn" onclick="revertBlock(this)"><i data-lucide="rotate-ccw" style="width:11px;height:11px"></i>AI 초안으로 되돌리기</button>'
     +'</div>'
     +'<div class="ec-block-content editable" contenteditable="true" data-original="'+orig+'">'+orig+'</div>'
     +'</div>';
@@ -1143,12 +1208,33 @@ function renderElementCards(){
 
 function bindEditableHandlers(){
   document.querySelectorAll('.editable').forEach(function(el){
+    if(el.dataset.bound) return;
+    el.dataset.bound = '1';
     el.addEventListener('input',function(){
       var orig = el.getAttribute('data-original')||'';
       var block = el.closest('.ec-block');
       if(block) block.classList.toggle('dirty', el.textContent !== orig);
     });
+    el.addEventListener('focus', function(){
+      el.setAttribute('data-snapshot', el.textContent);
+    });
+    el.addEventListener('blur', function(){
+      var snap = el.getAttribute('data-snapshot');
+      if(snap === null) return;
+      if(snap !== el.textContent) notifyAutosave();
+      el.removeAttribute('data-snapshot');
+    });
   });
+}
+
+// blur 시 자동저장 토스트 (점수 미선택이면 에러 토스트)
+function notifyAutosave(){
+  var hasScore = document.querySelectorAll('.score-btn.selected').length > 0;
+  if(!hasScore){
+    showToast('error', '점수 체크 후 저장해 주세요.');
+  } else {
+    showToast('success', '저장되었습니다.');
+  }
 }
 
 function revertBlock(btn){
@@ -1219,7 +1305,7 @@ var RERUN_LEVEL_KEY = 'clipo_last_scoring_level';
 var SCORING_LEVEL_LABELS_FIRST = ['관대하게','보통','엄격하게'];
 var SCORING_LEVEL_LABELS_RERUN = ['이전보다 관대','이전과 유사','이전보다 엄격'];
 // 최초 실행(이전 AI 채점 결과 없음) 학생 — 라벨에 "이전" 단어 제거
-var FIRST_RUN_STUDENTS = ['채점전','채점실패','한가람','오세훈'];
+var FIRST_RUN_STUDENTS = ['채점전','채점실패'];
 function isFirstRunStudent(){
   return FIRST_RUN_STUDENTS.indexOf(studentName) !== -1;
 }
@@ -1242,20 +1328,48 @@ function rerunAi(){
     labelsRoot.children[i].textContent = labelSet[i];
   }
   updateScoringLevelLabels();
-  var hasDirty = document.querySelectorAll('.ec-block.dirty').length > 0;
-  document.getElementById('rerunWarning').style.display = hasDirty ? 'flex' : 'none';
+  // 모드 선택은 항상 '덮어쓰기' 기본으로 리셋
+  selectRerunMode(document.querySelector('#rerunModeField .modal-radio-item[data-mode="overwrite"]'));
+  // 최초 실행 학생(이전 AI 채점 결과 없음)이면 모드 선택 자체를 숨김
+  var modeField = document.getElementById('rerunModeField');
+  if(modeField) modeField.style.display = isFirstRunStudent() ? 'none' : 'flex';
+  updateRerunWarning();
   document.getElementById('rerunConfirmModal').classList.add('show');
+}
+function selectRerunMode(el){
+  if(!el) return;
+  document.querySelectorAll('#rerunModeField .modal-radio-item').forEach(function(it){
+    it.classList.remove('selected');
+    var ring = it.querySelector('.radio-ring'); if(ring) ring.classList.remove('checked');
+  });
+  el.classList.add('selected');
+  var ring = el.querySelector('.radio-ring'); if(ring) ring.classList.add('checked');
+  updateRerunWarning();
+}
+function getRerunMode(){
+  var sel = document.querySelector('#rerunModeField .modal-radio-item.selected');
+  return sel ? sel.getAttribute('data-mode') : 'overwrite';
+}
+function updateRerunWarning(){
+  var hasDirty = document.querySelectorAll('.ec-block.dirty').length > 0;
+  var isOverwrite = getRerunMode() === 'overwrite';
+  // 수정한 내용이 있고 + 덮어쓰기 모드일 때만 경고 표시
+  document.getElementById('rerunWarning').style.display = (hasDirty && isOverwrite) ? 'flex' : 'none';
 }
 function closeRerunConfirm(){ document.getElementById('rerunConfirmModal').classList.remove('show'); }
 function confirmRerun(){
   var level = parseInt(document.getElementById('scoringLevelSlider').value,10);
   localStorage.setItem(RERUN_LEVEL_KEY, level);
+  var mode = getRerunMode();
   closeRerunConfirm();
-  doRerunAi();
+  doRerunAi(mode);
 }
-function doRerunAi(){
-  showToast('loading','AI 채점을 실행하고 있어요...');
-  setTimeout(function(){ showToast('success','AI 채점이 완료됐어요.'); },1800);
+function doRerunAi(mode){
+  var label = mode === 'append' ? '이어쓰기로 AI 채점을 실행하고 있어요...' : 'AI 채점을 실행하고 있어요...';
+  showToast('loading', label);
+  setTimeout(function(){
+    showToast('success', mode === 'append' ? 'AI 채점이 완료됐어요. (수정한 내용은 유지)' : 'AI 채점이 완료됐어요.');
+  },1800);
 }
 
 // ══════ 글자수 ══════
@@ -1298,11 +1412,49 @@ function revertTeacherFeedback(){
 // ══════ 액션 ══════
 function saveAndNext(){ showToast('success','저장됐어요.'); }
 
-// ══════ 학생 공개 모달 ══════
+// ══════ 미리보기 전용 모달 (개별 채점) ══════
+function openPreviewModal(){
+  var s = (typeof _curStudent !== 'undefined') ? _curStudent : null;
+  if(s){
+    document.getElementById('previewModalTitle').textContent = s.name + ' 학생 화면 미리보기';
+  }
+  var frame = document.getElementById('previewFrame');
+  if(frame && !frame.getAttribute('src')){
+    frame.setAttribute('src', 'result_student_view_v3_260512.html?preview=1');
+  }
+  document.getElementById('previewModal').classList.add('show');
+  // 모달 열린 직후 현재 체크 상태로 iframe 동기화
+  setTimeout(sendPreviewOpts, 120);
+  lucide.createIcons();
+}
+function closePreviewModal(){ document.getElementById('previewModal').classList.remove('show'); }
+
+// ══════ 미리보기 모달 — 표시 항목 토글 ══════
+function getPreviewOpts(){
+  var opts = {};
+  document.querySelectorAll('#previewModal .preview-opt-list .checkbox-row').forEach(function(el){
+    var key = el.getAttribute('data-key');
+    if(key) opts[key] = el.classList.contains('checked');
+  });
+  return opts;
+}
+function sendPreviewOpts(){
+  var iframe = document.getElementById('previewFrame');
+  if(!iframe || !iframe.contentWindow) return;
+  iframe.contentWindow.postMessage({type:'share-opts', opts:getPreviewOpts()}, '*');
+}
+function togglePreviewOpt(el){
+  if(el.classList.contains('disabled')) return;
+  el.classList.toggle('checked');
+  sendPreviewOpts();
+}
+
+// ══════ 학생 공개 모달 (학급 일괄 공개 플로우에서 사용) ══════
 function updateShareBtnState(){
+  // 개별 채점 페이지에선 미리보기 버튼만 노출 (공개 버튼 없음)
+  // — 본 함수는 학급 공개 플로우의 공개 버튼 활성화 체크에 재사용
   var btn = document.querySelector('.btn-share-student');
   if(!btn) return;
-  // 채점 결과 표에서 점수가 1개 이상 선택돼야 활성
   var hasScore = document.querySelectorAll('.score-btn.selected').length > 0;
   btn.disabled = !hasScore;
   btn.title = !hasScore ? '채점 결과 점수를 1개 이상 선택해야 공개할 수 있어요.' : '';
@@ -1508,12 +1660,24 @@ function confirmShare(){
   showToast('success', '학생에게 결과가 공개됐어요.');
 }
 
-// iframe 로드 완료 시 옵션 전송
+// iframe 로드 완료 시 옵션 전송 + 선생님 한마디 textarea blur 자동저장 토스트
 document.addEventListener('DOMContentLoaded', function(){
   var shareIframe = document.querySelector('#shareModal .share-preview-frame');
   if(shareIframe){ shareIframe.addEventListener('load', sendShareOpts); }
   var pdfIframe = document.getElementById('pdfPreviewFrame');
   if(pdfIframe){ pdfIframe.addEventListener('load', sendPdfOpts); }
+  var prevIframe = document.getElementById('previewFrame');
+  if(prevIframe){ prevIframe.addEventListener('load', sendPreviewOpts); }
+  var tf = document.getElementById('teacherFeedback');
+  if(tf){
+    tf.addEventListener('focus', function(){ tf.setAttribute('data-snapshot', tf.value); });
+    tf.addEventListener('blur', function(){
+      var snap = tf.getAttribute('data-snapshot');
+      if(snap === null) return;
+      if(snap !== tf.value) notifyAutosave();
+      tf.removeAttribute('data-snapshot');
+    });
+  }
 });
 
 // ══════ 뷰어 ══════
@@ -1552,6 +1716,7 @@ document.addEventListener('keydown',function(e){
   if(e.key!=='Escape')return;
   if(document.getElementById('instructionEditModal').classList.contains('show')) closeInstructionEditModal();
   else if(document.getElementById('rerunConfirmModal').classList.contains('show')) closeRerunConfirm();
+  else if(document.getElementById('previewModal').classList.contains('show')) closePreviewModal();
   else if(document.getElementById('shareModal').classList.contains('show')) closeShareModal();
   else if(document.getElementById('pdfModal').classList.contains('show')) closePdfModal();
   else if(document.getElementById('methodModal').classList.contains('show')) closeMethodModal();
@@ -1652,6 +1817,32 @@ function applyNotGradedUI(){
   lucide.createIcons();
 }
 
+// ══════ 이전 채점 학생 UI (legacy — 문항별 데이터 없음) ══════
+function applyLegacyUI(){
+  renderElementCards();
+  autoSelectAiScores();
+
+  // 문항별 탭은 데이터가 없으므로 empty state
+  var emptyHtml = '<div class="empty-state">'
+    +'<i data-lucide="info" class="empty-state-icon" style="width:36px;height:36px"></i>'
+    +'<div class="empty-state-title">표시할 정보가 없어요</div>'
+    +'<div class="empty-state-sub">이전에 채점된 결과라 문항별 결과가 없어요.<br>다시 채점하면 함께 생성돼요.</div>'
+    +'</div>';
+  document.getElementById('pane-instruction').innerHTML = emptyHtml;
+
+  // 디폴트 탭: 채점요소별
+  switchTab('rubric');
+
+  // 문항별 탭 버튼에 비활성 느낌(클릭은 가능하나 empty state만 표시)
+  var tabInst = document.getElementById('tab-instruction');
+  if(tabInst) tabInst.style.opacity = '0.55';
+
+  // 선생님 한마디 AI 초안 자동 채움 (새 UI 동일 적용 — 3섹션 구조)
+  fillTeacherFeedbackDraft();
+
+  lucide.createIcons();
+}
+
 // ══════ AI 채점 실패 학생 UI ══════
 function applyFailedUI(){
   // 좌측 viewer: 정상 노출 (과제물 PDF) — 제출은 됐음
@@ -1700,12 +1891,15 @@ var _curStudent = STUDENT_LIST[currentStudentIdx];
 var _isNotSubmitted = _curStudent && _curStudent.status === '미제출';
 var _isNotGraded = _curStudent && _curStudent.status === 'AI 채점 전';
 var _isFailed = _curStudent && _curStudent.status === 'AI 채점 실패';
+var _isLegacy = _curStudent && _curStudent.legacy === true;
 if(_isNotSubmitted){
   applyNotSubmittedUI();
 } else if(_isNotGraded){
   applyNotGradedUI();
 } else if(_isFailed){
   applyFailedUI();
+} else if(_isLegacy){
+  applyLegacyUI();
 } else {
   renderInstructionCards();
   renderElementCards();
