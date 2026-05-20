@@ -294,10 +294,27 @@ body.before-ai-rerun .score-btn.ai-suggest:hover{background:#f4f8ff;border-color
 .h-teacher-fb{font-size:13px;color:#3b3f4c;line-height:1.65;padding:12px 14px;background:#f6f7f9;border-radius:8px;white-space:pre-wrap;font-family:inherit;font-weight:500}
 .history-empty{padding:32px 20px;text-align:center;color:#9ca3af;font-size:13px;line-height:1.6}
 
+/* 히스토리 drawer 탭 (과제물 AI / 루브릭 AI) */
+.history-tabs{display:flex;gap:4px;padding:4px;background:#f1f3f5;border-radius:100px;margin-bottom:4px}
+.history-tab{flex:1;display:inline-flex;align-items:center;justify-content:center;gap:6px;height:36px;padding:0 12px;border-radius:100px;background:transparent;border:none;color:#6d7381;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;line-height:1;transition:all .12s}
+.history-tab i{color:#9ca3af;flex-shrink:0}
+.history-tab:hover:not(.active){color:#3b3f4c}
+.history-tab.active{background:#fff;color:#3b3f4c;box-shadow:0 1px 3px rgba(0,0,0,.08)}
+.history-tab.active i{color:#3b3f4c}
+.history-tab-count{display:inline-flex;align-items:center;height:18px;padding:0 7px;border-radius:100px;background:#e6e9ee;color:#6d7381;font-size:11px;font-weight:700;line-height:1}
+.history-tab.active .history-tab-count{background:#eef3ff;color:#3151c4}
+.history-tab-pane{display:flex;flex-direction:column;gap:12px}
+.history-tab-pane.active{display:flex}
+
+/* 루브릭 AI 히스토리 카드 내부 */
+.h-rai-list{display:flex;flex-direction:column;gap:8px}
+.h-rai-item{padding:11px 12px;border:1px solid #eaecf0;border-radius:8px;background:#fff;display:flex;flex-direction:column;gap:8px}
+.h-rai-item-hd{display:inline-flex;align-items:center;gap:8px;flex-wrap:wrap}
+.h-rai-tag{display:inline-flex;align-items:center;justify-content:center;height:22px;padding:0 8px;border-radius:100px;background:#f1f3f5;color:#6d7381;font-size:12px;font-weight:700;line-height:1}
+.h-rai-name{font-size:13px;font-weight:600;color:#3b3f4c;line-height:1.4}
+.h-rai-text{font-size:13px;color:#3b3f4c;line-height:1.55;padding:8px 10px;background:#f6f7f9;border-radius:6px;white-space:pre-wrap}
+
 /* AI 피드백 헤더 [이전 채점 보기] 버튼 (히스토리 학생만 노출) */
-.btn-history-log{display:none;align-items:center;justify-content:center;gap:6px;height:34px;padding:0 14px;border-radius:100px;background:#eef3ff;border:1px solid #ccdfff;color:#3151c4;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;line-height:1;margin-right:8px}
-.btn-history-log:hover{background:#dce6ff;border-color:#a3c3ff}
-.btn-history-log.visible{display:inline-flex}
 
 /* 페이지 하단 [다시 채점] 옆 "이전 결과 보기" 텍스트 링크 (히스토리 학생만) */
 .history-text-link{display:none;align-items:center;gap:5px;font-size:14px;font-weight:600;color:#3151c4;background:none;border:none;cursor:pointer;font-family:inherit;line-height:1;padding:6px 10px;border-radius:8px;text-decoration:underline;text-underline-offset:3px;text-decoration-color:#a3c3ff}
@@ -307,7 +324,7 @@ body.before-ai-rerun .score-btn.ai-suggest:hover{background:#f4f8ff;border-color
 /* 미리보기 전용 모달 (액션 없음) — share-preview 컴포넌트와 동일 비주얼 */
 .modal.preview-modal{width:98vw;max-width:1640px;height:94vh;max-height:980px}
 .preview-body{flex:1;min-height:0;display:flex;flex-direction:row;padding:16px;background:#f6f7f9;gap:16px;overflow:hidden}
-.preview-settings{width:240px;flex-shrink:0;display:flex;flex-direction:column;gap:12px;background:#fff;border-radius:12px;border:1px solid #eaecf0;padding:16px;overflow-y:auto}
+.preview-settings{width:360px;flex-shrink:0;display:flex;flex-direction:column;gap:12px;background:#fff;border-radius:12px;border:1px solid #eaecf0;padding:16px;overflow-y:auto}
 .preview-settings .modal-section-lbl{font-size:13px;font-weight:700;color:#222631;line-height:1.4;margin-bottom:4px}
 .preview-settings-hint{font-size:12px;color:#6d7381;line-height:1.5}
 .preview-preview-wrap{flex:1;min-width:0;display:flex;flex-direction:column;gap:10px}
@@ -663,7 +680,7 @@ select.field-input{appearance:none;-webkit-appearance:none;background-image:url(
 
       <div class="rubric-box">
         <div class="rubric-box-hd">
-          <span class="rubric-box-title">채점 기준</span>
+          <span class="rubric-box-title">채점기준</span>
           <div class="rubric-box-actions">
             <button class="btn-ai-apply applied" onclick="applyAiScores()">
               <i data-lucide="check" style="width:14px;height:14px"></i>
@@ -713,14 +730,9 @@ select.field-input{appearance:none;-webkit-appearance:none;background-image:url(
           <i data-lucide="bot" style="width:20px;height:20px;color:#365eef"></i>
           <span class="pn-section-title">AI 피드백</span>
         </div>
-        <div class="pn-section-hd-right" style="display:inline-flex;align-items:center">
-          <button class="btn-history-log" id="btnHistoryLog" onclick="openHistoryDrawer()" title="이전 차수 채점 결과 보기">
-            <i data-lucide="history" style="width:15px;height:15px"></i>이전 채점 보기
-          </button>
-          <div class="view-toggle" role="tablist">
-            <button class="vt-btn active" id="tab-instruction" onclick="switchTab('instruction')">문항별</button>
-            <button class="vt-btn" id="tab-rubric" onclick="switchTab('rubric')">채점요소별</button>
-          </div>
+        <div class="view-toggle" role="tablist">
+          <button class="vt-btn active" id="tab-instruction" onclick="switchTab('instruction')">문항별</button>
+          <button class="vt-btn" id="tab-rubric" onclick="switchTab('rubric')">채점요소별</button>
         </div>
       </div>
 
@@ -734,7 +746,6 @@ select.field-input{appearance:none;-webkit-appearance:none;background-image:url(
         <div class="pn-section-hd-left">
           <i data-lucide="list-checks" style="width:20px;height:20px;color:#0284c7"></i>
           <span class="pn-section-title">루브릭 기반 AI 피드백</span>
-          <span class="pn-section-badge-optional">선택</span>
         </div>
         <div class="pn-section-hd-right" id="rubricAiActionGroup">
           <button class="btn-rubric-ai-run" id="btnRubricAiRun" onclick="runRubricAi()">
@@ -744,7 +755,7 @@ select.field-input{appearance:none;-webkit-appearance:none;background-image:url(
       </div>
       <div id="rubricAiPane">
         <div class="rubric-ai-intro">
-          <p>분석 AI 피드백이 학생에게 어려울 때, <strong>채점기준 기반의 짧고 쉬운 톤</strong>으로 추가 피드백을 만들 수 있어요.</p>
+          <p>과제물 기반 피드백 외에 <strong>채점기준 기반의 추가 피드백</strong>을 만들 수 있어요.</p>
         </div>
       </div>
     </div>
@@ -892,6 +903,7 @@ select.field-input{appearance:none;-webkit-appearance:none;background-image:url(
             <li>채점요소별 점수 · 채점 근거 · 피드백</li>
             <li>문항별 채점 근거 · 피드백</li>
             <li>선생님 한마디(잘한 점 / 다음 도전 / 종합 의견)</li>
+            <li>루브릭 AI 결과도 함께 리셋 (점수가 갱신되므로)</li>
           </ul>
         </div>
       </div>
@@ -969,8 +981,8 @@ select.field-input{appearance:none;-webkit-appearance:none;background-image:url(
             <label class="checkbox-row checked" data-key="inst_ground" onclick="togglePdfOpt(this)"><span class="checkbox-box"><i data-lucide="check" style="width:12px;height:12px"></i></span><span class="checkbox-text">문항별 채점근거</span></label>
             <label class="checkbox-row checked" data-key="inst_feedback" onclick="togglePdfOpt(this)"><span class="checkbox-box"><i data-lucide="check" style="width:12px;height:12px"></i></span><span class="checkbox-text">문항별 피드백</span></label>
             <label class="checkbox-row checked" data-key="rubric" onclick="togglePdfOpt(this)"><span class="checkbox-box"><i data-lucide="check" style="width:12px;height:12px"></i></span><span class="checkbox-text">채점기준표</span></label>
-            <label class="checkbox-row checked" data-key="elem_ground" onclick="togglePdfOpt(this)"><span class="checkbox-box"><i data-lucide="check" style="width:12px;height:12px"></i></span><span class="checkbox-text">채점요소별 채점근거</span></label>
-            <label class="checkbox-row checked" data-key="elem_feedback_analysis" onclick="togglePdfOpt(this)"><span class="checkbox-box"><i data-lucide="check" style="width:12px;height:12px"></i></span><span class="checkbox-text">채점요소별 피드백 (분석 AI)</span></label>
+            <label class="checkbox-row checked" data-key="elem_ground" onclick="togglePdfOpt(this)"><span class="checkbox-box"><i data-lucide="check" style="width:12px;height:12px"></i></span><span class="checkbox-text">채점요소별 채점근거 (과제물 AI)</span></label>
+            <label class="checkbox-row checked" data-key="elem_feedback_analysis" onclick="togglePdfOpt(this)"><span class="checkbox-box"><i data-lucide="check" style="width:12px;height:12px"></i></span><span class="checkbox-text">채점요소별 피드백 (과제물 AI)</span></label>
             <label class="checkbox-row checked" data-key="elem_feedback_rubric" onclick="togglePdfOpt(this)"><span class="checkbox-box"><i data-lucide="check" style="width:12px;height:12px"></i></span><span class="checkbox-text">채점요소별 피드백 (루브릭 AI)</span></label>
             <label class="checkbox-row checked" data-key="teacher" onclick="togglePdfOpt(this)"><span class="checkbox-box"><i data-lucide="check" style="width:12px;height:12px"></i></span><span class="checkbox-text">선생님 한마디</span></label>
           </div>
@@ -1019,8 +1031,8 @@ select.field-input{appearance:none;-webkit-appearance:none;background-image:url(
             <label class="checkbox-row checked" data-key="inst_ground" onclick="toggleShareOpt(this)"><span class="checkbox-box"><i data-lucide="check" style="width:12px;height:12px"></i></span><span class="checkbox-text">문항별 채점근거</span></label>
             <label class="checkbox-row checked" data-key="inst_feedback" onclick="toggleShareOpt(this)"><span class="checkbox-box"><i data-lucide="check" style="width:12px;height:12px"></i></span><span class="checkbox-text">문항별 피드백</span></label>
             <label class="checkbox-row checked" data-key="rubric" onclick="toggleShareOpt(this)"><span class="checkbox-box"><i data-lucide="check" style="width:12px;height:12px"></i></span><span class="checkbox-text">채점기준표</span></label>
-            <label class="checkbox-row checked" data-key="elem_ground" onclick="toggleShareOpt(this)"><span class="checkbox-box"><i data-lucide="check" style="width:12px;height:12px"></i></span><span class="checkbox-text">채점요소별 채점근거</span></label>
-            <label class="checkbox-row checked" data-key="elem_feedback_analysis" onclick="toggleShareOpt(this)"><span class="checkbox-box"><i data-lucide="check" style="width:12px;height:12px"></i></span><span class="checkbox-text">채점요소별 피드백 (분석 AI)</span></label>
+            <label class="checkbox-row checked" data-key="elem_ground" onclick="toggleShareOpt(this)"><span class="checkbox-box"><i data-lucide="check" style="width:12px;height:12px"></i></span><span class="checkbox-text">채점요소별 채점근거 (과제물 AI)</span></label>
+            <label class="checkbox-row checked" data-key="elem_feedback_analysis" onclick="toggleShareOpt(this)"><span class="checkbox-box"><i data-lucide="check" style="width:12px;height:12px"></i></span><span class="checkbox-text">채점요소별 피드백 (과제물 AI)</span></label>
             <label class="checkbox-row checked" data-key="elem_feedback_rubric" onclick="toggleShareOpt(this)"><span class="checkbox-box"><i data-lucide="check" style="width:12px;height:12px"></i></span><span class="checkbox-text">채점요소별 피드백 (루브릭 AI)</span></label>
             <label class="checkbox-row checked" data-key="teacher" onclick="toggleShareOpt(this)"><span class="checkbox-box"><i data-lucide="check" style="width:12px;height:12px"></i></span><span class="checkbox-text">선생님 한마디</span></label>
           </div>
@@ -1103,8 +1115,8 @@ select.field-input{appearance:none;-webkit-appearance:none;background-image:url(
           <label class="checkbox-row checked" data-key="inst_ground" onclick="togglePreviewOpt(this)"><span class="checkbox-box"><i data-lucide="check" style="width:12px;height:12px"></i></span><span class="checkbox-text">문항별 채점근거</span></label>
           <label class="checkbox-row checked" data-key="inst_feedback" onclick="togglePreviewOpt(this)"><span class="checkbox-box"><i data-lucide="check" style="width:12px;height:12px"></i></span><span class="checkbox-text">문항별 피드백</span></label>
           <label class="checkbox-row checked" data-key="rubric" onclick="togglePreviewOpt(this)"><span class="checkbox-box"><i data-lucide="check" style="width:12px;height:12px"></i></span><span class="checkbox-text">채점기준표</span></label>
-          <label class="checkbox-row checked" data-key="elem_ground" onclick="togglePreviewOpt(this)"><span class="checkbox-box"><i data-lucide="check" style="width:12px;height:12px"></i></span><span class="checkbox-text">채점요소별 채점근거</span></label>
-          <label class="checkbox-row checked" data-key="elem_feedback_analysis" onclick="togglePreviewOpt(this)"><span class="checkbox-box"><i data-lucide="check" style="width:12px;height:12px"></i></span><span class="checkbox-text">채점요소별 피드백 (분석 AI)</span></label>
+          <label class="checkbox-row checked" data-key="elem_ground" onclick="togglePreviewOpt(this)"><span class="checkbox-box"><i data-lucide="check" style="width:12px;height:12px"></i></span><span class="checkbox-text">채점요소별 채점근거 (과제물 AI)</span></label>
+          <label class="checkbox-row checked" data-key="elem_feedback_analysis" onclick="togglePreviewOpt(this)"><span class="checkbox-box"><i data-lucide="check" style="width:12px;height:12px"></i></span><span class="checkbox-text">채점요소별 피드백 (과제물 AI)</span></label>
           <label class="checkbox-row checked" data-key="elem_feedback_rubric" onclick="togglePreviewOpt(this)"><span class="checkbox-box"><i data-lucide="check" style="width:12px;height:12px"></i></span><span class="checkbox-text">채점요소별 피드백 (루브릭 AI)</span></label>
           <label class="checkbox-row checked" data-key="teacher" onclick="togglePreviewOpt(this)"><span class="checkbox-box"><i data-lucide="check" style="width:12px;height:12px"></i></span><span class="checkbox-text">선생님 한마디</span></label>
         </div>
@@ -1566,6 +1578,9 @@ function doRerunAi(mode){
       fillTeacherFeedbackDraft();
     }
 
+    // 루브릭 AI 결과 리셋 — 분석 AI 재실행 시 점수가 갱신되므로 무효화
+    resetRubricAiSection();
+
     lucide.createIcons();
     updatePreviewBtnState();
     showToast('success', mode === 'append' ? 'AI 채점이 완료됐어요. (수정한 내용은 유지)' : 'AI 채점이 완료됐어요.');
@@ -1620,10 +1635,11 @@ function openPreviewModal(){
   }
   var frame = document.getElementById('previewFrame');
   // 학생 상태에 따라 iframe URL 분기 (미제출은 답안·문항별 결과 숨김)
-  var src = 'result_student_view_v3_260512.html?preview=1';
+  // 캐시 버스터(_t) 추가 + 매번 갱신 — 최신 학생 리포트 화면 항상 로드
+  var src = 'result_student_view_v3_260512.html?preview=1&_t=' + Date.now();
   var isMissing = (typeof _isNotSubmitted !== 'undefined') && _isNotSubmitted;
   if(isMissing) src += '&missing=1';
-  if(frame){ frame.setAttribute('src', src); }
+  if(frame){ frame.setAttribute('src', src); }  // 조건 없이 매번 새로 설정
   // 미제출 학생: 표시 항목 체크박스 중 답안·문항별 자동 OFF + 비활성
   applyPreviewItemAvailability();
   document.getElementById('previewModal').classList.add('show');
@@ -1638,28 +1654,30 @@ function applyPreviewItemAvailability(){
   var ta = document.getElementById('teacherFeedback');
   var hasTeacher = !!(ta && ta.value && ta.value.trim().length > 0);
 
-  // 문항별 결과: pane-instruction 안에 empty-state가 아닌 콘텐츠 카드가 있는지
+  // 분석 AI 결과: 문항별·채점요소별 결과 카드 (.ec-block / .item-block)
   var instPane = document.getElementById('pane-instruction');
   var hasInst = !!(instPane && !instPane.querySelector('.empty-state')
-                   && instPane.querySelector('.ec-block,.item-block,.rai-card'));
-
-  // 채점요소별 결과: pane-rubric 콘텐츠 또는 루브릭 AI 결과
+                   && instPane.querySelector('.ec-block,.item-block'));
   var rubPane = document.getElementById('pane-rubric');
-  var hasElem = !!(rubPane && !rubPane.querySelector('.empty-state')
-                   && rubPane.querySelector('.ec-block,.item-block,.rai-card'))
-                || document.querySelectorAll('.rai-card').length > 0;
+  var hasAnalysisElem = !!(rubPane && !rubPane.querySelector('.empty-state')
+                           && rubPane.querySelector('.ec-block,.item-block'));
 
-  // 루브릭 AI 결과 존재 여부 (rubric AI section)
-  var hasRubricAi = document.querySelectorAll('.rai-card').length > 0;
+  // 루브릭 AI 결과: 별도 섹션의 .rai-card
+  var hasRubricAi = document.querySelectorAll('#rubricAiPane .rai-card').length > 0
+                    || document.querySelectorAll('.rai-card').length > 0;
+
+  // 채점요소별 근거는 두 AI 공통(채점기준 텍스트 기반) — 둘 중 하나라도 있으면 활성
+  var hasElemGround = hasAnalysisElem || hasRubricAi;
+
   var availability = {
     score: hasScore,
     standards: true,
     inst_ground: hasInst,
     inst_feedback: hasInst,
     rubric: true,
-    elem_ground: hasElem,
-    elem_feedback_analysis: hasElem,
-    elem_feedback_rubric: hasRubricAi,
+    elem_ground: hasElemGround,
+    elem_feedback_analysis: hasAnalysisElem,  // 분석 AI 결과 있을 때만 활성
+    elem_feedback_rubric: hasRubricAi,        // 루브릭 AI 결과 있을 때만 활성
     teacher: hasTeacher
   };
   document.querySelectorAll('#previewModal .preview-opt-list .checkbox-row').forEach(function(el){
@@ -2014,17 +2032,15 @@ function applyNotSubmittedUI(){
   // 분석 AI 섹션은 사용 불가 안내 (메인 진입점은 별도 [루브릭 기반 AI] 섹션)
   var emptyHtml = '<div class="empty-state">'
     +'<i data-lucide="file-x-2" class="empty-state-icon" style="width:36px;height:36px"></i>'
-    +'<div class="empty-state-title">분석 AI는 사용할 수 없어요</div>'
+    +'<div class="empty-state-title">과제물 AI는 사용할 수 없어요</div>'
     +'<div class="empty-state-sub">과제물이 없어 학생 답안을 분석할 수 없어요.<br>아래 <strong>루브릭 기반 AI</strong>로 피드백을 만들어 보세요.</div>'
     +'</div>';
   document.getElementById('pane-instruction').innerHTML = emptyHtml;
   document.getElementById('pane-rubric').innerHTML = emptyHtml;
 
-  // 보기 토글 + 이전 채점 보기 숨김
+  // 보기 토글 숨김
   var vt = document.querySelector('.view-toggle');
   if(vt) vt.style.display = 'none';
-  var hl = document.getElementById('btnHistoryLog');
-  if(hl) hl.classList.remove('visible');
 
   // 채점 전이라 하단 [다시 채점] 버튼 숨김 — empty state CTA가 단일 진입점
   var rerun = document.querySelector('.btn-rerun-text');
@@ -2061,6 +2077,22 @@ var RUBRIC_AI_RESULT = [
   }
 ];
 
+// 루브릭 AI 섹션을 인트로 상태로 되돌림 (분석 AI 재실행 시 호출)
+function resetRubricAiSection(){
+  var pane = document.getElementById('rubricAiPane');
+  if(pane){
+    pane.innerHTML = '<div class="rubric-ai-intro">'
+      + '<p>과제물 기반 피드백 외에 <strong>채점기준 기반의 추가 피드백</strong>을 만들 수 있어요.</p>'
+      + '</div>';
+  }
+  var actionGroup = document.getElementById('rubricAiActionGroup');
+  if(actionGroup){
+    actionGroup.innerHTML = '<button class="btn-rubric-ai-run" id="btnRubricAiRun" onclick="runRubricAi()">'
+      + '<i data-lucide="wand-sparkles" style="width:14px;height:14px"></i>실행'
+      + '</button>';
+  }
+}
+
 function runRubricAi(){
   // 전제 조건: 모든 채점요소에 점수가 선택되어야 실행 가능
   var rubricRows = document.querySelectorAll('.rubric-box .rubric-row');
@@ -2072,6 +2104,14 @@ function runRubricAi(){
     showToast('warning', '채점요소별 점수를 모두 선택한 뒤 실행해 주세요.');
     return;
   }
+  // 사용자가 선택한 채점요소별 점수를 RUBRIC_AI_RESULT에 동적 반영
+  rubricRows.forEach(function(row, idx){
+    var selectedBtn = row.querySelector('.score-btn.selected');
+    if(selectedBtn && RUBRIC_AI_RESULT[idx]){
+      var pickedScore = parseInt(selectedBtn.textContent.trim(), 10);
+      if(!isNaN(pickedScore)) RUBRIC_AI_RESULT[idx].score = pickedScore;
+    }
+  });
   showToast('loading', '루브릭 기반 AI가 피드백을 만들고 있어요...');
   setTimeout(function(){
     renderRubricAiResult();
@@ -2094,13 +2134,13 @@ function renderRubricAiResult(){
       +    '</div>'
       +    '<div class="rai-sec">'
       +      '<span class="rai-sec-lbl">AI 피드백</span>'
-      +      '<div class="rai-sec-text editable" contenteditable="true">'+r.feedback+'</div>'
+      +      editableBlock('', r.feedback)
       +    '</div>'
       +  '</div>'
       +'</div>';
   }).join('');
   var wrap = '<div class="rai-list">'+html+'</div>';
-  // 일반 학생: 별도 섹션(rubricAiPane)에 렌더 + 헤더 액션 버튼 [재생성]으로 전환
+  // 루브릭 AI 결과는 별도 섹션(rubricAiPane)에만 렌더 — 분석 AI 섹션과 분리
   var pane = document.getElementById('rubricAiPane');
   if(pane) pane.innerHTML = wrap;
   var actionGroup = document.getElementById('rubricAiActionGroup');
@@ -2109,11 +2149,8 @@ function renderRubricAiResult(){
       + '<i data-lucide="rotate-ccw" style="width:14px;height:14px"></i>재생성'
       + '</button>';
   }
-  // 미제출 학생일 때만 분석 AI 섹션(pane-instruction/rubric)도 같은 결과로 채움 (legacy 흐름 유지)
-  if(typeof _isNotSubmitted !== 'undefined' && _isNotSubmitted){
-    document.getElementById('pane-rubric').innerHTML = wrap;
-    document.getElementById('pane-instruction').innerHTML = wrap;
-  }
+  // 인라인 편집 + dirty 표시 + AI 초안으로 되돌리기 핸들러 바인딩
+  bindEditableHandlers();
   lucide.createIcons();
 }
 
@@ -2225,21 +2262,71 @@ var HISTORY_LOG = [
   }
 ];
 
+// 루브릭 AI 차수별 누적 (더미)
+var RUBRIC_HISTORY_LOG = [
+  {
+    round: 2, isCurrent: true,
+    at: '2026.05.18 14:40',
+    total: 33, max: 50,
+    rubrics: [
+      {name:'장소 인식 및 특징 파악 능력', score:8, max:10, feedback:'장소를 잘 알고 있어요. 그곳에서 무슨 일이 있었는지, 어떤 기분이었는지 한두 줄씩 적어 보면 좋겠어요.'},
+      {name:'공간 구성 및 시각화 표현력', score:20, max:25, feedback:'그림지도를 정말 잘 그렸어요! 친구들에게 보여줘도 좋을 만큼 자세해요.'},
+      {name:'고장에 대한 가치 인식 및 태도', score:5, max:15, feedback:'우리 고장을 좋아하는 마음이 보여요. 다음에는 왜 좋은지 이유도 함께 적어 봐요!'}
+    ]
+  },
+  {
+    round: 1, isCurrent: false,
+    at: '2026.05.17 10:05',
+    total: 28, max: 50,
+    rubrics: [
+      {name:'장소 인식 및 특징 파악 능력', score:6, max:10, feedback:'장소를 적어 보았어요. 어떤 점이 좋은지도 함께 적어 보면 좋겠어요.'},
+      {name:'공간 구성 및 시각화 표현력', score:18, max:25, feedback:'그림으로 잘 표현했어요. 더 자세히 그려 보면 좋겠어요.'},
+      {name:'고장에 대한 가치 인식 및 태도', score:4, max:15, feedback:'우리 고장에 관심을 가져 봐요. 좋아하는 곳을 한두 군데 떠올려 봐요.'}
+    ]
+  }
+];
+
 function renderHistoryDrawer(){
   var body = document.getElementById('historyDrawerBody');
   if(!body) return;
-  if(!HISTORY_LOG || HISTORY_LOG.length === 0){
+  var hasAnalysis = HISTORY_LOG && HISTORY_LOG.length > 0;
+  var hasRubric = RUBRIC_HISTORY_LOG && RUBRIC_HISTORY_LOG.length > 0;
+  if(!hasAnalysis && !hasRubric){
     body.innerHTML = '<div class="history-empty">아직 채점 이력이 없어요.</div>';
     return;
   }
+  var analysisCount = hasAnalysis ? HISTORY_LOG.length : 0;
+  var rubricCount = hasRubric ? RUBRIC_HISTORY_LOG.length : 0;
   var html = '<div class="history-drawer-info">'
     +'<i data-lucide="info" style="width:14px;height:14px"></i>'
     +'<span>AI 채점을 다시 실행할 때마다 차수가 누적돼요. 이전 차수 결과는 <strong>읽기 전용</strong>이라 수정·되돌리기는 할 수 없어요.</span>'
     +'</div>';
-  html += HISTORY_LOG.map(function(h, idx){
+  // 탭 (과제물 AI / 루브릭 AI)
+  html += '<div class="history-tabs" role="tablist">'
+    + '<button class="history-tab active" data-target="hist-pane-analysis" onclick="switchHistoryDrawerTab(this)">'
+    +   '<i data-lucide="bot" style="width:14px;height:14px"></i>과제물 AI'
+    +   '<span class="history-tab-count">'+analysisCount+'차</span>'
+    + '</button>'
+    + '<button class="history-tab" data-target="hist-pane-rubric" onclick="switchHistoryDrawerTab(this)">'
+    +   '<i data-lucide="list-checks" style="width:14px;height:14px"></i>루브릭 AI'
+    +   '<span class="history-tab-count">'+rubricCount+'차</span>'
+    + '</button>'
+    + '</div>';
+  // 탭 콘텐츠
+  html += '<div class="history-tab-pane active" id="hist-pane-analysis">' + renderHistoryAnalysisList() + '</div>';
+  html += '<div class="history-tab-pane" id="hist-pane-rubric" style="display:none">' + renderHistoryRubricList() + '</div>';
+  body.innerHTML = html;
+  lucide.createIcons();
+}
+
+function renderHistoryAnalysisList(){
+  if(!HISTORY_LOG || HISTORY_LOG.length === 0){
+    return '<div class="history-empty">아직 과제물 AI 채점 이력이 없어요.</div>';
+  }
+  return HISTORY_LOG.map(function(h, idx){
     var expanded = h.isCurrent ? 'expanded' : '';
     var curBadge = h.isCurrent ? '<span class="history-card-current-badge">현재</span>' : '';
-    return '<div class="history-card '+(h.isCurrent?'current ':'')+expanded+'" data-idx="'+idx+'">'
+    return '<div class="history-card '+(h.isCurrent?'current ':'')+expanded+'" data-idx="a-'+idx+'">'
       +  '<div class="history-card-hd" onclick="toggleHistoryCard(this)">'
       +    '<div class="history-card-hd-left">'
       +      '<div class="history-card-hd-top"><span class="history-card-round">'+h.round+'차 채점</span>'+curBadge+'</div>'
@@ -2257,8 +2344,54 @@ function renderHistoryDrawer(){
       +  '</div>'
       +'</div>';
   }).join('');
-  body.innerHTML = html;
-  lucide.createIcons();
+}
+
+function renderHistoryRubricList(){
+  if(!RUBRIC_HISTORY_LOG || RUBRIC_HISTORY_LOG.length === 0){
+    return '<div class="history-empty">아직 루브릭 AI 실행 이력이 없어요.</div>';
+  }
+  return RUBRIC_HISTORY_LOG.map(function(h, idx){
+    var expanded = h.isCurrent ? 'expanded' : '';
+    var curBadge = h.isCurrent ? '<span class="history-card-current-badge">현재</span>' : '';
+    var rubricsHtml = h.rubrics.map(function(r){
+      return '<div class="h-rai-item">'
+        + '<div class="h-rai-item-hd">'
+        +   '<span class="h-rai-tag">'+r.score+' / '+r.max+'</span>'
+        +   '<span class="h-rai-name">'+r.name+'</span>'
+        + '</div>'
+        + '<div class="h-rai-text">'+r.feedback+'</div>'
+        + '</div>';
+    }).join('');
+    return '<div class="history-card '+(h.isCurrent?'current ':'')+expanded+'" data-idx="r-'+idx+'">'
+      +  '<div class="history-card-hd" onclick="toggleHistoryCard(this)">'
+      +    '<div class="history-card-hd-left">'
+      +      '<div class="history-card-hd-top"><span class="history-card-round">'+h.round+'차 실행</span>'+curBadge+'</div>'
+      +      '<div class="history-card-meta">'
+      +        '<span>'+h.at+'</span>'
+      +      '</div>'
+      +    '</div>'
+      +    '<div class="history-card-score"><span class="num">'+h.total+'</span><span>/ '+h.max+'</span></div>'
+      +    '<i data-lucide="chevron-down" class="history-card-chevron" style="width:18px;height:18px"></i>'
+      +  '</div>'
+      +  '<div class="history-card-body">'
+      +     '<div class="h-pn-section">'
+      +       '<div class="h-pn-section-hd"><span class="h-pn-section-title"><i data-lucide="list-checks" style="width:14px;height:14px"></i>채점기준 기반 피드백</span></div>'
+      +       '<div class="h-rai-list">'+rubricsHtml+'</div>'
+      +     '</div>'
+      +  '</div>'
+      +'</div>';
+  }).join('');
+}
+
+function switchHistoryDrawerTab(btn){
+  var drawerBody = document.getElementById('historyDrawerBody');
+  if(!drawerBody) return;
+  drawerBody.querySelectorAll('.history-tab').forEach(function(b){ b.classList.remove('active'); });
+  btn.classList.add('active');
+  var targetId = btn.getAttribute('data-target');
+  drawerBody.querySelectorAll('.history-tab-pane').forEach(function(p){ p.style.display = 'none'; p.classList.remove('active'); });
+  var target = document.getElementById(targetId);
+  if(target){ target.style.display = ''; target.classList.add('active'); }
 }
 
 function renderHistoryBody(h, idx){
@@ -2360,9 +2493,7 @@ function applyHistoryUI(){
   renderInstructionCards();
   renderElementCards();
   autoSelectAiScores();
-  // 두 진입점 노출
-  var btn = document.getElementById('btnHistoryLog');
-  if(btn) btn.classList.add('visible');
+  // 하단 [이전 결과 보기] 텍스트 링크 노출
   var link = document.getElementById('historyTextLink');
   if(link) link.classList.add('visible');
   lucide.createIcons();

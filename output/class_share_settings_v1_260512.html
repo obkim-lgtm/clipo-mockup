@@ -64,6 +64,7 @@ body{background:#f6f7f9;color:#222631;min-height:100vh}
 .col-id{width:70px}
 .col-name{width:80px;text-align:left;padding-left:14px;font-weight:600}
 .col-item{width:74px;font-size:12px}
+.col-item.col-elem-feedback{width:120px}
 .col-period{width:170px;font-size:12px}
 .col-state{width:90px;font-weight:600}
 .student-table thead th.col-item{font-size:12px;padding:8px 4px;line-height:1.25}
@@ -119,7 +120,7 @@ body{background:#f6f7f9;color:#222631;min-height:100vh}
 /* ══════ 미리보기 모달 ══════ */
 .modal.preview-modal{width:98vw;max-width:1640px;height:94vh;max-height:980px;max-width:1640px}
 .preview-body{flex:1;min-height:0;display:flex;flex-direction:row;padding:16px;background:#f6f7f9;gap:16px;overflow:hidden}
-.preview-settings{width:240px;flex-shrink:0;display:flex;flex-direction:column;gap:12px;background:#fff;border-radius:12px;border:1px solid #eaecf0;padding:16px;overflow-y:auto}
+.preview-settings{width:360px;flex-shrink:0;display:flex;flex-direction:column;gap:12px;background:#fff;border-radius:12px;border:1px solid #eaecf0;padding:16px;overflow-y:auto}
 .preview-settings .modal-section-lbl{font-size:13px;font-weight:700;color:#222631;line-height:1.4;margin-bottom:4px}
 .preview-settings-hint{font-size:12px;color:#6d7381;line-height:1.5}
 .preview-preview-wrap{flex:1;min-width:0;display:flex;flex-direction:column;gap:10px}
@@ -280,9 +281,9 @@ body{background:#f6f7f9;color:#222631;min-height:100vh}
             <th class="col-item">선생님<br>한마디</th>
             <th class="col-item">문항별<br>근거</th>
             <th class="col-item">문항별<br>피드백</th>
-            <th class="col-item">채점요소별<br>근거</th>
-            <th class="col-item">채점요소별 피드백<br>(분석 AI)</th>
-            <th class="col-item">채점요소별 피드백<br>(루브릭 AI)</th>
+            <th class="col-item col-elem-feedback">채점요소별 채점근거<br>(과제물 AI)</th>
+            <th class="col-item col-elem-feedback">채점요소별<br>피드백 (과제물 AI)</th>
+            <th class="col-item col-elem-feedback">채점요소별<br>피드백 (루브릭 AI)</th>
             <th class="col-period">공개 기간</th>
             <th class="col-state">공개 상태</th>
           </tr>
@@ -308,9 +309,9 @@ body{background:#f6f7f9;color:#222631;min-height:100vh}
         <label class="opt-checkbox checked" data-key="teacher" onclick="toggleBulkOpt(this)"><span class="box"><i data-lucide="check" style="width:13px;height:13px"></i></span><span class="lbl">선생님 한마디</span></label>
         <label class="opt-checkbox checked" data-key="inst_ground" onclick="toggleBulkOpt(this)"><span class="box"><i data-lucide="check" style="width:13px;height:13px"></i></span><span class="lbl">문항별 채점근거</span></label>
         <label class="opt-checkbox checked" data-key="inst_feedback" onclick="toggleBulkOpt(this)"><span class="box"><i data-lucide="check" style="width:13px;height:13px"></i></span><span class="lbl">문항별 피드백</span></label>
-        <label class="opt-checkbox" data-key="elem_ground" onclick="toggleBulkOpt(this)"><span class="box"><i data-lucide="check" style="width:13px;height:13px"></i></span><span class="lbl">채점요소별 채점근거</span></label>
-        <label class="opt-checkbox" data-key="elem_feedback_analysis" onclick="toggleBulkOpt(this)"><span class="box"><i data-lucide="check" style="width:13px;height:13px"></i></span><span class="lbl">채점요소별 피드백 <span style="font-weight:500;color:#6d7381">(분석 AI)</span></span></label>
-        <label class="opt-checkbox" data-key="elem_feedback_rubric" onclick="toggleBulkOpt(this)"><span class="box"><i data-lucide="check" style="width:13px;height:13px"></i></span><span class="lbl">채점요소별 피드백 <span style="font-weight:500;color:#0284c7">(루브릭 AI)</span></span></label>
+        <label class="opt-checkbox" data-key="elem_ground" onclick="toggleBulkOpt(this)"><span class="box"><i data-lucide="check" style="width:13px;height:13px"></i></span><span class="lbl">채점요소별 채점근거 (과제물 AI)</span></label>
+        <label class="opt-checkbox" data-key="elem_feedback_analysis" onclick="toggleBulkOpt(this)"><span class="box"><i data-lucide="check" style="width:13px;height:13px"></i></span><span class="lbl">채점요소별 피드백 (과제물 AI)</span></label>
+        <label class="opt-checkbox" data-key="elem_feedback_rubric" onclick="toggleBulkOpt(this)"><span class="box"><i data-lucide="check" style="width:13px;height:13px"></i></span><span class="lbl">채점요소별 피드백 (루브릭 AI)</span></label>
       </div>
     </section>
 
@@ -377,8 +378,8 @@ body{background:#f6f7f9;color:#222631;min-height:100vh}
           <label class="checkbox-row checked" data-key="inst_ground" onclick="togglePreviewOpt(this)"><span class="checkbox-box"><i data-lucide="check" style="width:12px;height:12px"></i></span><span class="checkbox-text">문항별 채점근거</span></label>
           <label class="checkbox-row checked" data-key="inst_feedback" onclick="togglePreviewOpt(this)"><span class="checkbox-box"><i data-lucide="check" style="width:12px;height:12px"></i></span><span class="checkbox-text">문항별 피드백</span></label>
           <label class="checkbox-row checked" data-key="rubric" onclick="togglePreviewOpt(this)"><span class="checkbox-box"><i data-lucide="check" style="width:12px;height:12px"></i></span><span class="checkbox-text">채점기준표</span></label>
-          <label class="checkbox-row checked" data-key="elem_ground" onclick="togglePreviewOpt(this)"><span class="checkbox-box"><i data-lucide="check" style="width:12px;height:12px"></i></span><span class="checkbox-text">채점요소별 채점근거</span></label>
-          <label class="checkbox-row checked" data-key="elem_feedback_analysis" onclick="togglePreviewOpt(this)"><span class="checkbox-box"><i data-lucide="check" style="width:12px;height:12px"></i></span><span class="checkbox-text">채점요소별 피드백 (분석 AI)</span></label>
+          <label class="checkbox-row checked" data-key="elem_ground" onclick="togglePreviewOpt(this)"><span class="checkbox-box"><i data-lucide="check" style="width:12px;height:12px"></i></span><span class="checkbox-text">채점요소별 채점근거 (과제물 AI)</span></label>
+          <label class="checkbox-row checked" data-key="elem_feedback_analysis" onclick="togglePreviewOpt(this)"><span class="checkbox-box"><i data-lucide="check" style="width:12px;height:12px"></i></span><span class="checkbox-text">채점요소별 피드백 (과제물 AI)</span></label>
           <label class="checkbox-row checked" data-key="elem_feedback_rubric" onclick="togglePreviewOpt(this)"><span class="checkbox-box"><i data-lucide="check" style="width:12px;height:12px"></i></span><span class="checkbox-text">채점요소별 피드백 (루브릭 AI)</span></label>
           <label class="checkbox-row checked" data-key="teacher" onclick="togglePreviewOpt(this)"><span class="checkbox-box"><i data-lucide="check" style="width:12px;height:12px"></i></span><span class="checkbox-text">선생님 한마디</span></label>
         </div>
@@ -456,9 +457,9 @@ function renderTable(){
       +'<td class="col-item">'+itemMark('teacher')+'</td>'
       +'<td class="col-item">'+itemMark('inst_ground')+'</td>'
       +'<td class="col-item">'+itemMark('inst_feedback')+'</td>'
-      +'<td class="col-item">'+itemMark('elem_ground')+'</td>'
-      +'<td class="col-item">'+itemMark('elem_feedback_analysis')+'</td>'
-      +'<td class="col-item">'+itemMark('elem_feedback_rubric')+'</td>'
+      +'<td class="col-item col-elem-feedback">'+itemMark('elem_ground')+'</td>'
+      +'<td class="col-item col-elem-feedback">'+itemMark('elem_feedback_analysis')+'</td>'
+      +'<td class="col-item col-elem-feedback">'+itemMark('elem_feedback_rubric')+'</td>'
       +'<td class="col-period">'+s.period+'</td>'
       +'<td class="col-state"><span class="'+stateCls+'">'+s.state+'</span></td>'
       +'</tr>';
