@@ -784,7 +784,7 @@ select.field-input{appearance:none;-webkit-appearance:none;background-image:url(
             <i data-lucide="rotate-ccw" style="width:16px;height:16px"></i>다시 채점
           </button>
           <button class="history-text-link" id="historyTextLink" onclick="openHistoryDrawer()" title="이전 차수 채점 결과 보기">
-            <i data-lucide="history" style="width:14px;height:14px"></i>이전 결과 보기
+            <i data-lucide="history" style="width:14px;height:14px"></i>이전 채점 결과
           </button>
         </div>
         <div class="teacher-fb-save-right">
@@ -903,7 +903,6 @@ select.field-input{appearance:none;-webkit-appearance:none;background-image:url(
             <li>채점요소별 점수 · 채점 근거 · 피드백</li>
             <li>문항별 채점 근거 · 피드백</li>
             <li>선생님 한마디(잘한 점 / 다음 도전 / 종합 의견)</li>
-            <li>루브릭 AI 결과도 함께 리셋 (점수가 갱신되므로)</li>
           </ul>
         </div>
       </div>
@@ -1087,7 +1086,7 @@ select.field-input{appearance:none;-webkit-appearance:none;background-image:url(
 <aside class="history-drawer" id="historyDrawer" aria-hidden="true">
   <div class="history-drawer-hd">
     <div class="history-drawer-hd-left">
-      <span class="history-drawer-title">AI 채점 로그</span>
+      <span class="history-drawer-title">이전 채점 결과</span>
       <span class="history-drawer-sub" id="historyDrawerSub">차수별 AI 채점 결과 (읽기 전용)</span>
     </div>
     <button class="modal-close" onclick="closeHistoryDrawer()" aria-label="닫기"><i data-lucide="x" style="width:18px;height:18px"></i></button>
@@ -1577,9 +1576,6 @@ function doRerunAi(mode){
     if(mode !== 'append'){
       fillTeacherFeedbackDraft();
     }
-
-    // 루브릭 AI 결과 리셋 — 분석 AI 재실행 시 점수가 갱신되므로 무효화
-    resetRubricAiSection();
 
     lucide.createIcons();
     updatePreviewBtnState();
