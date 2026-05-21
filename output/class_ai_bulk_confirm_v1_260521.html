@@ -198,7 +198,7 @@ body{background:#f6f7f9;color:#222631;min-height:100vh}
 
     <!-- 페이지 헤더 -->
     <div class="page-header">
-      <button class="btn-back" onclick="history.back()">
+      <button class="btn-back" onclick="goBack()">
         <i data-lucide="chevron-left" style="width:18px;height:18px"></i>이전으로
       </button>
       <h1 class="page-title">AI 점수 일괄 확정</h1>
@@ -334,11 +334,22 @@ function updateSelectedCount(){
   btn.disabled = (n === 0);
 }
 
+// 진입 경로 (?from=) 활용 — 도장 아이콘 누른 학생 채점 상세로 정확히 복귀
+function goBack(){
+  var p = new URLSearchParams(location.search);
+  var from = p.get('from');
+  if(from){
+    try { location.href = decodeURIComponent(from); return; } catch(e){}
+  }
+  // 기본 fallback: 개별 채점 화면
+  location.href = 'scoring_elementary_v2_260511.html';
+}
+
 function confirmSelected(){
   var n = STUDENTS.filter(function(s){ return s.checked; }).length;
   if(n === 0) return;
   showToast('success', n + '명의 AI 점수를 확정 점수로 적용했어요.');
-  setTimeout(function(){ history.back(); }, 1500);
+  setTimeout(goBack, 1500);
 }
 
 // 상세보기 모달
