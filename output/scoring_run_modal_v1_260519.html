@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <title>AI 채점 실행 모달 (1/2 · 2/2) — CLIPO</title>
-<link rel="icon" type="image/png" href="clipo_favicon.png">
+<link rel="icon" type="image/svg+xml" href="clipo_favicon_elem.svg">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard-gov.min.css">
 <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
 <style>
@@ -111,8 +111,9 @@
 <body>
 
 <div class="step-toggle">
-  <button id="btnStep1" class="active" onclick="showStep(1)">Step 1/2</button>
-  <button id="btnStep2" onclick="showStep(2)">Step 2/2</button>
+  <button id="btnStep1" class="active" onclick="showStep(1)">첫 채점 1/2</button>
+  <button id="btnStep2" onclick="showStep(2)">첫 채점 2/2</button>
+  <button id="btnStepRerun" onclick="showStep('rerun')">재실행</button>
 </div>
 
 <!-- ============ STEP 1/2 ============ -->
@@ -240,6 +241,70 @@
   </div>
 </div>
 
+<!-- ============ RERUN ============ -->
+<div class="modal step stepRerun hidden" id="stepRerun">
+  <div class="modal-hd">
+    <div class="modal-title">AI 채점 재실행</div>
+    <button class="modal-close" title="닫기"><i data-lucide="x" style="width:16px;height:16px"></i></button>
+  </div>
+
+  <div class="modal-body">
+
+    <!-- 채점 수준 (재실행 라벨) -->
+    <div class="field">
+      <div class="field-label">채점 수준</div>
+      <div class="slider-wrap">
+        <div class="slider-bar">
+          <div class="slider-fill"></div>
+          <div class="slider-thumb"></div>
+        </div>
+        <div class="slider-marks">
+          <div class="slider-mark"><div class="dot"></div><div class="lbl">이전보다 관대</div></div>
+          <div class="slider-mark"><div class="dot"></div><div class="lbl">이전과 유사</div></div>
+          <div class="slider-mark"><div class="dot"></div><div class="lbl">이전보다 엄격</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 학생 피드백 자동 구성 -->
+    <div class="field">
+      <div class="field-label">
+        학생 피드백 자동 구성
+        <span class="help-icon" tabindex="0">
+          <i data-lucide="circle-help" style="width:18px;height:18px"></i>
+          <span class="tip">피드백 구성 옵션 설명 보기</span>
+        </span>
+      </div>
+      <div class="radio-list">
+        <div class="radio-row" onclick="selectRadio(this)">
+          <div class="ring"></div>
+          <div class="lbl">사용 안함 (선생님이 직접 작성)</div>
+        </div>
+        <div class="radio-row selected" onclick="selectRadio(this)">
+          <div class="ring"></div>
+          <div class="lbl">AI 채점 근거</div>
+        </div>
+        <div class="radio-row" onclick="selectRadio(this)">
+          <div class="ring"></div>
+          <div class="lbl">AI 피드백</div>
+        </div>
+        <div class="radio-row" onclick="selectRadio(this)">
+          <div class="ring"></div>
+          <div class="lbl">AI 채점 근거 + AI 피드백</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="modal-ft">
+    <button class="btn btn-primary">
+      <i data-lucide="wand-sparkles" style="width:20px;height:20px"></i>
+      AI 채점 재실행
+    </button>
+  </div>
+</div>
+
 <script>
   // Sample student rows mirroring Figma step 2/2
   var STUDENTS = [
@@ -316,8 +381,10 @@
   function showStep(n){
     document.getElementById('step1').classList.toggle('hidden', n!==1);
     document.getElementById('step2').classList.toggle('hidden', n!==2);
+    document.getElementById('stepRerun').classList.toggle('hidden', n!=='rerun');
     document.getElementById('btnStep1').classList.toggle('active', n===1);
     document.getElementById('btnStep2').classList.toggle('active', n===2);
+    document.getElementById('btnStepRerun').classList.toggle('active', n==='rerun');
     if(window.lucide) lucide.createIcons();
   }
 

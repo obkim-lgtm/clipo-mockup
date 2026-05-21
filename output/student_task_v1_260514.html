@@ -1,0 +1,777 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>과제 | CLIPO</title>
+<link rel="icon" type="image/svg+xml" href="clipo_favicon_elem.svg">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard-gov.min.css">
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<style>
+*{font-family:'Pretendard GOV',-apple-system,sans-serif;box-sizing:border-box;margin:0;padding:0}
+body{background:#fef9f3;color:#3b3f4c;min-height:100vh}
+button{font-family:inherit}
+
+/* ══════ 헤더 (학생용) ══════ */
+.global-header{height:56px;background:#fff;display:flex;align-items:center;justify-content:space-between;position:fixed;top:0;left:0;right:0;z-index:210;padding:0 20px 0 8px;border-bottom:1px solid #f1e7d6}
+.gh-left{display:flex;align-items:center;gap:8px}
+.gh-menu-btn{width:40px;height:40px;display:inline-flex;align-items:center;justify-content:center;border:none;background:none;cursor:pointer;color:#3b3f4c;border-radius:8px}
+.gh-menu-btn:hover{background:#fef3e6}
+.gh-product-tag{display:inline-flex;align-items:center;height:18px;margin-left:12px;padding-left:12px;border-left:1px solid #e5e7eb;color:#6d7381;font-size:14px;font-weight:600;line-height:1}
+.gh-right{display:flex;align-items:center;gap:12px;padding-right:12px}
+.gh-user{display:inline-flex;align-items:center;gap:3px;font-size:16px;font-weight:500;color:#365eef;cursor:pointer;border:none;background:none;padding:0;line-height:1}
+.gh-user:hover{color:#3151c4}
+
+/* ══════ 사이드바 ══════ */
+.sidebar{position:fixed;top:56px;left:0;bottom:0;width:56px;background:#fff;border-right:1px solid #f1e7d6;display:flex;flex-direction:column;align-items:center;padding:8px 0;z-index:100}
+.sb-item{width:40px;height:40px;display:inline-flex;align-items:center;justify-content:center;border-radius:10px;color:#6d7381;cursor:pointer;border:none;background:none;margin-bottom:4px}
+.sb-item:hover{background:#fef3e6;color:#3b3f4c}
+.sb-item.active{background:#e9f2ff;color:#365eef}
+
+/* ══════ 메인 ══════ */
+.main{margin-left:56px;margin-top:56px;padding:32px 24px 80px;display:flex;justify-content:center}
+.container{width:100%;max-width:1024px;display:flex;flex-direction:column;gap:24px}
+
+/* ══════ 페이지 헤더 ══════ */
+.page-hd{display:flex;flex-direction:column;gap:6px}
+.page-back{display:inline-flex;align-items:center;gap:4px;font-size:14px;color:#6d7381;background:none;border:none;cursor:pointer;padding:0;line-height:1;margin-bottom:8px;align-self:flex-start}
+.page-back:hover{color:#3b3f4c}
+.page-title{font-size:26px;font-weight:700;color:#3b3f4c;line-height:1.3}
+.page-desc{font-size:14px;color:#6d7381;line-height:1.5}
+
+/* ══════ 학년도 + 필터 ══════ */
+.year-header{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-top:8px}
+.year-title{font-size:20px;font-weight:700;color:#3b3f4c;line-height:1.3}
+.filter-bar{display:inline-flex;align-items:center;gap:8px;flex-wrap:wrap}
+.term-tabs{display:inline-flex;align-items:center;gap:6px;padding:5px;background:#fef3e6;border-radius:100px}
+.term-tab{display:inline-flex;align-items:center;justify-content:center;height:32px;padding:0 16px;border-radius:100px;background:transparent;border:none;color:#6d7381;font-size:14px;font-weight:600;cursor:pointer;line-height:1;transition:all .15s}
+.term-tab.active{background:#fff;color:#c2410c;box-shadow:0 1px 3px rgba(0,0,0,.06)}
+.term-tab:hover:not(.active){color:#3b3f4c}
+.filter-select{display:inline-flex;align-items:center;height:36px;padding:0 32px 0 12px;border:1px solid #f1e7d6;border-radius:100px;background:#fff;font-size:13px;font-weight:500;font-family:inherit;color:#3b3f4c;cursor:pointer;outline:none;-webkit-appearance:none;appearance:none;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236d7381' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'></polyline></svg>");background-repeat:no-repeat;background-position:right 10px center;background-size:14px}
+.filter-select:hover{border-color:#ffd591}
+
+/* ══════ 섹션 ══════ */
+.section{display:flex;flex-direction:column;gap:14px}
+.section-hd{display:flex;align-items:center;gap:8px;padding:0 4px}
+.section-emoji{font-size:22px;line-height:1}
+.section-title{font-size:18px;font-weight:700;color:#3b3f4c;line-height:1.3}
+.section-count{display:inline-flex;align-items:center;height:22px;padding:0 8px;border-radius:100px;background:#fef3e6;color:#c2410c;font-size:12px;font-weight:700;line-height:1;margin-left:4px}
+.section-desc{font-size:13px;color:#6d7381;line-height:1.5;padding:0 4px}
+
+/* ══════ 과제 카드 ══════ */
+.task-list{display:flex;flex-direction:column;gap:12px}
+.task-card{display:flex;align-items:center;gap:14px;padding:16px 18px;background:#fff;border-radius:16px;border:1px solid #f1e7d6;box-shadow:0 2px 8px rgba(0,0,0,.03);position:relative;overflow:hidden;transition:transform .12s,box-shadow .12s}
+.task-card::before{content:"";position:absolute;left:0;top:0;bottom:0;width:5px;background:var(--subj-color, #d1d5db)}
+.task-card.subj-국어{--subj-color:#14b8a6;--subj-bg:#ccfbf1;--subj-text:#0f766e}
+.task-card.subj-수학{--subj-color:#3b82f6;--subj-bg:#dbeafe;--subj-text:#1e40af}
+.task-card.subj-과학{--subj-color:#f97316;--subj-bg:#ffedd5;--subj-text:#c2410c}
+.task-card.subj-사회{--subj-color:#a855f7;--subj-bg:#f3e8ff;--subj-text:#7e22ce}
+.task-card.subj-영어{--subj-color:#ec4899;--subj-bg:#fce7f3;--subj-text:#be185d}
+.task-card:hover{transform:translateY(-1px);box-shadow:0 4px 14px rgba(0,0,0,.06);border-color:var(--subj-color)}
+.task-subj-icon{width:44px;height:44px;display:inline-flex;align-items:center;justify-content:center;border-radius:12px;background:var(--subj-bg, #f3f4f6);color:var(--subj-text, #6d7381);font-size:20px;font-weight:800;flex-shrink:0;line-height:1}
+.task-info{flex:1;min-width:0;display:flex;flex-direction:column;gap:6px}
+.task-subj-row{display:inline-flex;align-items:center;gap:8px;flex-wrap:wrap}
+.task-subj-name{font-size:13px;font-weight:700;color:var(--subj-text, #6d7381)}
+.task-teacher{font-size:13px;color:#9ca3af;font-weight:500}
+.task-name{font-size:16px;font-weight:700;color:#3b3f4c;line-height:1.4}
+.task-meta{display:inline-flex;align-items:center;gap:10px;flex-wrap:wrap}
+.task-status{display:inline-flex;align-items:center;height:24px;padding:0 10px;border-radius:100px;font-size:12px;font-weight:700;line-height:1}
+.task-status.submitted{background:#dcfce7;color:#16a34a}
+.task-status.not-submitted{background:#fee2e2;color:#dc2626}
+.task-status.no-submission{background:#f1f3f5;color:#6d7381}
+.task-status.upcoming{background:#fef3e6;color:#c2410c}
+.task-deadline{display:inline-flex;align-items:center;gap:4px;font-size:13px;font-weight:600;line-height:1.3;color:#6d7381}
+.task-deadline.today{color:#dc2626}
+.task-deadline.tomorrow{color:#f97316}
+.task-deadline.expired{color:#9ca3af}
+.task-deadline-sub{font-size:11px;font-weight:500;color:#9ca3af;line-height:1.3}
+.task-action{flex-shrink:0}
+.btn-task{display:inline-flex;align-items:center;justify-content:center;gap:6px;height:38px;padding:0 14px;border-radius:100px;font-size:13px;font-weight:600;cursor:pointer;line-height:1;border:none}
+.btn-task.primary{background:#365eef;color:#fff;border:1px solid #365eef}
+.btn-task.primary:hover{background:#3151c4;border-color:#3151c4}
+.btn-task.outline{background:#fff;color:#3151c4;border:1px solid #ccdfff}
+.btn-task.outline:hover{background:#f4f8ff;border-color:#a3c3ff}
+.btn-task.muted{background:#f6f7f9;color:#9ca3af;border:1px solid #eaecf0;cursor:not-allowed}
+.btn-task.late{background:#f97316;color:#fff;border:1px solid #f97316}
+.btn-task.late:hover{background:#ea580c;border-color:#ea580c}
+
+/* ══════ 빈 상태 ══════ */
+.empty-state{padding:48px 20px;display:flex;flex-direction:column;align-items:center;gap:8px;background:#fff;border-radius:16px;border:1px dashed #f1e7d6}
+.empty-state-emoji{font-size:48px;line-height:1;margin-bottom:6px}
+.empty-state-title{font-size:16px;font-weight:600;color:#3b3f4c}
+.empty-state-desc{font-size:13px;color:#6d7381}
+.empty-state-cta{display:inline-flex;align-items:center;justify-content:center;gap:6px;height:36px;padding:0 16px;border-radius:100px;background:#fef3e6;color:#c2410c;font-size:13px;font-weight:600;cursor:pointer;border:none;line-height:1;margin-top:8px}
+.empty-state-cta:hover{background:#fde4c4}
+
+/* ══════ 제출 화면 ══════ */
+.submit-card{background:#fff;border-radius:16px;border:1px solid #f1e7d6;padding:24px;display:flex;flex-direction:column;gap:18px;box-shadow:0 2px 8px rgba(0,0,0,.03)}
+.submit-card-hd{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.submit-card-title{font-size:18px;font-weight:700;color:#3b3f4c;line-height:1.3}
+.submit-chips{display:inline-flex;align-items:center;gap:8px;flex-wrap:wrap}
+.chip{display:inline-flex;align-items:center;gap:5px;height:26px;padding:0 10px;border-radius:100px;font-size:12px;font-weight:600;line-height:1}
+.chip.warn{background:#fef2f2;color:#dc2626;border:1px solid #fecaca}
+.chip.info{background:#f1f3f5;color:#6d7381;border:1px solid #e5e7eb}
+.chip.late{background:#fef3e6;color:#c2410c;border:1px solid #ffd591}
+.chip.deadline{background:#dcfce7;color:#15803d;border:1px solid #bbf7d0}
+
+/* 과제 안내 박스 (선생님이 낸 과제 내용) */
+.brief-box{background:#fef9f3;border:1px solid #f1e7d6;border-radius:12px;padding:18px 20px;display:flex;flex-direction:column;gap:8px}
+.brief-label{display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:700;color:#c2410c;line-height:1}
+.brief-title{font-size:18px;font-weight:700;color:#3b3f4c;line-height:1.4}
+.brief-desc{font-size:14px;color:#3b3f4c;line-height:1.6}
+
+/* 입력 영역 공통 */
+.input-block{display:flex;flex-direction:column;gap:10px}
+.input-block-hd{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.input-block-title{display:inline-flex;align-items:center;gap:8px;font-size:16px;font-weight:700;color:#3b3f4c;line-height:1.3}
+.input-block-meta{font-size:12px;color:#9ca3af;font-weight:500}
+.divider-or{display:flex;align-items:center;gap:12px;color:#9ca3af;font-size:12px;font-weight:600;letter-spacing:.05em;padding:4px 0}
+.divider-or::before,.divider-or::after{content:"";flex:1;height:1px;background:#f1e7d6}
+
+/* 에디터 (직접 입력) */
+.editor-toolbar{display:flex;align-items:center;gap:2px;padding:6px 8px;background:#fafafa;border:1px solid #e5e7eb;border-bottom:none;border-radius:10px 10px 0 0}
+.tb-btn{width:30px;height:30px;display:inline-flex;align-items:center;justify-content:center;border:none;background:none;color:#6d7381;cursor:pointer;border-radius:6px}
+.tb-btn:hover{background:#f1f3f5;color:#3b3f4c}
+.tb-sep{width:1px;height:20px;background:#e5e7eb;margin:0 4px}
+.editor-area{min-height:280px;background:#fff;border:1px solid #e5e7eb;border-top:none;border-radius:0 0 10px 10px;padding:16px;font-size:16px;line-height:1.6;color:#3b3f4c;outline:none}
+.editor-area:focus{border-color:#365eef;box-shadow:0 0 0 3px rgba(54,94,239,.1)}
+.editor-area:empty::before{content:attr(data-placeholder);color:#b3b6bd}
+.editor-foot{display:flex;align-items:center;justify-content:space-between;gap:12px;font-size:12px;color:#6d7381;padding:0 4px}
+.editor-foot .char-count strong{color:#3b3f4c;font-weight:600}
+
+/* 파일 업로드 */
+.upload-zone{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;min-height:140px;padding:24px;background:#fef9f3;border:2px dashed #f1e7d6;border-radius:12px;cursor:pointer;transition:all .15s}
+.upload-zone:hover{border-color:#ffd591;background:#fef3e6}
+.upload-zone i{color:#c2410c;width:32px;height:32px}
+.upload-zone-title{font-size:14px;font-weight:600;color:#3b3f4c}
+.upload-zone-desc{font-size:12px;color:#6d7381;text-align:center;line-height:1.5}
+.upload-counter{font-size:13px;font-weight:600;color:#3b3f4c}
+.upload-counter strong{color:#365eef}
+.file-list{display:flex;flex-direction:column;gap:8px;margin-top:8px}
+.file-row{display:flex;align-items:center;gap:12px;padding:12px 14px;background:#fff;border:1px solid #e5e7eb;border-radius:10px;transition:border-color .12s}
+.file-row.is-grading{border-color:#365eef;background:#f4f8ff}
+.file-icon{width:36px;height:36px;display:inline-flex;align-items:center;justify-content:center;border-radius:8px;background:#f1f3f5;color:#6d7381;flex-shrink:0}
+.file-icon.pdf{background:#fee2e2;color:#dc2626}
+.file-icon.img{background:#dbeafe;color:#1e40af}
+.file-icon.hwp{background:#f3e8ff;color:#7e22ce}
+.file-info{flex:1;min-width:0;display:flex;flex-direction:column;gap:4px}
+.file-name{font-size:14px;font-weight:600;color:#3b3f4c;line-height:1.3;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.file-meta{display:inline-flex;align-items:center;gap:8px;font-size:12px;color:#9ca3af;font-weight:500}
+.file-meta .grading-badge{display:inline-flex;align-items:center;gap:3px;color:#365eef;font-weight:700}
+.file-meta .ungraded{color:#9ca3af;font-weight:500}
+.file-actions{display:inline-flex;align-items:center;gap:4px;flex-shrink:0}
+.file-btn{width:32px;height:32px;display:inline-flex;align-items:center;justify-content:center;border:none;background:none;color:#6d7381;cursor:pointer;border-radius:6px}
+.file-btn:hover{background:#f1f3f5;color:#3b3f4c}
+.file-btn.danger:hover{background:#fef2f2;color:#dc2626}
+
+.info-banner{display:flex;align-items:flex-start;gap:8px;padding:10px 14px;background:#f4f8ff;border:1px solid #ccdfff;border-radius:10px;font-size:13px;color:#3151c4;line-height:1.5}
+.info-banner i{flex-shrink:0;margin-top:2px}
+
+/* 제출 푸터 */
+.submit-footer{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;padding-top:8px}
+.submit-helper{font-size:13px;color:#6d7381;line-height:1.5}
+.submit-helper.late{color:#c2410c;font-weight:600}
+.btn-submit{display:inline-flex;align-items:center;justify-content:center;gap:6px;height:48px;padding:0 24px;border-radius:100px;background:#365eef;color:#fff;font-size:15px;font-weight:700;cursor:pointer;line-height:1;border:none;flex-shrink:0}
+.btn-submit:hover{background:#3151c4}
+.btn-submit.late{background:#f97316}
+.btn-submit.late:hover{background:#ea580c}
+.btn-submit.muted{background:#d1d5db;cursor:not-allowed}
+.btn-submit.muted:hover{background:#d1d5db}
+
+/* 푸터 */
+footer{padding:24px;text-align:center;font-size:12px;color:#9ca3af;line-height:1.5}
+footer a{color:#9ca3af;text-decoration:none;padding:0 8px}
+footer a:hover{color:#6d7381}
+.footer-sep{color:#d1d5db}
+
+/* ══════ 케이스 셀렉터 ══════ */
+.mockup-toggle{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#222631;color:#fff;border-radius:24px;padding:5px;display:inline-flex;align-items:center;gap:2px;box-shadow:0 8px 24px rgba(0,0,0,.2);z-index:550;flex-wrap:wrap;max-width:calc(100vw - 32px)}
+.mt-label{padding:4px 12px;color:#b3b6bd;font-size:11px;font-weight:700;letter-spacing:.05em}
+.mt-btn{padding:7px 14px;border:none;background:none;color:#b3b6bd;font-size:13px;font-weight:500;cursor:pointer;font-family:inherit;border-radius:18px;line-height:1;transition:all .15s}
+.mt-btn:hover{color:#fff}
+.mt-btn.active{background:#fff;color:#222631;font-weight:600}
+
+/* 토스트 */
+.toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%) translateY(12px);background:#222631;color:#fff;padding:12px 18px;border-radius:8px;font-size:14px;font-weight:500;line-height:1.3;box-shadow:0 8px 16px rgba(0,0,0,.16);opacity:0;transition:all .25s;z-index:600;pointer-events:none}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0);pointer-events:auto}
+
+/* 반응형 */
+@media (max-width:720px){
+  .global-header{height:52px}
+  .sidebar{top:52px;width:48px}
+  .sb-item{width:36px;height:36px}
+  .main{margin-left:48px;margin-top:52px;padding:20px 14px 80px}
+  .container{gap:18px}
+  .page-title{font-size:22px}
+  .year-header{flex-direction:column;align-items:flex-start;gap:10px}
+  .year-title{font-size:18px}
+  .task-card{padding:14px 14px;gap:10px;flex-wrap:wrap}
+  .task-subj-icon{width:38px;height:38px;font-size:16px}
+  .task-name{font-size:15px}
+  .task-action{flex-basis:100%;display:flex;justify-content:flex-end;margin-top:4px}
+  .submit-card{padding:18px}
+  .submit-footer{flex-direction:column;align-items:stretch}
+  .btn-submit{width:100%}
+  .mockup-toggle{bottom:12px;padding:4px}
+  .mt-label{padding:4px 8px;font-size:10px}
+  .mt-btn{padding:6px 10px;font-size:12px}
+}
+@media (max-width:420px){
+  .sidebar{display:none}
+  .main{margin-left:0;padding:16px 12px 80px}
+}
+</style>
+</head>
+<body>
+
+<!-- 헤더 -->
+<div class="global-header">
+  <div class="gh-left">
+    <button class="gh-menu-btn"><i data-lucide="menu" style="width:24px;height:24px"></i></button>
+    <a class="gh-logo" href="#" aria-label="CLIPO">
+      <svg width="76" height="16" viewBox="0 0 76 16" fill="none"><path d="M11.3613 4.03516H4.09668V11.9629H8.88281L8.88086 11.9648H15.6016V16H4.02539C1.80242 15.9998 0 14.223 0 12.0322V3.96777C0 1.77696 1.80242 0.000177874 4.02539 0H15.4561L11.3613 4.03516ZM22.0703 11.9648H33.5781V16H22.002C19.7788 16 17.9756 14.2231 17.9756 12.0322V0H22.0703V11.9648ZM40.0459 16H35.9521V0H40.0459V16ZM54.5381 0C56.4564 0 58.0138 1.53228 58.0186 3.42285L58.0166 3.4248V8.54297C58.014 10.4333 56.4567 11.9648 54.5361 11.9648H46.5107L42.416 16V0H54.5381ZM71.9746 0C74.0086 0.000134956 75.6887 1.49046 75.958 3.42285H76V12.5771H75.958C75.6887 14.5095 74.011 15.9999 71.9746 16H64.4238C62.3897 16 60.7098 14.5096 60.4404 12.5771C60.4145 12.398 60.3984 12.2184 60.3984 12.0322V3.96777C60.3984 3.78159 60.4145 3.60205 60.4404 3.42285C60.7098 1.49037 62.3873 0 64.4238 0H71.9746ZM64.4922 12.5771H71.9062V3.42285H64.4922V12.5771ZM46.5107 3.42285V8.54004H53.9238V3.42285H46.5107Z" fill="#365EEF"/></svg>
+    </a>
+    <span class="gh-product-tag">초등</span>
+  </div>
+  <div class="gh-right">
+    <button class="gh-user">김기리 학생<i data-lucide="chevron-down" style="width:20px;height:20px"></i></button>
+  </div>
+</div>
+
+<!-- 사이드바 -->
+<aside class="sidebar">
+  <button class="sb-item" title="홈" onclick="location.href='student_home_v1_260513.html'"><i data-lucide="home" style="width:20px;height:20px"></i></button>
+  <button class="sb-item active" title="과제"><i data-lucide="notebook-pen" style="width:20px;height:20px"></i></button>
+  <button class="sb-item" title="리포트"><i data-lucide="bar-chart-2" style="width:20px;height:20px"></i></button>
+</aside>
+
+<main class="main">
+
+  <!-- ════════ 뷰 1: 과제 목록 ════════ -->
+  <div class="container" id="view-list">
+
+    <div class="page-hd">
+      <h1 class="page-title">과제</h1>
+      <p class="page-desc">과제를 제출하고, 선생님이 공개한 채점 결과도 함께 확인해 보세요.</p>
+    </div>
+
+    <!-- 학년도 + 필터 -->
+    <div class="year-header">
+      <h2 class="year-title">2025학년도 과제 현황</h2>
+      <div class="filter-bar">
+        <div class="term-tabs">
+          <button class="term-tab active">1학기</button>
+          <button class="term-tab">2학기</button>
+        </div>
+        <select class="filter-select">
+          <option>모든 제출 상황</option>
+          <option>미제출</option>
+          <option>제출 완료</option>
+        </select>
+        <select class="filter-select">
+          <option>모든 과목</option>
+          <option>국어</option>
+          <option>수학</option>
+          <option>사회</option>
+          <option>과학</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- 섹션 1: 진행 중인 과제 -->
+    <section class="section">
+      <div class="section-hd">
+        <span class="section-emoji">📝</span>
+        <h2 class="section-title">제출하거나 결과를 기다리는 과제</h2>
+        <span class="section-count">4개</span>
+      </div>
+      <p class="section-desc">아직 선생님이 채점 중이거나, 제출해야 할 과제예요.</p>
+      <div class="task-list">
+
+        <div class="task-card subj-과학">
+          <div class="task-subj-icon">과</div>
+          <div class="task-info">
+            <div class="task-subj-row">
+              <span class="task-subj-name">과학</span>
+              <span class="task-teacher">· 김기념 선생님</span>
+              <span class="task-status not-submitted">미제출</span>
+            </div>
+            <div class="task-name">용해와 용액 실험 보고서 작성하기</div>
+            <div class="task-meta">
+              <span class="task-deadline today"><i data-lucide="clock" style="width:14px;height:14px"></i>오늘 마감</span>
+              <span class="task-deadline-sub">1월 21일(수) 12:00</span>
+            </div>
+          </div>
+          <div class="task-action"><button class="btn-task primary" onclick="openSubmit('both')"><i data-lucide="pen-line" style="width:14px;height:14px"></i>제출하기</button></div>
+        </div>
+
+        <div class="task-card subj-국어">
+          <div class="task-subj-icon">국</div>
+          <div class="task-info">
+            <div class="task-subj-row">
+              <span class="task-subj-name">국어</span>
+              <span class="task-teacher">· 이수민 선생님</span>
+              <span class="task-status submitted">제출 완료</span>
+            </div>
+            <div class="task-name">우리 고장에 대한 글쓰기</div>
+            <div class="task-meta">
+              <span class="task-deadline tomorrow"><i data-lucide="clock" style="width:14px;height:14px"></i>내일 마감</span>
+              <span class="task-deadline-sub">1월 22일(목) 12:00</span>
+            </div>
+          </div>
+          <div class="task-action"><button class="btn-task outline" onclick="openSubmit('text-only')">제출 확인</button></div>
+        </div>
+
+        <div class="task-card subj-사회">
+          <div class="task-subj-icon">사</div>
+          <div class="task-info">
+            <div class="task-subj-row">
+              <span class="task-subj-name">사회</span>
+              <span class="task-teacher">· 박민지 선생님</span>
+              <span class="task-status submitted">제출 완료</span>
+            </div>
+            <div class="task-name">우리 동네 지도 그리기 활동</div>
+            <div class="task-meta">
+              <span class="task-deadline"><i data-lucide="clock" style="width:14px;height:14px"></i>3일 남음</span>
+              <span class="task-deadline-sub">1월 24일(토) 18:00</span>
+            </div>
+          </div>
+          <div class="task-action"><button class="btn-task outline" onclick="openSubmit('file-resubmit')">제출 확인</button></div>
+        </div>
+
+        <div class="task-card subj-수학">
+          <div class="task-subj-icon">수</div>
+          <div class="task-info">
+            <div class="task-subj-row">
+              <span class="task-subj-name">수학</span>
+              <span class="task-teacher">· 김기념 선생님</span>
+              <span class="task-status not-submitted">미제출</span>
+            </div>
+            <div class="task-name">분수의 덧셈·뺄셈 단원 정리</div>
+            <div class="task-meta">
+              <span class="task-deadline expired"><i data-lucide="clock" style="width:14px;height:14px"></i>마감 지남 · 늦은 제출 가능</span>
+              <span class="task-deadline-sub">1월 18일(일) 12:00</span>
+            </div>
+          </div>
+          <div class="task-action"><button class="btn-task late" onclick="openSubmit('late')"><i data-lucide="alert-circle" style="width:14px;height:14px"></i>늦은 제출</button></div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- 섹션 2: 결과 공개 -->
+    <section class="section">
+      <div class="section-hd">
+        <span class="section-emoji">🎉</span>
+        <h2 class="section-title">결과가 도착한 과제</h2>
+        <span class="section-count">2개</span>
+      </div>
+      <p class="section-desc">선생님이 채점을 마쳤어요. 점수와 피드백을 확인해 보세요!</p>
+      <div class="task-list">
+
+        <div class="task-card subj-사회">
+          <div class="task-subj-icon">사</div>
+          <div class="task-info">
+            <div class="task-subj-row">
+              <span class="task-subj-name">사회</span>
+              <span class="task-teacher">· 홍길동 선생님</span>
+              <span class="task-status submitted">결과 공개</span>
+            </div>
+            <div class="task-name">우리 고장의 모습과 변화 — 그림지도 표현하기</div>
+            <div class="task-meta">
+              <span class="task-deadline expired"><i data-lucide="calendar-check" style="width:14px;height:14px"></i>1월 18일 공개</span>
+            </div>
+          </div>
+          <div class="task-action"><button class="btn-task primary"><i data-lucide="eye" style="width:14px;height:14px"></i>결과 보기</button></div>
+        </div>
+
+        <div class="task-card subj-국어">
+          <div class="task-subj-icon">국</div>
+          <div class="task-info">
+            <div class="task-subj-row">
+              <span class="task-subj-name">국어</span>
+              <span class="task-teacher">· 이수민 선생님</span>
+              <span class="task-status submitted">결과 공개</span>
+            </div>
+            <div class="task-name">읽은 책 소개하기 — 친구에게 추천하는 글</div>
+            <div class="task-meta">
+              <span class="task-deadline expired"><i data-lucide="calendar-check" style="width:14px;height:14px"></i>1월 15일 공개</span>
+            </div>
+          </div>
+          <div class="task-action"><button class="btn-task primary"><i data-lucide="eye" style="width:14px;height:14px"></i>결과 보기</button></div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- 섹션 3: 곧 시작될 과제 -->
+    <section class="section">
+      <div class="section-hd">
+        <span class="section-emoji">📅</span>
+        <h2 class="section-title">곧 시작될 과제</h2>
+        <span class="section-count">2개</span>
+      </div>
+      <p class="section-desc">아직 제출이 시작되지 않았어요. 준비해 두세요!</p>
+      <div class="task-list">
+
+        <div class="task-card subj-국어">
+          <div class="task-subj-icon">국</div>
+          <div class="task-info">
+            <div class="task-subj-row">
+              <span class="task-subj-name">국어</span>
+              <span class="task-teacher">· 이수민 선생님</span>
+              <span class="task-status upcoming">시작 전</span>
+            </div>
+            <div class="task-name">우리 반 친구 인터뷰 정리</div>
+            <div class="task-meta">
+              <span class="task-deadline"><i data-lucide="play" style="width:14px;height:14px"></i>1월 28일 시작</span>
+              <span class="task-deadline-sub">~ 2월 3일(월) 18:00</span>
+            </div>
+          </div>
+          <div class="task-action"><button class="btn-task muted">시작 전</button></div>
+        </div>
+
+        <div class="task-card subj-수학">
+          <div class="task-subj-icon">수</div>
+          <div class="task-info">
+            <div class="task-subj-row">
+              <span class="task-subj-name">수학</span>
+              <span class="task-teacher">· 김기념 선생님</span>
+              <span class="task-status upcoming">시작 전</span>
+            </div>
+            <div class="task-name">도형의 넓이 구하기 활동</div>
+            <div class="task-meta">
+              <span class="task-deadline"><i data-lucide="play" style="width:14px;height:14px"></i>1월 30일 시작</span>
+              <span class="task-deadline-sub">제출 마감 없음</span>
+            </div>
+          </div>
+          <div class="task-action"><button class="btn-task muted">시작 전</button></div>
+        </div>
+
+      </div>
+    </section>
+
+    <footer>
+      <a href="#">회사소개</a><span class="footer-sep">·</span>
+      <a href="#">이용약관</a><span class="footer-sep">·</span>
+      <a href="#">개인정보처리방침</a>
+      <div style="margin-top:8px">© 2026. Datadriven Inc. All rights reserved.</div>
+    </footer>
+  </div>
+
+  <!-- ════════ 뷰 2: 과제 제출 ════════ -->
+  <div class="container" id="view-submit" style="display:none">
+
+    <div class="page-hd">
+      <button class="page-back" onclick="backToList()"><i data-lucide="chevron-left" style="width:16px;height:16px"></i>이전으로</button>
+      <h1 class="page-title">과제 제출 및 확인</h1>
+      <p class="page-desc">과제 내용을 확인하고 직접 제출해 보세요.</p>
+    </div>
+
+    <!-- 선생님 과제 안내 -->
+    <div class="brief-box">
+      <span class="brief-label"><i data-lucide="bookmark" style="width:13px;height:13px"></i>선생님이 낸 과제</span>
+      <div class="brief-title" id="brief-title">용해와 용액 실험 보고서 작성하기</div>
+      <div class="brief-desc" id="brief-desc">
+        실험에서 관찰한 용해 현상을 정리하고, 용액의 진하기 비교 결과를 보고서로 작성해 주세요. 실험 사진이나 그림을 첨부하면 더 좋아요.
+      </div>
+    </div>
+
+    <!-- 제출 카드 -->
+    <div class="submit-card">
+      <div class="submit-card-hd">
+        <div class="submit-card-title">과제 제출</div>
+        <div class="submit-chips" id="submit-chips">
+          <!-- 동적 -->
+        </div>
+      </div>
+
+      <!-- 직접 입력 영역 -->
+      <div class="input-block" id="block-text" style="display:none">
+        <div class="input-block-hd">
+          <div class="input-block-title">
+            <i data-lucide="pen-line" style="width:18px;height:18px;color:#365eef"></i>
+            직접 입력
+          </div>
+          <div class="input-block-meta" id="autosave-meta">자동 저장 : 1월 21일 (수) 15:24</div>
+        </div>
+        <div>
+          <div class="editor-toolbar">
+            <button class="tb-btn"><i data-lucide="bold" style="width:14px;height:14px"></i></button>
+            <button class="tb-btn"><i data-lucide="italic" style="width:14px;height:14px"></i></button>
+            <button class="tb-btn"><i data-lucide="underline" style="width:14px;height:14px"></i></button>
+            <span class="tb-sep"></span>
+            <button class="tb-btn"><i data-lucide="list" style="width:14px;height:14px"></i></button>
+            <button class="tb-btn"><i data-lucide="list-ordered" style="width:14px;height:14px"></i></button>
+            <span class="tb-sep"></span>
+            <button class="tb-btn"><i data-lucide="link" style="width:14px;height:14px"></i></button>
+            <button class="tb-btn"><i data-lucide="image" style="width:14px;height:14px"></i></button>
+          </div>
+          <div class="editor-area" contenteditable="true" data-placeholder="여기에 직접 작성해 보세요." id="editor" oninput="updateCharCount()"></div>
+        </div>
+        <div class="editor-foot">
+          <span class="char-count">입력된 글자 수 : <strong id="char-count">0</strong>자 (글자 꾸밈 기호는 제거하고 카운트합니다)</span>
+        </div>
+      </div>
+
+      <!-- 구분선 (둘 다 노출 시) -->
+      <div class="divider-or" id="divider-or" style="display:none">또는 둘 다 제출</div>
+
+      <!-- 파일 업로드 영역 -->
+      <div class="input-block" id="block-file" style="display:none">
+        <div class="input-block-hd">
+          <div class="input-block-title">
+            <i data-lucide="paperclip" style="width:18px;height:18px;color:#365eef"></i>
+            파일 업로드
+          </div>
+          <div class="upload-counter">첨부 파일 <strong id="file-count">0</strong>/<span id="file-max">2</span>개</div>
+        </div>
+        <div class="upload-zone" onclick="addDummyFile()">
+          <i data-lucide="upload-cloud"></i>
+          <div class="upload-zone-title">파일을 끌어 놓거나 클릭해서 업로드</div>
+          <div class="upload-zone-desc" id="upload-formats">PDF, PNG, JPG · 최대 2개</div>
+        </div>
+        <div class="file-list" id="file-list">
+          <!-- 동적 -->
+        </div>
+        <div class="info-banner">
+          <i data-lucide="info" style="width:16px;height:16px"></i>
+          <span>AI 자동 채점은 PDF나 이미지 파일 <strong>1개</strong>에 대해서만 진행돼요. 여러 개 올리면 채점 대상을 골라 주세요.</span>
+        </div>
+      </div>
+
+      <!-- 푸터 -->
+      <div class="submit-footer">
+        <div class="submit-helper" id="submit-helper">과제를 작성하거나 파일을 업로드 하세요.</div>
+        <button class="btn-submit" id="btn-submit">
+          <i data-lucide="check" style="width:16px;height:16px"></i>
+          <span id="btn-submit-text">과제 제출</span>
+        </button>
+      </div>
+    </div>
+
+    <footer>
+      <a href="#">회사소개</a><span class="footer-sep">·</span>
+      <a href="#">이용약관</a><span class="footer-sep">·</span>
+      <a href="#">개인정보처리방침</a>
+      <div style="margin-top:8px">© 2026. Datadriven Inc. All rights reserved.</div>
+    </footer>
+  </div>
+
+</main>
+
+<!-- 케이스 셀렉터 -->
+<div class="mockup-toggle" id="mockup-toggle">
+  <span class="mt-label">MOCKUP</span>
+  <button class="mt-btn active" data-case="list" onclick="applyCase('list')">목록</button>
+  <button class="mt-btn" data-case="both" onclick="applyCase('both')">제출 (둘 다)</button>
+  <button class="mt-btn" data-case="text-only" onclick="applyCase('text-only')">제출 (직접만)</button>
+  <button class="mt-btn" data-case="file-resubmit" onclick="applyCase('file-resubmit')">제출 (파일·재제출)</button>
+  <button class="mt-btn" data-case="late" onclick="applyCase('late')">제출 (늦은 제출)</button>
+</div>
+
+<!-- 토스트 -->
+<div class="toast" id="toast"></div>
+
+<script>
+const SCENARIOS = {
+  'both': {
+    brief: { title: '용해와 용액 실험 보고서 작성하기', desc: '실험에서 관찰한 용해 현상을 정리하고, 용액의 진하기 비교 결과를 보고서로 작성해 주세요. 실험 사진이나 그림을 첨부하면 더 좋아요.' },
+    showText: true, showFile: true,
+    formats: 'PDF, PNG, JPG, HWP, DOC · 최대 2개', fileMax: 2,
+    files: [],
+    pasteBlock: true, late: false,
+    chips: [
+      {type:'warn', icon:'ban', text:'복사 및 붙여넣기 불가'},
+      {type:'deadline', icon:'clock', text:'오늘 마감 · 1월 21일 12:00'}
+    ],
+    helper: '과제를 작성하거나 파일을 업로드 하세요.',
+    btnText: '과제 제출', btnLate: false
+  },
+  'text-only': {
+    brief: { title: '우리 고장에 대한 글쓰기', desc: '우리 고장의 자랑거리를 떠올리며, 친구나 다른 지역 사람에게 소개하는 글을 직접 작성해 보세요.' },
+    showText: true, showFile: false,
+    formats: '', fileMax: 0,
+    files: [],
+    pasteBlock: true, late: false,
+    chips: [
+      {type:'warn', icon:'ban', text:'복사 및 붙여넣기 불가'},
+      {type:'deadline', icon:'clock', text:'내일 마감 · 1월 22일 12:00'}
+    ],
+    helper: '직접 입력으로만 제출 가능한 과제예요.',
+    btnText: '과제 제출', btnLate: false
+  },
+  'file-resubmit': {
+    brief: { title: '우리 동네 지도 그리기 활동', desc: '내가 사는 동네의 주요 장소를 표시한 지도를 그리고, 사진으로 찍어 PDF나 이미지로 업로드해 주세요.' },
+    showText: false, showFile: true,
+    formats: 'PDF, PNG, JPG · 최대 1개', fileMax: 1,
+    files: [
+      { name: '우리동네지도_김기리.pdf', size: '2.1 MB', type: 'pdf', grading: true }
+    ],
+    pasteBlock: false, late: false,
+    chips: [
+      {type:'info', icon:'check-circle-2', text:'제출 완료 · 1월 20일 19:32'},
+      {type:'deadline', icon:'clock', text:'3일 남음 · 1월 24일 18:00'}
+    ],
+    helper: '제출한 파일을 바꾸려면 기존 파일을 삭제한 뒤 다시 업로드해 주세요.',
+    btnText: '다시 제출', btnLate: false
+  },
+  'late': {
+    brief: { title: '분수의 덧셈·뺄셈 단원 정리', desc: '분수의 덧셈·뺄셈 단원에서 배운 내용을 정리하고, 연습 문제 풀이 과정을 함께 보여 주세요.' },
+    showText: true, showFile: true,
+    formats: 'PDF, PNG, JPG · 최대 1개', fileMax: 1,
+    files: [],
+    pasteBlock: false, late: true,
+    chips: [
+      {type:'late', icon:'alert-circle', text:'마감 후 제출 — 선생님께 표시됩니다'},
+      {type:'info', icon:'clock', text:'1월 18일(일) 12:00 마감'}
+    ],
+    helper: '마감일 이후 제출이에요. 선생님이 \'늦은 제출\'로 확인하게 됩니다.',
+    btnText: '늦은 제출', btnLate: true
+  }
+};
+
+let currentCase = 'list';
+
+function applyCase(caseKey){
+  currentCase = caseKey;
+  document.querySelectorAll('.mt-btn').forEach(b => b.classList.toggle('active', b.dataset.case === caseKey));
+
+  if(caseKey === 'list'){
+    document.getElementById('view-list').style.display = '';
+    document.getElementById('view-submit').style.display = 'none';
+    window.scrollTo({top:0, behavior:'smooth'});
+    return;
+  }
+
+  document.getElementById('view-list').style.display = 'none';
+  document.getElementById('view-submit').style.display = '';
+  renderSubmit(SCENARIOS[caseKey]);
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+function openSubmit(caseKey){ applyCase(caseKey); }
+function backToList(){ applyCase('list'); }
+
+function renderSubmit(s){
+  // 과제 안내
+  document.getElementById('brief-title').textContent = s.brief.title;
+  document.getElementById('brief-desc').textContent = s.brief.desc;
+
+  // chips
+  const chipsEl = document.getElementById('submit-chips');
+  chipsEl.innerHTML = s.chips.map(c =>
+    `<span class="chip ${c.type}"><i data-lucide="${c.icon}" style="width:13px;height:13px"></i>${c.text}</span>`
+  ).join('');
+
+  // 입력 영역
+  document.getElementById('block-text').style.display = s.showText ? '' : 'none';
+  document.getElementById('block-file').style.display = s.showFile ? '' : 'none';
+  document.getElementById('divider-or').style.display = (s.showText && s.showFile) ? '' : 'none';
+
+  // 파일 영역
+  if(s.showFile){
+    document.getElementById('upload-formats').textContent = s.formats;
+    document.getElementById('file-max').textContent = s.fileMax;
+    document.getElementById('file-count').textContent = s.files.length;
+    document.getElementById('file-list').innerHTML = s.files.map((f,i) => fileRowHtml(f,i)).join('');
+  }
+
+  // 푸터
+  document.getElementById('submit-helper').textContent = s.helper;
+  const helperEl = document.getElementById('submit-helper');
+  helperEl.classList.toggle('late', !!s.late);
+
+  const btn = document.getElementById('btn-submit');
+  btn.classList.toggle('late', !!s.btnLate);
+  document.getElementById('btn-submit-text').textContent = s.btnText;
+
+  // 에디터 초기화 (직접만/둘다 케이스마다 리셋 가벼움)
+  document.getElementById('editor').innerHTML = '';
+  updateCharCount();
+
+  lucide.createIcons();
+}
+
+function fileRowHtml(f, idx){
+  const iconMap = { pdf:'file-text', img:'image', hwp:'file' };
+  const iconClass = f.type;
+  const lucideIcon = iconMap[f.type] || 'file';
+  const gradingHtml = f.grading
+    ? '<span class="grading-badge"><i data-lucide="sparkles" style="width:12px;height:12px"></i>AI 자동 채점 대상</span>'
+    : '';
+  return `
+    <div class="file-row ${f.grading ? 'is-grading' : ''}">
+      <div class="file-icon ${iconClass}"><i data-lucide="${lucideIcon}" style="width:18px;height:18px"></i></div>
+      <div class="file-info">
+        <div class="file-name">${f.name}</div>
+        <div class="file-meta">
+          <span>${f.size}</span>
+          ${gradingHtml}
+        </div>
+      </div>
+      <div class="file-actions">
+        <button class="file-btn" title="미리보기"><i data-lucide="eye" style="width:16px;height:16px"></i></button>
+        <button class="file-btn danger" title="삭제" onclick="removeFile(${idx})"><i data-lucide="trash-2" style="width:16px;height:16px"></i></button>
+      </div>
+    </div>
+  `;
+}
+
+function addDummyFile(){
+  const s = SCENARIOS[currentCase];
+  if(!s || !s.showFile) return;
+  if(s.files.length >= s.fileMax){
+    showToast(`최대 ${s.fileMax}개까지 첨부할 수 있어요. 기존 파일을 삭제한 후 다시 업로드해 주세요.`);
+    return;
+  }
+  const sample = { name: `과제_${s.files.length+1}.pdf`, size: '1.4 MB', type: 'pdf', grading: s.files.length === 0 };
+  s.files.push(sample);
+  renderSubmit(s);
+}
+
+function removeFile(idx){
+  const s = SCENARIOS[currentCase];
+  s.files.splice(idx, 1);
+  if(s.files.length > 0) s.files[0].grading = true;
+  renderSubmit(s);
+}
+
+function updateCharCount(){
+  const editor = document.getElementById('editor');
+  if(!editor) return;
+  const text = editor.innerText.replace(/\s/g, '');
+  document.getElementById('char-count').textContent = text.length;
+}
+
+// paste 차단 (시각화만)
+document.addEventListener('paste', function(e){
+  if(currentCase === 'list') return;
+  const s = SCENARIOS[currentCase];
+  if(!s || !s.pasteBlock) return;
+  if(e.target.id === 'editor' || e.target.closest('#editor')){
+    e.preventDefault();
+    showToast('복사 및 붙여넣기가 불가한 과제입니다.');
+  }
+});
+
+let toastTimer;
+function showToast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 2400);
+}
+
+// 제출 버튼
+document.getElementById('btn-submit').addEventListener('click', function(){
+  showToast('제출이 완료되었어요!');
+});
+
+// init
+lucide.createIcons();
+</script>
+
+</body>
+</html>
