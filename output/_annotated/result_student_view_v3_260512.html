@@ -245,12 +245,31 @@ body{background:#fef9f3;color:#3b3f4c;min-height:100vh}
   .main{margin:0;padding:0}
 }
 
+/* 미리보기 모드 (선생님이 iframe으로 보는 시점) — 학생 클릭·다운로드 동작 차단 */
+body.preview-mode .btn-download,
+body.preview-mode .btn-back,
+body.preview-mode .period-bar{display:none}
+body.preview-mode .gh-menu-btn,
+body.preview-mode .gh-user,
+body.preview-mode .sb-item,
+body.preview-mode .gh-logo{pointer-events:none}
+body.preview-mode .gh-menu-btn:hover,
+body.preview-mode .sb-item:hover,
+body.preview-mode .gh-user:hover{background:none !important;color:inherit !important}
+
 /* ══════ 공개 옵션 토글 (parent iframe postMessage 기반) ══════ */
 body.hide-score [data-share="score"]{display:none}
 body.hide-standards [data-share="standards"]{display:none}
 body.hide-inst-ground [data-share="inst-ground"]{display:none}
 body.hide-inst-feedback [data-share="inst-feedback"]{display:none}
 body.hide-rubric [data-share="rubric"]{display:none}
+/* 점수 표시 off → 채점기준표 하이라이팅 제거 (그냥 일반 텍스트처럼) + 점수 컬럼 숨김 */
+body.hide-score .rubric-table tbody tr.got td{background:#fff}
+body.hide-score .rubric-table tbody tr.got td.crit-detail{color:#3b3f4c;font-weight:500}
+body.hide-score .rubric-table tbody tr.got td.score{color:#3b3f4c;font-weight:500}
+body.hide-score .rubric-table tbody td.score,
+body.hide-score .rubric-table thead th:last-child{display:none}
+body.hide-score .rubric-check{display:none}
 body.hide-elem-ground [data-share="elem-ground"]{display:none}
 body.hide-elem-feedback-analysis [data-share="elem-feedback-analysis"]{display:none}
 body.hide-elem-feedback-rubric [data-share="elem-feedback-rubric"]{display:none}
@@ -276,63 +295,6 @@ body.hide-elem-ground.hide-elem-feedback-analysis [data-share="elem-card"]{displ
 /* 미제출 모드 — 학생 답안·문항별 결과 숨김 */
 body.missing-mode [data-share="answer"]{display:none}
 body.missing-mode [data-share="inst-card"]{display:none}
-
-/* ══════ 어노테이션 시스템 ══════ */
-[data-note]{position:relative}
-.note-pin{display:inline-flex;align-items:center;justify-content:center;position:absolute;top:0;right:0;transform:translate(50%,-50%);width:18px;height:18px;border-radius:50%;background:#ec4899;color:#fff;font-size:10px;font-weight:800;line-height:1;cursor:grab;box-shadow:0 1px 4px rgba(236,72,153,.35);z-index:1600;border:1.5px solid #fff;transition:all .15s;font-family:inherit;user-select:none;touch-action:none;opacity:.55}
-.note-pin:hover{opacity:1;width:22px;height:22px;font-size:12px;box-shadow:0 4px 12px rgba(236,72,153,.6);background:#db2777;border-width:2px}
-.note-pin.active{opacity:1;width:22px;height:22px;font-size:12px;background:#be185d;box-shadow:0 0 0 3px rgba(236,72,153,.25),0 4px 12px rgba(236,72,153,.6);border-width:2px;z-index:1400}
-.note-pin.dragging{cursor:grabbing;opacity:.95;z-index:1200;width:22px;height:22px;font-size:12px;border-width:2px}
-body.show-notes .note-pin{opacity:1;width:22px;height:22px;font-size:12px;box-shadow:0 2px 8px rgba(236,72,153,.5);border-width:2px}
-.note-popover{position:absolute;z-index:1500;width:360px;background:#fff;border:1px solid #fbcfe8;border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.15);padding:12px 14px;font-size:13px;color:#3b3f4c;line-height:1.55;display:none;text-align:left}
-.note-popover.show{display:block}
-.note-popover-hd{display:flex;align-items:center;justify-content:space-between;gap:6px;margin-bottom:8px;padding-bottom:8px;border-bottom:1px solid #f1f3f5;cursor:move;user-select:none;touch-action:none}
-.note-popover-num{display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:50%;background:#ec4899;color:#fff;font-size:12px;font-weight:800;line-height:1}
-.note-popover-actions{display:inline-flex;align-items:center;gap:2px;margin-left:auto}
-.note-popover-action{width:24px;height:24px;display:inline-flex;align-items:center;justify-content:center;border:none;background:none;cursor:pointer;color:#6d7381;border-radius:6px;font-family:inherit;font-size:13px;line-height:1}
-.note-popover-action:hover{background:#f6f7f9;color:#3b3f4c}
-.note-popover-action.danger:hover{background:#fee2e2;color:#dc2626}
-.note-popover-body{font-size:13px;color:#3b3f4c;line-height:1.6;white-space:pre-wrap;word-break:break-word}
-.note-popover-textarea{width:100%;min-height:84px;max-height:420px;padding:10px 12px;border:1px solid #dde1e8;border-radius:8px;font-size:13px;color:#3b3f4c;line-height:1.6;font-family:inherit;resize:none;outline:none;box-sizing:border-box;overflow-y:auto;white-space:pre-wrap;word-break:break-word}
-.note-popover-textarea:focus{border-color:#365eef}
-.note-popover-edit-actions{display:flex;justify-content:flex-end;gap:6px;margin-top:8px}
-.note-popover-toolbar{display:flex;gap:4px;margin-bottom:6px;align-items:center}
-.note-popover-tool-btn{display:inline-flex;align-items:center;justify-content:center;width:28px;height:24px;border:1px solid #dde1e8;border-radius:5px;background:#fff;color:#3b3f4c;font-size:13px;font-weight:800;cursor:pointer;font-family:inherit;line-height:1}
-.note-popover-tool-btn:hover{background:#f6f7f9;border-color:#a3c3ff;color:#365eef}
-.note-popover-body strong{font-weight:800;color:#222631}
-.note-popover-btn{display:inline-flex;align-items:center;justify-content:center;height:28px;padding:0 12px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;line-height:1;border:1px solid #dde1e8;background:#fff;color:#3b3f4c}
-.note-popover-btn:hover{background:#f6f7f9}
-.note-popover-btn.primary{background:#365eef;border-color:#365eef;color:#fff}
-.note-popover-btn.primary:hover{background:#3151c4}
-body.note-add-mode *{cursor:crosshair !important}
-.notes-fab-wrap{position:fixed;bottom:18px;right:18px;z-index:500}
-.notes-toggle{display:inline-flex;align-items:center;gap:6px;height:40px;padding:0 16px;border-radius:100px;background:#1f2937;color:#e5e7eb;border:none;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;line-height:1;box-shadow:0 4px 20px rgba(0,0,0,.25)}
-.notes-toggle:hover{background:#374151;color:#fff}
-.notes-toggle.active{background:#ec4899;color:#fff}
-.notes-toggle .notes-toggle-count{display:inline-flex;align-items:center;justify-content:center;height:18px;min-width:18px;padding:0 6px;border-radius:100px;background:rgba(255,255,255,.2);color:#fff;font-size:11px;font-weight:700;line-height:1;margin-left:2px}
-.notes-toggle .notes-toggle-chev{margin-left:2px;opacity:.7;transition:transform .15s}
-.notes-fab-wrap.menu-open .notes-toggle-chev{transform:rotate(180deg)}
-.notes-menu{position:absolute;bottom:48px;right:0;min-width:200px;background:#fff;border:1px solid #eaecf0;border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.18);padding:6px;display:none;flex-direction:column}
-.notes-fab-wrap.menu-open .notes-menu{display:flex}
-.notes-menu-item{display:inline-flex;align-items:center;gap:8px;height:36px;padding:0 12px;border-radius:6px;background:none;border:none;cursor:pointer;font-family:inherit;font-size:13px;font-weight:500;color:#3b3f4c;line-height:1;text-align:left;white-space:nowrap}
-.notes-menu-item:hover{background:#f6f7f9;color:#222631}
-.notes-menu-item.danger{color:#b91c1c}
-.notes-menu-item.danger:hover{background:#fef2f2;color:#dc2626}
-.notes-menu-item .notes-menu-check{display:inline-flex;width:16px;height:16px;align-items:center;justify-content:center;color:#ec4899;font-weight:800;flex-shrink:0}
-.notes-menu-divider{height:1px;background:#f1f3f5;margin:4px 6px}
-.notes-menu-item-primary{background:#eef3ff;color:#365eef;font-weight:700;margin-bottom:4px}
-.notes-menu-item-primary:hover{background:#dce6ff;color:#3151c4}
-.notes-menu-item-primary .notes-menu-check{color:#365eef}
-.notes-fab-wrap{position:fixed;bottom:18px;right:18px;z-index:500}
-.notes-fab-drag{display:none;position:absolute;left:-30px;top:50%;transform:translateY(-50%);width:24px;height:24px;border-radius:50%;background:#1f2937;color:#fff;align-items:center;justify-content:center;cursor:grab;font-size:14px;font-weight:800;box-shadow:0 4px 12px rgba(0,0,0,.25);user-select:none;touch-action:none}
-.notes-fab-wrap:hover .notes-fab-drag,.notes-fab-wrap.dragging .notes-fab-drag{display:inline-flex}
-.notes-fab-wrap.dragging .notes-fab-drag{cursor:grabbing;background:#ec4899}
-.notes-fab-wrap.has-unsaved .notes-toggle{position:relative}
-.notes-fab-wrap.has-unsaved .notes-toggle::after{content:'';position:absolute;top:-4px;right:-4px;width:14px;height:14px;border-radius:50%;background:#ef4444;border:2px solid #fff;animation:notesPulse 1.6s ease-in-out infinite}
-.notes-fab-wrap.has-unsaved .notes-toggle::before{content:'⚠️ 미백업';position:absolute;bottom:48px;right:0;padding:4px 10px;background:#ef4444;color:#fff;font-size:11px;font-weight:700;border-radius:100px;white-space:nowrap;box-shadow:0 2px 8px rgba(239,68,68,.4);pointer-events:none}
-@keyframes notesPulse{0%,100%{box-shadow:0 0 0 0 rgba(239,68,68,.5)}50%{box-shadow:0 0 0 6px rgba(239,68,68,0)}}
-/* 미리보기/PDF 모드에서는 어노테이션 FAB·핀 숨김 */
-body.preview-mode .notes-fab-wrap,body.preview-mode .note-pin,body.preview-mode .note-popover{display:none !important}
 </style>
 </head>
 <body>
@@ -382,13 +344,7 @@ body.preview-mode .notes-fab-wrap,body.preview-mode .note-pin,body.preview-mode 
     </span>
 
     <!-- 점수 hero -->
-    <div class="score-hero" data-share="score" data-note-id="default-0" data-note="점수 hero 카드.
-• 학생 화면 최상단 — 시각적 임팩트 (메달 이모지 + % 진행바)
-• 메달 이모지: 점수 구간별 자동 매핑 (90%+ 🏆 / 70%+ 🥈 / 50%+ 💪 / 미만 📚)
-• 등급 표기는 초등 학생에게 부담될 수 있어 점수 + 격려 메시지로 대체
-• 미공개 시(hide-score 클래스) 카드 전체 숨김
-• PDF 출력 시에도 표시 (default ON)">
-
+    <div class="score-hero" data-share="score">
       <div class="score-info">
         <div class="score-eyebrow"><i data-lucide="award" style="width:14px;height:14px"></i>나의 점수</div>
         <div class="score-headline">사회과 — 우리 고장의 모습</div>
@@ -408,11 +364,7 @@ body.preview-mode .notes-fab-wrap,body.preview-mode .note-pin,body.preview-mode 
     </div>
 
     <!-- 평가 목표 -->
-    <section class="card" data-share="standards" data-note-id="default-1" data-note="성취기준 카드 (이번 평가에서 배운 것).
-• 교과 성취기준을 학생 친화적으로 다듬은 텍스트
-• 데이터 출처: 평가계획 단계에서 입력된 성취기준 (NCS code 기반)
-• 미공개 시 카드 숨김 (data-share='standards')
-• 학생 동기부여 차원에서 default ON 권장">
+    <section class="card" data-share="standards">
       <div class="card-hd">
         <span class="card-emoji">📚</span>
         <h2 class="card-title">이번 평가에서 배운 것들</h2>
@@ -425,11 +377,7 @@ body.preview-mode .notes-fab-wrap,body.preview-mode .note-pin,body.preview-mode 
     </section>
 
     <!-- 내 답안 -->
-    <section class="card" data-share="answer" data-note-id="default-2" data-note="학생 답안 카드 (내가 쓴 답).
-• 학생이 제출한 답안 원본 (OCR 결과 또는 텍스트 입력)
-• 출력 PDF에서는 default 숨김 (opts.answer=false 강제) — 별도 '과제물 다운로드' 버튼 사용
-• 미공개 시 hide-answer 클래스로 숨김
-• 미제출 학생(missing=1)인 경우 자동 숨김 (body.missing-mode)">
+    <section class="card" data-share="answer">
       <div class="card-hd">
         <span class="card-emoji">✏️</span>
         <h2 class="card-title">내가 쓴 답</h2>
@@ -462,12 +410,7 @@ body.preview-mode .notes-fab-wrap,body.preview-mode .note-pin,body.preview-mode 
     </section>
 
     <!-- 문항별 결과 -->
-    <section class="card" data-share="inst-card" data-note-id="default-3" data-note="문항별 채점근거 + 피드백 카드.
-• 문항별 채점근거(inst_ground)와 문항별 피드백(inst_feedback) 두 데이터를 통합 표시
-• 두 항목 모두 미공개일 때만 카드 자체 숨김 (body.hide-inst-ground.hide-inst-feedback)
-• 각 항목 개별 숨김도 지원
-• 신규 AI 채점에만 데이터 존재. 기존 채점(ITEMS_OLD)은 데이터 없음 → 자동 숨김
-• 미제출 학생인 경우 자동 숨김">
+    <section class="card" data-share="inst-card">
       <div class="card-hd">
         <span class="card-emoji">📝</span>
         <h2 class="card-title">문항별로 어떻게 했나요?</h2>
@@ -613,12 +556,7 @@ body.preview-mode .notes-fab-wrap,body.preview-mode .note-pin,body.preview-mode 
     </section>
 
     <!-- 채점 항목별 결과 -->
-    <section class="card" data-share="elem-card" data-note-id="default-4" data-note="채점요소별 (과제물 AI) 카드 — 1단.
-• 과제물 AI가 학생 답안을 분석해 채점요소별로 작성한 근거(elem_ground) + 피드백(elem_feedback_analysis)
-• AI가 학생 답안을 기반으로 산출한 결과 (✕ 채점기준 자체에 대한 일반 피드백 아님)
-• default OFF — 선생님이 의도적으로 켜야 학생에게 노출 (PRD 정책)
-• 두 항목 모두 미공개일 때만 카드 자체 숨김
-• 아래 '채점기준 기반 피드백' 카드(루브릭 AI)와 별개 — 두 AI는 데이터 결이 다름">
+    <section class="card" data-share="elem-card">
       <div class="card-hd">
         <span class="card-emoji">📊</span>
         <h2 class="card-title">채점 항목별로는 어땠나요?</h2>
@@ -680,13 +618,7 @@ body.preview-mode .notes-fab-wrap,body.preview-mode .note-pin,body.preview-mode 
     </section>
 
     <!-- 채점기준 기반 피드백 (루브릭 AI 단) -->
-    <section class="card rubric-section" data-share="elem-feedback-rubric" data-note-id="default-5" data-note="채점기준 기반 피드백 카드 — 2단 (루브릭 AI).
-• 루브릭 AI가 채점기준 텍스트만 보고 생성한 일반 피드백 (학생 답안 미참조)
-• 점수는 선생님이 직접 체크한 점수가 그대로 반영됨 (✕ AI 예상 점수 아님)
-• 과제물 AI(1단)와는 별개 카드 — 두 AI가 섞이면 학생 입장에서 헷갈림
-• default OFF — 선생님이 의도적으로 켜야 학생에게 노출
-• 시각 차별화: 하늘색 배경(.rubric-section)으로 1단과 구분
-• PRD V0.3 'AI 채점결과 데이터 매핑' 표 참조">
+    <section class="card rubric-section" data-share="elem-feedback-rubric">
       <div class="card-hd">
         <span class="card-emoji">📋</span>
         <h2 class="card-title">채점기준 기반 피드백</h2>
@@ -718,13 +650,7 @@ body.preview-mode .notes-fab-wrap,body.preview-mode .note-pin,body.preview-mode 
     </section>
 
     <!-- 선생님 피드백 -->
-    <section class="card" data-share="teacher" data-note-id="default-6" data-note="선생님 한마디 카드.
-• 선생님이 채점 화면(scoring_elementary_v2)에서 직접 입력한 종합 피드백
-• 잘한 점 / 다음에 해볼 도전 / 종합 의견 3단 구조
-• 입력 시점에 AI 자동 생성도 가능 (선생님이 수정 가능)
-• 미공개 시 hide-teacher 클래스로 숨김
-• default ON (학생에게 가장 의미있는 영역)
-• 본문 16px 이상 (CLAUDE.md 절대 규칙 — 학생이 읽는 텍스트)">
+    <section class="card" data-share="teacher">
       <div class="card-hd">
         <span class="card-emoji">💬</span>
         <h2 class="card-title">선생님 한마디</h2>
@@ -762,13 +688,13 @@ body.preview-mode .notes-fab-wrap,body.preview-mode .note-pin,body.preview-mode 
 <script>
   lucide.createIcons();
 
-  // 미리보기 모드(부모가 iframe으로 띄울 때) — 실제 공개 기간 데이터가 없으므로 기간 영역 숨김
-  // missing=1 (미제출 학생) — 학생 답안·문항별 결과 카드 숨김 + 안내 보강
+  // 미리보기 모드(부모가 iframe으로 띄울 때) — 학생 클릭·다운로드 동작 차단
+  // ?preview=1, ?print=1 또는 iframe 안(parent !== window)이면 자동 preview-mode
   (function(){
     var p = new URLSearchParams(location.search);
-    if(p.get('preview') === '1'){
-      var pb = document.querySelector('.period-bar');
-      if(pb) pb.style.display = 'none';
+    var isInIframe = window.parent !== window;
+    if(p.get('preview') === '1' || p.get('print') === '1' || isInIframe){
+      document.body.classList.add('preview-mode');
     }
     if(p.get('missing') === '1'){
       document.body.classList.add('missing-mode');
@@ -798,647 +724,6 @@ body.preview-mode .notes-fab-wrap,body.preview-mode .note-pin,body.preview-mode 
     document.body.classList.toggle('hide-teacher', o.teacher === false);
     document.body.classList.toggle('hide-answer', o.answer === false);
   });
-
-  // iframe 안에서 띄울 때는 어노테이션 FAB 숨김 (preview 또는 부모창 존재 시)
-  (function(){
-    var p = new URLSearchParams(location.search);
-    if(p.get('preview') === '1' || window.parent !== window){
-      document.body.classList.add('preview-mode');
-    }
-  })();
-
-  // ══════ 어노테이션 시스템 (통합 저장) ══════
-  (function(){
-    var STORAGE_KEY = 'clipo_notes_all';
-    var PAGE_KEY = location.pathname.split('/').pop() || 'index';
-    function loadAll(){ try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {}; } catch(e){ return {}; } }
-    function saveAll(all){ try { localStorage.setItem(STORAGE_KEY, JSON.stringify(all)); } catch(e){} }
-    function loadFromStorage(){ return loadAll()[PAGE_KEY] || null; }
-    function saveToStorage(n){ var all = loadAll(); all[PAGE_KEY] = n; saveAll(all); }
-    (function migrate(){
-      var all = loadAll();
-      var changed = false;
-      for(var i=0; i<localStorage.length; i++){
-        var k = localStorage.key(i);
-        if(!k || k === STORAGE_KEY || k.indexOf('clipo_notes_') !== 0) continue;
-        var pk = k.replace('clipo_notes_', '');
-        try { var d = JSON.parse(localStorage.getItem(k)); if(d && !all[pk]){ all[pk] = d; changed = true; } } catch(e){}
-      }
-      if(changed) saveAll(all);
-    })();
-    function ensureNoteId(el){
-      if(!el.getAttribute('data-note-id')){
-        el.setAttribute('data-note-id', 'note-'+Math.random().toString(36).slice(2,9));
-      }
-      return el.getAttribute('data-note-id');
-    }
-    function applyStorage(){
-      var stored = loadFromStorage();
-      if(!stored) return;
-      Object.keys(stored).forEach(function(id){
-        var el = document.querySelector('[data-note-id="'+id+'"]');
-        if(!el) return;
-        if(stored[id].deleted){
-          el.removeAttribute('data-note');
-        } else if(stored[id].note){
-          el.setAttribute('data-note', stored[id].note);
-        }
-      });
-      Object.keys(stored).forEach(function(id){
-        if(stored[id].deleted) return;
-        if(!stored[id].note || stored[id].note === '새 어노테이션 — 내용을 입력하세요') return;
-        if(document.querySelector('[data-note-id="'+id+'"]')) return;
-        var target = null;
-        if(stored[id].selector && stored[id].selector !== '[data-note-id="'+id+'"]'){
-          try { target = document.querySelector(stored[id].selector); } catch(e){}
-        }
-        if(!target){
-          target = document.createElement('div');
-          target.className = 'note-orphan-anchor';
-          target.style.cssText = 'position:absolute;width:1px;height:1px;pointer-events:none';
-          if(stored[id].pos){ target.style.top = stored[id].pos.top; target.style.left = stored[id].pos.left; }
-          else { target.style.top = (100+Math.random()*200)+'px'; target.style.left = (100+Math.random()*200)+'px'; }
-          document.body.appendChild(target);
-        }
-        target.setAttribute('data-note-id', id);
-        target.setAttribute('data-note', stored[id].note);
-      });
-    }
-    function buildPins(){
-      document.querySelectorAll('.note-pin,.note-popover').forEach(function(el){ el.remove(); });
-      var nodes = document.querySelectorAll('[data-note]');
-      var stored = loadFromStorage() || {};
-      nodes.forEach(function(el, idx){
-        ensureNoteId(el);
-        var id = el.getAttribute('data-note-id');
-        var num = idx + 1;
-        var pin = document.createElement('button');
-        pin.type = 'button';
-        pin.className = 'note-pin';
-        pin.textContent = num;
-        if(stored[id] && stored[id].pos){
-          pin.style.top = stored[id].pos.top;
-          pin.style.right = 'auto';
-          pin.style.left = stored[id].pos.left;
-          pin.style.transform = 'none';
-        }
-        attachPinHandlers(pin, el, num, id);
-        el.appendChild(pin);
-      });
-      updateCount();
-      return nodes.length;
-    }
-    function attachPinHandlers(pin, targetEl, num, id){
-      var dragStart = null;
-      var moved = false;
-      pin.addEventListener('pointerdown', function(e){
-        e.stopPropagation();
-        pin.setPointerCapture(e.pointerId);
-        var rect = pin.getBoundingClientRect();
-        var hostRect = targetEl.getBoundingClientRect();
-        dragStart = {
-          startX: e.clientX, startY: e.clientY,
-          offsetLeft: rect.left - hostRect.left + rect.width/2,
-          offsetTop: rect.top - hostRect.top + rect.height/2,
-          pinW: rect.width, pinH: rect.height
-        };
-        moved = false;
-      });
-      pin.addEventListener('pointermove', function(e){
-        if(!dragStart) return;
-        var dx = e.clientX - dragStart.startX;
-        var dy = e.clientY - dragStart.startY;
-        if(Math.abs(dx) + Math.abs(dy) > 3){
-          moved = true;
-          pin.classList.add('dragging');
-          var newLeft = dragStart.offsetLeft + dx - dragStart.pinW/2;
-          var newTop = dragStart.offsetTop + dy - dragStart.pinH/2;
-          pin.style.left = newLeft + 'px';
-          pin.style.top = newTop + 'px';
-          pin.style.right = 'auto';
-          pin.style.transform = 'none';
-        }
-      });
-      pin.addEventListener('pointerup', function(e){
-        e.stopPropagation();
-        if(dragStart && pin.hasPointerCapture(e.pointerId)) pin.releasePointerCapture(e.pointerId);
-        if(moved){
-          var stored = loadFromStorage() || {};
-          stored[id] = stored[id] || {};
-          stored[id].pos = { top: pin.style.top, left: pin.style.left };
-          saveToStorage(stored);
-          pin.classList.remove('dragging');
-        } else {
-          openPopover(targetEl, num, pin);
-        }
-        dragStart = null;
-        moved = false;
-      });
-      pin.addEventListener('pointercancel', function(){
-        dragStart = null; moved = false; pin.classList.remove('dragging');
-      });
-    }
-    function updateCount(){
-      var n = document.querySelectorAll('[data-note]').length;
-      var el = document.querySelector('.notes-toggle-count');
-      if(el) el.textContent = n;
-    }
-    function closeAllPopovers(){
-      document.querySelectorAll('.note-popover').forEach(function(p){ p.remove(); });
-      document.querySelectorAll('.note-pin.active').forEach(function(p){ p.classList.remove('active'); });
-    }
-    function openPopover(targetEl, num, pinEl){
-      var alreadyOpen = pinEl.classList.contains('active');
-      closeAllPopovers();
-      if(alreadyOpen) return;
-      renderPopover(targetEl, num, pinEl, false);
-    }
-    function renderPopover(targetEl, num, pinEl, editing, keepOthers){
-      if(!keepOthers) closeAllPopovers();
-      var noteText = targetEl.getAttribute('data-note') || '';
-      var pop = document.createElement('div');
-      pop.className = 'note-popover show';
-      var bodyHtml = editing
-        ? '<div class="note-popover-toolbar"><button type="button" class="note-popover-tool-btn" data-tool="bold" title="굵게 (Ctrl+B)">B</button></div>'
-        + '<textarea class="note-popover-textarea" placeholder="어노테이션 내용을 입력하세요...">'+escHtml(noteText)+'</textarea>'
-          + '<div class="note-popover-edit-actions">'
-          +   '<button class="note-popover-btn" data-act="cancel">취소</button>'
-          +   '<button class="note-popover-btn primary" data-act="save">저장</button>'
-          + '</div>'
-        : '<div class="note-popover-body">'+renderNote(noteText)+'</div>';
-      pop.innerHTML = '<div class="note-popover-hd">'
-        + '<span class="note-popover-num">'+num+'</span>'
-        + '<div class="note-popover-actions">'
-        +   (editing ? '' : '<button class="note-popover-action" data-act="edit" title="편집">✏️</button>')
-        +   (editing ? '' : '<button class="note-popover-action danger" data-act="delete" title="삭제">🗑</button>')
-        +   '<button class="note-popover-action" data-act="close" title="닫기">✕</button>'
-        + '</div>'
-        + '</div>'
-        + bodyHtml;
-      targetEl.appendChild(pop);
-      var __id = targetEl.getAttribute('data-note-id');
-      var __s = loadFromStorage() || {};
-      if(__id && __s[__id] && __s[__id].popoverPos){
-        pop.style.left = __s[__id].popoverPos.left;
-        pop.style.top = __s[__id].popoverPos.top;
-        pop.style.right = 'auto';
-      } else {
-        var rect = pinEl.getBoundingClientRect();
-        var popW = 300;
-        if(rect.right + popW + 16 > window.innerWidth){
-          pop.style.right = '0'; pop.style.left = 'auto';
-          pop.style.top = (pinEl.offsetTop + 24) + 'px';
-        } else {
-          pop.style.left = (pinEl.offsetLeft + 24) + 'px';
-          pop.style.top = (pinEl.offsetTop - 8) + 'px';
-        }
-      }
-      pinEl.classList.add('active');
-      var __hd = pop.querySelector('.note-popover-hd');
-      if(__hd){
-        var __pd = null;
-        __hd.addEventListener('pointerdown', function(ev){
-          if(ev.target.closest('.note-popover-action')) return;
-          ev.preventDefault();
-          __hd.setPointerCapture(ev.pointerId);
-          var pr = pop.getBoundingClientRect();
-          __pd = { sx: ev.clientX, sy: ev.clientY, l: pr.left, t: pr.top };
-        });
-        __hd.addEventListener('pointermove', function(ev){
-          if(!__pd) return;
-          var hr = targetEl.getBoundingClientRect();
-          var nl = (__pd.l + (ev.clientX - __pd.sx) - hr.left);
-          var nt = (__pd.t + (ev.clientY - __pd.sy) - hr.top);
-          pop.style.left = nl + 'px';
-          pop.style.top = nt + 'px';
-          pop.style.right = 'auto';
-        });
-        __hd.addEventListener('pointerup', function(ev){
-          if(!__pd) return;
-          if(__hd.hasPointerCapture(ev.pointerId)) __hd.releasePointerCapture(ev.pointerId);
-          var idd = targetEl.getAttribute('data-note-id');
-          if(idd){
-            var ss = loadFromStorage() || {};
-            ss[idd] = ss[idd] || {};
-            ss[idd].popoverPos = { top: pop.style.top, left: pop.style.left };
-            saveToStorage(ss);
-          }
-          __pd = null;
-        });
-        __hd.addEventListener('pointercancel', function(){ __pd = null; });
-      }
-      // editing 모드면 textarea 자동 높이 조절
-    var __ta = pop.querySelector('.note-popover-textarea');
-    if(__ta){
-      var __autoGrow = function(){
-        __ta.style.height = 'auto';
-        var h = Math.min(__ta.scrollHeight + 2, 420);
-        __ta.style.height = h + 'px';
-      };
-      var __saveTimer = null;
-      var __autoSave = function(){
-        if(__saveTimer) clearTimeout(__saveTimer);
-        __saveTimer = setTimeout(function(){
-          var __id = targetEl.getAttribute('data-note-id');
-          if(!__id) return;
-          var __stored = loadFromStorage() || {};
-          __stored[__id] = __stored[__id] || {};
-          __stored[__id].note = __ta.value;
-          delete __stored[__id].deleted;
-          saveToStorage(__stored);
-          targetEl.setAttribute('data-note', __ta.value);
-        }, 200);
-      };
-      __ta.addEventListener('input', function(){ __autoGrow(); __autoSave(); });
-      // 볼드 toolbar + Ctrl+B 단축키
-      function __wrapBold(){
-        var s = __ta.selectionStart, e = __ta.selectionEnd;
-        var sel = __ta.value.substring(s, e) || '굵은 글자';
-        var before = __ta.value.substring(0, s);
-        var after = __ta.value.substring(e);
-        __ta.value = before + '**' + sel + '**' + after;
-        __ta.focus();
-        __ta.setSelectionRange(s + 2, s + 2 + sel.length);
-        __autoGrow(); __autoSave();
-      }
-      var __bBtn = pop.querySelector('[data-tool="bold"]');
-      if(__bBtn){ __bBtn.addEventListener('click', function(ev){ ev.preventDefault(); __wrapBold(); }); }
-      __ta.addEventListener('keydown', function(ev){
-        if((ev.ctrlKey || ev.metaKey) && (ev.key === 'b' || ev.key === 'B')){
-          ev.preventDefault();
-          __wrapBold();
-        }
-      });
-      setTimeout(function(){ __autoGrow(); __ta.focus(); var v=__ta.value; __ta.value=''; __ta.value=v; }, 0);
-    }
-    pop.querySelectorAll('[data-act]').forEach(function(btn){
-        btn.onclick = function(e){
-          e.stopPropagation();
-          var act = btn.getAttribute('data-act');
-          if(act === 'close'){ closeAllPopovers(); }
-          else if(act === 'edit'){ renderPopover(targetEl, num, pinEl, true); }
-          else if(act === 'cancel'){ renderPopover(targetEl, num, pinEl, false); }
-          else if(act === 'save'){
-            var newText = pop.querySelector('.note-popover-textarea').value.trim();
-            var id = targetEl.getAttribute('data-note-id');
-            var stored = loadFromStorage() || {};
-            stored[id] = stored[id] || {};
-            stored[id].note = newText;
-            saveToStorage(stored);
-            targetEl.setAttribute('data-note', newText);
-            renderPopover(targetEl, num, pinEl, false);
-          }
-          else if(act === 'delete'){
-            if(!confirm('이 어노테이션을 삭제할까요?')) return;
-            var id2 = targetEl.getAttribute('data-note-id');
-            var stored2 = loadFromStorage() || {};
-            stored2[id2] = stored2[id2] || {};
-            stored2[id2].deleted = true;
-            saveToStorage(stored2);
-            targetEl.removeAttribute('data-note');
-            closeAllPopovers();
-            buildPins();
-          }
-        };
-      });
-    }
-    function escHtml(s){
-      return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-    }
-    function renderNote(s){
-      return escHtml(s).replace(/\*\*([^*\n]+?)\*\*/g, '<strong>$1</strong>');
-    }
-    function openAllPopovers(){
-      closeAllPopovers();
-      var nodes = document.querySelectorAll('[data-note]');
-      nodes.forEach(function(el, idx){
-        var pin = el.querySelector('.note-pin');
-        if(pin){ renderPopover(el, idx + 1, pin, false, true); }
-      });
-    }
-    var addMode = false;
-    function toggleAddMode(){
-      addMode = !addMode;
-      document.body.classList.toggle('note-add-mode', addMode);
-    }
-    document.addEventListener('click', function(e){
-      if(!addMode) return;
-      var target = e.target;
-      if(target.closest('.notes-toggle') || target.closest('.note-pin') || target.closest('.note-popover') || target.closest('.notes-menu')) return;
-      e.preventDefault();
-      e.stopPropagation();
-      // 빈 어노테이션 생성 후 인라인 textarea 풍선 즉시 오픈 (multi-line 지원)
-      var id = 'note-'+Math.random().toString(36).slice(2,9);
-      target.setAttribute('data-note-id', id);
-      target.setAttribute('data-note', '');
-      var selector = '[data-note-id="'+id+'"]';
-      var stored = loadFromStorage() || {};
-      stored[id] = { note: '', selector: selector };
-      saveToStorage(stored);
-      buildPins();
-      toggleAddMode();
-      var allNoteEls = document.querySelectorAll('[data-note]');
-      var newIdx = -1;
-      allNoteEls.forEach(function(el, i){ if(el === target) newIdx = i; });
-      if(newIdx >= 0){
-        var pin = target.querySelector('.note-pin');
-        if(pin){ renderPopover(target, newIdx + 1, pin, true); }
-
-      }
-    }, true);
-    function exportNotes(){
-      var all = loadAll();
-      var current = all[PAGE_KEY] || {};
-      document.querySelectorAll('[data-note]').forEach(function(el){
-        var id = el.getAttribute('data-note-id'); if(!id) return;
-        current[id] = current[id] || {};
-        current[id].note = el.getAttribute('data-note');
-      });
-      all[PAGE_KEY] = current;
-      saveAll(all);
-      var blob = new Blob([JSON.stringify(all, null, 2)], {type:'application/json'});
-      var url = URL.createObjectURL(blob);
-      var a = document.createElement('a');
-      a.href = url; a.download = 'clipo_notes_all.json'; a.click();
-      URL.revokeObjectURL(url);
-    }
-    function importNotes(){
-      var input = document.createElement('input');
-      input.type = 'file'; input.accept = 'application/json,.json';
-      input.onchange = function(e){
-        var file = e.target.files && e.target.files[0]; if(!file) return;
-        var reader = new FileReader();
-        reader.onload = function(){
-          try {
-            var data = JSON.parse(reader.result);
-            if(typeof data !== 'object' || data === null) throw new Error('JSON 형식이 올바르지 않아요');
-            if(!confirm('가져온 어노테이션으로 현재 저장 상태를 덮어쓸까요? (모든 페이지)')) return;
-            saveAll(data);
-            alert('어노테이션을 가져왔어요. 페이지를 새로고침합니다.');
-            location.reload();
-          } catch(err){ alert('가져오기 실패: ' + err.message); }
-        };
-        reader.readAsText(file);
-      };
-      input.click();
-    }
-    function resetNotes(){
-      if(!confirm('이 페이지의 모든 어노테이션을 삭제할까요?\n(default·추가 모두 제거. JSON 가져오기로 복원 가능)')) return;
-      var pageStored = loadFromStorage() || {};
-      document.querySelectorAll('[data-note]').forEach(function(el){
-        var id = el.getAttribute('data-note-id');
-        if(!id){ id = 'note-'+Math.random().toString(36).slice(2,9); el.setAttribute('data-note-id', id); }
-        pageStored[id] = pageStored[id] || {};
-        pageStored[id].deleted = true;
-      });
-      saveToStorage(pageStored);
-      location.reload();
-    }
-    var wrap = document.createElement('div');
-    wrap.className = 'notes-fab-wrap';
-    wrap.innerHTML =
-        '<div class="notes-menu">'
-      +   '<button class="notes-menu-item notes-menu-item-primary" data-act="view"><span class="notes-menu-check"></span>👁&nbsp;&nbsp;어노테이션 보기</button>'
-      +   '<button class="notes-menu-item" data-act="add">+&nbsp;&nbsp;새 어노테이션 추가</button>'
-      +   '<div class="notes-menu-divider"></div>'
-      +   '<button class="notes-menu-item" data-act="export">⬇&nbsp;&nbsp;JSON 내보내기 (전체)</button>'
-    +   '<button class="notes-menu-item" data-act="copy">📋&nbsp;&nbsp;JSON 텍스트 복사</button>'
-      +   '<button class="notes-menu-item" data-act="cloud">☁&nbsp;&nbsp;폴더 JSON 다시 불러오기</button>'
-    +   '<button class="notes-menu-item" data-act="import">⬆&nbsp;&nbsp;JSON 가져오기</button>'
-      +   '<button class="notes-menu-item danger" data-act="reset">↺&nbsp;&nbsp;이 페이지 초기화</button>'
-      + '</div>'
-      + '<button class="notes-toggle" type="button">📝 어노테이션 <span class="notes-toggle-count">0</span><span class="notes-toggle-chev">▾</span></button>';
-    document.body.appendChild(wrap);
-
-    var mainBtn = wrap.querySelector('.notes-toggle');
-    var menu = wrap.querySelector('.notes-menu');
-    function setMenuOpen(open){ wrap.classList.toggle('menu-open', open); }
-    function setViewMode(on){
-      document.body.classList.toggle('show-notes', on);
-      mainBtn.classList.toggle('active', on);
-      var checkEl = wrap.querySelector('[data-act="view"] .notes-menu-check');
-      if(checkEl) checkEl.textContent = on ? '✓' : '';
-      if(on){
-        applyStorage();
-        buildPins();
-      } else {
-        closeAllPopovers();
-        if(addMode) toggleAddMode();
-      }
-    }
-    mainBtn.onclick = function(e){
-      e.stopPropagation();
-      setMenuOpen(!wrap.classList.contains('menu-open'));
-    };
-    menu.addEventListener('click', function(e){
-      var btn = e.target.closest('[data-act]');
-      if(!btn) return;
-      e.stopPropagation();
-      var act = btn.getAttribute('data-act');
-      if(act === 'view'){
-        setViewMode(!document.body.classList.contains('show-notes'));
-      } else if(act === 'add'){
-        if(!document.body.classList.contains('show-notes')) setViewMode(true);
-        toggleAddMode();
-        setMenuOpen(false);
-      } else if(act === 'export'){
-        exportNotes();
-        setMenuOpen(false);
-      } else if(act === 'copy'){
-        if(window.__copyClipoNotes) window.__copyClipoNotes();
-        setMenuOpen(false);
-      } else if(act === 'cloud'){
-        if(window.__importClipoNotesFromFolder) window.__importClipoNotesFromFolder();
-        setMenuOpen(false);
-      } else if(act === 'import'){
-        importNotes();
-        setMenuOpen(false);
-      } else if(act === 'reset'){
-        resetNotes();
-      }
-    });
-    document.addEventListener('click', function(e){
-      if(wrap.classList.contains('menu-open') && !wrap.contains(e.target)){
-        setMenuOpen(false);
-      }
-    });
-    window.__clipoNotesSync = function(){ applyStorage(); buildPins(); updateCount(); };
-    applyStorage();
-    buildPins();
-    updateCount();
-})();
-
-// ══════ 안전장치 (미백업 추적 + 떠나기 경고 + 클립보드 복사) ══════
-(function(){
-  var KEY = 'clipo_notes_all';
-  var META = 'clipo_notes_meta';
-  function snapshot(){ return localStorage.getItem(KEY) || ''; }
-  function getMeta(){ try { return JSON.parse(localStorage.getItem(META)) || {}; } catch(e){ return {}; } }
-  function setMeta(m){ try { localStorage.setItem(META, JSON.stringify(m)); } catch(e){} }
-  function isUnsaved(){
-    var snap = snapshot();
-    if(!snap || snap === '{}') return false;
-    var m = getMeta();
-    return snap !== (m.lastSavedSnapshot || '');
-  }
-  function markSaved(){
-    var m = getMeta();
-    m.lastSavedSnapshot = snapshot();
-    m.lastSavedAt = Date.now();
-    setMeta(m);
-    updateBadge();
-  }
-  function updateBadge(){
-    var fab = document.querySelector('.notes-fab-wrap');
-    if(!fab) return;
-    fab.classList.toggle('has-unsaved', isUnsaved());
-  }
-  function copyJsonText(){
-    var data = snapshot() || '{}';
-    var pretty;
-    try { pretty = JSON.stringify(JSON.parse(data), null, 2); }
-    catch(e){ pretty = data; }
-    function done(){ markSaved(); alert('어노테이션 JSON이 클립보드에 복사됐어요.\n메모장·노션·슬랙 어디든 붙여넣어 백업하세요.\n(클로드 채팅에 붙여넣으면 박제도 가능)'); }
-    if(navigator.clipboard && navigator.clipboard.writeText){
-      navigator.clipboard.writeText(pretty).then(done).catch(fallback);
-    } else { fallback(); }
-    function fallback(){
-      var ta = document.createElement('textarea');
-      ta.value = pretty;
-      ta.style.position = 'fixed'; ta.style.top = '-1000px';
-      document.body.appendChild(ta);
-      ta.focus(); ta.select();
-      try { document.execCommand('copy'); done(); }
-      catch(e){ alert('자동 복사 실패. 콘솔에 출력했어요 — 수동으로 복사하세요.'); console.log(pretty); }
-      document.body.removeChild(ta);
-    }
-  }
-  window.__copyClipoNotes = copyJsonText;
-  // export·import 클릭 시 백업 완료로 처리
-  document.addEventListener('click', function(e){
-    var btn = e.target.closest && e.target.closest('[data-act="export"],[data-act="import"]');
-    if(btn){ setTimeout(markSaved, 200); }
-  }, true);
-  // 폴링으로 배지 동기화
-  setInterval(updateBadge, 1500);
-  setTimeout(updateBadge, 600);
-})();
-
-
-// ══════ FAB 위치 드래그 (FAB 자체로 드래그/클릭 자동 구분) ══════
-(function(){
-  var POS_KEY = 'clipo_notes_fab_pos';
-  function init(){
-    var wrap = document.querySelector('.notes-fab-wrap');
-    if(!wrap) { setTimeout(init, 200); return; }
-    var toggle = wrap.querySelector('.notes-toggle');
-    if(!toggle) { setTimeout(init, 200); return; }
-    // 저장된 위치 복원
-    try {
-      var saved = JSON.parse(localStorage.getItem(POS_KEY));
-      if(saved && saved.left != null && saved.top != null){
-        wrap.style.bottom = 'auto';
-        wrap.style.right = 'auto';
-        wrap.style.left = saved.left + 'px';
-        wrap.style.top = saved.top + 'px';
-      }
-    } catch(e){}
-    // FAB 자체로 드래그 (5px 이상 움직이면 드래그, 아니면 메뉴 클릭)
-    var dragStart = null;
-    var moved = false;
-    toggle.addEventListener('pointerdown', function(e){
-      if(e.button !== 0) return; // 좌클릭만
-      var rect = wrap.getBoundingClientRect();
-      dragStart = { x: e.clientX, y: e.clientY, left: rect.left, top: rect.top };
-      moved = false;
-      try { toggle.setPointerCapture(e.pointerId); } catch(err){}
-    });
-    toggle.addEventListener('pointermove', function(e){
-      if(!dragStart) return;
-      var dx = e.clientX - dragStart.x;
-      var dy = e.clientY - dragStart.y;
-      if(Math.abs(dx) + Math.abs(dy) > 5){
-        if(!moved){ moved = true; wrap.classList.add('dragging'); }
-        var newLeft = Math.max(0, Math.min(window.innerWidth - 100, dragStart.left + dx));
-        var newTop = Math.max(0, Math.min(window.innerHeight - 40, dragStart.top + dy));
-        wrap.style.bottom = 'auto';
-        wrap.style.right = 'auto';
-        wrap.style.left = newLeft + 'px';
-        wrap.style.top = newTop + 'px';
-      }
-    });
-    toggle.addEventListener('pointerup', function(e){
-      if(!dragStart) return;
-      try { if(toggle.hasPointerCapture(e.pointerId)) toggle.releasePointerCapture(e.pointerId); } catch(err){}
-      var wasDrag = moved;
-      dragStart = null; moved = false;
-      if(wasDrag){
-        // 드래그였음 → 위치 저장 + 직후 click 막기
-        try {
-          var rect = wrap.getBoundingClientRect();
-          localStorage.setItem(POS_KEY, JSON.stringify({ left: rect.left, top: rect.top }));
-        } catch(err){}
-        wrap.classList.remove('dragging');
-        var blocker = function(ev){ ev.stopPropagation(); ev.preventDefault(); toggle.removeEventListener('click', blocker, true); };
-        toggle.addEventListener('click', blocker, true);
-      }
-      // 안 움직였으면 click 자연스럽게 발생 → 메뉴 토글
-    });
-    toggle.addEventListener('pointercancel', function(){
-      wrap.classList.remove('dragging');
-      dragStart = null; moved = false;
-    });
-  }
-  if(document.readyState === 'loading'){
-    document.addEventListener('DOMContentLoaded', init);
-  } else {
-    setTimeout(init, 100);
-  }
-})();
-
-
-// ══════ 폴더 JSON 자동 동기화 (clipo_notes_all.json) ══════
-(function(){
-  function load(force){
-    fetch('clipo_notes_all.json?t=' + Date.now())
-      .then(function(r){
-        if(!r.ok) throw new Error('not found ' + r.status);
-        return r.json();
-      })
-      .then(function(data){
-        if(typeof data !== 'object' || data === null) return;
-        var existing = localStorage.getItem('clipo_notes_all');
-        var isEmpty = !existing || existing === '{}';
-        if(force){
-          if(!confirm('폴더의 clipo_notes_all.json으로 현재 로컬 어노테이션을 덮어쓸까요?\n(되돌릴 수 없어요)')) return;
-          localStorage.setItem('clipo_notes_all', JSON.stringify(data));
-          location.reload();
-        } else if(isEmpty){
-          // 첫 방문자 — 자동 import
-          localStorage.setItem('clipo_notes_all', JSON.stringify(data));
-          try {
-            localStorage.setItem('clipo_notes_meta', JSON.stringify({
-              lastSavedSnapshot: JSON.stringify(data),
-              lastSavedAt: Date.now()
-            }));
-          } catch(e){}
-          // 어노테이션 UI 즉시 갱신 (deleted·텍스트 반영 + 카운트)
-          if(window.__clipoNotesSync){ setTimeout(window.__clipoNotesSync, 30); }
-        }
-      })
-      .catch(function(err){
-        if(force){ alert('폴더에 clipo_notes_all.json이 없어요. 먼저 [JSON 내보내기]로 받아서 같은 폴더에 저장하세요.'); }
-      });
-  }
-  window.__importClipoNotesFromFolder = function(){ load(true); };
-  // 첫 로드 시 자동 (localStorage 비어있을 때만 효력)
-  if(document.readyState === 'loading'){
-    document.addEventListener('DOMContentLoaded', function(){ load(false); });
-  } else {
-    setTimeout(function(){ load(false); }, 50);
-  }
-})();
-
 </script>
 </body>
 </html>

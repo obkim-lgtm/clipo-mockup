@@ -245,6 +245,18 @@ body{background:#fef9f3;color:#3b3f4c;min-height:100vh}
   .main{margin:0;padding:0}
 }
 
+/* 미리보기 모드 (선생님이 iframe으로 보는 시점) — 학생 클릭·다운로드 동작 차단 */
+body.preview-mode .btn-download,
+body.preview-mode .btn-back,
+body.preview-mode .period-bar{display:none}
+body.preview-mode .gh-menu-btn,
+body.preview-mode .gh-user,
+body.preview-mode .sb-item,
+body.preview-mode .gh-logo{pointer-events:none}
+body.preview-mode .gh-menu-btn:hover,
+body.preview-mode .sb-item:hover,
+body.preview-mode .gh-user:hover{background:none !important;color:inherit !important}
+
 /* ══════ 공개 옵션 토글 (parent iframe postMessage 기반) ══════ */
 body.hide-score [data-share="score"]{display:none}
 body.hide-standards [data-share="standards"]{display:none}
@@ -676,13 +688,13 @@ body.missing-mode [data-share="inst-card"]{display:none}
 <script>
   lucide.createIcons();
 
-  // 미리보기 모드(부모가 iframe으로 띄울 때) — 실제 공개 기간 데이터가 없으므로 기간 영역 숨김
-  // missing=1 (미제출 학생) — 학생 답안·문항별 결과 카드 숨김 + 안내 보강
+  // 미리보기 모드(부모가 iframe으로 띄울 때) — 학생 클릭·다운로드 동작 차단
+  // ?preview=1, ?print=1 또는 iframe 안(parent !== window)이면 자동 preview-mode
   (function(){
     var p = new URLSearchParams(location.search);
-    if(p.get('preview') === '1'){
-      var pb = document.querySelector('.period-bar');
-      if(pb) pb.style.display = 'none';
+    var isInIframe = window.parent !== window;
+    if(p.get('preview') === '1' || p.get('print') === '1' || isInIframe){
+      document.body.classList.add('preview-mode');
     }
     if(p.get('missing') === '1'){
       document.body.classList.add('missing-mode');
