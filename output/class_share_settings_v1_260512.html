@@ -121,10 +121,10 @@ body{background:#f6f7f9;color:#222631;min-height:100vh}
 .modal.preview-modal{width:98vw;max-width:1640px;height:94vh;max-height:980px;max-width:1640px}
 .preview-body{flex:1;min-height:0;display:flex;flex-direction:row;padding:16px;background:#f6f7f9;gap:16px;overflow:hidden}
 .preview-settings{width:360px;flex-shrink:0;display:flex;flex-direction:column;gap:12px;background:#fff;border-radius:12px;border:1px solid #eaecf0;padding:16px;overflow-y:auto}
-.preview-settings .modal-section-lbl{font-size:13px;font-weight:700;color:#222631;line-height:1.4;margin-bottom:4px}
+.preview-settings .modal-section-lbl{font-size:16px;font-weight:700;color:#222631;line-height:1.4;margin-bottom:4px}
 .preview-preview-wrap{flex:1;min-width:0;display:flex;flex-direction:column;gap:10px}
-.preview-frame-lbl{font-size:15px;font-weight:600;color:#3b3f4c;display:flex;align-items:center;gap:8px;line-height:1.4;padding:10px 14px;background:#f4f8ff;border:1px solid #dce6ff;border-radius:10px}
-.preview-frame-lbl i{color:#365eef;flex-shrink:0}
+.preview-frame-lbl{font-size:15px;font-weight:600;color:#3b3f4c;display:flex;align-items:center;gap:8px;line-height:1.4;padding:10px 14px;background:#f6f7f9;border:1px solid #eaecf0;border-radius:10px}
+.preview-frame-lbl i{color:#6d7381;flex-shrink:0}
 .preview-frame-lbl .lbl-sub{font-size:13px;font-weight:500;color:#6d7381;margin-left:4px}
 .preview-frame{flex:1;width:100%;border:0;border-radius:10px;background:#fff;box-shadow:0 1px 4px rgba(0,0,0,.06)}
 .preview-opt-list{display:flex;flex-direction:column;gap:8px}
@@ -133,7 +133,7 @@ body{background:#f6f7f9;color:#222631;min-height:100vh}
 .preview-opt-list .checkbox-row.checked{border-color:#a3c3ff;background:#f4f8ff}
 .preview-opt-list .checkbox-row .checkbox-box{width:18px;height:18px;border:2px solid #dde1e8;border-radius:5px;background:#fff;color:#fff;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .12s}
 .preview-opt-list .checkbox-row.checked .checkbox-box{background:#365eef;border-color:#365eef}
-.preview-opt-list .checkbox-text{font-size:14px;color:#222631;font-weight:500}
+.preview-opt-list .checkbox-text{font-size:16px;color:#222631;font-weight:500;line-height:1.4}
 @media (max-width:900px){
   .preview-body{flex-direction:column}
   .preview-settings{width:100%;max-height:36%}
@@ -253,7 +253,7 @@ body{background:#f6f7f9;color:#222631;min-height:100vh}
   <div class="container">
 
     <div class="page-header">
-      <button class="btn-back" onclick="history.back()">
+      <button class="btn-back" onclick="location.href='class_scoring_detail_v1_260512.html'">
         <i data-lucide="chevron-left" style="width:18px;height:18px"></i>이전으로
       </button>
       <h1 class="page-title">1학년 1반 클리포 공개 설정</h1>
@@ -276,15 +276,15 @@ body{background:#f6f7f9;color:#222631;min-height:100vh}
             <th class="col-check"><span class="tbl-checkbox" id="headerCheck" onclick="toggleAll(this)"><i data-lucide="check" style="width:13px;height:13px"></i></span></th>
             <th class="col-id">학번</th>
             <th class="col-name" style="text-align:left;padding-left:14px">이름</th>
+            <th class="col-item">점수<br>(총점/등급)</th>
             <th class="col-item">성취기준</th>
-            <th class="col-item">채점기준</th>
-            <th class="col-item">점수</th>
-            <th class="col-item">선생님<br>한마디</th>
-            <th class="col-item">문항별<br>근거</th>
+            <th class="col-item">문항별<br>채점근거</th>
             <th class="col-item">문항별<br>피드백</th>
-            <th class="col-item col-elem-feedback">채점요소별 채점근거<br>(과제물 AI)</th>
-            <th class="col-item col-elem-feedback">채점요소별<br>피드백 (과제물 AI)</th>
-            <th class="col-item col-elem-feedback">채점요소별<br>피드백 (루브릭 AI)</th>
+            <th class="col-item">채점기준표</th>
+            <th class="col-item col-elem-feedback">채점요소별<br>채점근거<br>(과제물 AI)</th>
+            <th class="col-item col-elem-feedback">채점요소별<br>피드백<br>(과제물 AI)</th>
+            <th class="col-item col-elem-feedback">채점요소별<br>피드백<br>(루브릭 AI)</th>
+            <th class="col-item">선생님<br>한마디</th>
             <th class="col-period">공개 기간</th>
             <th class="col-state">공개 상태</th>
           </tr>
@@ -304,15 +304,15 @@ body{background:#f6f7f9;color:#222631;min-height:100vh}
         <span class="card-count-badge" id="optCountBadge">6개 / 8개</span>
       </div>
       <div class="bulk-opts" id="bulkOpts">
+        <label class="opt-checkbox checked" data-key="score" onclick="toggleBulkOpt(this)"><span class="box"><i data-lucide="check" style="width:13px;height:13px"></i></span><span class="lbl">점수</span></label>
         <label class="opt-checkbox checked" data-key="standards" onclick="toggleBulkOpt(this)"><span class="box"><i data-lucide="check" style="width:13px;height:13px"></i></span><span class="lbl">성취기준</span></label>
-        <label class="opt-checkbox checked" data-key="rubric" onclick="toggleBulkOpt(this)"><span class="box"><i data-lucide="check" style="width:13px;height:13px"></i></span><span class="lbl">채점기준</span></label>
-        <label class="opt-checkbox checked" data-key="score" onclick="toggleBulkOpt(this)"><span class="box"><i data-lucide="check" style="width:13px;height:13px"></i></span><span class="lbl">점수 (총점/등급)</span></label>
-        <label class="opt-checkbox checked" data-key="teacher" onclick="toggleBulkOpt(this)"><span class="box"><i data-lucide="check" style="width:13px;height:13px"></i></span><span class="lbl">선생님 한마디</span></label>
         <label class="opt-checkbox checked" data-key="inst_ground" onclick="toggleBulkOpt(this)"><span class="box"><i data-lucide="check" style="width:13px;height:13px"></i></span><span class="lbl">문항별 채점근거</span></label>
         <label class="opt-checkbox checked" data-key="inst_feedback" onclick="toggleBulkOpt(this)"><span class="box"><i data-lucide="check" style="width:13px;height:13px"></i></span><span class="lbl">문항별 피드백</span></label>
+        <label class="opt-checkbox checked" data-key="rubric" onclick="toggleBulkOpt(this)"><span class="box"><i data-lucide="check" style="width:13px;height:13px"></i></span><span class="lbl">채점기준표</span></label>
         <label class="opt-checkbox" data-key="elem_ground" onclick="toggleBulkOpt(this)"><span class="box"><i data-lucide="check" style="width:13px;height:13px"></i></span><span class="lbl">채점요소별 채점근거 (과제물 AI)</span></label>
         <label class="opt-checkbox" data-key="elem_feedback_analysis" onclick="toggleBulkOpt(this)"><span class="box"><i data-lucide="check" style="width:13px;height:13px"></i></span><span class="lbl">채점요소별 피드백 (과제물 AI)</span></label>
         <label class="opt-checkbox" data-key="elem_feedback_rubric" onclick="toggleBulkOpt(this)"><span class="box"><i data-lucide="check" style="width:13px;height:13px"></i></span><span class="lbl">채점요소별 피드백 (루브릭 AI)</span></label>
+        <label class="opt-checkbox checked" data-key="teacher" onclick="toggleBulkOpt(this)"><span class="box"><i data-lucide="check" style="width:13px;height:13px"></i></span><span class="lbl">선생님 한마디</span></label>
       </div>
     </section>
 
@@ -373,7 +373,7 @@ body{background:#f6f7f9;color:#222631;min-height:100vh}
       <div class="preview-settings">
         <span class="modal-section-lbl">표시 항목</span>
         <div class="preview-opt-list">
-          <label class="checkbox-row checked" data-key="score" onclick="togglePreviewOpt(this)"><span class="checkbox-box"><i data-lucide="check" style="width:12px;height:12px"></i></span><span class="checkbox-text">점수 (총점/등급)</span></label>
+          <label class="checkbox-row checked" data-key="score" onclick="togglePreviewOpt(this)"><span class="checkbox-box"><i data-lucide="check" style="width:12px;height:12px"></i></span><span class="checkbox-text">점수</span></label>
           <label class="checkbox-row checked" data-key="standards" onclick="togglePreviewOpt(this)"><span class="checkbox-box"><i data-lucide="check" style="width:12px;height:12px"></i></span><span class="checkbox-text">성취기준</span></label>
           <label class="checkbox-row checked" data-key="inst_ground" onclick="togglePreviewOpt(this)"><span class="checkbox-box"><i data-lucide="check" style="width:12px;height:12px"></i></span><span class="checkbox-text">문항별 채점근거</span></label>
           <label class="checkbox-row checked" data-key="inst_feedback" onclick="togglePreviewOpt(this)"><span class="checkbox-box"><i data-lucide="check" style="width:12px;height:12px"></i></span><span class="checkbox-text">문항별 피드백</span></label>
@@ -451,15 +451,15 @@ function renderTable(){
       +'<td class="col-check"><span class="'+checkClass+'" onclick="toggleStudent('+i+',this)"><i data-lucide="check" style="width:13px;height:13px"></i></span></td>'
       +'<td class="col-id">'+s.id+'</td>'
       +'<td class="col-name" style="text-align:left;padding-left:14px">'+s.name+'</td>'
-      +'<td class="col-item">'+itemMark('standards')+'</td>'
-      +'<td class="col-item">'+itemMark('rubric')+'</td>'
       +'<td class="col-item">'+itemMark('score')+'</td>'
-      +'<td class="col-item">'+itemMark('teacher')+'</td>'
+      +'<td class="col-item">'+itemMark('standards')+'</td>'
       +'<td class="col-item">'+itemMark('inst_ground')+'</td>'
       +'<td class="col-item">'+itemMark('inst_feedback')+'</td>'
+      +'<td class="col-item">'+itemMark('rubric')+'</td>'
       +'<td class="col-item col-elem-feedback">'+itemMark('elem_ground')+'</td>'
       +'<td class="col-item col-elem-feedback">'+itemMark('elem_feedback_analysis')+'</td>'
       +'<td class="col-item col-elem-feedback">'+itemMark('elem_feedback_rubric')+'</td>'
+      +'<td class="col-item">'+itemMark('teacher')+'</td>'
       +'<td class="col-period">'+s.period+'</td>'
       +'<td class="col-state"><span class="'+stateCls+'">'+s.state+'</span></td>'
       +'</tr>';
