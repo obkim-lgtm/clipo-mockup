@@ -1013,12 +1013,14 @@ lucide.createIcons();
 })();
 
 
-// ══════ FAB 위치 드래그 (호버 시 ⋮⋮ 그립 표시) ══════
+// ══════ FAB 위치 드래그 (FAB 자체로 드래그/클릭 자동 구분) ══════
 (function(){
   var POS_KEY = 'clipo_notes_fab_pos';
   function init(){
     var wrap = document.querySelector('.notes-fab-wrap');
     if(!wrap) { setTimeout(init, 200); return; }
+    var toggle = wrap.querySelector('.notes-toggle');
+    if(!toggle) { setTimeout(init, 200); return; }
     // 저장된 위치 복원
     try {
       var saved = JSON.parse(localStorage.getItem(POS_KEY));
@@ -1029,52 +1031,51 @@ lucide.createIcons();
         wrap.style.top = saved.top + 'px';
       }
     } catch(e){}
-    // 그립 핸들 추가
-    var grip = document.createElement('span');
-    grip.className = 'notes-fab-drag';
-    grip.title = '드래그해서 위치 이동';
-    grip.textContent = '⋮⋮';
-    wrap.appendChild(grip);
-    // 드래그 로직
+    // FAB 자체로 드래그 (5px 이상 움직이면 드래그, 아니면 메뉴 클릭)
     var dragStart = null;
-    grip.addEventListener('pointerdown', function(e){
-      e.preventDefault();
-      e.stopPropagation();
-      grip.setPointerCapture(e.pointerId);
+    var moved = false;
+    toggle.addEventListener('pointerdown', function(e){
+      if(e.button !== 0) return; // 좌클릭만
       var rect = wrap.getBoundingClientRect();
       dragStart = { x: e.clientX, y: e.clientY, left: rect.left, top: rect.top };
-      wrap.classList.add('dragging');
+      moved = false;
+      try { toggle.setPointerCapture(e.pointerId); } catch(err){}
     });
-    grip.addEventListener('pointermove', function(e){
+    toggle.addEventListener('pointermove', function(e){
       if(!dragStart) return;
       var dx = e.clientX - dragStart.x;
       var dy = e.clientY - dragStart.y;
-      var newLeft = dragStart.left + dx;
-      var newTop = dragStart.top + dy;
-      // 화면 경계 clamp
-      newLeft = Math.max(0, Math.min(window.innerWidth - 100, newLeft));
-      newTop = Math.max(0, Math.min(window.innerHeight - 40, newTop));
-      wrap.style.bottom = 'auto';
-      wrap.style.right = 'auto';
-      wrap.style.left = newLeft + 'px';
-      wrap.style.top = newTop + 'px';
+      if(Math.abs(dx) + Math.abs(dy) > 5){
+        if(!moved){ moved = true; wrap.classList.add('dragging'); }
+        var newLeft = Math.max(0, Math.min(window.innerWidth - 100, dragStart.left + dx));
+        var newTop = Math.max(0, Math.min(window.innerHeight - 40, dragStart.top + dy));
+        wrap.style.bottom = 'auto';
+        wrap.style.right = 'auto';
+        wrap.style.left = newLeft + 'px';
+        wrap.style.top = newTop + 'px';
+      }
     });
-    grip.addEventListener('pointerup', function(e){
+    toggle.addEventListener('pointerup', function(e){
       if(!dragStart) return;
-      if(grip.hasPointerCapture(e.pointerId)) grip.releasePointerCapture(e.pointerId);
-      wrap.classList.remove('dragging');
-      try {
-        var rect = wrap.getBoundingClientRect();
-        localStorage.setItem(POS_KEY, JSON.stringify({ left: rect.left, top: rect.top }));
-      } catch(e){}
-      dragStart = null;
+      try { if(toggle.hasPointerCapture(e.pointerId)) toggle.releasePointerCapture(e.pointerId); } catch(err){}
+      var wasDrag = moved;
+      dragStart = null; moved = false;
+      if(wasDrag){
+        // 드래그였음 → 위치 저장 + 직후 click 막기
+        try {
+          var rect = wrap.getBoundingClientRect();
+          localStorage.setItem(POS_KEY, JSON.stringify({ left: rect.left, top: rect.top }));
+        } catch(err){}
+        wrap.classList.remove('dragging');
+        var blocker = function(ev){ ev.stopPropagation(); ev.preventDefault(); toggle.removeEventListener('click', blocker, true); };
+        toggle.addEventListener('click', blocker, true);
+      }
+      // 안 움직였으면 click 자연스럽게 발생 → 메뉴 토글
     });
-    grip.addEventListener('pointercancel', function(){
+    toggle.addEventListener('pointercancel', function(){
       wrap.classList.remove('dragging');
-      dragStart = null;
+      dragStart = null; moved = false;
     });
-    // 그립 클릭 시 메뉴 안 열리게 (FAB 토글 클릭과 분리)
-    grip.addEventListener('click', function(e){ e.stopPropagation(); });
   }
   if(document.readyState === 'loading'){
     document.addEventListener('DOMContentLoaded', init);
