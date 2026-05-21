@@ -1,0 +1,1122 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>1학년 1반 채점 결과 출력 | CLIPO</title>
+<link rel="icon" type="image/svg+xml" href="clipo_favicon_elem.svg">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard-gov.min.css">
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<style>
+*{font-family:'Pretendard GOV',-apple-system,sans-serif;box-sizing:border-box;margin:0;padding:0}
+body{background:#f6f7f9;color:#222631;min-height:100vh}
+
+/* 헤더 */
+.global-header{height:56px;background:#fff;display:flex;align-items:center;justify-content:space-between;position:fixed;top:0;left:0;right:0;z-index:210;padding:0 20px 0 8px;border-bottom:1px solid #f1f3f5}
+.gh-left{display:flex;align-items:center;gap:8px}
+.gh-menu-btn{width:40px;height:40px;display:inline-flex;align-items:center;justify-content:center;border:none;background:none;cursor:pointer;color:#3b3f4c;border-radius:4px}
+.gh-menu-btn:hover{background:#f6f7f9}
+.gh-product-tag{display:inline-flex;align-items:center;height:18px;margin-left:12px;padding-left:12px;border-left:1px solid #e5e7eb;color:#6d7381;font-size:14px;font-weight:600;line-height:1}
+.gh-right{display:flex;align-items:center;gap:12px;padding-right:12px}
+.gh-plan{display:inline-flex;align-items:center;height:22px;padding:0 10px;border-radius:100px;background:#e9f2ff;border:1px solid #ccdfff;font-size:12px;font-weight:500;color:#3151c4;line-height:1}
+.gh-dday{font-size:14px;font-weight:500;color:#6d7381;line-height:1}
+.gh-credit{display:inline-flex;align-items:center;gap:6px;font-size:14px;font-weight:500;color:#3b3f4c;line-height:1}
+.gh-sep{width:0;height:14px;border-left:1px solid #dde1e8}
+.gh-user{display:inline-flex;align-items:center;gap:3px;font-size:14px;font-weight:500;color:#3b3f4c;cursor:pointer;border:none;background:none;padding:0;line-height:1}
+.gh-user:hover{color:#365eef}
+
+.sub-nav{height:54px;background:#fff;border-bottom:1px solid #dde1e8;display:flex;align-items:flex-end;padding:0 24px;position:fixed;top:56px;left:0;right:0;z-index:205}
+.sub-nav-item{position:relative;display:inline-flex;align-items:center;justify-content:center;height:54px;padding:0 16px;font-size:15px;font-weight:500;color:#6d7381;cursor:pointer;text-decoration:none;line-height:1;background:none;border:none;font-family:inherit}
+.sub-nav-item:hover{color:#222631}
+.sub-nav-item.active{color:#365eef;font-weight:600}
+.sub-nav-item.active::after{content:"";position:absolute;left:12px;right:12px;bottom:-1px;height:2px;background:#365eef;border-radius:2px 2px 0 0}
+
+.sidebar{position:fixed;top:110px;left:0;bottom:0;width:56px;background:#fff;border-right:1px solid #dde1e8;display:flex;flex-direction:column;align-items:center;padding:8px 0;z-index:100;gap:4px}
+.sb-item{width:40px;height:40px;display:inline-flex;align-items:center;justify-content:center;border-radius:6px;color:#6d7381;cursor:pointer;border:none;background:none}
+.sb-item:hover{background:#f6f7f9;color:#3b3f4c}
+.sb-item.active{background:#e9f2ff;color:#365eef}
+
+.main{margin-left:56px;margin-top:110px;padding:24px;display:flex;justify-content:center}
+.container{width:100%;max-width:1248px;display:flex;flex-direction:column;gap:20px}
+
+/* 페이지 헤더 */
+.page-header{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.ph-left{flex:1;display:flex;flex-direction:column;gap:8px;min-width:0}
+.btn-back{display:inline-flex;align-items:center;gap:4px;font-size:15px;font-weight:500;color:#3b3f4c;background:none;border:none;cursor:pointer;padding:0;line-height:1;font-family:inherit;align-self:flex-start;margin-bottom:6px}
+.btn-back:hover{color:#222631}
+.page-title{font-size:22px;font-weight:700;color:#222631;line-height:1.3}
+.page-desc{font-size:14px;color:#3b3f4c;line-height:1.55}
+.ph-right{display:inline-flex;gap:10px;flex-shrink:0}
+.btn-outline{display:inline-flex;align-items:center;justify-content:center;gap:6px;height:40px;padding:0 16px;border-radius:100px;background:#fff;border:1px solid #ccdfff;color:#3151c4;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;line-height:1}
+.btn-outline:hover{background:#f4f8ff;border-color:#a3c3ff}
+.btn-primary{display:inline-flex;align-items:center;justify-content:center;gap:6px;height:40px;padding:0 16px;border-radius:100px;background:#365eef;border:1px solid #365eef;color:#fff;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;line-height:1}
+.btn-primary:hover{background:#3151c4;border-color:#3151c4}
+
+/* 미리보기 카드 */
+.preview-card{background:#fff;border:1px solid #eaecf0;border-radius:14px;padding:24px;display:flex;flex-direction:column;gap:16px}
+.preview-hd{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.preview-title{font-size:18px;font-weight:700;color:#222631;line-height:1.3}
+
+/* 학생 선택 + 액션 */
+.student-bar{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.student-select{flex:1;min-width:280px;height:42px;padding:0 14px;border:1px solid #dde1e8;border-radius:8px;font-size:14px;font-weight:600;font-family:inherit;color:#222631;background:#fff;outline:none;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:8px;position:relative}
+.student-select:hover{border-color:#a3c3ff}
+.student-select:focus{border-color:#365eef}
+.student-select select{flex:1;border:none;background:none;outline:none;font:inherit;color:inherit;cursor:pointer;-webkit-appearance:none;appearance:none;padding-right:24px;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236d7381' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'></polyline></svg>");background-repeat:no-repeat;background-position:right 4px center;background-size:14px}
+.student-select option:disabled{color:#9ca3af}
+
+/* PDF 미리보기 프레임 (학생 화면 iframe) */
+.pdf-frame{background:#3b3f4c;border-radius:10px;padding:24px;display:flex;justify-content:center;min-height:720px}
+.pdf-iframe{width:100%;max-width:920px;height:980px;border:0;border-radius:8px;background:#fff;box-shadow:0 8px 30px rgba(0,0,0,.2)}
+
+/* ══════ 모달 ══════ */
+.modal-overlay{position:fixed;inset:0;background:rgba(34,38,49,.5);display:none;align-items:center;justify-content:center;z-index:1000;padding:24px}
+.modal-overlay.show{display:flex}
+.modal{background:#fff;border-radius:16px;max-width:560px;width:100%;max-height:calc(100vh - 48px);display:flex;flex-direction:column;overflow:hidden;box-shadow:0 12px 40px rgba(0,0,0,.18)}
+.modal-hd{display:flex;align-items:center;justify-content:space-between;padding:20px 24px;border-bottom:1px solid #eaecf0;flex-shrink:0}
+.modal-title{font-size:18px;font-weight:700;color:#222631;line-height:1.3}
+.modal-close{width:32px;height:32px;display:inline-flex;align-items:center;justify-content:center;border:none;background:none;cursor:pointer;color:#6d7381;border-radius:100px}
+.modal-close:hover{background:#f6f7f9}
+.modal-body{padding:20px 24px;overflow-y:auto;display:flex;flex-direction:column;gap:12px}
+.modal-ft{display:flex;justify-content:flex-end;align-items:center;padding:16px 24px;border-top:1px solid #eaecf0;gap:8px;flex-shrink:0;background:#f9fafb}
+.btn-modal-cancel{display:inline-flex;align-items:center;justify-content:center;height:40px;padding:0 18px;border-radius:100px;background:#fff;border:1px solid #dde1e8;color:#3b3f4c;font-size:15px;font-weight:600;cursor:pointer;font-family:inherit;line-height:1}
+.btn-modal-cancel:hover{border-color:#a3c3ff;color:#365eef}
+.btn-modal-save{display:inline-flex;align-items:center;justify-content:center;gap:6px;height:40px;padding:0 18px;border-radius:100px;background:#365eef;border:none;color:#fff;font-size:15px;font-weight:600;cursor:pointer;font-family:inherit;line-height:1}
+.btn-modal-save:hover{background:#3151c4}
+
+.opt-list{display:flex;flex-direction:column;gap:8px}
+.opt-row{display:flex;align-items:center;gap:10px;padding:10px 12px;border:1px solid #eaecf0;border-radius:10px;background:#fff;cursor:pointer;transition:border-color .12s,background .12s}
+.opt-row:hover{border-color:#a3c3ff;background:#fafbff}
+.opt-row.checked{border-color:#a3c3ff;background:#f4f8ff}
+.opt-row .box{width:18px;height:18px;border:2px solid #dde1e8;border-radius:4px;display:inline-flex;align-items:center;justify-content:center;background:#fff;color:#fff;transition:all .12s;flex-shrink:0}
+.opt-row.checked .box{background:#365eef;border-color:#365eef}
+.opt-row-text{font-size:14px;color:#222631;line-height:1}
+
+.modal-section-lbl{font-size:13px;font-weight:700;color:#6d7381;letter-spacing:.02em}
+
+/* 데모 모드 스위처 */
+.demo-mode-switcher{position:fixed;bottom:18px;right:18px;display:inline-flex;align-items:center;gap:4px;padding:6px 8px;background:#1f2937;color:#e5e7eb;border-radius:100px;font-family:'Pretendard GOV',inherit;z-index:500;box-shadow:0 4px 20px rgba(0,0,0,.25)}
+.demo-mode-label{font-size:10px;font-weight:800;letter-spacing:.08em;color:#9ca3af;padding:0 8px 0 6px}
+.demo-mode-btn{display:inline-flex;align-items:center;justify-content:center;height:26px;padding:0 12px;border-radius:100px;background:transparent;border:none;color:#9ca3af;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;line-height:1;transition:all .15s}
+.demo-mode-btn:hover{color:#fff}
+.demo-mode-btn.active{background:#3b82f6;color:#fff}
+
+/* 토스트 */
+.toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(12px);padding:14px 22px;border-radius:100px;font-size:15px;font-weight:500;line-height:1.4;box-shadow:0 4px 12px rgba(0,0,0,.15);opacity:0;transition:all .25s;z-index:900;pointer-events:none;display:flex;align-items:center;gap:10px;min-width:280px}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.toast.success{background:#319d64;color:#fff}
+.toast.loading{background:#365eef;color:#fff}
+
+/* ══════ 어노테이션 시스템 ══════ */
+[data-note]{position:relative}
+.note-pin{display:inline-flex;align-items:center;justify-content:center;position:absolute;top:0;right:0;transform:translate(50%,-50%);width:18px;height:18px;border-radius:50%;background:#ec4899;color:#fff;font-size:10px;font-weight:800;line-height:1;cursor:grab;box-shadow:0 1px 4px rgba(236,72,153,.35);z-index:1600;border:1.5px solid #fff;transition:all .15s;font-family:inherit;user-select:none;touch-action:none;opacity:.55}
+.note-pin:hover{opacity:1;width:22px;height:22px;font-size:12px;box-shadow:0 4px 12px rgba(236,72,153,.6);background:#db2777;border-width:2px}
+.note-pin.active{opacity:1;width:22px;height:22px;font-size:12px;background:#be185d;box-shadow:0 0 0 3px rgba(236,72,153,.25),0 4px 12px rgba(236,72,153,.6);border-width:2px;z-index:1400}
+.note-pin.dragging{cursor:grabbing;opacity:.95;z-index:1200;width:22px;height:22px;font-size:12px;border-width:2px}
+body.show-notes .note-pin{opacity:1;width:22px;height:22px;font-size:12px;box-shadow:0 2px 8px rgba(236,72,153,.5);border-width:2px}
+.note-popover{position:absolute;z-index:1500;width:360px;background:#fff;border:1px solid #fbcfe8;border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.15);padding:12px 14px;font-size:13px;color:#3b3f4c;line-height:1.55;display:none;text-align:left}
+.note-popover.show{display:block}
+.note-popover-hd{display:flex;align-items:center;justify-content:space-between;gap:6px;margin-bottom:8px;padding-bottom:8px;border-bottom:1px solid #f1f3f5;cursor:move;user-select:none;touch-action:none}
+.note-popover-num{display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:50%;background:#ec4899;color:#fff;font-size:12px;font-weight:800;line-height:1}
+.note-popover-actions{display:inline-flex;align-items:center;gap:2px;margin-left:auto}
+.note-popover-action{width:24px;height:24px;display:inline-flex;align-items:center;justify-content:center;border:none;background:none;cursor:pointer;color:#6d7381;border-radius:6px;font-family:inherit;font-size:13px;line-height:1}
+.note-popover-action:hover{background:#f6f7f9;color:#3b3f4c}
+.note-popover-action.danger:hover{background:#fee2e2;color:#dc2626}
+.note-popover-body{font-size:13px;color:#3b3f4c;line-height:1.6;white-space:pre-wrap;word-break:break-word}
+.note-popover-textarea{width:100%;min-height:84px;max-height:420px;padding:10px 12px;border:1px solid #dde1e8;border-radius:8px;font-size:13px;color:#3b3f4c;line-height:1.6;font-family:inherit;resize:none;outline:none;box-sizing:border-box;overflow-y:auto;white-space:pre-wrap;word-break:break-word}
+.note-popover-textarea:focus{border-color:#365eef}
+.note-popover-edit-actions{display:flex;justify-content:flex-end;gap:6px;margin-top:8px}
+.note-popover-toolbar{display:flex;gap:4px;margin-bottom:6px;align-items:center}
+.note-popover-tool-btn{display:inline-flex;align-items:center;justify-content:center;width:28px;height:24px;border:1px solid #dde1e8;border-radius:5px;background:#fff;color:#3b3f4c;font-size:13px;font-weight:800;cursor:pointer;font-family:inherit;line-height:1}
+.note-popover-tool-btn:hover{background:#f6f7f9;border-color:#a3c3ff;color:#365eef}
+.note-popover-body strong{font-weight:800;color:#222631}
+.note-popover-btn{display:inline-flex;align-items:center;justify-content:center;height:28px;padding:0 12px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;line-height:1;border:1px solid #dde1e8;background:#fff;color:#3b3f4c}
+.note-popover-btn:hover{background:#f6f7f9}
+.note-popover-btn.primary{background:#365eef;border-color:#365eef;color:#fff}
+.note-popover-btn.primary:hover{background:#3151c4}
+body.note-add-mode *{cursor:crosshair !important}
+.notes-fab-wrap{position:fixed;bottom:18px;right:200px;z-index:500}
+.notes-toggle{display:inline-flex;align-items:center;gap:6px;height:40px;padding:0 16px;border-radius:100px;background:#1f2937;color:#e5e7eb;border:none;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;line-height:1;box-shadow:0 4px 20px rgba(0,0,0,.25)}
+.notes-toggle:hover{background:#374151;color:#fff}
+.notes-toggle.active{background:#ec4899;color:#fff}
+.notes-toggle .notes-toggle-count{display:inline-flex;align-items:center;justify-content:center;height:18px;min-width:18px;padding:0 6px;border-radius:100px;background:rgba(255,255,255,.2);color:#fff;font-size:11px;font-weight:700;line-height:1;margin-left:2px}
+.notes-toggle .notes-toggle-chev{margin-left:2px;opacity:.7;transition:transform .15s}
+.notes-fab-wrap.menu-open .notes-toggle-chev{transform:rotate(180deg)}
+.notes-menu{position:absolute;bottom:48px;right:0;min-width:200px;background:#fff;border:1px solid #eaecf0;border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.18);padding:6px;display:none;flex-direction:column}
+.notes-fab-wrap.menu-open .notes-menu{display:flex}
+.notes-menu-item{display:inline-flex;align-items:center;gap:8px;height:36px;padding:0 12px;border-radius:6px;background:none;border:none;cursor:pointer;font-family:inherit;font-size:13px;font-weight:500;color:#3b3f4c;line-height:1;text-align:left;white-space:nowrap}
+.notes-menu-item:hover{background:#f6f7f9;color:#222631}
+.notes-menu-item.danger{color:#b91c1c}
+.notes-menu-item.danger:hover{background:#fef2f2;color:#dc2626}
+.notes-menu-item .notes-menu-check{display:inline-flex;width:16px;height:16px;align-items:center;justify-content:center;color:#ec4899;font-weight:800;flex-shrink:0}
+.notes-menu-divider{height:1px;background:#f1f3f5;margin:4px 6px}
+.notes-menu-item-primary{background:#eef3ff;color:#365eef;font-weight:700;margin-bottom:4px}
+.notes-menu-item-primary:hover{background:#dce6ff;color:#3151c4}
+.notes-menu-item-primary .notes-menu-check{color:#365eef}
+.notes-fab-wrap{position:fixed;bottom:18px;right:18px;z-index:500}
+.notes-fab-drag{display:none;position:absolute;left:-30px;top:50%;transform:translateY(-50%);width:24px;height:24px;border-radius:50%;background:#1f2937;color:#fff;align-items:center;justify-content:center;cursor:grab;font-size:14px;font-weight:800;box-shadow:0 4px 12px rgba(0,0,0,.25);user-select:none;touch-action:none}
+.notes-fab-wrap:hover .notes-fab-drag,.notes-fab-wrap.dragging .notes-fab-drag{display:inline-flex}
+.notes-fab-wrap.dragging .notes-fab-drag{cursor:grabbing;background:#ec4899}
+.notes-fab-wrap.has-unsaved .notes-toggle{position:relative}
+.notes-fab-wrap.has-unsaved .notes-toggle::after{content:'';position:absolute;top:-4px;right:-4px;width:14px;height:14px;border-radius:50%;background:#ef4444;border:2px solid #fff;animation:notesPulse 1.6s ease-in-out infinite}
+.notes-fab-wrap.has-unsaved .notes-toggle::before{content:'⚠️ 미백업';position:absolute;bottom:48px;right:0;padding:4px 10px;background:#ef4444;color:#fff;font-size:11px;font-weight:700;border-radius:100px;white-space:nowrap;box-shadow:0 2px 8px rgba(239,68,68,.4);pointer-events:none}
+@keyframes notesPulse{0%,100%{box-shadow:0 0 0 0 rgba(239,68,68,.5)}50%{box-shadow:0 0 0 6px rgba(239,68,68,0)}}
+
+@media print{
+  .global-header,.sub-nav,.sidebar,.page-header,.preview-hd,.student-bar,.demo-mode-switcher,.btn-back{display:none}
+  .main{margin:0;padding:0}
+  .preview-card,.pdf-frame{background:#fff;padding:0;border:none;box-shadow:none}
+}
+/* 반응형 */
+@media (max-width:960px){
+  .main{padding:18px 14px}
+  .page-title{font-size:20px}
+  .ph-right{flex-wrap:wrap}
+  .pdf-iframe{height:840px}
+  .pdf-frame{padding:18px;min-height:640px}
+}
+@media (max-width:720px){
+  .global-header{height:52px;padding:0 12px 0 4px}
+  .gh-product-tag{margin-left:8px;padding-left:8px;font-size:13px}
+  .gh-plan,.gh-dday,.gh-credit,.gh-sep{display:none}
+  .gh-user{font-size:13px}
+  .sub-nav{top:52px;height:48px;padding:0 12px}
+  .sub-nav-item{padding:0 10px;font-size:14px;height:48px}
+  .sidebar{top:100px;width:48px}
+  .sb-item{width:36px;height:36px}
+  .main{margin-left:48px;margin-top:100px;padding:14px 10px}
+  .container{gap:14px}
+  .page-header{flex-direction:column;align-items:stretch;gap:10px}
+  .page-title{font-size:18px}
+  .ph-right{justify-content:flex-start;flex-wrap:wrap}
+  .btn-outline,.btn-primary{height:38px;font-size:13px;padding:0 14px}
+  .preview-card{padding:18px;border-radius:12px}
+  .preview-title{font-size:16px}
+  .student-bar{gap:8px}
+  .student-select{min-width:200px}
+  .pdf-frame{padding:12px;min-height:500px}
+  .pdf-iframe{height:680px}
+  .demo-mode-switcher{bottom:12px;right:12px;padding:4px 6px}
+  .demo-mode-btn{height:24px;padding:0 10px;font-size:11px}
+  .demo-mode-label{font-size:9px;padding:0 4px}
+  .modal{max-width:calc(100vw - 32px)}
+}
+@media (max-width:420px){
+  .sidebar{display:none}
+  .main{margin-left:0;padding:12px 10px}
+  .gh-menu-btn{width:36px;height:36px}
+  .page-title{font-size:17px}
+  .pdf-iframe{height:560px}
+}
+</style>
+</head>
+<body>
+
+<!-- 헤더 -->
+<div class="global-header">
+  <div class="gh-left">
+    <button class="gh-menu-btn"><i data-lucide="menu" style="width:24px;height:24px"></i></button>
+    <a class="gh-logo" href="#" aria-label="CLIPO">
+      <svg width="76" height="16" viewBox="0 0 76 16" fill="none"><path d="M11.3613 4.03516H4.09668V11.9629H8.88281L8.88086 11.9648H15.6016V16H4.02539C1.80242 15.9998 0 14.223 0 12.0322V3.96777C0 1.77696 1.80242 0.000177874 4.02539 0H15.4561L11.3613 4.03516ZM22.0703 11.9648H33.5781V16H22.002C19.7788 16 17.9756 14.2231 17.9756 12.0322V0H22.0703V11.9648ZM40.0459 16H35.9521V0H40.0459V16ZM54.5381 0C56.4564 0 58.0138 1.53228 58.0186 3.42285L58.0166 3.4248V8.54297C58.014 10.4333 56.4567 11.9648 54.5361 11.9648H46.5107L42.416 16V0H54.5381ZM71.9746 0C74.0086 0.000134956 75.6887 1.49046 75.958 3.42285H76V12.5771H75.958C75.6887 14.5095 74.011 15.9999 71.9746 16H64.4238C62.3897 16 60.7098 14.5096 60.4404 12.5771C60.4145 12.398 60.3984 12.2184 60.3984 12.0322V3.96777C60.3984 3.78159 60.4145 3.60205 60.4404 3.42285C60.7098 1.49037 62.3873 0 64.4238 0H71.9746ZM64.4922 12.5771H71.9062V3.42285H64.4922V12.5771ZM46.5107 3.42285V8.54004H53.9238V3.42285H46.5107Z" fill="#365EEF"/></svg>
+    </a>
+    <span class="gh-product-tag">초등</span>
+  </div>
+  <div class="gh-right">
+    <span class="gh-plan">개인 유료</span>
+    <span class="gh-dday">D-30</span>
+    <span class="gh-credit"><i data-lucide="bot" style="width:20px;height:20px"></i>AI 크레딧 900</span>
+    <div class="gh-sep"></div>
+    <button class="gh-user">홍길동 선생님(대표교사)<i data-lucide="chevron-down" style="width:22px;height:22px"></i></button>
+  </div>
+</div>
+
+<nav class="sub-nav">
+  <button class="sub-nav-item">수업 홈</button>
+  <button class="sub-nav-item">수행평가 설계</button>
+  <button class="sub-nav-item">과제물 관리</button>
+  <button class="sub-nav-item active">수행평가 채점</button>
+  <button class="sub-nav-item">세부능력 및 특기사항 지원</button>
+</nav>
+
+<aside class="sidebar">
+  <button class="sb-item" title="홈"><i data-lucide="home" style="width:20px;height:20px"></i></button>
+  <button class="sb-item" title="평가계획"><i data-lucide="scissors" style="width:20px;height:20px"></i></button>
+  <button class="sb-item active" title="수업"><i data-lucide="layout-grid" style="width:20px;height:20px"></i></button>
+  <button class="sb-item" title="창의적 체험활동"><i data-lucide="notebook-pen" style="width:20px;height:20px"></i></button>
+  <button class="sb-item" title="리포트"><i data-lucide="bar-chart-2" style="width:20px;height:20px"></i></button>
+</aside>
+
+<main class="main">
+  <div class="container">
+
+    <!-- 페이지 헤더 -->
+    <div class="page-header">
+      <div class="ph-left">
+        <button class="btn-back" onclick="history.back()">
+          <i data-lucide="chevron-left" style="width:18px;height:18px"></i>이전으로
+        </button>
+        <h1 class="page-title">1학년 1반 채점 결과 출력</h1>
+        <p class="page-desc">출력할 학생과 항목을 선택하세요. 개별 피드백 자료로 활용할 수 있어요.</p>
+      </div>
+      <div class="ph-right">
+        <button class="btn-outline" onclick="openOptModal()" data-note-id="default-0" data-note="출력 항목 설정 버튼.
+• 모달 오픈 → 9개 출력 항목 체크박스 (PDF에 포함할 항목 선택)
+• 학생 화면 미리보기와 출력 항목은 별개로 관리 (출력은 PDF 전용)
+• 채점요소별 항목 3개(과제물 AI 근거·피드백, 루브릭 AI 피드백)는 default OFF
+• 학생에게 데이터 없는 항목은 체크해도 자동 빠짐 ('학생에게 없는 항목은 자동으로 빠집니다' 안내)">
+          <i data-lucide="settings" style="width:16px;height:16px"></i>출력 항목 설정
+        </button>
+        <button class="btn-primary" onclick="printAll()" data-note-id="default-1" data-note="전체 학생 출력 버튼.
+• 학급 전체 채점 완료 학생의 PDF를 일괄 생성·다운로드
+• 미제출/미채점/채점 실패 학생은 자동 제외
+• 토스트: 'N명의 PDF를 생성하고 있어요' → 완료 후 '다운로드가 완료됐어요'
+• 파일명 규약: '<학급명>_<수행평가명>_<날짜>_<학생명>.pdf' (zip으로 묶어 다운로드)">
+          <i data-lucide="printer" style="width:16px;height:16px"></i>전체 학생 출력
+        </button>
+      </div>
+    </div>
+
+    <!-- 미리보기 카드 -->
+    <section class="preview-card">
+      <div class="preview-hd">
+        <h2 class="preview-title">출력 미리보기</h2>
+      </div>
+
+      <!-- 학생 선택 + 액션 -->
+      <div class="student-bar" data-note-id="default-2" data-note="학생 선택 + 개별 액션 영역.
+• select: 학급 전체 학생 리스트. 미제출/미채점/채점 실패 학생은 disabled 처리
+• 학생 선택 시 iframe에 학생 데이터 + 출력 옵션이 postMessage로 전달돼 미리보기 갱신
+• [과제물 다운로드]: 학생 원본 답안지 PDF/이미지 다운로드 (채점 결과 PDF와 별개)
+• [학생 개별 출력]: 현재 선택 학생의 채점 결과 PDF만 출력">
+        <div class="student-select">
+          <select id="studentSelect" onchange="renderPreview()"></select>
+        </div>
+        <button class="btn-outline" onclick="downloadAssignment()">
+          <i data-lucide="download" style="width:16px;height:16px"></i>과제물 다운로드
+        </button>
+        <button class="btn-primary" onclick="printSingle()">
+          <i data-lucide="printer" style="width:16px;height:16px"></i>학생 개별 출력
+        </button>
+      </div>
+
+      <!-- PDF 미리보기 (학생 결과 화면 iframe) -->
+      <div class="pdf-frame" data-note-id="default-3" data-note="PDF 출력 미리보기 영역.
+• 학생 결과 화면(result_student_view_v3)을 iframe으로 렌더링
+• 출력 항목 설정 + 학생별 데이터 유무로 계산된 옵션이 postMessage로 전달돼 항목 ON/OFF
+• PDF 출력 시에는 과제물(학생이 쓴 답)은 표시 안 함 (opts.answer=false 강제)
+• 실제 인쇄/PDF 변환은 @media print 스타일로 헤더·사이드바·DEMO 스위처 숨김 처리">
+        <iframe class="pdf-iframe" id="pdfIframe" src="result_student_view_v3_260512.html" title="PDF 출력 미리보기"></iframe>
+      </div>
+    </section>
+
+  </div>
+</main>
+
+<!-- 출력 항목 설정 모달 -->
+<div class="modal-overlay" id="optModal" onclick="if(event.target===this)closeOptModal()">
+  <div class="modal">
+    <div class="modal-hd">
+      <span class="modal-title">출력 항목 설정</span>
+      <button class="modal-close" onclick="closeOptModal()"><i data-lucide="x" style="width:18px;height:18px"></i></button>
+    </div>
+    <div class="modal-body">
+      <p style="font-size:14px;color:#6d7381;line-height:1.55;margin:0">PDF에 포함할 항목을 선택하세요. 학생에게 없는 항목은 자동으로 빠집니다.</p>
+      <span class="modal-section-lbl">공통 항목</span>
+      <div class="opt-list" id="optList">
+        <label class="opt-row checked" data-key="standards" onclick="toggleOpt(this)"><span class="box"><i data-lucide="check" style="width:12px;height:12px"></i></span><span class="opt-row-text">성취기준</span></label>
+        <label class="opt-row checked" data-key="rubric" onclick="toggleOpt(this)"><span class="box"><i data-lucide="check" style="width:12px;height:12px"></i></span><span class="opt-row-text">채점기준</span></label>
+        <label class="opt-row checked" data-key="score" onclick="toggleOpt(this)"><span class="box"><i data-lucide="check" style="width:12px;height:12px"></i></span><span class="opt-row-text">점수 (총점/등급)</span></label>
+        <label class="opt-row checked" data-key="teacher" onclick="toggleOpt(this)"><span class="box"><i data-lucide="check" style="width:12px;height:12px"></i></span><span class="opt-row-text">선생님 한마디</span></label>
+        <label class="opt-row checked" data-key="inst_ground" onclick="toggleOpt(this)"><span class="box"><i data-lucide="check" style="width:12px;height:12px"></i></span><span class="opt-row-text">문항별 채점근거</span></label>
+        <label class="opt-row checked" data-key="inst_feedback" onclick="toggleOpt(this)"><span class="box"><i data-lucide="check" style="width:12px;height:12px"></i></span><span class="opt-row-text">문항별 피드백</span></label>
+        <label class="opt-row" data-key="elem_ground" onclick="toggleOpt(this)"><span class="box"><i data-lucide="check" style="width:12px;height:12px"></i></span><span class="opt-row-text">채점요소별 채점근거 (과제물 AI)</span></label>
+        <label class="opt-row" data-key="elem_feedback_analysis" onclick="toggleOpt(this)"><span class="box"><i data-lucide="check" style="width:12px;height:12px"></i></span><span class="opt-row-text">채점요소별 피드백 (과제물 AI)</span></label>
+        <label class="opt-row" data-key="elem_feedback_rubric" onclick="toggleOpt(this)"><span class="box"><i data-lucide="check" style="width:12px;height:12px"></i></span><span class="opt-row-text">채점요소별 피드백 (루브릭 AI)</span></label>
+      </div>
+    </div>
+    <div class="modal-ft">
+      <button class="btn-modal-cancel" onclick="closeOptModal()">취소</button>
+      <button class="btn-modal-save" onclick="applyOpts()"><i data-lucide="check" style="width:14px;height:14px"></i>적용</button>
+    </div>
+  </div>
+</div>
+
+<!-- 데모 모드 스위처 -->
+<div class="demo-mode-switcher" data-note-id="default-4" data-note="데모 모드 스위처 (개발/리뷰용 — 운영 배포 시 제거).
+• 신규: 모든 학생이 신규 AI 채점 데이터 (9개 항목 全 보유)
+• 섞임: '이전채점' 학생만 기존 데이터(공통 4개), 나머지는 신규 → 가장 현실적인 케이스
+• 기존: 모든 학생이 이전 채점 (공통 4개만, 추가 5개 데이터 없음)
+• default = 섞임">
+  <span class="demo-mode-label">DEMO</span>
+  <button class="demo-mode-btn" data-mode="new" onclick="setDemoMode(this)">신규</button>
+  <button class="demo-mode-btn active" data-mode="mixed" onclick="setDemoMode(this)">섞임</button>
+  <button class="demo-mode-btn" data-mode="old" onclick="setDemoMode(this)">기존</button>
+</div>
+
+<div class="toast" id="toast">
+  <i id="toastIcon" data-lucide="circle-check-big" style="width:18px;height:18px;flex-shrink:0"></i>
+  <span id="toastMsg"></span>
+</div>
+
+<script>
+// 학생 데이터
+var ITEMS_NEW  = {standards:true, rubric:true, score:true, teacher:true, inst_ground:true,  inst_feedback:true,  elem_ground:true,  elem_feedback_analysis:true, elem_feedback_rubric:true};
+var ITEMS_OLD  = {standards:true, rubric:true, score:true, teacher:true, inst_ground:false, inst_feedback:false, elem_ground:false, elem_feedback_analysis:false, elem_feedback_rubric:false};
+var ITEMS_NONE = {standards:false,rubric:false,score:false,teacher:false,inst_ground:false, inst_feedback:false, elem_ground:false, elem_feedback_analysis:false, elem_feedback_rubric:false};
+
+var STUDENTS = [
+  {id:'10101', name:'김피드백', status:'완료',     items:ITEMS_NEW},
+  {id:'10103', name:'미제출',   status:'미제출',   items:ITEMS_NONE},
+  {id:'10104', name:'채점전',   status:'미채점',   items:ITEMS_NONE},
+  {id:'10105', name:'채점실패', status:'채점 실패', items:ITEMS_NONE},
+  {id:'10106', name:'이전채점', status:'완료',     items:ITEMS_OLD}
+];
+
+var DEMO_MODE = 'mixed';
+var MIXED_OLD_NAMES = ['이전채점'];
+
+var BULK_OPTS = {standards:true, rubric:true, score:true, teacher:true, inst_ground:true, inst_feedback:true, elem_ground:false, elem_feedback_analysis:false, elem_feedback_rubric:false};
+
+function applyDemoMode(){
+  STUDENTS.forEach(function(s){
+    if(s.status === '미제출' || s.status === '미채점' || s.status === '채점 실패'){ s.items = ITEMS_NONE; return; }
+    if(DEMO_MODE === 'new') s.items = ITEMS_NEW;
+    else if(DEMO_MODE === 'old') s.items = ITEMS_OLD;
+    else s.items = MIXED_OLD_NAMES.indexOf(s.name) >= 0 ? ITEMS_OLD : ITEMS_NEW;
+  });
+  populateStudentSelect();
+  renderPreview();
+}
+
+function setDemoMode(btn){
+  DEMO_MODE = btn.getAttribute('data-mode');
+  document.querySelectorAll('.demo-mode-btn').forEach(function(b){ b.classList.remove('active'); });
+  btn.classList.add('active');
+  applyDemoMode();
+}
+
+function populateStudentSelect(){
+  var sel = document.getElementById('studentSelect');
+  var prevValue = sel.value;
+  sel.innerHTML = STUDENTS.map(function(s){
+    var disabled = s.items === ITEMS_NONE ? ' disabled' : '';
+    return '<option value="'+s.id+'"'+disabled+'>'+s.id+' '+s.name+' ('+s.status+')</option>';
+  }).join('');
+  // 이전 선택 유지하거나 첫 번째 가능한 학생 선택
+  var firstSelectable = STUDENTS.find(function(s){ return s.items !== ITEMS_NONE; });
+  sel.value = (prevValue && STUDENTS.find(function(s){return s.id===prevValue;}) && STUDENTS.find(function(s){return s.id===prevValue;}).items !== ITEMS_NONE)
+              ? prevValue
+              : (firstSelectable ? firstSelectable.id : '');
+}
+
+// iframe에 학생 데이터 + 옵션 전달 (학생 데이터는 v3 기본값, 옵션만 postMessage)
+function sendPreviewOpts(){
+  var iframe = document.getElementById('pdfIframe');
+  if(!iframe || !iframe.contentWindow) return;
+  var sel = document.getElementById('studentSelect');
+  var s = STUDENTS.find(function(x){ return x.id === sel.value; });
+  // 학생의 items와 BULK_OPTS의 교집합만 노출 (없는 데이터는 무조건 hide)
+  var opts = {};
+  ['standards','rubric','score','teacher','inst_ground','inst_feedback','elem_ground','elem_feedback_analysis','elem_feedback_rubric'].forEach(function(k){
+    opts[k] = s ? (s.items[k] && BULK_OPTS[k]) : false;
+  });
+  opts.answer = false; // PDF 출력에서는 과제물(내가 쓴 답) 미표시
+  iframe.contentWindow.postMessage({type:'share-opts', opts:opts}, '*');
+}
+
+function renderPreview(){
+  // 학생 변경 또는 옵션 변경 시 iframe에 옵션 전달
+  sendPreviewOpts();
+}
+
+// iframe 로드 완료 시 초기 옵션 전달
+document.addEventListener('DOMContentLoaded', function(){
+  var iframe = document.getElementById('pdfIframe');
+  if(iframe){ iframe.addEventListener('load', sendPreviewOpts); }
+});
+
+// 출력 항목 설정 모달
+function openOptModal(){
+  document.getElementById('optModal').classList.add('show');
+  lucide.createIcons();
+}
+function closeOptModal(){ document.getElementById('optModal').classList.remove('show'); }
+function toggleOpt(el){
+  el.classList.toggle('checked');
+  var key = el.getAttribute('data-key');
+  BULK_OPTS[key] = el.classList.contains('checked');
+}
+function applyOpts(){
+  closeOptModal();
+  renderPreview();
+  showToast('success', '출력 항목 설정이 적용됐어요.');
+}
+
+// 액션
+function printAll(){
+  var graded = STUDENTS.filter(function(s){ return s.items !== ITEMS_NONE; }).length;
+  showToast('loading', '학급 전체 '+graded+'명의 PDF를 생성하고 있어요...');
+  setTimeout(function(){ showToast('success', '학급 전체 '+graded+'명의 PDF 다운로드가 완료됐어요.'); }, 1500);
+}
+function printSingle(){
+  var s = STUDENTS.find(function(x){ return x.id === document.getElementById('studentSelect').value; });
+  showToast('success', (s ? s.name+' ' : '') + '학생 PDF를 인쇄합니다.');
+}
+function downloadAssignment(){
+  var s = STUDENTS.find(function(x){ return x.id === document.getElementById('studentSelect').value; });
+  showToast('success', (s ? s.name+' ' : '') + '학생의 과제물 원본을 다운로드합니다.');
+}
+
+// 토스트
+var toastTimer = null;
+function showToast(type, msg){
+  if(toastTimer) clearTimeout(toastTimer);
+  var t = document.getElementById('toast');
+  var ic = document.getElementById('toastIcon');
+  var m = document.getElementById('toastMsg');
+  t.className = 'toast ' + type + ' show';
+  ic.setAttribute('data-lucide', type === 'loading' ? 'loader' : 'circle-check-big');
+  m.textContent = msg;
+  lucide.createIcons();
+  if(type !== 'loading') toastTimer = setTimeout(function(){ t.classList.remove('show'); }, 2400);
+}
+
+document.addEventListener('keydown', function(e){
+  if(e.key === 'Escape' && document.getElementById('optModal').classList.contains('show')){
+    closeOptModal();
+  }
+});
+
+applyDemoMode();
+lucide.createIcons();
+
+// ══════ 어노테이션 시스템 (통합 저장 — 모든 페이지의 어노테이션을 단일 키에 namespace로) ══════
+(function(){
+  var STORAGE_KEY = 'clipo_notes_all';
+  var PAGE_KEY = location.pathname.split('/').pop() || 'index';
+  function loadAll(){ try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {}; } catch(e){ return {}; } }
+  function saveAll(all){ try { localStorage.setItem(STORAGE_KEY, JSON.stringify(all)); } catch(e){} }
+  function loadFromStorage(){ return loadAll()[PAGE_KEY] || null; }
+  function saveToStorage(n){ var all = loadAll(); all[PAGE_KEY] = n; saveAll(all); }
+  (function migrate(){
+    var all = loadAll();
+    var changed = false;
+    for(var i=0; i<localStorage.length; i++){
+      var k = localStorage.key(i);
+      if(!k || k === STORAGE_KEY || k.indexOf('clipo_notes_') !== 0) continue;
+      var pk = k.replace('clipo_notes_', '');
+      try { var d = JSON.parse(localStorage.getItem(k)); if(d && !all[pk]){ all[pk] = d; changed = true; } } catch(e){}
+    }
+    if(changed) saveAll(all);
+  })();
+  function ensureNoteId(el){
+    if(!el.getAttribute('data-note-id')){
+      el.setAttribute('data-note-id', 'note-'+Math.random().toString(36).slice(2,9));
+    }
+    return el.getAttribute('data-note-id');
+  }
+  function applyStorage(){
+    var stored = loadFromStorage();
+    if(!stored) return;
+    Object.keys(stored).forEach(function(id){
+      var el = document.querySelector('[data-note-id="'+id+'"]');
+      if(!el) return;
+      if(stored[id].deleted){
+        el.removeAttribute('data-note');
+      } else if(stored[id].note){
+        el.setAttribute('data-note', stored[id].note);
+      }
+    });
+    Object.keys(stored).forEach(function(id){
+      if(stored[id].deleted) return;
+      if(stored[id].selector && !document.querySelector('[data-note-id="'+id+'"]')){
+        var target = document.querySelector(stored[id].selector);
+        if(target){
+          target.setAttribute('data-note-id', id);
+          target.setAttribute('data-note', stored[id].note);
+        }
+      }
+    });
+  }
+  function buildPins(){
+    document.querySelectorAll('.note-pin,.note-popover').forEach(function(el){ el.remove(); });
+    var nodes = document.querySelectorAll('[data-note]');
+    var stored = loadFromStorage() || {};
+    nodes.forEach(function(el, idx){
+      ensureNoteId(el);
+      var id = el.getAttribute('data-note-id');
+      var num = idx + 1;
+      var pin = document.createElement('button');
+      pin.type = 'button';
+      pin.className = 'note-pin';
+      pin.textContent = num;
+      if(stored[id] && stored[id].pos){
+        pin.style.top = stored[id].pos.top;
+        pin.style.right = 'auto';
+        pin.style.left = stored[id].pos.left;
+        pin.style.transform = 'none';
+      }
+      attachPinHandlers(pin, el, num, id);
+      el.appendChild(pin);
+    });
+    updateCount();
+    return nodes.length;
+  }
+  function attachPinHandlers(pin, targetEl, num, id){
+    var dragStart = null;
+    var moved = false;
+    pin.addEventListener('pointerdown', function(e){
+      e.stopPropagation();
+      pin.setPointerCapture(e.pointerId);
+      var rect = pin.getBoundingClientRect();
+      var hostRect = targetEl.getBoundingClientRect();
+      dragStart = {
+        startX: e.clientX, startY: e.clientY,
+        offsetLeft: rect.left - hostRect.left + rect.width/2,
+        offsetTop: rect.top - hostRect.top + rect.height/2,
+        pinW: rect.width, pinH: rect.height
+      };
+      moved = false;
+    });
+    pin.addEventListener('pointermove', function(e){
+      if(!dragStart) return;
+      var dx = e.clientX - dragStart.startX;
+      var dy = e.clientY - dragStart.startY;
+      if(Math.abs(dx) + Math.abs(dy) > 3){
+        moved = true;
+        pin.classList.add('dragging');
+        var newLeft = dragStart.offsetLeft + dx - dragStart.pinW/2;
+        var newTop = dragStart.offsetTop + dy - dragStart.pinH/2;
+        pin.style.left = newLeft + 'px';
+        pin.style.top = newTop + 'px';
+        pin.style.right = 'auto';
+        pin.style.transform = 'none';
+      }
+    });
+    pin.addEventListener('pointerup', function(e){
+      e.stopPropagation();
+      if(dragStart && pin.hasPointerCapture(e.pointerId)) pin.releasePointerCapture(e.pointerId);
+      if(moved){
+        var stored = loadFromStorage() || {};
+        stored[id] = stored[id] || {};
+        stored[id].pos = { top: pin.style.top, left: pin.style.left };
+        saveToStorage(stored);
+        pin.classList.remove('dragging');
+      } else {
+        openPopover(targetEl, num, pin);
+      }
+      dragStart = null;
+      moved = false;
+    });
+    pin.addEventListener('pointercancel', function(){
+      dragStart = null; moved = false; pin.classList.remove('dragging');
+    });
+  }
+  function updateCount(){
+    var n = document.querySelectorAll('[data-note]').length;
+    var el = document.querySelector('.notes-toggle-count');
+    if(el) el.textContent = n;
+  }
+  function closeAllPopovers(){
+    document.querySelectorAll('.note-popover').forEach(function(p){ p.remove(); });
+    document.querySelectorAll('.note-pin.active').forEach(function(p){ p.classList.remove('active'); });
+  }
+  function openPopover(targetEl, num, pinEl){
+    var alreadyOpen = pinEl.classList.contains('active');
+    closeAllPopovers();
+    if(alreadyOpen) return;
+    renderPopover(targetEl, num, pinEl, false);
+  }
+  function renderPopover(targetEl, num, pinEl, editing, keepOthers){
+    if(!keepOthers) closeAllPopovers();
+    var noteText = targetEl.getAttribute('data-note') || '';
+    var pop = document.createElement('div');
+    pop.className = 'note-popover show';
+    var bodyHtml = editing
+      ? '<div class="note-popover-toolbar"><button type="button" class="note-popover-tool-btn" data-tool="bold" title="굵게 (Ctrl+B)">B</button></div>'
+        + '<textarea class="note-popover-textarea" placeholder="어노테이션 내용을 입력하세요...">'+escHtml(noteText)+'</textarea>'
+        + '<div class="note-popover-edit-actions">'
+        +   '<button class="note-popover-btn" data-act="cancel">취소</button>'
+        +   '<button class="note-popover-btn primary" data-act="save">저장</button>'
+        + '</div>'
+      : '<div class="note-popover-body">'+renderNote(noteText)+'</div>';
+    pop.innerHTML = '<div class="note-popover-hd">'
+      + '<span class="note-popover-num">'+num+'</span>'
+      + '<div class="note-popover-actions">'
+      +   (editing ? '' : '<button class="note-popover-action" data-act="edit" title="편집">✏️</button>')
+      +   (editing ? '' : '<button class="note-popover-action danger" data-act="delete" title="삭제">🗑</button>')
+      +   '<button class="note-popover-action" data-act="close" title="닫기">✕</button>'
+      + '</div>'
+      + '</div>'
+      + bodyHtml;
+    targetEl.appendChild(pop);
+    // 저장된 풍선 위치 우선
+    var __id = targetEl.getAttribute('data-note-id');
+    var __s = loadFromStorage() || {};
+    if(__id && __s[__id] && __s[__id].popoverPos){
+      pop.style.left = __s[__id].popoverPos.left;
+      pop.style.top = __s[__id].popoverPos.top;
+      pop.style.right = 'auto';
+    } else {
+      var rect = pinEl.getBoundingClientRect();
+      var popW = 300;
+      if(rect.right + popW + 16 > window.innerWidth){
+        pop.style.right = '0'; pop.style.left = 'auto';
+        pop.style.top = (pinEl.offsetTop + 24) + 'px';
+      } else {
+        pop.style.left = (pinEl.offsetLeft + 24) + 'px';
+        pop.style.top = (pinEl.offsetTop - 8) + 'px';
+      }
+    }
+    pinEl.classList.add('active');
+    // 풍선 헤더 드래그
+    var __hd = pop.querySelector('.note-popover-hd');
+    if(__hd){
+      var __pd = null;
+      __hd.addEventListener('pointerdown', function(ev){
+        if(ev.target.closest('.note-popover-action')) return;
+        ev.preventDefault();
+        __hd.setPointerCapture(ev.pointerId);
+        var pr = pop.getBoundingClientRect();
+        __pd = { sx: ev.clientX, sy: ev.clientY, l: pr.left, t: pr.top };
+      });
+      __hd.addEventListener('pointermove', function(ev){
+        if(!__pd) return;
+        var hr = targetEl.getBoundingClientRect();
+        var nl = (__pd.l + (ev.clientX - __pd.sx) - hr.left);
+        var nt = (__pd.t + (ev.clientY - __pd.sy) - hr.top);
+        pop.style.left = nl + 'px';
+        pop.style.top = nt + 'px';
+        pop.style.right = 'auto';
+      });
+      __hd.addEventListener('pointerup', function(ev){
+        if(!__pd) return;
+        if(__hd.hasPointerCapture(ev.pointerId)) __hd.releasePointerCapture(ev.pointerId);
+        var idd = targetEl.getAttribute('data-note-id');
+        if(idd){
+          var ss = loadFromStorage() || {};
+          ss[idd] = ss[idd] || {};
+          ss[idd].popoverPos = { top: pop.style.top, left: pop.style.left };
+          saveToStorage(ss);
+        }
+        __pd = null;
+      });
+      __hd.addEventListener('pointercancel', function(){ __pd = null; });
+    }
+    // editing 모드면 textarea 자동 높이 조절
+    var __ta = pop.querySelector('.note-popover-textarea');
+    if(__ta){
+      var __autoGrow = function(){
+        __ta.style.height = 'auto';
+        var h = Math.min(__ta.scrollHeight + 2, 420);
+        __ta.style.height = h + 'px';
+      };
+      var __saveTimer = null;
+      var __autoSave = function(){
+        if(__saveTimer) clearTimeout(__saveTimer);
+        __saveTimer = setTimeout(function(){
+          var __id = targetEl.getAttribute('data-note-id');
+          if(!__id) return;
+          var __stored = loadFromStorage() || {};
+          __stored[__id] = __stored[__id] || {};
+          __stored[__id].note = __ta.value;
+          delete __stored[__id].deleted;
+          saveToStorage(__stored);
+          targetEl.setAttribute('data-note', __ta.value);
+        }, 200);
+      };
+      __ta.addEventListener('input', function(){ __autoGrow(); __autoSave(); });
+      // 볼드 toolbar + Ctrl+B 단축키
+      function __wrapBold(){
+        var s = __ta.selectionStart, e = __ta.selectionEnd;
+        var sel = __ta.value.substring(s, e) || '굵은 글자';
+        var before = __ta.value.substring(0, s);
+        var after = __ta.value.substring(e);
+        __ta.value = before + '**' + sel + '**' + after;
+        __ta.focus();
+        __ta.setSelectionRange(s + 2, s + 2 + sel.length);
+        __autoGrow(); __autoSave();
+      }
+      var __bBtn = pop.querySelector('[data-tool="bold"]');
+      if(__bBtn){ __bBtn.addEventListener('click', function(ev){ ev.preventDefault(); __wrapBold(); }); }
+      __ta.addEventListener('keydown', function(ev){
+        if((ev.ctrlKey || ev.metaKey) && (ev.key === 'b' || ev.key === 'B')){
+          ev.preventDefault();
+          __wrapBold();
+        }
+      });
+      setTimeout(function(){ __autoGrow(); __ta.focus(); var v=__ta.value; __ta.value=''; __ta.value=v; }, 0);
+    }
+    pop.querySelectorAll('[data-act]').forEach(function(btn){
+      btn.onclick = function(e){
+        e.stopPropagation();
+        var act = btn.getAttribute('data-act');
+        if(act === 'close'){ closeAllPopovers(); }
+        else if(act === 'edit'){ renderPopover(targetEl, num, pinEl, true); }
+        else if(act === 'cancel'){ renderPopover(targetEl, num, pinEl, false); }
+        else if(act === 'save'){
+          var newText = pop.querySelector('.note-popover-textarea').value.trim();
+          var id = targetEl.getAttribute('data-note-id');
+          var stored = loadFromStorage() || {};
+          stored[id] = stored[id] || {};
+          stored[id].note = newText;
+          saveToStorage(stored);
+          targetEl.setAttribute('data-note', newText);
+          renderPopover(targetEl, num, pinEl, false);
+        }
+        else if(act === 'delete'){
+          if(!confirm('이 어노테이션을 삭제할까요?')) return;
+          var id2 = targetEl.getAttribute('data-note-id');
+          var stored2 = loadFromStorage() || {};
+          stored2[id2] = stored2[id2] || {};
+          stored2[id2].deleted = true;
+          saveToStorage(stored2);
+          targetEl.removeAttribute('data-note');
+          closeAllPopovers();
+          buildPins();
+        }
+      };
+    });
+  }
+  function escHtml(s){
+    return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+  // markdown bold (**text**) → <strong>text</strong>
+  function renderNote(s){
+    return escHtml(s).replace(/\*\*([^*\n]+?)\*\*/g, '<strong>$1</strong>');
+  }
+  // 모든 풍선 한번에 펼치기
+  function openAllPopovers(){
+    closeAllPopovers();
+    var nodes = document.querySelectorAll('[data-note]');
+    nodes.forEach(function(el, idx){
+      var pin = el.querySelector('.note-pin');
+      if(pin){ renderPopover(el, idx + 1, pin, false, true); }
+    });
+  }
+  var addMode = false;
+  function toggleAddMode(){
+    addMode = !addMode;
+    document.body.classList.toggle('note-add-mode', addMode);
+  }
+  document.addEventListener('click', function(e){
+    if(!addMode) return;
+    var target = e.target;
+    if(target.closest('.notes-toggle') || target.closest('.note-pin') || target.closest('.note-popover') || target.closest('.notes-menu')) return;
+    e.preventDefault();
+    e.stopPropagation();
+    // 빈 어노테이션 생성 후 인라인 textarea 풍선 즉시 오픈 (multi-line 지원)
+    var id = 'note-'+Math.random().toString(36).slice(2,9);
+    target.setAttribute('data-note-id', id);
+    target.setAttribute('data-note', '');
+    var selector = '[data-note-id="'+id+'"]';
+    var stored = loadFromStorage() || {};
+    stored[id] = { note: '', selector: selector };
+    saveToStorage(stored);
+    buildPins();
+    toggleAddMode();
+    var allNoteEls = document.querySelectorAll('[data-note]');
+    var newIdx = -1;
+    allNoteEls.forEach(function(el, i){ if(el === target) newIdx = i; });
+    if(newIdx >= 0){
+      var pin = target.querySelector('.note-pin');
+      if(pin){ renderPopover(target, newIdx + 1, pin, true); }
+      // 첫 진입 시 placeholder 자동 선택 → 바로 덮어쓰기 편함
+
+    }
+  }, true);
+  function exportNotes(){
+    var all = loadAll();
+    var current = all[PAGE_KEY] || {};
+    document.querySelectorAll('[data-note]').forEach(function(el){
+      var id = el.getAttribute('data-note-id'); if(!id) return;
+      current[id] = current[id] || {};
+      current[id].note = el.getAttribute('data-note');
+    });
+    all[PAGE_KEY] = current;
+    saveAll(all);
+    var blob = new Blob([JSON.stringify(all, null, 2)], {type:'application/json'});
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url; a.download = 'clipo_notes_all.json'; a.click();
+    URL.revokeObjectURL(url);
+  }
+  function importNotes(){
+    var input = document.createElement('input');
+    input.type = 'file'; input.accept = 'application/json,.json';
+    input.onchange = function(e){
+      var file = e.target.files && e.target.files[0]; if(!file) return;
+      var reader = new FileReader();
+      reader.onload = function(){
+        try {
+          var data = JSON.parse(reader.result);
+          if(typeof data !== 'object' || data === null) throw new Error('JSON 형식이 올바르지 않아요');
+          if(!confirm('가져온 어노테이션으로 현재 저장 상태를 덮어쓸까요? (모든 페이지)')) return;
+          saveAll(data);
+          alert('어노테이션을 가져왔어요. 페이지를 새로고침합니다.');
+          location.reload();
+        } catch(err){ alert('가져오기 실패: ' + err.message); }
+      };
+      reader.readAsText(file);
+    };
+    input.click();
+  }
+  function resetNotes(){
+    if(!confirm('이 페이지의 모든 어노테이션을 삭제할까요?\n(default·추가 모두 제거. JSON 가져오기로 복원 가능)')) return;
+    var pageStored = loadFromStorage() || {};
+    document.querySelectorAll('[data-note]').forEach(function(el){
+      var id = el.getAttribute('data-note-id');
+      if(!id){ id = 'note-'+Math.random().toString(36).slice(2,9); el.setAttribute('data-note-id', id); }
+      pageStored[id] = pageStored[id] || {};
+      pageStored[id].deleted = true;
+    });
+    saveToStorage(pageStored);
+    location.reload();
+  }
+  var wrap = document.createElement('div');
+  wrap.className = 'notes-fab-wrap';
+  wrap.innerHTML =
+      '<div class="notes-menu">'
+    +   '<button class="notes-menu-item notes-menu-item-primary" data-act="view"><span class="notes-menu-check"></span>👁&nbsp;&nbsp;어노테이션 보기</button>'
+    +   '<button class="notes-menu-item" data-act="add">+&nbsp;&nbsp;새 어노테이션 추가</button>'
+    +   '<div class="notes-menu-divider"></div>'
+    +   '<button class="notes-menu-item" data-act="export">⬇&nbsp;&nbsp;JSON 내보내기 (전체)</button>'
+    +   '<button class="notes-menu-item" data-act="copy">📋&nbsp;&nbsp;JSON 텍스트 복사</button>'
+    +   '<button class="notes-menu-item" data-act="cloud">☁&nbsp;&nbsp;폴더 JSON 다시 불러오기</button>'
+    +   '<button class="notes-menu-item" data-act="import">⬆&nbsp;&nbsp;JSON 가져오기</button>'
+    +   '<button class="notes-menu-item danger" data-act="reset">↺&nbsp;&nbsp;이 페이지 초기화</button>'
+    + '</div>'
+    + '<button class="notes-toggle" type="button">📝 어노테이션 <span class="notes-toggle-count">0</span><span class="notes-toggle-chev">▾</span></button>';
+  document.body.appendChild(wrap);
+
+  var mainBtn = wrap.querySelector('.notes-toggle');
+  var menu = wrap.querySelector('.notes-menu');
+  function setMenuOpen(open){ wrap.classList.toggle('menu-open', open); }
+  function setViewMode(on){
+    document.body.classList.toggle('show-notes', on);
+    mainBtn.classList.toggle('active', on);
+    var checkEl = wrap.querySelector('[data-act="view"] .notes-menu-check');
+    if(checkEl) checkEl.textContent = on ? '✓' : '';
+    if(on){
+      applyStorage();
+      buildPins();
+    } else {
+      closeAllPopovers();
+      if(addMode) toggleAddMode();
+    }
+  }
+  mainBtn.onclick = function(e){
+    e.stopPropagation();
+    setMenuOpen(!wrap.classList.contains('menu-open'));
+  };
+  menu.addEventListener('click', function(e){
+    var btn = e.target.closest('[data-act]');
+    if(!btn) return;
+    e.stopPropagation();
+    var act = btn.getAttribute('data-act');
+    if(act === 'view'){
+      setViewMode(!document.body.classList.contains('show-notes'));
+    } else if(act === 'add'){
+      if(!document.body.classList.contains('show-notes')) setViewMode(true);
+      toggleAddMode();
+      setMenuOpen(false);
+    } else if(act === 'export'){
+      exportNotes();
+      setMenuOpen(false);
+    } else if(act === 'copy'){
+      if(window.__copyClipoNotes) window.__copyClipoNotes();
+      setMenuOpen(false);
+    } else if(act === 'cloud'){
+      if(window.__importClipoNotesFromFolder) window.__importClipoNotesFromFolder();
+      setMenuOpen(false);
+    } else if(act === 'import'){
+      importNotes();
+      setMenuOpen(false);
+    } else if(act === 'reset'){
+      resetNotes();
+    }
+  });
+  document.addEventListener('click', function(e){
+    if(wrap.classList.contains('menu-open') && !wrap.contains(e.target)){
+      setMenuOpen(false);
+    }
+  });
+  window.__clipoNotesSync = function(){ applyStorage(); buildPins(); updateCount(); };
+  applyStorage();
+  buildPins();
+  updateCount();
+})();
+
+// ══════ 안전장치 (미백업 추적 + 떠나기 경고 + 클립보드 복사) ══════
+(function(){
+  var KEY = 'clipo_notes_all';
+  var META = 'clipo_notes_meta';
+  function snapshot(){ return localStorage.getItem(KEY) || ''; }
+  function getMeta(){ try { return JSON.parse(localStorage.getItem(META)) || {}; } catch(e){ return {}; } }
+  function setMeta(m){ try { localStorage.setItem(META, JSON.stringify(m)); } catch(e){} }
+  function isUnsaved(){
+    var snap = snapshot();
+    if(!snap || snap === '{}') return false;
+    var m = getMeta();
+    return snap !== (m.lastSavedSnapshot || '');
+  }
+  function markSaved(){
+    var m = getMeta();
+    m.lastSavedSnapshot = snapshot();
+    m.lastSavedAt = Date.now();
+    setMeta(m);
+    updateBadge();
+  }
+  function updateBadge(){
+    var fab = document.querySelector('.notes-fab-wrap');
+    if(!fab) return;
+    fab.classList.toggle('has-unsaved', isUnsaved());
+  }
+  function copyJsonText(){
+    var data = snapshot() || '{}';
+    var pretty;
+    try { pretty = JSON.stringify(JSON.parse(data), null, 2); }
+    catch(e){ pretty = data; }
+    function done(){ markSaved(); alert('어노테이션 JSON이 클립보드에 복사됐어요.\n메모장·노션·슬랙 어디든 붙여넣어 백업하세요.\n(클로드 채팅에 붙여넣으면 박제도 가능)'); }
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(pretty).then(done).catch(fallback);
+    } else { fallback(); }
+    function fallback(){
+      var ta = document.createElement('textarea');
+      ta.value = pretty;
+      ta.style.position = 'fixed'; ta.style.top = '-1000px';
+      document.body.appendChild(ta);
+      ta.focus(); ta.select();
+      try { document.execCommand('copy'); done(); }
+      catch(e){ alert('자동 복사 실패. 콘솔에 출력했어요 — 수동으로 복사하세요.'); console.log(pretty); }
+      document.body.removeChild(ta);
+    }
+  }
+  window.__copyClipoNotes = copyJsonText;
+  // export·import 클릭 시 백업 완료로 처리
+  document.addEventListener('click', function(e){
+    var btn = e.target.closest && e.target.closest('[data-act="export"],[data-act="import"]');
+    if(btn){ setTimeout(markSaved, 200); }
+  }, true);
+  // 폴링으로 배지 동기화
+  setInterval(updateBadge, 1500);
+  setTimeout(updateBadge, 600);
+})();
+
+
+// ══════ FAB 위치 드래그 (호버 시 ⋮⋮ 그립 표시) ══════
+(function(){
+  var POS_KEY = 'clipo_notes_fab_pos';
+  function init(){
+    var wrap = document.querySelector('.notes-fab-wrap');
+    if(!wrap) { setTimeout(init, 200); return; }
+    // 저장된 위치 복원
+    try {
+      var saved = JSON.parse(localStorage.getItem(POS_KEY));
+      if(saved && saved.left != null && saved.top != null){
+        wrap.style.bottom = 'auto';
+        wrap.style.right = 'auto';
+        wrap.style.left = saved.left + 'px';
+        wrap.style.top = saved.top + 'px';
+      }
+    } catch(e){}
+    // 그립 핸들 추가
+    var grip = document.createElement('span');
+    grip.className = 'notes-fab-drag';
+    grip.title = '드래그해서 위치 이동';
+    grip.textContent = '⋮⋮';
+    wrap.appendChild(grip);
+    // 드래그 로직
+    var dragStart = null;
+    grip.addEventListener('pointerdown', function(e){
+      e.preventDefault();
+      e.stopPropagation();
+      grip.setPointerCapture(e.pointerId);
+      var rect = wrap.getBoundingClientRect();
+      dragStart = { x: e.clientX, y: e.clientY, left: rect.left, top: rect.top };
+      wrap.classList.add('dragging');
+    });
+    grip.addEventListener('pointermove', function(e){
+      if(!dragStart) return;
+      var dx = e.clientX - dragStart.x;
+      var dy = e.clientY - dragStart.y;
+      var newLeft = dragStart.left + dx;
+      var newTop = dragStart.top + dy;
+      // 화면 경계 clamp
+      newLeft = Math.max(0, Math.min(window.innerWidth - 100, newLeft));
+      newTop = Math.max(0, Math.min(window.innerHeight - 40, newTop));
+      wrap.style.bottom = 'auto';
+      wrap.style.right = 'auto';
+      wrap.style.left = newLeft + 'px';
+      wrap.style.top = newTop + 'px';
+    });
+    grip.addEventListener('pointerup', function(e){
+      if(!dragStart) return;
+      if(grip.hasPointerCapture(e.pointerId)) grip.releasePointerCapture(e.pointerId);
+      wrap.classList.remove('dragging');
+      try {
+        var rect = wrap.getBoundingClientRect();
+        localStorage.setItem(POS_KEY, JSON.stringify({ left: rect.left, top: rect.top }));
+      } catch(e){}
+      dragStart = null;
+    });
+    grip.addEventListener('pointercancel', function(){
+      wrap.classList.remove('dragging');
+      dragStart = null;
+    });
+    // 그립 클릭 시 메뉴 안 열리게 (FAB 토글 클릭과 분리)
+    grip.addEventListener('click', function(e){ e.stopPropagation(); });
+  }
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    setTimeout(init, 100);
+  }
+})();
+
+
+// ══════ 폴더 JSON 자동 동기화 (clipo_notes_all.json) ══════
+(function(){
+  function load(force){
+    fetch('clipo_notes_all.json?t=' + Date.now())
+      .then(function(r){
+        if(!r.ok) throw new Error('not found ' + r.status);
+        return r.json();
+      })
+      .then(function(data){
+        if(typeof data !== 'object' || data === null) return;
+        var existing = localStorage.getItem('clipo_notes_all');
+        var isEmpty = !existing || existing === '{}';
+        if(force){
+          if(!confirm('폴더의 clipo_notes_all.json으로 현재 로컬 어노테이션을 덮어쓸까요?\n(되돌릴 수 없어요)')) return;
+          localStorage.setItem('clipo_notes_all', JSON.stringify(data));
+          location.reload();
+        } else if(isEmpty){
+          // 첫 방문자 — 자동 import
+          localStorage.setItem('clipo_notes_all', JSON.stringify(data));
+          try {
+            localStorage.setItem('clipo_notes_meta', JSON.stringify({
+              lastSavedSnapshot: JSON.stringify(data),
+              lastSavedAt: Date.now()
+            }));
+          } catch(e){}
+          // 어노테이션 UI 즉시 갱신 (deleted·텍스트 반영 + 카운트)
+          if(window.__clipoNotesSync){ setTimeout(window.__clipoNotesSync, 30); }
+        }
+      })
+      .catch(function(err){
+        if(force){ alert('폴더에 clipo_notes_all.json이 없어요. 먼저 [JSON 내보내기]로 받아서 같은 폴더에 저장하세요.'); }
+      });
+  }
+  window.__importClipoNotesFromFolder = function(){ load(true); };
+  // 첫 로드 시 자동 (localStorage 비어있을 때만 효력)
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', function(){ load(false); });
+  } else {
+    setTimeout(function(){ load(false); }, 50);
+  }
+})();
+
+</script>
+</body>
+</html>
