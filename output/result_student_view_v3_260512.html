@@ -1404,13 +1404,14 @@ body.preview-mode .notes-fab-wrap,body.preview-mode .note-pin,body.preview-mode 
         } else if(isEmpty){
           // 첫 방문자 — 자동 import
           localStorage.setItem('clipo_notes_all', JSON.stringify(data));
-          // 메타 마크 (백업된 상태로)
           try {
             localStorage.setItem('clipo_notes_meta', JSON.stringify({
               lastSavedSnapshot: JSON.stringify(data),
               lastSavedAt: Date.now()
             }));
           } catch(e){}
+          // 어노테이션 UI 즉시 갱신 (deleted·텍스트 반영 + 카운트)
+          if(window.__clipoNotesSync){ setTimeout(window.__clipoNotesSync, 30); }
         }
       })
       .catch(function(err){
