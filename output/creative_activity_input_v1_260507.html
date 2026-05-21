@@ -748,7 +748,7 @@ body.nav-expanded .sticky-cta{left:200px;transition:left .2s ease}
             <th class="col-survey">설문</th>
             <th class="col-pdf">활동지</th>
             <th class="col-kw">활동 내용</th>
-            <th class="col-level">활동 수준</th>
+            <th class="col-level">참여 정도</th>
             <th class="col-action">관리</th>
           </tr>
         </thead>
@@ -803,7 +803,6 @@ body.nav-expanded .sticky-cta{left:200px;transition:left .2s ease}
             <tr>
               <th class="s3-col-sid">학번</th>
               <th class="s3-col-name">이름</th>
-              <th class="s3-col-level">활동 수준</th>
               <th class="s3-col-ai">AI 생성 기록</th>
               <th class="s3-col-bring"></th>
               <th class="s3-col-edit">선생님 작성 기록</th>
@@ -864,12 +863,12 @@ body.nav-expanded .sticky-cta{left:200px;transition:left .2s ease}
         </div>
       </div>
       <div class="dp-section" style="margin-bottom:0">
-        <div class="dp-label">활동 수준</div>
+        <div class="dp-label">참여 정도</div>
         <div class="level-chips" id="md-level-chips">
-          <button class="level-chip" data-level="high" onclick="setLevel('high')">상</button>
-          <button class="level-chip" data-level="mid" onclick="setLevel('mid')">중</button>
-          <button class="level-chip" data-level="low" onclick="setLevel('low')">하</button>
-          <button class="level-chip" data-level="none" onclick="setLevel('none')">미선택</button>
+          <button class="level-chip" data-level="high" onclick="setLevel('high')">활동 주도</button>
+          <button class="level-chip" data-level="mid" onclick="setLevel('mid')">적극 참여</button>
+          <button class="level-chip" data-level="low" onclick="setLevel('low')">기본 참여</button>
+          <button class="level-chip" data-level="none" onclick="setLevel('none')">자동</button>
         </div>
       </div>
     </div>
@@ -1538,8 +1537,8 @@ function fileSummaryText(s){
   return order.filter(k=>set.has(k)).join(' · ');
 }
 function levelLabel(lev){
-  if(!lev || lev==='none') return '<span class="col-empty">—</span>';
-  return {high:'상', mid:'중', low:'하'}[lev] || '<span class="col-empty">—</span>';
+  if(!lev || lev==='none') return '<span class="col-empty" title="자료 있으면 AI가 자동 추정">자동</span>';
+  return {high:'활동 주도', mid:'적극 참여', low:'기본 참여'}[lev] || '<span class="col-empty">—</span>';
 }
 function kwSummaryText(s){
   return s.keywords.map(k=>k.text).join(', ');
@@ -1840,7 +1839,7 @@ function renderDrawerDataPane(s){
       : (f.kindLabel === '활동지' ? `매칭: ${s.name} 학생 영역 추출됨` : `개별 업로드 자료`);
     const actionBtn = isVirtual
       ? `<button class="btn-file-download" onclick="event.stopPropagation();showSurveyInDrawer(${s.id},${i})" title="응답 보기"><i data-lucide="eye" style="width:14px;height:14px"></i> 보기</button>`
-      : `<button class="btn-file-download" onclick="event.stopPropagation();downloadFileSim('${f.name.replace(/'/g,"\\'")}')" title="다운로드"><i data-lucide="download" style="width:14px;height:14px"></i> 다운로드</button>`;
+      : `<button class="btn-file-download" onclick="event.stopPropagation();openPdfNewTab('${f.name.replace(/'/g,"\\'")}')" title="새 탭에서 보기"><i data-lucide="eye" style="width:14px;height:14px"></i> 보기</button>`;
     return `<div class="file-row file-row-detail">
       <i data-lucide="${isVirtual?'list-checks':'paperclip'}" style="width:16px;height:16px;color:${isVirtual?'#7c3aed':'#b3b6bd'};flex-shrink:0;margin-top:2px"></i>
       <div class="file-row-main">
@@ -1900,12 +1899,12 @@ function renderDrawerDataPane(s){
       </div>
     </div>
     <div class="dp-section" style="margin-bottom:0">
-      <div class="dp-label">활동 수준</div>
+      <div class="dp-label">참여 정도</div>
       <div class="level-chips" id="dr-level-chips">
-        <button class="level-chip ${lev==='high'?'active':''}" data-level="high" onclick="setDrawerLevel('high')">상</button>
-        <button class="level-chip ${lev==='mid'?'active':''}" data-level="mid" onclick="setDrawerLevel('mid')">중</button>
-        <button class="level-chip ${lev==='low'?'active':''}" data-level="low" onclick="setDrawerLevel('low')">하</button>
-        <button class="level-chip ${lev==='none'?'active':''}" data-level="none" onclick="setDrawerLevel('none')">미선택</button>
+        <button class="level-chip ${lev==='high'?'active':''}" data-level="high" onclick="setDrawerLevel('high')">활동 주도</button>
+        <button class="level-chip ${lev==='mid'?'active':''}" data-level="mid" onclick="setDrawerLevel('mid')">적극 참여</button>
+        <button class="level-chip ${lev==='low'?'active':''}" data-level="low" onclick="setDrawerLevel('low')">기본 참여</button>
+        <button class="level-chip ${lev==='none'?'active':''}" data-level="none" onclick="setDrawerLevel('none')">자동</button>
       </div>
     </div>
   `;
@@ -2086,6 +2085,10 @@ function saveDetail(){
 // ───── 학생 자료 추가/제거 (학생 상세 모달용) ─────
 function downloadFileSim(name){
   showToast(`${name} 다운로드를 시작했어요`);
+}
+function openPdfNewTab(name){
+  // 실제 구현 시 PDF URL을 새 탭으로 열기. 목업에선 토스트로 안내.
+  showToast(`${name}을(를) 새 탭에서 열어요`);
 }
 function goBulkRegister(){
   // 드로어를 닫고 자료 등록 모달을 즉시 노출
@@ -2339,12 +2342,20 @@ function renderS3Row(s){
     </div>`;
   } else {
     const hasData = s.files.length>0 || s.keywords.length>0;
+    const needAnalysis = hasData && s2HasFiles(s) && getS2(s).status !== 'done';
+    const emptyMsg = !hasData
+      ? '자료·활동 내용을 등록하면 AI가 기록 초안을 만들어 드려요.'
+      : (needAnalysis
+        ? '자료가 분석되지 않았어요. 2단계에서 분석을 먼저 실행해 주세요.'
+        : '기록 생성 버튼을 눌러 AI 기록 초안을 확인해 보세요.');
     aiCell = `<div class="s3-ai-box">
-      <div class="s3-text empty">${hasData ? '기록 생성 버튼을 눌러 AI 기록 초안을 확인해 보세요.' : '자료·활동 내용을 등록하면 AI가 기록 초안을 만들어 드려요.'}</div>
+      <div class="s3-text empty">${emptyMsg}</div>
       <div class="s3-cell-foot">
         <span class="s3-byte">0 Byte</span>
         ${hasData
-          ? `<button class="s3-genrow-btn" onclick="generateOne(${s.id})"><i data-lucide="sparkles" style="width:12px;height:12px"></i> 기록 생성</button>`
+          ? (needAnalysis
+            ? `<a href="#" onclick="event.preventDefault();goStep(2)" style="font-size:12px;color:#416bff;text-decoration:underline;font-weight:500;cursor:pointer">2단계에서 자료 분석 →</a>`
+            : `<button class="s3-genrow-btn" onclick="generateOne(${s.id})"><i data-lucide="sparkles" style="width:12px;height:12px"></i> 기록 생성</button>`)
           : (window.currentRelease === 'after' ? `<button class="s3-mini-btn" onclick="openDrawer(${s.id})"><i data-lucide="edit-3" style="width:12px;height:12px"></i> 입력</button>` : `<a href="#" onclick="event.preventDefault();goStep(1)" style="font-size:12px;color:#416bff;text-decoration:underline;font-weight:500;cursor:pointer">1단계에서 자료 입력 →</a>`)}
       </div>
     </div>`;
@@ -2368,7 +2379,6 @@ function renderS3Row(s){
       <div class="s3-stu-name">${s.name}${dirtyDot}</div>
       ${window.currentRelease === 'after' ? `<button class="s3-mini-btn" onclick="openDrawer(${s.id})"><i data-lucide="edit-3" style="width:12px;height:12px"></i> 수정</button>` : ''}
     </td>
-    <td class="s3-col-level s3-cell-level">${levelLabel(s.level)}</td>
     <td class="s3-col-ai">${aiCell}</td>
     <td class="s3-col-bring"><button class="s3-bring-btn" onclick="bringToEdit(${s.id})" ${s3.aiText?'':'disabled'}><i data-lucide="arrow-right" style="width:14px;height:14px"></i><span>가져오기</span></button></td>
     <td class="s3-col-edit">${editCell}</td>
@@ -2680,7 +2690,7 @@ function renderS2Main(){
   const s = STUDENTS.find(x=>x.id===s2CurStudentId);
   if(!s){ $('s2-main').innerHTML=''; return; }
   const s2 = getS2(s);
-  const summary = `자료 ${s.files.length}건 · 활동 내용 ${s.keywords.length ? '기재' : '미기재'}${s.level?` · 활동 수준 ${ {high:'상',mid:'중',low:'하'}[s.level]||'-'}`:''}`;
+  const summary = `자료 ${s.files.length}건 · 활동 내용 ${s.keywords.length ? '기재' : '미기재'}${s.level?` · 참여 정도 ${ {high:'활동 주도',mid:'적극 참여',low:'기본 참여'}[s.level]||'-'}`:''}`;
   const stuHd = `<div class="s2-stu-hd">
     <div class="s2-stu-hd-info">
       <div class="s2-stu-hd-name-wrap">
@@ -2707,7 +2717,7 @@ function renderS2Main(){
       <div class="s2-state-desc">활동 자료가 없으면 AI 분석이 불필요합니다.<br>다음 단계에서 활동 내용을 기반으로 기록 초안이 생성됩니다.</div>
       <div class="s2-state-summary">
         <div class="s2-state-summary-row"><strong>활동 내용</strong> ${s.keywords.length}개${s.keywords.length?` (${s.keywords.slice(0,5).map(k=>k.text).join(', ')}${s.keywords.length>5?' 외':''})`:''}</div>
-        ${s.level?`<div class="s2-state-summary-row"><strong>활동 수준</strong> ${ {high:'상',mid:'중',low:'하'}[s.level]}</div>`:''}
+        ${s.level?`<div class="s2-state-summary-row"><strong>참여 정도</strong> ${ {high:'활동 주도',mid:'적극 참여',low:'기본 참여'}[s.level]}</div>`:''}
       </div>
       <div><button class="btn-primary-lg" onclick="skipStep2()">3단계로 이동 <i data-lucide="arrow-right" style="width:16px;height:16px"></i></button></div>
     </div>`;
@@ -2720,7 +2730,7 @@ function renderS2Main(){
       <div class="s2-state-summary">
         <div class="s2-state-summary-row"><strong>자료</strong> ${s.files.length}건</div>
         <div class="s2-state-summary-row"><strong>활동 내용</strong> <span class="s2-summary-trunc" title="${kwText}">${kwText}</span></div>
-        ${s.level?`<div class="s2-state-summary-row"><strong>활동 수준</strong> ${ {high:'상',mid:'중',low:'하'}[s.level]}</div>`:''}
+        ${s.level?`<div class="s2-state-summary-row"><strong>참여 정도</strong> ${ {high:'활동 주도',mid:'적극 참여',low:'기본 참여'}[s.level]}</div>`:''}
       </div>
       <div><button class="btn-secondary-lg" onclick="startAnalyze(${s.id})"><i data-lucide="sparkles" style="width:16px;height:16px"></i> 개별 분석 시작</button></div>
     </div>`;
