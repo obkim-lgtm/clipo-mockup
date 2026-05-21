@@ -585,13 +585,30 @@ lucide.createIcons();
     // 추가된 어노테이션(custom-target)도 복원
     Object.keys(stored).forEach(function(id){
       if(stored[id].deleted) return;
-      if(stored[id].selector && !document.querySelector('[data-note-id="'+id+'"]')){
-        var target = document.querySelector(stored[id].selector);
-        if(target){
-          target.setAttribute('data-note-id', id);
-          target.setAttribute('data-note', stored[id].note);
-        }
+      if(!stored[id].note) return;
+      if(document.querySelector('[data-note-id="'+id+'"]')) return;
+      // 1순위: 저장된 selector로 매칭 시도 (self-ID는 무시)
+      var target = null;
+      if(stored[id].selector && stored[id].selector !== '[data-note-id="'+id+'"]'){
+        try { target = document.querySelector(stored[id].selector); } catch(e){}
       }
+      // 2순위: orphan fallback — body에 floating anchor 자동 생성
+      if(!target){
+        target = document.createElement('div');
+        target.className = 'note-orphan-anchor';
+        target.style.cssText = 'position:absolute;width:1px;height:1px;pointer-events:none';
+        if(stored[id].pos){
+          target.style.top = stored[id].pos.top;
+          target.style.left = stored[id].pos.left;
+        } else {
+          // pos도 없으면 화면 중앙 인근에 배치
+          target.style.top = (100 + Math.random()*200) + 'px';
+          target.style.left = (100 + Math.random()*200) + 'px';
+        }
+        document.body.appendChild(target);
+      }
+      target.setAttribute('data-note-id', id);
+      target.setAttribute('data-note', stored[id].note);
     });
   }
   // 핀 부착 (드래그 가능 + localStorage에 위치 저장)

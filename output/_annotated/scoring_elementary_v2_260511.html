@@ -2676,13 +2676,30 @@ lucide.createIcons();
   function ensureNoteId(el){ if(!el.getAttribute('data-note-id')) el.setAttribute('data-note-id','note-'+Math.random().toString(36).slice(2,9)); return el.getAttribute('data-note-id'); }
   function applyStorage(){
     var s = loadFromStorage(); if(!s) return;
+    // 1차: 기존 element에 매칭
     Object.keys(s).forEach(function(id){
       var el = document.querySelector('[data-note-id="'+id+'"]');
-      if(!el && s[id].selector) el = document.querySelector(s[id].selector);
+      if(!el && s[id].selector && s[id].selector !== '[data-note-id="'+id+'"]'){
+        try { el = document.querySelector(s[id].selector); } catch(e){}
+      }
       if(!el) return;
       if(!el.getAttribute('data-note-id')) el.setAttribute('data-note-id', id);
       if(s[id].deleted) el.removeAttribute('data-note');
       else if(s[id].note) el.setAttribute('data-note', s[id].note);
+    });
+    // 2차: orphan fallback — selector 매칭 실패한 어노테이션을 body에 floating anchor로 생성
+    Object.keys(s).forEach(function(id){
+      if(s[id].deleted) return;
+      if(!s[id].note || s[id].note === '새 어노테이션 — 내용을 입력하세요') return;
+      if(document.querySelector('[data-note-id="'+id+'"]')) return;
+      var anc = document.createElement('div');
+      anc.className = 'note-orphan-anchor';
+      anc.style.cssText = 'position:absolute;width:1px;height:1px;pointer-events:none';
+      if(s[id].pos){ anc.style.top = s[id].pos.top; anc.style.left = s[id].pos.left; }
+      else { anc.style.top = (100+Math.random()*200)+'px'; anc.style.left = (100+Math.random()*200)+'px'; }
+      document.body.appendChild(anc);
+      anc.setAttribute('data-note-id', id);
+      anc.setAttribute('data-note', s[id].note);
     });
   }
   function escHtml(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }

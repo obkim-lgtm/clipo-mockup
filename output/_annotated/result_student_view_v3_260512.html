@@ -846,13 +846,22 @@ body.preview-mode .notes-fab-wrap,body.preview-mode .note-pin,body.preview-mode 
       });
       Object.keys(stored).forEach(function(id){
         if(stored[id].deleted) return;
-        if(stored[id].selector && !document.querySelector('[data-note-id="'+id+'"]')){
-          var target = document.querySelector(stored[id].selector);
-          if(target){
-            target.setAttribute('data-note-id', id);
-            target.setAttribute('data-note', stored[id].note);
-          }
+        if(!stored[id].note || stored[id].note === '새 어노테이션 — 내용을 입력하세요') return;
+        if(document.querySelector('[data-note-id="'+id+'"]')) return;
+        var target = null;
+        if(stored[id].selector && stored[id].selector !== '[data-note-id="'+id+'"]'){
+          try { target = document.querySelector(stored[id].selector); } catch(e){}
         }
+        if(!target){
+          target = document.createElement('div');
+          target.className = 'note-orphan-anchor';
+          target.style.cssText = 'position:absolute;width:1px;height:1px;pointer-events:none';
+          if(stored[id].pos){ target.style.top = stored[id].pos.top; target.style.left = stored[id].pos.left; }
+          else { target.style.top = (100+Math.random()*200)+'px'; target.style.left = (100+Math.random()*200)+'px'; }
+          document.body.appendChild(target);
+        }
+        target.setAttribute('data-note-id', id);
+        target.setAttribute('data-note', stored[id].note);
       });
     }
     function buildPins(){
