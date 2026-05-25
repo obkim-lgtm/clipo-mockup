@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>1학년 1반 채점 결과 출력 | CLIPO</title>
-<link rel="icon" type="image/png" href="clipo_favicon.png">
+<link rel="icon" type="image/svg+xml" href="clipo_favicon_elem.svg">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard-gov.min.css">
 <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
 <style>
@@ -95,7 +95,8 @@ body{background:#f6f7f9;color:#222631;min-height:100vh}
 .modal-section-lbl{font-size:13px;font-weight:700;color:#6d7381;letter-spacing:.02em}
 
 /* 데모 모드 스위처 */
-.demo-mode-switcher{position:fixed;bottom:18px;right:18px;display:inline-flex;align-items:center;gap:4px;padding:6px 8px;background:#1f2937;color:#e5e7eb;border-radius:100px;font-family:'Pretendard GOV',inherit;z-index:500;box-shadow:0 4px 20px rgba(0,0,0,.25)}
+.demo-mode-switcher{position:fixed;bottom:18px;right:18px;display:inline-flex;align-items:center;gap:4px;padding:6px 8px;background:#1f2937;color:#e5e7eb;border-radius:100px;font-family:'Pretendard GOV',inherit;z-index:500;box-shadow:0 4px 20px rgba(0,0,0,.25);cursor:move;user-select:none}
+.demo-mode-switcher.dragging{box-shadow:0 8px 32px rgba(0,0,0,.45);opacity:.95}
 .demo-mode-label{font-size:10px;font-weight:800;letter-spacing:.08em;color:#9ca3af;padding:0 8px 0 6px}
 .demo-mode-btn{display:inline-flex;align-items:center;justify-content:center;height:26px;padding:0 12px;border-radius:100px;background:transparent;border:none;color:#9ca3af;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;line-height:1;transition:all .15s}
 .demo-mode-btn:hover{color:#fff}
@@ -234,7 +235,7 @@ body{background:#f6f7f9;color:#222631;min-height:100vh}
 
       <!-- PDF 미리보기 (학생 결과 화면 iframe) -->
       <div class="pdf-frame">
-        <iframe class="pdf-iframe" id="pdfIframe" src="result_student_view_v3_260512.html" title="PDF 출력 미리보기"></iframe>
+        <iframe class="pdf-iframe" id="pdfIframe" src="result_student_view_v3_260512.html?preview=1" title="PDF 출력 미리보기"></iframe>
       </div>
     </section>
 
@@ -249,17 +250,17 @@ body{background:#f6f7f9;color:#222631;min-height:100vh}
       <button class="modal-close" onclick="closeOptModal()"><i data-lucide="x" style="width:18px;height:18px"></i></button>
     </div>
     <div class="modal-body">
-      <p style="font-size:14px;color:#6d7381;line-height:1.55;margin:0">PDF에 포함할 항목을 선택하세요. 학생에게 없는 항목은 자동으로 빠집니다.</p>
-      <span class="modal-section-lbl">공통 항목</span>
+      <p style="font-size:14px;color:#6d7381;line-height:1.55;margin:0">채점 결과 출력물을 구성할 항목을 선택해 주세요.</p>
       <div class="opt-list" id="optList">
+        <label class="opt-row checked" data-key="score" onclick="toggleOpt(this)"><span class="box"><i data-lucide="check" style="width:12px;height:12px"></i></span><span class="opt-row-text">점수</span></label>
         <label class="opt-row checked" data-key="standards" onclick="toggleOpt(this)"><span class="box"><i data-lucide="check" style="width:12px;height:12px"></i></span><span class="opt-row-text">성취기준</span></label>
-        <label class="opt-row checked" data-key="rubric" onclick="toggleOpt(this)"><span class="box"><i data-lucide="check" style="width:12px;height:12px"></i></span><span class="opt-row-text">채점기준</span></label>
-        <label class="opt-row checked" data-key="score" onclick="toggleOpt(this)"><span class="box"><i data-lucide="check" style="width:12px;height:12px"></i></span><span class="opt-row-text">점수 (총점/등급)</span></label>
-        <label class="opt-row checked" data-key="teacher" onclick="toggleOpt(this)"><span class="box"><i data-lucide="check" style="width:12px;height:12px"></i></span><span class="opt-row-text">선생님 종합 피드백</span></label>
         <label class="opt-row checked" data-key="inst_ground" onclick="toggleOpt(this)"><span class="box"><i data-lucide="check" style="width:12px;height:12px"></i></span><span class="opt-row-text">문항별 채점근거</span></label>
         <label class="opt-row checked" data-key="inst_feedback" onclick="toggleOpt(this)"><span class="box"><i data-lucide="check" style="width:12px;height:12px"></i></span><span class="opt-row-text">문항별 피드백</span></label>
-        <label class="opt-row" data-key="elem_ground" onclick="toggleOpt(this)"><span class="box"><i data-lucide="check" style="width:12px;height:12px"></i></span><span class="opt-row-text">채점요소별 채점근거</span></label>
-        <label class="opt-row" data-key="elem_feedback" onclick="toggleOpt(this)"><span class="box"><i data-lucide="check" style="width:12px;height:12px"></i></span><span class="opt-row-text">채점요소별 피드백</span></label>
+        <label class="opt-row checked" data-key="rubric" onclick="toggleOpt(this)"><span class="box"><i data-lucide="check" style="width:12px;height:12px"></i></span><span class="opt-row-text">채점기준표</span></label>
+        <label class="opt-row" data-key="elem_ground" onclick="toggleOpt(this)"><span class="box"><i data-lucide="check" style="width:12px;height:12px"></i></span><span class="opt-row-text">채점요소별 채점근거 (과제물 AI)</span></label>
+        <label class="opt-row" data-key="elem_feedback_analysis" onclick="toggleOpt(this)"><span class="box"><i data-lucide="check" style="width:12px;height:12px"></i></span><span class="opt-row-text">채점요소별 피드백 (과제물 AI)</span></label>
+        <label class="opt-row" data-key="elem_feedback_rubric" onclick="toggleOpt(this)"><span class="box"><i data-lucide="check" style="width:12px;height:12px"></i></span><span class="opt-row-text">채점요소별 피드백 (루브릭 AI)</span></label>
+        <label class="opt-row checked" data-key="teacher" onclick="toggleOpt(this)"><span class="box"><i data-lucide="check" style="width:12px;height:12px"></i></span><span class="opt-row-text">선생님 한마디</span></label>
       </div>
     </div>
     <div class="modal-ft">
@@ -276,6 +277,29 @@ body{background:#f6f7f9;color:#222631;min-height:100vh}
   <button class="demo-mode-btn active" data-mode="mixed" onclick="setDemoMode(this)">섞임</button>
   <button class="demo-mode-btn" data-mode="old" onclick="setDemoMode(this)">기존</button>
 </div>
+<script>
+(function(){
+  var bar=document.querySelector('.demo-mode-switcher');if(!bar)return;
+  var d=false,sx=0,sy=0,sl=0,st=0;
+  bar.addEventListener('mousedown',function(e){
+    if(e.target.closest('.demo-mode-btn'))return;
+    var r=bar.getBoundingClientRect();
+    sl=r.left;st=r.top;sx=e.clientX;sy=e.clientY;d=true;
+    bar.style.right='auto';bar.style.bottom='auto';
+    bar.style.left=sl+'px';bar.style.top=st+'px';
+    bar.classList.add('dragging');e.preventDefault();
+  });
+  document.addEventListener('mousemove',function(e){
+    if(!d)return;
+    var nx=sl+(e.clientX-sx),ny=st+(e.clientY-sy);
+    var r=bar.getBoundingClientRect();
+    nx=Math.max(4,Math.min(innerWidth-r.width-4,nx));
+    ny=Math.max(4,Math.min(innerHeight-r.height-4,ny));
+    bar.style.left=nx+'px';bar.style.top=ny+'px';
+  });
+  document.addEventListener('mouseup',function(){if(d){d=false;bar.classList.remove('dragging');}});
+})();
+</script>
 
 <div class="toast" id="toast">
   <i id="toastIcon" data-lucide="circle-check-big" style="width:18px;height:18px;flex-shrink:0"></i>
@@ -284,27 +308,22 @@ body{background:#f6f7f9;color:#222631;min-height:100vh}
 
 <script>
 // 학생 데이터
-var ITEMS_NEW  = {standards:true, rubric:true, score:true, teacher:true, inst_ground:true,  inst_feedback:true,  elem_ground:true,  elem_feedback:true};
-var ITEMS_OLD  = {standards:true, rubric:true, score:true, teacher:true, inst_ground:false, inst_feedback:false, elem_ground:false, elem_feedback:false};
-var ITEMS_NONE = {standards:false,rubric:false,score:false,teacher:false,inst_ground:false, inst_feedback:false, elem_ground:false, elem_feedback:false};
+var ITEMS_NEW  = {standards:true, rubric:true, score:true, teacher:true, inst_ground:true,  inst_feedback:true,  elem_ground:true,  elem_feedback_analysis:true, elem_feedback_rubric:true};
+var ITEMS_OLD  = {standards:true, rubric:true, score:true, teacher:true, inst_ground:false, inst_feedback:false, elem_ground:false, elem_feedback_analysis:false, elem_feedback_rubric:false};
+var ITEMS_NONE = {standards:false,rubric:false,score:false,teacher:false,inst_ground:false, inst_feedback:false, elem_ground:false, elem_feedback_analysis:false, elem_feedback_rubric:false};
 
 var STUDENTS = [
   {id:'10101', name:'김피드백', status:'완료',     items:ITEMS_NEW},
-  {id:'10102', name:'김채점',   status:'완료',     items:ITEMS_NEW},
   {id:'10103', name:'미제출',   status:'미제출',   items:ITEMS_NONE},
   {id:'10104', name:'채점전',   status:'미채점',   items:ITEMS_NONE},
   {id:'10105', name:'채점실패', status:'채점 실패', items:ITEMS_NONE},
-  {id:'10106', name:'이전채점', status:'완료',     items:ITEMS_OLD},
-  {id:'10107', name:'김현재',   status:'완료',     items:ITEMS_OLD},
-  {id:'10108', name:'인라인',   status:'완료',     items:ITEMS_NEW},
-  {id:'10109', name:'한가람',   status:'미채점',   items:ITEMS_NONE},
-  {id:'10110', name:'오세훈',   status:'미채점',   items:ITEMS_NONE}
+  {id:'10106', name:'이전채점', status:'완료',     items:ITEMS_OLD}
 ];
 
 var DEMO_MODE = 'mixed';
-var MIXED_OLD_NAMES = ['이전채점','김현재'];
+var MIXED_OLD_NAMES = ['이전채점'];
 
-var BULK_OPTS = {standards:true, rubric:true, score:true, teacher:true, inst_ground:true, inst_feedback:true, elem_ground:false, elem_feedback:false};
+var BULK_OPTS = {standards:true, rubric:true, score:true, teacher:true, inst_ground:true, inst_feedback:true, elem_ground:false, elem_feedback_analysis:false, elem_feedback_rubric:false};
 
 function applyDemoMode(){
   STUDENTS.forEach(function(s){
@@ -346,7 +365,7 @@ function sendPreviewOpts(){
   var s = STUDENTS.find(function(x){ return x.id === sel.value; });
   // 학생의 items와 BULK_OPTS의 교집합만 노출 (없는 데이터는 무조건 hide)
   var opts = {};
-  ['standards','rubric','score','teacher','inst_ground','inst_feedback','elem_ground','elem_feedback'].forEach(function(k){
+  ['standards','rubric','score','teacher','inst_ground','inst_feedback','elem_ground','elem_feedback_analysis','elem_feedback_rubric'].forEach(function(k){
     opts[k] = s ? (s.items[k] && BULK_OPTS[k]) : false;
   });
   opts.answer = false; // PDF 출력에서는 과제물(내가 쓴 답) 미표시

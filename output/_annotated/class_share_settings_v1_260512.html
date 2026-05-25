@@ -1,0 +1,1380 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>1학년 1반 클리포에서 결과 확인 | CLIPO</title>
+<link rel="icon" type="image/svg+xml" href="clipo_favicon_elem.svg">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard-gov.min.css">
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<style>
+*{font-family:'Pretendard GOV',-apple-system,sans-serif;box-sizing:border-box;margin:0;padding:0}
+body{background:#f6f7f9;color:#222631;min-height:100vh}
+
+/* 헤더 */
+.global-header{height:56px;background:#fff;display:flex;align-items:center;justify-content:space-between;position:fixed;top:0;left:0;right:0;z-index:210;padding:0 20px 0 8px;border-bottom:1px solid #f1f3f5}
+.gh-left{display:flex;align-items:center;gap:8px}
+.gh-menu-btn{width:40px;height:40px;display:inline-flex;align-items:center;justify-content:center;border:none;background:none;cursor:pointer;color:#3b3f4c;border-radius:4px}
+.gh-menu-btn:hover{background:#f6f7f9}
+.gh-product-tag{display:inline-flex;align-items:center;height:18px;margin-left:12px;padding-left:12px;border-left:1px solid #e5e7eb;color:#6d7381;font-size:14px;font-weight:600;line-height:1}
+.gh-right{display:flex;align-items:center;gap:12px;padding-right:12px}
+.gh-plan{display:inline-flex;align-items:center;height:22px;padding:0 10px;border-radius:100px;background:#e9f2ff;border:1px solid #ccdfff;font-size:12px;font-weight:500;color:#3151c4;line-height:1}
+.gh-dday{font-size:14px;font-weight:500;color:#6d7381;line-height:1}
+.gh-credit{display:inline-flex;align-items:center;gap:6px;font-size:14px;font-weight:500;color:#3b3f4c;line-height:1}
+.gh-sep{width:0;height:14px;border-left:1px solid #dde1e8}
+.gh-user{display:inline-flex;align-items:center;gap:3px;font-size:14px;font-weight:500;color:#3b3f4c;cursor:pointer;border:none;background:none;padding:0;line-height:1}
+.gh-user:hover{color:#365eef}
+
+.sub-nav{height:54px;background:#fff;border-bottom:1px solid #dde1e8;display:flex;align-items:flex-end;padding:0 24px;position:fixed;top:56px;left:0;right:0;z-index:205}
+.sub-nav-item{position:relative;display:inline-flex;align-items:center;justify-content:center;height:54px;padding:0 16px;font-size:15px;font-weight:500;color:#6d7381;cursor:pointer;text-decoration:none;line-height:1;background:none;border:none;font-family:inherit}
+.sub-nav-item:hover{color:#222631}
+.sub-nav-item.active{color:#365eef;font-weight:600}
+.sub-nav-item.active::after{content:"";position:absolute;left:12px;right:12px;bottom:-1px;height:2px;background:#365eef;border-radius:2px 2px 0 0}
+
+.sidebar{position:fixed;top:110px;left:0;bottom:0;width:56px;background:#fff;border-right:1px solid #dde1e8;display:flex;flex-direction:column;align-items:center;padding:8px 0;z-index:100;gap:4px}
+.sb-item{width:40px;height:40px;display:inline-flex;align-items:center;justify-content:center;border-radius:6px;color:#6d7381;cursor:pointer;border:none;background:none}
+.sb-item:hover{background:#f6f7f9;color:#3b3f4c}
+.sb-item.active{background:#e9f2ff;color:#365eef}
+
+.main{margin-left:56px;margin-top:110px;padding:24px;display:flex;justify-content:center}
+.container{width:100%;max-width:1248px;display:flex;flex-direction:column;gap:20px}
+
+/* 페이지 헤더 */
+.page-header{display:flex;flex-direction:column;gap:8px}
+.btn-back{display:inline-flex;align-items:center;gap:4px;font-size:15px;font-weight:500;color:#3b3f4c;background:none;border:none;cursor:pointer;padding:0;line-height:1;font-family:inherit;align-self:flex-start;margin-bottom:6px}
+.btn-back:hover{color:#222631}
+.page-title{font-size:22px;font-weight:700;color:#222631;line-height:1.3}
+.page-desc{font-size:14px;color:#3b3f4c;line-height:1.55}
+
+/* 카드 공통 */
+.card{background:#fff;border:1px solid #eaecf0;border-radius:14px;padding:24px;display:flex;flex-direction:column;gap:16px}
+.card-hd{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+.card-hd-left{flex:1;display:flex;flex-direction:column;gap:4px;min-width:0}
+.card-title{font-size:18px;font-weight:700;color:#222631;line-height:1.3}
+.card-desc{font-size:13px;color:#6d7381;line-height:1.55}
+.card-count-badge{display:inline-flex;align-items:center;height:24px;padding:0 10px;border-radius:100px;background:#e9f2ff;color:#3151c4;font-size:13px;font-weight:600;line-height:1;flex-shrink:0}
+
+/* 학생 테이블 */
+.student-table{width:100%;border-collapse:collapse;table-layout:fixed}
+.student-table thead th{background:#f6f7f9;font-size:13px;font-weight:700;color:#3b3f4c;text-align:center;padding:10px 8px;height:44px;border-bottom:1px solid #dde1e8}
+.student-table tbody td{padding:12px 8px;font-size:13px;color:#3b3f4c;line-height:1.4;text-align:center;border-bottom:1px solid #eaecf0;vertical-align:middle}
+.student-table tbody tr:last-child td{border-bottom:none}
+.student-table tbody tr.disabled td{color:#cbd0d8;background:#fafbfc}
+.col-check{width:44px}
+.col-id{width:70px}
+.col-name{width:80px;text-align:left;padding-left:14px;font-weight:600}
+.col-item{width:74px;font-size:12px}
+.col-item.col-elem-feedback{width:120px}
+.col-period{width:170px;font-size:12px}
+.col-state{width:90px;font-weight:600}
+.student-table thead th.col-item{font-size:12px;padding:8px 4px;line-height:1.25}
+
+/* 체크박스 */
+.tbl-checkbox{display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border:2px solid #dde1e8;border-radius:5px;background:#fff;color:#fff;cursor:pointer;transition:all .12s}
+.tbl-checkbox.checked{background:#365eef;border-color:#365eef}
+.tbl-checkbox.disabled{background:#f6f7f9;border-color:#e5e7eb;cursor:not-allowed;opacity:.6}
+.tbl-checkbox.disabled.checked{background:#cbd0d8;border-color:#cbd0d8}
+.item-mark{color:#365eef;font-weight:700}
+.disabled .item-mark{color:#cbd0d8}
+.dash{color:#cbd0d8}
+.state-pub{color:#16a34a;font-weight:700;font-size:12px}
+.state-soon{color:#9ca3af;font-weight:600;font-size:12px}
+.state-expired{color:#dc2626;font-weight:600;font-size:12px}
+
+/* 공개 설정 변경 */
+.bulk-opts{display:flex;flex-wrap:wrap;gap:12px;align-items:center}
+.opt-checkbox{display:inline-flex;align-items:center;gap:8px;cursor:pointer;padding:6px 12px;border-radius:8px;transition:background .12s}
+.opt-checkbox:hover{background:#f6f7f9}
+.opt-checkbox .box{width:20px;height:20px;border:2px solid #dde1e8;border-radius:5px;background:#fff;color:#fff;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .12s}
+.opt-checkbox.checked .box{background:#365eef;border-color:#365eef}
+.opt-checkbox .lbl{font-size:14px;font-weight:500;color:#222631;line-height:1}
+
+/* 공개 기간 — 시작/종료 세로 스택 + 옆에 즉시/무기한 체크박스 */
+.period-dt-stack{display:flex;flex-direction:column;gap:14px;max-width:560px}
+.period-dt-field{display:flex;flex-direction:column;gap:6px}
+.period-dt-lbl{font-size:13px;font-weight:600;color:#6d7381;line-height:1}
+.period-dt-input-row{display:flex;align-items:center;gap:14px}
+.period-dt-input{flex:1;max-width:340px;height:40px;padding:0 12px;border:1px solid #dde1e8;border-radius:8px;font-size:14px;font-family:inherit;color:#222631;outline:none;line-height:1;background:#fff}
+.period-dt-input:focus{border-color:#365eef}
+.period-dt-input:disabled{background:#f6f7f9;color:#9ca3af;cursor:not-allowed}
+.period-dt-check{display:inline-flex;align-items:center;gap:8px;cursor:pointer;font-size:14px;font-weight:500;color:#6d7381;user-select:none;line-height:1;padding:8px 14px;border-radius:8px;transition:background .12s}
+.period-dt-check:hover{background:#f6f7f9}
+.period-dt-check .dt-check-box{width:18px;height:18px;border:2px solid #dde1e8;border-radius:4px;display:inline-flex;align-items:center;justify-content:center;background:#fff;color:#fff;transition:all .12s;flex-shrink:0}
+.period-dt-check.checked{color:#365eef;font-weight:700}
+.period-dt-check.checked .dt-check-box{background:#365eef;border-color:#365eef}
+
+/* 푸터 액션 */
+.footer-actions{display:flex;justify-content:flex-end;gap:8px;padding:8px 0}
+.btn-action{display:inline-flex;align-items:center;justify-content:center;gap:6px;height:44px;padding:0 18px;border-radius:100px;font-size:15px;font-weight:600;cursor:pointer;font-family:inherit;line-height:1}
+.btn-preview{background:#fff;border:1px solid #ccdfff;color:#3151c4}
+.btn-preview:hover{background:#f4f8ff;border-color:#a3c3ff}
+.btn-save{background:#365eef;border:1px solid #365eef;color:#fff}
+.btn-save:hover{background:#3151c4;border-color:#3151c4}
+.state-cancelled{color:#dc2626;font-weight:600;font-size:12px}
+
+/* ══════ 모달 ══════ */
+.modal-overlay{position:fixed;inset:0;background:rgba(34,38,49,.5);display:none;align-items:center;justify-content:center;z-index:1000;padding:24px}
+.modal-overlay.show{display:flex}
+.modal{background:#fff;border-radius:16px;max-width:520px;width:100%;max-height:calc(100vh - 48px);display:flex;flex-direction:column;overflow:hidden;box-shadow:0 12px 40px rgba(0,0,0,.18)}
+
+/* ══════ 미리보기 모달 ══════ */
+.modal.preview-modal{width:98vw;max-width:1640px;height:94vh;max-height:980px;max-width:1640px}
+.preview-body{flex:1;min-height:0;display:flex;flex-direction:row;padding:16px;background:#f6f7f9;gap:16px;overflow:hidden}
+.preview-settings{width:360px;flex-shrink:0;display:flex;flex-direction:column;gap:12px;background:#fff;border-radius:12px;border:1px solid #eaecf0;padding:16px;overflow-y:auto}
+.preview-settings .modal-section-lbl{font-size:13px;font-weight:700;color:#222631;line-height:1.4;margin-bottom:4px}
+.preview-settings-hint{font-size:12px;color:#6d7381;line-height:1.5}
+.preview-preview-wrap{flex:1;min-width:0;display:flex;flex-direction:column;gap:10px}
+.preview-frame-lbl{font-size:13px;font-weight:600;color:#6d7381;display:flex;align-items:center;gap:6px;line-height:1}
+.preview-frame{flex:1;width:100%;border:0;border-radius:10px;background:#fff;box-shadow:0 1px 4px rgba(0,0,0,.06)}
+.preview-opt-list{display:flex;flex-direction:column;gap:8px}
+.preview-opt-list .checkbox-row{display:flex;align-items:center;gap:8px;padding:10px 12px;border-radius:10px;border:1px solid #eaecf0;background:#fff;width:100%;cursor:pointer;transition:border-color .12s,background .12s}
+.preview-opt-list .checkbox-row:hover{border-color:#a3c3ff;background:#fafbff}
+.preview-opt-list .checkbox-row.checked{border-color:#a3c3ff;background:#f4f8ff}
+.preview-opt-list .checkbox-row .checkbox-box{width:18px;height:18px;border:2px solid #dde1e8;border-radius:5px;background:#fff;color:#fff;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .12s}
+.preview-opt-list .checkbox-row.checked .checkbox-box{background:#365eef;border-color:#365eef}
+.preview-opt-list .checkbox-text{font-size:14px;color:#222631;font-weight:500}
+@media (max-width:900px){
+  .preview-body{flex-direction:column}
+  .preview-settings{width:100%;max-height:36%}
+}
+.modal-hd{display:flex;align-items:center;justify-content:space-between;padding:20px 24px;border-bottom:1px solid #eaecf0;flex-shrink:0}
+.modal-title{font-size:18px;font-weight:700;color:#222631;line-height:1.3}
+.modal-close{width:32px;height:32px;display:inline-flex;align-items:center;justify-content:center;border:none;background:none;cursor:pointer;color:#6d7381;border-radius:100px}
+.modal-close:hover{background:#f6f7f9;color:#222631}
+.modal-body{padding:20px 24px;overflow-y:auto;display:flex;flex-direction:column;gap:14px}
+.modal-ft{display:flex;justify-content:flex-end;align-items:center;padding:16px 24px;border-top:1px solid #eaecf0;gap:8px;flex-shrink:0;background:#f9fafb}
+.btn-modal-cancel{display:inline-flex;align-items:center;justify-content:center;height:40px;padding:0 18px;border-radius:100px;background:#fff;border:1px solid #dde1e8;color:#3b3f4c;font-size:15px;font-weight:600;cursor:pointer;font-family:inherit;line-height:1}
+.btn-modal-cancel:hover{border-color:#a3c3ff;color:#365eef}
+.btn-modal-save{display:inline-flex;align-items:center;justify-content:center;gap:6px;height:40px;padding:0 18px;border-radius:100px;background:#365eef;border:none;color:#fff;font-size:15px;font-weight:600;cursor:pointer;font-family:inherit;line-height:1}
+.btn-modal-save.danger{background:#dc2626}
+.btn-modal-save.danger:hover{background:#b91c1c}
+.alert-warning{display:flex;align-items:flex-start;gap:10px;padding:14px 16px;border-radius:10px;background:#fff5f5;border-left:3px solid #dc2626}
+.alert-warning i{color:#dc2626;flex-shrink:0;margin-top:1px}
+.alert-warning-text{font-size:14px;color:#3b3f4c;line-height:1.6}
+.alert-warning-text strong{color:#dc2626;font-weight:700}
+.alert-info{display:flex;align-items:flex-start;gap:10px;padding:14px 16px;border-radius:10px;background:#f4f8ff;border-left:3px solid #365eef}
+.alert-info i{color:#365eef;flex-shrink:0;margin-top:1px}
+.alert-info-text{font-size:14px;color:#3b3f4c;line-height:1.6}
+.alert-info-text strong{color:#3151c4;font-weight:700}
+.modal-body p{font-size:14px;color:#3b3f4c;line-height:1.55;margin:0}
+.checkbox-row-modal{display:inline-flex;align-items:center;gap:8px;cursor:pointer;user-select:none;padding:4px 0}
+.checkbox-row-modal .box{width:18px;height:18px;border:2px solid #dde1e8;border-radius:4px;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;background:#fff;color:#fff;transition:all .12s}
+.checkbox-row-modal.checked .box{background:#365eef;border-color:#365eef}
+.checkbox-row-modal-text{font-size:14px;color:#3b3f4c;line-height:1.4}
+
+/* 데모 모드 스위처 (우측 하단) */
+.demo-mode-switcher{position:fixed;bottom:18px;right:18px;display:inline-flex;align-items:center;gap:4px;padding:6px 8px;background:#1f2937;color:#e5e7eb;border-radius:100px;font-family:'Pretendard GOV',inherit;z-index:500;box-shadow:0 4px 20px rgba(0,0,0,.25);cursor:move;user-select:none}
+.demo-mode-switcher.dragging{box-shadow:0 8px 32px rgba(0,0,0,.45);opacity:.95}
+.demo-mode-label{font-size:10px;font-weight:800;letter-spacing:.08em;color:#9ca3af;padding:0 8px 0 6px}
+.demo-mode-btn{display:inline-flex;align-items:center;justify-content:center;height:26px;padding:0 12px;border-radius:100px;background:transparent;border:none;color:#9ca3af;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;line-height:1;transition:all .15s}
+.demo-mode-btn:hover{color:#fff}
+.demo-mode-btn.active{background:#3b82f6;color:#fff}
+
+/* 토스트 */
+.toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(12px);padding:14px 22px;border-radius:100px;font-size:15px;font-weight:500;line-height:1.4;box-shadow:0 4px 12px rgba(0,0,0,.15);opacity:0;transition:all .25s;z-index:900;pointer-events:none;display:flex;align-items:center;gap:10px;min-width:280px}
+
+/* ══════ 어노테이션 시스템 ══════ */
+[data-note]{position:relative}
+.note-pin{display:inline-flex;align-items:center;justify-content:center;position:absolute;top:0;right:0;transform:translate(50%,-50%);width:18px;height:18px;border-radius:50%;background:#ec4899;color:#fff;font-size:10px;font-weight:800;line-height:1;cursor:grab;box-shadow:0 1px 4px rgba(236,72,153,.35);z-index:1600;border:1.5px solid #fff;transition:all .15s;font-family:inherit;user-select:none;touch-action:none;opacity:.55}
+.note-pin:hover{opacity:1;width:22px;height:22px;font-size:12px;box-shadow:0 4px 12px rgba(236,72,153,.6);background:#db2777;border-width:2px}
+.note-pin.active{opacity:1;width:22px;height:22px;font-size:12px;background:#be185d;box-shadow:0 0 0 3px rgba(236,72,153,.25),0 4px 12px rgba(236,72,153,.6);border-width:2px;z-index:1400}
+.note-pin.dragging{cursor:grabbing;opacity:.95;z-index:1200;width:22px;height:22px;font-size:12px;border-width:2px}
+body.show-notes .note-pin{opacity:1;width:22px;height:22px;font-size:12px;box-shadow:0 2px 8px rgba(236,72,153,.5);border-width:2px}
+.note-popover{position:absolute;z-index:1500;width:360px;background:#fff;border:1px solid #fbcfe8;border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.15);padding:12px 14px;font-size:13px;color:#3b3f4c;line-height:1.55;display:none;text-align:left}
+.note-popover.show{display:block}
+.note-popover-hd{display:flex;align-items:center;justify-content:space-between;gap:6px;margin-bottom:8px;padding-bottom:8px;border-bottom:1px solid #f1f3f5;cursor:move;user-select:none;touch-action:none}
+.note-popover-num{display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:50%;background:#ec4899;color:#fff;font-size:12px;font-weight:800;line-height:1}
+.note-popover-actions{display:inline-flex;align-items:center;gap:2px;margin-left:auto}
+.note-popover-action{width:24px;height:24px;display:inline-flex;align-items:center;justify-content:center;border:none;background:none;cursor:pointer;color:#6d7381;border-radius:6px;font-family:inherit;font-size:13px;line-height:1}
+.note-popover-action:hover{background:#f6f7f9;color:#3b3f4c}
+.note-popover-action.danger:hover{background:#fee2e2;color:#dc2626}
+.note-popover-body{font-size:13px;color:#3b3f4c;line-height:1.6;white-space:pre-wrap;word-break:break-word}
+.note-popover-textarea{width:100%;min-height:84px;max-height:420px;padding:10px 12px;border:1px solid #dde1e8;border-radius:8px;font-size:13px;color:#3b3f4c;line-height:1.6;font-family:inherit;resize:none;outline:none;box-sizing:border-box;overflow-y:auto;white-space:pre-wrap;word-break:break-word}
+.note-popover-textarea:focus{border-color:#365eef}
+.note-popover-edit-actions{display:flex;justify-content:flex-end;gap:6px;margin-top:8px}
+.note-popover-toolbar{display:flex;gap:4px;margin-bottom:6px;align-items:center}
+.note-popover-tool-btn{display:inline-flex;align-items:center;justify-content:center;width:28px;height:24px;border:1px solid #dde1e8;border-radius:5px;background:#fff;color:#3b3f4c;font-size:13px;font-weight:800;cursor:pointer;font-family:inherit;line-height:1}
+.note-popover-tool-btn:hover{background:#f6f7f9;border-color:#a3c3ff;color:#365eef}
+.note-popover-body strong{font-weight:800;color:#222631}
+.note-popover-btn{display:inline-flex;align-items:center;justify-content:center;height:28px;padding:0 12px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;line-height:1;border:1px solid #dde1e8;background:#fff;color:#3b3f4c}
+.note-popover-btn:hover{background:#f6f7f9}
+.note-popover-btn.primary{background:#365eef;border-color:#365eef;color:#fff}
+.note-popover-btn.primary:hover{background:#3151c4}
+body.note-add-mode *{cursor:crosshair !important}
+.notes-fab-wrap{position:fixed;bottom:18px;right:200px;z-index:500}
+.notes-toggle{display:inline-flex;align-items:center;gap:6px;height:40px;padding:0 16px;border-radius:100px;background:#1f2937;color:#e5e7eb;border:none;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;line-height:1;box-shadow:0 4px 20px rgba(0,0,0,.25)}
+.notes-toggle:hover{background:#374151;color:#fff}
+.notes-toggle.active{background:#ec4899;color:#fff}
+.notes-toggle .notes-toggle-count{display:inline-flex;align-items:center;justify-content:center;height:18px;min-width:18px;padding:0 6px;border-radius:100px;background:rgba(255,255,255,.2);color:#fff;font-size:11px;font-weight:700;line-height:1;margin-left:2px}
+.notes-toggle .notes-toggle-chev{margin-left:2px;opacity:.7;transition:transform .15s}
+.notes-fab-wrap.menu-open .notes-toggle-chev{transform:rotate(180deg)}
+.notes-menu{position:absolute;bottom:48px;right:0;min-width:200px;background:#fff;border:1px solid #eaecf0;border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.18);padding:6px;display:none;flex-direction:column}
+.notes-fab-wrap.menu-open .notes-menu{display:flex}
+.notes-menu-item{display:inline-flex;align-items:center;gap:8px;height:36px;padding:0 12px;border-radius:6px;background:none;border:none;cursor:pointer;font-family:inherit;font-size:13px;font-weight:500;color:#3b3f4c;line-height:1;text-align:left;white-space:nowrap}
+.notes-menu-item:hover{background:#f6f7f9;color:#222631}
+.notes-menu-item.danger{color:#b91c1c}
+.notes-menu-item.danger:hover{background:#fef2f2;color:#dc2626}
+.notes-menu-item .notes-menu-check{display:inline-flex;width:16px;height:16px;align-items:center;justify-content:center;color:#ec4899;font-weight:800;flex-shrink:0}
+.notes-menu-divider{height:1px;background:#f1f3f5;margin:4px 6px}
+.notes-menu-item-primary{background:#eef3ff;color:#365eef;font-weight:700;margin-bottom:4px}
+.notes-menu-item-primary:hover{background:#dce6ff;color:#3151c4}
+.notes-menu-item-primary .notes-menu-check{color:#365eef}
+.notes-fab-wrap{position:fixed;bottom:18px;right:18px;z-index:500}
+.notes-fab-drag{display:none;position:absolute;left:-30px;top:50%;transform:translateY(-50%);width:24px;height:24px;border-radius:50%;background:#1f2937;color:#fff;align-items:center;justify-content:center;cursor:grab;font-size:14px;font-weight:800;box-shadow:0 4px 12px rgba(0,0,0,.25);user-select:none;touch-action:none}
+.notes-fab-wrap:hover .notes-fab-drag,.notes-fab-wrap.dragging .notes-fab-drag{display:inline-flex}
+.notes-fab-wrap.dragging .notes-fab-drag{cursor:grabbing;background:#ec4899}
+.notes-fab-wrap.has-unsaved .notes-toggle{position:relative}
+.notes-fab-wrap.has-unsaved .notes-toggle::after{content:'';position:absolute;top:-4px;right:-4px;width:14px;height:14px;border-radius:50%;background:#ef4444;border:2px solid #fff;animation:notesPulse 1.6s ease-in-out infinite}
+.notes-fab-wrap.has-unsaved .notes-toggle::before{content:'⚠️ 미백업';position:absolute;bottom:48px;right:0;padding:4px 10px;background:#ef4444;color:#fff;font-size:11px;font-weight:700;border-radius:100px;white-space:nowrap;box-shadow:0 2px 8px rgba(239,68,68,.4);pointer-events:none}
+@keyframes notesPulse{0%,100%{box-shadow:0 0 0 0 rgba(239,68,68,.5)}50%{box-shadow:0 0 0 6px rgba(239,68,68,0)}}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.toast.success{background:#319d64;color:#fff}
+.toast.loading{background:#365eef;color:#fff}
+
+/* 반응형 */
+@media (max-width:960px){
+  .main{padding:18px 14px}
+  .page-title{font-size:20px}
+}
+@media (max-width:720px){
+  .global-header{height:52px;padding:0 12px 0 4px}
+  .gh-product-tag{margin-left:8px;padding-left:8px;font-size:13px}
+  .gh-plan,.gh-dday,.gh-credit,.gh-sep{display:none}
+  .gh-user{font-size:13px}
+  .sub-nav{top:52px;height:48px;padding:0 12px}
+  .sub-nav-item{padding:0 10px;font-size:14px;height:48px}
+  .sidebar{top:100px;width:48px}
+  .sb-item{width:36px;height:36px}
+  .main{margin-left:48px;margin-top:100px;padding:14px 10px}
+  .container{gap:14px}
+  .page-title{font-size:18px}
+  .card{padding:18px;border-radius:12px}
+  .card-title{font-size:16px}
+  .student-table{min-width:1100px}
+  .footer-actions{flex-direction:column;align-items:stretch}
+  .btn-action{width:100%}
+  .period-dt-input-row{flex-wrap:wrap;gap:8px}
+  .period-dt-input{max-width:none}
+  .demo-mode-switcher{bottom:12px;right:12px;padding:4px 6px}
+  .demo-mode-btn{height:24px;padding:0 10px;font-size:11px}
+  .demo-mode-label{font-size:9px;padding:0 4px}
+  .modal{max-width:calc(100vw - 32px)}
+}
+@media (max-width:420px){
+  .sidebar{display:none}
+  .main{margin-left:0;padding:12px 10px}
+  .gh-menu-btn{width:36px;height:36px}
+  .page-title{font-size:17px}
+}
+</style>
+</head>
+<body>
+
+<!-- 헤더 -->
+<div class="global-header">
+  <div class="gh-left">
+    <button class="gh-menu-btn"><i data-lucide="menu" style="width:24px;height:24px"></i></button>
+    <a class="gh-logo" href="#" aria-label="CLIPO">
+      <svg width="76" height="16" viewBox="0 0 76 16" fill="none"><path d="M11.3613 4.03516H4.09668V11.9629H8.88281L8.88086 11.9648H15.6016V16H4.02539C1.80242 15.9998 0 14.223 0 12.0322V3.96777C0 1.77696 1.80242 0.000177874 4.02539 0H15.4561L11.3613 4.03516ZM22.0703 11.9648H33.5781V16H22.002C19.7788 16 17.9756 14.2231 17.9756 12.0322V0H22.0703V11.9648ZM40.0459 16H35.9521V0H40.0459V16ZM54.5381 0C56.4564 0 58.0138 1.53228 58.0186 3.42285L58.0166 3.4248V8.54297C58.014 10.4333 56.4567 11.9648 54.5361 11.9648H46.5107L42.416 16V0H54.5381ZM71.9746 0C74.0086 0.000134956 75.6887 1.49046 75.958 3.42285H76V12.5771H75.958C75.6887 14.5095 74.011 15.9999 71.9746 16H64.4238C62.3897 16 60.7098 14.5096 60.4404 12.5771C60.4145 12.398 60.3984 12.2184 60.3984 12.0322V3.96777C60.3984 3.78159 60.4145 3.60205 60.4404 3.42285C60.7098 1.49037 62.3873 0 64.4238 0H71.9746ZM64.4922 12.5771H71.9062V3.42285H64.4922V12.5771ZM46.5107 3.42285V8.54004H53.9238V3.42285H46.5107Z" fill="#365EEF"/></svg>
+    </a>
+    <span class="gh-product-tag">초등</span>
+  </div>
+  <div class="gh-right">
+    <span class="gh-plan">개인 유료</span>
+    <span class="gh-dday">D-30</span>
+    <span class="gh-credit"><i data-lucide="bot" style="width:20px;height:20px"></i>AI 크레딧 900</span>
+    <div class="gh-sep"></div>
+    <button class="gh-user">홍길동 선생님(대표교사)<i data-lucide="chevron-down" style="width:22px;height:22px"></i></button>
+  </div>
+</div>
+
+<nav class="sub-nav">
+  <button class="sub-nav-item">수업 홈</button>
+  <button class="sub-nav-item">수행평가 설계</button>
+  <button class="sub-nav-item">과제물 관리</button>
+  <button class="sub-nav-item active">수행평가 채점</button>
+  <button class="sub-nav-item">세부능력 및 특기사항 지원</button>
+</nav>
+
+<aside class="sidebar">
+  <button class="sb-item" title="홈"><i data-lucide="home" style="width:20px;height:20px"></i></button>
+  <button class="sb-item" title="평가계획"><i data-lucide="scissors" style="width:20px;height:20px"></i></button>
+  <button class="sb-item active" title="수업"><i data-lucide="layout-grid" style="width:20px;height:20px"></i></button>
+  <button class="sb-item" title="창의적 체험활동"><i data-lucide="notebook-pen" style="width:20px;height:20px"></i></button>
+  <button class="sb-item" title="리포트"><i data-lucide="bar-chart-2" style="width:20px;height:20px"></i></button>
+</aside>
+
+<main class="main">
+  <div class="container">
+
+    <div class="page-header">
+      <button class="btn-back" onclick="history.back()">
+        <i data-lucide="chevron-left" style="width:18px;height:18px"></i>이전으로
+      </button>
+      <h1 class="page-title">1학년 1반 클리포에서 결과 확인</h1>
+      <p class="page-desc">공유할 학생, 공개 항목, 공개 기간을 설정하고 저장하면 학생이 바로 확인할 수 있어요.</p>
+    </div>
+
+    <!-- 공개 현황 -->
+    <section class="card" data-note-id="default-0" data-note="학급 학생별 공개 상태 표.
+• 체크박스: 채점 완료 학생만 활성. 미채점 학생은 비활성(회색)
+• 표의 '-' 항목: 해당 학생에게 데이터 없음 (예: 미제출 학생은 문항별 데이터 없음 → 자동 fallback)
+• 일괄 체크: 상단 헤더 체크박스로 전체 선택/해제 (비활성 학생 제외)
+• 공개 기간 컬럼: 학생별 다른 기간 설정 가능 (default = 학급 공통)
+• 공개 상태 컬럼: 미공개 / 공개 중 / 공개 만료 / 공개 예정 등 동적 표시">
+      <div class="card-hd">
+        <div class="card-hd-left">
+          <h2 class="card-title">공개 현황</h2>
+          <p class="card-desc">채점이 완료된 학생만 선택할 수 있어요. 미채점 학생은 채점 후 추가 공유할 수 있어요. 표의 '-' 항목은 해당 학생에게 데이터가 없어 공개할 수 없는 항목이에요.</p>
+        </div>
+        <span class="card-count-badge" id="selectedCountBadge">5명 / 10명</span>
+      </div>
+      <div style="overflow-x:auto">
+      <table class="student-table">
+        <thead>
+          <tr>
+            <th class="col-check"><span class="tbl-checkbox" id="headerCheck" onclick="toggleAll(this)"><i data-lucide="check" style="width:13px;height:13px"></i></span></th>
+            <th class="col-id">학번</th>
+            <th class="col-name" style="text-align:left;padding-left:14px">이름</th>
+            <th class="col-item">성취기준</th>
+            <th class="col-item">채점기준</th>
+            <th class="col-item">점수</th>
+            <th class="col-item">선생님<br>한마디</th>
+            <th class="col-item">문항별<br>근거</th>
+            <th class="col-item">문항별<br>피드백</th>
+            <th class="col-item col-elem-feedback">채점요소별 채점근거<br>(과제물 AI)</th>
+            <th class="col-item col-elem-feedback">채점요소별<br>피드백 (과제물 AI)</th>
+            <th class="col-item col-elem-feedback">채점요소별<br>피드백 (루브릭 AI)</th>
+            <th class="col-period">공개 기간</th>
+            <th class="col-state">공개 상태</th>
+          </tr>
+        </thead>
+        <tbody id="studentTbody"></tbody>
+      </table>
+      </div>
+    </section>
+
+    <!-- 공개 설정 변경 -->
+    <section class="card" data-note-id="default-1" data-note="일괄 공개 항목 설정.
+• 9개 항목을 선택한 학생들에게 일괄 ON/OFF
+• 학생별 데이터 유무는 위 표의 ✓/- 로 표시 (체크해도 데이터 없으면 미적용)
+• 채점요소별 항목 3개 (과제물 AI 근거·피드백, 루브릭 AI 피드백)은 default OFF — 선생님이 의도적으로 켜야 학생에게 노출
+• 데모 모드별 default 다름:
+  - 신규/섞임: 공통 4 + 문항별 2 = 6개 ON
+  - 기존: 공통 4개만 ON (이전 채점엔 추가 데이터 없음)">
+      <div class="card-hd">
+        <div class="card-hd-left">
+          <h2 class="card-title">공개 설정 변경</h2>
+          <p class="card-desc">위에서 선택한 <strong id="selectedCountText">5명</strong>에게 아래 항목을 일괄 적용합니다.</p>
+        </div>
+        <span class="card-count-badge" id="optCountBadge">6개 / 8개</span>
+      </div>
+      <div class="bulk-opts" id="bulkOpts">
+        <label class="opt-checkbox checked" data-key="standards" onclick="toggleBulkOpt(this)"><span class="box"><i data-lucide="check" style="width:13px;height:13px"></i></span><span class="lbl">성취기준</span></label>
+        <label class="opt-checkbox checked" data-key="rubric" onclick="toggleBulkOpt(this)"><span class="box"><i data-lucide="check" style="width:13px;height:13px"></i></span><span class="lbl">채점기준</span></label>
+        <label class="opt-checkbox checked" data-key="score" onclick="toggleBulkOpt(this)"><span class="box"><i data-lucide="check" style="width:13px;height:13px"></i></span><span class="lbl">점수</span></label>
+        <label class="opt-checkbox checked" data-key="teacher" onclick="toggleBulkOpt(this)"><span class="box"><i data-lucide="check" style="width:13px;height:13px"></i></span><span class="lbl">선생님 한마디</span></label>
+        <label class="opt-checkbox checked" data-key="inst_ground" onclick="toggleBulkOpt(this)"><span class="box"><i data-lucide="check" style="width:13px;height:13px"></i></span><span class="lbl">문항별 채점근거</span></label>
+        <label class="opt-checkbox checked" data-key="inst_feedback" onclick="toggleBulkOpt(this)"><span class="box"><i data-lucide="check" style="width:13px;height:13px"></i></span><span class="lbl">문항별 피드백</span></label>
+        <label class="opt-checkbox" data-key="elem_ground" onclick="toggleBulkOpt(this)"><span class="box"><i data-lucide="check" style="width:13px;height:13px"></i></span><span class="lbl">채점요소별 채점근거 (과제물 AI)</span></label>
+        <label class="opt-checkbox" data-key="elem_feedback_analysis" onclick="toggleBulkOpt(this)"><span class="box"><i data-lucide="check" style="width:13px;height:13px"></i></span><span class="lbl">채점요소별 피드백 (과제물 AI)</span></label>
+        <label class="opt-checkbox" data-key="elem_feedback_rubric" onclick="toggleBulkOpt(this)"><span class="box"><i data-lucide="check" style="width:13px;height:13px"></i></span><span class="lbl">채점요소별 피드백 (루브릭 AI)</span></label>
+      </div>
+    </section>
+
+    <!-- 공개 기간 -->
+    <section class="card" data-note-id="default-2" data-note="일괄 공개 기간 설정.
+• 시작일시 + '즉시' 체크박스: 체크 시 input disable, 저장 시점부터 즉시 공개
+• 종료일시 + '무기한' 체크박스: 체크 시 input disable, 종료 없음
+• 선택 학생 전원에게 동일 기간 일괄 적용
+• 학생별 다른 기간은 표의 '공개 기간' 컬럼에서 별도 수정 가능 (default = 학급 공통)
+• 종료일시가 과거이면 즉시 '공개 만료' 상태로 전환">
+      <div class="card-hd">
+        <div class="card-hd-left">
+          <h2 class="card-title">공개 기간</h2>
+          <p class="card-desc">위에서 선택한 <strong id="selectedCountText2">5명</strong>에게 아래 공개 기간을 일괄 적용합니다.</p>
+        </div>
+      </div>
+      <div class="period-dt-stack">
+        <div class="period-dt-field">
+          <span class="period-dt-lbl">시작일시</span>
+          <div class="period-dt-input-row">
+            <input type="datetime-local" class="period-dt-input" id="periodStart" disabled value="">
+            <label class="period-dt-check checked" id="periodNowCheck" onclick="toggleNow(this)">
+              <span class="dt-check-box"><i data-lucide="check" style="width:13px;height:13px"></i></span>
+              <span>즉시</span>
+            </label>
+          </div>
+        </div>
+        <div class="period-dt-field">
+          <span class="period-dt-lbl">종료일시</span>
+          <div class="period-dt-input-row">
+            <input type="datetime-local" class="period-dt-input" id="periodEnd" disabled value="">
+            <label class="period-dt-check checked" id="periodUntilCheck" onclick="toggleUntil(this)">
+              <span class="dt-check-box"><i data-lucide="check" style="width:13px;height:13px"></i></span>
+              <span>무기한</span>
+            </label>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 푸터 -->
+    <div class="footer-actions">
+      <button class="btn-action btn-preview" onclick="previewStudent()" data-note-id="default-3" data-note="학생 화면 미리보기 버튼.
+• 현재 설정으로 학생이 보게 될 화면을 모달로 표시 (실제 공개 X)
+• 모달 좌측 표시 항목 체크박스로 항목 ON/OFF 토글 가능 → postMessage로 iframe에 실시간 반영
+• 활성화 조건: 선택 학생 ≥ 1명 (선택 0명일 때는 비활성)
+• PRD '미리보기 버튼 활성화 조건' 표 참조">
+        <i data-lucide="eye" style="width:18px;height:18px"></i>학생 화면 미리보기
+      </button>
+      <button class="btn-action btn-save" onclick="saveShareSettings()" data-note-id="default-4" data-note="공유 설정 저장 버튼.
+• 저장 → 즉시 학생 화면에 반영 (학생은 새로고침/재진입 시 변경분 확인)
+• 저장 후 자동으로 학급 채점 상세 페이지로 이동
+• 저장 시 토스트 노출 ('N명에게 공개 설정이 저장됐어요')
+• 비활성 조건: 선택 학생 0명일 때 (저장할 대상 없음)">
+        <i data-lucide="check" style="width:18px;height:18px"></i>공유 설정 저장
+      </button>
+    </div>
+
+  </div>
+</main>
+
+<!-- 학생 화면 미리보기 모달 (페이지 내 표시) -->
+<div class="modal-overlay" id="previewModal" onclick="if(event.target===this)closePreviewModal()">
+  <div class="modal preview-modal">
+    <div class="modal-hd">
+      <span class="modal-title">학생 화면 미리보기</span>
+      <button class="modal-close" onclick="closePreviewModal()"><i data-lucide="x" style="width:18px;height:18px"></i></button>
+    </div>
+    <div class="preview-body">
+      <!-- 좌측: 표시 항목 체크 -->
+      <div class="preview-settings">
+        <span class="modal-section-lbl">표시 항목</span>
+        <p class="preview-settings-hint">항목을 켜고 끄면서 학생 화면을 확인해 보세요. 실제 공개는 일어나지 않아요.</p>
+        <div class="preview-opt-list">
+          <label class="checkbox-row checked" data-key="score" onclick="togglePreviewOpt(this)"><span class="checkbox-box"><i data-lucide="check" style="width:12px;height:12px"></i></span><span class="checkbox-text">점수</span></label>
+          <label class="checkbox-row checked" data-key="standards" onclick="togglePreviewOpt(this)"><span class="checkbox-box"><i data-lucide="check" style="width:12px;height:12px"></i></span><span class="checkbox-text">성취기준</span></label>
+          <label class="checkbox-row checked" data-key="inst_ground" onclick="togglePreviewOpt(this)"><span class="checkbox-box"><i data-lucide="check" style="width:12px;height:12px"></i></span><span class="checkbox-text">문항별 채점근거</span></label>
+          <label class="checkbox-row checked" data-key="inst_feedback" onclick="togglePreviewOpt(this)"><span class="checkbox-box"><i data-lucide="check" style="width:12px;height:12px"></i></span><span class="checkbox-text">문항별 피드백</span></label>
+          <label class="checkbox-row checked" data-key="rubric" onclick="togglePreviewOpt(this)"><span class="checkbox-box"><i data-lucide="check" style="width:12px;height:12px"></i></span><span class="checkbox-text">채점기준표</span></label>
+          <label class="checkbox-row checked" data-key="elem_ground" onclick="togglePreviewOpt(this)"><span class="checkbox-box"><i data-lucide="check" style="width:12px;height:12px"></i></span><span class="checkbox-text">채점요소별 채점근거 (과제물 AI)</span></label>
+          <label class="checkbox-row checked" data-key="elem_feedback_analysis" onclick="togglePreviewOpt(this)"><span class="checkbox-box"><i data-lucide="check" style="width:12px;height:12px"></i></span><span class="checkbox-text">채점요소별 피드백 (과제물 AI)</span></label>
+          <label class="checkbox-row checked" data-key="elem_feedback_rubric" onclick="togglePreviewOpt(this)"><span class="checkbox-box"><i data-lucide="check" style="width:12px;height:12px"></i></span><span class="checkbox-text">채점요소별 피드백 (루브릭 AI)</span></label>
+          <label class="checkbox-row checked" data-key="teacher" onclick="togglePreviewOpt(this)"><span class="checkbox-box"><i data-lucide="check" style="width:12px;height:12px"></i></span><span class="checkbox-text">선생님 한마디</span></label>
+        </div>
+      </div>
+      <!-- 우측: 미리보기 -->
+      <div class="preview-preview-wrap">
+        <div class="preview-frame-lbl"><i data-lucide="eye" style="width:14px;height:14px"></i>학생이 보게 될 화면 (공개되지 않습니다)</div>
+        <iframe class="preview-frame" id="previewFrame" src="" title="학생 화면 미리보기"></iframe>
+      </div>
+    </div>
+    <div class="modal-ft" style="justify-content:flex-end">
+      <div class="modal-actions">
+        <button class="btn-modal-cancel" onclick="closePreviewModal()">닫기</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 데모 모드 스위처 -->
+<div class="demo-mode-switcher" data-note-id="default-5" data-note="데모 모드 스위처 (개발/리뷰용 — 운영 배포 시 제거).
+• 신규: 모든 학생이 신규 AI 채점 데이터 보유 (9개 항목 全 데이터 ✓)
+• 섞임: 일부 학생(이전채점)은 기존 채점 데이터 (공통 4개만), 나머지는 신규
+• 기존: 모든 학생이 이전 채점 (공통 4개만 데이터 보유, 추가 5개는 '-')
+• default = 섞임 (가장 현실적인 케이스)
+• 모드 전환 시 표·일괄 옵션 체크박스 default 모두 재계산">
+  <span class="demo-mode-label">DEMO</span>
+  <button class="demo-mode-btn" data-mode="new" onclick="setDemoMode(this)">신규</button>
+  <button class="demo-mode-btn active" data-mode="mixed" onclick="setDemoMode(this)">섞임</button>
+  <button class="demo-mode-btn" data-mode="old" onclick="setDemoMode(this)">기존</button>
+</div>
+<script>
+(function(){
+  var bar=document.querySelector('.demo-mode-switcher');if(!bar)return;
+  var d=false,sx=0,sy=0,sl=0,st=0;
+  bar.addEventListener('mousedown',function(e){
+    if(e.target.closest('.demo-mode-btn'))return;
+    var r=bar.getBoundingClientRect();
+    sl=r.left;st=r.top;sx=e.clientX;sy=e.clientY;d=true;
+    bar.style.right='auto';bar.style.bottom='auto';
+    bar.style.left=sl+'px';bar.style.top=st+'px';
+    bar.classList.add('dragging');e.preventDefault();
+  });
+  document.addEventListener('mousemove',function(e){
+    if(!d)return;
+    var nx=sl+(e.clientX-sx),ny=st+(e.clientY-sy);
+    var r=bar.getBoundingClientRect();
+    nx=Math.max(4,Math.min(innerWidth-r.width-4,nx));
+    ny=Math.max(4,Math.min(innerHeight-r.height-4,ny));
+    bar.style.left=nx+'px';bar.style.top=ny+'px';
+  });
+  document.addEventListener('mouseup',function(){if(d){d=false;bar.classList.remove('dragging');}});
+})();
+</script>
+
+<div class="toast" id="toast">
+  <i id="toastIcon" data-lucide="circle-check-big" style="width:18px;height:18px;flex-shrink:0"></i>
+  <span id="toastMsg"></span>
+</div>
+
+<script>
+// 학생 데이터 — items: 학생별 채점 데이터 보유 여부 (false면 해당 항목 없음, '-' 표시)
+// 공통 4개: standards(성취기준) / rubric(채점기준표) / score(점수) / teacher(선생님 종합 피드백)
+// 추가 4개: inst_ground(문항별 근거) / inst_feedback(문항별 피드백) / elem_ground(채점요소별 근거) / elem_feedback(채점요소별 피드백)
+// 기존 채점 학생(이전채점 v1)은 추가 4개 데이터 없음 → false
+var ITEMS_NEW  = {standards:true, rubric:true, score:true, teacher:true, inst_ground:true,  inst_feedback:true,  elem_ground:true,  elem_feedback_analysis:true, elem_feedback_rubric:true};
+var ITEMS_OLD  = {standards:true, rubric:true, score:true, teacher:true, inst_ground:false, inst_feedback:false, elem_ground:false, elem_feedback_analysis:false, elem_feedback_rubric:false};
+var ITEMS_NONE = {standards:false,rubric:false,score:false,teacher:false,inst_ground:false, inst_feedback:false, elem_ground:false, elem_feedback_analysis:false, elem_feedback_rubric:false};
+
+var STUDENTS = [
+  {id:'10101', name:'김피드백', selectable:true,  checked:true,  items:ITEMS_NEW,  period:'26.04.08 ~ 무기한',     state:'공개'},
+  {id:'10103', name:'미제출',   selectable:false, checked:false, items:ITEMS_NONE, period:'-',                    state:'미채점'},
+  {id:'10104', name:'채점전',   selectable:false, checked:false, items:ITEMS_NONE, period:'-',                    state:'미채점'},
+  {id:'10105', name:'채점실패', selectable:false, checked:false, items:ITEMS_NONE, period:'-',                    state:'미채점'},
+  {id:'10106', name:'이전채점', selectable:true,  checked:true,  items:ITEMS_OLD,  period:'26.04.08 ~ 무기한',     state:'공개'}
+];
+
+// 일괄 적용 옵션 — 8개 (채점요소별 근거·피드백은 기본 해제)
+var BULK_OPTS = {standards:true, rubric:true, score:true, teacher:true, inst_ground:true, inst_feedback:true, elem_ground:false, elem_feedback_analysis:false, elem_feedback_rubric:false};
+var BULK_OPT_KEYS = ['standards','rubric','score','teacher','inst_ground','inst_feedback','elem_ground','elem_feedback_analysis','elem_feedback_rubric'];
+
+function renderTable(){
+  var tbody = document.getElementById('studentTbody');
+  tbody.innerHTML = STUDENTS.map(function(s, i){
+    var checkClass = 'tbl-checkbox' + (s.checked ? ' checked' : '') + (s.selectable ? '' : ' disabled');
+    var rowClass = s.selectable ? '' : 'disabled';
+    // 항목 마크: 학생에게 그 항목 데이터가 있고 + 일괄 적용 옵션이 켜져있고 + 학생이 체크돼있어야 ✓
+    function itemMark(key){
+      if(!s.selectable || !s.checked) return '<span class="dash">-</span>';
+      if(!s.items[key]) return '<span class="dash">-</span>'; // 학생에게 그 항목 데이터 없음
+      return BULK_OPTS[key] ? '<span class="item-mark">✓</span>' : '<span class="dash">-</span>';
+    }
+    var stateCls = s.state === '공개' ? 'state-pub'
+                 : s.state === '공개 만료' ? 'state-expired'
+                 : s.state === '공개 취소됨' ? 'state-cancelled'
+                 : 'state-soon';
+    return '<tr class="'+rowClass+'">'
+      +'<td class="col-check"><span class="'+checkClass+'" onclick="toggleStudent('+i+',this)"><i data-lucide="check" style="width:13px;height:13px"></i></span></td>'
+      +'<td class="col-id">'+s.id+'</td>'
+      +'<td class="col-name" style="text-align:left;padding-left:14px">'+s.name+'</td>'
+      +'<td class="col-item">'+itemMark('standards')+'</td>'
+      +'<td class="col-item">'+itemMark('rubric')+'</td>'
+      +'<td class="col-item">'+itemMark('score')+'</td>'
+      +'<td class="col-item">'+itemMark('teacher')+'</td>'
+      +'<td class="col-item">'+itemMark('inst_ground')+'</td>'
+      +'<td class="col-item">'+itemMark('inst_feedback')+'</td>'
+      +'<td class="col-item col-elem-feedback">'+itemMark('elem_ground')+'</td>'
+      +'<td class="col-item col-elem-feedback">'+itemMark('elem_feedback_analysis')+'</td>'
+      +'<td class="col-item col-elem-feedback">'+itemMark('elem_feedback_rubric')+'</td>'
+      +'<td class="col-period">'+s.period+'</td>'
+      +'<td class="col-state"><span class="'+stateCls+'">'+s.state+'</span></td>'
+      +'</tr>';
+  }).join('');
+  lucide.createIcons();
+  updateCounts();
+}
+
+function toggleStudent(idx, el){
+  var s = STUDENTS[idx];
+  if(!s.selectable) return;
+  s.checked = !s.checked;
+  renderTable();
+}
+
+function toggleAll(el){
+  var allChecked = STUDENTS.filter(function(s){ return s.selectable; }).every(function(s){ return s.checked; });
+  STUDENTS.forEach(function(s){ if(s.selectable) s.checked = !allChecked; });
+  renderTable();
+}
+
+function updateCounts(){
+  var selected = STUDENTS.filter(function(s){ return s.selectable && s.checked; }).length;
+  var total = STUDENTS.length;
+  document.getElementById('selectedCountBadge').textContent = selected + '명 / ' + total + '명';
+  document.getElementById('selectedCountText').textContent = selected + '명';
+  document.getElementById('selectedCountText2').textContent = selected + '명';
+  // 헤더 체크박스
+  var hc = document.getElementById('headerCheck');
+  var selectableCount = STUDENTS.filter(function(s){ return s.selectable; }).length;
+  if(selected === selectableCount && selected > 0){
+    hc.classList.add('checked');
+  } else {
+    hc.classList.remove('checked');
+  }
+  // 옵션 카운트
+  var optChecked = BULK_OPT_KEYS.filter(function(k){ return BULK_OPTS[k]; }).length;
+  document.getElementById('optCountBadge').textContent = optChecked + '개 / 8개';
+}
+
+function toggleBulkOpt(el){
+  var key = el.getAttribute('data-key');
+  el.classList.toggle('checked');
+  BULK_OPTS[key] = el.classList.contains('checked');
+  renderTable();
+}
+
+function toggleNow(el){
+  var checked = el.classList.toggle('checked');
+  var input = document.getElementById('periodStart');
+  input.disabled = checked;
+  if(checked){
+    input.value = '';
+  } else {
+    var now = new Date();
+    now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+    input.value = now.toISOString().slice(0,16);
+  }
+}
+function toggleUntil(el){
+  var checked = el.classList.toggle('checked');
+  var input = document.getElementById('periodEnd');
+  input.disabled = checked;
+  if(checked){
+    input.value = '';
+  } else {
+    input.value = '2026-12-31T23:59';
+  }
+}
+
+function previewStudent(){
+  openPreviewModal();
+}
+
+// ══════ 학생 화면 미리보기 모달 ══════
+function openPreviewModal(){
+  var frame = document.getElementById('previewFrame');
+  if(frame && !frame.getAttribute('src')){
+    frame.setAttribute('src', 'result_student_view_v3_260512.html?preview=1');
+  }
+  document.getElementById('previewModal').classList.add('show');
+  setTimeout(sendPreviewOpts, 120);
+  lucide.createIcons();
+}
+function closePreviewModal(){ document.getElementById('previewModal').classList.remove('show'); }
+function getPreviewOpts(){
+  var opts = {};
+  document.querySelectorAll('#previewModal .preview-opt-list .checkbox-row').forEach(function(el){
+    var key = el.getAttribute('data-key');
+    if(key) opts[key] = el.classList.contains('checked');
+  });
+  return opts;
+}
+function sendPreviewOpts(){
+  var iframe = document.getElementById('previewFrame');
+  if(!iframe || !iframe.contentWindow) return;
+  iframe.contentWindow.postMessage({type:'share-opts', opts:getPreviewOpts()}, '*');
+}
+function togglePreviewOpt(el){
+  if(el.classList.contains('disabled')) return;
+  el.classList.toggle('checked');
+  sendPreviewOpts();
+}
+document.addEventListener('DOMContentLoaded', function(){
+  var prevIframe = document.getElementById('previewFrame');
+  if(prevIframe){ prevIframe.addEventListener('load', sendPreviewOpts); }
+});
+
+function saveShareSettings(){
+  var selected = STUDENTS.filter(function(s){ return s.selectable && s.checked; }).length;
+  showToast('success', selected + '명에게 공개 설정이 저장됐어요. 학생들이 바로 결과를 확인할 수 있어요.');
+  setTimeout(function(){
+    location.href = 'class_scoring_detail_v1_260512.html';
+  }, 1500);
+}
+
+var toastTimer = null;
+function showToast(type, msg){
+  if(toastTimer) clearTimeout(toastTimer);
+  var t = document.getElementById('toast');
+  var ic = document.getElementById('toastIcon');
+  var m = document.getElementById('toastMsg');
+  t.className = 'toast ' + type + ' show';
+  ic.setAttribute('data-lucide', type === 'loading' ? 'loader' : 'circle-check-big');
+  m.textContent = msg;
+  lucide.createIcons();
+  if(type !== 'loading') toastTimer = setTimeout(function(){ t.classList.remove('show'); }, 2800);
+}
+
+// ══════ 데모 모드 (신규 / 섞임 / 기존) ══════
+var DEMO_MODE = 'mixed';
+var MIXED_OLD_NAMES = ['이전채점']; // 섞임 모드에서 기존 채점으로 처리할 학생
+
+function applyDemoMode(){
+  STUDENTS.forEach(function(s){
+    if(!s.selectable){ s.items = ITEMS_NONE; return; }
+    if(DEMO_MODE === 'new') s.items = ITEMS_NEW;
+    else if(DEMO_MODE === 'old') s.items = ITEMS_OLD;
+    else s.items = MIXED_OLD_NAMES.indexOf(s.name) >= 0 ? ITEMS_OLD : ITEMS_NEW;
+  });
+
+  // 모드별 일괄 적용 옵션 디폴트
+  // - 신규/섞임: 공통 4 + 문항별 2 = 6개 ON, 채점요소별 2개 OFF
+  // - 기존: 공통 4개만 ON, 추가 4개 모두 OFF (기존 채점엔 데이터 없음)
+  if(DEMO_MODE === 'old'){
+    BULK_OPTS = {standards:true, rubric:true, score:true, teacher:true,
+                 inst_ground:false, inst_feedback:false, elem_ground:false, elem_feedback_analysis:false, elem_feedback_rubric:false};
+  } else {
+    BULK_OPTS = {standards:true, rubric:true, score:true, teacher:true,
+                 inst_ground:true, inst_feedback:true, elem_ground:false, elem_feedback_analysis:false, elem_feedback_rubric:false};
+  }
+  // UI 체크박스 동기화
+  document.querySelectorAll('#bulkOpts .opt-checkbox').forEach(function(el){
+    var key = el.getAttribute('data-key');
+    el.classList.toggle('checked', BULK_OPTS[key] === true);
+  });
+
+  renderTable();
+}
+
+function setDemoMode(btn){
+  DEMO_MODE = btn.getAttribute('data-mode');
+  document.querySelectorAll('.demo-mode-btn').forEach(function(b){ b.classList.remove('active'); });
+  btn.classList.add('active');
+  applyDemoMode();
+}
+
+applyDemoMode();
+lucide.createIcons();
+
+// ══════ 어노테이션 시스템 (통합 저장 — 모든 페이지의 어노테이션을 단일 키에 namespace로) ══════
+(function(){
+  var STORAGE_KEY = 'clipo_notes_all';
+  var PAGE_KEY = location.pathname.split('/').pop() || 'index';
+  function loadAll(){ try { return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {}; } catch(e){ return {}; } }
+  function saveAll(all){ try { localStorage.setItem(STORAGE_KEY, JSON.stringify(all)); } catch(e){} }
+  function loadFromStorage(){ return loadAll()[PAGE_KEY] || null; }
+  function saveToStorage(n){ var all = loadAll(); all[PAGE_KEY] = n; saveAll(all); }
+  (function migrate(){
+    var all = loadAll();
+    var changed = false;
+    for(var i=0; i<localStorage.length; i++){
+      var k = localStorage.key(i);
+      if(!k || k === STORAGE_KEY || k.indexOf('clipo_notes_') !== 0) continue;
+      var pk = k.replace('clipo_notes_', '');
+      try { var d = JSON.parse(localStorage.getItem(k)); if(d && !all[pk]){ all[pk] = d; changed = true; } } catch(e){}
+    }
+    if(changed) saveAll(all);
+  })();
+  function ensureNoteId(el){
+    if(!el.getAttribute('data-note-id')){
+      el.setAttribute('data-note-id', 'note-'+Math.random().toString(36).slice(2,9));
+    }
+    return el.getAttribute('data-note-id');
+  }
+  function applyStorage(){
+    var stored = loadFromStorage();
+    if(!stored) return;
+    Object.keys(stored).forEach(function(id){
+      var el = document.querySelector('[data-note-id="'+id+'"]');
+      if(!el) return;
+      if(stored[id].deleted){
+        el.removeAttribute('data-note');
+      } else if(stored[id].note){
+        el.setAttribute('data-note', stored[id].note);
+      }
+    });
+    Object.keys(stored).forEach(function(id){
+      if(stored[id].deleted) return;
+      if(!stored[id].note || stored[id].note === '새 어노테이션 — 내용을 입력하세요') return;
+      if(document.querySelector('[data-note-id="'+id+'"]')) return;
+      var target = null;
+      if(stored[id].selector && stored[id].selector !== '[data-note-id="'+id+'"]'){
+        try { target = document.querySelector(stored[id].selector); } catch(e){}
+      }
+      if(!target){
+        target = document.createElement('div');
+        target.className = 'note-orphan-anchor';
+        target.style.cssText = 'position:absolute;width:1px;height:1px;pointer-events:none';
+        if(stored[id].pos){ target.style.top = stored[id].pos.top; target.style.left = stored[id].pos.left; }
+        else { target.style.top = (100+Math.random()*200)+'px'; target.style.left = (100+Math.random()*200)+'px'; }
+        document.body.appendChild(target);
+      }
+      target.setAttribute('data-note-id', id);
+      target.setAttribute('data-note', stored[id].note);
+    });
+  }
+  function buildPins(){
+    document.querySelectorAll('.note-pin,.note-popover').forEach(function(el){ el.remove(); });
+    var nodes = document.querySelectorAll('[data-note]');
+    var stored = loadFromStorage() || {};
+    nodes.forEach(function(el, idx){
+      ensureNoteId(el);
+      var id = el.getAttribute('data-note-id');
+      var num = idx + 1;
+      var pin = document.createElement('button');
+      pin.type = 'button';
+      pin.className = 'note-pin';
+      pin.textContent = num;
+      if(stored[id] && stored[id].pos){
+        pin.style.top = stored[id].pos.top;
+        pin.style.right = 'auto';
+        pin.style.left = stored[id].pos.left;
+        pin.style.transform = 'none';
+      }
+      attachPinHandlers(pin, el, num, id);
+      el.appendChild(pin);
+    });
+    updateCount();
+    return nodes.length;
+  }
+  function attachPinHandlers(pin, targetEl, num, id){
+    var dragStart = null;
+    var moved = false;
+    pin.addEventListener('pointerdown', function(e){
+      e.stopPropagation();
+      pin.setPointerCapture(e.pointerId);
+      var rect = pin.getBoundingClientRect();
+      var hostRect = targetEl.getBoundingClientRect();
+      dragStart = {
+        startX: e.clientX, startY: e.clientY,
+        offsetLeft: rect.left - hostRect.left + rect.width/2,
+        offsetTop: rect.top - hostRect.top + rect.height/2,
+        pinW: rect.width, pinH: rect.height
+      };
+      moved = false;
+    });
+    pin.addEventListener('pointermove', function(e){
+      if(!dragStart) return;
+      var dx = e.clientX - dragStart.startX;
+      var dy = e.clientY - dragStart.startY;
+      if(Math.abs(dx) + Math.abs(dy) > 3){
+        moved = true;
+        pin.classList.add('dragging');
+        var newLeft = dragStart.offsetLeft + dx - dragStart.pinW/2;
+        var newTop = dragStart.offsetTop + dy - dragStart.pinH/2;
+        pin.style.left = newLeft + 'px';
+        pin.style.top = newTop + 'px';
+        pin.style.right = 'auto';
+        pin.style.transform = 'none';
+      }
+    });
+    pin.addEventListener('pointerup', function(e){
+      e.stopPropagation();
+      if(dragStart && pin.hasPointerCapture(e.pointerId)) pin.releasePointerCapture(e.pointerId);
+      if(moved){
+        var stored = loadFromStorage() || {};
+        stored[id] = stored[id] || {};
+        stored[id].pos = { top: pin.style.top, left: pin.style.left };
+        saveToStorage(stored);
+        pin.classList.remove('dragging');
+      } else {
+        openPopover(targetEl, num, pin);
+      }
+      dragStart = null;
+      moved = false;
+    });
+    pin.addEventListener('pointercancel', function(){
+      dragStart = null; moved = false; pin.classList.remove('dragging');
+    });
+  }
+  function updateCount(){
+    var n = document.querySelectorAll('[data-note]').length;
+    var el = document.querySelector('.notes-toggle-count');
+    if(el) el.textContent = n;
+  }
+  function closeAllPopovers(){
+    document.querySelectorAll('.note-popover').forEach(function(p){ p.remove(); });
+    document.querySelectorAll('.note-pin.active').forEach(function(p){ p.classList.remove('active'); });
+  }
+  function openPopover(targetEl, num, pinEl){
+    var alreadyOpen = pinEl.classList.contains('active');
+    closeAllPopovers();
+    if(alreadyOpen) return;
+    renderPopover(targetEl, num, pinEl, false);
+  }
+  function renderPopover(targetEl, num, pinEl, editing, keepOthers){
+    if(!keepOthers) closeAllPopovers();
+    var noteText = targetEl.getAttribute('data-note') || '';
+    var pop = document.createElement('div');
+    pop.className = 'note-popover show';
+    var bodyHtml = editing
+      ? '<div class="note-popover-toolbar"><button type="button" class="note-popover-tool-btn" data-tool="bold" title="굵게 (Ctrl+B)">B</button></div>'
+        + '<textarea class="note-popover-textarea" placeholder="어노테이션 내용을 입력하세요...">'+escHtml(noteText)+'</textarea>'
+        + '<div class="note-popover-edit-actions">'
+        +   '<button class="note-popover-btn" data-act="cancel">취소</button>'
+        +   '<button class="note-popover-btn primary" data-act="save">저장</button>'
+        + '</div>'
+      : '<div class="note-popover-body">'+renderNote(noteText)+'</div>';
+    pop.innerHTML = '<div class="note-popover-hd">'
+      + '<span class="note-popover-num">'+num+'</span>'
+      + '<div class="note-popover-actions">'
+      +   (editing ? '' : '<button class="note-popover-action" data-act="edit" title="편집">✏️</button>')
+      +   (editing ? '' : '<button class="note-popover-action danger" data-act="delete" title="삭제">🗑</button>')
+      +   '<button class="note-popover-action" data-act="close" title="닫기">✕</button>'
+      + '</div>'
+      + '</div>'
+      + bodyHtml;
+    targetEl.appendChild(pop);
+    // 저장된 풍선 위치 우선
+    var __id = targetEl.getAttribute('data-note-id');
+    var __s = loadFromStorage() || {};
+    if(__id && __s[__id] && __s[__id].popoverPos){
+      pop.style.left = __s[__id].popoverPos.left;
+      pop.style.top = __s[__id].popoverPos.top;
+      pop.style.right = 'auto';
+    } else {
+      var rect = pinEl.getBoundingClientRect();
+      var popW = 300;
+      if(rect.right + popW + 16 > window.innerWidth){
+        pop.style.right = '0'; pop.style.left = 'auto';
+        pop.style.top = (pinEl.offsetTop + 24) + 'px';
+      } else {
+        pop.style.left = (pinEl.offsetLeft + 24) + 'px';
+        pop.style.top = (pinEl.offsetTop - 8) + 'px';
+      }
+    }
+    pinEl.classList.add('active');
+    // 풍선 헤더 드래그
+    var __hd = pop.querySelector('.note-popover-hd');
+    if(__hd){
+      var __pd = null;
+      __hd.addEventListener('pointerdown', function(ev){
+        if(ev.target.closest('.note-popover-action')) return;
+        ev.preventDefault();
+        __hd.setPointerCapture(ev.pointerId);
+        var pr = pop.getBoundingClientRect();
+        __pd = { sx: ev.clientX, sy: ev.clientY, l: pr.left, t: pr.top };
+      });
+      __hd.addEventListener('pointermove', function(ev){
+        if(!__pd) return;
+        var hr = targetEl.getBoundingClientRect();
+        var nl = (__pd.l + (ev.clientX - __pd.sx) - hr.left);
+        var nt = (__pd.t + (ev.clientY - __pd.sy) - hr.top);
+        pop.style.left = nl + 'px';
+        pop.style.top = nt + 'px';
+        pop.style.right = 'auto';
+      });
+      __hd.addEventListener('pointerup', function(ev){
+        if(!__pd) return;
+        if(__hd.hasPointerCapture(ev.pointerId)) __hd.releasePointerCapture(ev.pointerId);
+        var idd = targetEl.getAttribute('data-note-id');
+        if(idd){
+          var ss = loadFromStorage() || {};
+          ss[idd] = ss[idd] || {};
+          ss[idd].popoverPos = { top: pop.style.top, left: pop.style.left };
+          saveToStorage(ss);
+        }
+        __pd = null;
+      });
+      __hd.addEventListener('pointercancel', function(){ __pd = null; });
+    }
+    // editing 모드면 textarea 자동 높이 조절
+    var __ta = pop.querySelector('.note-popover-textarea');
+    if(__ta){
+      var __autoGrow = function(){
+        __ta.style.height = 'auto';
+        var h = Math.min(__ta.scrollHeight + 2, 420);
+        __ta.style.height = h + 'px';
+      };
+      var __saveTimer = null;
+      var __autoSave = function(){
+        if(__saveTimer) clearTimeout(__saveTimer);
+        __saveTimer = setTimeout(function(){
+          var __id = targetEl.getAttribute('data-note-id');
+          if(!__id) return;
+          var __stored = loadFromStorage() || {};
+          __stored[__id] = __stored[__id] || {};
+          __stored[__id].note = __ta.value;
+          delete __stored[__id].deleted;
+          saveToStorage(__stored);
+          targetEl.setAttribute('data-note', __ta.value);
+        }, 200);
+      };
+      __ta.addEventListener('input', function(){ __autoGrow(); __autoSave(); });
+      // 볼드 toolbar + Ctrl+B 단축키
+      function __wrapBold(){
+        var s = __ta.selectionStart, e = __ta.selectionEnd;
+        var sel = __ta.value.substring(s, e) || '굵은 글자';
+        var before = __ta.value.substring(0, s);
+        var after = __ta.value.substring(e);
+        __ta.value = before + '**' + sel + '**' + after;
+        __ta.focus();
+        __ta.setSelectionRange(s + 2, s + 2 + sel.length);
+        __autoGrow(); __autoSave();
+      }
+      var __bBtn = pop.querySelector('[data-tool="bold"]');
+      if(__bBtn){ __bBtn.addEventListener('click', function(ev){ ev.preventDefault(); __wrapBold(); }); }
+      __ta.addEventListener('keydown', function(ev){
+        if((ev.ctrlKey || ev.metaKey) && (ev.key === 'b' || ev.key === 'B')){
+          ev.preventDefault();
+          __wrapBold();
+        }
+      });
+      setTimeout(function(){ __autoGrow(); __ta.focus(); var v=__ta.value; __ta.value=''; __ta.value=v; }, 0);
+    }
+    pop.querySelectorAll('[data-act]').forEach(function(btn){
+      btn.onclick = function(e){
+        e.stopPropagation();
+        var act = btn.getAttribute('data-act');
+        if(act === 'close'){ closeAllPopovers(); }
+        else if(act === 'edit'){ renderPopover(targetEl, num, pinEl, true); }
+        else if(act === 'cancel'){ renderPopover(targetEl, num, pinEl, false); }
+        else if(act === 'save'){
+          var newText = pop.querySelector('.note-popover-textarea').value.trim();
+          var id = targetEl.getAttribute('data-note-id');
+          var stored = loadFromStorage() || {};
+          stored[id] = stored[id] || {};
+          stored[id].note = newText;
+          saveToStorage(stored);
+          targetEl.setAttribute('data-note', newText);
+          renderPopover(targetEl, num, pinEl, false);
+        }
+        else if(act === 'delete'){
+          if(!confirm('이 어노테이션을 삭제할까요?')) return;
+          var id2 = targetEl.getAttribute('data-note-id');
+          var stored2 = loadFromStorage() || {};
+          stored2[id2] = stored2[id2] || {};
+          stored2[id2].deleted = true;
+          saveToStorage(stored2);
+          targetEl.removeAttribute('data-note');
+          closeAllPopovers();
+          buildPins();
+        }
+      };
+    });
+  }
+  function escHtml(s){
+    return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+  // markdown bold (**text**) → <strong>text</strong>
+  function renderNote(s){
+    return escHtml(s).replace(/\*\*([^*\n]+?)\*\*/g, '<strong>$1</strong>');
+  }
+  // 모든 풍선 한번에 펼치기
+  function openAllPopovers(){
+    closeAllPopovers();
+    var nodes = document.querySelectorAll('[data-note]');
+    nodes.forEach(function(el, idx){
+      var pin = el.querySelector('.note-pin');
+      if(pin){ renderPopover(el, idx + 1, pin, false, true); }
+    });
+  }
+  var addMode = false;
+  function toggleAddMode(){
+    addMode = !addMode;
+    document.body.classList.toggle('note-add-mode', addMode);
+  }
+  document.addEventListener('click', function(e){
+    if(!addMode) return;
+    var target = e.target;
+    if(target.closest('.notes-toggle') || target.closest('.note-pin') || target.closest('.note-popover') || target.closest('.notes-menu')) return;
+    e.preventDefault();
+    e.stopPropagation();
+    // 빈 어노테이션 생성 후 인라인 textarea 풍선 즉시 오픈 (multi-line 지원)
+    var id = 'note-'+Math.random().toString(36).slice(2,9);
+    target.setAttribute('data-note-id', id);
+    target.setAttribute('data-note', '');
+    var selector = '[data-note-id="'+id+'"]';
+    var stored = loadFromStorage() || {};
+    stored[id] = { note: '', selector: selector };
+    saveToStorage(stored);
+    buildPins();
+    toggleAddMode();
+    var allNoteEls = document.querySelectorAll('[data-note]');
+    var newIdx = -1;
+    allNoteEls.forEach(function(el, i){ if(el === target) newIdx = i; });
+    if(newIdx >= 0){
+      var pin = target.querySelector('.note-pin');
+      if(pin){ renderPopover(target, newIdx + 1, pin, true); }
+      // 첫 진입 시 placeholder 자동 선택 → 바로 덮어쓰기 편함
+
+    }
+  }, true);
+  function exportNotes(){
+    var all = loadAll();
+    var current = all[PAGE_KEY] || {};
+    document.querySelectorAll('[data-note]').forEach(function(el){
+      var id = el.getAttribute('data-note-id'); if(!id) return;
+      current[id] = current[id] || {};
+      current[id].note = el.getAttribute('data-note');
+    });
+    all[PAGE_KEY] = current;
+    saveAll(all);
+    var blob = new Blob([JSON.stringify(all, null, 2)], {type:'application/json'});
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url; a.download = 'clipo_notes_all.json'; a.click();
+    URL.revokeObjectURL(url);
+  }
+  function importNotes(){
+    var input = document.createElement('input');
+    input.type = 'file'; input.accept = 'application/json,.json';
+    input.onchange = function(e){
+      var file = e.target.files && e.target.files[0]; if(!file) return;
+      var reader = new FileReader();
+      reader.onload = function(){
+        try {
+          var data = JSON.parse(reader.result);
+          if(typeof data !== 'object' || data === null) throw new Error('JSON 형식이 올바르지 않아요');
+          if(!confirm('가져온 어노테이션으로 현재 저장 상태를 덮어쓸까요? (모든 페이지)')) return;
+          saveAll(data);
+          alert('어노테이션을 가져왔어요. 페이지를 새로고침합니다.');
+          location.reload();
+        } catch(err){ alert('가져오기 실패: ' + err.message); }
+      };
+      reader.readAsText(file);
+    };
+    input.click();
+  }
+  function resetNotes(){
+    if(!confirm('이 페이지의 모든 어노테이션을 삭제할까요?\n(default·추가 모두 제거. JSON 가져오기로 복원 가능)')) return;
+    var pageStored = loadFromStorage() || {};
+    document.querySelectorAll('[data-note]').forEach(function(el){
+      var id = el.getAttribute('data-note-id');
+      if(!id){ id = 'note-'+Math.random().toString(36).slice(2,9); el.setAttribute('data-note-id', id); }
+      pageStored[id] = pageStored[id] || {};
+      pageStored[id].deleted = true;
+    });
+    saveToStorage(pageStored);
+    location.reload();
+  }
+  var wrap = document.createElement('div');
+  wrap.className = 'notes-fab-wrap';
+  wrap.innerHTML =
+      '<div class="notes-menu">'
+    +   '<button class="notes-menu-item notes-menu-item-primary" data-act="view"><span class="notes-menu-check"></span>👁&nbsp;&nbsp;어노테이션 보기</button>'
+    +   '<button class="notes-menu-item" data-act="add">+&nbsp;&nbsp;새 어노테이션 추가</button>'
+    +   '<div class="notes-menu-divider"></div>'
+    +   '<button class="notes-menu-item" data-act="export">⬇&nbsp;&nbsp;JSON 내보내기 (전체)</button>'
+    +   '<button class="notes-menu-item" data-act="copy">📋&nbsp;&nbsp;JSON 텍스트 복사</button>'
+    +   '<button class="notes-menu-item" data-act="cloud">☁&nbsp;&nbsp;폴더 JSON 다시 불러오기</button>'
+    +   '<button class="notes-menu-item" data-act="import">⬆&nbsp;&nbsp;JSON 가져오기</button>'
+    +   '<button class="notes-menu-item danger" data-act="reset">↺&nbsp;&nbsp;이 페이지 초기화</button>'
+    + '</div>'
+    + '<button class="notes-toggle" type="button">📝 어노테이션 <span class="notes-toggle-count">0</span><span class="notes-toggle-chev">▾</span></button>';
+  document.body.appendChild(wrap);
+
+  var mainBtn = wrap.querySelector('.notes-toggle');
+  var menu = wrap.querySelector('.notes-menu');
+  function setMenuOpen(open){ wrap.classList.toggle('menu-open', open); }
+  function setViewMode(on){
+    document.body.classList.toggle('show-notes', on);
+    mainBtn.classList.toggle('active', on);
+    var checkEl = wrap.querySelector('[data-act="view"] .notes-menu-check');
+    if(checkEl) checkEl.textContent = on ? '✓' : '';
+    if(on){
+      applyStorage();
+      buildPins();
+    } else {
+      closeAllPopovers();
+      if(addMode) toggleAddMode();
+    }
+  }
+  mainBtn.onclick = function(e){
+    e.stopPropagation();
+    setMenuOpen(!wrap.classList.contains('menu-open'));
+  };
+  menu.addEventListener('click', function(e){
+    var btn = e.target.closest('[data-act]');
+    if(!btn) return;
+    e.stopPropagation();
+    var act = btn.getAttribute('data-act');
+    if(act === 'view'){
+      setViewMode(!document.body.classList.contains('show-notes'));
+    } else if(act === 'add'){
+      if(!document.body.classList.contains('show-notes')) setViewMode(true);
+      toggleAddMode();
+      setMenuOpen(false);
+    } else if(act === 'export'){
+      exportNotes();
+      setMenuOpen(false);
+    } else if(act === 'copy'){
+      if(window.__copyClipoNotes) window.__copyClipoNotes();
+      setMenuOpen(false);
+    } else if(act === 'cloud'){
+      if(window.__importClipoNotesFromFolder) window.__importClipoNotesFromFolder();
+      setMenuOpen(false);
+    } else if(act === 'import'){
+      importNotes();
+      setMenuOpen(false);
+    } else if(act === 'reset'){
+      resetNotes();
+    }
+  });
+  document.addEventListener('click', function(e){
+    if(wrap.classList.contains('menu-open') && !wrap.contains(e.target)){
+      setMenuOpen(false);
+    }
+  });
+  window.__clipoNotesSync = function(){ applyStorage(); buildPins(); updateCount(); };
+  applyStorage();
+  buildPins();
+  updateCount();
+})();
+
+// ══════ 안전장치 (미백업 추적 + 떠나기 경고 + 클립보드 복사) ══════
+(function(){
+  var KEY = 'clipo_notes_all';
+  var META = 'clipo_notes_meta';
+  function snapshot(){ return localStorage.getItem(KEY) || ''; }
+  function getMeta(){ try { return JSON.parse(localStorage.getItem(META)) || {}; } catch(e){ return {}; } }
+  function setMeta(m){ try { localStorage.setItem(META, JSON.stringify(m)); } catch(e){} }
+  function isUnsaved(){
+    var snap = snapshot();
+    if(!snap || snap === '{}') return false;
+    var m = getMeta();
+    return snap !== (m.lastSavedSnapshot || '');
+  }
+  function markSaved(){
+    var m = getMeta();
+    m.lastSavedSnapshot = snapshot();
+    m.lastSavedAt = Date.now();
+    setMeta(m);
+    updateBadge();
+  }
+  function updateBadge(){
+    var fab = document.querySelector('.notes-fab-wrap');
+    if(!fab) return;
+    fab.classList.toggle('has-unsaved', isUnsaved());
+  }
+  function copyJsonText(){
+    var data = snapshot() || '{}';
+    var pretty;
+    try { pretty = JSON.stringify(JSON.parse(data), null, 2); }
+    catch(e){ pretty = data; }
+    function done(){ markSaved(); alert('어노테이션 JSON이 클립보드에 복사됐어요.\n메모장·노션·슬랙 어디든 붙여넣어 백업하세요.\n(클로드 채팅에 붙여넣으면 박제도 가능)'); }
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(pretty).then(done).catch(fallback);
+    } else { fallback(); }
+    function fallback(){
+      var ta = document.createElement('textarea');
+      ta.value = pretty;
+      ta.style.position = 'fixed'; ta.style.top = '-1000px';
+      document.body.appendChild(ta);
+      ta.focus(); ta.select();
+      try { document.execCommand('copy'); done(); }
+      catch(e){ alert('자동 복사 실패. 콘솔에 출력했어요 — 수동으로 복사하세요.'); console.log(pretty); }
+      document.body.removeChild(ta);
+    }
+  }
+  window.__copyClipoNotes = copyJsonText;
+  // export·import 클릭 시 백업 완료로 처리
+  document.addEventListener('click', function(e){
+    var btn = e.target.closest && e.target.closest('[data-act="export"],[data-act="import"]');
+    if(btn){ setTimeout(markSaved, 200); }
+  }, true);
+  // 폴링으로 배지 동기화
+  setInterval(updateBadge, 1500);
+  setTimeout(updateBadge, 600);
+})();
+
+
+// ══════ FAB 위치 드래그 (FAB 자체로 드래그/클릭 자동 구분) ══════
+(function(){
+  var POS_KEY = 'clipo_notes_fab_pos';
+  function init(){
+    var wrap = document.querySelector('.notes-fab-wrap');
+    if(!wrap) { setTimeout(init, 200); return; }
+    var toggle = wrap.querySelector('.notes-toggle');
+    if(!toggle) { setTimeout(init, 200); return; }
+    // 저장된 위치 복원
+    try {
+      var saved = JSON.parse(localStorage.getItem(POS_KEY));
+      if(saved && saved.left != null && saved.top != null){
+        wrap.style.bottom = 'auto';
+        wrap.style.right = 'auto';
+        wrap.style.left = saved.left + 'px';
+        wrap.style.top = saved.top + 'px';
+      }
+    } catch(e){}
+    // FAB 자체로 드래그 (5px 이상 움직이면 드래그, 아니면 메뉴 클릭)
+    var dragStart = null;
+    var moved = false;
+    toggle.addEventListener('pointerdown', function(e){
+      if(e.button !== 0) return; // 좌클릭만
+      var rect = wrap.getBoundingClientRect();
+      dragStart = { x: e.clientX, y: e.clientY, left: rect.left, top: rect.top };
+      moved = false;
+      try { toggle.setPointerCapture(e.pointerId); } catch(err){}
+    });
+    toggle.addEventListener('pointermove', function(e){
+      if(!dragStart) return;
+      var dx = e.clientX - dragStart.x;
+      var dy = e.clientY - dragStart.y;
+      if(Math.abs(dx) + Math.abs(dy) > 5){
+        if(!moved){ moved = true; wrap.classList.add('dragging'); }
+        var newLeft = Math.max(0, Math.min(window.innerWidth - 100, dragStart.left + dx));
+        var newTop = Math.max(0, Math.min(window.innerHeight - 40, dragStart.top + dy));
+        wrap.style.bottom = 'auto';
+        wrap.style.right = 'auto';
+        wrap.style.left = newLeft + 'px';
+        wrap.style.top = newTop + 'px';
+      }
+    });
+    toggle.addEventListener('pointerup', function(e){
+      if(!dragStart) return;
+      try { if(toggle.hasPointerCapture(e.pointerId)) toggle.releasePointerCapture(e.pointerId); } catch(err){}
+      var wasDrag = moved;
+      dragStart = null; moved = false;
+      if(wasDrag){
+        // 드래그였음 → 위치 저장 + 직후 click 막기
+        try {
+          var rect = wrap.getBoundingClientRect();
+          localStorage.setItem(POS_KEY, JSON.stringify({ left: rect.left, top: rect.top }));
+        } catch(err){}
+        wrap.classList.remove('dragging');
+        var blocker = function(ev){ ev.stopPropagation(); ev.preventDefault(); toggle.removeEventListener('click', blocker, true); };
+        toggle.addEventListener('click', blocker, true);
+      }
+      // 안 움직였으면 click 자연스럽게 발생 → 메뉴 토글
+    });
+    toggle.addEventListener('pointercancel', function(){
+      wrap.classList.remove('dragging');
+      dragStart = null; moved = false;
+    });
+  }
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    setTimeout(init, 100);
+  }
+})();
+
+
+// ══════ 폴더 JSON 자동 동기화 (clipo_notes_all.json) ══════
+(function(){
+  function load(force){
+    fetch('clipo_notes_all.json?t=' + Date.now())
+      .then(function(r){
+        if(!r.ok) throw new Error('not found ' + r.status);
+        return r.json();
+      })
+      .then(function(data){
+        if(typeof data !== 'object' || data === null) return;
+        var existing = localStorage.getItem('clipo_notes_all');
+        var isEmpty = !existing || existing === '{}';
+        if(force){
+          if(!confirm('폴더의 clipo_notes_all.json으로 현재 로컬 어노테이션을 덮어쓸까요?\n(되돌릴 수 없어요)')) return;
+          localStorage.setItem('clipo_notes_all', JSON.stringify(data));
+          location.reload();
+        } else if(isEmpty){
+          // 첫 방문자 — 자동 import
+          localStorage.setItem('clipo_notes_all', JSON.stringify(data));
+          try {
+            localStorage.setItem('clipo_notes_meta', JSON.stringify({
+              lastSavedSnapshot: JSON.stringify(data),
+              lastSavedAt: Date.now()
+            }));
+          } catch(e){}
+          // 어노테이션 UI 즉시 갱신 (deleted·텍스트 반영 + 카운트)
+          if(window.__clipoNotesSync){ setTimeout(window.__clipoNotesSync, 30); }
+        }
+      })
+      .catch(function(err){
+        if(force){ alert('폴더에 clipo_notes_all.json이 없어요. 먼저 [JSON 내보내기]로 받아서 같은 폴더에 저장하세요.'); }
+      });
+  }
+  window.__importClipoNotesFromFolder = function(){ load(true); };
+  // 첫 로드 시 자동 (localStorage 비어있을 때만 효력)
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', function(){ load(false); });
+  } else {
+    setTimeout(function(){ load(false); }, 50);
+  }
+})();
+
+</script>
+</body>
+</html>
