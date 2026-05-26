@@ -2818,7 +2818,9 @@ function renderS2Sidebar(){
     else if(s2.status==='analyzing') status = `<span class="s2-stu-status analyzing">분석 중</span>`;
     else if(s2.status==='done') status = `<span class="s2-stu-status done">분석 완료</span>`;
     else status = `<span class="s2-stu-status idle">분석 필요</span>`;
-    const dirtyDot = s.dirty ? '<span class="dirty-dot" title="자료 변경됨 · 재분석 권장"></span>' : '';
+    // _dirtyLevel='items'(재분석 직후 stale 기록 케이스)는 2단계 관점에서 fresh이므로 점 제외
+    const showStep2Dot = s.dirty && s._dirtyLevel !== 'items';
+    const dirtyDot = showStep2Dot ? '<span class="dirty-dot" title="자료 변경됨 · 재분석 권장"></span>' : '';
     return `<div class="s2-stu-row ${isActive?'active':''}" onclick="selectS2Student(${s.id})">
       <span class="s2-stu-name">${s.name}${dirtyDot}</span>
       <span class="s2-stu-sid-small">${s.sid}</span>
@@ -2837,9 +2839,10 @@ function renderS2Main(){
   if(!s){ $('s2-main').innerHTML=''; return; }
   const s2 = getS2(s);
   const summary = `자료 ${s.files.length}건 · 활동 내용 ${s.keywords.length ? '기재' : '미기재'}${s.level?` · 활동 수준 ${ {high:'상',mid:'중',low:'하'}[s.level]||'-'}`:''}`;
-  // 자료 변경됨 안내 (자료 있는 학생이 dirty)
+  // 자료 변경됨 안내 (자료 있는 학생이 dirty + _dirtyLevel='items'가 아닐 때)
+  // _dirtyLevel='items'는 재분석 직후 "기록만 stale" 상태 → 2단계 관점에서는 fresh이므로 안내 제외
   let dirtyNoticeHtml = '';
-  if(s.dirty && s2HasFiles(s)){
+  if(s.dirty && s2HasFiles(s) && s._dirtyLevel !== 'items'){
     if(s2.status === 'done'){
       dirtyNoticeHtml = `<div class="s2-stu-hd-notice"><i data-lucide="alert-circle" style="width:14px;height:14px"></i><span>자료가 변경됐어요. 아래 표시된 결과는 <strong>이전 분석 내용</strong>이에요. 우측 <strong>[재분석]</strong>으로 다시 분석해 주세요.</span></div>`;
     } else if(s2.status === 'idle'){
@@ -3099,16 +3102,18 @@ function startAnalyze(sid){
   renderS2Main();
   setTimeout(()=>{
     s2.status = 'done';
+    const hadRecord = !!(s.s3 && s.s3.aiText);
     s.dirty = false;
     s._dirtyLevel = null;
     // 추천 항목 자동 체크 (분석 직후엔 미저장 변경 없음 — 사용자가 체크하면 그때 dirty)
     const data = STEP2_DATA[s.sid] || {items: STEP2_DEFAULT_ITEMS.slice(0,5)};
     s2.selectedIds = new Set(data.items.filter(it=>it.source_origin==='stage1_recommended').map(it=>it.id));
     s2.unsavedChanges = false;
-    // 분석 완료 후 기존 AI 기록이 있다면 items 레벨 dirty 부여 → "재생성 필요" banner
-    if(s.s3 && s.s3.aiText){
+    // 분석 완료 후 기존 AI 기록이 있다면 → 기록은 stale 상태. 3단계 [재생성] 유도 표시 유지
+    if(hadRecord){
       s._dirtyLevel = 'items';
       s._editChanged = true;
+      s.dirty = true; // 3단계 점/주황 안내 노출용 — 사용자가 재생성하면 generateOne 에서 false 처리됨
     }
     if(s.id === s2CurStudentId){ renderS2Main(); }
     renderS2Sidebar();
