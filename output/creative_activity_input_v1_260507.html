@@ -286,20 +286,22 @@ body.nav-expanded .sticky-cta{left:200px;transition:left .2s ease}
 .modal-bg.show{display:flex}
 .modal{background:#fff;border-radius:16px;width:100%;max-width:560px;max-height:calc(100vh - 40px);display:flex;flex-direction:column;box-shadow:0 12px 40px rgba(0,0,0,.18);overflow:hidden}
 .modal.lg{max-width:760px}
-.modal.xl{max-width:860px}
+.modal.xl{max-width:512px}
 
 /* 자료 등록 카드 (모달 안) */
-.reg-cards{display:grid;grid-template-columns:repeat(3, 1fr);gap:12px}
-.reg-card{padding:20px;border:1px solid #e5e7eb;border-radius:12px;cursor:pointer;display:flex;flex-direction:column;gap:10px;transition:all .15s;background:#fff;text-align:left;font-family:inherit;position:relative}
+.reg-cards{display:flex;flex-direction:column;gap:10px}
+.reg-card{padding:18px 20px;border:1px solid #e5e7eb;border-radius:12px;cursor:pointer;display:flex;align-items:flex-start;gap:14px;transition:all .15s;background:#fff;text-align:left;font-family:inherit;position:relative;width:100%}
 .reg-card:hover{border-color:#416bff;box-shadow:0 4px 12px rgba(65,107,255,0.08)}
-.rc-head{display:flex;align-items:center;justify-content:space-between;gap:8px}
-.rc-chip{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:600;padding:3px 8px;border-radius:10px;line-height:1.4;flex-shrink:0}
-.rc-chip.ai{background:#eff3ff;color:#416bff}
-.rc-chip.aux{background:#f1f3f5;color:#6d7381}
-.rc-icon{width:44px;height:44px;border-radius:10px;background:#f4f8ff;color:#416bff;display:inline-flex;align-items:center;justify-content:center;line-height:1;flex-shrink:0}
+.rc-icon{width:40px;height:40px;border-radius:10px;background:#eff3ff;color:#416bff;display:inline-flex;align-items:center;justify-content:center;line-height:1;flex-shrink:0;margin-top:2px}
 .rc-icon.aux{background:#f1f3f5;color:#6d7381}
+.rc-body{flex:1;min-width:0;display:flex;flex-direction:column;gap:6px}
+.rc-title-row{display:flex;align-items:center;justify-content:space-between;gap:10px}
 .rc-title{font-size:16px;font-weight:600;color:#222631;line-height:1.3}
-.rc-desc{font-size:14px;color:#3b3f4c;line-height:1.55;flex:1}
+.rc-chip{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:600;padding:4px 10px;border-radius:10px;line-height:1.4;flex-shrink:0}
+.rc-chip.ai{background:#eff3ff;color:#416bff}
+.rc-chip.draft{background:#f1f3f5;color:#6d7381}
+.rc-chip.aux{background:#f1f3f5;color:#6d7381}
+.rc-desc{font-size:13px;color:#6d7381;line-height:1.55}
 .rc-match{display:flex;align-items:flex-start;gap:6px;padding:10px 12px;background:#f9fafb;border-radius:8px;font-size:13px;color:#6d7381;line-height:1.55}
 .rc-match i{color:#b3b6bd;margin-top:1px;flex-shrink:0}
 .rc-match-multi{display:flex;flex-direction:column;gap:2px}
@@ -698,7 +700,7 @@ body.nav-expanded .sticky-cta{left:200px;transition:left .2s ease}
   <!-- 페이지 타이틀 블록 -->
   <div class="page-title-block">
     <h1 class="pt-title" id="pt-title">자율활동 : 2학년 1반</h1>
-    <p class="pt-desc">학생 활동 자료·내용을 등록하면 AI가 분석해 기록 초안을 만들어 드려요.</p>
+    <p class="pt-desc" id="pt-desc">학생별로 자료와 활동 내용을 등록해 주세요. 다음 단계에서 AI가 분석해 기록에 들어갈 내용을 추천해 드려요.</p>
   </div>
 
   <!-- 스텝 버튼 바 + 우측 보조 액션 -->
@@ -722,7 +724,7 @@ body.nav-expanded .sticky-cta{left:200px;transition:left .2s ease}
         기록 확인 및 수정
       </button>
     </div>
-    <button class="btn-outline" id="btn-student-manage" onclick="onStudentBtn()"><i data-lucide="user-plus" style="width:14px;height:14px" id="btn-student-icon"></i> <span id="btn-student-label">학생 추가</span></button>
+    <button class="btn-outline" id="btn-student-manage" onclick="onStudentBtn()" style="display:none"><i data-lucide="user-plus" style="width:14px;height:14px" id="btn-student-icon"></i> <span id="btn-student-label">학생 추가</span></button>
   </div>
 
   <!-- ============ STEP 1 ============ -->
@@ -748,7 +750,7 @@ body.nav-expanded .sticky-cta{left:200px;transition:left .2s ease}
             <th class="col-survey">설문</th>
             <th class="col-pdf">활동지</th>
             <th class="col-kw">활동 내용</th>
-            <th class="col-level">참여 정도</th>
+            <th class="col-level">활동 수준</th>
             <th class="col-action">관리</th>
           </tr>
         </thead>
@@ -863,11 +865,11 @@ body.nav-expanded .sticky-cta{left:200px;transition:left .2s ease}
         </div>
       </div>
       <div class="dp-section" style="margin-bottom:0">
-        <div class="dp-label">참여 정도</div>
+        <div class="dp-label">활동 수준</div>
         <div class="level-chips" id="md-level-chips">
-          <button class="level-chip" data-level="high" onclick="setLevel('high')">활동 주도</button>
-          <button class="level-chip" data-level="mid" onclick="setLevel('mid')">적극 참여</button>
-          <button class="level-chip" data-level="low" onclick="setLevel('low')">기본 참여</button>
+          <button class="level-chip" data-level="high" onclick="setLevel('high')">상</button>
+          <button class="level-chip" data-level="mid" onclick="setLevel('mid')">중</button>
+          <button class="level-chip" data-level="low" onclick="setLevel('low')">하</button>
           <button class="level-chip" data-level="none" onclick="setLevel('none')">자동</button>
         </div>
       </div>
@@ -926,46 +928,40 @@ body.nav-expanded .sticky-cta{left:200px;transition:left .2s ease}
     <div class="modal-hd">
       <div>
         <div class="modal-title">일괄 자료 등록</div>
-        <div class="modal-sub">자료를 올리면 학번·이름을 기준으로 학생별 자동 매칭되어, 활동 자료와 활동 내용을 일괄 등록할 수 있어요.</div>
+        <div class="modal-sub">학번과 이름을 기준으로 활동 자료와 활동 내용을 일괄 등록할 수 있어요.</div>
       </div>
       <button class="modal-x" onclick="closeModal('modal-register')"><i data-lucide="x" style="width:18px;height:18px"></i></button>
     </div>
     <div class="modal-body">
       <div class="reg-cards">
         <button class="reg-card" data-type="survey" onclick="pickRegisterType('survey')">
-          <div class="rc-head">
-            <div class="rc-icon"><i data-lucide="file-spreadsheet" style="width:22px;height:22px"></i></div>
-            <span class="rc-chip ai"><i data-lucide="sparkles" style="width:10px;height:10px"></i> AI 자동 분석</span>
-          </div>
-          <div class="rc-title">학생 설문 응답 (EXCEL)</div>
-          <div class="rc-desc">구글 설문·자기평가서 응답을 엑셀로 일괄 등록</div>
-          <div class="rc-match">
-            <i data-lucide="link" style="width:14px;height:14px"></i>
-            <span>엑셀에 학번·이름 열이 있어야 학생별로 자동 매칭돼요</span>
+          <div class="rc-icon"><i data-lucide="clipboard-list" style="width:22px;height:22px"></i></div>
+          <div class="rc-body">
+            <div class="rc-title-row">
+              <div class="rc-title">학생 설문 응답 (EXCEL)</div>
+              <span class="rc-chip ai"><i data-lucide="sparkles" style="width:10px;height:10px"></i> AI 자동 분석</span>
+            </div>
+            <div class="rc-desc">구글 설문이나 자기평가서 응답 내용을<br>제공되는 템플릿에 맞춰 일괄 등록</div>
           </div>
         </button>
         <button class="reg-card" data-type="activity" onclick="pickRegisterType('activity')">
-          <div class="rc-head">
-            <div class="rc-icon"><i data-lucide="file-text" style="width:22px;height:22px"></i></div>
-            <span class="rc-chip ai"><i data-lucide="sparkles" style="width:10px;height:10px"></i> AI 자동 분석</span>
-          </div>
-          <div class="rc-title">활동지·보고서 (PDF)</div>
-          <div class="rc-desc">학급 전체 활동지·보고서를 한 PDF로 묶어 등록</div>
-          <div class="rc-match">
-            <i data-lucide="link" style="width:14px;height:14px"></i>
-            <span>각 페이지에 학번·이름이 보여야 학생별로 자동 매칭돼요</span>
+          <div class="rc-icon"><i data-lucide="file-text" style="width:22px;height:22px"></i></div>
+          <div class="rc-body">
+            <div class="rc-title-row">
+              <div class="rc-title">활동지·보고서 (PDF)</div>
+              <span class="rc-chip ai"><i data-lucide="sparkles" style="width:10px;height:10px"></i> AI 자동 분석</span>
+            </div>
+            <div class="rc-desc">학급 전체 활동지·보고서 PDF 파일을<br>학번 순서대로 묶어 일괄 등록</div>
           </div>
         </button>
         <button class="reg-card" data-type="keyword" onclick="pickRegisterType('keyword')">
-          <div class="rc-head">
-            <div class="rc-icon aux"><i data-lucide="pencil" style="width:22px;height:22px"></i></div>
-            <span class="rc-chip aux"><i data-lucide="edit-3" style="width:10px;height:10px"></i> 직접 입력</span>
-          </div>
-          <div class="rc-title">학생 활동 내용 (EXCEL)</div>
-          <div class="rc-desc">선생님이 관찰한 활동 내용을 엑셀로 직접 등록</div>
-          <div class="rc-match">
-            <i data-lucide="link" style="width:14px;height:14px"></i>
-            <span>파일 자료가 없어도 활동 내용만으로 기록을 만들 수 있어요</span>
+          <div class="rc-icon aux"><i data-lucide="pencil" style="width:22px;height:22px"></i></div>
+          <div class="rc-body">
+            <div class="rc-title-row">
+              <div class="rc-title">학생 활동 내용 (EXCEL)</div>
+              <span class="rc-chip draft"><i data-lucide="paperclip" style="width:10px;height:10px"></i> 기록 초안 생성</span>
+            </div>
+            <div class="rc-desc">선생님이 관찰한 활동 내용을<br>제공되는 템플릿에 맞춰 직접 입력</div>
           </div>
         </button>
       </div>
@@ -1538,7 +1534,7 @@ function fileSummaryText(s){
 }
 function levelLabel(lev){
   if(!lev || lev==='none') return '<span class="col-empty" title="자료 있으면 AI가 자동 추정">자동</span>';
-  return {high:'활동 주도', mid:'적극 참여', low:'기본 참여'}[lev] || '<span class="col-empty">—</span>';
+  return {high:'상', mid:'중', low:'하'}[lev] || '<span class="col-empty">—</span>';
 }
 function kwSummaryText(s){
   return s.keywords.map(k=>k.text).join(', ');
@@ -1899,11 +1895,11 @@ function renderDrawerDataPane(s){
       </div>
     </div>
     <div class="dp-section" style="margin-bottom:0">
-      <div class="dp-label">참여 정도</div>
+      <div class="dp-label">활동 수준</div>
       <div class="level-chips" id="dr-level-chips">
-        <button class="level-chip ${lev==='high'?'active':''}" data-level="high" onclick="setDrawerLevel('high')">활동 주도</button>
-        <button class="level-chip ${lev==='mid'?'active':''}" data-level="mid" onclick="setDrawerLevel('mid')">적극 참여</button>
-        <button class="level-chip ${lev==='low'?'active':''}" data-level="low" onclick="setDrawerLevel('low')">기본 참여</button>
+        <button class="level-chip ${lev==='high'?'active':''}" data-level="high" onclick="setDrawerLevel('high')">상</button>
+        <button class="level-chip ${lev==='mid'?'active':''}" data-level="mid" onclick="setDrawerLevel('mid')">중</button>
+        <button class="level-chip ${lev==='low'?'active':''}" data-level="low" onclick="setDrawerLevel('low')">하</button>
         <button class="level-chip ${lev==='none'?'active':''}" data-level="none" onclick="setDrawerLevel('none')">자동</button>
       </div>
     </div>
@@ -2256,13 +2252,22 @@ function goStep(n){
   cur.classList.remove('done','disabled');
   cur.classList.add('active');
   $('cta-step-label').textContent = 'Step '+n+' / 3 · ' + ['학생 자료 입력','AI 자료 분석','기록 확인 및 수정'][n-1];
+  // 단계별 페이지 부제 갱신
+  const stepDescs = [
+    '학생별로 자료와 활동 내용을 등록해 주세요. 다음 단계에서 AI가 분석해 기록에 들어갈 내용을 추천해 드려요.',
+    '활동 자료가 있는 학생은 AI가 분석해 기록에 들어갈 내용을 추천받고, 자료가 없는 학생은 분석 없이 다음 단계로 진행돼요.',
+    'AI 기록 초안을 확인하고 다듬어 주세요. 완성된 기록은 엑셀로 내보낼 수 있어요.'
+  ];
+  const descEl = document.getElementById('pt-desc');
+  if(descEl) descEl.textContent = stepDescs[n-1];
   $('cta-prev').disabled = n===1;
   if(n<3) $('cta-next').innerHTML = '다음 단계 <i data-lucide="arrow-right" style="width:14px;height:14px"></i>';
   else $('cta-next').innerHTML = '<i data-lucide="check" style="width:14px;height:14px"></i> 저장';
   // 투어 진행 중이면 단계에 맞춰 스톱 인덱스 동기화
   if (typeof syncTourToStep === 'function') syncTourToStep(n);
+  // 학생 추가/관리 버튼은 카드 메뉴로 이동했으므로 항상 숨김
   const stuBtn = $('btn-student-manage');
-  if(stuBtn) stuBtn.style.display = (n===1) ? '' : 'none';
+  if(stuBtn) stuBtn.style.display = 'none';
   if(n===2) renderStep2();
   if(n===3) renderStep3();
   if(n===1) refreshProgress();
@@ -2690,7 +2695,7 @@ function renderS2Main(){
   const s = STUDENTS.find(x=>x.id===s2CurStudentId);
   if(!s){ $('s2-main').innerHTML=''; return; }
   const s2 = getS2(s);
-  const summary = `자료 ${s.files.length}건 · 활동 내용 ${s.keywords.length ? '기재' : '미기재'}${s.level?` · 참여 정도 ${ {high:'활동 주도',mid:'적극 참여',low:'기본 참여'}[s.level]||'-'}`:''}`;
+  const summary = `자료 ${s.files.length}건 · 활동 내용 ${s.keywords.length ? '기재' : '미기재'}${s.level?` · 활동 수준 ${ {high:'상',mid:'중',low:'하'}[s.level]||'-'}`:''}`;
   const stuHd = `<div class="s2-stu-hd">
     <div class="s2-stu-hd-info">
       <div class="s2-stu-hd-name-wrap">
@@ -2717,7 +2722,7 @@ function renderS2Main(){
       <div class="s2-state-desc">활동 자료가 없으면 AI 분석이 불필요합니다.<br>다음 단계에서 활동 내용을 기반으로 기록 초안이 생성됩니다.</div>
       <div class="s2-state-summary">
         <div class="s2-state-summary-row"><strong>활동 내용</strong> ${s.keywords.length}개${s.keywords.length?` (${s.keywords.slice(0,5).map(k=>k.text).join(', ')}${s.keywords.length>5?' 외':''})`:''}</div>
-        ${s.level?`<div class="s2-state-summary-row"><strong>참여 정도</strong> ${ {high:'활동 주도',mid:'적극 참여',low:'기본 참여'}[s.level]}</div>`:''}
+        ${s.level?`<div class="s2-state-summary-row"><strong>활동 수준</strong> ${ {high:'상',mid:'중',low:'하'}[s.level]}</div>`:''}
       </div>
       <div><button class="btn-primary-lg" onclick="skipStep2()">3단계로 이동 <i data-lucide="arrow-right" style="width:16px;height:16px"></i></button></div>
     </div>`;
@@ -2730,7 +2735,7 @@ function renderS2Main(){
       <div class="s2-state-summary">
         <div class="s2-state-summary-row"><strong>자료</strong> ${s.files.length}건</div>
         <div class="s2-state-summary-row"><strong>활동 내용</strong> <span class="s2-summary-trunc" title="${kwText}">${kwText}</span></div>
-        ${s.level?`<div class="s2-state-summary-row"><strong>참여 정도</strong> ${ {high:'활동 주도',mid:'적극 참여',low:'기본 참여'}[s.level]}</div>`:''}
+        ${s.level?`<div class="s2-state-summary-row"><strong>활동 수준</strong> ${ {high:'상',mid:'중',low:'하'}[s.level]}</div>`:''}
       </div>
       <div><button class="btn-secondary-lg" onclick="startAnalyze(${s.id})"><i data-lucide="sparkles" style="width:16px;height:16px"></i> 개별 분석 시작</button></div>
     </div>`;
@@ -3361,14 +3366,17 @@ function doRegisterTypeUpload(type){
   closeModal('modal-register');
   const params = new URLSearchParams({ type: ACTIVITY_TYPE, cls: CLS });
   if(type === 'keyword'){
-    location.href = 'creative_activity_keyword_upload_v1_260508.html?' + params.toString();
+    location.href = 'creative_activity_keyword_upload_v1_260526.html?' + params.toString();
     return;
   }
   if(type === 'survey'){
     location.href = 'creative_activity_survey_upload_v1_260508.html?' + params.toString();
     return;
   }
-  showToast('활동지·보고서 상세 페이지는 다음 단계에서 만듭니다');
+  if(type === 'activity'){
+    location.href = 'creative_activity_pdf_upload_v1_260526.html?' + params.toString();
+    return;
+  }
 }
 
 // ───── 모달 / 토스트 ─────

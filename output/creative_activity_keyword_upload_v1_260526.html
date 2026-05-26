@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>설문 응답 일괄 등록 - CLIPO</title>
+<title>학생 활동 내용 일괄 등록 - CLIPO</title>
 <link rel="icon" type="image/svg+xml" href="favicon_chang.svg">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard-gov.min.css">
 <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
@@ -47,7 +47,7 @@ body.nav-expanded .main-shell { margin-left: 200px; transition: margin-left .2s 
 
 /* 카드 */
 .card { background: #fff; border: 1px solid #e5e7eb; border-radius: 12px; padding: 28px 32px; margin-bottom: 16px; }
-.card-title { font-size: 18px; font-weight: 700; color: #222631; margin-bottom: 4px; padding-left: 4px; border-left: 4px solid transparent; line-height: 1.4; }
+.card-title { font-size: 18px; font-weight: 700; color: #222631; margin-bottom: 4px; line-height: 1.4; }
 .card-desc { font-size: 14px; color: #3b3f4c; margin-bottom: 20px; line-height: 1.55; }
 
 /* 업로드 영역 */
@@ -88,51 +88,24 @@ body.nav-expanded .main-shell { margin-left: 200px; transition: margin-left .2s 
 .result-table-wrap { border: 1px solid #e5e7eb; border-radius: 8px; overflow: hidden; }
 .result-table { width: 100%; border-collapse: separate; border-spacing: 0; font-size: 14px; }
 .result-table th { background: #f9fafb; padding: 12px 14px; text-align: center; font-weight: 600; color: #3b3f4c; font-size: 13px; border-bottom: 1px solid #e5e7eb; white-space: nowrap; }
-.result-table td { padding: 14px 14px; text-align: center; border-bottom: 1px solid #f1f3f5; color: #3b3f4c; vertical-align: middle; background: #fff; font-size: 13px; }
+.result-table td { padding: 14px 14px; text-align: center; border-bottom: 1px solid #f1f3f5; color: #3b3f4c; vertical-align: top; background: #fff; font-size: 13px; line-height: 1.55; }
 .result-table tbody tr:last-child td { border-bottom: none; }
 .result-table tbody tr:hover td { background: #fafbfc; }
 
-.col-no { width: 50px; }
-.col-sid { width: 70px; }
-.col-name { width: 80px; }
-.col-rcnt { width: 72px; }
-.col-detail { width: 100px; }
-.col-q { text-align: left !important; padding: 12px 14px !important; }
-.q-text { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; line-height: 1.55; color: #3b3f4c; max-width: 200px; }
-.q-empty { color: #b3b6bd; }
-
-.detail-link { color: #416bff; font-size: 13px; font-weight: 600; text-decoration: underline; cursor: pointer; background: none; border: none; font-family: inherit; padding: 4px 8px; }
-.detail-link:hover { color: #365eef; }
+.col-sid { width: 80px; }
+.col-name { width: 90px; }
+.col-level { width: 90px; }
+.col-content { text-align: left !important; }
+.content-cell { white-space: normal; line-height: 1.55; color: #3b3f4c; }
+.level-empty { color: #b3b6bd; }
 
 /* 하단 액션 */
 .footer-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 16px; }
-.btn-cancel-lg { padding: 12px 28px; border-radius: 999px; background: #fff; color: #3b3f4c; font-size: 14px; font-weight: 600; font-family: inherit; cursor: pointer; line-height: 1; border: 1px solid #d4e0ff; color: #416bff; }
+.btn-cancel-lg { padding: 12px 28px; border-radius: 999px; background: #fff; color: #416bff; font-size: 14px; font-weight: 600; font-family: inherit; cursor: pointer; line-height: 1; border: 1px solid #d4e0ff; }
 .btn-cancel-lg:hover { background: #f4f8ff; }
 .btn-save-lg { padding: 12px 28px; border: none; border-radius: 999px; background: #416bff; color: #fff; font-size: 14px; font-weight: 600; font-family: inherit; cursor: pointer; line-height: 1; display: inline-flex; align-items: center; justify-content: center; gap: 6px; }
 .btn-save-lg:hover { background: #365eef; }
 .btn-save-lg:disabled { background: #c1cefb; color: #fff; cursor: not-allowed; }
-
-/* 모달 */
-.modal-bg { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 500; align-items: center; justify-content: center; padding: 24px; }
-.modal-bg.show { display: flex; }
-.modal { background: #fff; border-radius: 12px; width: 600px; max-width: 100%; max-height: calc(100vh - 48px); display: flex; flex-direction: column; box-shadow: 0 4px 16px rgba(0,0,0,.16); overflow: hidden; position: relative; }
-.modal-hd { padding: 22px 24px 12px; display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
-.modal-title { font-size: 18px; font-weight: 700; color: #222631; line-height: 1.4; }
-.modal-x { background: none; border: none; cursor: pointer; color: #6d7381; padding: 4px; display: flex; border-radius: 4px; flex-shrink: 0; }
-.modal-x:hover { background: #f1f3f5; }
-.modal-body { padding: 8px 24px 20px; overflow-y: auto; flex: 1; }
-.modal-ft { padding: 14px 24px 20px; display: flex; justify-content: flex-end; gap: 8px; border-top: 1px solid #f1f3f5; }
-.btn-modal-confirm { padding: 9px 22px; border: none; border-radius: 6px; background: #416bff; color: #fff; font-size: 14px; font-weight: 600; font-family: inherit; cursor: pointer; line-height: 1; }
-.btn-modal-confirm:hover { background: #365eef; }
-
-/* 모달 내 응답 카드 */
-.qa-row { margin-bottom: 16px; }
-.qa-row:last-child { margin-bottom: 0; }
-.qa-q { font-size: 14px; font-weight: 700; color: #416bff; margin-bottom: 8px; line-height: 1.5; }
-.qa-q .qno { color: #416bff; margin-right: 6px; }
-.qa-q .qtext { color: #222631; font-weight: 600; }
-.qa-a { font-size: 14px; color: #3b3f4c; line-height: 1.6; white-space: pre-wrap; word-break: break-word; background: #f6f7f9; padding: 12px 14px; border-radius: 8px; }
-.qa-empty { color: #b3b6bd; font-style: italic; }
 
 /* 토스트 */
 .toast { position: fixed; bottom: 32px; left: 50%; transform: translateX(-50%) translateY(20px); background: #222631; color: #fff; padding: 12px 20px; border-radius: 8px; font-size: 14px; display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 4px 16px rgba(0,0,0,.2); opacity: 0; transition: opacity .2s, transform .2s; z-index: 600; pointer-events: none; line-height: 1; }
@@ -147,7 +120,6 @@ body.nav-expanded .main-shell { margin-left: 200px; transition: margin-left .2s 
 
 @media (max-width: 1023px) {
   .main { padding: 24px 24px !important; }
-  .modal { width: calc(100vw - 32px) !important; max-width: calc(100vw - 32px) !important; }
 }
 </style>
 </head>
@@ -195,13 +167,13 @@ body.nav-expanded .main-shell { margin-left: 200px; transition: margin-left .2s 
     <i data-lucide="chevron-left" style="width:14px;height:14px"></i> 이전으로
   </a>
 
-  <h1 class="page-title">설문 응답 일괄 등록 : <span id="pt-cls">2학년 1반</span></h1>
-  <p class="page-sub">학생들이 제출한 설문 응답을 엑셀로 일괄 등록할 수 있어요. 등록한 응답은 AI가 분석할 때 학생 활동 자료로 활용돼요.</p>
+  <h1 class="page-title">학생 활동 내용 일괄 등록 : <span id="pt-cls">2학년 1반</span></h1>
+  <p class="page-sub">평소 학생을 관찰하며 기록한 활동 내용을 엑셀로 일괄 등록할 수 있어요. 등록한 내용은 AI가 학생별 기록 초안을 만들 때 활용돼요.</p>
 
   <!-- 카드 1: 엑셀 파일 업로드 -->
   <div class="card">
     <div class="card-title">1. 엑셀 파일 업로드</div>
-    <div class="card-desc">아래에서 템플릿을 다운받아, 설문 내용을 양식에 맞춰 입력해 주세요.</div>
+    <div class="card-desc">아래에서 템플릿을 다운받아, 활동 내용을 양식에 맞춰 입력해 주세요.</div>
 
     <div class="upload-label">파일 업로드</div>
     <div class="upload-btns">
@@ -209,7 +181,7 @@ body.nav-expanded .main-shell { margin-left: 200px; transition: margin-left .2s 
         <i data-lucide="upload" style="width:16px;height:16px"></i> 파일 업로드
       </button>
       <button class="btn-outline" onclick="downloadTemplate()">
-        <i data-lucide="download" style="width:16px;height:16px"></i> 설문 응답 템플릿 다운로드
+        <i data-lucide="download" style="width:16px;height:16px"></i> 활동 내용 템플릿 다운로드
       </button>
     </div>
 
@@ -218,7 +190,7 @@ body.nav-expanded .main-shell { margin-left: 200px; transition: margin-left .2s 
       <div class="file-chip">
         <div class="file-chip-icon"><i data-lucide="file-spreadsheet" style="width:18px;height:18px"></i></div>
         <div class="file-chip-info">
-          <div class="file-chip-name" id="fileName">자율_설문응답_2학년1반.xlsx</div>
+          <div class="file-chip-name" id="fileName">자율_활동내용_2학년1반.xlsx</div>
           <div class="file-chip-meta" id="fileMeta">28KB · 방금 업로드</div>
         </div>
         <button class="file-chip-x" onclick="clearUpload()" title="업로드 취소"><i data-lucide="x" style="width:16px;height:16px"></i></button>
@@ -226,9 +198,10 @@ body.nav-expanded .main-shell { margin-left: 200px; transition: margin-left .2s 
     </div>
 
     <div class="info-box">
-      <div class="info-head">※ 반드시 위의 <span class="hi">[설문 응답 템플릿]</span>을 다운받아, 양식에 맞춰 작성 후 업로드해 주세요. 다른 양식은 사용할 수 없어요.</div>
+      <div class="info-head">※ 반드시 위의 <span class="hi">[활동 내용 템플릿]</span>을 다운받아, 양식에 맞춰 작성 후 업로드해 주세요. 다른 양식은 사용할 수 없어요.</div>
       <ul>
-        <li>설문의 학생 응답은 항목 별로 1,000자 이내로 작성해 주세요.</li>
+        <li>활동 내용은 1,000자 이내로 작성해 주세요.</li>
+        <li>활동 수준은 선택사항이며, 상/중/하로 작성해 주세요.</li>
         <li>파일 용량은 20MB까지 가능해요.</li>
       </ul>
     </div>
@@ -249,10 +222,16 @@ body.nav-expanded .main-shell { margin-left: 200px; transition: margin-left .2s 
 
     <!-- 결과 -->
     <div id="resultSection" style="display:none">
-      <div class="result-summary">총 <span class="num" id="rsTotal">0</span>명 · 응답 수 <span class="num" id="rsCount">0</span></div>
       <div class="result-table-wrap">
         <table class="result-table">
-          <thead><tr id="resultHead"></tr></thead>
+          <thead>
+            <tr>
+              <th class="col-sid">학번</th>
+              <th class="col-name">이름</th>
+              <th class="col-content">활동 내용</th>
+              <th class="col-level">활동 수준</th>
+            </tr>
+          </thead>
           <tbody id="resultRows"></tbody>
         </table>
       </div>
@@ -270,20 +249,6 @@ body.nav-expanded .main-shell { margin-left: 200px; transition: margin-left .2s 
 </main>
 </div>
 
-<!-- 자세히 보기 모달 -->
-<div class="modal-bg" id="qaModal">
-  <div class="modal">
-    <div class="modal-hd">
-      <div class="modal-title" id="qaTitle">설문 응답</div>
-      <button class="modal-x" onclick="closeQaModal()"><i data-lucide="x" style="width:18px;height:18px"></i></button>
-    </div>
-    <div class="modal-body" id="qaBody"></div>
-    <div class="modal-ft">
-      <button class="btn-modal-confirm" onclick="closeQaModal()">닫기</button>
-    </div>
-  </div>
-</div>
-
 <div class="toast" id="toast"></div>
 
 <script>
@@ -292,40 +257,22 @@ const ACTIVITY_TYPE = _params.get('type') || '자율활동';
 const CLS = _params.get('cls') || '2학년 1반';
 document.getElementById('pt-cls').textContent = CLS;
 
-// 설문 문항
-const SURVEY_QUESTIONS = [
-  '이번 학기 가장 인상 깊었던 자율 활동은 무엇이었나요?',
-  '이번 학기 가장 인상 깊었던 자율 활동은 무엇이었나요?',
-  '이번 학기 가장 인상 깊었던 자율 활동은 무엇이었나요?',
-  '이번 학기 가장 인상 깊었던 자율 활동은 무엇이었나요?'
-];
+// mock 데이터
+const LONG_CONTENT = '기억에 남는 활동이 있었나요? 그 활동에 대해 소감을 적어 보세요. 기억에 남는 활동이 있었나요? 그 활동에 대해 소감을 적어 보세요. 기억에 남는 활동이 있었나요? 그 활동에 대해 소감을 적어 보세요. 기억에 남는 활동이 있었나요? 그 활동에 대해 소감을 적어 보세요. 기억에 남는 활동이 있었나요? 그 활동에 대해 소감을 적어 보세요. 기억에 남는 활동이 있었나요? 그 활동에 대해 소감을 적어 보세요.';
+const SHORT_CONTENT = '기억에 남는 활동이 있었나요? 그 활동에 대해 소감을 적어 보세요.';
 
-// 업로드 응답 mock
 const UPLOAD_ROWS = [
-  { sid:'10101', name:'김하나', answers:[
-    '학급 봉사활동 시간에 친구들과 협력하여 청소 구역을 정리한 것이 기억에 남습니다. 처음에는 귀찮다고 생각했지만, 점차 우리 반을 깨끗하게 만든다는 보람을 느꼈습니다.',
-    '학급 봉사활동 시간에 친구들과 협력하여 청소 구역을 정리한 것이 기억에 남습니다. 처음에는 귀찮다고 생각했지만, 점차 우리 반을 깨끗하게 만든다는 보람을 느꼈습니다.',
-    '학급 봉사활동 시간에 친구들과 협력하여 청소 구역을 정리한 것이 기억에 남습니다. 처음에는 귀찮다고 생각했지만, 점차 우리 반을 깨끗하게 만든다는 보람을 느꼈습니다.',
-    '학급 봉사활동 시간에 친구들과 협력하여 청소 구역을 정리한 것이 기억에 남습니다. 처음에는 귀찮다고 생각했지만, 점차 우리 반을 깨끗하게 만든다는 보람을 느꼈습니다.'
-  ]},
-  { sid:'10102', name:'김하나', answers:[
-    '학급 봉사활동 시간에 친구들과 협력하여 청소 구역을 정리한 것이 기억에 남습니다.',
-    '학급 봉사활동 시간에 친구들과 협력하여 청소 구역을 정리한 것이 기억에 남습니다.',
-    '학급 봉사활동 시간에 친구들과 협력하여 청소 구역을 정리한 것이 기억에 남습니다.',
-    '학급 봉사활동 시간에 친구들과 협력하여 청소 구역을 정리한 것이 기억에 남습니다.'
-  ]},
-  { sid:'10103', name:'김하나', answers:[
-    '학급 봉사활동 시간에 친구들과 협력하여 청소 구역을 정리한 것이 기억에 남습니다.',
-    '학급 봉사활동 시간에 친구들과 협력하여 청소 구역을 정리한 것이 기억에 남습니다.',
-    '학급 봉사활동 시간에 친구들과 협력하여 청소 구역을 정리한 것이 기억에 남습니다.',
-    '학급 봉사활동 시간에 친구들과 협력하여 청소 구역을 정리한 것이 기억에 남습니다.'
-  ]},
-  { sid:'10104', name:'김하나', answers:[
-    '학급 봉사활동 시간에 친구들과 협력하여 청소 구역을 정리한 것이 기억에 남습니다.',
-    '학급 봉사활동 시간에 친구들과 협력하여 청소 구역을 정리한 것이 기억에 남습니다.',
-    '학급 봉사활동 시간에 친구들과 협력하여 청소 구역을 정리한 것이 기억에 남습니다.',
-    '학급 봉사활동 시간에 친구들과 협력하여 청소 구역을 정리한 것이 기억에 남습니다.'
-  ]}
+  { sid:'10101', name:'김가나', content: LONG_CONTENT, level: '' },
+  { sid:'10102', name:'김가나', content: SHORT_CONTENT, level: '' },
+  { sid:'10103', name:'김가나', content: SHORT_CONTENT, level: '' },
+  { sid:'10104', name:'김가나', content: SHORT_CONTENT, level: '' },
+  { sid:'10105', name:'김가나', content: SHORT_CONTENT, level: '' },
+  { sid:'10106', name:'김가나', content: SHORT_CONTENT, level: '' },
+  { sid:'10107', name:'김가나', content: SHORT_CONTENT, level: '' },
+  { sid:'10108', name:'김가나', content: SHORT_CONTENT, level: '' },
+  { sid:'10109', name:'김가나', content: SHORT_CONTENT, level: '' },
+  { sid:'10110', name:'김가나', content: SHORT_CONTENT, level: '' },
+  { sid:'10111', name:'김가나', content: SHORT_CONTENT, level: '' }
 ];
 
 let currentRows = [];
@@ -346,48 +293,12 @@ function showToast(msg) {
 }
 
 function downloadTemplate() {
-  showToast('설문 응답 템플릿을 다운로드했어요');
-}
-
-function answeredCount(answers) { return answers.filter(a => a && a.trim()).length; }
-
-function buildHeadRow() {
-  let html = `
-    <th class="col-no">No.</th>
-    <th class="col-sid">학번</th>
-    <th class="col-name">이름</th>
-    <th class="col-rcnt">응답 수</th>`;
-  SURVEY_QUESTIONS.forEach((q, i) => {
-    html += `<th class="col-q">문항 ${i+1}</th>`;
-  });
-  html += `<th class="col-detail"></th>`;
-  return html;
-}
-
-function buildBodyRow(r, idx) {
-  const cnt = answeredCount(r.answers);
-  let html = `
-    <td class="col-no">${idx + 1}</td>
-    <td class="col-sid">${r.sid}</td>
-    <td class="col-name">${r.name}</td>
-    <td class="col-rcnt">${cnt}/${SURVEY_QUESTIONS.length}</td>`;
-  r.answers.forEach((a, i) => {
-    if (i >= SURVEY_QUESTIONS.length) return;
-    html += a
-      ? `<td class="col-q"><div class="q-text">${escapeHtml(a)}</div></td>`
-      : `<td class="col-q"><span class="q-empty">-</span></td>`;
-  });
-  html += `<td class="col-detail"><button class="detail-link" onclick="openQaModal(${idx})">자세히 보기</button></td>`;
-  return `<tr>${html}</tr>`;
-}
-
-function init() {
-  lucide.createIcons();
+  showToast('활동 내용 템플릿을 다운로드했어요');
 }
 
 function onFilePicked() {
   document.getElementById('uploadFilled').style.display = '';
-  currentRows = UPLOAD_ROWS.map(r => ({...r, answers: [...r.answers]}));
+  currentRows = UPLOAD_ROWS.map(r => ({...r}));
   renderResult();
   lucide.createIcons();
 }
@@ -404,53 +315,35 @@ function clearUpload() {
 function renderResult() {
   document.getElementById('uploadEmpty').style.display = 'none';
   document.getElementById('resultSection').style.display = '';
-  document.getElementById('resultHead').innerHTML = buildHeadRow();
-  document.getElementById('resultRows').innerHTML = currentRows.map((r, i) => buildBodyRow(r, i)).join('');
-
-  const totalAns = currentRows.reduce((acc, r) => acc + answeredCount(r.answers), 0);
-  document.getElementById('rsTotal').textContent = currentRows.length;
-  document.getElementById('rsCount').textContent = totalAns;
+  document.getElementById('resultRows').innerHTML = currentRows.map(r => `
+    <tr>
+      <td class="col-sid">${r.sid}</td>
+      <td class="col-name">${r.name}</td>
+      <td class="col-content"><div class="content-cell">${escapeHtml(r.content)}</div></td>
+      <td class="col-level">${r.level ? r.level : '<span class="level-empty">-</span>'}</td>
+    </tr>
+  `).join('');
   document.getElementById('saveBtn').disabled = false;
   lucide.createIcons();
 }
 
-function openQaModal(idx) {
-  const row = currentRows[idx];
-  if (!row) return;
-  document.getElementById('qaTitle').textContent = `설문 응답 : ${row.sid} ${row.name}`;
-  document.getElementById('qaBody').innerHTML = SURVEY_QUESTIONS.map((q, i) => {
-    const a = row.answers[i] || '';
-    return `<div class="qa-row">
-      <div class="qa-q"><span class="qno">Q${i+1}.</span><span class="qtext">${escapeHtml(q)}</span></div>
-      <div class="qa-a${a ? '' : ' qa-empty'}">${a ? escapeHtml(a) : '응답 없음'}</div>
-    </div>`;
-  }).join('');
-  document.getElementById('qaModal').classList.add('show');
-  lucide.createIcons();
-}
-
-function closeQaModal() {
-  document.getElementById('qaModal').classList.remove('show');
-}
-
 function escapeHtml(s) { return String(s).replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c])); }
 
-// 네비게이션
 function goBack() {
   const params = new URLSearchParams({ type: ACTIVITY_TYPE, cls: CLS });
   location.href = 'creative_activity_input_v1_260507.html?' + params.toString();
 }
 
 function saveAndBack() {
-  try { localStorage.setItem('clipo_survey_' + CLS, '1'); } catch(e) {}
-  showToast(`${currentRows.length}명의 설문 응답을 등록했어요`);
+  try { localStorage.setItem('clipo_keyword_' + CLS, '1'); } catch(e) {}
+  showToast(`${currentRows.length}명의 활동 내용을 등록했어요`);
   setTimeout(() => {
     const params = new URLSearchParams({ type: ACTIVITY_TYPE, cls: CLS, demo: '1' });
     location.href = 'creative_activity_input_v1_260507.html?' + params.toString();
   }, 700);
 }
 
-init();
+lucide.createIcons();
 </script>
 
 </body>
