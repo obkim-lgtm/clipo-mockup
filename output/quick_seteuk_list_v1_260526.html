@@ -1,0 +1,950 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" type="image/svg+xml" href="favicon_gan.svg">
+  <title>세특 간편 생성기 - CLIPO</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard-gov.min.css">
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+  <style>
+    * { font-family: 'Pretendard GOV', -apple-system, sans-serif; box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: #f6f7f9; color: #222631; }
+
+    /* ── 헤더 ── */
+    .g-hd { height: 56px; background: #fff; border-bottom: 1px solid #d9d9d9; display: flex; align-items: center; padding: 0 20px 0 8px; position: fixed; top: 0; left: 0; right: 0; z-index: 200; }
+    .g-hd-r { margin-left: auto; display: flex; align-items: center; gap: 6px; font-size: 14px; color: #3b3f4c; }
+    .plan-badge { background: #416bff; color: #fff; font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 4px; }
+    .hd-div { width: 1px; height: 14px; background: #d9d9d9; margin: 0 4px; }
+    .credit-wrap { display: flex; align-items: center; gap: 4px; padding: 4px 10px; background: #f6f7f9; border-radius: 6px; font-size: 13px; font-weight: 600; color: #3b3f4c; }
+    .user-btn { display: inline-flex; align-items: center; justify-content: center; gap: 4px; padding: 4px 10px; border: 1px solid #d9d9d9; border-radius: 6px; background: #fff; font-size: 13px; color: #3b3f4c; cursor: pointer; line-height: 1; }
+
+    /* ── 사이드바 ── */
+    .icon-sb { width: 56px; background: #fff; border-right: 1px solid #d9d9d9; position: fixed; top: 56px; bottom: 0; left: 0; display: flex; flex-direction: column; padding: 8px 0; z-index: 150; transition: width .2s ease; }
+    .icon-sb.expanded { width: 200px; }
+    .si { height: 40px; display: flex; align-items: center; border-radius: 8px; color: #6d7381; cursor: pointer; margin-bottom: 2px; position: relative; padding: 0 4px 0 16px; gap: 10px; white-space: nowrap; flex-shrink: 0; }
+    .si:hover { background: #f1f3f5; }
+    .si.active { background: #e9f2ff; color: #416bff; }
+    .si-icon { width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .si-label { font-size: 13px; font-weight: 500; opacity: 0; transition: opacity .1s; overflow: hidden; }
+    .icon-sb.expanded .si-label { opacity: 1; }
+    .si-tip { position: absolute; left: 48px; top: 50%; transform: translateY(-50%); background: #222631; color: #fff; font-size: 11px; padding: 3px 8px; border-radius: 4px; white-space: nowrap; display: none; z-index: 300; pointer-events: none; }
+    .si:hover .si-tip { display: block; }
+    .icon-sb.expanded .si-tip { display: none !important; }
+    .nav-bottom { margin-top: auto; width: 100%; }
+    .nav-div { height: 1px; background: #f1f3f5; margin: 4px 0; }
+    body.nav-expanded .list-main-shell { margin-left: 200px; transition: margin-left .2s ease; }
+
+    /* ── 본문 ── */
+    .list-main-shell { margin-left: 56px; margin-top: 56px; min-height: calc(100vh - 56px); }
+    .list-main { max-width: 1200px; margin: 0 auto; padding: 40px 48px 80px; }
+
+    .page-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 24px; margin-bottom: 36px; }
+    .page-title { font-size: 26px; font-weight: 600; color: #222631; margin-bottom: 8px; display: inline-flex; align-items: center; gap: 8px; }
+    .page-title .beta { font-size: 11px; font-weight: 600; background: #e9f2ff; color: #3151c4; padding: 3px 8px; border-radius: 4px; display: inline-flex; align-items: center; gap: 3px; border: 1px solid #ccdfff; }
+    .page-sub { font-size: 14px; color: #6d7381; line-height: 1.55; max-width: 720px; }
+    .btn-primary { background: #365eef; color: #fff; border: none; border-radius: 9999px; padding: 0 18px; height: 40px; font-size: 14px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 6px; font-family: inherit; line-height: 1; white-space: nowrap; }
+    .btn-primary:hover { background: #3151c4; }
+
+    /* ── 연도 섹션 ── */
+    .year-sec { margin-bottom: 32px; }
+    .year-title { font-size: 16px; font-weight: 600; color: #222631; margin-bottom: 12px; display: inline-flex; align-items: center; gap: 8px; }
+    .ybadge { font-size: 12px; font-weight: 500; padding: 2px 8px; border-radius: 4px; }
+    .ybadge.past { background: #f1f3f5; color: #6d7381; }
+
+    /* ── 카드(창체 패턴) ── */
+    .cards-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+    .card { background: #fff; border: 1px solid #d9d9d9; border-radius: 12px; padding: 20px 24px; cursor: pointer; transition: box-shadow .15s, border-color .15s; position: relative; }
+    .card:hover { border-color: #b3b3b3; box-shadow: 0 4px 12px rgba(0,0,0,.08); }
+    .card-top { display: flex; align-items: center; justify-content: space-between; }
+    .subj-badge { font-size: 12px; font-weight: 600; padding: 3px 10px; border-radius: 20px; background: #e9f2ff; color: #3151c4; }
+    .menu-btn { background: none; border: none; cursor: pointer; color: #6d7381; display: inline-flex; align-items: center; justify-content: center; border-radius: 6px; padding: 4px; }
+    .menu-btn:hover { background: #f1f3f5; }
+    .card-title { font-size: 20px; font-weight: 600; color: #222631; margin: 12px 0 4px; line-height: 1.35; word-break: break-word; }
+    .card-date { font-size: 14px; color: #6d7381; }
+    .divider { height: 1px; background: #f1f3f5; margin: 16px 0 12px; }
+    .pb-row { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 14px; }
+    .pb-row .lbl { color: #6d7381; }
+    .pb-row .val { color: #3b3f4c; font-weight: 500; }
+    .pb-bg { height: 6px; background: #f1f3f5; border-radius: 3px; overflow: hidden; }
+    .pb-fill { height: 100%; border-radius: 3px; background: #365eef; }
+    /* 지난 기록(과거 학년도)은 톤다운 — 진행률 회색 처리 */
+    .year-sec:has(.ybadge.past) .pb-fill { background: #b3b6bd; }
+    .year-sec:has(.ybadge.past) .pb-row .val { color: #6d7381; }
+    .stu-empty { display: flex; align-items: center; gap: 6px; padding: 6px 0; }
+    .stu-empty span { font-size: 14px; color: #b3b6bd; }
+
+    .card-dropdown { display: none; position: absolute; top: 44px; right: 16px; background: #fff; border: 1px solid #d9d9d9; border-radius: 8px; box-shadow: 0 4px 16px rgba(0,0,0,.12); z-index: 50; min-width: 160px; overflow: hidden; }
+    .card-dropdown.open { display: block; }
+    .dropdown-item { display: flex; align-items: center; gap: 8px; padding: 10px 14px; font-size: 14px; cursor: pointer; color: #3b3f4c; }
+    .dropdown-item:hover { background: #f6f7f9; }
+    .dropdown-item.danger { color: #f2525f; }
+    .dropdown-item.danger:hover { background: #fff3f4; }
+
+    @media (max-width: 1023px) { .cards-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 640px) { .cards-grid { grid-template-columns: 1fr; gap: 12px; } }
+
+    /* ── 모달 ── */
+    .overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.4); z-index: 300; align-items: center; justify-content: center; padding: 24px; }
+    .overlay.open { display: flex; }
+    .modal-lg { background: #fff; border-radius: 12px; width: 760px; max-width: 100%; max-height: calc(100vh - 48px); display: flex; flex-direction: column; box-shadow: 0 0 1px #2226314D, 0 4px 8px #0000001A; overflow: hidden; }
+    .modal-head { display: flex; align-items: center; justify-content: space-between; padding: 22px 28px 18px; border-bottom: 1px solid #f1f3f5; }
+    .modal-head-title { font-size: 20px; font-weight: 600; color: #222631; }
+    .modal-x { background: none; border: none; padding: 6px; cursor: pointer; color: #6d7381; display: inline-flex; align-items: center; justify-content: center; border-radius: 6px; }
+    .modal-x:hover { background: #f1f3f5; }
+    .modal-body { padding: 24px 28px; overflow-y: auto; flex: 1; }
+    .modal-foot { display: flex; gap: 10px; justify-content: flex-end; padding: 16px 28px 22px; border-top: 1px solid #f1f3f5; }
+
+    .form-sec { margin-bottom: 28px; }
+    .form-sec:last-child { margin-bottom: 0; }
+    .form-sec-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
+    .form-sec-title { font-size: 17px; font-weight: 600; color: #222631; }
+    .form-sec-cnt { font-size: 13px; color: #3151c4; background: #e9f2ff; padding: 3px 8px; border-radius: 4px; font-weight: 500; }
+    .form-sec-desc { font-size: 14px; color: #6d7381; line-height: 1.55; margin-bottom: 16px; }
+
+    .field-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 14px; }
+    .field-row { margin-bottom: 14px; }
+    .field-row:last-child { margin-bottom: 0; }
+    .field-label { display: block; font-size: 14px; font-weight: 500; color: #3b3f4c; margin-bottom: 8px; }
+    .field-input, .field-select { width: 100%; padding: 10px 14px; font-size: 15px; font-family: inherit; border: 1px solid #d9d9d9; border-radius: 6px; color: #222631; background: #fff; height: 42px; }
+    .field-select { background: #fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%236d7381' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E") no-repeat right 12px center; appearance: none; cursor: pointer; padding-right: 36px; }
+    .field-input:focus, .field-select:focus { outline: none; border-color: #416bff; }
+    .field-input::placeholder { color: #b3b3b3; }
+
+    .help-link { font-size: 13px; color: #6d7381; margin: 0 0 14px; }
+    .help-link a { color: #416bff; text-decoration: none; font-weight: 500; margin-left: 4px; }
+    .help-link a:hover { text-decoration: underline; }
+
+    .std-row { border: 1px solid #e6e8ee; border-radius: 8px; padding: 14px 16px; margin-bottom: 10px; background: #fff; }
+    .std-row-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; gap: 10px; }
+    .std-row-title { font-size: 14px; font-weight: 500; color: #3b3f4c; }
+    .std-row-head-right { display: inline-flex; align-items: center; gap: 4px; }
+    .std-row-del { background: none; border: none; padding: 4px; cursor: pointer; color: #6d7381; display: inline-flex; align-items: center; justify-content: center; border-radius: 4px; }
+    .std-row-del:hover { background: #f1f3f5; color: #f2525f; }
+    .std-row-body { display: flex; gap: 10px; align-items: center; }
+    .std-row-body .field-select, .std-row-body .field-input { flex: 1; min-width: 0; }
+    .std-direct { display: inline-flex; align-items: center; gap: 6px; font-size: 14px; color: #3b3f4c; cursor: pointer; white-space: nowrap; padding: 0 6px; user-select: none; }
+    .std-direct input { width: 16px; height: 16px; accent-color: #416bff; cursor: pointer; }
+
+    .btn-add-std { display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 0 16px; height: 40px; font-size: 14px; font-weight: 600; border: 1px solid #416bff; border-radius: 6px; background: #fff; color: #416bff; cursor: pointer; font-family: inherit; line-height: 1; margin-top: 4px; }
+    .btn-add-std:hover { background: #eef3ff; }
+    .btn-add-std:disabled { border-color: #dde1e8; color: #b3b6bd; cursor: not-allowed; background: #fff; }
+
+    .btn-cancel { padding: 0 18px; height: 42px; font-size: 14px; font-weight: 500; border: 1px solid #d9d9d9; border-radius: 6px; background: #fff; color: #3b3f4c; cursor: pointer; font-family: inherit; line-height: 1; }
+    .btn-cancel:hover { background: #f6f7f9; }
+    .btn-submit { padding: 0 22px; height: 42px; font-size: 14px; font-weight: 600; border: none; border-radius: 6px; background: #365eef; color: #fff; cursor: pointer; font-family: inherit; line-height: 1; }
+    .btn-submit:hover { background: #3151c4; }
+    .btn-submit:disabled { background: #dde1e8; color: #b3b6bd; cursor: not-allowed; }
+
+    /* ── 토스트 ── */
+    .toast { position: fixed; bottom: 32px; left: 50%; transform: translateX(-50%) translateY(20px); background: #222631; color: #fff; padding: 12px 20px; border-radius: 8px; font-size: 14px; display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 4px 16px rgba(0,0,0,.2); opacity: 0; transition: opacity .2s, transform .2s; z-index: 600; pointer-events: none; line-height: 1; }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+    .toast-ic { display: inline-flex; align-items: center; justify-content: center; color: #1ab864; }
+
+    /* ── 빈 상태 ── */
+    .empty-wrap { display: none; flex-direction: column; align-items: center; justify-content: center; padding: 120px 24px; text-align: center; }
+    .empty-wrap.show { display: flex; }
+    .empty-illu { width: 200px; height: 133px; margin-bottom: 20px; display: flex; align-items: center; justify-content: center; }
+    .empty-title { font-size: 18px; font-weight: 600; color: #222631; line-height: 1.4; margin-bottom: 8px; }
+    .empty-sub { font-size: 15px; color: #6d7381; line-height: 1.55; }
+
+    /* ── MOCKUP 토글 (드래그 가능) ── */
+    .mockup-toggle { position: fixed; bottom: 24px; right: 24px; background: #222631; color: #fff; border-radius: 24px; padding: 5px; display: inline-flex; align-items: center; gap: 2px; box-shadow: 0 8px 24px rgba(0,0,0,.2); z-index: 550; font-family: inherit; cursor: move; user-select: none; }
+    .mockup-toggle.dragging { box-shadow: 0 12px 32px rgba(0,0,0,.4); opacity: .95; }
+    .mt-label { padding: 0 8px 0 10px; font-size: 11px; font-weight: 700; color: #b3b6bd; letter-spacing: 0.5px; }
+    .mt-btn { padding: 7px 14px; border: none; background: none; color: #b3b6bd; font-size: 13px; font-weight: 500; cursor: pointer; font-family: inherit; border-radius: 18px; line-height: 1; transition: all .15s; }
+    .mt-btn:hover { color: #fff; }
+    .mt-btn.active { background: #416bff; color: #fff; }
+
+    footer { text-align: center; padding: 48px 0 24px; font-size: 13px; color: #6d7381; }
+    footer a { color: #6d7381; text-decoration: none; margin: 0 8px; }
+  </style>
+</head>
+<body>
+
+<!-- 헤더 -->
+<header class="g-hd">
+  <button onclick="toggleNav()" style="width:36px;height:36px;border:none;background:none;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;color:#3b3f4c;margin-right:8px;line-height:1">
+    <i data-lucide="menu" style="width:20px;height:20px"></i>
+  </button>
+  <svg width="76" height="16" viewBox="0 0 76 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M11.3613 4.03516H4.09668V11.9629H8.88281L8.88086 11.9648H15.6016V16H4.02539C1.80242 15.9998 0 14.223 0 12.0322V3.96777C0 1.77696 1.80242 0.000177874 4.02539 0H15.4561L11.3613 4.03516ZM22.0703 11.9648H33.5781V16H22.002C19.7788 16 17.9756 14.2231 17.9756 12.0322V0H22.0703V11.9648ZM40.0459 16H35.9521V0H40.0459V16ZM54.5381 0C56.4564 0 58.0138 1.53228 58.0186 3.42285L58.0166 3.4248V8.54297C58.014 10.4333 56.4567 11.9648 54.5361 11.9648H46.5107L42.416 16V0H54.5381ZM71.9746 0C74.0086 0.000134956 75.6887 1.49046 75.958 3.42285H76V12.5771H75.958C75.6887 14.5095 74.011 15.9999 71.9746 16H64.4238C62.3897 16 60.7098 14.5096 60.4404 12.5771C60.4145 12.398 60.3984 12.2184 60.3984 12.0322V3.96777C60.3984 3.78159 60.4145 3.60205 60.4404 3.42285C60.7098 1.49037 62.3873 0 64.4238 0H71.9746ZM64.4922 12.5771H71.9062V3.42285H64.4922V12.5771ZM46.5107 3.42285V8.54004H53.9238V3.42285H46.5107Z" fill="#365EEF"/>
+  </svg>
+  <div class="g-hd-r">
+    <span class="plan-badge">개인 유료</span>
+    <span style="font-size:13px;color:#6d7381">D-1654</span>
+    <div class="hd-div"></div>
+    <i data-lucide="bot" style="width:16px;height:16px;color:#416bff"></i>
+    <div class="credit-wrap">AI 크레딧 750</div>
+    <div class="hd-div"></div>
+    <button class="user-btn">
+      test99 선생님(대표교사) <i data-lucide="chevron-down" style="width:14px;height:14px"></i>
+    </button>
+  </div>
+</header>
+
+<!-- 사이드바 -->
+<nav class="icon-sb" id="icon-sb">
+  <div class="si"><div class="si-icon"><i data-lucide="home" style="width:20px;height:20px"></i></div><span class="si-label">홈</span><span class="si-tip">홈</span></div>
+  <div class="si"><div class="si-icon"><i data-lucide="scissors" style="width:20px;height:20px"></i></div><span class="si-label">평가계획</span><span class="si-tip">평가계획</span></div>
+  <div class="si"><div class="si-icon"><i data-lucide="layout-grid" style="width:20px;height:20px"></i></div><span class="si-label">수업</span><span class="si-tip">수업</span></div>
+  <div class="si"><div class="si-icon"><i data-lucide="notebook-pen" style="width:20px;height:20px"></i></div><span class="si-label">창의적 체험활동 <span style="font-size:10px;background:#416bff;color:#fff;padding:1px 5px;border-radius:3px;margin-left:2px">Beta</span></span><span class="si-tip">창의적 체험활동</span></div>
+  <div class="si active"><div class="si-icon"><i data-lucide="zap" style="width:20px;height:20px"></i></div><span class="si-label">세특 간편 생성기</span><span class="si-tip">세특 간편 생성기</span></div>
+  <div class="si"><div class="si-icon"><i data-lucide="smile" style="width:20px;height:20px"></i></div><span class="si-label">행동특성 및 종합기록</span><span class="si-tip">행동특성 및 종합기록</span></div>
+  <div class="si"><div class="si-icon"><i data-lucide="bar-chart-2" style="width:20px;height:20px"></i></div><span class="si-label">리포트</span><span class="si-tip">리포트</span></div>
+  <div class="si"><div class="si-icon"><i data-lucide="building-2" style="width:20px;height:20px"></i></div><span class="si-label">학교 설정</span><span class="si-tip">학교 설정</span></div>
+  <div class="nav-bottom">
+    <div class="nav-div"></div>
+    <div class="si"><div class="si-icon"><i data-lucide="file-down" style="width:20px;height:20px"></i></div><span class="si-label">매뉴얼 다운로드</span><span class="si-tip">매뉴얼 다운로드</span></div>
+    <div class="si"><div class="si-icon"><i data-lucide="credit-card" style="width:20px;height:20px"></i></div><span class="si-label">요금제</span><span class="si-tip">요금제</span></div>
+    <div class="si"><div class="si-icon"><i data-lucide="help-circle" style="width:20px;height:20px"></i></div><span class="si-label">고객센터</span><span class="si-tip">고객센터</span></div>
+  </div>
+</nav>
+
+<!-- 본문 -->
+<div class="list-main-shell">
+<main class="list-main">
+
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">세특 간편 생성기 <span class="beta"><i data-lucide="flask-conical" style="width:11px;height:11px"></i> Beta</span></h1>
+      <p class="page-sub">간단한 입력으로 학생별 세부능력 및 특기사항 기록 초안을 손쉽게 생성해 보세요. 단, AI 생성 결과는 항상 선생님의 최종 확인이 필요합니다.</p>
+    </div>
+    <button class="btn-primary" onclick="openSubjectModal()">
+      <i data-lucide="plus" style="width:16px;height:16px"></i> 교과 추가
+    </button>
+  </div>
+
+  <!-- 데이터 있음 -->
+  <div id="data-state">
+    <!-- 2026학년도 -->
+    <section class="year-sec">
+      <div class="year-title">2026학년도</div>
+      <div class="cards-grid">
+
+        <div class="card" onclick="goDetail(event,'사회','세특 간편 생성기')">
+          <div class="card-top">
+            <span class="subj-badge">사회</span>
+            <button class="menu-btn" onclick="toggleDropdown(event,this)"><i data-lucide="more-horizontal" style="width:16px;height:16px"></i></button>
+          </div>
+          <div class="card-dropdown">
+            <div class="dropdown-item" onclick="openRenameGroupModal(event,this)"><i data-lucide="pencil" style="width:14px;height:14px"></i>이름 변경</div>
+            <div class="dropdown-item" onclick="goManageStudents(event,this)"><i data-lucide="users" style="width:14px;height:14px"></i>참여 학생 관리</div>
+            <div class="dropdown-item danger" onclick="openDeleteGroupModal(event,this)"><i data-lucide="trash-2" style="width:14px;height:14px"></i>삭제</div>
+          </div>
+          <p class="card-title">세특 간편 생성기</p>
+          <p class="card-date">2026.05.22 수정</p>
+          <div class="divider"></div>
+          <div class="pb-row"><span class="lbl">기록 진행률</span><span class="val">5 / 28명</span></div>
+          <div class="pb-bg"><div class="pb-fill" style="width:18%"></div></div>
+        </div>
+
+        <div class="card" onclick="goDetail(event,'사회','테스트 입력')">
+          <div class="card-top">
+            <span class="subj-badge">사회</span>
+            <button class="menu-btn" onclick="toggleDropdown(event,this)"><i data-lucide="more-horizontal" style="width:16px;height:16px"></i></button>
+          </div>
+          <div class="card-dropdown">
+            <div class="dropdown-item" onclick="openRenameGroupModal(event,this)"><i data-lucide="pencil" style="width:14px;height:14px"></i>이름 변경</div>
+            <div class="dropdown-item" onclick="goManageStudents(event,this)"><i data-lucide="users" style="width:14px;height:14px"></i>참여 학생 관리</div>
+            <div class="dropdown-item danger" onclick="openDeleteGroupModal(event,this)"><i data-lucide="trash-2" style="width:14px;height:14px"></i>삭제</div>
+          </div>
+          <p class="card-title">테스트 입력</p>
+          <p class="card-date">2026.05.14 수정</p>
+          <div class="divider"></div>
+          <div class="pb-row"><span class="lbl">기록 진행률</span><span class="val">28 / 28명</span></div>
+          <div class="pb-bg"><div class="pb-fill" style="width:100%"></div></div>
+        </div>
+
+        <div class="card" onclick="goDetail(event,'사회','서천고 연수 2')">
+          <div class="card-top">
+            <span class="subj-badge">사회</span>
+            <button class="menu-btn" onclick="toggleDropdown(event,this)"><i data-lucide="more-horizontal" style="width:16px;height:16px"></i></button>
+          </div>
+          <div class="card-dropdown">
+            <div class="dropdown-item" onclick="openRenameGroupModal(event,this)"><i data-lucide="pencil" style="width:14px;height:14px"></i>이름 변경</div>
+            <div class="dropdown-item" onclick="goManageStudents(event,this)"><i data-lucide="users" style="width:14px;height:14px"></i>참여 학생 관리</div>
+            <div class="dropdown-item danger" onclick="openDeleteGroupModal(event,this)"><i data-lucide="trash-2" style="width:14px;height:14px"></i>삭제</div>
+          </div>
+          <p class="card-title">서천고 연수 2</p>
+          <p class="card-date">2026.05.13 수정</p>
+          <div class="divider"></div>
+          <div class="pb-row"><span class="lbl">기록 진행률</span><span class="val">12 / 30명</span></div>
+          <div class="pb-bg"><div class="pb-fill" style="width:40%"></div></div>
+        </div>
+
+        <div class="card" onclick="goDetail(event,'사회','서천고등학교 간편 세특')">
+          <div class="card-top">
+            <span class="subj-badge">사회</span>
+            <button class="menu-btn" onclick="toggleDropdown(event,this)"><i data-lucide="more-horizontal" style="width:16px;height:16px"></i></button>
+          </div>
+          <div class="card-dropdown">
+            <div class="dropdown-item" onclick="openRenameGroupModal(event,this)"><i data-lucide="pencil" style="width:14px;height:14px"></i>이름 변경</div>
+            <div class="dropdown-item" onclick="goManageStudents(event,this)"><i data-lucide="users" style="width:14px;height:14px"></i>참여 학생 관리</div>
+            <div class="dropdown-item danger" onclick="openDeleteGroupModal(event,this)"><i data-lucide="trash-2" style="width:14px;height:14px"></i>삭제</div>
+          </div>
+          <p class="card-title">서천고등학교 간편 세특</p>
+          <p class="card-date">2026.05.13 수정</p>
+          <div class="divider"></div>
+          <div class="stu-empty">
+            <i data-lucide="user-plus" style="width:14px;height:14px;color:#b3b6bd"></i>
+            <span>학생 등록 전</span>
+          </div>
+        </div>
+
+        <div class="card" onclick="goDetail(event,'사회','대신중학교 연수')">
+          <div class="card-top">
+            <span class="subj-badge">사회</span>
+            <button class="menu-btn" onclick="toggleDropdown(event,this)"><i data-lucide="more-horizontal" style="width:16px;height:16px"></i></button>
+          </div>
+          <div class="card-dropdown">
+            <div class="dropdown-item" onclick="openRenameGroupModal(event,this)"><i data-lucide="pencil" style="width:14px;height:14px"></i>이름 변경</div>
+            <div class="dropdown-item" onclick="goManageStudents(event,this)"><i data-lucide="users" style="width:14px;height:14px"></i>참여 학생 관리</div>
+            <div class="dropdown-item danger" onclick="openDeleteGroupModal(event,this)"><i data-lucide="trash-2" style="width:14px;height:14px"></i>삭제</div>
+          </div>
+          <p class="card-title">대신중학교 연수</p>
+          <p class="card-date">2026.04.24 수정</p>
+          <div class="divider"></div>
+          <div class="pb-row"><span class="lbl">기록 진행률</span><span class="val">25 / 25명</span></div>
+          <div class="pb-bg"><div class="pb-fill" style="width:100%"></div></div>
+        </div>
+
+        <div class="card" onclick="goDetail(event,'영어','성남여중 연수')">
+          <div class="card-top">
+            <span class="subj-badge">영어</span>
+            <button class="menu-btn" onclick="toggleDropdown(event,this)"><i data-lucide="more-horizontal" style="width:16px;height:16px"></i></button>
+          </div>
+          <div class="card-dropdown">
+            <div class="dropdown-item" onclick="openRenameGroupModal(event,this)"><i data-lucide="pencil" style="width:14px;height:14px"></i>이름 변경</div>
+            <div class="dropdown-item" onclick="goManageStudents(event,this)"><i data-lucide="users" style="width:14px;height:14px"></i>참여 학생 관리</div>
+            <div class="dropdown-item danger" onclick="openDeleteGroupModal(event,this)"><i data-lucide="trash-2" style="width:14px;height:14px"></i>삭제</div>
+          </div>
+          <p class="card-title">성남여중 연수</p>
+          <p class="card-date">2026.04.20 수정</p>
+          <div class="divider"></div>
+          <div class="pb-row"><span class="lbl">기록 진행률</span><span class="val">22 / 26명</span></div>
+          <div class="pb-bg"><div class="pb-fill" style="width:85%"></div></div>
+        </div>
+
+        <div class="card" onclick="goDetail(event,'도덕','세종시교육청 연수')">
+          <div class="card-top">
+            <span class="subj-badge">도덕</span>
+            <button class="menu-btn" onclick="toggleDropdown(event,this)"><i data-lucide="more-horizontal" style="width:16px;height:16px"></i></button>
+          </div>
+          <div class="card-dropdown">
+            <div class="dropdown-item" onclick="openRenameGroupModal(event,this)"><i data-lucide="pencil" style="width:14px;height:14px"></i>이름 변경</div>
+            <div class="dropdown-item" onclick="goManageStudents(event,this)"><i data-lucide="users" style="width:14px;height:14px"></i>참여 학생 관리</div>
+            <div class="dropdown-item danger" onclick="openDeleteGroupModal(event,this)"><i data-lucide="trash-2" style="width:14px;height:14px"></i>삭제</div>
+          </div>
+          <p class="card-title">세종시교육청 연수</p>
+          <p class="card-date">2026.04.08 수정</p>
+          <div class="divider"></div>
+          <div class="pb-row"><span class="lbl">기록 진행률</span><span class="val">18 / 24명</span></div>
+          <div class="pb-bg"><div class="pb-fill" style="width:75%"></div></div>
+        </div>
+
+        <div class="card" onclick="goDetail(event,'과학','테스트')">
+          <div class="card-top">
+            <span class="subj-badge">과학</span>
+            <button class="menu-btn" onclick="toggleDropdown(event,this)"><i data-lucide="more-horizontal" style="width:16px;height:16px"></i></button>
+          </div>
+          <div class="card-dropdown">
+            <div class="dropdown-item" onclick="openRenameGroupModal(event,this)"><i data-lucide="pencil" style="width:14px;height:14px"></i>이름 변경</div>
+            <div class="dropdown-item" onclick="goManageStudents(event,this)"><i data-lucide="users" style="width:14px;height:14px"></i>참여 학생 관리</div>
+            <div class="dropdown-item danger" onclick="openDeleteGroupModal(event,this)"><i data-lucide="trash-2" style="width:14px;height:14px"></i>삭제</div>
+          </div>
+          <p class="card-title">테스트</p>
+          <p class="card-date">2026.03.23 수정</p>
+          <div class="divider"></div>
+          <div class="stu-empty">
+            <i data-lucide="user-plus" style="width:14px;height:14px;color:#b3b6bd"></i>
+            <span>학생 등록 전</span>
+          </div>
+        </div>
+
+        <div class="card" onclick="goDetail(event,'사회','테스트 수행평가')">
+          <div class="card-top">
+            <span class="subj-badge">사회</span>
+            <button class="menu-btn" onclick="toggleDropdown(event,this)"><i data-lucide="more-horizontal" style="width:16px;height:16px"></i></button>
+          </div>
+          <div class="card-dropdown">
+            <div class="dropdown-item" onclick="openRenameGroupModal(event,this)"><i data-lucide="pencil" style="width:14px;height:14px"></i>이름 변경</div>
+            <div class="dropdown-item" onclick="goManageStudents(event,this)"><i data-lucide="users" style="width:14px;height:14px"></i>참여 학생 관리</div>
+            <div class="dropdown-item danger" onclick="openDeleteGroupModal(event,this)"><i data-lucide="trash-2" style="width:14px;height:14px"></i>삭제</div>
+          </div>
+          <p class="card-title">테스트 수행평가</p>
+          <p class="card-date">2026.03.23 수정</p>
+          <div class="divider"></div>
+          <div class="pb-row"><span class="lbl">기록 진행률</span><span class="val">3 / 28명</span></div>
+          <div class="pb-bg"><div class="pb-fill" style="width:11%"></div></div>
+        </div>
+
+        <div class="card" onclick="goDetail(event,'도덕','테스트 생성')">
+          <div class="card-top">
+            <span class="subj-badge">도덕</span>
+            <button class="menu-btn" onclick="toggleDropdown(event,this)"><i data-lucide="more-horizontal" style="width:16px;height:16px"></i></button>
+          </div>
+          <div class="card-dropdown">
+            <div class="dropdown-item" onclick="openRenameGroupModal(event,this)"><i data-lucide="pencil" style="width:14px;height:14px"></i>이름 변경</div>
+            <div class="dropdown-item" onclick="goManageStudents(event,this)"><i data-lucide="users" style="width:14px;height:14px"></i>참여 학생 관리</div>
+            <div class="dropdown-item danger" onclick="openDeleteGroupModal(event,this)"><i data-lucide="trash-2" style="width:14px;height:14px"></i>삭제</div>
+          </div>
+          <p class="card-title">테스트 생성</p>
+          <p class="card-date">2026.03.18 수정</p>
+          <div class="divider"></div>
+          <div class="stu-empty">
+            <i data-lucide="user-plus" style="width:14px;height:14px;color:#b3b6bd"></i>
+            <span>학생 등록 전</span>
+          </div>
+        </div>
+
+        <div class="card" onclick="goDetail(event,'수학','테스트')">
+          <div class="card-top">
+            <span class="subj-badge">수학</span>
+            <button class="menu-btn" onclick="toggleDropdown(event,this)"><i data-lucide="more-horizontal" style="width:16px;height:16px"></i></button>
+          </div>
+          <div class="card-dropdown">
+            <div class="dropdown-item" onclick="openRenameGroupModal(event,this)"><i data-lucide="pencil" style="width:14px;height:14px"></i>이름 변경</div>
+            <div class="dropdown-item" onclick="goManageStudents(event,this)"><i data-lucide="users" style="width:14px;height:14px"></i>참여 학생 관리</div>
+            <div class="dropdown-item danger" onclick="openDeleteGroupModal(event,this)"><i data-lucide="trash-2" style="width:14px;height:14px"></i>삭제</div>
+          </div>
+          <p class="card-title">테스트</p>
+          <p class="card-date">2026.02.24 수정</p>
+          <div class="divider"></div>
+          <div class="pb-row"><span class="lbl">기록 진행률</span><span class="val">30 / 30명</span></div>
+          <div class="pb-bg"><div class="pb-fill" style="width:100%"></div></div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- 2025학년도 -->
+    <section class="year-sec">
+      <div class="year-title">2025학년도 <span class="ybadge past">지난 기록</span></div>
+      <div class="cards-grid">
+        <div class="card" onclick="goDetail(event,'사회','2학기 기말고사 수행평가')">
+          <div class="card-top">
+            <span class="subj-badge">사회</span>
+            <button class="menu-btn" onclick="toggleDropdown(event,this)"><i data-lucide="more-horizontal" style="width:16px;height:16px"></i></button>
+          </div>
+          <div class="card-dropdown">
+            <div class="dropdown-item" onclick="openRenameGroupModal(event,this)"><i data-lucide="pencil" style="width:14px;height:14px"></i>이름 변경</div>
+            <div class="dropdown-item" onclick="goManageStudents(event,this)"><i data-lucide="users" style="width:14px;height:14px"></i>참여 학생 관리</div>
+            <div class="dropdown-item danger" onclick="openDeleteGroupModal(event,this)"><i data-lucide="trash-2" style="width:14px;height:14px"></i>삭제</div>
+          </div>
+          <p class="card-title">2학기 기말고사 수행평가</p>
+          <p class="card-date">2025.12.12 수정</p>
+          <div class="divider"></div>
+          <div class="pb-row"><span class="lbl">기록 진행률</span><span class="val">28 / 28명</span></div>
+          <div class="pb-bg"><div class="pb-fill" style="width:100%"></div></div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- 빈 상태 -->
+  <div class="empty-wrap" id="empty-state">
+    <div class="empty-illu">
+      <svg width="200" height="133" viewBox="0 0 200 133" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <ellipse cx="100" cy="70" rx="78" ry="58" fill="#eff3ff"/>
+        <!-- 책상 -->
+        <rect x="70" y="92" width="80" height="30" rx="4" fill="#fff" stroke="#222631" stroke-width="1.5"/>
+        <!-- 노트북 -->
+        <rect x="78" y="78" width="46" height="32" rx="2" fill="#fff" stroke="#222631" stroke-width="1.5"/>
+        <line x1="84" y1="86" x2="116" y2="86" stroke="#d4e0ff" stroke-width="1.5"/>
+        <line x1="84" y1="92" x2="116" y2="92" stroke="#d4e0ff" stroke-width="1.5"/>
+        <line x1="84" y1="98" x2="108" y2="98" stroke="#d4e0ff" stroke-width="1.5"/>
+        <!-- 캐릭터 -->
+        <ellipse cx="95" cy="58" rx="13" ry="12" fill="#fde2cf"/>
+        <path d="M82 56 Q82 44 95 44 Q108 44 108 56" fill="#222631"/>
+        <circle cx="91" cy="58" r="1.2" fill="#222631"/>
+        <circle cx="99" cy="58" r="1.2" fill="#222631"/>
+        <path d="M93 63 Q95 65 97 63" stroke="#222631" stroke-width="1.2" stroke-linecap="round" fill="none"/>
+        <!-- 몸통 -->
+        <path d="M80 75 L80 92 L110 92 L110 75 Q110 70 105 70 L85 70 Q80 70 80 75 Z" fill="#416bff"/>
+        <!-- AI 스파클 -->
+        <g transform="translate(135,55)">
+          <circle r="14" fill="#416bff"/>
+          <path d="M0 -6 L1 -1 L6 0 L1 1 L0 6 L-1 1 L-6 0 L-1 -1 Z" fill="#fff"/>
+          <circle cx="-7" cy="-6" r="2" fill="#fff"/>
+          <circle cx="7" cy="6" r="1.5" fill="#fff"/>
+        </g>
+      </svg>
+    </div>
+    <div class="empty-title">세특 기록을 생성할 그룹을 생성해주세요.</div>
+    <div class="empty-sub">세특 만들기 버튼을 클릭하세요.</div>
+  </div>
+
+</main>
+</div>
+
+<!-- 교과 추가 모달 -->
+<div class="overlay" id="subjectModal">
+  <div class="modal-lg">
+    <div class="modal-head">
+      <div class="modal-head-title">교과 추가</div>
+      <button class="modal-x" onclick="closeSubjectModal()"><i data-lucide="x" style="width:20px;height:20px"></i></button>
+    </div>
+    <div class="modal-body">
+
+      <!-- 기본 정보 -->
+      <div class="form-sec">
+        <div class="form-sec-head">
+          <div class="form-sec-title">기본 정보</div>
+        </div>
+        <div class="field-grid-2">
+          <div>
+            <label class="field-label">학년도</label>
+            <select class="field-select">
+              <option>2026학년도</option>
+              <option>2027학년도</option>
+            </select>
+          </div>
+          <div>
+            <label class="field-label">반 편성 기준</label>
+            <select class="field-select" id="classMode">
+              <option value="academic">학적 기준반</option>
+              <option value="mobile">이동수업반</option>
+            </select>
+          </div>
+        </div>
+        <div class="field-row">
+          <label class="field-label">이름</label>
+          <input type="text" class="field-input" id="groupName" placeholder="예: 1학년 1반 사회" maxlength="40">
+        </div>
+      </div>
+
+      <!-- 교과 및 성취기준 -->
+      <div class="form-sec">
+        <div class="form-sec-head">
+          <div class="form-sec-title">교과 및 성취기준</div>
+          <div class="form-sec-cnt" id="stdCount">1개 / 10개</div>
+        </div>
+        <div class="field-grid-2">
+          <div>
+            <label class="field-label">교육과정</label>
+            <select class="field-select" id="curriculum">
+              <option>2015 개정 교육과정</option>
+              <option>2022 개정 교육과정</option>
+            </select>
+          </div>
+          <div>
+            <label class="field-label">과목</label>
+            <select class="field-select" id="subject">
+              <option>사회</option>
+              <option>영어</option>
+              <option>도덕</option>
+              <option>과학</option>
+              <option>수학</option>
+              <option>국어</option>
+            </select>
+          </div>
+        </div>
+        <div class="help-link">* 원하는 과목이 없을 경우 내 정보에서 교과를 추가해 주세요. <a href="#" onclick="event.preventDefault()">교과 추가</a></div>
+
+        <div id="stdList">
+          <!-- 성취기준 row 자동 생성 -->
+        </div>
+
+        <button class="btn-add-std" id="btnAddStd" onclick="addStandardRow()">
+          <i data-lucide="plus" style="width:16px;height:16px"></i> 기준 추가
+        </button>
+      </div>
+    </div>
+
+    <div class="modal-foot">
+      <button class="btn-cancel" onclick="closeSubjectModal()">취소</button>
+      <button class="btn-submit" id="btnSubmit" onclick="submitSubject()">저장</button>
+    </div>
+  </div>
+</div>
+
+<!-- 이름 변경 모달 -->
+<div class="overlay" id="renameGroupModal" onclick="if(event.target===this)closeRenameGroupModal()">
+  <div class="modal-box" style="background:#fff;border-radius:12px;padding:24px 28px;width:420px;max-width:calc(100vw - 48px);box-shadow:0 0 1px #2226314D,0 8px 16px rgba(0,0,0,.1);">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px">
+      <p style="font-size:18px;font-weight:600;color:#222631">이름 변경</p>
+      <button onclick="closeRenameGroupModal()" style="background:none;border:none;cursor:pointer;color:#6d7381;padding:6px;display:flex;border-radius:6px"><i data-lucide="x" style="width:20px;height:20px"></i></button>
+    </div>
+    <input type="text" class="field-input" id="renameGroupInput" placeholder="새 이름을 입력해 주세요" maxlength="40" style="width:100%;height:44px;padding:0 14px;font-size:15px;line-height:1;border:1px solid #d9d9d9;border-radius:6px;color:#222631" onkeydown="if(event.key==='Enter')confirmRenameGroup()">
+    <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:18px">
+      <button class="btn-cancel" onclick="closeRenameGroupModal()">취소</button>
+      <button class="btn-submit active" onclick="confirmRenameGroup()">저장</button>
+    </div>
+  </div>
+</div>
+
+<!-- 삭제 확인 모달 -->
+<div class="overlay" id="deleteGroupModal" onclick="if(event.target===this)closeDeleteGroupModal()">
+  <div style="background:#fff;border-radius:12px;padding:28px 20px;width:384px;max-width:calc(100vw - 48px);display:flex;flex-direction:column;gap:20px;align-items:center;box-shadow:0 0 1px #2226314D,0 8px 16px rgba(0,0,0,.1)">
+    <div style="width:44px;height:44px;border-radius:50%;background:#fee2e2;display:flex;align-items:center;justify-content:center"><i data-lucide="trash-2" style="width:22px;height:22px;color:#f2525f"></i></div>
+    <p id="delGroupTitle" style="font-size:18px;font-weight:600;color:#222631;line-height:1.55;text-align:center;width:100%">그룹을 삭제하시겠습니까?</p>
+    <p style="font-size:15px;color:#222631;line-height:1.55;text-align:center">입력한 자료와 작성된 데이터가<br>모두 삭제되며 복구할 수 없어요.</p>
+    <div style="display:flex;gap:12px;width:100%">
+      <button onclick="closeDeleteGroupModal()" style="flex:1;height:40px;padding:0 16px;font-size:15px;font-weight:500;font-family:inherit;border:1px solid #fc9ba2;border-radius:4px;background:#fff;color:#ab303a;cursor:pointer;line-height:1">아니오</button>
+      <button onclick="confirmDeleteGroup()" style="flex:1;height:40px;padding:0 16px;font-size:15px;font-weight:500;font-family:inherit;border:none;border-radius:4px;background:#db3e51;color:#fff;cursor:pointer;line-height:1">네, 삭제합니다.</button>
+    </div>
+  </div>
+</div>
+
+<!-- 토스트 -->
+<div class="toast" id="toast"><span class="toast-ic"><i data-lucide="check-circle" style="width:18px;height:18px"></i></span><span id="toastMsg">저장됐어요</span></div>
+
+<!-- MOCKUP 토글 -->
+<div class="mockup-toggle">
+  <span class="mt-label">MOCKUP</span>
+  <button class="mt-btn active" data-scenario="hasData" onclick="setScenario('hasData')">데이터 있음</button>
+  <button class="mt-btn" data-scenario="empty" onclick="setScenario('empty')">데이터 없음</button>
+</div>
+
+<footer><a href="#">회사소개</a><a href="#">이용약관</a><a href="#">개인정보처리방침</a><a href="#">고객센터</a><div style="margin-top:8px;">© 2026 Datadriven Inc. All rights reserved.</div></footer>
+
+<script>
+  lucide.createIcons();
+
+  function toggleNav() {
+    document.getElementById('icon-sb').classList.toggle('expanded');
+    document.body.classList.toggle('nav-expanded');
+  }
+
+  function stopAll(e){ e.stopPropagation(); e.preventDefault(); }
+
+  function toggleDropdown(e, btn) {
+    e.stopPropagation();
+    const dd = btn.closest('.card').querySelector('.card-dropdown');
+    document.querySelectorAll('.card-dropdown.open').forEach(d => { if (d !== dd) d.classList.remove('open'); });
+    dd.classList.toggle('open');
+  }
+
+  document.addEventListener('click', () => {
+    document.querySelectorAll('.card-dropdown.open').forEach(d => d.classList.remove('open'));
+  });
+
+  function goDetail(e, subj, title) {
+    if (e.target.closest('.menu-btn') || e.target.closest('.card-dropdown')) return;
+    var card = e.currentTarget;
+    var hasStudents = !card.querySelector('.stu-empty');
+    var classMode = card.dataset.classMode || 'academic';
+    if (!hasStudents) {
+      location.href = 'quick_seteuk_register_v1_260526.html?name=' + encodeURIComponent(title) + '&subject=' + encodeURIComponent(subj) + '&classMode=' + classMode;
+    } else {
+      location.href = 'quick_seteuk_input_v1_260526.html?name=' + encodeURIComponent(title) + '&subject=' + encodeURIComponent(subj);
+    }
+  }
+
+  // ── 교과 추가 모달 ──
+  var SAMPLE_STD = {
+    '사회': [
+      '[9사(일사)01-01] 인간 행동의 중요한 동기인 사회화에 대해 알아본다.',
+      '[9사(일사)01-02] 사회적 지위와 역할의 의미를 이해한다.',
+      '[9사(일사)01-03] 사회집단의 의미를 이해하고, 사회집단에서 나타나는 차별과 갈등의 사례와 이에 대한 해결 방안을 탐구한다.',
+      '[9사(일사)02-01] 문화의 의미를 이해하고 문화가 가지는 특징을 설명한다.'
+    ],
+    '영어': [
+      '[9영01-01] 친숙한 일반적 주제에 관한 말이나 대화를 듣고 세부 정보를 파악한다.',
+      '[9영02-03] 일상생활이나 친숙한 일반적 주제에 관한 글에서 의도나 목적을 파악한다.'
+    ],
+    '도덕': [
+      '[9도01-01] 도덕적인 삶의 의미와 그 중요성에 대해 토의한다.',
+      '[9도02-02] 우정의 의미를 이해하고 친구 관계에서 발생하는 도덕적 문제를 합리적으로 해결한다.'
+    ],
+    '과학': [
+      '[9과01-01] 과학적 탐구 과정을 이해하고 적용한다.',
+      '[9과02-04] 물질의 상태 변화를 입자 모형으로 설명한다.'
+    ],
+    '수학': [
+      '[9수01-01] 양수와 음수, 정수와 유리수의 개념을 이해한다.',
+      '[9수02-03] 일차방정식을 풀고 활용 문제를 해결한다.'
+    ],
+    '국어': [
+      '[9국01-01] 듣기·말하기는 의미 공유의 과정임을 이해하고 듣기·말하기 활동을 한다.'
+    ]
+  };
+
+  var stdSeq = 0;
+  function getStdOptions(subject) {
+    var list = SAMPLE_STD[subject] || [];
+    return list.map(function(s){ return '<option>' + s + '</option>'; }).join('');
+  }
+
+  function renderStdList() {
+    var list = document.getElementById('stdList');
+    var subject = document.getElementById('subject').value;
+    var rows = list.querySelectorAll('.std-row');
+    rows.forEach(function(row, idx) {
+      row.querySelector('.std-row-title').textContent = '성취기준 ' + (idx + 1);
+      var sel = row.querySelector('select.std-select');
+      var cur = sel.value;
+      sel.innerHTML = getStdOptions(subject);
+      if ([...sel.options].some(function(o){return o.value === cur;})) sel.value = cur;
+    });
+    document.getElementById('stdCount').textContent = rows.length + '개 / 10개';
+    var addBtn = document.getElementById('btnAddStd');
+    addBtn.disabled = rows.length >= 10;
+  }
+
+  function addStandardRow() {
+    var list = document.getElementById('stdList');
+    if (list.children.length >= 10) return;
+    stdSeq++;
+    var subject = document.getElementById('subject').value;
+    var row = document.createElement('div');
+    row.className = 'std-row';
+    row.dataset.seq = stdSeq;
+    row.innerHTML = '' +
+      '<div class="std-row-head">' +
+        '<div class="std-row-title">성취기준</div>' +
+        '<div class="std-row-head-right">' +
+          '<label class="std-direct"><input type="checkbox" onchange="toggleDirect(this)"> 직접 입력</label>' +
+          '<button class="std-row-del" onclick="removeStandardRow(this)" title="삭제"><i data-lucide="x" style="width:16px;height:16px"></i></button>' +
+        '</div>' +
+      '</div>' +
+      '<div class="std-row-body">' +
+        '<select class="field-select std-select">' + getStdOptions(subject) + '</select>' +
+        '<input type="text" class="field-input std-input" placeholder="성취기준을 직접 입력해 주세요" style="display:none">' +
+      '</div>';
+    list.appendChild(row);
+    lucide.createIcons();
+    renderStdList();
+  }
+
+  function removeStandardRow(btn) {
+    var row = btn.closest('.std-row');
+    var list = document.getElementById('stdList');
+    if (list.children.length <= 1) {
+      showToast('성취기준은 최소 1개 이상 필요해요');
+      return;
+    }
+    row.remove();
+    renderStdList();
+  }
+
+  function toggleDirect(cb) {
+    var body = cb.closest('.std-row-body');
+    var sel = body.querySelector('.std-select');
+    var inp = body.querySelector('.std-input');
+    if (cb.checked) { sel.style.display = 'none'; inp.style.display = ''; inp.focus(); }
+    else { sel.style.display = ''; inp.style.display = 'none'; }
+  }
+
+  function openSubjectModal() {
+    document.getElementById('groupName').value = '';
+    document.getElementById('stdList').innerHTML = '';
+    addStandardRow();
+    document.getElementById('subjectModal').classList.add('open');
+  }
+  function closeSubjectModal() {
+    document.getElementById('subjectModal').classList.remove('open');
+  }
+  document.getElementById('subjectModal').addEventListener('click', function(e){
+    if (e.target === this) closeSubjectModal();
+  });
+  document.getElementById('subject').addEventListener('change', renderStdList);
+
+  var subjBadgePalette = ['사회','영어','도덕','과학','수학','국어'];
+  function submitSubject() {
+    var name = document.getElementById('groupName').value.trim();
+    if (!name) { showToast('이름을 입력해 주세요'); document.getElementById('groupName').focus(); return; }
+    var subject = document.getElementById('subject').value;
+    var classMode = document.getElementById('classMode').value;
+    var grid = document.querySelector('section[class="year-sec"] .cards-grid, .year-sec .cards-grid');
+    var card = document.createElement('div');
+    card.className = 'card';
+    card.dataset.classMode = classMode;
+    card.innerHTML = '' +
+      '<div class="card-top">' +
+        '<span class="subj-badge">' + subject + '</span>' +
+        '<button class="menu-btn" onclick="toggleDropdown(event,this)"><i data-lucide="more-horizontal" style="width:16px;height:16px"></i></button>' +
+      '</div>' +
+      '<div class="card-dropdown">' +
+        '<div class="dropdown-item" onclick="openRenameGroupModal(event,this)"><i data-lucide="pencil" style="width:14px;height:14px"></i>이름 변경</div>' +
+        '<div class="dropdown-item" onclick="goManageStudents(event,this)"><i data-lucide="users" style="width:14px;height:14px"></i>참여 학생 관리</div>' +
+        '<div class="dropdown-item danger" onclick="openDeleteGroupModal(event,this)"><i data-lucide="trash-2" style="width:14px;height:14px"></i>삭제</div>' +
+      '</div>' +
+      '<p class="card-title">' + name + '</p>' +
+      '<p class="card-date">방금</p>' +
+      '<div class="divider"></div>' +
+      '<div class="stu-empty"><i data-lucide="user-plus" style="width:14px;height:14px;color:#b3b6bd"></i><span>학생 등록 전</span></div>';
+    card.setAttribute('onclick', "goDetail(event,'" + subject + "','" + name.replace(/'/g, "\\'") + "')");
+    grid.prepend(card);
+    lucide.createIcons();
+    closeSubjectModal();
+    showToast('교과가 추가됐어요');
+  }
+
+  // ── 카드 메뉴 액션 ──
+  var pendingCard = null;
+
+  function getCardContext(menuEl) {
+    var card = menuEl.closest('.card');
+    return {
+      card: card,
+      title: card.querySelector('.card-title').textContent.trim(),
+      subject: card.querySelector('.subj-badge').textContent.trim(),
+      classMode: card.dataset.classMode || 'academic'
+    };
+  }
+
+  function openRenameGroupModal(e, el) {
+    e.stopPropagation();
+    var ctx = getCardContext(el);
+    pendingCard = ctx.card;
+    var input = document.getElementById('renameGroupInput');
+    input.value = ctx.title;
+    document.getElementById('renameGroupModal').classList.add('open');
+    document.querySelectorAll('.card-dropdown.open').forEach(d => d.classList.remove('open'));
+    lucide.createIcons();
+    setTimeout(function(){ input.focus(); input.select(); }, 50);
+  }
+  function closeRenameGroupModal() {
+    document.getElementById('renameGroupModal').classList.remove('open');
+    pendingCard = null;
+  }
+  function confirmRenameGroup() {
+    var input = document.getElementById('renameGroupInput');
+    var newName = input.value.trim();
+    if (!newName) { showToast('이름을 입력해 주세요'); input.focus(); return; }
+    if (pendingCard) {
+      var titleEl = pendingCard.querySelector('.card-title');
+      titleEl.textContent = newName;
+      // onclick의 title 인자도 갱신
+      var subject = pendingCard.querySelector('.subj-badge').textContent.trim();
+      pendingCard.setAttribute('onclick', "goDetail(event,'" + subject + "','" + newName.replace(/'/g, "\\'") + "')");
+      showToast('이름을 변경했어요');
+    }
+    closeRenameGroupModal();
+  }
+
+  function goManageStudents(e, el) {
+    e.stopPropagation();
+    var ctx = getCardContext(el);
+    document.querySelectorAll('.card-dropdown.open').forEach(d => d.classList.remove('open'));
+    location.href = 'quick_seteuk_register_v1_260526.html?name=' + encodeURIComponent(ctx.title) + '&subject=' + encodeURIComponent(ctx.subject) + '&classMode=' + ctx.classMode;
+  }
+
+  function openDeleteGroupModal(e, el) {
+    e.stopPropagation();
+    var ctx = getCardContext(el);
+    pendingCard = ctx.card;
+    document.getElementById('delGroupTitle').textContent = '"' + ctx.title + '"을(를) 삭제하시겠습니까?';
+    document.getElementById('deleteGroupModal').classList.add('open');
+    document.querySelectorAll('.card-dropdown.open').forEach(d => d.classList.remove('open'));
+    lucide.createIcons();
+  }
+  function closeDeleteGroupModal() {
+    document.getElementById('deleteGroupModal').classList.remove('open');
+    pendingCard = null;
+  }
+  function confirmDeleteGroup() {
+    if (pendingCard) {
+      pendingCard.remove();
+      showToast('삭제했어요');
+    }
+    closeDeleteGroupModal();
+  }
+
+  function showToast(msg) {
+    var t = document.getElementById('toast');
+    document.getElementById('toastMsg').textContent = msg;
+    t.classList.add('show');
+    clearTimeout(window._toastTimer);
+    window._toastTimer = setTimeout(function(){ t.classList.remove('show'); }, 2400);
+  }
+
+  // ?registered=<name>&count=<n>&subject=<subj> 로 돌아오면 토스트 + 카드 진행률 반영
+  (function(){
+    var p = new URLSearchParams(location.search);
+    var reg = p.get('registered');
+    var count = parseInt(p.get('count') || '0', 10);
+    var subject = p.get('subject') || '사회';
+    if (reg) {
+      updateOrCreateCardForRegistered(reg, count, subject);
+      setTimeout(function(){ showToast('"' + reg + '" 학생 등록을 완료했어요'); }, 200);
+      history.replaceState({}, '', location.pathname);
+    }
+  })();
+
+  function updateOrCreateCardForRegistered(name, total, subject) {
+    // 기존 카드 매칭
+    var cards = document.querySelectorAll('.card');
+    var matchedCard = null;
+    cards.forEach(function(c){
+      var t = c.querySelector('.card-title');
+      if (t && t.textContent.trim() === name) matchedCard = c;
+    });
+
+    var pbHTML = '<div class="pb-row"><span class="lbl">기록 진행률</span><span class="val">0 / ' + total + '명</span></div>' +
+                 '<div class="pb-bg"><div class="pb-fill" style="width:0%"></div></div>';
+
+    if (matchedCard) {
+      var stuEmpty = matchedCard.querySelector('.stu-empty');
+      if (stuEmpty) {
+        // 학생 등록 전 → 진행률로 교체
+        var temp = document.createElement('div');
+        temp.innerHTML = pbHTML;
+        stuEmpty.replaceWith(...temp.childNodes);
+      } else {
+        // 이미 진행률이 있으면 갱신
+        var val = matchedCard.querySelector('.pb-row .val');
+        if (val) val.textContent = '0 / ' + total + '명';
+      }
+      lucide.createIcons();
+      return;
+    }
+
+    // 새 카드 prepend (모달에서 만든 카드가 새로고침으로 사라진 경우)
+    var grid = document.querySelector('.year-sec .cards-grid');
+    if (!grid) return;
+    var card = document.createElement('div');
+    card.className = 'card';
+    card.innerHTML = '' +
+      '<div class="card-top">' +
+        '<span class="subj-badge">' + subject + '</span>' +
+        '<button class="menu-btn" onclick="toggleDropdown(event,this)"><i data-lucide="more-horizontal" style="width:16px;height:16px"></i></button>' +
+      '</div>' +
+      '<div class="card-dropdown">' +
+        '<div class="dropdown-item" onclick="openRenameGroupModal(event,this)"><i data-lucide="pencil" style="width:14px;height:14px"></i>이름 변경</div>' +
+        '<div class="dropdown-item" onclick="goManageStudents(event,this)"><i data-lucide="users" style="width:14px;height:14px"></i>참여 학생 관리</div>' +
+        '<div class="dropdown-item danger" onclick="openDeleteGroupModal(event,this)"><i data-lucide="trash-2" style="width:14px;height:14px"></i>삭제</div>' +
+      '</div>' +
+      '<p class="card-title">' + name + '</p>' +
+      '<p class="card-date">방금</p>' +
+      '<div class="divider"></div>' +
+      pbHTML;
+    card.setAttribute('onclick', "goDetail(event,'" + subject + "','" + name.replace(/'/g, "\\'") + "')");
+    grid.prepend(card);
+    lucide.createIcons();
+  }
+
+  function setScenario(s) {
+    document.querySelectorAll('.mt-btn').forEach(b => b.classList.toggle('active', b.dataset.scenario === s));
+    document.getElementById('data-state').style.display = (s === 'hasData') ? '' : 'none';
+    document.getElementById('empty-state').classList.toggle('show', s === 'empty');
+  }
+
+  // MOCKUP 토글 드래그
+  (function(){
+    var bar = document.querySelector('.mockup-toggle'); if (!bar) return;
+    var d = false, sx = 0, sy = 0, sl = 0, st = 0;
+    bar.addEventListener('mousedown', function(e){
+      if (e.target.closest('.mt-btn')) return;
+      var r = bar.getBoundingClientRect();
+      sl = r.left; st = r.top; sx = e.clientX; sy = e.clientY; d = true;
+      bar.style.right = 'auto'; bar.style.bottom = 'auto';
+      bar.style.left = sl + 'px'; bar.style.top = st + 'px';
+      bar.classList.add('dragging'); e.preventDefault();
+    });
+    document.addEventListener('mousemove', function(e){
+      if (!d) return;
+      var nx = sl + (e.clientX - sx), ny = st + (e.clientY - sy);
+      var r = bar.getBoundingClientRect();
+      nx = Math.max(4, Math.min(innerWidth - r.width - 4, nx));
+      ny = Math.max(4, Math.min(innerHeight - r.height - 4, ny));
+      bar.style.left = nx + 'px'; bar.style.top = ny + 'px';
+    });
+    document.addEventListener('mouseup', function(){ if (d){ d = false; bar.classList.remove('dragging'); } });
+  })();
+</script>
+
+</body>
+</html>

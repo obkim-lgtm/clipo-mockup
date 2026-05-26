@@ -1,0 +1,1302 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>참여 학생 등록 - CLIPO</title>
+<link rel="icon" type="image/svg+xml" href="favicon_gan.svg">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard-gov.min.css">
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<style>
+* { font-family: 'Pretendard GOV', -apple-system, sans-serif; box-sizing: border-box; margin: 0; padding: 0; }
+body { background: #f6f7f9; color: #222631; }
+
+/* 헤더 */
+.g-hd { height: 56px; background: #fff; border-bottom: 1px solid #d9d9d9; display: flex; align-items: center; padding: 0 20px 0 8px; position: fixed; top: 0; left: 0; right: 0; z-index: 200; }
+.g-hd-r { margin-left: auto; display: flex; align-items: center; gap: 6px; font-size: 14px; color: #3b3f4c; }
+.plan-badge { background: #416bff; color: #fff; font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 4px; }
+.hd-div { width: 1px; height: 14px; background: #d9d9d9; margin: 0 4px; }
+.credit-wrap { display: flex; align-items: center; gap: 4px; padding: 4px 10px; background: #f6f7f9; border-radius: 6px; font-size: 13px; font-weight: 600; color: #3b3f4c; }
+.user-btn { display: inline-flex; align-items: center; justify-content: center; gap: 4px; padding: 4px 10px; border: 1px solid #d9d9d9; border-radius: 6px; background: #fff; font-size: 13px; color: #3b3f4c; cursor: pointer; line-height: 1; }
+
+/* 사이드바 */
+.icon-sb { width: 56px; background: #fff; border-right: 1px solid #d9d9d9; position: fixed; top: 56px; bottom: 0; left: 0; display: flex; flex-direction: column; padding: 8px 0; z-index: 150; transition: width .2s ease; }
+.icon-sb.expanded { width: 200px; }
+.si { height: 40px; display: flex; align-items: center; border-radius: 8px; color: #6d7381; cursor: pointer; margin-bottom: 2px; position: relative; padding: 0 4px 0 16px; gap: 10px; white-space: nowrap; flex-shrink: 0; }
+.si:hover { background: #f1f3f5; }
+.si.active { background: #e9f2ff; color: #416bff; }
+.si-icon { width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.si-label { font-size: 13px; font-weight: 500; opacity: 0; transition: opacity .1s; overflow: hidden; }
+.icon-sb.expanded .si-label { opacity: 1; }
+.si-tip { position: absolute; left: 48px; top: 50%; transform: translateY(-50%); background: #222631; color: #fff; font-size: 11px; padding: 3px 8px; border-radius: 4px; white-space: nowrap; display: none; z-index: 300; pointer-events: none; }
+.si:hover .si-tip { display: block; }
+.icon-sb.expanded .si-tip { display: none !important; }
+.nav-bottom { margin-top: auto; width: 100%; }
+.nav-div { height: 1px; background: #f1f3f5; margin: 4px 0; }
+body.nav-expanded .main-shell { margin-left: 200px; transition: margin-left .2s ease; }
+
+/* 메인 */
+.main-shell { margin-left: 56px; margin-top: 56px; min-height: calc(100vh - 56px); }
+.main { max-width: 1280px; margin: 0 auto; padding: 24px 48px 48px; }
+
+.back-link { display: inline-flex; align-items: center; gap: 4px; font-size: 14px; color: #6d7381; text-decoration: none; margin-bottom: 8px; cursor: pointer; font-weight: 500; }
+.back-link:hover { color: #416bff; }
+
+.page-title { font-size: 24px; font-weight: 700; color: #222631; margin-bottom: 8px; line-height: 1.3; }
+.page-sub { font-size: 14px; color: #6d7381; margin-bottom: 24px; line-height: 1.55; }
+
+/* 2-column 레이아웃 */
+.two-col { display: grid; grid-template-columns: 272px 1fr; gap: 16px; align-items: start; }
+
+/* 카드 공통 */
+.card { background: #fff; border: 1px solid #e5e7eb; border-radius: 12px; padding: 24px; }
+.right-card { padding: 28px 32px; min-height: 580px; }
+
+/* 좌측 등록 방식 카드 */
+.method-title { font-size: 18px; font-weight: 700; color: #222631; margin-bottom: 16px; }
+.method-group-label { font-size: 13px; font-weight: 500; color: #6d7381; margin-bottom: 8px; margin-top: 18px; }
+.method-group-label:first-of-type { margin-top: 0; }
+.method-option { display: flex; align-items: center; gap: 10px; padding: 12px 14px; border: 1px solid #d9d9d9; border-radius: 10px; cursor: pointer; transition: all .15s; }
+.method-option:hover { border-color: #b3b3b3; }
+.method-option.selected { border-color: #416bff; background: #f4f8ff; }
+.method-radio { width: 18px; height: 18px; border: 1.5px solid #b3b6bd; border-radius: 50%; flex-shrink: 0; position: relative; }
+.method-option.selected .method-radio { border-color: #416bff; }
+.method-option.selected .method-radio::after { content:''; width: 8px; height: 8px; background: #416bff; border-radius: 50%; position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); }
+.method-label { font-size: 15px; color: #3b3f4c; font-weight: 500; }
+.method-option.selected .method-label { color: #222631; font-weight: 600; }
+
+/* 우측 카드 - 학생 목록 선택 */
+.right-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin-bottom: 6px; }
+.right-title { font-size: 18px; font-weight: 700; color: #222631; }
+.right-sub { font-size: 14px; color: #3b3f4c; line-height: 1.55; margin-bottom: 20px; }
+.btn-primary { display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 10px 18px; border: none; border-radius: 8px; background: #416bff; color: #fff; font-size: 14px; font-weight: 600; font-family: inherit; cursor: pointer; line-height: 1; white-space: nowrap; }
+.btn-primary:hover { background: #365eef; }
+.btn-outline { display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 10px 18px; border-radius: 8px; background: #eff3ff; color: #416bff; border: 1px solid #d4e0ff; font-size: 14px; font-weight: 600; font-family: inherit; cursor: pointer; line-height: 1; }
+.btn-outline:hover { background: #e0eaff; }
+
+/* 빈 상태 */
+.empty-area { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 80px 24px; text-align: center; }
+.empty-illust-bg { width: 132px; height: 132px; border-radius: 50%; background: #eff3ff; display: flex; align-items: center; justify-content: center; margin-bottom: 20px; }
+.empty-msg { font-size: 16px; font-weight: 700; color: #222631; margin-bottom: 8px; }
+.empty-sub { font-size: 14px; color: #6d7381; line-height: 1.55; }
+
+/* 선택된 학생 표시 */
+.selected-summary { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; }
+.dong-chip { background: #f4f8ff; color: #416bff; font-size: 13px; font-weight: 600; padding: 6px 12px; border-radius: 6px; }
+.summary-count { font-size: 14px; color: #3b3f4c; font-weight: 500; }
+
+/* 학생 테이블 */
+.st-table-wrap { border: 1px solid #e5e7eb; border-radius: 10px; overflow: hidden; }
+.st-table { width: 100%; border-collapse: separate; border-spacing: 0; font-size: 14px; }
+.st-table th { background: #f9fafb; padding: 12px 14px; text-align: center; font-weight: 600; color: #3b3f4c; font-size: 13px; border-bottom: 1px solid #e5e7eb; }
+.st-table td { padding: 13px 14px; text-align: center; border-bottom: 1px solid #f1f3f5; color: #3b3f4c; font-size: 14px; }
+.st-table tbody tr:last-child td { border-bottom: none; }
+.st-table tbody tr.row-err td { background: #fff5f5; color: #f2525f; }
+
+/* 업로드 페인 — 카드 형태 */
+.upload-section { margin-bottom: 24px; }
+.upload-section:last-of-type { margin-bottom: 0; }
+.upload-section-num { font-size: 18px; font-weight: 700; color: #222631; margin-bottom: 6px; line-height: 1.4; }
+.upload-section-desc { font-size: 14px; color: #3b3f4c; margin-bottom: 18px; line-height: 1.55; }
+.upload-label { font-size: 14px; font-weight: 600; color: #222631; margin-bottom: 10px; }
+.upload-btns { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; }
+.section-divider { height: 1px; background: #e5e7eb; margin: 24px 0; }
+
+/* 안내 박스 */
+.info-box { background: #f6f7f9; border-radius: 8px; padding: 14px 18px; font-size: 13px; color: #3b3f4c; line-height: 1.7; position: relative; display: flex; align-items: flex-start; gap: 12px; }
+.info-box-content { flex: 1; }
+.info-box .info-head { color: #222631; font-weight: 500; margin-bottom: 4px; }
+.info-box .info-head .hi { color: #416bff; font-weight: 700; }
+.info-box ul { padding-left: 16px; margin: 0; }
+.info-box ul li { color: #3b3f4c; }
+.info-box .info-link { flex-shrink: 0; align-self: center; display: inline-flex; align-items: center; gap: 4px; padding: 8px 14px; background: #fff; border: 1px solid #d9d9d9; border-radius: 8px; color: #3b3f4c; font-size: 13px; font-weight: 500; text-decoration: none; cursor: pointer; }
+.info-box .info-link:hover { border-color: #416bff; color: #416bff; }
+
+/* 업로드 결과 빈 상태 */
+.upload-empty { padding: 80px 20px; text-align: center; }
+.upload-empty-icon { width: 56px; height: 56px; border-radius: 50%; background: #f1f3f5; color: #6d7381; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 16px; }
+.upload-empty-msg { font-size: 15px; font-weight: 600; color: #222631; margin-bottom: 4px; }
+.upload-empty-sub { font-size: 13px; color: #6d7381; }
+
+/* 업로드 칩 */
+.upload-chip-row { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; flex-wrap: wrap; }
+.upload-chip { background: #f4f8ff; color: #416bff; font-size: 13px; font-weight: 600; padding: 5px 12px; border-radius: 6px; }
+.upload-chip-count { font-size: 13px; color: #3b3f4c; margin-right: 6px; }
+
+/* 업로드 에러 박스 */
+.upload-err-box { background: #fff5f5; border-radius: 8px; padding: 14px 16px; margin-top: 12px; font-size: 13px; color: #b91c1c; line-height: 1.7; display: flex; gap: 10px; align-items: flex-start; }
+.upload-err-box .ic { color: #f2525f; flex-shrink: 0; margin-top: 1px; }
+
+/* 파일 칩 */
+.file-chip { display: flex; align-items: center; gap: 10px; padding: 10px 14px; border: 1px solid #d9d9d9; border-radius: 8px; font-size: 14px; color: #3b3f4c; margin-bottom: 16px; }
+.file-chip-icon { width: 32px; height: 32px; border-radius: 6px; background: #eff3ff; color: #416bff; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.file-chip-info { flex: 1; min-width: 0; }
+.file-chip-name { font-size: 14px; font-weight: 500; color: #222631; line-height: 1.3; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.file-chip-meta { font-size: 12px; color: #6d7381; line-height: 1.4; margin-top: 2px; }
+.file-chip-x { background: none; border: none; color: #6d7381; cursor: pointer; padding: 6px; display: flex; border-radius: 4px; }
+.file-chip-x:hover { background: #f1f3f5; color: #f2525f; }
+
+/* 하단 액션 */
+.footer-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 20px; }
+.btn-cancel-lg { padding: 12px 28px; border-radius: 999px; background: #fff; color: #416bff; font-size: 14px; font-weight: 600; font-family: inherit; cursor: pointer; line-height: 1; border: 1px solid #d4e0ff; }
+.btn-cancel-lg:hover { background: #f4f8ff; }
+.btn-save-lg { padding: 12px 28px; border: none; border-radius: 999px; background: #416bff; color: #fff; font-size: 14px; font-weight: 600; font-family: inherit; cursor: pointer; line-height: 1; display: inline-flex; align-items: center; justify-content: center; gap: 6px; }
+.btn-save-lg:hover { background: #365eef; }
+.btn-save-lg:disabled { background: #c1cefb; color: #fff; cursor: not-allowed; }
+
+/* 학생 목록 모달 (Figma 4923-15804 매칭) */
+.overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 300; align-items: center; justify-content: center; padding: 24px; }
+.overlay.open { display: flex; }
+.modal-box { background: #fff; border-radius: 12px; width: 560px; max-width: calc(100vw - 48px); max-height: calc(100vh - 48px); display: flex; flex-direction: column; box-shadow: 0 4px 16px rgba(0,0,0,.16); overflow: hidden; padding: 28px 28px 24px; }
+.modal-head { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 24px; }
+.modal-title { font-size: 20px; font-weight: 700; color: #222631; }
+.modal-x { background: none; border: none; cursor: pointer; color: #6d7381; padding: 6px; display: flex; border-radius: 6px; }
+.modal-x:hover { background: #f1f3f5; }
+
+.stu-search { display: flex; align-items: center; gap: 10px; padding: 12px 16px; border: 1px solid #d9d9d9; border-radius: 10px; margin-bottom: 14px; height: 48px; }
+.stu-search input { flex: 1; border: none; outline: none; font-size: 15px; font-family: inherit; color: #222631; background: transparent; }
+.stu-search input::placeholder { color: #b3b6bd; }
+.stu-tree { border: 1px solid #e5e7eb; border-radius: 10px; padding: 8px; max-height: 380px; overflow-y: auto; }
+.stu-class-row { display: flex; align-items: center; gap: 12px; padding: 14px 16px; border-radius: 8px; cursor: pointer; }
+.stu-class-row:hover { background: #f6f7f9; }
+.stu-class-label { flex: 1; font-size: 15px; font-weight: 500; color: #222631; line-height: 1.4; }
+.stu-expand { background: none; border: none; color: #6d7381; cursor: pointer; padding: 4px; display: inline-flex; align-items: center; justify-content: center; border-radius: 4px; }
+.stu-expand:hover { background: #eef0f3; }
+.stu-class-children { display: none; padding: 4px 0 8px 44px; }
+.stu-class-children.open { display: block; }
+.stu-row { display: flex; align-items: center; gap: 12px; padding: 10px 16px; border-radius: 8px; cursor: pointer; font-size: 15px; color: #3b3f4c; }
+.stu-row:hover { background: #f6f7f9; }
+.stu-row-label { font-size: 15px; color: #3b3f4c; line-height: 1.4; }
+.stu-checkbox { position: relative; display: inline-flex; align-items: center; justify-content: center; width: 20px; height: 20px; cursor: pointer; flex-shrink: 0; }
+.stu-checkbox input { position: absolute; opacity: 0; width: 0; height: 0; }
+.stu-checkbox span { width: 20px; height: 20px; border: 1.5px solid #d9d9d9; border-radius: 4px; background: #fff; display: inline-flex; align-items: center; justify-content: center; transition: all .12s; }
+.stu-checkbox input:checked + span { background: #416bff; border-color: #416bff; }
+.stu-checkbox input:checked + span::after { content: ''; width: 5px; height: 9px; border: solid #fff; border-width: 0 2px 2px 0; transform: rotate(45deg); margin-top: -2px; }
+.stu-checkbox.indeterminate span { background: #416bff; border-color: #416bff; }
+.stu-checkbox.indeterminate span::after { content: ''; width: 10px; height: 2px; background: #fff; border: none; transform: none; margin: 0; }
+
+.modal-foot { display: flex; align-items: center; justify-content: space-between; margin-top: 20px; gap: 12px; flex-wrap: wrap; }
+.modal-help { font-size: 13px; color: #6d7381; flex: 1; line-height: 1.5; }
+.modal-acts { display: flex; gap: 8px; }
+.btn-modal-cancel { padding: 11px 26px; border: 1px solid #d9d9d9; border-radius: 8px; background: #fff; color: #3b3f4c; font-size: 15px; font-weight: 500; font-family: inherit; cursor: pointer; line-height: 1; }
+.btn-modal-cancel:hover { background: #f6f7f9; }
+.btn-modal-confirm { padding: 11px 26px; border: none; border-radius: 8px; background: #416bff; color: #fff; font-size: 15px; font-weight: 600; font-family: inherit; cursor: pointer; line-height: 1; }
+.btn-modal-confirm:hover { background: #365eef; }
+.btn-modal-confirm:disabled { background: #c1cefb; color: #fff; cursor: not-allowed; }
+
+/* 스텝 바 */
+.step-bar { display: flex; align-items: center; gap: 6px; margin: 4px 0 24px; flex-wrap: wrap; }
+.step-btn { display: inline-flex; align-items: center; gap: 8px; padding: 9px 16px; border: 1px solid #e5e7eb; border-radius: 8px; background: #fff; color: #6d7381; font-size: 14px; font-weight: 500; cursor: default; line-height: 1; font-family: inherit; transition: all .15s; }
+.step-btn.active { border-color: #416bff; color: #416bff; font-weight: 600; box-shadow: 0 0 0 1px #416bff inset; }
+.step-btn.done { border-color: #bce4cf; color: #15803d; }
+.step-btn.disabled { color: #b3b6bd; background: #fafbfc; }
+.step-num { display: inline-flex; align-items: center; justify-content: center; width: 20px; height: 20px; border-radius: 50%; background: #f1f3f5; color: #6d7381; font-size: 12px; font-weight: 700; line-height: 1; flex-shrink: 0; }
+.step-btn.active .step-num { background: #416bff; color: #fff; }
+.step-btn.done .step-num { background: #1ab864; color: #fff; }
+.step-btn.disabled .step-num { background: #f1f3f5; color: #c5c8d0; }
+.step-arrow { color: #c5c8d0; display: inline-flex; align-items: center; line-height: 1; }
+
+/* ── 이동수업반 모드 ── */
+.class-card { background: #fff; border: 1px solid #e5e7eb; border-radius: 10px; margin-bottom: 10px; overflow: hidden; transition: border-color .15s; }
+.class-card:last-child { margin-bottom: 0; }
+.class-card:hover { border-color: #d4d8e0; }
+.class-card.expanded { border-color: #c7d2e1; }
+.cc-head { display: flex; align-items: center; gap: 12px; padding: 14px 16px; cursor: pointer; }
+.cc-head:hover { background: #fafbfc; }
+.cc-toggle { color: #6d7381; display: inline-flex; align-items: center; justify-content: center; transition: transform .15s; flex-shrink: 0; }
+.class-card.expanded .cc-toggle { transform: rotate(90deg); }
+.cc-name { font-size: 15px; font-weight: 600; color: #222631; flex-shrink: 0; }
+.cc-count { font-size: 13px; font-weight: 500; color: #3151c4; background: #e9f2ff; padding: 3px 8px; border-radius: 4px; flex-shrink: 0; }
+.cc-grow { flex: 1; }
+.cc-actions { display: inline-flex; align-items: center; gap: 4px; flex-shrink: 0; position: relative; }
+.btn-cc-assign { display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 0 14px; height: 36px; border: 1px solid #416bff; border-radius: 8px; background: #fff; color: #416bff; font-size: 13px; font-weight: 600; cursor: pointer; font-family: inherit; line-height: 1; }
+.btn-cc-assign:hover { background: #eff3ff; }
+.cc-menu-btn { background: none; border: none; cursor: pointer; color: #6d7381; padding: 6px; display: inline-flex; align-items: center; justify-content: center; border-radius: 6px; }
+.cc-menu-btn:hover { background: #f1f3f5; }
+.cc-menu { display: none; position: absolute; top: 38px; right: 0; background: #fff; border: 1px solid #d9d9d9; border-radius: 8px; box-shadow: 0 4px 16px rgba(0,0,0,.12); z-index: 50; min-width: 140px; overflow: hidden; }
+.cc-menu.open { display: block; }
+.dropdown-item { display: flex; align-items: center; gap: 8px; padding: 10px 14px; font-size: 14px; cursor: pointer; color: #3b3f4c; white-space: nowrap; line-height: 1.3; }
+.dropdown-item:hover { background: #f6f7f9; }
+.dropdown-item.danger { color: #f2525f; }
+.dropdown-item.danger:hover { background: #fff3f4; }
+
+/* ── 삭제 확인 모달 (Figma 4996:12944 톤) ── */
+.del-box { background: #fff; border-radius: 12px; padding: 28px 20px; width: 384px; max-width: calc(100vw - 48px); display: flex; flex-direction: column; gap: 20px; align-items: center; box-shadow: 0 0 1px #2226314D, 0 8px 16px rgba(0,0,0,.1); }
+.del-icon { width: 44px; height: 44px; border-radius: 50%; background: #fee2e2; display: flex; align-items: center; justify-content: center; }
+.del-title { font-size: 18px; font-weight: 600; color: #222631; line-height: 1.55; text-align: center; width: 100%; }
+.del-desc { font-size: 15px; font-weight: 400; color: #222631; line-height: 1.55; text-align: center; }
+.del-footer { display: flex; gap: 12px; width: 100%; }
+.btn-del-cancel { flex: 1; height: 40px; padding: 0 16px; font-size: 15px; font-weight: 500; font-family: inherit; border: 1px solid #fc9ba2; border-radius: 4px; background: #fff; color: #ab303a; cursor: pointer; line-height: 1; }
+.btn-del-cancel:hover { background: #fff3f4; }
+.btn-del-confirm { flex: 1; height: 40px; padding: 0 16px; font-size: 15px; font-weight: 500; font-family: inherit; border: none; border-radius: 4px; background: #db3e51; color: #fff; cursor: pointer; line-height: 1; }
+.btn-del-confirm:hover { background: #b91c1c; }
+.cc-body { display: none; padding: 0 16px 16px; border-top: 1px solid #f1f3f5; }
+.class-card.expanded .cc-body { display: block; }
+.cc-empty { padding: 28px 16px; text-align: center; font-size: 14px; color: #b3b6bd; line-height: 1.55; }
+
+/* ── 반 만들기 모달 ── */
+.cc-modal { width: 480px; }
+.cc-rows { display: flex; flex-direction: column; gap: 10px; margin-bottom: 12px; }
+.cc-row { display: flex; align-items: center; gap: 8px; }
+.cc-input-wrap { flex: 1; position: relative; }
+.cc-input-wrap .field-input { width: 100%; height: 44px; padding: 0 36px 0 14px; font-size: 15px; line-height: 1; }
+.cc-suffix { position: absolute; right: 14px; top: 50%; transform: translateY(-50%); font-size: 14px; color: #6d7381; pointer-events: none; }
+.cc-row-del { width: 44px; height: 44px; border-radius: 8px; border: 1px solid #d9d9d9; background: #fff; color: #6d7381; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.cc-row-del:hover { background: #fff3f4; border-color: #f2525f; color: #f2525f; }
+.btn-add-row { display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 0 14px; height: 36px; border: 1px solid #d4e0ff; border-radius: 8px; background: #eff3ff; color: #416bff; font-size: 13px; font-weight: 600; cursor: pointer; font-family: inherit; line-height: 1; margin-bottom: 16px; }
+.btn-add-row:hover { background: #d4e0ff; }
+
+/* ── MOCKUP 모드 토글 ── */
+.mockup-toggle { position: fixed; bottom: 24px; right: 24px; background: #222631; color: #fff; border-radius: 24px; padding: 5px; display: inline-flex; align-items: center; gap: 2px; box-shadow: 0 8px 24px rgba(0,0,0,.2); z-index: 600; font-family: inherit; cursor: move; user-select: none; }
+.mockup-toggle.dragging { box-shadow: 0 12px 32px rgba(0,0,0,.4); opacity: .95; }
+.mt-label { padding: 0 8px 0 10px; font-size: 11px; font-weight: 700; color: #b3b6bd; letter-spacing: 0.5px; }
+.mt-btn { padding: 7px 14px; border: none; background: none; color: #b3b6bd; font-size: 13px; font-weight: 500; cursor: pointer; font-family: inherit; border-radius: 18px; line-height: 1; transition: all .15s; }
+.mt-btn:hover { color: #fff; }
+.mt-btn.active { background: #416bff; color: #fff; }
+
+/* 토스트 */
+.toast { position: fixed; bottom: 32px; left: 50%; transform: translateX(-50%) translateY(20px); background: #222631; color: #fff; padding: 12px 20px; border-radius: 8px; font-size: 14px; display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 4px 16px rgba(0,0,0,.2); opacity: 0; transition: opacity .2s, transform .2s; z-index: 400; pointer-events: none; line-height: 1; }
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+.toast-ic { display: inline-flex; align-items: center; justify-content: center; color: #1ab864; }
+
+/* 풋터 */
+.page-footer { text-align: center; padding: 24px 16px; font-size: 12px; color: #6d7381; }
+.page-footer .links { margin-bottom: 6px; }
+.page-footer .links a { color: #6d7381; text-decoration: none; margin: 0 8px; }
+.page-footer .links a:hover { color: #416bff; }
+
+@media (max-width: 1023px) {
+  .two-col { grid-template-columns: 1fr !important; gap: 16px !important; }
+  .main { padding: 24px 24px !important; }
+  .modal-box { width: calc(100vw - 32px) !important; }
+}
+@media (max-width: 640px) {
+  .main { padding: 16px 16px !important; }
+  .page-title { font-size: 22px !important; flex-wrap: wrap; }
+  .footer-actions { flex-direction: column-reverse; }
+  .footer-actions button { width: 100%; }
+}
+</style>
+</head>
+<body>
+
+<header class="g-hd">
+  <button onclick="toggleNav()" style="width:36px;height:36px;border:none;background:none;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#3b3f4c;margin-right:8px">
+    <i data-lucide="menu" style="width:20px;height:20px"></i>
+  </button>
+  <svg width="76" height="16" viewBox="0 0 76 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M11.3613 4.03516H4.09668V11.9629H8.88281L8.88086 11.9648H15.6016V16H4.02539C1.80242 15.9998 0 14.223 0 12.0322V3.96777C0 1.77696 1.80242 0.000177874 4.02539 0H15.4561L11.3613 4.03516ZM22.0703 11.9648H33.5781V16H22.002C19.7788 16 17.9756 14.2231 17.9756 12.0322V0H22.0703V11.9648ZM40.0459 16H35.9521V0H40.0459V16ZM54.5381 0C56.4564 0 58.0138 1.53228 58.0186 3.42285L58.0166 3.4248V8.54297C58.014 10.4333 56.4567 11.9648 54.5361 11.9648H46.5107L42.416 16V0H54.5381ZM71.9746 0C74.0086 0.000134956 75.6887 1.49046 75.958 3.42285H76V12.5771H75.958C75.6887 14.5095 74.011 15.9999 71.9746 16H64.4238C62.3897 16 60.7098 14.5096 60.4404 12.5771C60.4145 12.398 60.3984 12.2184 60.3984 12.0322V3.96777C60.3984 3.78159 60.4145 3.60205 60.4404 3.42285C60.7098 1.49037 62.3873 0 64.4238 0H71.9746ZM64.4922 12.5771H71.9062V3.42285H64.4922V12.5771ZM46.5107 3.42285V8.54004H53.9238V3.42285H46.5107Z" fill="#365EEF"/>
+  </svg>
+  <div class="g-hd-r">
+    <span class="plan-badge">개인 유료</span>
+    <span style="font-size:13px;color:#6d7381">D-1654</span>
+    <div class="hd-div"></div>
+    <i data-lucide="bot" style="width:16px;height:16px;color:#416bff"></i>
+    <div class="credit-wrap">AI 크레딧 750</div>
+    <div class="hd-div"></div>
+    <button class="user-btn">test99 선생님(대표교사) <i data-lucide="chevron-down" style="width:14px;height:14px"></i></button>
+  </div>
+</header>
+
+<nav class="icon-sb" id="icon-sb">
+  <div class="si"><div class="si-icon"><i data-lucide="home" style="width:20px;height:20px"></i></div><span class="si-label">홈</span><span class="si-tip">홈</span></div>
+  <div class="si"><div class="si-icon"><i data-lucide="scissors" style="width:20px;height:20px"></i></div><span class="si-label">평가계획</span><span class="si-tip">평가계획</span></div>
+  <div class="si"><div class="si-icon"><i data-lucide="layout-grid" style="width:20px;height:20px"></i></div><span class="si-label">수업</span><span class="si-tip">수업</span></div>
+  <div class="si"><div class="si-icon"><i data-lucide="notebook-pen" style="width:20px;height:20px"></i></div><span class="si-label">창의적 체험활동 <span style="font-size:10px;background:#416bff;color:#fff;padding:1px 5px;border-radius:3px;margin-left:2px">Beta</span></span><span class="si-tip">창의적 체험활동</span></div>
+  <div class="si active"><div class="si-icon"><i data-lucide="zap" style="width:20px;height:20px"></i></div><span class="si-label">세특 간편 생성기</span><span class="si-tip">세특 간편 생성기</span></div>
+  <div class="si"><div class="si-icon"><i data-lucide="smile" style="width:20px;height:20px"></i></div><span class="si-label">행동특성 및 종합기록</span><span class="si-tip">행동특성 및 종합기록 지원</span></div>
+  <div class="si"><div class="si-icon"><i data-lucide="bar-chart-2" style="width:20px;height:20px"></i></div><span class="si-label">리포트</span><span class="si-tip">리포트</span></div>
+  <div class="si"><div class="si-icon"><i data-lucide="building-2" style="width:20px;height:20px"></i></div><span class="si-label">학교 설정</span><span class="si-tip">학교 설정</span></div>
+  <div class="nav-bottom">
+    <div class="nav-div"></div>
+    <div class="si"><div class="si-icon"><i data-lucide="file-down" style="width:20px;height:20px"></i></div><span class="si-label">매뉴얼 다운로드</span><span class="si-tip">매뉴얼 다운로드</span></div>
+    <div class="si"><div class="si-icon"><i data-lucide="credit-card" style="width:20px;height:20px"></i></div><span class="si-label">요금제</span><span class="si-tip">요금제</span></div>
+    <div class="si"><div class="si-icon"><i data-lucide="help-circle" style="width:20px;height:20px"></i></div><span class="si-label">고객센터</span><span class="si-tip">고객센터</span></div>
+  </div>
+</nav>
+
+<div class="main-shell">
+<main class="main">
+
+  <a class="back-link" onclick="goBack()">
+    <i data-lucide="chevron-left" style="width:14px;height:14px"></i> 이전으로
+  </a>
+
+  <h1 class="page-title">참여 학생 등록 : <span id="groupName">새 그룹</span></h1>
+  <p class="page-sub">기록을 생성할 학생을 등록해 주세요.</p>
+
+  <div class="two-col">
+
+    <!-- 좌측: 그룹 구성 방법 -->
+    <div class="card">
+      <p class="method-title">학생 등록 방법</p>
+      <p class="method-group-label">직접 선택</p>
+      <div class="method-option selected" data-method="select" onclick="selectMethod('select')">
+        <div class="method-radio"></div>
+        <span class="method-label">학생 목록에서 선택</span>
+      </div>
+      <p class="method-group-label">엑셀 업로드</p>
+      <div class="method-option" data-method="upload" onclick="selectMethod('upload')">
+        <div class="method-radio"></div>
+        <span class="method-label">학생 명단 업로드</span>
+      </div>
+      <div class="method-option" data-method="uploadKeyword" onclick="selectMethod('uploadKeyword')" style="margin-top:8px">
+        <div class="method-radio"></div>
+        <span class="method-label">학생 명단+키워드 업로드</span>
+      </div>
+    </div>
+
+    <!-- 우측 -->
+    <div class="card right-card">
+
+      <!-- ── 학생 목록에서 선택 페인 ── -->
+      <div id="paneSelect">
+
+      <!-- ──── 학적기준반 모드 ──── -->
+      <div id="selectAcademic">
+        <div class="right-head">
+          <div>
+            <p class="right-title">학생 목록에서 선택</p>
+            <p class="right-sub" style="margin-bottom:0;margin-top:4px">학생 목록에서 학생을 선택하여 등록해 주세요.</p>
+          </div>
+          <button class="btn-primary" onclick="openStudentModal()">
+            <i data-lucide="user-check" style="width:14px;height:14px"></i> 학생 목록 보기
+          </button>
+        </div>
+
+        <!-- 빈 상태 -->
+        <div class="empty-area" id="selectEmpty">
+          <div class="empty-illust-bg">
+            <!-- 책가방 학생 일러스트 (Figma 매칭) -->
+            <svg width="92" height="92" viewBox="0 0 92 92" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <!-- 책가방 (왼쪽 어깨끈) -->
+              <path d="M28 38 Q28 32 33 30" stroke="#5a4a3a" stroke-width="3" stroke-linecap="round" fill="none"/>
+              <!-- 머리 -->
+              <ellipse cx="46" cy="30" rx="13" ry="13" fill="#fde2cf"/>
+              <!-- 헤어 -->
+              <path d="M33 28 Q33 18 46 17 Q59 18 59 28 Q56 22 46 22 Q36 22 33 28 Z" fill="#2a2a2a"/>
+              <!-- 눈 (감은 눈, 미소) -->
+              <path d="M40 31 Q42 33 44 31" stroke="#222631" stroke-width="1.5" stroke-linecap="round" fill="none"/>
+              <path d="M48 31 Q50 33 52 31" stroke="#222631" stroke-width="1.5" stroke-linecap="round" fill="none"/>
+              <!-- 입 -->
+              <path d="M43 37 Q46 39 49 37" stroke="#222631" stroke-width="1.5" stroke-linecap="round" fill="none"/>
+              <!-- 몸통 (티셔츠) -->
+              <path d="M34 44 Q34 42 38 41 L54 41 Q58 42 58 44 L60 70 Q60 74 56 74 L36 74 Q32 74 32 70 Z" fill="#416bff"/>
+              <!-- 책가방 본체 (등 뒤) -->
+              <rect x="58" y="44" width="14" height="22" rx="3" fill="#1ab864"/>
+              <!-- 책가방 끈 (오른쪽 어깨) -->
+              <path d="M58 44 Q56 38 52 36" stroke="#1ab864" stroke-width="4" stroke-linecap="round" fill="none"/>
+              <!-- 반짝이 (오른쪽 위) -->
+              <path d="M68 32 L70 28 L72 32 L76 34 L72 36 L70 40 L68 36 L64 34 Z" fill="#416bff" opacity="0.5"/>
+              <path d="M72 22 L73 20 L74 22 L76 23 L74 24 L73 26 L72 24 L70 23 Z" fill="#416bff" opacity="0.4"/>
+            </svg>
+          </div>
+          <p class="empty-msg">학생 목록에서 학생을 선택해 주세요.</p>
+          <p class="empty-sub">선택한 학생은 이 화면에 표시돼요.</p>
+        </div>
+
+        <!-- 선택된 학생 -->
+        <div id="selectedContent" style="display:none">
+          <div class="selected-summary">
+            <span class="dong-chip" id="dongChip">새 그룹</span>
+            <span class="summary-count" id="summaryCount">0명</span>
+          </div>
+          <div class="st-table-wrap">
+            <table class="st-table">
+              <thead>
+                <tr>
+                  <th style="width:64px">No.</th>
+                  <th style="width:70px">학년</th>
+                  <th style="width:70px">반</th>
+                  <th style="width:70px">번호</th>
+                  <th>이름</th>
+                </tr>
+              </thead>
+              <tbody id="selectedBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      <!-- /selectAcademic -->
+
+      <!-- ──── 이동수업반 모드 ──── -->
+      <div id="selectMobile" style="display:none">
+        <div class="right-head">
+          <div>
+            <p class="right-title">학생 목록에서 선택</p>
+            <p class="right-sub" style="margin-bottom:0;margin-top:4px">이동수업반을 만들고 학생을 등록해 주세요.</p>
+          </div>
+          <button class="btn-primary" onclick="openCreateClassModal()">
+            <i data-lucide="plus" style="width:14px;height:14px"></i> 반 만들기
+          </button>
+        </div>
+
+        <!-- 빈 상태 (반 0개) -->
+        <div class="empty-area" id="mobileEmpty">
+          <div class="empty-illust-bg">
+            <svg width="92" height="92" viewBox="0 0 92 92" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect x="22" y="32" width="48" height="40" rx="4" fill="#fff" stroke="#222631" stroke-width="1.5"/>
+              <line x1="30" y1="44" x2="62" y2="44" stroke="#d4e0ff" stroke-width="1.5"/>
+              <line x1="30" y1="52" x2="62" y2="52" stroke="#d4e0ff" stroke-width="1.5"/>
+              <line x1="30" y1="60" x2="50" y2="60" stroke="#d4e0ff" stroke-width="1.5"/>
+              <circle cx="46" cy="22" r="6" fill="#416bff"/>
+              <path d="M46 28 Q42 30 42 36" stroke="#416bff" stroke-width="2" stroke-linecap="round" fill="none"/>
+              <path d="M46 28 Q50 30 50 36" stroke="#416bff" stroke-width="2" stroke-linecap="round" fill="none"/>
+            </svg>
+          </div>
+          <p class="empty-msg">반을 만들어 학생을 등록해 주세요.</p>
+          <p class="empty-sub">우측 상단 [반 만들기] 버튼을 눌러 시작해 주세요.</p>
+        </div>
+
+        <!-- 반 카드 리스트 -->
+        <div id="mobileClassList" style="display:none"></div>
+      </div>
+      <!-- /selectMobile -->
+
+      </div>
+      <!-- /paneSelect -->
+
+      <!-- ── 학생 명단 업로드 페인 ── -->
+      <div id="paneUpload" style="display:none">
+
+        <!-- 1. 학생 명단 업로드 -->
+        <div class="upload-section">
+          <div class="upload-section-num">학생 명단 업로드</div>
+          <div class="upload-section-desc">아래에서 템플릿을 다운받아, 기록을 생성할 학생을 등록해 주세요.</div>
+
+          <div class="upload-label">파일 업로드</div>
+          <div class="upload-btns">
+            <button class="btn-primary" onclick="simulateUpload()">
+              <i data-lucide="upload" style="width:16px;height:16px"></i> 파일 업로드
+            </button>
+            <button class="btn-outline" onclick="showToast('학생 명단 템플릿을 다운로드했어요')">
+              <i data-lucide="download" style="width:16px;height:16px"></i> 학생 명단 템플릿 다운로드
+            </button>
+          </div>
+
+          <!-- 업로드 파일 chip -->
+          <div class="file-chip" id="fileChip" style="display:none">
+            <div class="file-chip-icon"><i data-lucide="file-spreadsheet" style="width:18px;height:18px"></i></div>
+            <div class="file-chip-info">
+              <div class="file-chip-name">학생_명단.xlsx</div>
+              <div class="file-chip-meta">28KB · 방금 업로드</div>
+            </div>
+            <button class="file-chip-x" onclick="clearUpload()" title="업로드 취소"><i data-lucide="x" style="width:16px;height:16px"></i></button>
+          </div>
+
+          <div class="info-box">
+            <div class="info-box-content">
+              <div class="info-head">※ 반드시 위의 <span class="hi">[학생 명단 템플릿]</span>을 다운받아, 양식에 맞춰 작성 후 업로드해 주세요. 다른 양식은 사용할 수 없어요.</div>
+              <ul>
+                <li>교과 생성 시 선택한 학년도에 등록된 학생만 그룹에 등록 가능해요.</li>
+                <li>교내에 등록되어 있지 않은 학생은 '학교 설정'에서 학생을 먼저 추가해 주세요.</li>
+              </ul>
+            </div>
+            <a class="info-link" href="#" onclick="event.preventDefault();showToast('학교 설정으로 이동')">학교 설정으로 이동 <i data-lucide="chevron-right" style="width:14px;height:14px"></i></a>
+          </div>
+        </div>
+
+        <div class="section-divider"></div>
+
+        <!-- 2. 업로드 파일 확인 -->
+        <div class="upload-section">
+          <div class="upload-section-num">업로드 파일 확인</div>
+
+          <!-- 빈 상태 -->
+          <div id="uploadEmpty">
+            <div class="upload-empty">
+              <div class="upload-empty-icon"><i data-lucide="file-text" style="width:28px;height:28px"></i></div>
+              <div class="upload-empty-msg">파일을 업로드해 주세요.</div>
+              <div class="upload-empty-sub">업로드 후 등록할 명단을 확인할 수 있어요.</div>
+            </div>
+          </div>
+
+          <!-- 결과 -->
+          <div id="uploadResult" style="display:none">
+            <div class="upload-chip-row" id="uploadChipRow"></div>
+            <div class="st-table-wrap">
+              <table class="st-table">
+                <thead>
+                  <tr>
+                    <th style="width:64px">No.</th>
+                    <th style="width:80px">학년</th>
+                    <th style="width:80px">반</th>
+                    <th style="width:80px">번호</th>
+                    <th>이름</th>
+                    <th style="width:100px">ID</th>
+                  </tr>
+                </thead>
+                <tbody id="uploadBody"></tbody>
+              </table>
+            </div>
+            <div class="upload-err-box" id="uploadErrBox" style="display:none">
+              <i data-lucide="info" class="ic" style="width:16px;height:16px"></i>
+              <div>
+                <div style="color:#b91c1c;font-weight:500;margin-bottom:2px">중복된 학번이 포함되어 있습니다. <strong>[No.2], [No.3]</strong></div>
+                <div style="color:#9a3412">학생 목록에 등록되어 있지 않은 학생입니다. 학교 설정에서 먼저 학생을 등록해 주세요. <strong>[No.n], [No.n], [No.n],,,,</strong></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ── 학생 명단+키워드 업로드 페인 ── -->
+      <div id="paneUploadKeyword" style="display:none">
+
+        <!-- 1. 학생 명단+키워드 업로드 -->
+        <div class="upload-section">
+          <div class="upload-section-num">학생 명단+키워드 업로드</div>
+          <div class="upload-section-desc">학생 명단과 수행 수준 · 키워드 · 활동 내역까지 한 번에 업로드하면 AI 초안을 바로 생성할 수 있어요.</div>
+
+          <div class="upload-label">파일 업로드</div>
+          <div class="upload-btns">
+            <button class="btn-primary" onclick="simulateUploadKeyword()">
+              <i data-lucide="upload" style="width:16px;height:16px"></i> 파일 업로드
+            </button>
+            <button class="btn-outline" onclick="showToast('학생 명단+키워드 템플릿을 다운로드했어요')">
+              <i data-lucide="download" style="width:16px;height:16px"></i> 학생 명단+키워드 템플릿 다운로드
+            </button>
+          </div>
+
+          <!-- 업로드 파일 chip -->
+          <div class="file-chip" id="fileChipKw" style="display:none">
+            <div class="file-chip-icon"><i data-lucide="file-spreadsheet" style="width:18px;height:18px"></i></div>
+            <div class="file-chip-info">
+              <div class="file-chip-name">학생_명단_키워드.xlsx</div>
+              <div class="file-chip-meta">36KB · 방금 업로드</div>
+            </div>
+            <button class="file-chip-x" onclick="clearUploadKw()" title="업로드 취소"><i data-lucide="x" style="width:16px;height:16px"></i></button>
+          </div>
+
+          <div class="info-box">
+            <div class="info-box-content">
+              <div class="info-head">※ 반드시 위의 <span class="hi">[학생 명단+키워드 템플릿]</span>을 다운받아, 양식에 맞춰 작성 후 업로드해 주세요. 다른 양식은 사용할 수 없어요.</div>
+              <ul>
+                <li>교과 생성 시 선택한 학년도에 등록된 학생만 그룹에 등록 가능해요.</li>
+                <li>교내에 등록되어 있지 않은 학생은 '학교 설정'에서 학생을 먼저 추가해 주세요.</li>
+                <li>수행 수준 · 키워드 · 활동 내역은 비워둘 수 있어요. 등록 후 화면에서 직접 입력도 가능해요.</li>
+              </ul>
+            </div>
+            <a class="info-link" href="#" onclick="event.preventDefault();showToast('학교 설정으로 이동')">학교 설정으로 이동 <i data-lucide="chevron-right" style="width:14px;height:14px"></i></a>
+          </div>
+        </div>
+
+        <div class="section-divider"></div>
+
+        <!-- 2. 업로드 파일 확인 -->
+        <div class="upload-section">
+          <div class="upload-section-num">업로드 파일 확인</div>
+
+          <!-- 빈 상태 -->
+          <div id="uploadEmptyKw">
+            <div class="upload-empty">
+              <div class="upload-empty-icon"><i data-lucide="file-text" style="width:28px;height:28px"></i></div>
+              <div class="upload-empty-msg">파일을 업로드해 주세요.</div>
+              <div class="upload-empty-sub">업로드 후 등록할 명단을 확인할 수 있어요.</div>
+            </div>
+          </div>
+
+          <!-- 결과 -->
+          <div id="uploadResultKw" style="display:none">
+            <div class="upload-chip-row" id="uploadChipRowKw"></div>
+            <div class="st-table-wrap" style="overflow-x:auto">
+              <table class="st-table" style="min-width:880px">
+                <thead>
+                  <tr>
+                    <th style="width:56px">No.</th>
+                    <th style="width:60px">학년</th>
+                    <th style="width:60px">반</th>
+                    <th style="width:60px">번호</th>
+                    <th style="width:90px">이름</th>
+                    <th style="width:90px">ID</th>
+                    <th style="width:110px">수행 수준</th>
+                    <th>키워드 및 활동 내역</th>
+                  </tr>
+                </thead>
+                <tbody id="uploadBodyKw"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+
+  <div class="footer-actions">
+    <button class="btn-cancel-lg" onclick="goBack()">취소</button>
+    <button class="btn-save-lg" id="btnSave" disabled onclick="onSave()">
+      <i data-lucide="check" style="width:16px;height:16px"></i> 저장
+    </button>
+  </div>
+
+
+</main>
+</div>
+
+<!-- 반 만들기 모달 -->
+<div class="overlay" id="createClassModal" onclick="if(event.target===this)closeCreateClassModal()">
+  <div class="modal-box cc-modal">
+    <div class="modal-head">
+      <p class="modal-title">반 만들기</p>
+      <button class="modal-x" onclick="closeCreateClassModal()"><i data-lucide="x" style="width:20px;height:20px"></i></button>
+    </div>
+    <div class="cc-rows" id="createClassRows"></div>
+    <button class="btn-add-row" onclick="addCreateClassRow()">
+      <i data-lucide="plus-circle" style="width:14px;height:14px"></i> 추가
+    </button>
+    <div class="modal-foot" style="margin-top:8px">
+      <div class="modal-acts" style="margin-left:auto">
+        <button class="btn-modal-cancel" onclick="closeCreateClassModal()">취소</button>
+        <button class="btn-modal-confirm" id="btnCreateClasses" onclick="confirmCreateClasses()">저장</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 반 이름 변경 모달 -->
+<div class="overlay" id="renameClassModal" onclick="if(event.target===this)closeRenameClassModal()">
+  <div class="modal-box" style="width:400px;padding:24px 28px">
+    <div class="modal-head">
+      <p class="modal-title">반 이름 변경</p>
+      <button class="modal-x" onclick="closeRenameClassModal()"><i data-lucide="x" style="width:20px;height:20px"></i></button>
+    </div>
+    <div class="cc-input-wrap">
+      <input type="text" class="field-input" id="renameClassInput" placeholder="반 이름을 입력해 주세요" maxlength="20" onkeydown="if(event.key==='Enter')confirmRenameClass()">
+      <span class="cc-suffix">반</span>
+    </div>
+    <div class="modal-foot" style="margin-top:16px">
+      <div class="modal-acts" style="margin-left:auto">
+        <button class="btn-modal-cancel" onclick="closeRenameClassModal()">취소</button>
+        <button class="btn-modal-confirm" onclick="confirmRenameClass()">저장</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 반 삭제 확인 모달 -->
+<div class="overlay" id="deleteClassModal" onclick="if(event.target===this)closeDeleteClassModal()">
+  <div class="del-box">
+    <div class="del-icon"><i data-lucide="trash-2" style="width:22px;height:22px;color:#f2525f"></i></div>
+    <p class="del-title" id="delClassTitle">반을 삭제하시겠습니까?</p>
+    <p class="del-desc">등록된 학생은 모두 해제되며<br>복구할 수 없어요.</p>
+    <div class="del-footer">
+      <button class="btn-del-cancel" onclick="closeDeleteClassModal()">아니오</button>
+      <button class="btn-del-confirm" onclick="confirmDeleteClass()">네, 삭제합니다.</button>
+    </div>
+  </div>
+</div>
+
+<!-- 학생 목록 모달 -->
+<div class="overlay" id="studentModal" onclick="if(event.target===this)closeStudentModal()">
+  <div class="modal-box">
+    <div class="modal-head">
+      <p class="modal-title">학생 목록</p>
+      <button class="modal-x" onclick="closeStudentModal()"><i data-lucide="x" style="width:20px;height:20px"></i></button>
+    </div>
+    <div class="stu-search">
+      <i data-lucide="search" style="width:18px;height:18px;color:#6d7381"></i>
+      <input type="text" id="treeSearch" placeholder="이름 또는 학번 검색" oninput="renderTree()">
+    </div>
+    <div class="stu-tree" id="treeBody"></div>
+    <div class="modal-foot">
+      <p class="modal-help">학생 목록은 학교 설정에서 수정할 수 있어요.</p>
+      <div class="modal-acts">
+        <button class="btn-modal-cancel" onclick="closeStudentModal()">취소</button>
+        <button class="btn-modal-confirm" id="btnAssign" onclick="confirmAssign()" disabled>등록 (0명)</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MOCKUP 모드 토글 -->
+<div class="mockup-toggle">
+  <span class="mt-label">반 편성</span>
+  <button class="mt-btn active" data-mode="academic" onclick="setClassMode('academic')">학적반</button>
+  <button class="mt-btn" data-mode="mobile" onclick="setClassMode('mobile')">이동수업반</button>
+</div>
+
+<div class="toast" id="toast">
+  <span class="toast-ic"><i data-lucide="check-circle" style="width:18px;height:18px"></i></span>
+  <span id="toastMsg"></span>
+</div>
+
+<script>
+lucide.createIcons();
+
+function toggleNav() {
+  document.getElementById('icon-sb').classList.toggle('expanded');
+  document.body.classList.toggle('nav-expanded');
+}
+
+function goBack() {
+  location.href = 'quick_seteuk_list_v1_260526.html';
+}
+
+(function() {
+  const p = new URLSearchParams(location.search);
+  const name = p.get('name');
+  if (name) {
+    document.getElementById('groupName').textContent = name;
+    document.getElementById('dongChip').textContent = name;
+  }
+  if (p.get('classMode') === 'mobile') {
+    setTimeout(() => setClassMode('mobile'), 0);
+  }
+})();
+
+const CLASSES = [
+  { id:'1-1', name:'1학년 1반', students:[
+    {n:1,name:'김하나',sid:'10101'},{n:2,name:'이민수',sid:'10102'},
+    {n:3,name:'박서연',sid:'10103'},{n:4,name:'정유진',sid:'10104'}
+  ]},
+  { id:'1-2', name:'1학년 2반', students:[
+    {n:1,name:'최지호',sid:'10201'},{n:2,name:'한도윤',sid:'10202'},
+    {n:3,name:'윤서아',sid:'10203'},{n:4,name:'송하늘',sid:'10204'}
+  ]},
+  { id:'1-3', name:'1학년 3반', students:[
+    {n:1,name:'김하나',sid:'10301'},{n:2,name:'김두나',sid:'10302'},
+    {n:3,name:'김세나',sid:'10303'},{n:4,name:'김네나',sid:'10304'},{n:5,name:'김다나',sid:'10305'}
+  ]},
+  { id:'2-1', name:'2학년 1반', students:[
+    {n:1,name:'이주원',sid:'20101'},{n:2,name:'박서준',sid:'20102'},
+    {n:3,name:'장민하',sid:'20103'},{n:4,name:'오지유',sid:'20104'}
+  ]},
+  { id:'2-2', name:'2학년 2반', students:[
+    {n:1,name:'백하늘',sid:'20201'},{n:2,name:'문지호',sid:'20202'},
+    {n:3,name:'서나은',sid:'20203'},{n:4,name:'권유찬',sid:'20204'}
+  ]},
+  { id:'2-3', name:'2학년 3반', students:[
+    {n:1,name:'전소율',sid:'20301'},{n:2,name:'홍시우',sid:'20302'},
+    {n:3,name:'노예린',sid:'20303'},{n:4,name:'배지호',sid:'20304'}
+  ]}
+];
+
+let assigned = {};
+let pickerSel = {};
+let currentMethod = 'select';
+
+// 이동수업반 모드 상태
+let classMode = 'academic'; // 'academic' | 'mobile'
+let mobileClasses = []; // [{id, name, assigned: {cid: Set(sid)}}]
+let mobileTargetClass = null; // 학생 모달이 어느 반에 배정 중인지
+let nextMobileClassId = 1;
+
+function selectMethod(m) {
+  currentMethod = m;
+  document.querySelectorAll('.method-option').forEach(o => o.classList.toggle('selected', o.dataset.method === m));
+  document.getElementById('paneSelect').style.display = m === 'select' ? 'block' : 'none';
+  document.getElementById('paneUpload').style.display = m === 'upload' ? 'block' : 'none';
+  document.getElementById('paneUploadKeyword').style.display = m === 'uploadKeyword' ? 'block' : 'none';
+  refreshSaveBtn();
+}
+
+// ── 학생 목록 모달 ──
+function openStudentModal() {
+  mobileTargetClass = null;
+  pickerSel = {};
+  Object.keys(assigned).forEach(cid => pickerSel[cid] = new Set(assigned[cid]));
+  document.querySelector('#studentModal .modal-title').textContent = '학생 목록';
+  renderTree();
+  document.getElementById('studentModal').classList.add('open');
+  lucide.createIcons();
+}
+function closeStudentModal() {
+  document.getElementById('studentModal').classList.remove('open');
+  mobileTargetClass = null;
+}
+
+function renderTree() {
+  const body = document.getElementById('treeBody');
+  const q = (document.getElementById('treeSearch')?.value || '').trim().toLowerCase();
+  const matched = CLASSES.map(c => ({
+    ...c,
+    matchedStudents: c.students.filter(s => !q || s.name.toLowerCase().includes(q) || s.sid.toLowerCase().includes(q) || c.name.toLowerCase().includes(q))
+  })).filter(c => !q || c.matchedStudents.length > 0);
+  if (matched.length === 0) {
+    body.innerHTML = `<div style="padding:48px 16px;text-align:center;font-size:14px;color:#b3b6bd">검색 결과가 없어요</div>`;
+    updateAssignBtn();
+    return;
+  }
+  body.innerHTML = matched.map(c => {
+    const sel = pickerSel[c.id] ? pickerSel[c.id].size : 0;
+    const total = c.students.length;
+    const openByQuery = q ? 'open' : '';
+    const indet = sel > 0 && sel < total ? 'indeterminate' : '';
+    const allChecked = sel === total && total > 0;
+    return `
+    <div class="tree-row" data-cid="${c.id}">
+      <div class="stu-class-row">
+        <label class="stu-checkbox ${indet}">
+          <input type="checkbox" class="cb-class" data-cid="${c.id}" ${allChecked ? 'checked' : ''} onchange="toggleClass('${c.id}')">
+          <span></span>
+        </label>
+        <span class="stu-class-label">${c.name} (${sel}/${total}명)</span>
+        <button class="stu-expand" onclick="toggleClassRow('${c.id}', event)"><i data-lucide="chevron-${openByQuery ? 'up' : 'down'}" style="width:18px;height:18px"></i></button>
+      </div>
+      <div class="stu-class-children ${openByQuery}">
+        ${c.matchedStudents.map(s => `
+          <div class="stu-row">
+            <label class="stu-checkbox">
+              <input type="checkbox" class="cb-stu" data-cid="${c.id}" data-sid="${s.sid}" ${pickerSel[c.id]?.has(s.sid) ? 'checked' : ''} onchange="toggleStudent('${c.id}','${s.sid}')">
+              <span></span>
+            </label>
+            <span class="stu-row-label">${s.sid} ${s.name}</span>
+          </div>
+        `).join('')}
+      </div>
+    </div>`;
+  }).join('');
+  updateAssignBtn();
+  lucide.createIcons();
+}
+
+function toggleClassRow(cid, e) {
+  if (e) e.stopPropagation();
+  const row = document.querySelector(`.tree-row[data-cid="${cid}"]`);
+  const children = row.querySelector('.stu-class-children');
+  const btn = row.querySelector('.stu-expand');
+  children.classList.toggle('open');
+  const isOpen = children.classList.contains('open');
+  const icon = btn.querySelector('i');
+  if (icon) {
+    icon.setAttribute('data-lucide', isOpen ? 'chevron-up' : 'chevron-down');
+    lucide.createIcons();
+  }
+}
+
+function toggleClass(cid) {
+  const cls = CLASSES.find(c => c.id === cid);
+  if (!pickerSel[cid]) pickerSel[cid] = new Set();
+  if (pickerSel[cid].size === cls.students.length) pickerSel[cid].clear();
+  else cls.students.forEach(s => pickerSel[cid].add(s.sid));
+  renderTree();
+}
+
+function toggleStudent(cid, sid) {
+  if (!pickerSel[cid]) pickerSel[cid] = new Set();
+  if (pickerSel[cid].has(sid)) pickerSel[cid].delete(sid);
+  else pickerSel[cid].add(sid);
+  renderTree();
+}
+
+function updateAssignBtn() {
+  const total = Object.values(pickerSel).reduce((s, set) => s + set.size, 0);
+  const btn = document.getElementById('btnAssign');
+  btn.textContent = `등록 (${total}명)`;
+  btn.disabled = total === 0;
+}
+
+function confirmAssign() {
+  if (mobileTargetClass) {
+    // 이동수업반: 해당 반에 저장
+    const c = mobileClasses.find(c => c.id === mobileTargetClass);
+    c.assigned = {};
+    Object.keys(pickerSel).forEach(cid => { if (pickerSel[cid].size > 0) c.assigned[cid] = new Set(pickerSel[cid]); });
+    closeStudentModal();
+    renderMobileClasses();
+    refreshSaveBtn();
+    const total = Object.values(c.assigned).reduce((s, set) => s + set.size, 0);
+    showToast(`${c.name}반에 ${total}명을 등록했어요`);
+  } else {
+    // 학적기준반: 글로벌 assigned에 저장
+    assigned = {};
+    Object.keys(pickerSel).forEach(cid => { if (pickerSel[cid].size > 0) assigned[cid] = new Set(pickerSel[cid]); });
+    closeStudentModal();
+    renderSelectedTable();
+    refreshSaveBtn();
+    const total = Object.values(assigned).reduce((s, set) => s + set.size, 0);
+    showToast(`${total}명을 등록했어요`);
+  }
+}
+
+function renderSelectedTable() {
+  const total = Object.values(assigned).reduce((s, set) => s + set.size, 0);
+  const empty = document.getElementById('selectEmpty');
+  const wrap = document.getElementById('selectedContent');
+  if (total === 0) {
+    empty.style.display = 'flex';
+    wrap.style.display = 'none';
+    return;
+  }
+  empty.style.display = 'none';
+  wrap.style.display = 'block';
+  document.getElementById('summaryCount').textContent = `${total}명`;
+
+  // 학생 데이터 펼치기
+  let rows = [];
+  CLASSES.forEach(c => {
+    if (!assigned[c.id]?.size) return;
+    const [g, b] = c.id.split('-');
+    c.students.forEach(s => {
+      if (assigned[c.id].has(s.sid)) {
+        rows.push({ g, b, n: s.n, name: s.name });
+      }
+    });
+  });
+  document.getElementById('selectedBody').innerHTML = rows.map((r, i) => `
+    <tr>
+      <td>${i + 1}</td>
+      <td>${r.g}</td>
+      <td>${r.b}</td>
+      <td>${r.n}</td>
+      <td>${r.name}</td>
+    </tr>
+  `).join('');
+}
+
+// ── 엑셀 업로드 (학생 명단) ──
+function simulateUpload() {
+  document.getElementById('fileChip').style.display = 'flex';
+  document.getElementById('uploadEmpty').style.display = 'none';
+  document.getElementById('uploadResult').style.display = 'block';
+
+  document.getElementById('uploadChipRow').innerHTML = `
+    <span class="upload-chip">1학년 1반</span><span class="upload-chip-count">5명</span>
+    <span class="upload-chip">1학년 2반</span><span class="upload-chip-count">5명</span>
+  `;
+
+  const rows = [];
+  const names = ['김두나','김세나','김하나','이민수','박서연','정유진','최지호','한도윤','윤서아','송하늘','권유찬'];
+  for (let i = 1; i <= 11; i++) {
+    rows.push({ no: i, g: 1, b: i <= 5 ? 1 : 2, n: i <= 5 ? i : i - 5, name: names[i - 1], id: '10' + (i <= 5 ? 1 : 2) + String(i <= 5 ? i : i - 5).padStart(2,'0'), err: (i === 2 || i === 3) });
+  }
+  document.getElementById('uploadBody').innerHTML = rows.map(r => `
+    <tr class="${r.err ? 'row-err' : ''}">
+      <td>${r.no}</td>
+      <td>${r.g}</td>
+      <td>${r.b}</td>
+      <td>${r.n}</td>
+      <td>${r.name}</td>
+      <td>${r.id}</td>
+    </tr>
+  `).join('');
+
+  document.getElementById('uploadErrBox').style.display = 'flex';
+  refreshSaveBtn();
+  lucide.createIcons();
+}
+
+function clearUpload() {
+  document.getElementById('fileChip').style.display = 'none';
+  document.getElementById('uploadEmpty').style.display = 'block';
+  document.getElementById('uploadResult').style.display = 'none';
+  document.getElementById('uploadErrBox').style.display = 'none';
+  refreshSaveBtn();
+  lucide.createIcons();
+}
+
+// ── 엑셀 업로드 (학생 명단+키워드) ──
+function simulateUploadKeyword() {
+  document.getElementById('fileChipKw').style.display = 'flex';
+  document.getElementById('uploadEmptyKw').style.display = 'none';
+  document.getElementById('uploadResultKw').style.display = 'block';
+
+  document.getElementById('uploadChipRowKw').innerHTML = `
+    <span class="upload-chip">1학년 1반</span><span class="upload-chip-count">5명</span>
+    <span class="upload-chip">1학년 2반</span><span class="upload-chip-count">3명</span>
+  `;
+
+  const sample = [
+    { no:1, g:1, b:1, n:1, name:'김두나', id:'10101', level:'우수', kw:'사회집단·갈등 해결 사례 발표, 모둠 토론 리더' },
+    { no:2, g:1, b:1, n:2, name:'김세나', id:'10102', level:'우수', kw:'문화 다양성 보고서 작성, 통계 자료 활용' },
+    { no:3, g:1, b:1, n:3, name:'김하나', id:'10103', level:'보통', kw:'역할 분담 토론 참여, 노트 정리 우수' },
+    { no:4, g:1, b:1, n:4, name:'이민수', id:'10104', level:'보통', kw:'사회화 사례 조사, 모둠 발표 보조' },
+    { no:5, g:1, b:1, n:5, name:'박서연', id:'10105', level:'미흡', kw:'' },
+    { no:6, g:1, b:2, n:1, name:'최지호', id:'10201', level:'우수', kw:'시민 참여 사례 인터뷰 진행' },
+    { no:7, g:1, b:2, n:2, name:'한도윤', id:'10202', level:'보통', kw:'학급 회의 진행, 의견 정리' },
+    { no:8, g:1, b:2, n:3, name:'윤서아', id:'10203', level:'우수', kw:'사회 변화 자료 시각화 발표' },
+  ];
+  document.getElementById('uploadBodyKw').innerHTML = sample.map(r => `
+    <tr>
+      <td>${r.no}</td>
+      <td>${r.g}</td>
+      <td>${r.b}</td>
+      <td>${r.n}</td>
+      <td>${r.name}</td>
+      <td>${r.id}</td>
+      <td>${r.level}</td>
+      <td style="text-align:left;color:#3b3f4c">${r.kw || '<span style="color:#b3b6bd">—</span>'}</td>
+    </tr>
+  `).join('');
+
+  refreshSaveBtn();
+  lucide.createIcons();
+}
+
+function clearUploadKw() {
+  document.getElementById('fileChipKw').style.display = 'none';
+  document.getElementById('uploadEmptyKw').style.display = 'block';
+  document.getElementById('uploadResultKw').style.display = 'none';
+  refreshSaveBtn();
+  lucide.createIcons();
+}
+
+function refreshSaveBtn() {
+  let ready = false;
+  if (currentMethod === 'select') {
+    if (classMode === 'mobile') {
+      ready = mobileClasses.some(c => Object.values(c.assigned).reduce((s, set) => s + set.size, 0) > 0);
+    } else {
+      ready = Object.values(assigned).reduce((s, set) => s + set.size, 0) > 0;
+    }
+  } else if (currentMethod === 'upload') {
+    ready = document.getElementById('fileChip').style.display === 'flex';
+  } else if (currentMethod === 'uploadKeyword') {
+    ready = document.getElementById('fileChipKw').style.display === 'flex';
+  }
+  document.getElementById('btnSave').disabled = !ready;
+}
+
+function onSave() {
+  const name = document.getElementById('groupName').textContent.trim();
+  let total = 0;
+  if (currentMethod === 'select') {
+    if (classMode === 'mobile') {
+      total = mobileClasses.reduce((s, c) => s + Object.values(c.assigned).reduce((sub, set) => sub + set.size, 0), 0);
+    } else {
+      total = Object.values(assigned).reduce((s, set) => s + set.size, 0);
+    }
+  } else if (currentMethod === 'upload') {
+    total = 11;
+  } else if (currentMethod === 'uploadKeyword') {
+    total = 8;
+  }
+  const subject = new URLSearchParams(location.search).get('subject') || '사회';
+  showToast('학생을 등록했어요');
+  setTimeout(() => {
+    location.href = 'quick_seteuk_list_v1_260526.html?registered=' + encodeURIComponent(name) + '&count=' + total + '&subject=' + encodeURIComponent(subject);
+  }, 800);
+}
+
+// ══════════════ 이동수업반 모드 ══════════════
+function setClassMode(mode) {
+  classMode = mode;
+  document.querySelectorAll('.mockup-toggle .mt-btn').forEach(b => b.classList.toggle('active', b.dataset.mode === mode));
+  document.getElementById('selectAcademic').style.display = mode === 'academic' ? 'block' : 'none';
+  document.getElementById('selectMobile').style.display = mode === 'mobile' ? 'block' : 'none';
+  refreshSaveBtn();
+}
+
+// 반 만들기 모달
+function openCreateClassModal() {
+  document.getElementById('createClassRows').innerHTML = '';
+  addCreateClassRow();
+  document.getElementById('createClassModal').classList.add('open');
+  lucide.createIcons();
+}
+function closeCreateClassModal() {
+  document.getElementById('createClassModal').classList.remove('open');
+}
+function addCreateClassRow() {
+  const rows = document.getElementById('createClassRows');
+  if (rows.children.length >= 10) { showToast('한 번에 최대 10개까지 만들 수 있어요'); return; }
+  const row = document.createElement('div');
+  row.className = 'cc-row';
+  row.innerHTML = `
+    <div class="cc-input-wrap">
+      <input type="text" class="field-input" placeholder="반 이름을 입력해 주세요" maxlength="20">
+      <span class="cc-suffix">반</span>
+    </div>
+    <button class="cc-row-del" onclick="removeCreateClassRow(this)" title="삭제"><i data-lucide="minus" style="width:14px;height:14px"></i></button>
+  `;
+  rows.appendChild(row);
+  row.querySelector('input').focus();
+  lucide.createIcons();
+}
+function removeCreateClassRow(btn) {
+  const rows = document.getElementById('createClassRows');
+  if (rows.children.length <= 1) { showToast('최소 1개 이상 필요해요'); return; }
+  btn.closest('.cc-row').remove();
+}
+function confirmCreateClasses() {
+  const inputs = [...document.querySelectorAll('#createClassRows input')];
+  const names = inputs.map(i => i.value.trim()).filter(n => n.length > 0);
+  if (names.length === 0) { showToast('반 이름을 입력해 주세요'); inputs[0]?.focus(); return; }
+  names.forEach(n => {
+    mobileClasses.push({ id: 'mc-' + (nextMobileClassId++), name: n, assigned: {} });
+  });
+  closeCreateClassModal();
+  renderMobileClasses();
+  refreshSaveBtn();
+  showToast(names.length + '개 반을 만들었어요');
+}
+
+// 반 카드 렌더링
+function renderMobileClasses() {
+  const wrap = document.getElementById('mobileClassList');
+  const empty = document.getElementById('mobileEmpty');
+  if (mobileClasses.length === 0) {
+    wrap.style.display = 'none';
+    empty.style.display = 'flex';
+    return;
+  }
+  empty.style.display = 'none';
+  wrap.style.display = 'block';
+  wrap.innerHTML = mobileClasses.map((c, i) => {
+    const totalAssigned = Object.values(c.assigned).reduce((s, set) => s + set.size, 0);
+    const expandedCls = i === 0 ? 'expanded' : '';
+    const btnLabel = totalAssigned > 0 ? '학생 변경' : '학생 등록';
+    return `
+    <div class="class-card ${expandedCls}" data-mc-id="${c.id}">
+      <div class="cc-head" onclick="toggleClassCard('${c.id}', event)">
+        <i data-lucide="chevron-right" class="cc-toggle" style="width:18px;height:18px"></i>
+        <span class="cc-name">${escapeHtml(c.name)}반</span>
+        <span class="cc-count">${totalAssigned}명</span>
+        <span class="cc-grow"></span>
+        <div class="cc-actions" onclick="event.stopPropagation()">
+          <button class="btn-cc-assign" onclick="openStudentModalForClass('${c.id}')">
+            <i data-lucide="user-plus" style="width:13px;height:13px"></i> ${btnLabel}
+          </button>
+          <button class="cc-menu-btn" onclick="toggleMobileClassMenu(event, '${c.id}')"><i data-lucide="more-vertical" style="width:16px;height:16px"></i></button>
+          <div class="cc-menu" id="cc-menu-${c.id}">
+            <div class="dropdown-item" onclick="renameMobileClass(event, '${c.id}')"><i data-lucide="pencil" style="width:14px;height:14px"></i>이름 변경</div>
+            <div class="dropdown-item danger" onclick="deleteMobileClass(event, '${c.id}')"><i data-lucide="trash-2" style="width:14px;height:14px"></i>반 삭제</div>
+          </div>
+        </div>
+      </div>
+      <div class="cc-body">
+        ${totalAssigned > 0 ? renderClassStudentTable(c) : '<div class="cc-empty">아직 등록된 학생이 없어요.<br>[학생 등록] 버튼을 눌러 추가해 주세요.</div>'}
+      </div>
+    </div>`;
+  }).join('');
+  lucide.createIcons();
+}
+function escapeHtml(s) { return String(s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
+
+function renderClassStudentTable(c) {
+  let rows = [];
+  CLASSES.forEach(cls => {
+    if (!c.assigned[cls.id]?.size) return;
+    const [g, b] = cls.id.split('-');
+    cls.students.forEach(s => {
+      if (c.assigned[cls.id].has(s.sid)) rows.push({ g, b, n: s.n, name: s.name });
+    });
+  });
+  return `
+    <div class="st-table-wrap" style="margin-top:12px">
+      <table class="st-table">
+        <thead><tr><th style="width:64px">No.</th><th style="width:70px">학년</th><th style="width:70px">반</th><th style="width:70px">번호</th><th>이름</th></tr></thead>
+        <tbody>${rows.map((r,i) => `<tr><td>${i+1}</td><td>${r.g}</td><td>${r.b}</td><td>${r.n}</td><td>${escapeHtml(r.name)}</td></tr>`).join('')}</tbody>
+      </table>
+    </div>
+  `;
+}
+
+function toggleClassCard(mcId, e) {
+  if (e && (e.target.closest('.cc-actions') || e.target.closest('.cc-menu'))) return;
+  const card = document.querySelector(`.class-card[data-mc-id="${mcId}"]`);
+  card.classList.toggle('expanded');
+}
+
+function toggleMobileClassMenu(e, mcId) {
+  e.stopPropagation();
+  const menu = document.getElementById('cc-menu-' + mcId);
+  document.querySelectorAll('.cc-menu.open').forEach(m => { if (m !== menu) m.classList.remove('open'); });
+  menu.classList.toggle('open');
+}
+document.addEventListener('click', () => {
+  document.querySelectorAll('.cc-menu.open').forEach(m => m.classList.remove('open'));
+});
+
+let pendingClassId = null;
+
+function renameMobileClass(e, mcId) {
+  e.stopPropagation();
+  document.querySelectorAll('.cc-menu.open').forEach(m => m.classList.remove('open'));
+  pendingClassId = mcId;
+  const c = mobileClasses.find(c => c.id === mcId);
+  const input = document.getElementById('renameClassInput');
+  input.value = c.name;
+  document.getElementById('renameClassModal').classList.add('open');
+  lucide.createIcons();
+  setTimeout(() => { input.focus(); input.select(); }, 50);
+}
+function closeRenameClassModal() {
+  document.getElementById('renameClassModal').classList.remove('open');
+  pendingClassId = null;
+}
+function confirmRenameClass() {
+  const input = document.getElementById('renameClassInput');
+  const newName = input.value.trim();
+  if (!newName) { showToast('반 이름을 입력해 주세요'); input.focus(); return; }
+  const c = mobileClasses.find(c => c.id === pendingClassId);
+  if (c) {
+    c.name = newName;
+    renderMobileClasses();
+    showToast('이름을 변경했어요');
+  }
+  closeRenameClassModal();
+}
+
+function deleteMobileClass(e, mcId) {
+  e.stopPropagation();
+  document.querySelectorAll('.cc-menu.open').forEach(m => m.classList.remove('open'));
+  pendingClassId = mcId;
+  const c = mobileClasses.find(c => c.id === mcId);
+  document.getElementById('delClassTitle').textContent = `${c.name}반을 삭제하시겠습니까?`;
+  document.getElementById('deleteClassModal').classList.add('open');
+  lucide.createIcons();
+}
+function closeDeleteClassModal() {
+  document.getElementById('deleteClassModal').classList.remove('open');
+  pendingClassId = null;
+}
+function confirmDeleteClass() {
+  if (!pendingClassId) return;
+  mobileClasses = mobileClasses.filter(c => c.id !== pendingClassId);
+  closeDeleteClassModal();
+  renderMobileClasses();
+  refreshSaveBtn();
+  showToast('반을 삭제했어요');
+}
+
+function openStudentModalForClass(mcId) {
+  mobileTargetClass = mcId;
+  const c = mobileClasses.find(c => c.id === mcId);
+  pickerSel = {};
+  Object.keys(c.assigned).forEach(cid => pickerSel[cid] = new Set(c.assigned[cid]));
+  document.querySelector('#studentModal .modal-title').textContent = `학생 목록 (${c.name}반)`;
+  renderTree();
+  document.getElementById('studentModal').classList.add('open');
+  lucide.createIcons();
+}
+
+// MOCKUP 토글 드래그
+(function(){
+  var bar = document.querySelector('.mockup-toggle'); if (!bar) return;
+  var d=false, sx=0, sy=0, sl=0, st=0;
+  bar.addEventListener('mousedown', function(e){
+    if (e.target.closest('button')) return;
+    var r = bar.getBoundingClientRect();
+    sl=r.left; st=r.top; sx=e.clientX; sy=e.clientY; d=true;
+    bar.style.right='auto'; bar.style.bottom='auto';
+    bar.style.left=sl+'px'; bar.style.top=st+'px';
+    bar.classList.add('dragging'); e.preventDefault();
+  });
+  document.addEventListener('mousemove', function(e){
+    if(!d) return;
+    var nx=sl+(e.clientX-sx), ny=st+(e.clientY-sy);
+    var r=bar.getBoundingClientRect();
+    nx=Math.max(4, Math.min(innerWidth-r.width-4, nx));
+    ny=Math.max(4, Math.min(innerHeight-r.height-4, ny));
+    bar.style.left=nx+'px'; bar.style.top=ny+'px';
+  });
+  document.addEventListener('mouseup', function(){ if(d){d=false; bar.classList.remove('dragging');} });
+})();
+
+let _toastTimer = null;
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  document.getElementById('toastMsg').textContent = msg;
+  t.classList.add('show');
+  lucide.createIcons();
+  clearTimeout(_toastTimer);
+  _toastTimer = setTimeout(() => t.classList.remove('show'), 2500);
+}
+</script>
+
+</body>
+</html>
