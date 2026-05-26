@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>1학년 1반 클리포 공개 설정 | CLIPO</title>
+<title>1학년 1반 클리포에서 결과 확인 | CLIPO</title>
 <link rel="icon" type="image/svg+xml" href="clipo_favicon_elem.svg">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard-gov.min.css">
 <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
@@ -163,7 +163,8 @@ body{background:#f6f7f9;color:#222631;min-height:100vh}
 .checkbox-row-modal-text{font-size:14px;color:#3b3f4c;line-height:1.4}
 
 /* 데모 모드 스위처 (우측 하단) */
-.demo-mode-switcher{position:fixed;bottom:18px;right:18px;display:inline-flex;align-items:center;gap:4px;padding:6px 8px;background:#1f2937;color:#e5e7eb;border-radius:100px;font-family:'Pretendard GOV',inherit;z-index:500;box-shadow:0 4px 20px rgba(0,0,0,.25)}
+.demo-mode-switcher{position:fixed;bottom:18px;right:18px;display:inline-flex;align-items:center;gap:4px;padding:6px 8px;background:#1f2937;color:#e5e7eb;border-radius:100px;font-family:'Pretendard GOV',inherit;z-index:500;box-shadow:0 4px 20px rgba(0,0,0,.25);cursor:move;user-select:none}
+.demo-mode-switcher.dragging{box-shadow:0 8px 32px rgba(0,0,0,.45);opacity:.95}
 .demo-mode-label{font-size:10px;font-weight:800;letter-spacing:.08em;color:#9ca3af;padding:0 8px 0 6px}
 .demo-mode-btn{display:inline-flex;align-items:center;justify-content:center;height:26px;padding:0 12px;border-radius:100px;background:transparent;border:none;color:#9ca3af;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;line-height:1;transition:all .15s}
 .demo-mode-btn:hover{color:#fff}
@@ -310,7 +311,7 @@ body.note-add-mode *{cursor:crosshair !important}
       <button class="btn-back" onclick="history.back()">
         <i data-lucide="chevron-left" style="width:18px;height:18px"></i>이전으로
       </button>
-      <h1 class="page-title">1학년 1반 클리포 공개 설정</h1>
+      <h1 class="page-title">1학년 1반 클리포에서 결과 확인</h1>
       <p class="page-desc">공유할 학생, 공개 항목, 공개 기간을 설정하고 저장하면 학생이 바로 확인할 수 있어요.</p>
     </div>
 
@@ -489,6 +490,29 @@ body.note-add-mode *{cursor:crosshair !important}
   <button class="demo-mode-btn active" data-mode="mixed" onclick="setDemoMode(this)">섞임</button>
   <button class="demo-mode-btn" data-mode="old" onclick="setDemoMode(this)">기존</button>
 </div>
+<script>
+(function(){
+  var bar=document.querySelector('.demo-mode-switcher');if(!bar)return;
+  var d=false,sx=0,sy=0,sl=0,st=0;
+  bar.addEventListener('mousedown',function(e){
+    if(e.target.closest('.demo-mode-btn'))return;
+    var r=bar.getBoundingClientRect();
+    sl=r.left;st=r.top;sx=e.clientX;sy=e.clientY;d=true;
+    bar.style.right='auto';bar.style.bottom='auto';
+    bar.style.left=sl+'px';bar.style.top=st+'px';
+    bar.classList.add('dragging');e.preventDefault();
+  });
+  document.addEventListener('mousemove',function(e){
+    if(!d)return;
+    var nx=sl+(e.clientX-sx),ny=st+(e.clientY-sy);
+    var r=bar.getBoundingClientRect();
+    nx=Math.max(4,Math.min(innerWidth-r.width-4,nx));
+    ny=Math.max(4,Math.min(innerHeight-r.height-4,ny));
+    bar.style.left=nx+'px';bar.style.top=ny+'px';
+  });
+  document.addEventListener('mouseup',function(){if(d){d=false;bar.classList.remove('dragging');}});
+})();
+</script>
 
 <div class="toast" id="toast">
   <i id="toastIcon" data-lucide="circle-check-big" style="width:18px;height:18px;flex-shrink:0"></i>

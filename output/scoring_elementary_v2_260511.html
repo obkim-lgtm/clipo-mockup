@@ -35,7 +35,7 @@ body{background:#fff;color:#222631;overflow:hidden;height:100vh}
 .sub-nav-item.active::after{content:"";position:absolute;left:12px;right:12px;bottom:-1px;height:2px;background:#365eef;border-radius:2px 2px 0 0}
 
 /* ══════ 채점 액션바 (68px) ══════ */
-.top-bar{height:68px;background:#fff;display:flex;align-items:center;position:fixed;top:102px;left:0;right:0;z-index:200;border-bottom:1px solid #dde1e8;padding:0 24px 0 0}
+.top-bar{height:68px;background:#fff;display:flex;align-items:center;position:fixed;top:0;left:0;right:0;z-index:200;border-bottom:1px solid #dde1e8;padding:0 24px 0 0}
 .tb-left{display:flex;align-items:center;gap:0;flex:1;min-width:0}
 .btn-back{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;height:68px;width:68px;border-right:1px solid #dde1e8;background:#fff;color:#6d7381;font-size:12px;font-weight:500;font-family:inherit;cursor:pointer;flex-shrink:0;border-top:none;border-bottom:none;border-left:none;border-radius:0;line-height:1}
 .btn-back:hover{background:#f6f7f9;color:#222631}
@@ -54,7 +54,7 @@ body{background:#fff;color:#222631;overflow:hidden;height:100vh}
 .btn-save:hover{background:#3151c4}
 
 /* ══════ 메인 영역 ══════ */
-.main-wrap{display:flex;position:fixed;top:170px;left:0;right:0;bottom:0}
+.main-wrap{display:flex;position:fixed;top:68px;left:0;right:0;bottom:0}
 
 /* ══════ 뷰어 (좌) ══════ */
 .viewer{flex:1;display:flex;flex-direction:column;min-width:0;position:relative;background:#dde1e8}
@@ -170,6 +170,8 @@ body.before-ai-rerun .score-btn.ai-suggest:hover{background:#f4f8ff;border-color
 .ec-level.lv-mid{background:#fef3c7;color:#92400e}
 .ec-level.lv-low{background:#fee2e2;color:#991b1b}
 .ec-level.lv-score{background:var(--ac-bg);color:var(--ac-text)}
+.ec-level .ai-suggest-note{font-size:11px;font-weight:500;color:#6d7381;margin-left:4px}
+.ec-level .ai-suggest-prefix{font-size:11px;font-weight:500;color:#6d7381;margin-right:4px}
 .ec-summary{flex:1;font-size:15px;font-weight:600;color:#222631;line-height:1.4}
 .ec-header-edit-icon{visibility:hidden;flex-shrink:0;color:var(--ac)}
 .ec-card-header:hover .ec-header-edit-icon{visibility:visible}
@@ -215,8 +217,8 @@ body.before-ai-rerun .score-btn.ai-suggest:hover{background:#f4f8ff;border-color
 .teacher-fb-ta:focus{border-color:#365eef}
 .teacher-fb-bottom{display:flex;align-items:center;justify-content:space-between;margin-top:8px}
 .char-count{font-size:13px;color:#6d7381;line-height:1}
-.btn-formula{display:inline-flex;align-items:center;justify-content:center;gap:4px;height:32px;padding:0 14px;border-radius:100px;background:#fff;border:1px solid #dde1e8;color:#3b3f4c;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;line-height:1}
-.btn-formula:hover{border-color:#a3c3ff;color:#365eef}
+.btn-formula{display:inline-flex;align-items:center;justify-content:center;gap:4px;height:28px;padding:0 8px;border-radius:6px;background:none;border:none;color:#6d7381;font-size:12px;font-weight:500;cursor:pointer;font-family:inherit;line-height:1}
+.btn-formula:hover{background:#f4f8ff;color:#365eef}
 .teacher-fb-save{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-top:12px;flex-wrap:wrap}
 .teacher-fb-save-left{display:inline-flex;align-items:center;gap:4px;flex-wrap:wrap}
 .teacher-fb-save-right{display:inline-flex;align-items:center;gap:8px;flex-wrap:wrap}
@@ -413,7 +415,8 @@ body.before-ai-rerun .score-btn.ai-suggest:hover{background:#f4f8ff;border-color
 .modal-close:hover{background:#f6f7f9;color:#222631}
 .modal-body{padding:20px 24px;overflow-y:auto;display:flex;flex-direction:column;gap:24px}
 .modal-ft{display:flex;justify-content:space-between;align-items:center;padding:16px 24px;border-top:1px solid #eaecf0;gap:12px;flex-shrink:0;background:#f9fafb}
-.modal-actions{display:inline-flex;gap:8px}
+.modal-actions{display:inline-flex;gap:8px;flex-shrink:0}
+.btn-modal-cancel,.btn-modal-save{white-space:nowrap}
 .field{display:flex;flex-direction:column;gap:12px}
 .field-lbl{font-size:14px;font-weight:600;color:#3b3f4c;line-height:1}
 .field-input{width:100%;padding:10px 12px;border:1px solid #dde1e8;border-radius:10px;font-size:16px;font-family:inherit;color:#222631;outline:none;line-height:1.5;font-weight:600}
@@ -478,6 +481,43 @@ select.field-input{appearance:none;-webkit-appearance:none;background-image:url(
 .modal-info-text strong{color:#222631;font-weight:700}
 .modal-info-list{margin:6px 0 0 0;padding-left:18px;font-size:13px;color:#3b3f4c;line-height:1.7}
 
+/* 채점 모델 카드 (접힘/펼침 토글 — 다시 채점 모달 상단, 학급 모달과 동일 톤) */
+.model-section{display:flex;flex-direction:column;gap:0}
+.model-summary{display:flex;align-items:center;gap:10px;padding:12px 14px;border:1px solid #d4e2ff;border-radius:10px;background:#f4f8ff;cursor:pointer;user-select:none;transition:background .15s}
+.model-summary:hover{background:#eaf1ff}
+.model-badge-mini{width:32px;height:32px;border-radius:6px;background:linear-gradient(135deg,#5b7fff,#365eef);color:#fff;display:inline-flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0;letter-spacing:.02em;box-shadow:0 1px 3px rgba(54,94,239,.25)}
+.model-summary-title{font-size:14px;font-weight:700;color:#222631;flex:1}
+.model-summary-date{font-size:12px;color:#6d7381}
+.model-chevron{color:#6d7381;transition:transform .2s;flex-shrink:0}
+.model-section.expanded .model-chevron{transform:rotate(180deg)}
+.model-detail{margin-top:8px;padding:14px;background:#fff;border:1px solid #eaecf0;border-radius:10px;display:flex;flex-direction:column;gap:8px}
+.model-detail .model-desc{font-size:13px;color:#3b3f4c;line-height:1.5}
+.model-detail .model-feats{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:4px}
+.model-detail .model-feats li{font-size:13px;color:#3b3f4c;line-height:1.5;padding-left:10px;position:relative}
+.model-detail .model-feats li::before{content:"-";position:absolute;left:0}
+.model-detail .model-link-btn{display:inline-flex;align-items:center;gap:4px;height:30px;padding:0 12px;border-radius:6px;background:#f4f8ff;border:1px solid #d4e2ff;color:#3151c4;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;line-height:1;align-self:flex-start;text-decoration:none;transition:all .15s}
+.model-detail .model-link-btn:hover{background:#eaf1ff;border-color:#a3c3ff}
+
+/* 크레딧 사용 안내 (모달 푸터 좌측) */
+.credit-notice{display:inline-flex;align-items:center;gap:6px;font-size:13px;color:#3b3f4c;line-height:1;white-space:nowrap;flex-shrink:0}
+.credit-notice i{color:#365eef;flex-shrink:0}
+.credit-notice strong{color:#365eef;font-weight:700}
+.credit-notice-sub{color:#6d7381;font-weight:500;margin-left:2px;white-space:nowrap}
+.credit-help{color:#6d7381 !important;cursor:help}
+
+/* (?) 툴팁 — hover + 클릭 토글 (Lucide가 <i>를 <svg>로 교체하며 native title 속성을 소실시켜서 커스텀 구현) */
+.credit-tooltip-wrap{position:relative;display:inline-flex;align-items:center;cursor:help;margin-left:2px;line-height:1}
+.credit-tooltip{position:absolute;bottom:calc(100% + 8px);right:-8px;background:#222631;color:#fff;font-size:12px;line-height:1.5;padding:8px 12px;border-radius:8px;width:240px;font-weight:500;opacity:0;visibility:hidden;transition:opacity .15s,visibility .15s;z-index:1100;pointer-events:none;box-shadow:0 4px 16px rgba(0,0,0,.25);text-align:left;white-space:normal}
+.credit-tooltip::after{content:"";position:absolute;top:100%;right:14px;border:5px solid transparent;border-top-color:#222631}
+.credit-tooltip-wrap:hover .credit-tooltip,
+.credit-tooltip-wrap.show .credit-tooltip{opacity:1;visibility:visible}
+
+/* 환불 안내 배너 (채점 실패 후 다시 채점 시) */
+.modal-info.refund-notice{background:#e6f7ec;border:1px solid #b8e6c8}
+.modal-info.refund-notice .modal-info-icon{color:#1ab864}
+.modal-info.refund-notice .modal-info-text{color:#055f33}
+.modal-info.refund-notice .modal-info-text strong{color:#055f33;font-weight:700}
+
 /* ══════ 토스트 ══════ */
 .toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(12px);padding:14px 22px;border-radius:100px;font-size:15px;font-weight:500;line-height:1.4;box-shadow:0 4px 12px rgba(0,0,0,.15);opacity:0;transition:all .25s;z-index:900;pointer-events:none;display:flex;align-items:center;gap:10px;min-width:280px}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
@@ -538,34 +578,7 @@ select.field-input{appearance:none;-webkit-appearance:none;background-image:url(
 </head>
 <body>
 
-<!-- ══════ 글로벌 헤더 ══════ -->
-<div class="global-header">
-  <div class="gh-left">
-    <button class="gh-menu-btn"><i data-lucide="menu" style="width:24px;height:24px"></i></button>
-    <a class="gh-logo" href="#" aria-label="CLIPO">
-      <svg width="76" height="16" viewBox="0 0 76 16" fill="none"><path d="M11.3613 4.03516H4.09668V11.9629H8.88281L8.88086 11.9648H15.6016V16H4.02539C1.80242 15.9998 0 14.223 0 12.0322V3.96777C0 1.77696 1.80242 0.000177874 4.02539 0H15.4561L11.3613 4.03516ZM22.0703 11.9648H33.5781V16H22.002C19.7788 16 17.9756 14.2231 17.9756 12.0322V0H22.0703V11.9648ZM40.0459 16H35.9521V0H40.0459V16ZM54.5381 0C56.4564 0 58.0138 1.53228 58.0186 3.42285L58.0166 3.4248V8.54297C58.014 10.4333 56.4567 11.9648 54.5361 11.9648H46.5107L42.416 16V0H54.5381ZM71.9746 0C74.0086 0.000134956 75.6887 1.49046 75.958 3.42285H76V12.5771H75.958C75.6887 14.5095 74.011 15.9999 71.9746 16H64.4238C62.3897 16 60.7098 14.5096 60.4404 12.5771C60.4145 12.398 60.3984 12.2184 60.3984 12.0322V3.96777C60.3984 3.78159 60.4145 3.60205 60.4404 3.42285C60.7098 1.49037 62.3873 0 64.4238 0H71.9746ZM64.4922 12.5771H71.9062V3.42285H64.4922V12.5771ZM46.5107 3.42285V8.54004H53.9238V3.42285H46.5107Z" fill="#365EEF"/></svg>
-    </a>
-    <span class="gh-product-tag">초등</span>
-  </div>
-  <div class="gh-right">
-    <span class="gh-plan">개인 유료</span>
-    <span class="gh-dday">D-30</span>
-    <span class="gh-credit"><i data-lucide="bot" style="width:20px;height:20px"></i>AI 크레딧 900</span>
-    <div class="gh-sep"></div>
-    <button class="gh-user">홍길동 선생님(대표교사)<i data-lucide="chevron-down" style="width:22px;height:22px"></i></button>
-  </div>
-</div>
-
-<!-- ══════ 서브 네비게이션 ══════ -->
-<nav class="sub-nav">
-  <button class="sub-nav-item">수업 홈</button>
-  <button class="sub-nav-item">수행평가 설계</button>
-  <button class="sub-nav-item">과제물 관리</button>
-  <button class="sub-nav-item active">수행평가 채점</button>
-  <button class="sub-nav-item">세부능력 및 특기사항 지원</button>
-</nav>
-
-<!-- ══════ 채점 액션바 ══════ -->
+<!-- ══════ 채점 액션바 (글로벌 헤더·서브내비 제거 — 채점 deep work 모드) ══════ -->
 <div class="top-bar">
   <div class="tb-left">
     <button class="btn-back" onclick="goBack()">
@@ -772,16 +785,13 @@ select.field-input{appearance:none;-webkit-appearance:none;background-image:url(
           <span class="pn-section-title">선생님 한마디</span>
         </div>
         <div class="pn-section-hd-right" id="tfActionGroup">
+          <button class="btn-formula" title="수식 입력"><i data-lucide="sigma" style="width:13px;height:13px"></i>수식 입력</button>
           <button class="btn-tf-revert" id="btnTfRevert" onclick="revertTeacherFeedback()" style="display:none">
             <i data-lucide="rotate-ccw" style="width:13px;height:13px"></i>AI 초안으로 되돌리기
           </button>
         </div>
       </div>
-      <textarea id="teacherFeedback" class="teacher-fb-ta" oninput="updateCharCount();updateTfRevertVis();updatePreviewBtnState()" placeholder="AI 초안이 채워져 있어요. 자유롭게 수정해 학생에게 전달할 메시지로 다듬어 보세요."></textarea>
-      <div class="teacher-fb-bottom">
-        <span class="char-count" id="charCount">0자 / 0 byte</span>
-        <button class="btn-formula"><i data-lucide="sigma" style="width:14px;height:14px"></i>수식 입력</button>
-      </div>
+      <textarea id="teacherFeedback" class="teacher-fb-ta" oninput="updateTfRevertVis();updatePreviewBtnState()" placeholder="AI 초안이 채워져 있어요. 자유롭게 수정해 학생에게 전달할 메시지로 다듬어 보세요."></textarea>
       <div class="teacher-fb-save">
         <div class="teacher-fb-save-left">
           <button class="btn-rerun-text" onclick="rerunAi()">
@@ -836,6 +846,7 @@ select.field-input{appearance:none;-webkit-appearance:none;background-image:url(
           <option value="high">상</option>
           <option value="mid">중</option>
           <option value="low">하</option>
+          <option value="hidden">미표시</option>
         </select>
       </div>
     </div>
@@ -869,6 +880,27 @@ select.field-input{appearance:none;-webkit-appearance:none;background-image:url(
       <button class="modal-close" onclick="closeRerunConfirm()"><i data-lucide="x" style="width:18px;height:18px"></i></button>
     </div>
     <div class="modal-body">
+      <div class="modal-info refund-notice" id="rerunRefundNotice" style="display:none">
+        <i data-lucide="circle-check-big" class="modal-info-icon" style="width:16px;height:16px"></i>
+        <div class="modal-info-text">이전 실행이 네트워크 오류로 실패해서 <strong>사용한 크레딧 1개는 이미 반환</strong>됐어요. 이번 다시 채점에는 새 크레딧 1개를 사용해요.</div>
+      </div>
+      <div class="model-section" id="rerunModelSection">
+        <div class="model-summary" onclick="toggleRerunModelCard()">
+          <div class="model-badge-mini">3.2</div>
+          <span class="model-summary-title">채점 모델 v3.2</span>
+          <span class="model-summary-date">2026-05-20 업데이트</span>
+          <i data-lucide="chevron-down" class="model-chevron" style="width:16px;height:16px"></i>
+        </div>
+        <div class="model-detail" style="display:none">
+          <span class="model-desc">수식·그래프·서술형 답안 인식과 채점 정확도를 개선한 AI 모델입니다.</span>
+          <ul class="model-feats">
+            <li>수학, 과학, 정보 과목의 채점 정확도를 개선했어요.</li>
+            <li>손글씨·이미지 답안의 OCR 인식률을 높였어요.</li>
+            <li>지시문과 학생 답안을 더 정확히 구분해요.</li>
+          </ul>
+          <a class="model-link-btn" href="#" target="_blank" rel="noopener" onclick="event.preventDefault();showToast('success','채점 활용 예시 페이지로 이동합니다.')">채점 활용 예시보기 <i data-lucide="external-link" style="width:11px;height:11px"></i></a>
+        </div>
+      </div>
       <div class="field">
         <span class="field-lbl">채점 수준</span>
         <div class="scoring-level">
@@ -899,26 +931,62 @@ select.field-input{appearance:none;-webkit-appearance:none;background-image:url(
           </label>
         </div>
       </div>
-      <div class="modal-info">
-        <i data-lucide="info" class="modal-info-icon" style="width:16px;height:16px"></i>
-        <div class="modal-info-text">
-          <strong>다시 실행하면 선택한 방식에 따라 AI 채점 결과가 갱신돼요.</strong>
-          <ul class="modal-info-list">
-            <li>채점요소별 점수 · 채점 근거 · 피드백</li>
-            <li>문항별 채점 근거 · 피드백</li>
-            <li>선생님 한마디(잘한 점 / 다음 도전 / 종합 의견)</li>
-          </ul>
-        </div>
-      </div>
       <div class="modal-warning" id="rerunWarning" style="display:none">
         <i data-lucide="alert-triangle" class="modal-warning-icon" style="width:16px;height:16px"></i>
         <span class="modal-warning-text"><strong>수정한 내용이 있어요.</strong> [덮어쓰기]로 실행하면 직접 수정한 내용이 모두 사라져요.</span>
       </div>
     </div>
-    <div class="modal-ft" style="justify-content:flex-end">
+    <div class="modal-ft">
+      <span class="credit-notice"><i data-lucide="bot" style="width:14px;height:14px"></i>AI 크레딧 <strong>1개</strong> 사용<span class="credit-notice-sub">· 잔여 900개</span><span class="credit-tooltip-wrap" onclick="this.classList.toggle('show');event.stopPropagation()"><i data-lucide="help-circle" class="credit-help" style="width:13px;height:13px"></i><span class="credit-tooltip">네트워크 오류 등으로 AI 실행이 실패한 경우, 사용한 크레딧은 자동으로 반환돼요.</span></span></span>
       <div class="modal-actions">
         <button class="btn-modal-cancel" onclick="closeRerunConfirm()">취소</button>
         <button class="btn-modal-save" onclick="confirmRerun()"><i data-lucide="wand-sparkles" style="width:14px;height:14px"></i>채점 실행</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 루브릭 AI 실행 확인 모달 -->
+<div class="modal-overlay" id="rubricAiConfirmModal" onclick="if(event.target===this)closeRubricAiConfirm()">
+  <div class="modal" style="max-width:520px">
+    <div class="modal-hd">
+      <span class="modal-title">루브릭 기반 AI 피드백 생성</span>
+      <button class="modal-close" onclick="closeRubricAiConfirm()"><i data-lucide="x" style="width:18px;height:18px"></i></button>
+    </div>
+    <div class="modal-body">
+      <div class="modal-info">
+        <i data-lucide="info" class="modal-info-icon" style="width:16px;height:16px"></i>
+        <div class="modal-info-text">선택한 채점요소별 점수를 기반으로 <strong>채점기준에 맞는 피드백</strong>을 만들어요.</div>
+      </div>
+      <div class="field" id="rubricAiModeField" style="display:none">
+        <span class="field-lbl">기존 결과 처리</span>
+        <div class="modal-radio-group">
+          <label class="modal-radio-item selected" data-mode="overwrite" onclick="selectRubricAiMode(this)">
+            <div class="radio-ring checked"></div>
+            <div class="modal-radio-content">
+              <span class="modal-radio-text">덮어쓰기</span>
+              <span class="modal-radio-desc">모든 AI 피드백을 새로 생성해요. 직접 수정한 내용은 사라져요.</span>
+            </div>
+          </label>
+          <label class="modal-radio-item" data-mode="append" onclick="selectRubricAiMode(this)">
+            <div class="radio-ring"></div>
+            <div class="modal-radio-content">
+              <span class="modal-radio-text">이어쓰기</span>
+              <span class="modal-radio-desc">직접 수정한 피드백은 그대로 두고, 손대지 않은 영역만 새로 생성해요.</span>
+            </div>
+          </label>
+        </div>
+      </div>
+      <div class="modal-warning" id="rubricAiWarning" style="display:none">
+        <i data-lucide="alert-triangle" class="modal-warning-icon" style="width:16px;height:16px"></i>
+        <span class="modal-warning-text"><strong>수정한 내용이 있어요.</strong> [덮어쓰기]로 다시 생성하면 직접 수정한 피드백이 모두 사라져요.</span>
+      </div>
+    </div>
+    <div class="modal-ft">
+      <span class="credit-notice"><i data-lucide="bot" style="width:14px;height:14px"></i>AI 크레딧 <strong>1개</strong> 사용<span class="credit-notice-sub">· 잔여 900개</span><span class="credit-tooltip-wrap" onclick="this.classList.toggle('show');event.stopPropagation()"><i data-lucide="help-circle" class="credit-help" style="width:13px;height:13px"></i><span class="credit-tooltip">네트워크 오류 등으로 AI 실행이 실패한 경우, 사용한 크레딧은 자동으로 반환돼요.</span></span></span>
+      <div class="modal-actions">
+        <button class="btn-modal-cancel" onclick="closeRubricAiConfirm()">취소</button>
+        <button class="btn-modal-save" onclick="confirmRubricAi()"><i data-lucide="wand-sparkles" style="width:14px;height:14px"></i>피드백 생성</button>
       </div>
     </div>
   </div>
@@ -1125,7 +1193,7 @@ select.field-input{appearance:none;-webkit-appearance:none;background-image:url(
       </div>
       <!-- 우측: 미리보기 -->
       <div class="preview-preview-wrap">
-        <div class="share-preview-lbl"><i data-lucide="eye" style="width:18px;height:18px"></i>학생 화면 미리보기<span class="lbl-sub">· 학급 채점 현황의 [학생에게 결과 공개하기] 버튼을 눌러 학생에게 전달할 수 있어요.</span><button class="lbl-action" onclick="location.href='class_scoring_detail_v1_260512.html'">학급 채점 현황으로 이동<i data-lucide="arrow-right" style="width:13px;height:13px"></i></button></div>
+        <div class="share-preview-lbl"><i data-lucide="eye" style="width:18px;height:18px"></i>학생 화면 미리보기<span class="lbl-sub">· 학급 채점 현황의 [학생에게 결과 공개하기] 버튼을 눌러 학생에게 전달할 수 있어요.</span><button class="lbl-action" onclick="window.open('class_scoring_detail_v1_260512.html','_blank')" title="새 탭으로 열기 — 작업 중인 채점 내용이 유지돼요">학급 채점 현황으로 이동<i data-lucide="external-link" style="width:13px;height:13px"></i></button></div>
         <iframe class="share-preview-frame" id="previewFrame" src="" title="학생 화면 미리보기"></iframe>
       </div>
     </div>
@@ -1219,6 +1287,8 @@ function selectScore(btn, rubricId, value){
   btn.classList.add('selected');
   scores[rubricId] = value;
   updateTotal();
+  // 채점요소별 카드 점수 표시를 선생님 선택값으로 sync (AI 예상은 괄호로 부가)
+  if(typeof renderElementCards === 'function') renderElementCards();
   if(typeof updateShareBtnState === 'function') updateShareBtnState();
   if(typeof updatePreviewBtnState === 'function') updatePreviewBtnState();
 }
@@ -1351,7 +1421,7 @@ function renderInstructionCards(){
       +'<div class="ec-card-header editable-header" onclick="openInstructionEditModal('+i+')">'
       +'<span class="ec-label">'+escHtml(it.label)+'</span>'
       +'<span class="ec-summary">'+escHtml(it.summary)+'</span>'
-      +'<span class="ec-level lv-'+it.level+'">'+LEVEL_LABEL[it.level]+'</span>'
+      +(it.level === 'hidden' ? '' : '<span class="ec-level lv-'+it.level+'">'+LEVEL_LABEL[it.level]+'</span>')
       +'<i class="ec-header-edit-icon" data-lucide="pencil-line" style="width:14px;height:14px"></i>'
       +'</div>'
       +'<div class="ec-card-body">'
@@ -1367,10 +1437,23 @@ function renderElementCards(){
   var pane = document.getElementById('pane-rubric');
   pane.innerHTML = ELEMENTS.map(function(el,i){
     var ac = CARD_ACCENTS[i % CARD_ACCENTS.length];
+    var rubricId = i + 1;
+    var teacherScore = scores[rubricId];
+    var scoreHtml;
+    if(teacherScore === undefined){
+      // 선생님 미선택 — AI 예상치임을 prefix로 명시
+      scoreHtml = '<span class="ai-suggest-prefix">AI 예상</span>'+el.score+' / '+el.maxScore+'점';
+    } else if(teacherScore === el.score){
+      // 같음 — 깔끔하게
+      scoreHtml = teacherScore+' / '+el.maxScore+'점';
+    } else {
+      // 다름 — 선생님 메인 + AI 예상 보조
+      scoreHtml = teacherScore+' / '+el.maxScore+'점<span class="ai-suggest-note">(AI 예상 '+el.score+'점)</span>';
+    }
     return '<div class="eval-card '+ac+'" data-kind="element" data-idx="'+i+'">'
       +'<div class="ec-card-header readonly-header">'
       +'<span class="ec-summary">'+escHtml(el.name)+'</span>'
-      +'<span class="ec-level lv-score">'+el.score+' / '+el.maxScore+'점</span>'
+      +'<span class="ec-level lv-score">'+scoreHtml+'</span>'
       +'</div>'
       +'<div class="ec-card-body">'
       +feedbackBlock(el.feedback)
@@ -1454,7 +1537,7 @@ function confirmDeleteInstruction(){
   closeInstructionEditModal();
   renderInstructionCards();
   lucide.createIcons();
-  showToast('success', '문항 '+deletedLabel+'을(를) 삭제했어요.');
+  showToast('success', '문항이 삭제되었습니다.');
 }
 function toggleApplyAll(el){ el.classList.toggle('checked'); }
 function saveInstructionEdit(){
@@ -1472,10 +1555,18 @@ function saveInstructionEdit(){
   closeInstructionEditModal();
   renderInstructionCards();
   lucide.createIcons();
-  showToast('success', applyAll?'문항 정보가 저장됐어요. (번호·제목은 전체 학생 적용)':'이 학생 채점본에만 저장됐어요.');
+  showToast('success', '문항 정보가 저장되었습니다.');
 }
 
 // ══════ 다시 채점 ══════
+function toggleRerunModelCard(){
+  var section = document.getElementById('rerunModelSection');
+  if(!section) return;
+  var detail = section.querySelector('.model-detail');
+  var isCollapsed = detail.style.display === 'none';
+  detail.style.display = isCollapsed ? 'flex' : 'none';
+  section.classList.toggle('expanded', isCollapsed);
+}
 var RERUN_LEVEL_KEY = 'clipo_last_scoring_level';
 var SCORING_LEVEL_LABELS_FIRST = ['관대하게','보통','엄격하게'];
 var SCORING_LEVEL_LABELS_RERUN = ['이전보다 관대','이전과 유사','이전보다 엄격'];
@@ -1511,6 +1602,9 @@ function rerunAi(){
   var modeField = document.getElementById('rerunModeField');
   if(modeField) modeField.style.display = isFirstRunStudent() ? 'none' : 'flex';
   updateRerunWarning();
+  // 채점 실패 학생은 이전 크레딧이 반환됐다는 안심 배너 노출
+  var refundBanner = document.getElementById('rerunRefundNotice');
+  if(refundBanner) refundBanner.style.display = (studentName === '채점실패') ? 'flex' : 'none';
   document.getElementById('rerunConfirmModal').classList.add('show');
 }
 function selectRerunMode(el){
@@ -1528,7 +1622,12 @@ function getRerunMode(){
   return sel ? sel.getAttribute('data-mode') : 'overwrite';
 }
 function updateRerunWarning(){
-  var hasDirty = document.querySelectorAll('.ec-block.dirty').length > 0;
+  var hasDirtyBlocks = document.querySelectorAll('.ec-block.dirty').length > 0;
+  // 선생님 한마디 textarea가 AI 초안과 다르면 dirty로 간주
+  var ta = document.getElementById('teacherFeedback');
+  var origDraft = ta ? (ta.getAttribute('data-ai-draft') || '') : '';
+  var tfDirty = !!(ta && origDraft && ta.value !== origDraft);
+  var hasDirty = hasDirtyBlocks || tfDirty;
   var isOverwrite = getRerunMode() === 'overwrite';
   // 수정한 내용이 있고 + 덮어쓰기 모드일 때만 경고 표시
   document.getElementById('rerunWarning').style.display = (hasDirty && isOverwrite) ? 'flex' : 'none';
@@ -1542,8 +1641,7 @@ function confirmRerun(){
   doRerunAi(mode);
 }
 function doRerunAi(mode){
-  var label = mode === 'append' ? '이어쓰기로 AI 채점을 실행하고 있어요...' : 'AI 채점을 실행하고 있어요...';
-  showToast('loading', label);
+  showToast('success', 'AI 채점을 실행합니다.');
   setTimeout(function(){
     // 채점 실행 완료 — 이후 [다시 채점]엔 덮어쓰기/이어쓰기 모드 선택 노출
     _hasGradedOnce = true;
@@ -1582,15 +1680,16 @@ function doRerunAi(mode){
 
     lucide.createIcons();
     updatePreviewBtnState();
-    showToast('success', mode === 'append' ? 'AI 채점이 완료됐어요. (수정한 내용은 유지)' : 'AI 채점이 완료됐어요.');
   },1400);
 }
 
 // ══════ 글자수 ══════
 function updateCharCount(){
+  var c = document.getElementById('charCount');
+  if(!c) return; // 글자수 표시 제거됨 — 다른 곳에서 호출돼도 안전하게 무시
   var t = document.getElementById('teacherFeedback');
   var txt = t.value;
-  document.getElementById('charCount').textContent = txt.length+'자 / '+new TextEncoder().encode(txt).length+' byte';
+  c.textContent = txt.length+'자 / '+new TextEncoder().encode(txt).length+' byte';
 }
 
 // ══════ 선생님 종합 피드백 (AI 초안 — 3섹션 인라인 구조) ══════
@@ -2092,6 +2191,26 @@ function resetRubricAiSection(){
   }
 }
 
+function selectRubricAiMode(el){
+  var group = el.parentNode;
+  group.querySelectorAll('.modal-radio-item').forEach(function(it){
+    it.classList.toggle('selected', it === el);
+    var ring = it.querySelector('.radio-ring');
+    if(ring) ring.classList.toggle('checked', it === el);
+  });
+  updateRubricAiWarning();
+}
+function getRubricAiMode(){
+  var sel = document.querySelector('#rubricAiModeField .modal-radio-item.selected');
+  return sel ? sel.getAttribute('data-mode') : 'overwrite';
+}
+function updateRubricAiWarning(){
+  var isRegen = document.querySelectorAll('#rubricAiPane .rai-card').length > 0;
+  var hasDirty = document.querySelectorAll('#rubricAiPane .ec-block.dirty').length > 0;
+  var isOverwrite = getRubricAiMode() === 'overwrite';
+  var warning = document.getElementById('rubricAiWarning');
+  if(warning) warning.style.display = (isRegen && hasDirty && isOverwrite) ? 'flex' : 'none';
+}
 function runRubricAi(){
   // 전제 조건: 모든 채점요소에 점수가 선택되어야 실행 가능
   var rubricRows = document.querySelectorAll('.rubric-box .rubric-row');
@@ -2103,7 +2222,26 @@ function runRubricAi(){
     showToast('warning', '채점요소별 점수를 모두 선택한 뒤 실행해 주세요.');
     return;
   }
-  // 사용자가 선택한 채점요소별 점수를 RUBRIC_AI_RESULT에 동적 반영
+  // 다시 생성 여부 (이미 생성된 카드 있으면 regen 모드)
+  var isRegen = document.querySelectorAll('#rubricAiPane .rai-card').length > 0;
+  // 모드 필드: 다시 생성 시에만 노출, 디폴트 '덮어쓰기'로 리셋
+  var modeField = document.getElementById('rubricAiModeField');
+  if(modeField){
+    modeField.style.display = isRegen ? 'flex' : 'none';
+    var ow = modeField.querySelector('.modal-radio-item[data-mode="overwrite"]');
+    if(ow) selectRubricAiMode(ow);
+  }
+  updateRubricAiWarning();
+  document.getElementById('rubricAiConfirmModal').classList.add('show');
+  lucide.createIcons();
+}
+function closeRubricAiConfirm(){
+  document.getElementById('rubricAiConfirmModal').classList.remove('show');
+}
+function confirmRubricAi(){
+  closeRubricAiConfirm();
+  var mode = getRubricAiMode();
+  var rubricRows = document.querySelectorAll('.rubric-box .rubric-row');
   rubricRows.forEach(function(row, idx){
     var selectedBtn = row.querySelector('.score-btn.selected');
     if(selectedBtn && RUBRIC_AI_RESULT[idx]){
@@ -2111,11 +2249,30 @@ function runRubricAi(){
       if(!isNaN(pickedScore)) RUBRIC_AI_RESULT[idx].score = pickedScore;
     }
   });
-  showToast('loading', '루브릭 기반 AI가 피드백을 만들고 있어요...');
+  // 이어쓰기 모드: 수정한 피드백 보존
+  var preserved = {};
+  if(mode === 'append'){
+    document.querySelectorAll('#rubricAiPane .rai-card').forEach(function(card, idx){
+      var dirtyEditable = card.querySelector('.ec-block.dirty .editable');
+      if(dirtyEditable) preserved[idx] = dirtyEditable.innerHTML;
+    });
+  }
+  showToast('success', 'AI 피드백을 생성합니다.');
   setTimeout(function(){
     renderRubricAiResult();
+    if(mode === 'append'){
+      document.querySelectorAll('#rubricAiPane .rai-card').forEach(function(card, idx){
+        if(preserved[idx] != null){
+          var editable = card.querySelector('.ec-block .editable');
+          if(editable){
+            editable.innerHTML = preserved[idx];
+            var block = editable.closest('.ec-block');
+            if(block) block.classList.add('dirty');
+          }
+        }
+      });
+    }
     updatePreviewBtnState();
-    showToast('success', 'AI 피드백이 생성됐어요.');
   }, 1400);
 }
 
@@ -2145,7 +2302,7 @@ function renderRubricAiResult(){
   var actionGroup = document.getElementById('rubricAiActionGroup');
   if(actionGroup){
     actionGroup.innerHTML = '<button class="btn-rubric-ai-regen" onclick="runRubricAi()">'
-      + '<i data-lucide="rotate-ccw" style="width:14px;height:14px"></i>재생성'
+      + '<i data-lucide="rotate-ccw" style="width:14px;height:14px"></i>다시 생성'
       + '</button>';
   }
   // 인라인 편집 + dirty 표시 + AI 초안으로 되돌리기 핸들러 바인딩
@@ -2518,8 +2675,13 @@ function applyLegacyUI(){
   var tabInst = document.getElementById('tab-instruction');
   if(tabInst) tabInst.style.opacity = '0.55';
 
-  // 선생님 한마디 AI 초안 자동 채움 (새 UI 동일 적용 — 3섹션 구조)
-  fillTeacherFeedbackDraft();
+  // 이전 채점 학생은 AI 한마디 초안 없음 — 빈 textarea + 안내 placeholder
+  var ta = document.getElementById('teacherFeedback');
+  if(ta){
+    ta.value = '';
+    ta.removeAttribute('data-ai-draft');
+    ta.placeholder = '(선택) 학생·학부모에게 안내하거나 메모로 남길 내용을 적어 주세요.';
+  }
 
   lucide.createIcons();
 }
