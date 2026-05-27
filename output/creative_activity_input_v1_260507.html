@@ -2087,6 +2087,8 @@ function commitDrawerKeywords(){
   if(!ta || !curDetailId) return;
   const s = STUDENTS.find(x=>x.id===curDetailId);
   if(!s) return;
+  // 파이프라인 진행 중 → 변경 무시
+  if(s.s2 && s.s2.status === 'analyzing') return;
   const parsed = ta.value.split(/[,，]/).map(x=>x.trim()).filter(Boolean);
   const oldText = s.keywords.map(k=>k.text).join('|');
   const newText = parsed.join('|');
@@ -2096,6 +2098,11 @@ function commitDrawerKeywords(){
 function setDrawerLevel(level){
   const s = STUDENTS.find(x=>x.id===curDetailId);
   if(!s) return;
+  // 파이프라인 진행 중 → 변경 차단
+  if(s.s2 && s.s2.status === 'analyzing'){
+    showToast('분석 진행 중에는 수정할 수 없어요. 완료 후 다시 시도해 주세요');
+    return;
+  }
   const oldLevel = s.level;
   s.level = level === 'none' ? null : level;
   if(oldLevel !== s.level) markDirty(s, 'items');
@@ -2256,6 +2263,11 @@ function pickIndFile(){
   if(!curDetailId) return;
   const s = STUDENTS.find(x=>x.id===curDetailId);
   if(!s) return;
+  // 파이프라인 진행 중(분석 중) → 수정 차단
+  if(s.s2 && s.s2.status === 'analyzing'){
+    showToast('분석 진행 중에는 수정할 수 없어요. 완료 후 다시 시도해 주세요');
+    return;
+  }
   // 정책: 학생당 PDF 1개 (학급 일괄 PDF '활동지' 또는 드로어 개별 PDF 중 하나만)
   const hasPdf = s.files.some(f => !f._pendingDelete && (f.kindLabel === '활동지' || f.kindLabel === '개별'));
   if(hasPdf){ showToast('이미 PDF 자료가 등록되어 있어요. 기존 자료를 삭제 후 다시 등록해 주세요'); return; }
@@ -2293,6 +2305,11 @@ let _pendingFileDel = null;
 function askRemoveStudentFile(sid, idx){
   const s = STUDENTS.find(x=>x.id===sid);
   if(!s || !s.files[idx]) return;
+  // 파이프라인 진행 중(분석 중) → 수정 차단
+  if(s.s2 && s.s2.status === 'analyzing'){
+    showToast('분석 진행 중에는 수정할 수 없어요. 완료 후 다시 시도해 주세요');
+    return;
+  }
   _pendingFileDel = { sid, idx };
   document.getElementById('modal-file-del').classList.add('show');
   lucide.createIcons();
@@ -2501,19 +2518,8 @@ function renderStep3(){
 }
 function renderS3Row(s){
   const s3 = getS3(s);
-  // dirty 태그 라벨 — 변경 항목 수에 따라 분기
-  // 여러 항목 변경 시엔 "여러 항목 변경됨", 단일이면 해당 라벨
-  let dirtyTagText = '변경됨';
-  if (s._dirtyLevels && s._dirtyLevels.size > 1) {
-    dirtyTagText = '여러 항목 변경됨';
-  } else {
-    dirtyTagText = ({
-      file: '자료 변경됨',
-      kw: '활동 내용 변경됨',
-      items: '활동 수준 변경됨',
-      analysis: '분석 결과 갱신됨'
-    })[s._dirtyLevel] || '변경됨';
-  }
+  // 변경 종류 무관 단일 라벨 (백엔드 추적 부담 줄이기 — Jacob 제안 반영)
+  const dirtyTagText = '변경됨';
 
   let aiCell;
   if(s3.aiText){
