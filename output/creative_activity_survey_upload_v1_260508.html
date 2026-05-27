@@ -249,7 +249,22 @@ body.nav-expanded .main-shell { margin-left: 200px; transition: margin-left .2s 
 
     <!-- 결과 -->
     <div id="resultSection" style="display:none">
-      <div class="result-summary">총 <span class="num" id="rsTotal">0</span>명 · 응답 수 <span class="num" id="rsCount">0</span></div>
+      <!-- 인식된 설문 문항 -->
+      <div class="result-summary">설문 문항 <span class="num" id="rsQTotal">0</span>개</div>
+      <div class="result-table-wrap" style="margin-bottom:24px">
+        <table class="result-table">
+          <thead>
+            <tr>
+              <th style="width:64px">No.</th>
+              <th style="text-align:left !important">설문 문항</th>
+            </tr>
+          </thead>
+          <tbody id="resultQuestionRows"></tbody>
+        </table>
+      </div>
+
+      <!-- 응답 결과 -->
+      <div class="result-summary">응답 결과 <span class="num" id="rsTotal">0</span>명</div>
       <div class="result-table-wrap">
         <table class="result-table">
           <thead><tr id="resultHead"></tr></thead>
@@ -404,12 +419,21 @@ function clearUpload() {
 function renderResult() {
   document.getElementById('uploadEmpty').style.display = 'none';
   document.getElementById('resultSection').style.display = '';
+
+  // 인식된 설문 문항 표
+  document.getElementById('rsQTotal').textContent = SURVEY_QUESTIONS.length;
+  document.getElementById('resultQuestionRows').innerHTML = SURVEY_QUESTIONS.map((q, i) => `
+    <tr>
+      <td>${i + 1}</td>
+      <td style="text-align:left">${q}</td>
+    </tr>
+  `).join('');
+
+  // 응답 결과 표
   document.getElementById('resultHead').innerHTML = buildHeadRow();
   document.getElementById('resultRows').innerHTML = currentRows.map((r, i) => buildBodyRow(r, i)).join('');
 
-  const totalAns = currentRows.reduce((acc, r) => acc + answeredCount(r.answers), 0);
   document.getElementById('rsTotal').textContent = currentRows.length;
-  document.getElementById('rsCount').textContent = totalAns;
   document.getElementById('saveBtn').disabled = false;
   lucide.createIcons();
 }
