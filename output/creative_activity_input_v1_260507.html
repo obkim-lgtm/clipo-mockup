@@ -419,7 +419,8 @@ body.nav-expanded .sticky-cta{left:200px;transition:left .2s ease}
 .s3-genrow-btn{display:inline-flex;align-items:center;justify-content:center;gap:4px;padding:5px 10px;border:1px solid #416bff;border-radius:5px;background:#416bff;color:#fff;font-size:12px;font-weight:500;cursor:pointer;font-family:inherit;line-height:1;transition:background .15s}
 .s3-genrow-btn:hover{background:#365eef}
 
-.s3-bring-btn{display:inline-flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:14px 6px;border:1px solid #d9d9d9;border-radius:8px;background:#fff;color:#3b3f4c;font-size:11px;font-weight:500;cursor:pointer;font-family:inherit;line-height:1.4;width:48px;margin:0 auto}
+.s3-bring-btn{display:inline-flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:8px 6px;border:1px solid #d9d9d9;border-radius:8px;background:#fff;color:#3b3f4c;font-size:11px;font-weight:500;cursor:pointer;font-family:inherit;line-height:1.3;width:48px;margin:0 auto}
+.s3-bring-btn span{text-align:center}
 .s3-bring-btn:hover:not(:disabled){border-color:#416bff;color:#416bff;background:#f4f8ff}
 .s3-bring-btn:disabled{opacity:.4;cursor:not-allowed}
 
@@ -1140,7 +1141,7 @@ body.nav-expanded .sticky-cta{left:200px;transition:left .2s ease}
       <div id="s3-analyze-warning" style="display:none;align-items:flex-start;gap:8px;padding:12px 14px;background:#fffbeb;border:1px solid #fde68a;border-radius:8px;margin-bottom:16px;font-size:13px;color:#92400e;line-height:1.55">
         <i data-lucide="alert-triangle" style="width:14px;height:14px;flex-shrink:0;margin-top:2px"></i>
         <div style="flex:1">
-          <div><strong>분석 안 된 학생</strong>은 업로드된 자료가 기록에 반영되지 않아요. 더 정확한 기록을 위해 <strong>2단계에서 먼저 분석</strong>하는 걸 권장합니다.</div>
+          <div><strong>분석 필요</strong> 상태인 학생은 업로드된 자료가 기록에 반영되지 않아요. 더 정확한 기록을 위해 <strong>2단계에서 먼저 분석</strong>하는 걸 권장합니다.</div>
           <a onclick="openStep2InNewTab(event)" style="display:inline-flex;align-items:center;gap:4px;margin-top:6px;font-size:13px;font-weight:600;color:#92400e;text-decoration:underline;cursor:pointer">2단계에서 분석하기 <i data-lucide="external-link" style="width:13px;height:13px"></i></a>
         </div>
       </div>
@@ -1162,11 +1163,11 @@ body.nav-expanded .sticky-cta{left:200px;transition:left .2s ease}
 
       <div id="s3-prompt-section" style="display:none">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-top:20px;margin-bottom:8px;gap:8px">
-          <span style="font-size:14px;font-weight:600;color:#3b3f4c">요청사항 <span style="font-weight:500;color:#6d7381">(선택)</span></span>
+          <span style="font-size:14px;font-weight:600;color:#3b3f4c">재생성 요청사항 <span style="font-weight:500;color:#6d7381">(선택)</span></span>
           <span id="s3-prompt-count" style="font-size:12px;color:#b3b6bd;font-variant-numeric:tabular-nums">0 / 200</span>
         </div>
         <div id="s3-regen-hint" style="font-size:13px;color:#6d7381;margin-bottom:8px;line-height:1.55">
-          이전 결과에서 마음에 안 드는 부분이나 바꾸고 싶은 방향을 적어주시면 그에 맞춰 다시 생성해드려요.
+          이미 생성된 기록이 있는 학생만 표시돼요. 바꾸고 싶은 방향을 적어주시면 그에 맞춰 다시 생성해드려요.
         </div>
         <textarea id="s3-prompt-input" class="s3-prompt-textarea" placeholder="예) 협력적 태도와 리더십을 더 강조해 주세요." maxlength="200" oninput="updateS3PromptCount();autoResizeS3Prompt(this)"></textarea>
         <div id="s3-prompt-limit-msg" style="font-size:12px;color:#f2525f;font-weight:500;margin-top:6px;display:none">최대 200자까지 입력할 수 있어요</div>
@@ -1348,7 +1349,7 @@ let STUDENTS = [
   {id:3, sid:'20103', name:'이지호', files:[
     {name:'학기말_자율설문 (행)', type:'survey', source:'bulk', kindLabel:'설문'},
     {name:'2학년1반_활동지_스캔본.pdf', size:'12.4MB', type:'pdf', source:'bulk', kindLabel:'활동지'}
-  ], keywords:[]},
+  ], keywords:[], demoDirtyLevel:'file'},
   {id:4, sid:'20104', name:'최유진', level:'high', files:[
     {name:'2학년1반_활동지_스캔본.pdf', size:'12.4MB', type:'pdf', source:'bulk', kindLabel:'활동지'}
   ], keywords:[{text:'창의적 표현',source:'bulk'},{text:'미적 감수성',source:'bulk'}], demoSkipAutoAnalyze:true},
@@ -1357,17 +1358,17 @@ let STUDENTS = [
   ], keywords:[], demoSkipAutoAnalyze:true},
   {id:6, sid:'20106', name:'한지민', level:'mid', files:[
     {name:'학기말_자율설문 (행)', type:'survey', source:'bulk', kindLabel:'설문'}
-  ], keywords:[{text:'사고력',source:'bulk'}]},
+  ], keywords:[{text:'사고력',source:'bulk'}], demoSkipAutoGen:true},
   {id:7, sid:'20107', name:'유태성', level:'low', files:[
     {name:'학기말_자율설문 (행)', type:'survey', source:'bulk', kindLabel:'설문'},
     {name:'2학년1반_활동지_스캔본.pdf', size:'12.4MB', type:'pdf', source:'bulk', kindLabel:'활동지'}
   ], keywords:[
     {text:'배려심',source:'bulk'},{text:'성실함',source:'bulk'},{text:'리더십',source:'bulk'}
-  ]},
-  {id:8, sid:'20108', name:'송예린', files:[
+  ], demoDirtyLevel:'items'},
+  {id:8, sid:'20108', name:'송예린', level:'mid', files:[
     {name:'학기말_자율설문 (행)', type:'survey', source:'bulk', kindLabel:'설문'},
     {name:'2학년1반_활동지_스캔본.pdf', size:'12.4MB', type:'pdf', source:'bulk', kindLabel:'활동지'}
-  ], keywords:[]},
+  ], keywords:[{text:'성실함',source:'bulk'},{text:'주도성',source:'bulk'}], demoDirtyLevels:['file','items']},
 ];
 
 // 원본 데모 데이터 백업 (시나리오 토글용)
@@ -1887,8 +1888,9 @@ function cascadeFromDrawer(){
     renderDrawerBanner(s);
     closeDrawer();
     const noPriorRecord = !(s.s3 && s.s3.aiText);
-    const dataChanged = !!s._dataChangedSinceGen;
-    const useOne = noPriorRecord || dataChanged;
+    // 1·2단계 변경(자료/내용/수준/추천항목)으로 dirty면 분량만 묻고 재생성
+    // 변경 없는데 사용자가 직접 재생성 누른 경우만 요청사항 입력 받음
+    const useOne = noPriorRecord || s.dirty;
     openLengthModal({type: useOne ? 'one' : 'regen', sid:s.id});
   } else {
     // file 또는 kw 변경
@@ -2268,6 +2270,9 @@ function markDirty(s, level){
   if(!s._dirtyLevel || rank[level] > rank[s._dirtyLevel]){
     s._dirtyLevel = level;
   }
+  // 변경된 레벨 누적 (3단계 태그 라벨용 — 여러 항목 변경 시 "여러 항목 변경됨")
+  if(!s._dirtyLevels) s._dirtyLevels = new Set();
+  s._dirtyLevels.add(level);
   // 드로어 열려 있으면 banner 즉시 갱신
   if(isDrawerOpen() && curDetailId === s.id) renderDrawerBanner(s);
 }
@@ -2441,6 +2446,18 @@ function renderStep3(){
 }
 function renderS3Row(s){
   const s3 = getS3(s);
+  // dirty 태그 라벨 — 변경 항목 수에 따라 분기
+  // 여러 항목 변경 시엔 "여러 항목 변경됨", 단일이면 해당 라벨
+  let dirtyTagText = '변경됨';
+  if (s._dirtyLevels && s._dirtyLevels.size > 1) {
+    dirtyTagText = '여러 항목 변경됨';
+  } else {
+    dirtyTagText = ({
+      file: '자료 변경됨',
+      kw: '활동 내용 변경됨',
+      items: '활동 수준 변경됨'
+    })[s._dirtyLevel] || '변경됨';
+  }
 
   let aiCell;
   if(s3.aiText){
@@ -2448,7 +2465,7 @@ function renderS3Row(s){
     aiCell = `<div class="s3-ai-box">
       <div class="s3-text">${s3.aiText}</div>
       <div class="s3-cell-foot">
-        <span class="s3-byte">${byteLen(s3.aiText)} Byte${s.dirty?' · <span style="color:#c2410c;font-weight:500">자료 변경됨</span>':''}</span>
+        <span class="s3-byte">${byteLen(s3.aiText)} Byte${s.dirty?` · <span style="color:#c2410c;font-weight:500">${dirtyTagText}</span>`:''}</span>
         <div class="s3-cell-actions">
           <button class="s3-mini-btn ai ${regenAttention}" onclick="regenerateOne(${s.id})"><i data-lucide="sparkles" style="width:12px;height:12px"></i> 재생성</button>
           <button class="s3-mini-btn" onclick="copyAi(${s.id})"><i data-lucide="copy" style="width:12px;height:12px"></i> 복사</button>
@@ -2492,7 +2509,7 @@ function renderS3Row(s){
     ${overLimit ? '<div class="s3-bytes-err">초과</div>' : ''}
   </div>`;
 
-  const dirtyDot = s.dirty ? '<span class="dirty-dot" title="자료 변경됨 · 재생성 권장"></span>' : '';
+  const dirtyDot = s.dirty ? `<span class="dirty-dot" title="${dirtyTagText} · 재생성 권장"></span>` : '';
   return `<tr ${s.dirty?'class="s3-row-dirty"':''}>
     <td class="s3-col-sid s3-cell-sid">${s.sid}</td>
     <td class="s3-col-name">
@@ -2500,7 +2517,7 @@ function renderS3Row(s){
       ${window.currentRelease === 'after' ? `<button class="s3-mini-btn" onclick="openDrawer(${s.id})"><i data-lucide="edit-3" style="width:12px;height:12px"></i> 수정</button>` : ''}
     </td>
     <td class="s3-col-ai">${aiCell}</td>
-    <td class="s3-col-bring"><button class="s3-bring-btn" onclick="bringToEdit(${s.id})" ${s3.aiText?'':'disabled'}><i data-lucide="arrow-right" style="width:14px;height:14px"></i><span>가져오기</span></button></td>
+    <td class="s3-col-bring"><button class="s3-bring-btn" onclick="bringToEdit(${s.id})" ${s3.aiText?'':'disabled'}><i data-lucide="arrow-right" style="width:14px;height:14px"></i><span>가져<br>오기</span></button></td>
     <td class="s3-col-edit">${editCell}</td>
     <td class="s3-col-bytes">${bytesCell}</td>
   </tr>`;
@@ -2530,9 +2547,13 @@ function openLengthModal(scope){
   // 프롬프트 초기화
   const promptEl = document.getElementById('s3-prompt-input');
   if (promptEl) { promptEl.value = ''; updateS3PromptCount(); autoResizeS3Prompt(promptEl); }
-  // 요청사항 영역: 개별 재생성에서만 노출
+  // 요청사항 영역 노출 규칙
+  // - 'regen' (개별 자발적 재생성): 항상 노출
+  // - 'all' (전체 생성/재생성): 기존 생성된 학생이 한 명이라도 있으면 노출 (재생성 맥락)
+  // - 'one' (1·2단계 변경 후 재생성): 비노출 (변경 사항 그대로 반영하면 되므로)
   const promptSection = document.getElementById('s3-prompt-section');
-  const showPrompt = scope.type === 'regen';
+  const hasAnyExistingRecord = STUDENTS.some(st => st.s3 && st.s3.aiText);
+  const showPrompt = scope.type === 'regen' || (scope.type === 'all' && hasAnyExistingRecord);
   if (promptSection) promptSection.style.display = showPrompt ? '' : 'none';
   $('modal-length').classList.add('show');
   lucide.createIcons();
@@ -2553,9 +2574,9 @@ function dataStatusOf(s){
 }
 function dataStatusTag(s){
   const st = dataStatusOf(s);
-  if (st === 'analyzed') return '<span class="stu-pick-tag analyzed"><span class="dot"></span>분석됨</span>';
+  if (st === 'analyzed') return '<span class="stu-pick-tag analyzed"><span class="dot"></span>분석 완료</span>';
   if (st === 'needs-analysis') return '<span class="stu-pick-tag warn"><span class="dot"></span>분석 필요</span>';
-  return '<span class="stu-pick-tag muted"><span class="dot"></span>자료없음</span>';
+  return '<span class="stu-pick-tag muted"><span class="dot"></span>자료 없음</span>';
 }
 
 function populateStuPick(){
@@ -2572,16 +2593,16 @@ function populateStuPick(){
     <span class="stu-pick-header-spacer"></span>
     <span class="stu-pick-header-col sid">학번</span>
     <span class="stu-pick-header-col name">이름</span>
-    <span class="stu-pick-header-col data">자료</span>
-    <span class="stu-pick-header-col gen">AI 생성</span>
+    <span class="stu-pick-header-col data">분석</span>
+    <span class="stu-pick-header-col gen">AI 기록</span>
   </div>`;
   const rows = sorted.map(s => {
     const s3 = getS3(s);
     const canGen = s3CanGenerate(s);
     const dataTag = dataStatusTag(s);
     let genTag = '';
-    if (!canGen) genTag = '<span class="stu-pick-tag disabled"><span class="dot"></span>생성불가</span>';
-    else if (s3.aiText) genTag = s.dirty ? '<span class="stu-pick-tag warn"><span class="dot"></span>변경됨</span>' : '<span class="stu-pick-tag exists"><span class="dot"></span>생성됨</span>';
+    if (!canGen) genTag = '<span class="stu-pick-tag disabled"><span class="dot"></span>생성 불가</span>';
+    else if (s3.aiText) genTag = s.dirty ? '<span class="stu-pick-tag warn"><span class="dot"></span>재생성 필요</span>' : '<span class="stu-pick-tag exists"><span class="dot"></span>생성 완료</span>';
     else genTag = '<span class="stu-pick-tag muted"><span class="dot"></span>생성 전</span>';
     const disabledCls = canGen ? '' : 'disabled';
     return `<label class="stu-pick-row ${disabledCls}" ${canGen ? '' : 'title="자료나 활동 내용이 없어 생성할 수 없습니다"'}>
@@ -2598,7 +2619,8 @@ function populateStuPick(){
 
 function updateStuPickCount(){
   const cbs = document.querySelectorAll('.stu-pick-cb:not(:disabled)');
-  const checked = document.querySelectorAll('.stu-pick-cb:checked').length;
+  const checkedCbs = Array.from(document.querySelectorAll('.stu-pick-cb:checked'));
+  const checked = checkedCbs.length;
   document.getElementById('stu-pick-count').textContent = `${checked}/${cbs.length}명`;
   const creditEl = document.getElementById('s3-credit-count');
   if (creditEl) creditEl.textContent = checked;
@@ -2608,9 +2630,18 @@ function updateStuPickCount(){
   const btn = document.getElementById('s3-confirm-btn');
   if (btn && pendingGenerate?.type === 'all') btn.disabled = checked === 0;
   // 선택된 학생 중 분석 안 된 학생이 있으면 경고 노출
-  const hasUnanalyzedSelected = Array.from(document.querySelectorAll('.stu-pick-cb:checked')).some(cb => cb.dataset.unanalyzed === '1');
+  const hasUnanalyzedSelected = checkedCbs.some(cb => cb.dataset.unanalyzed === '1');
   const warn = document.getElementById('s3-analyze-warning');
   if (warn) warn.style.display = hasUnanalyzedSelected ? 'flex' : 'none';
+  // 요청사항 영역: 선택된 학생 중 기존 생성된 학생이 있을 때만 노출 ('all' 타입에 한정)
+  if (pendingGenerate?.type === 'all') {
+    const hasSelectedWithRecord = checkedCbs.some(cb => {
+      const s = STUDENTS.find(st => st.id === +cb.value);
+      return s && s.s3 && s.s3.aiText;
+    });
+    const promptSection = document.getElementById('s3-prompt-section');
+    if (promptSection) promptSection.style.display = hasSelectedWithRecord ? '' : 'none';
+  }
 }
 
 function toggleAllStuPick(checked){
@@ -2664,7 +2695,7 @@ function confirmLength(){
         s3.aiText = pickMockText(s);
         s3.generatedAt = Date.now();
         s.dirty = false;
-        s._dirtyLevel = null;
+        s._dirtyLevel = null; if(s._dirtyLevels) s._dirtyLevels.clear();
         if(!s3.editText) s3.editText = s3.aiText;
         n++;
       }
@@ -2678,7 +2709,7 @@ function confirmLength(){
       s3.aiText = pickMockText(s);
       s3.generatedAt = Date.now();
       s.dirty = false;
-      s._dirtyLevel = null;
+      s._dirtyLevel = null; if(s._dirtyLevels) s._dirtyLevels.clear();
       delete s._dataChangedSinceGen;
       if(!s3.editText) s3.editText = s3.aiText;
       renderStep3();
@@ -3106,7 +3137,7 @@ function startAnalyze(sid){
     s2.status = 'done';
     const hadRecord = !!(s.s3 && s.s3.aiText);
     s.dirty = false;
-    s._dirtyLevel = null;
+    s._dirtyLevel = null; if(s._dirtyLevels) s._dirtyLevels.clear();
     // 추천 항목 자동 체크 (분석 직후엔 미저장 변경 없음 — 사용자가 체크하면 그때 dirty)
     const data = STEP2_DATA[s.sid] || {items: STEP2_DEFAULT_ITEMS.slice(0,5)};
     s2.selectedIds = new Set(data.items.filter(it=>it.source_origin==='stage1_recommended').map(it=>it.id));
@@ -3196,7 +3227,7 @@ function applyScenario(scenario){
     s.s2 = { status:'idle', selectedIds:new Set(), customs:[] };
     s.s3 = { aiText:'', editText:'', generatedAt:null };
     s.dirty = false;
-    s._dirtyLevel = null;
+    s._dirtyLevel = null; if(s._dirtyLevels) s._dirtyLevels.clear();
   });
   // '자료 있음' 시나리오에서는 자료 있는 모든 학생을 분석/기록 완료 상태로 재시드
   // (1/2/3단계 상태 일관화 — 자료가 있으면 분석/기록도 있다고 가정)
@@ -3260,12 +3291,12 @@ function populateAnalyzeStuPick(){
     const dataTag = canAnalyze
       ? '<span class="stu-pick-tag analyzed"><span class="dot"></span>있음</span>'
       : '<span class="stu-pick-tag muted"><span class="dot"></span>없음</span>';
-    // 분석 컬럼: 분석됨 / 분석 중 / 미분석 / —
+    // 분석 컬럼: 분석 완료 / 분석 중 / 분석 필요 / —
     let analyzeTag = '';
     if (!canAnalyze) analyzeTag = '<span class="stu-pick-tag-blank">—</span>';
-    else if (status === 'done') analyzeTag = '<span class="stu-pick-tag exists">분석됨</span>';
+    else if (status === 'done') analyzeTag = '<span class="stu-pick-tag exists">분석 완료</span>';
     else if (status === 'analyzing') analyzeTag = '<span class="stu-pick-tag warn">분석 중</span>';
-    else analyzeTag = '<span class="stu-pick-tag">미분석</span>';
+    else analyzeTag = '<span class="stu-pick-tag">분석 필요</span>';
     const disabledCls = canAnalyze ? '' : 'disabled';
     return `<label class="stu-pick-row ${disabledCls}" ${canAnalyze ? '' : 'title="자료가 없어 분석할 수 없습니다"'}>
       <input type="checkbox" class="analyze-stu-pick-cb" value="${s.id}" ${canAnalyze ? 'checked' : 'disabled'} onchange="updateAnalyzeStuPickCount()">
@@ -3583,9 +3614,18 @@ function toggleNav(){
 // 분석 완료 + 기록 생성된 상태로 시작 (1/2/3단계 상태 일관화)
 // dirty 플래그는 사용자가 실제로 자료를 수정할 때만 설정 — 초기엔 false
 function seedDemoCompletedStudent(){
+  // 데모 케이스 분포:
+  // - 김민수·송예린: D. 모두 완료 (fresh)
+  // - 박서연: A. 자료 없음 (시드 스킵)
+  // - 이지호: E. 자료 변경됨 (file dirty) — demoDirtyLevel='file'
+  // - 최유진·정우진: B. 분석 필요 — demoSkipAutoAnalyze
+  // - 한지민: C. 분석은 완료, 기록만 X — demoSkipAutoGen
+  // - 유태성: F. 활동 수준 변경됨 (items dirty) — demoDirtyLevel='items'
   STUDENTS.forEach((s, idx) => {
-    if (s.files.length === 0) return; // 자료 없는 학생은 건너뜀
-    if (s.demoSkipAutoAnalyze) return; // 일부 학생은 '분석 필요' 케이스 데모용으로 idle 유지
+    if (s.files.length === 0) return; // 자료 없는 학생 (A 케이스)은 건너뜀
+    if (s.demoSkipAutoAnalyze) return; // B 케이스 — 분석 필요 상태로 유지
+
+    // 2단계 분석 완료 시드
     const s2 = getS2(s);
     s2.status = 'done';
     const data = STEP2_DATA[s.sid] || { items: STEP2_DEFAULT_ITEMS };
@@ -3593,11 +3633,32 @@ function seedDemoCompletedStudent(){
       (data.items || []).filter(it => it.source_origin === 'stage1_recommended').map(it => it.id)
     );
     s2.unsavedChanges = false;
-    const s3 = getS3(s);
-    s3.aiText = S3_MOCK_TEXTS[idx % S3_MOCK_TEXTS.length] || '';
-    s3.generatedAt = new Date().toISOString();
-    // dirty는 사용자가 자료 수정한 후에만 표시됨 (초기엔 깨끗)
-    s.dirty = false;
+
+    // 3단계 기록 생성 시드 (demoSkipAutoGen 학생은 건너뜀 — C 케이스)
+    if (!s.demoSkipAutoGen) {
+      const s3 = getS3(s);
+      s3.aiText = S3_MOCK_TEXTS[idx % S3_MOCK_TEXTS.length] || '';
+      s3.generatedAt = new Date().toISOString();
+    }
+
+    // dirty 상태 시드 (E·F·G 케이스)
+    // demoDirtyLevels(배열): 여러 항목 변경됨 (G 케이스)
+    // demoDirtyLevel(단일): 단일 항목 변경됨 (E·F 케이스)
+    if (s.demoDirtyLevels && s.demoDirtyLevels.length > 0) {
+      s.dirty = true;
+      const rank = {file:3, kw:2, items:1};
+      // 가장 높은 순위 레벨을 _dirtyLevel 로 (배너/모달 분기용)
+      s._dirtyLevel = s.demoDirtyLevels.reduce((acc, lv) => !acc || rank[lv] > rank[acc] ? lv : acc, null);
+      s._dirtyLevels = new Set(s.demoDirtyLevels);
+    } else if (s.demoDirtyLevel) {
+      s.dirty = true;
+      s._dirtyLevel = s.demoDirtyLevel;
+      s._dirtyLevels = new Set([s.demoDirtyLevel]);
+    } else {
+      s.dirty = false;
+      s._dirtyLevel = null;
+      if (s._dirtyLevels) s._dirtyLevels.clear();
+    }
   });
 }
 seedDemoCompletedStudent();
