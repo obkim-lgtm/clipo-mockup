@@ -215,6 +215,295 @@ body.nav-expanded .sticky-cta { left: 200px; }
   .main { padding: 16px 24px; }
   .sticky-cta { padding: 12px 24px; }
 }
+
+/* ──────────── STEP 2: AI 자료 분석 ──────────── */
+.s2-header { display: flex; align-items: center; justify-content: space-between; gap: 14px; padding: 14px 20px; background: #fff; border: 1px solid #e5e7eb; border-radius: 12px; margin-bottom: 16px; }
+.s2-title-wrap { display: flex; align-items: center; gap: 8px; }
+.s2-title { font-size: 18px; font-weight: 600; color: #222631; }
+.s2-desc { font-size: 13px; color: #6d7381; margin-left: 12px; }
+
+.s2-layout { display: grid; grid-template-columns: 304px 1fr; gap: 16px; align-items: start; }
+.s2-stulist { background: #fff; border: 1px solid #e5e7eb; border-radius: 12px; padding: 20px; position: sticky; top: 80px; max-height: calc(100vh - 200px); overflow-y: auto; }
+.s2-stulist .lp-title { font-size: 16px; font-weight: 700; color: #222631; margin-bottom: 14px; }
+.s2-stulist .stu-count { font-size: 13px; color: #6d7381; margin-bottom: 8px; }
+#s2-stu-rows { display: flex; flex-direction: column; gap: 6px; }
+.s2-stu-status { font-size: 11px; padding: 2px 8px; border-radius: 10px; font-weight: 600; line-height: 1.4; flex-shrink: 0; }
+.s2-stu-status.none { background: #fff3e0; color: #f97316; }
+.s2-stu-status.pending { background: #f1f3f5; color: #6d7381; }
+.s2-stu-status.analyzing { background: #fef3c7; color: #b45309; }
+.s2-stu-status.done { background: #dcfce7; color: #15803d; }
+
+.s2-main { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
+.s2-stu-hd { background: #fff; border: 1px solid #e5e7eb; border-radius: 12px; padding: 18px 22px; display: flex; align-items: center; gap: 14px; }
+.s2-stu-hd-avatar { width: 40px; height: 40px; border-radius: 50%; background: #416bff; color: #fff; display: inline-flex; align-items: center; justify-content: center; font-size: 16px; font-weight: 700; line-height: 1; flex-shrink: 0; }
+.s2-stu-hd-info { flex: 1; min-width: 0; }
+.s2-stu-hd-name-wrap { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.s2-stu-hd-name { font-size: 18px; font-weight: 700; color: #222631; line-height: 1.2; }
+.s2-stu-hd-sid { font-size: 14px; color: #6d7381; font-variant-numeric: tabular-nums; }
+.s2-stu-hd-meta { font-size: 13px; color: #6d7381; margin-top: 6px; }
+
+.s2-state-card { background: #fff; border: 1px solid #e5e7eb; border-radius: 12px; padding: 36px 24px; text-align: center; }
+.s2-state-icon { width: 56px; height: 56px; border-radius: 50%; background: #eff3ff; color: #416bff; display: inline-flex; align-items: center; justify-content: center; margin: 0 auto 14px; }
+.s2-state-title { font-size: 16px; font-weight: 600; color: #222631; margin-bottom: 6px; }
+.s2-state-desc { font-size: 14px; color: #6d7381; line-height: 1.6; margin-bottom: 16px; }
+.s2-file-chips { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin-bottom: 20px; }
+.s2-file-chip { display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; border: 1px solid #d4e0ff; background: #f4f8ff; color: #3151c4; border-radius: 999px; font-size: 13px; font-weight: 500; max-width: 280px; }
+.s2-file-chip i { color: #416bff; flex-shrink: 0; }
+.s2-file-chip .fn { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+.btn-primary-lg { display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 11px 22px; border: none; border-radius: 8px; background: #416bff; color: #fff; font-size: 15px; font-weight: 600; cursor: pointer; font-family: inherit; line-height: 1; }
+.btn-primary-lg:hover { background: #365eef; }
+.btn-secondary-lg { display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 11px 22px; border: 1px solid #416bff; border-radius: 8px; background: #fff; color: #416bff; font-size: 15px; font-weight: 600; cursor: pointer; font-family: inherit; line-height: 1; }
+.btn-secondary-lg:hover { background: #f4f8ff; }
+.s2-credit-info { display: inline-flex; align-items: center; gap: 6px; padding: 8px 14px; background: #f4f8ff; border: 1px solid #c7d6ff; border-radius: 8px; font-size: 13px; color: #3151c4; margin-bottom: 14px; }
+
+.s2-loading-block { display: flex; flex-direction: column; align-items: center; gap: 14px; padding: 36px 24px; }
+.s2-spinner { width: 40px; height: 40px; border: 3px solid #e9f2ff; border-top-color: #416bff; border-radius: 50%; animation: s2spin .8s linear infinite; }
+@keyframes s2spin { to { transform: rotate(360deg); } }
+
+.s2-result-card { background: #fff; border: 1px solid #e5e7eb; border-radius: 12px; padding: 18px 22px; }
+.s2-result-hd { display: flex; align-items: center; gap: 8px; margin-bottom: 12px; }
+.s2-result-hd-icon { width: 28px; height: 28px; border-radius: 6px; background: #416bff; color: #fff; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.s2-result-hd-title { font-size: 14px; font-weight: 700; color: #222631; }
+.s2-result-items { display: flex; flex-direction: column; gap: 8px; }
+.s2-result-item { padding: 12px 14px; background: #f9fafb; border: 1px solid #f1f3f5; border-radius: 8px; font-size: 14px; color: #222631; line-height: 1.6; }
+.s2-result-item-tag { display: inline-block; font-size: 12px; font-weight: 600; color: #416bff; background: #eff3ff; padding: 2px 8px; border-radius: 4px; margin-right: 8px; vertical-align: middle; }
+
+/* AI 요약 */
+.s2-summary { margin: 0 0 12px; padding: 18px 20px; background: linear-gradient(135deg, #f4f8ff 0%, #fafbff 100%); border: 1px solid #d6e3ff; border-radius: 12px; display: flex; flex-direction: column; gap: 12px; }
+.s2-summary-hd { display: flex; align-items: center; gap: 6px; }
+.s2-summary-badge { display: inline-flex; align-items: center; gap: 4px; font-size: 12px; font-weight: 600; color: #416bff; background: #fff; border: 1px solid #c7d6ff; padding: 3px 10px; border-radius: 20px; line-height: 1.4; }
+.s2-summary-title { font-size: 14px; font-weight: 600; color: #222631; }
+.s2-summary-narr { font-size: 14px; line-height: 1.7; color: #222631; }
+.s2-summary-hl { display: flex; flex-direction: column; gap: 6px; margin: 0; padding: 0; list-style: none; }
+.s2-summary-hl li { display: flex; align-items: flex-start; gap: 8px; font-size: 14px; line-height: 1.5; color: #3b3f4c; }
+.s2-summary-hl li::before { content: ''; flex-shrink: 0; width: 5px; height: 5px; border-radius: 50%; background: #416bff; margin-top: 8px; }
+
+/* 그룹 헤더 */
+.s2-group-hd { display: flex; align-items: center; gap: 8px; padding: 6px 4px; margin-top: 4px; }
+.s2-group-title { font-size: 14px; font-weight: 600; color: #222631; }
+.s2-group-cnt { font-size: 12px; color: #6d7381; font-variant-numeric: tabular-nums; }
+
+/* AI 분석 항목 카드 */
+.s2-item { background: #fff; border: 1px solid #e5e7eb; border-radius: 12px; padding: 18px 22px; display: flex; gap: 14px; cursor: pointer; transition: border-color .15s; }
+.s2-item:hover { border-color: #c7d6ff; }
+.s2-item.checked { border-color: #c7d6ff; background: #fbfcff; }
+.s2-item.candidate { background: #fafbfc; border-color: #f1f3f5; }
+.s2-item-check { width: 22px; height: 22px; border: 1.5px solid #d9d9d9; border-radius: 5px; flex-shrink: 0; display: inline-flex; align-items: center; justify-content: center; background: #fff; color: transparent; line-height: 1; margin-top: 1px; }
+.s2-item.checked .s2-item-check { background: #416bff; border-color: #416bff; color: #fff; }
+.s2-item-body { flex: 1; min-width: 0; }
+.s2-item-tags { display: flex; gap: 10px; margin-bottom: 10px; flex-wrap: wrap; align-items: center; }
+.s2-tag { display: inline-flex; align-items: center; padding: 0; background: none; font-size: 13px; font-weight: 500; line-height: 1.4; color: #6d7381; }
+.s2-tag::before { content: '#'; color: #b3b6bd; margin-right: 1px; font-weight: 500; }
+.s2-item-source { display: flex; align-items: flex-start; gap: 6px; padding: 9px 12px; background: #f9fafb; border: 1px solid #f1f3f5; border-radius: 6px; font-size: 13px; color: #3b3f4c; line-height: 1.55; margin-bottom: 8px; }
+.s2-item-source strong { color: #222631; font-weight: 600; }
+.s2-item-content { font-size: 14px; color: #222631; line-height: 1.65; margin-bottom: 10px; }
+.s2-item-rationale { background: #f4f8ff; border-left: 3px solid #416bff; border-radius: 0 8px 8px 0; padding: 10px 14px; font-size: 13px; color: #3b3f4c; line-height: 1.65; }
+.s2-item-rationale-label { font-weight: 600; color: #416bff; display: inline-flex; align-items: center; gap: 4px; margin-right: 6px; }
+.s2-item-rationale-label::before { content: '✦'; color: #416bff; }
+
+/* 학생 특성 (직접 입력) 카드 */
+.s2-kw-box { margin: 0 4px 8px; padding: 14px 18px; background: #fff; border: 1px solid #e5e7eb; border-radius: 12px; font-size: 14px; color: #222631; line-height: 1.6; }
+
+/* 직접 추가 */
+.s2-add-btn { display: flex; align-items: center; justify-content: center; gap: 6px; padding: 14px 18px; background: #fff; border: 1.5px dashed #c7d6ff; border-radius: 12px; color: #416bff; font-size: 14px; font-weight: 600; cursor: pointer; font-family: inherit; line-height: 1; width: 100%; }
+.s2-add-btn:hover { background: #f4f8ff; border-color: #416bff; }
+.s2-custom-card { background: #fffbeb; border: 1px solid #fde68a; border-radius: 12px; padding: 16px 20px; display: flex; flex-direction: column; gap: 8px; }
+.s2-custom-tag { display: inline-flex; align-items: center; padding: 3px 9px; background: #fde68a; color: #92400e; border-radius: 6px; font-size: 12px; font-weight: 600; line-height: 1.5; align-self: flex-start; }
+.s2-custom-textarea { width: 100%; border: 1px solid #d9d9d9; border-radius: 8px; padding: 10px 12px; font-size: 14px; font-family: inherit; color: #222631; line-height: 1.6; resize: vertical; min-height: 64px; outline: none; background: #fff; }
+.s2-custom-textarea:focus { border-color: #416bff; }
+.btn-x-link { padding: 6px 10px; border: none; background: none; color: #92400e; font-size: 13px; cursor: pointer; font-family: inherit; line-height: 1; }
+.btn-x-link:hover { color: #7c2d12; text-decoration: underline; }
+
+/* 헤더 우측 [재분석] 버튼 */
+.btn-ai-outline { display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 0 14px; height: 36px; border: 1px solid #416bff; border-radius: 8px; background: #fff; color: #416bff; font-size: 13px; font-weight: 600; cursor: pointer; font-family: inherit; line-height: 1; }
+.btn-ai-outline:hover { background: #f4f8ff; }
+
+/* ──────────── STEP 3: AI 기록 생성 ──────────── */
+.s3-page { display: flex; flex-direction: column; gap: 16px; }
+.s3-card { background: #fff; border: 1px solid #e5e7eb; border-radius: 12px; padding: 22px 24px; }
+.s3-card-title { font-size: 16px; font-weight: 700; color: #222631; margin-bottom: 4px; }
+.s3-card-sub { font-size: 13px; color: #6d7381; line-height: 1.55; margin-bottom: 16px; }
+.s3-card-head-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 12px; }
+.s3-card-count { font-size: 13px; color: #6d7381; font-variant-numeric: tabular-nums; }
+
+.s3-info-box { display: flex; align-items: flex-start; gap: 8px; padding: 12px 14px; background: #f4f8ff; border: 1px solid #c7d6ff; border-radius: 8px; font-size: 13px; color: #3151c4; line-height: 1.55; }
+.s3-info-box i { flex-shrink: 0; margin-top: 2px; }
+.s3-info-box strong { color: #1d3acf; }
+.s3-warn-box { display: flex; align-items: flex-start; gap: 8px; padding: 14px 16px; background: #fffbeb; border: 1px solid #fde68a; border-radius: 8px; font-size: 13px; color: #92400e; line-height: 1.6; }
+.s3-warn-box i { flex-shrink: 0; margin-top: 2px; color: #f59e0b; }
+.s3-warn-box strong { color: #78350f; font-weight: 600; }
+.s3-warn-link { color: #c2410c; text-decoration: underline; cursor: pointer; font-weight: 600; display: inline-flex; align-items: center; gap: 3px; margin-top: 4px; }
+.s3-warn-link:hover { color: #9a3412; }
+
+/* 학생 선택 테이블 */
+.s3-stu-master { display: flex; align-items: center; gap: 8px; padding: 10px 14px; background: #f6f7f9; border: 1px solid #e5e7eb; border-radius: 8px; cursor: pointer; user-select: none; margin-bottom: 6px; font-size: 14px; color: #3b3f4c; }
+.s3-stu-master input { accent-color: #416bff; width: 16px; height: 16px; cursor: pointer; }
+.s3-stu-table-wrap { border: 1px solid #e5e7eb; border-radius: 8px; overflow: hidden; }
+.s3-stu-table-header { display: grid; grid-template-columns: 40px 80px 1fr 120px 120px 130px; align-items: center; gap: 8px; padding: 10px 14px; background: #fafbfc; border-bottom: 1px solid #f1f3f5; font-size: 12px; font-weight: 600; color: #6d7381; text-align: center; }
+.s3-stu-row { display: grid; grid-template-columns: 40px 80px 1fr 120px 120px 130px; align-items: center; gap: 8px; padding: 10px 14px; border-bottom: 1px solid #f1f3f5; cursor: pointer; text-align: center; }
+.s3-stu-row > * { display: inline-flex; align-items: center; justify-content: center; }
+.s3-stu-row:last-child { border-bottom: none; }
+.s3-stu-row:hover { background: #f9fafb; }
+.s3-stu-row.disabled { opacity: .55; cursor: not-allowed; }
+.s3-stu-row.disabled input { cursor: not-allowed; }
+.s3-stu-row input { accent-color: #416bff; width: 16px; height: 16px; cursor: pointer; }
+.s3-stu-row .sid { font-size: 13px; color: #6d7381; font-variant-numeric: tabular-nums; }
+.s3-stu-row .name { font-size: 14px; color: #222631; }
+
+.s3-pill { display: inline-flex; align-items: center; gap: 4px; padding: 3px 8px; font-size: 11px; font-weight: 600; line-height: 1.4; border-radius: 10px; }
+.s3-pill::before { content: ''; width: 5px; height: 5px; border-radius: 50%; background: currentColor; display: inline-block; }
+.s3-pill.input-yes { color: #15803d; background: #dcfce7; }
+.s3-pill.input-no { color: #6d7381; background: #f1f3f5; }
+.s3-pill.done-ana { color: #15803d; background: #dcfce7; }
+.s3-pill.need-ana { color: #b45309; background: #fef3c7; }
+.s3-pill.no-data { color: #6d7381; background: #f1f3f5; }
+.s3-pill.gen-done { color: #3151c4; background: #e9f2ff; }
+.s3-pill.gen-stale { color: #c2410c; background: #fff3e0; }
+.s3-pill.gen-pending { color: #6d7381; background: #f1f3f5; }
+.s3-pill.gen-blocked { color: #f97316; background: #fff3e0; }
+
+/* 분량 radio 카드 */
+.s3-len-list { display: flex; flex-direction: column; gap: 8px; }
+.s3-len-row { display: flex; align-items: center; gap: 10px; padding: 14px 16px; border: 1px solid #e5e7eb; border-radius: 10px; cursor: pointer; transition: all .15s; }
+.s3-len-row:hover { border-color: #b3b6bd; }
+.s3-len-row.selected { border-color: #416bff; background: #f4f8ff; box-shadow: 0 0 0 1px #416bff inset; }
+.s3-len-radio { width: 18px; height: 18px; border: 1.5px solid #b3b6bd; border-radius: 50%; flex-shrink: 0; position: relative; }
+.s3-len-row.selected .s3-len-radio { border-color: #416bff; }
+.s3-len-row.selected .s3-len-radio::after { content: ''; width: 8px; height: 8px; background: #416bff; border-radius: 50%; position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); }
+.s3-len-label { font-size: 15px; font-weight: 500; color: #222631; }
+.s3-len-row.selected .s3-len-label { font-weight: 600; color: #222631; }
+.s3-len-byte { font-size: 13px; color: #6d7381; margin-left: 4px; }
+
+/* AI 고급 설정 */
+.s3-adv-badge { display: inline-flex; align-items: center; gap: 4px; padding: 4px 10px; background: #eff3ff; color: #416bff; border-radius: 6px; font-size: 12px; font-weight: 600; line-height: 1; margin-bottom: 14px; }
+.s3-toggle-row { display: flex; align-items: flex-start; justify-content: space-between; gap: 14px; padding: 14px 0; border-bottom: 1px solid #f1f3f5; }
+.s3-toggle-row:last-child { border-bottom: none; }
+.s3-toggle-row:last-child { padding-bottom: 0; }
+.s3-toggle-info { flex: 1; min-width: 0; }
+.s3-toggle-title { font-size: 15px; font-weight: 600; color: #222631; margin-bottom: 4px; display: inline-flex; align-items: center; gap: 6px; }
+.s3-toggle-desc { font-size: 13px; color: #6d7381; line-height: 1.55; }
+.s3-switch { position: relative; width: 40px; height: 22px; border-radius: 22px; background: #d1d5db; cursor: pointer; flex-shrink: 0; transition: background .15s; }
+.s3-switch.on { background: #416bff; }
+.s3-switch::after { content: ''; position: absolute; left: 2px; top: 2px; width: 18px; height: 18px; border-radius: 50%; background: #fff; transition: left .15s; box-shadow: 0 1px 2px rgba(0,0,0,.2); }
+.s3-switch.on::after { left: 20px; }
+.s3-bl-wrap { margin-top: 12px; display: none; }
+.s3-bl-wrap.show { display: block; }
+.s3-bl-count { font-size: 12px; color: #6d7381; margin-bottom: 6px; }
+.s3-bl-input { width: 100%; padding: 10px 14px; font-size: 14px; font-family: inherit; border: 1px solid #d9d9d9; border-radius: 6px; color: #222631; height: 44px; line-height: 1; }
+.s3-bl-input:focus { outline: none; border-color: #416bff; }
+.s3-bl-input::placeholder { color: #b3b3b3; }
+
+/* 재생성 요청사항 */
+.s3-regen-textarea { width: 100%; min-height: 88px; padding: 12px 14px; font-size: 14px; font-family: inherit; line-height: 1.6; border: 1px solid #d9d9d9; border-radius: 8px; resize: vertical; color: #222631; }
+.s3-regen-textarea:focus { outline: none; border-color: #416bff; }
+.s3-regen-count { font-size: 12px; color: #6d7381; text-align: right; margin-top: 6px; }
+
+/* ──────────── STEP 4: 기록 확인 및 수정 ──────────── */
+.s4-card { background: #fff; border: 1px solid #e5e7eb; border-radius: 12px; overflow: hidden; }
+.s4-header { padding: 14px 20px; display: flex; align-items: center; gap: 14px; border-bottom: 1px solid #e5e7eb; }
+.s4-title { font-size: 16px; font-weight: 600; color: #222631; }
+.s4-saved { font-size: 13px; color: #6d7381; margin-left: auto; }
+.s4-actions { display: flex; gap: 8px; }
+.btn-ai-outline-sm { display: inline-flex; align-items: center; justify-content: center; gap: 5px; padding: 7px 12px; font-size: 13px; font-weight: 500; border: 1px solid #416bff; border-radius: 6px; background: #fff; color: #416bff; cursor: pointer; line-height: 1; font-family: inherit; }
+.btn-ai-outline-sm:hover { background: #f4f8ff; }
+.btn-excel { display: inline-flex; align-items: center; justify-content: center; gap: 5px; padding: 7px 12px; font-size: 13px; font-weight: 500; border: 1px solid #1ab864; border-radius: 6px; background: #fff; color: #15803d; cursor: pointer; line-height: 1; font-family: inherit; }
+.btn-excel:hover { background: #dcfce7; }
+.s4-table-wrap { overflow-x: auto; }
+.s4-table { width: 100%; border-collapse: collapse; table-layout: fixed; min-width: 1080px; }
+.s4-table thead th { padding: 12px 14px; text-align: center; font-size: 13px; font-weight: 600; color: #6d7381; background: #f6f7f9; border-bottom: 1px solid #e5e7eb; vertical-align: middle; }
+.s4-table tbody td { padding: 18px 14px; border-bottom: 1px solid #f1f3f5; vertical-align: top; text-align: center; }
+.s4-table tbody tr:last-child td { border-bottom: none; }
+.s4-table th:first-child, .s4-table td:first-child { padding-left: 20px; }
+.s4-table th:last-child, .s4-table td:last-child { padding-right: 20px; }
+.s4-col-sid { width: 80px; }
+.s4-col-name { width: 110px; }
+.s4-col-bring { width: 64px; padding: 0 !important; vertical-align: middle !important; }
+.s4-col-bytes { width: 110px; vertical-align: middle !important; }
+.s4-cell-sid { font-variant-numeric: tabular-nums; color: #3b3f4c; font-size: 14px; }
+.s4-cell-name { font-weight: 600; color: #222631; font-size: 14px; }
+.s4-ai-box, .s4-edit-box { display: flex; flex-direction: column; border: 1px solid #d9d9d9; border-radius: 8px; padding: 12px 14px; background: #fff; min-height: 200px; gap: 0; text-align: left; }
+.s4-edit-box:focus-within { border-color: #416bff; box-shadow: 0 0 0 1px #416bff inset; }
+.s4-text { font-size: 13px; color: #222631; line-height: 1.65; flex: 1; overflow-y: auto; max-height: 240px; white-space: pre-wrap; }
+.s4-text.empty { color: #b3b6bd; }
+.s4-textarea { width: 100%; border: none; outline: none; resize: none; font-family: inherit; font-size: 13px; line-height: 1.65; color: #222631; flex: 1; min-height: 160px; background: transparent; padding: 0; }
+.s4-textarea::placeholder { color: #b3b6bd; }
+.s4-cell-foot { display: flex; align-items: center; justify-content: space-between; gap: 6px; padding-top: 10px; margin-top: 10px; border-top: 1px solid #f1f3f5; flex-shrink: 0; }
+.s4-byte { font-size: 12px; color: #6d7381; font-variant-numeric: tabular-nums; }
+.s4-cell-actions { display: flex; gap: 4px; }
+.s4-mini-btn { display: inline-flex; align-items: center; justify-content: center; gap: 4px; padding: 5px 10px; border: 1px solid #d9d9d9; border-radius: 5px; background: #fff; color: #3b3f4c; font-size: 12px; font-weight: 500; cursor: pointer; font-family: inherit; line-height: 1; }
+.s4-mini-btn:hover { border-color: #416bff; color: #416bff; }
+.s4-regen-btn { display: inline-flex; align-items: center; justify-content: center; gap: 5px; padding: 7px 14px; border: none; border-radius: 6px; background: #416bff; color: #fff; font-size: 12px; font-weight: 600; cursor: pointer; font-family: inherit; line-height: 1; }
+.s4-regen-btn:hover { background: #365eef; }
+.s4-bring-btn { display: inline-flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; padding: 8px 6px; border: 1px solid #d9d9d9; border-radius: 8px; background: #fff; color: #3b3f4c; font-size: 11px; font-weight: 500; cursor: pointer; font-family: inherit; line-height: 1.3; width: 48px; margin: 0 auto; }
+.s4-bring-btn span { text-align: center; }
+.s4-bring-btn:hover:not(:disabled) { border-color: #416bff; color: #416bff; background: #f4f8ff; }
+.s4-bring-btn:disabled { opacity: .4; cursor: not-allowed; }
+.s4-bytes-cell { display: flex; flex-direction: column; align-items: center; gap: 2px; line-height: 1.3; }
+.s4-bytes-num { font-size: 14px; font-weight: 600; color: #222631; }
+.s4-bytes-label { font-size: 11px; color: #b3b6bd; font-weight: 500; }
+.s4-bytes-cell.over .s4-bytes-num { color: #f2525f; }
+.s4-bytes-err { font-size: 11px; color: #f2525f; font-weight: 600; margin-top: 2px; }
+
+/* 드로어 (개별 (재)생성 옵션) */
+.drawer-bg { display: none; position: fixed; inset: 0; background: rgba(34,38,49,.45); z-index: 600; justify-content: flex-end; }
+.drawer-bg.show { display: flex; }
+.drawer { background: #fff; width: 480px; max-width: calc(100vw - 40px); height: 100%; display: flex; flex-direction: column; box-shadow: -12px 0 40px rgba(0,0,0,.16); animation: drawer-slide .25s ease-out; }
+@keyframes drawer-slide { from { transform: translateX(100%); } to { transform: translateX(0); } }
+.drawer-hd { padding: 18px 24px; border-bottom: 1px solid #f1f3f5; display: flex; align-items: center; gap: 12px; }
+.drawer-info { flex: 1; min-width: 0; }
+.drawer-name { font-size: 18px; font-weight: 700; color: #222631; line-height: 1.3; }
+.drawer-sub { font-size: 13px; color: #6d7381; margin-top: 3px; }
+.drawer-body { flex: 1; overflow-y: auto; padding: 20px 24px; display: flex; flex-direction: column; gap: 24px; }
+.drawer-ft { padding: 14px 24px; border-top: 1px solid #f1f3f5; display: flex; justify-content: flex-end; gap: 8px; flex-shrink: 0; }
+.drawer-section-title { font-size: 14px; font-weight: 700; color: #222631; margin-bottom: 10px; display: block; }
+.drawer-section-sub { font-size: 13px; color: #6d7381; line-height: 1.55; margin: -6px 0 10px; }
+
+/* MOCKUP 토글 (시나리오 전환) */
+.mockup-toggle { position: fixed; bottom: 88px; right: 24px; background: #222631; color: #fff; border-radius: 24px; padding: 5px; display: inline-flex; align-items: center; gap: 2px; box-shadow: 0 8px 24px rgba(0,0,0,.2); z-index: 700; font-family: inherit; cursor: move; user-select: none; }
+.mockup-toggle.dragging { box-shadow: 0 12px 32px rgba(0,0,0,.4); opacity: .95; }
+.mt-label { padding: 0 8px 0 10px; font-size: 11px; font-weight: 700; color: #b3b6bd; letter-spacing: 0.5px; }
+.mt-btn { padding: 7px 14px; border: none; background: none; color: #b3b6bd; font-size: 13px; font-weight: 500; cursor: pointer; font-family: inherit; border-radius: 18px; line-height: 1; transition: all .15s; }
+.mt-btn:hover { color: #fff; }
+.mt-btn.active { background: #416bff; color: #fff; }
+
+/* 생성 진행 오버레이 */
+.s3-gen-overlay { display: none; position: fixed; inset: 0; background: rgba(34,38,49,.45); z-index: 500; align-items: center; justify-content: center; }
+.s3-gen-overlay.show { display: flex; }
+.s3-gen-card { background: #fff; border-radius: 12px; padding: 36px 32px; min-width: 360px; text-align: center; box-shadow: 0 12px 40px rgba(0,0,0,.18); }
+.s3-gen-card .s2-spinner { margin: 0 auto 16px; }
+.s3-gen-title { font-size: 16px; font-weight: 700; color: #222631; margin-bottom: 6px; }
+.s3-gen-desc { font-size: 13px; color: #6d7381; line-height: 1.55; }
+
+/* ── 전체 AI 분석 모달 (창체 패턴) ── */
+.modal-ft { padding: 16px 24px; border-top: 1px solid #f1f3f5; display: flex; justify-content: flex-end; gap: 8px; }
+.btn-primary { display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 10px 20px; border: none; border-radius: 8px; background: #416bff; color: #fff; font-size: 14px; font-weight: 600; cursor: pointer; line-height: 1; font-family: inherit; }
+.btn-primary:hover { background: #365eef; }
+.btn-primary:disabled { background: #c7d6ff; cursor: not-allowed; }
+.btn-secondary { display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 10px 20px; border: 1px solid #d9d9d9; border-radius: 8px; background: #fff; color: #3b3f4c; font-size: 14px; font-weight: 600; cursor: pointer; line-height: 1; font-family: inherit; }
+.btn-secondary:hover { background: #f6f7f9; }
+.ana-info-box { display: flex; align-items: flex-start; gap: 8px; padding: 12px 14px; background: #f4f8ff; border: 1px solid #c7d6ff; border-radius: 8px; margin-bottom: 16px; font-size: 13px; color: #3151c4; line-height: 1.55; }
+.ana-info-box i { flex-shrink: 0; margin-top: 2px; }
+.ana-info-box strong { color: #1d3acf; }
+.stu-pick-section { margin-bottom: 0; }
+.stu-pick-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+.stu-pick-title { font-size: 14px; font-weight: 600; color: #222631; }
+.stu-pick-count { font-size: 13px; color: #6d7381; }
+.stu-pick-master { display: flex; align-items: center; gap: 8px; padding: 10px 14px; background: #f6f7f9; border-radius: 8px; cursor: pointer; user-select: none; margin-bottom: 6px; font-size: 14px; color: #3b3f4c; border: 1px solid #e5e7eb; }
+.stu-pick-master input { accent-color: #416bff; width: 16px; height: 16px; cursor: pointer; }
+.stu-pick-list { max-height: 280px; overflow-y: auto; border: 1px solid #e5e7eb; border-radius: 8px; }
+.stu-pick-row { display: flex; align-items: center; gap: 10px; padding: 9px 14px; cursor: pointer; border-bottom: 1px solid #f1f3f5; }
+.stu-pick-row:last-child { border-bottom: none; }
+.stu-pick-row:hover { background: #f9fafb; }
+.stu-pick-row.disabled { opacity: .55; cursor: not-allowed; }
+.stu-pick-row.disabled input { cursor: not-allowed; }
+.stu-pick-row input { accent-color: #416bff; width: 16px; height: 16px; cursor: pointer; }
+.stu-pick-sid { font-size: 13px; color: #6d7381; font-variant-numeric: tabular-nums; width: 56px; flex-shrink: 0; }
+.stu-pick-name { font-size: 14px; color: #222631; flex: 1; }
+.stu-pick-tag { font-size: 11px; color: #6d7381; padding: 2px 7px; background: #f1f3f5; border-radius: 10px; flex-shrink: 0; }
+.stu-pick-tag.exists { color: #416bff; background: #e9f2ff; }
+.stu-pick-tag.disabled { color: #f97316; background: #fff3e0; }
+.stu-pick-tag.analyzed { color: #15803d; background: #dcfce7; }
 </style>
 </head>
 <body>
@@ -265,21 +554,29 @@ body.nav-expanded .sticky-cta { left: 200px; }
   <p class="page-sub">학생을 선택하여 자료와 특성을 입력해 주세요.</p>
 
   <div class="step-bar">
-    <div class="step-btn active">
+    <button class="step-btn active" id="step-1" onclick="goStep(1)" style="cursor:pointer">
       <span class="step-num">1</span>
       학생 자료 입력
-    </div>
+    </button>
     <span class="step-arrow"><i data-lucide="chevron-right" style="width:16px;height:16px"></i></span>
-    <div class="step-btn disabled">
+    <button class="step-btn" id="step-2" onclick="goStep(2)" style="cursor:pointer">
       <span class="step-num">2</span>
-      AI 기록 생성
-    </div>
+      AI 자료 분석
+    </button>
     <span class="step-arrow"><i data-lucide="chevron-right" style="width:16px;height:16px"></i></span>
-    <div class="step-btn disabled">
+    <button class="step-btn" id="step-3" onclick="goStep(3)" style="cursor:pointer">
       <span class="step-num">3</span>
-      기록 편집
-    </div>
+      AI 기록 생성
+    </button>
+    <span class="step-arrow"><i data-lucide="chevron-right" style="width:16px;height:16px"></i></span>
+    <button class="step-btn" id="step-4" onclick="goStep(4)" style="cursor:pointer">
+      <span class="step-num">4</span>
+      기록 확인 및 수정
+    </button>
   </div>
+
+  <!-- ============ STEP 1: 학생 자료 입력 ============ -->
+  <div id="step-1-panel">
 
   <div class="summary-card">
     <div class="summary-text">
@@ -295,7 +592,7 @@ body.nav-expanded .sticky-cta { left: 200px; }
 
     <!-- 좌측: 학생 선택 -->
     <div class="card">
-      <p class="lp-title">학생 선택</p>
+      <p class="lp-title">학생 명단</p>
 
       <div class="lp-field-label">반</div>
       <select class="field-select" id="classSel" onchange="renderStudents()">
@@ -422,6 +719,275 @@ body.nav-expanded .sticky-cta { left: 200px; }
     </div>
   </div>
 
+  </div>
+  <!-- /step-1-panel -->
+
+  <!-- ============ STEP 2: AI 자료 분석 ============ -->
+  <div id="step-2-panel" style="display:none">
+
+    <!-- 상단 요약 카드 (스텝 1과 동일 패턴) -->
+    <div class="summary-card">
+      <div class="summary-text">
+        <div class="summary-title">AI 자료 분석</div>
+        <div class="summary-sub" id="s2SummarySub">전체 0명 · 분석 완료 0명 · 자료 없음 0명</div>
+      </div>
+      <button class="btn-bulk-primary" onclick="s2RunAll()">
+        <i data-lucide="sparkles" style="width:16px;height:16px"></i> 전체 분석 시작
+      </button>
+    </div>
+
+    <!-- 메인 레이아웃 -->
+    <div class="s2-layout">
+      <aside class="s2-stulist">
+        <p class="lp-title">학생 명단</p>
+        <div class="lp-field-label">반</div>
+        <select class="field-select" id="s2-classSel" onchange="s2OnClassChange()"></select>
+        <div class="stu-count" id="s2-stu-count">학생 목록 (0명)</div>
+        <div id="s2-stu-rows"></div>
+      </aside>
+      <main class="s2-main" id="s2-main"></main>
+    </div>
+
+  </div>
+  <!-- /step-2-panel -->
+
+  <!-- ============ STEP 3: AI 기록 생성 ============ -->
+  <div id="step-3-panel" style="display:none">
+
+    <!-- 상단 요약 카드 -->
+    <div class="summary-card">
+      <div class="summary-text">
+        <div class="summary-title">AI 기록 생성</div>
+        <div class="summary-sub" id="s3SummarySub">전체 0명 · 생성 완료 0명 · 대기 0명</div>
+      </div>
+    </div>
+
+    <div class="s3-page">
+
+      <!-- 안내 -->
+      <div class="s3-info-box">
+        <i data-lucide="info" style="width:14px;height:14px"></i>
+        <div>AI 기록 생성은 <strong>학생당 1 크레딧</strong>이 사용돼요. 자료나 학생 특성이 없는 학생은 생성할 수 없어요.</div>
+      </div>
+      <div class="s3-warn-box" id="s3WarnBox" style="display:none">
+        <i data-lucide="alert-triangle" style="width:14px;height:14px"></i>
+        <div>
+          <strong>분석 필요</strong> 상태인 학생은 업로드된 자료가 기록에 반영되지 않아요. 더 정확한 기록을 위해 <strong>2단계에서 먼저 분석</strong>하는 걸 권장해요.
+          <div><span class="s3-warn-link" onclick="goStep(2)">2단계에서 분석하기 <i data-lucide="external-link" style="width:12px;height:12px"></i></span></div>
+        </div>
+      </div>
+
+      <!-- 학생 선택 -->
+      <div class="s3-card">
+        <div class="s3-card-head-row">
+          <div class="s3-card-title">학생 선택</div>
+          <div class="s3-card-count" id="s3StuPickCount">0 / 0명</div>
+        </div>
+        <label class="s3-stu-master">
+          <input type="checkbox" id="s3PickAll" onchange="s3ToggleAll(this.checked)">
+          <span>전체 선택 (생성 가능한 학생만)</span>
+        </label>
+        <div class="s3-stu-table-wrap">
+          <div class="s3-stu-table-header">
+            <span></span>
+            <span>학번</span>
+            <span>이름</span>
+            <span>1단계 입력</span>
+            <span>2단계 분석</span>
+            <span>3단계 AI 기록</span>
+          </div>
+          <div id="s3StuList"></div>
+        </div>
+      </div>
+
+      <!-- 기록 분량 -->
+      <div class="s3-card">
+        <div class="s3-card-title">AI 기록 생성 분량</div>
+        <div class="s3-card-sub">기록 생성 분량을 선택해 주세요. 입력하신 내용에 따라 실제 생성 분량은 달라질 수 있어요.</div>
+        <div class="s3-len-list" id="s3LenList">
+          <div class="s3-len-row" data-len="50-100" onclick="s3SetLen('50-100')">
+            <div class="s3-len-radio"></div>
+            <span class="s3-len-label">50~100자<span class="s3-len-byte">(150~300 Byte)</span></span>
+          </div>
+          <div class="s3-len-row" data-len="100-250" onclick="s3SetLen('100-250')">
+            <div class="s3-len-radio"></div>
+            <span class="s3-len-label">100~250자<span class="s3-len-byte">(300~750 Byte)</span></span>
+          </div>
+          <div class="s3-len-row selected" data-len="250-400" onclick="s3SetLen('250-400')">
+            <div class="s3-len-radio"></div>
+            <span class="s3-len-label">250~400자<span class="s3-len-byte">(750~1,200 Byte)</span></span>
+          </div>
+          <div class="s3-len-row" data-len="400-500" onclick="s3SetLen('400-500')">
+            <div class="s3-len-radio"></div>
+            <span class="s3-len-label">400~500자<span class="s3-len-byte">(1,200~1,500 Byte)</span></span>
+          </div>
+          <div class="s3-len-row" data-len="500-600" onclick="s3SetLen('500-600')">
+            <div class="s3-len-radio"></div>
+            <span class="s3-len-label">500~600자<span class="s3-len-byte">(1,500~1,800 Byte)</span></span>
+          </div>
+        </div>
+      </div>
+
+      <!-- AI 고급 설정 -->
+      <div class="s3-card">
+        <div class="s3-card-title">AI 고급 설정</div>
+        <div class="s3-card-sub">생성될 기록의 표현·단어 정책을 추가로 조정해요.</div>
+        <div class="s3-toggle-row">
+          <div class="s3-toggle-info">
+            <div class="s3-toggle-title">부정적 표현 허용 <i data-lucide="info" style="width:13px;height:13px;color:#b3b6bd"></i></div>
+            <div class="s3-toggle-desc">학생의 성장 정도나 발전 가능성 중심으로 표현을 완화하지 않고, AI Assistant가 생성한 부정적 표현을 그대로 작성해요.</div>
+          </div>
+          <div class="s3-switch" id="s3AllowNeg" onclick="this.classList.toggle('on')"></div>
+        </div>
+        <div class="s3-toggle-row">
+          <div class="s3-toggle-info">
+            <div class="s3-toggle-title">포함되면 안 되는 단어 추가 <i data-lucide="info" style="width:13px;height:13px;color:#b3b6bd"></i></div>
+            <div class="s3-toggle-desc">포함되면 안 되는 단어를 입력해 주세요. AI 기록은 학생부 기준에 맞게 작성되며, 입력한 단어는 적절한 표현으로 대체돼요.</div>
+            <div class="s3-bl-wrap" id="s3BlWrap">
+              <div class="s3-bl-count">단어를 쉼표로 구분하여 입력해 주세요. <span id="s3BlCount">(0개/50개)</span></div>
+              <input type="text" class="s3-bl-input" id="s3BlInput" placeholder="예시) 게으름, 불성실, 무능, 부족, 문제 많음, 소극적, 부정적, 포기, 불가능" oninput="s3UpdateBlCount()">
+            </div>
+          </div>
+          <div class="s3-switch" id="s3BlSwitch" onclick="s3ToggleBl(this)"></div>
+        </div>
+      </div>
+
+      <!-- 재생성 요청사항 -->
+      <div class="s3-card" id="s3RegenCard" style="display:none">
+        <div class="s3-card-head-row">
+          <div class="s3-card-title">재생성 요청사항 <span style="font-size:13px;color:#6d7381;font-weight:500">(선택)</span></div>
+          <div class="s3-card-count"><span id="s3RegenCount">0</span> / 200</div>
+        </div>
+        <div class="s3-card-sub">이미 생성된 기록이 있는 학생만 표시돼요. 바꾸고 싶은 방향을 적어주시면 그에 맞춰 다시 생성해드려요.</div>
+        <textarea class="s3-regen-textarea" id="s3RegenTextarea" maxlength="200" placeholder="예) 협력적 태도와 리더십을 더 강조해 주세요." oninput="s3UpdateRegenCount()"></textarea>
+      </div>
+
+    </div>
+  </div>
+  <!-- /step-3-panel -->
+
+  <!-- ============ STEP 4: 기록 확인 및 수정 ============ -->
+  <div id="step-4-panel" style="display:none">
+    <div class="s4-card">
+      <div class="s4-header">
+        <div class="s4-title">총 <span id="s4Count">0</span>명</div>
+        <span class="s4-saved" id="s4Saved">저장된 적 없음</span>
+        <div class="s4-actions">
+          <button class="btn-ai-outline-sm" onclick="s4BringAll()"><i data-lucide="corner-down-right" style="width:14px;height:14px"></i> 전체 AI 기록 옮기기</button>
+          <button class="btn-excel" onclick="s4ExportExcel()"><i data-lucide="download" style="width:14px;height:14px"></i> 엑셀 내보내기</button>
+        </div>
+      </div>
+      <div class="s4-table-wrap">
+        <table class="s4-table">
+          <thead>
+            <tr>
+              <th class="s4-col-sid">학번</th>
+              <th class="s4-col-name">이름</th>
+              <th>AI 생성 기록</th>
+              <th class="s4-col-bring"></th>
+              <th>선생님 작성 기록</th>
+              <th class="s4-col-bytes">글자수</th>
+            </tr>
+          </thead>
+          <tbody id="s4Rows"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  <!-- /step-4-panel -->
+
+  <!-- 개별 (재)생성 드로어 -->
+  <div class="drawer-bg" id="s4Drawer" onclick="if(event.target===this)s4CloseDrawer()">
+    <div class="drawer">
+      <div class="drawer-hd">
+        <div class="drawer-info">
+          <div class="drawer-name" id="s4DrawerName">AI 기록 생성</div>
+          <div class="drawer-sub" id="s4DrawerSub">분량과 옵션을 설정하고 생성해 주세요.</div>
+        </div>
+        <button class="modal-x" onclick="s4CloseDrawer()"><i data-lucide="x" style="width:18px;height:18px"></i></button>
+      </div>
+      <div class="drawer-body">
+
+        <div>
+          <span class="drawer-section-title">AI 기록 생성 분량</span>
+          <div class="drawer-section-sub">기록 생성 분량을 선택해 주세요. 입력하신 내용에 따라 실제 생성 분량은 달라질 수 있어요.</div>
+          <div class="s3-len-list" id="s4LenList">
+            <div class="s3-len-row" data-len="50-100" onclick="s4SetLen('50-100')">
+              <div class="s3-len-radio"></div>
+              <span class="s3-len-label">50~100자<span class="s3-len-byte">(150~300 Byte)</span></span>
+            </div>
+            <div class="s3-len-row" data-len="100-250" onclick="s4SetLen('100-250')">
+              <div class="s3-len-radio"></div>
+              <span class="s3-len-label">100~250자<span class="s3-len-byte">(300~750 Byte)</span></span>
+            </div>
+            <div class="s3-len-row selected" data-len="250-400" onclick="s4SetLen('250-400')">
+              <div class="s3-len-radio"></div>
+              <span class="s3-len-label">250~400자<span class="s3-len-byte">(750~1,200 Byte)</span></span>
+            </div>
+            <div class="s3-len-row" data-len="400-500" onclick="s4SetLen('400-500')">
+              <div class="s3-len-radio"></div>
+              <span class="s3-len-label">400~500자<span class="s3-len-byte">(1,200~1,500 Byte)</span></span>
+            </div>
+            <div class="s3-len-row" data-len="500-600" onclick="s4SetLen('500-600')">
+              <div class="s3-len-radio"></div>
+              <span class="s3-len-label">500~600자<span class="s3-len-byte">(1,500~1,800 Byte)</span></span>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <span class="drawer-section-title">AI 고급 설정</span>
+          <div class="drawer-section-sub">생성될 기록의 표현·단어 정책을 추가로 조정해요.</div>
+          <div class="s3-toggle-row">
+            <div class="s3-toggle-info">
+              <div class="s3-toggle-title">부정적 표현 허용</div>
+              <div class="s3-toggle-desc">학생의 성장 정도나 발전 가능성 중심으로 표현을 완화하지 않고, AI Assistant가 생성한 부정적 표현을 그대로 작성해요.</div>
+            </div>
+            <div class="s3-switch" id="s4AllowNeg" onclick="this.classList.toggle('on')"></div>
+          </div>
+          <div class="s3-toggle-row">
+            <div class="s3-toggle-info">
+              <div class="s3-toggle-title">포함되면 안 되는 단어 추가</div>
+              <div class="s3-toggle-desc">포함되면 안 되는 단어를 입력해 주세요. AI 기록은 학생부 기준에 맞게 작성되며, 입력한 단어는 적절한 표현으로 대체돼요.</div>
+              <div class="s3-bl-wrap" id="s4BlWrap">
+                <div class="s3-bl-count">단어를 쉼표로 구분하여 입력해 주세요.</div>
+                <input type="text" class="s3-bl-input" id="s4BlInput" placeholder="예시) 게으름, 불성실, 무능">
+              </div>
+            </div>
+            <div class="s3-switch" id="s4BlSwitch" onclick="s4ToggleBl(this)"></div>
+          </div>
+        </div>
+
+        <div id="s4RegenSection" style="display:none">
+          <span class="drawer-section-title">재생성 요청사항 <span style="font-size:13px;color:#6d7381;font-weight:500">(선택)</span></span>
+          <div class="drawer-section-sub">바꾸고 싶은 방향을 적어주시면 그에 맞춰 다시 생성해 드려요.</div>
+          <textarea class="s3-regen-textarea" id="s4RegenTextarea" maxlength="200" placeholder="예) 협력적 태도와 리더십을 더 강조해 주세요."></textarea>
+        </div>
+
+      </div>
+      <div class="drawer-ft">
+        <button class="btn-secondary" onclick="s4CloseDrawer()">취소</button>
+        <button class="btn-primary" onclick="s4ConfirmDrawer()"><i data-lucide="sparkles" style="width:14px;height:14px"></i> 생성 · 1 크레딧</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MOCKUP 시나리오 토글 -->
+  <div class="mockup-toggle" id="mockupToggle">
+    <span class="mt-label">MOCKUP</span>
+    <button class="mt-btn active" data-scenario="empty" onclick="setMockupScenario('empty')">빈 화면</button>
+    <button class="mt-btn" data-scenario="data" onclick="setMockupScenario('data')">데이터 있음</button>
+  </div>
+
+  <!-- 생성 진행 오버레이 -->
+  <div class="s3-gen-overlay" id="s3GenOverlay">
+    <div class="s3-gen-card">
+      <div class="s2-spinner"></div>
+      <div class="s3-gen-title">AI가 기록을 생성하고 있어요</div>
+      <div class="s3-gen-desc"><span id="s3GenCount">0</span>명 생성 중 · 잠시만 기다려 주세요.</div>
+    </div>
+  </div>
+
 </main>
 </div>
 
@@ -433,6 +999,42 @@ body.nav-expanded .sticky-cta { left: 200px; }
     <button class="btn-next" onclick="goNext()">다음 단계 <i data-lucide="arrow-right" style="width:14px;height:14px"></i></button>
   </div>
 </footer>
+
+<!-- 전체 AI 분석 모달 -->
+<div class="modal-bg" id="modal-analyze" onclick="if(event.target===this)closeAnalyzeModal()">
+  <div class="modal">
+    <div class="modal-hd">
+      <div>
+        <div class="modal-title" id="anaModalTitle">전체 AI 분석</div>
+        <div class="modal-sub">분석할 학생을 선택해 주세요.</div>
+      </div>
+      <button class="modal-x" onclick="closeAnalyzeModal()"><i data-lucide="x" style="width:18px;height:18px"></i></button>
+    </div>
+    <div class="modal-body">
+      <div class="ana-info-box">
+        <i data-lucide="info" style="width:14px;height:14px"></i>
+        <div>AI 분석은 <strong>학생당 1 크레딧</strong>이 사용돼요. 자료(PDF/JPG/PNG)가 없는 학생은 분석할 수 없어요.</div>
+      </div>
+      <div class="stu-pick-section">
+        <div class="stu-pick-head">
+          <span class="stu-pick-title">학생 선택</span>
+          <span class="stu-pick-count" id="anaPickCount">0 / 0명</span>
+        </div>
+        <label class="stu-pick-master">
+          <input type="checkbox" id="anaPickAll" onchange="toggleAllAnaPick(this.checked)">
+          <span>전체 선택 (분석 가능한 학생만)</span>
+        </label>
+        <div class="stu-pick-list" id="anaPickList"></div>
+      </div>
+    </div>
+    <div class="modal-ft">
+      <button class="btn-secondary" onclick="closeAnalyzeModal()">취소</button>
+      <button class="btn-primary" id="anaConfirmBtn" onclick="confirmAnalyze()" disabled>
+        <i data-lucide="sparkles" style="width:14px;height:14px"></i> 분석 시작 · <span id="anaCreditCount">0</span> 크레딧
+      </button>
+    </div>
+  </div>
+</div>
 
 <!-- 일괄 자료 등록 모달 (창체 패턴 + 반 선택 step) -->
 <div class="modal-bg" id="bulkPickerModal" onclick="if(event.target===this)closeBulkPicker()">
@@ -529,8 +1131,9 @@ function renderStudents(){
   document.getElementById('stuCount').textContent = `학생 목록 (${students.length}명)`;
   list.innerHTML = students.map(s => {
     const st = getOrInitState(s.id);
-    const hasInput = !!st.text.trim() || !!st.file;
-    const levelLabel = st.level === '자동' ? '자동' : st.level;
+    const fileSet = !!st.file;
+    const textSet = (st.text || '').trim().length > 0;
+    const levelLabel = st.level || '중';
     return `
       <div class="stu-item ${s.id === currentStudentId ? 'active' : ''}" data-sid="${s.id}" onclick="selectStudent('${s.id}')">
         <div class="stu-row1">
@@ -538,9 +1141,9 @@ function renderStudents(){
           <div class="stu-name">${s.id} ${s.name}</div>
         </div>
         <div class="stu-chips">
-          <span class="stu-chip ${hasInput ? 'has' : ''}">입력 ${hasInput ? '완료' : '전'}</span>
-          ${st.file ? `<span class="stu-chip has">자료 첨부</span>` : ''}
-          <span class="stu-chip ${st.level && st.level !== '중' ? 'has' : ''}">수행 ${levelLabel}</span>
+          <span class="stu-chip ${fileSet ? 'has' : ''}">자료 등록</span>
+          <span class="stu-chip ${textSet ? 'has' : ''}">특성 입력</span>
+          <span class="stu-chip ${levelLabel !== '중' ? 'has' : ''}">${levelLabel}</span>
         </div>
       </div>`;
   }).join('');
@@ -771,8 +1374,807 @@ function navigateBulkUpload(type, cls){
 
 function toggleKwBox(){ document.getElementById('kwbox').classList.toggle('expanded'); }
 
-function goPrev(){ location.href = 'quick_seteuk_register_v1_260526.html?name=' + encodeURIComponent(groupName) + '&subject=' + encodeURIComponent(subject); }
-function goNext(){ showToast('AI 기록 생성 단계 (다음 시안)'); }
+// ────── 스텝 전환 ──────
+let currentStep = 1;
+function goStep(n){
+  currentStep = n;
+  document.getElementById('step-1-panel').style.display = n === 1 ? '' : 'none';
+  document.getElementById('step-2-panel').style.display = n === 2 ? '' : 'none';
+  document.getElementById('step-3-panel').style.display = n === 3 ? '' : 'none';
+  document.getElementById('step-4-panel').style.display = n === 4 ? '' : 'none';
+  // step-bar active 갱신
+  document.querySelectorAll('.step-btn').forEach((b, i) => {
+    b.classList.remove('active');
+    if (i + 1 === n) b.classList.add('active');
+  });
+  // sticky footer 진행률 / 버튼 라벨 갱신
+  if (n === 2){ s2RenderSidebar(); s2SelectFirst(); s2UpdateProgress(); }
+  else if (n === 3){ s3Render(); }
+  else if (n === 4){ s4Render(); }
+  else updateProgress();
+  // 이전 단계 / 다음 단계 처리
+  const prevBtn = document.querySelector('.btn-prev');
+  const nextBtn = document.querySelector('.btn-next');
+  if (n === 3){
+    prevBtn.innerHTML = '<i data-lucide="arrow-left" style="width:14px;height:14px"></i> 이전 단계';
+    nextBtn.innerHTML = '<i data-lucide="sparkles" style="width:14px;height:14px"></i> 생성 · <span id="s3GenCredit">' + s3Selected.size + '</span> 크레딧';
+    nextBtn.onclick = s3Generate;
+  } else {
+    prevBtn.innerHTML = '<i data-lucide="arrow-left" style="width:14px;height:14px"></i> 이전 단계';
+    nextBtn.innerHTML = '다음 단계 <i data-lucide="arrow-right" style="width:14px;height:14px"></i>';
+    nextBtn.onclick = goNext;
+  }
+  window.scrollTo({top: 0, behavior: 'smooth'});
+  lucide.createIcons();
+}
+
+function goPrev(){
+  if (currentStep > 1){ goStep(currentStep - 1); return; }
+  location.href = 'quick_seteuk_register_v1_260526.html?name=' + encodeURIComponent(groupName) + '&subject=' + encodeURIComponent(subject);
+}
+function goNext(){
+  if (currentStep < 4){ goStep(currentStep + 1); return; }
+  showToast('마지막 단계입니다');
+}
+
+// ────── STEP 2: AI 자료 분석 ──────
+// analysisStatus: 'none' (자료 없음 - 스킵 대상) | 'pending' (자료 있음, 분석 전) | 'analyzing' | 'done'
+let s2CurrentId = null;
+
+function s2GetStatus(sid){
+  const st = inputState[sid];
+  if (!st || !st.file) return 'none';
+  return st.analysisStatus || 'pending';
+}
+
+function s2AllStudents(){
+  return Object.values(STUDENT_BANK).flat();
+}
+
+function s2EnsureClassSel(){
+  const sel = document.getElementById('s2-classSel');
+  if (!sel || sel.options.length) return;
+  Object.keys(STUDENT_BANK).forEach(k => {
+    const opt = document.createElement('option');
+    opt.value = k; opt.textContent = k;
+    sel.appendChild(opt);
+  });
+}
+
+function s2OnClassChange(){
+  // 반 변경 시 첫 학생 자동 선택
+  const cls = document.getElementById('s2-classSel').value;
+  const list = STUDENT_BANK[cls] || [];
+  s2CurrentId = list[0]?.id || null;
+  s2RenderSidebar();
+  s2RenderMain();
+}
+
+function s2RenderSidebar(){
+  s2EnsureClassSel();
+  s2UpdateSummary();
+  const cls = document.getElementById('s2-classSel').value || Object.keys(STUDENT_BANK)[0];
+  const students = STUDENT_BANK[cls] || [];
+  document.getElementById('s2-stu-count').textContent = `학생 목록 (${students.length}명)`;
+  document.getElementById('s2-stu-rows').innerHTML = students.map(s => {
+    const status = s2GetStatus(s.id);
+    const statusLabel = { none: '자료 없음', pending: '분석 대기', analyzing: '분석 중', done: '분석 완료' }[status];
+    return `
+      <div class="stu-item ${s.id === s2CurrentId ? 'active' : ''}" onclick="s2SelectStudent('${s.id}')">
+        <div class="stu-row1">
+          <div class="stu-radio"></div>
+          <div class="stu-name">${s.id} ${s.name}</div>
+          <span class="s2-stu-status ${status}">${statusLabel}</span>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+function s2SelectFirst(){
+  s2EnsureClassSel();
+  const cls = document.getElementById('s2-classSel').value || Object.keys(STUDENT_BANK)[0];
+  const students = STUDENT_BANK[cls] || [];
+  if (students.length === 0) return;
+  // 우선 자료 있는 학생, 없으면 첫 학생
+  const withFile = students.find(s => s2GetStatus(s.id) !== 'none');
+  s2SelectStudent((withFile || students[0]).id);
+}
+
+function s2SelectStudent(sid){
+  s2CurrentId = sid;
+  s2RenderSidebar();
+  s2RenderMain();
+}
+
+function s2RenderMain(){
+  const main = document.getElementById('s2-main');
+  if (!s2CurrentId){ main.innerHTML = ''; return; }
+  const all = s2AllStudents();
+  const stu = all.find(s => s.id === s2CurrentId);
+  if (!stu){ main.innerHTML = ''; return; }
+  const st = inputState[stu.id] || {};
+  const status = s2GetStatus(stu.id);
+  const initial = stu.name.charAt(0);
+
+  const subMap = {
+    none: '자료가 없어 AI 분석을 건너뛸 수 있어요. 다음 단계에서 학생 특성으로 기록 초안이 생성돼요.',
+    pending: '업로드된 자료를 AI가 분석해 학생 특성을 추출해 드려요.',
+    analyzing: 'AI가 자료를 분석하고 있어요. 잠시만 기다려 주세요.',
+    done: 'AI가 추천한 학생 특성이에요. 다음 단계에서 기록 초안 생성에 활용돼요.'
+  };
+  const headerActions = status === 'done'
+    ? `<button class="btn-ai-outline" onclick="s2Reanalyze('${stu.id}')"><i data-lucide="refresh-ccw" style="width:14px;height:14px"></i> 재분석</button>`
+    : '';
+  const header = `
+    <div class="card" style="padding:18px 22px;display:flex;align-items:center;justify-content:space-between;gap:14px">
+      <div style="flex:1;min-width:0">
+        <div class="rp-head">
+          <p class="rp-title"><i data-lucide="user" style="width:18px;height:18px;color:#416bff"></i> <span>${stu.id} ${stu.name}</span></p>
+        </div>
+        <p class="rp-sub" style="margin-bottom:0">${subMap[status]}</p>
+      </div>
+      ${headerActions}
+    </div>`;
+
+  let body = '';
+  if (status === 'none'){
+    body = `
+      <div class="s2-state-card">
+        <div class="s2-state-icon" style="background:#fff7ed;color:#f97316"><i data-lucide="inbox" style="width:24px;height:24px"></i></div>
+        <div class="s2-state-title">분석할 자료가 없어요</div>
+        <div class="s2-state-desc">이 학생은 분석 단계를 건너뛰고<br>다음 단계에서 학생 특성 기반으로 기록 초안이 생성돼요.</div>
+        <button class="btn-secondary-lg" onclick="s2NextStudent()"><i data-lucide="chevron-right" style="width:16px;height:16px"></i> 다음 학생</button>
+      </div>`;
+  } else if (status === 'pending'){
+    body = `
+      <div class="s2-state-card">
+        <div class="s2-state-icon"><i data-lucide="sparkles" style="width:24px;height:24px"></i></div>
+        <div class="s2-state-title">AI 분석을 시작해 주세요</div>
+        <div class="s2-state-desc">업로드된 자료를 AI가 분석해<br>학생 특성을 추출해 드려요.</div>
+        <div class="s2-file-chips">
+          <span class="s2-file-chip"><i data-lucide="file-text" style="width:14px;height:14px"></i><span class="fn">${st.file.name}</span></span>
+        </div>
+        <div class="s2-credit-info"><i data-lucide="info" style="width:14px;height:14px"></i> 분석 실행 시 <strong>1 크레딧</strong>이 차감돼요</div>
+        <div><button class="btn-primary-lg" onclick="s2StartAnalysis('${stu.id}')"><i data-lucide="sparkles" style="width:16px;height:16px"></i> 분석 시작</button></div>
+      </div>`;
+  } else if (status === 'analyzing'){
+    body = `
+      <div class="s2-state-card">
+        <div class="s2-loading-block">
+          <div class="s2-spinner"></div>
+          <div>
+            <div class="s2-state-title">자료를 분석하고 있어요</div>
+            <div class="s2-state-desc">잠시만 기다려 주세요.</div>
+          </div>
+        </div>
+      </div>`;
+  } else if (status === 'done'){
+    body = s2RenderDone(stu, st);
+  }
+  main.innerHTML = header + body;
+  lucide.createIcons();
+}
+
+// 더미 분석 결과 생성
+function s2GenerateDummyResult(stu){
+  const fileName = (inputState[stu.id] && inputState[stu.id].file && inputState[stu.id].file.name) || '학생_과제물.pdf';
+  return {
+    summary: {
+      narrative: `${stu.name} 학생은 실험 설계와 자료 해석 능력이 두드러지며, 모둠 활동에서 의사소통과 협업 태도가 잘 드러납니다.`,
+      highlights: [
+        '관찰 결과를 표·그래프로 정리해 핵심 변수와 추세를 명확히 제시',
+        '실생활 사례에 개념을 적용해 깊이 있는 이해를 보임',
+        '모둠 토의를 주도하며 팀원의 의견을 적극 수용'
+      ]
+    },
+    items: [
+      { id:'r1', category:'과정·기능', competency:'탐구', recommended:true, source:`${fileName} · 2.1 가설`, rationale:'가설 설정 단계에서 변수와 가설의 인과관계를 명확히 기술함.', content:'주제에 대한 가설을 명확히 설정하고, 변수 간 인과관계를 논리적으로 정리해 탐구의 방향을 분명히 함.' },
+      { id:'r2', category:'과정·기능', competency:'자료 해석', recommended:true, source:`${fileName} · 3. 결과`, rationale:'표·그래프 활용도가 높고 추세 해석이 정확함.', content:'관찰 결과를 표와 그래프로 정리해 핵심 변수와 추세를 한눈에 드러내고, 데이터에서 의미를 추출함.' },
+      { id:'r3', category:'지식·이해', competency:'개념 적용', recommended:true, source:`${fileName} · 4. 고찰`, rationale:'학습 개념을 실제 사례와 연결한 점이 돋보임.', content:'실생활 사례를 들어 개념 적용을 시도하며 학습 내용을 깊이 있게 이해하고 있음을 보여줌.' },
+      { id:'c1', category:'가치·태도', competency:'협업', recommended:false, source:`${fileName} · 5. 활동 후기`, rationale:'모둠 활동 후기에서 의사소통 사례 확인.', content:'모둠 활동에서 의사소통을 주도하며 팀원의 의견을 적극 수용하는 태도를 보임.' },
+      { id:'c2', category:'과정·기능', competency:'비판적 사고', recommended:false, source:`${fileName} · 4. 고찰`, rationale:'결과의 한계를 스스로 지적함.', content:'실험 결과의 한계를 인식하고 추가 조사 방향을 제시하는 비판적 사고가 드러남.' }
+    ]
+  };
+}
+
+function s2StartAnalysis(sid){
+  const st = inputState[sid] || (inputState[sid] = {});
+  st.analysisStatus = 'analyzing';
+  s2RenderSidebar(); s2RenderMain();
+  setTimeout(() => {
+    const stu = s2AllStudents().find(x => x.id === sid);
+    const result = s2GenerateDummyResult(stu);
+    st.analysisStatus = 'done';
+    st.analysisSummary = result.summary;
+    st.analysisItems = result.items;
+    st.analysisChecked = new Set(result.items.filter(it => it.recommended).map(it => it.id));
+    st.analysisCustoms = st.analysisCustoms || [];
+    s2RenderSidebar(); s2RenderMain(); s2UpdateProgress();
+    showToast('분석이 완료됐어요');
+  }, 1500);
+}
+
+function s2Reanalyze(sid){ s2StartAnalysis(sid); }
+
+function s2RenderDone(stu, st){
+  const items = st.analysisItems || [];
+  const summary = st.analysisSummary;
+  const checked = st.analysisChecked || new Set();
+  const customs = st.analysisCustoms || [];
+  const recItems = items.filter(it => it.recommended);
+
+  const esc = (s) => String(s||'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+  const summaryHtml = summary ? `
+    <div class="s2-summary">
+      <div class="s2-summary-hd">
+        <span class="s2-summary-badge"><i data-lucide="sparkles" style="width:12px;height:12px"></i> AI 요약</span>
+        <span class="s2-summary-title">학생 특성 한눈에 보기</span>
+      </div>
+      ${summary.narrative ? `<div class="s2-summary-narr">${esc(summary.narrative)}</div>` : ''}
+      ${(summary.highlights||[]).length ? `<ul class="s2-summary-hl">${summary.highlights.map(h => `<li>${esc(h)}</li>`).join('')}</ul>` : ''}
+    </div>` : '';
+
+  const renderItem = (it) => {
+    const isChecked = checked.has(it.id);
+    const isCandidate = !it.recommended;
+    const tags = [
+      `<span class="s2-tag">${esc(it.category)}</span>`,
+      it.competency ? `<span class="s2-tag">${esc(it.competency)}</span>` : ''
+    ].filter(Boolean).join('');
+    const sourceLine = it.source ? `
+      <div class="s2-item-source">
+        <i data-lucide="paperclip" style="width:13px;height:13px;color:#b3b6bd;flex-shrink:0;margin-top:2px"></i>
+        <span><strong>${esc(it.source)}</strong></span>
+      </div>` : '';
+    const rationale = it.rationale ? `<div class="s2-item-rationale"><span class="s2-item-rationale-label">추천 근거</span>${esc(it.rationale)}</div>` : '';
+    return `
+      <div class="s2-item ${isChecked?'checked':''} ${isCandidate?'candidate':''}" onclick="s2ToggleItem('${stu.id}','${it.id}')">
+        <span class="s2-item-check"><i data-lucide="check" style="width:14px;height:14px"></i></span>
+        <div class="s2-item-body">
+          <div class="s2-item-tags">${tags}</div>
+          <div class="s2-item-content">${esc(it.content)}</div>
+          ${sourceLine}
+          ${rationale}
+        </div>
+      </div>`;
+  };
+  const itemsHtml = items.map(renderItem).join('');
+
+  const kwText = (st.text || '').trim();
+  const kwBox = kwText ? `
+    <div class="s2-group-hd">
+      <span class="s2-group-title">학생 특성 <span style="font-size:12px;font-weight:500;color:#6d7381;background:#f1f3f5;padding:2px 7px;border-radius:4px;margin-left:4px">직접 입력</span></span>
+    </div>
+    <div class="s2-kw-box">${esc(kwText)}</div>` : '';
+
+  const customsHtml = customs.map((c, i) => {
+    if (!c.saved){
+      return `
+        <div class="s2-custom-card">
+          <div style="display:flex;align-items:center;gap:8px">
+            <span class="s2-custom-tag">직접 추가</span>
+            <button class="btn-x-link" onclick="s2CancelCustom('${stu.id}',${i})" style="margin-left:auto">취소</button>
+          </div>
+          <textarea class="s2-custom-textarea" maxlength="100" placeholder="추가로 기록할 학생 특성을 입력해 주세요 (최대 100자)" oninput="s2UpdateCustom('${stu.id}',${i},this.value)">${esc(c.content||'')}</textarea>
+          <div style="display:flex;justify-content:flex-end;gap:8px">
+            <button onclick="s2SaveCustom('${stu.id}',${i})" style="padding:7px 16px;border:none;border-radius:6px;background:#365eef;color:#fff;font-size:13px;font-weight:600;font-family:inherit;cursor:pointer;line-height:1">저장</button>
+          </div>
+        </div>`;
+    }
+    return `
+      <div class="s2-custom-card" style="background:#fffaeb;border-color:#fcd34d">
+        <div style="display:flex;align-items:center;gap:8px">
+          <span class="s2-custom-tag">직접 추가</span>
+          <span style="font-size:12px;color:#15803d;font-weight:600;display:inline-flex;align-items:center;gap:3px"><i data-lucide="check-circle" style="width:13px;height:13px"></i> 기록에 반영됨</span>
+          <div style="margin-left:auto;display:flex;gap:8px">
+            <button class="btn-x-link" onclick="s2EditCustom('${stu.id}',${i})">수정</button>
+            <button class="btn-x-link" onclick="s2RemoveCustom('${stu.id}',${i})">삭제</button>
+          </div>
+        </div>
+        <div style="font-size:14px;color:#222631;line-height:1.6;padding:8px 0">${esc(c.content||'')}</div>
+      </div>`;
+  }).join('');
+
+  return `
+    ${summaryHtml}
+    <div class="s2-group-hd">
+      <span class="s2-group-title">AI 분석 내용</span>
+      <span class="s2-group-cnt">${items.length}개 (추천 ${recItems.length})</span>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:8px">${itemsHtml}</div>
+    ${kwBox}
+    <div class="s2-group-hd">
+      <span class="s2-group-title">직접 추가</span>
+    </div>
+    ${customsHtml}
+    ${customs.length === 0 ? `<button class="s2-add-btn" onclick="s2AddCustom('${stu.id}')"><i data-lucide="plus" style="width:16px;height:16px"></i> 직접 추가</button>` : ''}
+    <div style="display:flex;align-items:center;justify-content:flex-end;margin-top:16px;padding-top:12px;border-top:1px solid #f1f3f5">
+      <button class="btn-primary-lg" onclick="s2NextStudent()">저장 후 다음 학생 <i data-lucide="chevron-right" style="width:16px;height:16px"></i></button>
+    </div>`;
+}
+
+// 아이템 / 커스텀 액션
+function s2ToggleItem(sid, itemId){
+  const st = inputState[sid]; if (!st || !st.analysisChecked) return;
+  if (st.analysisChecked.has(itemId)) st.analysisChecked.delete(itemId);
+  else st.analysisChecked.add(itemId);
+  s2RenderMain();
+}
+function s2AddCustom(sid){
+  const st = inputState[sid]; if (!st) return;
+  if (!st.analysisCustoms) st.analysisCustoms = [];
+  st.analysisCustoms.push({ content: '', saved: false });
+  s2RenderMain();
+}
+function s2UpdateCustom(sid, idx, val){
+  const st = inputState[sid]; if (!st || !st.analysisCustoms || !st.analysisCustoms[idx]) return;
+  st.analysisCustoms[idx].content = val;
+}
+function s2SaveCustom(sid, idx){
+  const st = inputState[sid]; if (!st || !st.analysisCustoms || !st.analysisCustoms[idx]) return;
+  if (!(st.analysisCustoms[idx].content || '').trim()){ showToast('내용을 입력해 주세요'); return; }
+  st.analysisCustoms[idx].saved = true;
+  s2RenderMain();
+}
+function s2CancelCustom(sid, idx){
+  const st = inputState[sid]; if (!st || !st.analysisCustoms) return;
+  st.analysisCustoms.splice(idx, 1);
+  s2RenderMain();
+}
+function s2EditCustom(sid, idx){
+  const st = inputState[sid]; if (!st || !st.analysisCustoms || !st.analysisCustoms[idx]) return;
+  st.analysisCustoms[idx].saved = false;
+  s2RenderMain();
+}
+function s2RemoveCustom(sid, idx){
+  const st = inputState[sid]; if (!st || !st.analysisCustoms) return;
+  st.analysisCustoms.splice(idx, 1);
+  s2RenderMain();
+}
+
+function s2RunAll(){ openAnalyzeModal(); }
+
+// ── 전체 AI 분석 모달 ──
+let anaSelected = new Set();
+function openAnalyzeModal(){
+  const all = s2AllStudents();
+  const someDone = all.some(s => s2GetStatus(s.id) === 'done');
+  document.getElementById('anaModalTitle').textContent = someDone ? '전체 AI 재분석' : '전체 AI 분석';
+  // 기본 선택: 분석 가능한 학생 전체 (이미 완료된 학생도 포함 — 재분석 가능)
+  anaSelected = new Set(all.filter(s => s2GetStatus(s.id) !== 'none').map(s => s.id));
+  renderAnaList();
+  document.getElementById('modal-analyze').classList.add('show');
+  lucide.createIcons();
+}
+function closeAnalyzeModal(){
+  document.getElementById('modal-analyze').classList.remove('show');
+}
+function renderAnaList(){
+  const all = s2AllStudents();
+  const eligible = all.filter(s => s2GetStatus(s.id) !== 'none');
+  const list = document.getElementById('anaPickList');
+  list.innerHTML = all.map(s => {
+    const status = s2GetStatus(s.id);
+    const disabled = status === 'none';
+    const checked = anaSelected.has(s.id);
+    let tag;
+    if (status === 'none') tag = `<span class="stu-pick-tag disabled">자료 없음</span>`;
+    else if (status === 'done') tag = `<span class="stu-pick-tag analyzed">분석 완료</span>`;
+    else tag = `<span class="stu-pick-tag exists">자료 있음</span>`;
+    return `
+      <label class="stu-pick-row ${disabled ? 'disabled' : ''}" ${disabled ? '' : `onclick="toggleAnaPick('${s.id}', event)"`}>
+        <input type="checkbox" ${disabled ? 'disabled' : ''} ${checked ? 'checked' : ''} onchange="event.stopPropagation();toggleAnaPick('${s.id}')">
+        <span class="stu-pick-sid">${s.id}</span>
+        <span class="stu-pick-name">${s.name}</span>
+        ${tag}
+      </label>`;
+  }).join('');
+  // 진행률 / 크레딧 갱신
+  document.getElementById('anaPickCount').textContent = `${anaSelected.size} / ${eligible.length}명`;
+  document.getElementById('anaCreditCount').textContent = anaSelected.size;
+  document.getElementById('anaConfirmBtn').disabled = anaSelected.size === 0;
+  // master checkbox 동기화
+  const master = document.getElementById('anaPickAll');
+  master.checked = eligible.length > 0 && anaSelected.size === eligible.length;
+  master.indeterminate = anaSelected.size > 0 && anaSelected.size < eligible.length;
+}
+function toggleAllAnaPick(checked){
+  const all = s2AllStudents();
+  const eligible = all.filter(s => s2GetStatus(s.id) !== 'none');
+  anaSelected = new Set(checked ? eligible.map(s => s.id) : []);
+  renderAnaList();
+}
+function toggleAnaPick(sid, e){
+  if (e && e.target && e.target.tagName === 'INPUT') {} else if (e) { e.preventDefault(); }
+  if (anaSelected.has(sid)) anaSelected.delete(sid);
+  else anaSelected.add(sid);
+  renderAnaList();
+}
+function confirmAnalyze(){
+  const ids = [...anaSelected];
+  if (ids.length === 0) return;
+  closeAnalyzeModal();
+  showToast(`${ids.length}명 일괄 분석을 시작했어요`);
+  ids.forEach(id => {
+    const st = inputState[id]; if (!st) return;
+    st.analysisStatus = 'analyzing';
+  });
+  s2RenderSidebar(); s2RenderMain();
+  setTimeout(() => {
+    ids.forEach(id => {
+      const st = inputState[id]; if (!st) return;
+      const stu = s2AllStudents().find(x => x.id === id);
+      const result = s2GenerateDummyResult(stu);
+      st.analysisStatus = 'done';
+      st.analysisSummary = result.summary;
+      st.analysisItems = result.items;
+      st.analysisChecked = new Set(result.items.filter(it => it.recommended).map(it => it.id));
+      st.analysisCustoms = st.analysisCustoms || [];
+    });
+    s2RenderSidebar(); s2RenderMain(); s2UpdateProgress();
+    showToast(`${ids.length}명 분석이 완료됐어요`);
+  }, 2000);
+}
+
+function s2NextStudent(){
+  const cls = document.getElementById('s2-classSel').value || Object.keys(STUDENT_BANK)[0];
+  const students = STUDENT_BANK[cls] || [];
+  const idx = students.findIndex(s => s.id === s2CurrentId);
+  if (idx >= 0 && idx < students.length - 1) s2SelectStudent(students[idx + 1].id);
+  else showToast('이 반의 마지막 학생이에요');
+}
+
+function s2UpdateProgress(){
+  const all = s2AllStudents();
+  const targets = all.filter(s => s2GetStatus(s.id) !== 'none');
+  const done = targets.filter(s => s2GetStatus(s.id) === 'done').length;
+  document.getElementById('progress').textContent = `${done} / ${targets.length}명`;
+  s2UpdateSummary();
+}
+
+function s2UpdateSummary(){
+  const all = s2AllStudents();
+  const total = all.length;
+  const done = all.filter(s => s2GetStatus(s.id) === 'done').length;
+  const none = all.filter(s => s2GetStatus(s.id) === 'none').length;
+  const el = document.getElementById('s2SummarySub');
+  if (el) el.innerHTML = `전체 <span class="hi">${total}명</span> · 분석 완료 <span class="hi">${done}명</span> · 자료 없음 <span class="hi">${none}명</span>`;
+}
+
+// ────── STEP 3: AI 기록 생성 ──────
+// inputState[sid].s3Record = '생성된 기록 텍스트'
+// inputState[sid].s3Length = '250-400' 등
+let s3Selected = new Set();
+let s3Length = '250-400';
+
+function s3HasInput(sid){
+  const st = inputState[sid]; if (!st) return false;
+  if (st.analysisItems && st.analysisItems.length) return true;
+  if ((st.text || '').trim()) return true;
+  return false;
+}
+
+function s3GetGenStatus(sid){
+  const st = inputState[sid]; if (!st) return 'blocked';
+  if (!s3HasInput(sid)) return 'blocked';
+  if (st.s3Stale) return 'stale';
+  if (st.s3Record) return 'done';
+  return 'pending';
+}
+
+function s3AnalysisStatus(sid){
+  const st = inputState[sid];
+  if (!st || !st.file) return 'no-data';
+  const a = st.analysisStatus;
+  if (a === 'done') return 'done-ana';
+  return 'need-ana';
+}
+
+function s3Render(){
+  s3RenderStudentList();
+  s3UpdateSummary();
+  s3UpdateRegenVisibility();
+}
+
+function s3RenderStudentList(){
+  const all = s2AllStudents();
+  // 초기 선택: 생성 가능한 학생 전체 (한 번만)
+  if (s3Selected.size === 0){
+    all.forEach(s => { if (s3GetGenStatus(s.id) !== 'blocked') s3Selected.add(s.id); });
+  }
+  const eligible = all.filter(s => s3GetGenStatus(s.id) !== 'blocked');
+  const list = document.getElementById('s3StuList');
+  list.innerHTML = all.map(s => {
+    const gen = s3GetGenStatus(s.id);
+    const ana = s3AnalysisStatus(s.id);
+    const hasInput = s3HasInput(s.id);
+    const disabled = gen === 'blocked';
+    const checked = s3Selected.has(s.id);
+    const inputCls = hasInput ? 'input-yes' : 'input-no';
+    const inputLabel = hasInput ? '입력 완료' : '입력 없음';
+    const anaLabel = { 'done-ana':'분석 완료', 'need-ana':'분석 필요', 'no-data':'자료 없음' }[ana];
+    let genLabel, genCls;
+    if (gen === 'blocked'){ genLabel = '생성 불가'; genCls = 'gen-blocked'; }
+    else if (gen === 'stale'){ genLabel = '재생성 필요'; genCls = 'gen-stale'; }
+    else if (gen === 'done'){ genLabel = '생성 완료'; genCls = 'gen-done'; }
+    else { genLabel = '미생성'; genCls = 'gen-pending'; }
+    return `
+      <label class="s3-stu-row ${disabled ? 'disabled' : ''}">
+        <input type="checkbox" ${disabled ? 'disabled' : ''} ${checked ? 'checked' : ''} onchange="s3TogglePick('${s.id}', this.checked)">
+        <span class="sid">${s.id}</span>
+        <span class="name">${s.name}</span>
+        <span><span class="s3-pill ${inputCls}">${inputLabel}</span></span>
+        <span><span class="s3-pill ${ana}">${anaLabel}</span></span>
+        <span><span class="s3-pill ${genCls}">${genLabel}</span></span>
+      </label>`;
+  }).join('');
+  // 카운트
+  document.getElementById('s3StuPickCount').textContent = `${[...s3Selected].filter(id => s3GetGenStatus(id) !== 'blocked').length} / ${eligible.length}명`;
+  // 마스터 체크박스
+  const master = document.getElementById('s3PickAll');
+  const selCount = [...s3Selected].filter(id => s3GetGenStatus(id) !== 'blocked').length;
+  master.checked = eligible.length > 0 && selCount === eligible.length;
+  master.indeterminate = selCount > 0 && selCount < eligible.length;
+  // 분석 필요 학생 있으면 경고 박스
+  const needAnaCount = all.filter(s => s3AnalysisStatus(s.id) === 'need-ana').length;
+  document.getElementById('s3WarnBox').style.display = needAnaCount > 0 ? '' : 'none';
+  // sticky 푸터 크레딧 갱신
+  s3UpdateCtaCredit();
+  lucide.createIcons();
+}
+
+function s3ToggleAll(checked){
+  const all = s2AllStudents();
+  const eligible = all.filter(s => s3GetGenStatus(s.id) !== 'blocked');
+  s3Selected = new Set(checked ? eligible.map(s => s.id) : []);
+  s3RenderStudentList();
+  s3UpdateSummary();
+}
+function s3TogglePick(sid, checked){
+  if (checked) s3Selected.add(sid); else s3Selected.delete(sid);
+  s3RenderStudentList();
+  s3UpdateSummary();
+}
+function s3SetLen(len){
+  s3Length = len;
+  document.querySelectorAll('#s3LenList .s3-len-row').forEach(r => r.classList.toggle('selected', r.dataset.len === len));
+}
+
+function s3ToggleBl(el){
+  el.classList.toggle('on');
+  document.getElementById('s3BlWrap').classList.toggle('show', el.classList.contains('on'));
+}
+function s3UpdateBlCount(){
+  const v = document.getElementById('s3BlInput').value.trim();
+  const words = v ? v.split(',').map(s => s.trim()).filter(Boolean) : [];
+  document.getElementById('s3BlCount').textContent = `(${words.length}개/50개)`;
+}
+function s3UpdateRegenCount(){
+  const v = document.getElementById('s3RegenTextarea').value;
+  document.getElementById('s3RegenCount').textContent = v.length;
+}
+function s3UpdateRegenVisibility(){
+  const anyDone = [...s3Selected].some(id => s3GetGenStatus(id) === 'done' || s3GetGenStatus(id) === 'stale');
+  document.getElementById('s3RegenCard').style.display = anyDone ? '' : 'none';
+}
+
+function s3UpdateSummary(){
+  const all = s2AllStudents();
+  const total = all.length;
+  const done = all.filter(s => s3GetGenStatus(s.id) === 'done').length;
+  const pending = all.filter(s => {
+    const g = s3GetGenStatus(s.id);
+    return g === 'pending' || g === 'stale';
+  }).length;
+  const el = document.getElementById('s3SummarySub');
+  if (el) el.innerHTML = `전체 <span class="hi">${total}명</span> · 생성 완료 <span class="hi">${done}명</span> · 대기 <span class="hi">${pending}명</span>`;
+  s3UpdateRegenVisibility();
+}
+
+function s3UpdateCtaCredit(){
+  const credit = [...s3Selected].filter(id => s3GetGenStatus(id) !== 'blocked').length;
+  const span = document.getElementById('s3GenCredit');
+  if (span) span.textContent = credit;
+  const nextBtn = document.querySelector('.btn-next');
+  if (nextBtn && currentStep === 3) nextBtn.disabled = credit === 0;
+}
+
+function s3Generate(){
+  const targets = [...s3Selected].filter(id => s3GetGenStatus(id) !== 'blocked');
+  if (targets.length === 0){ showToast('생성할 학생을 선택해 주세요'); return; }
+  // 오버레이
+  document.getElementById('s3GenCount').textContent = targets.length;
+  document.getElementById('s3GenOverlay').classList.add('show');
+  lucide.createIcons();
+  setTimeout(() => {
+    targets.forEach(id => {
+      const st = inputState[id]; if (!st) return;
+      const stu = s2AllStudents().find(x => x.id === id);
+      st.s3Record = s3GenerateDummyRecord(stu, st);
+      st.s3Length = s3Length;
+      st.s3Stale = false;
+    });
+    document.getElementById('s3GenOverlay').classList.remove('show');
+    showToast(`${targets.length}명 기록 생성을 완료했어요`);
+    // 생성 완료 → 4단계로 자동 이동
+    setTimeout(() => goStep(4), 300);
+  }, 2200);
+}
+
+function s3GenerateDummyRecord(stu, st){
+  return `${stu.name} 학생은 학습 활동 전반에서 적극적인 탐구 태도와 협업 능력을 두드러지게 보임. 가설을 명확히 설정하고 자료를 표와 그래프로 정리하여 핵심 변수와 추세를 한눈에 드러냈으며, 학습 내용을 실생활 사례에 적용하여 깊이 있는 이해를 보여줌. 모둠 활동에서는 의사소통을 주도하며 팀원의 의견을 적극 수용하는 모습이 인상적이었음.`;
+}
+
+// ────── STEP 4: 기록 확인 및 수정 ──────
+function s4Byte(s){
+  s = s || ''; let n = 0;
+  for (let i = 0; i < s.length; i++){ n += s.charCodeAt(i) > 127 ? 3 : 1; }
+  return n;
+}
+
+function s4Render(){
+  const all = s2AllStudents();
+  document.getElementById('s4Count').textContent = all.length;
+  document.getElementById('s4Rows').innerHTML = all.map(s => s4RenderRow(s)).join('');
+  lucide.createIcons();
+}
+
+function s4RenderRow(s){
+  const st = inputState[s.id] || {};
+  const aiText = st.s3Record || '';
+  const editText = st.s4Edit || '';
+  const aiChars = aiText.replace(/\s/g, '').length;
+  const aiBytes = s4Byte(aiText);
+  const editBytes = s4Byte(editText);
+  const overLimit = editBytes > 1500;
+
+  let aiCell;
+  if (aiText){
+    aiCell = `
+      <div class="s4-ai-box">
+        <div class="s4-text">${aiText}</div>
+        <div class="s4-cell-foot">
+          <span class="s4-byte">${aiChars}자 (${aiBytes}Byte)</span>
+          <div class="s4-cell-actions">
+            <button class="s4-regen-btn" onclick="s4OpenDrawer('${s.id}', 'regen')"><i data-lucide="sparkles" style="width:12px;height:12px"></i> 다시 생성</button>
+            <button class="s4-mini-btn" onclick="s4Copy('${s.id}')"><i data-lucide="copy" style="width:12px;height:12px"></i> 복사</button>
+          </div>
+        </div>
+      </div>`;
+  } else {
+    const hasInput = s3HasInput(s.id);
+    const emptyMsg = hasInput
+      ? '아직 생성된 기록이 없어요. 3단계에서 일괄 생성하거나 우측 버튼으로 개별 생성할 수 있어요.'
+      : '자료·학생 특성이 없어 기록을 생성할 수 없어요. 1단계에서 입력해 주세요.';
+    aiCell = `
+      <div class="s4-ai-box">
+        <div class="s4-text empty">${emptyMsg}</div>
+        <div class="s4-cell-foot">
+          <span class="s4-byte">0 Byte</span>
+          ${hasInput
+            ? `<button class="s4-regen-btn" onclick="s4OpenDrawer('${s.id}','gen')"><i data-lucide="sparkles" style="width:12px;height:12px"></i> 기록 생성</button>`
+            : `<a href="#" onclick="event.preventDefault();goStep(1)" style="font-size:12px;color:#416bff;text-decoration:underline;font-weight:500;cursor:pointer">1단계로 →</a>`
+          }
+        </div>
+      </div>`;
+  }
+
+  const editCell = `
+    <div class="s4-edit-box">
+      <textarea class="s4-textarea" placeholder="${aiText ? '왼쪽 [가져오기]로 AI 기록을 옮겨와 다듬을 수 있어요' : '직접 작성하거나, AI 기록 생성 후 [가져오기]로 옮겨와 수정해 보세요.'}" oninput="s4UpdateEdit('${s.id}', this.value, this)">${editText}</textarea>
+    </div>`;
+
+  const bytesCell = `
+    <div class="s4-bytes-cell ${overLimit?'over':''}">
+      <div class="s4-bytes-num">${editBytes.toLocaleString()}</div>
+      <div class="s4-bytes-label">/ 1,500Byte</div>
+      ${overLimit ? '<div class="s4-bytes-err">초과</div>' : ''}
+    </div>`;
+
+  return `<tr>
+    <td class="s4-col-sid s4-cell-sid">${s.id}</td>
+    <td class="s4-col-name s4-cell-name">${s.name}</td>
+    <td>${aiCell}</td>
+    <td class="s4-col-bring"><button class="s4-bring-btn" onclick="s4Bring('${s.id}')" ${aiText?'':'disabled'}><i data-lucide="arrow-right" style="width:14px;height:14px"></i><span>가져<br>오기</span></button></td>
+    <td>${editCell}</td>
+    <td class="s4-col-bytes">${bytesCell}</td>
+  </tr>`;
+}
+
+function s4UpdateEdit(sid, val, ta){
+  const st = inputState[sid] || (inputState[sid] = {});
+  st.s4Edit = val;
+  // bytes 셀만 갱신
+  const tr = ta.closest('tr');
+  if (!tr) return;
+  const bytes = s4Byte(val);
+  const cell = tr.querySelector('.s4-bytes-cell');
+  if (cell){
+    cell.classList.toggle('over', bytes > 1500);
+    cell.querySelector('.s4-bytes-num').textContent = bytes.toLocaleString();
+    let err = cell.querySelector('.s4-bytes-err');
+    if (bytes > 1500){
+      if (!err){ err = document.createElement('div'); err.className = 's4-bytes-err'; err.textContent = '초과'; cell.appendChild(err); }
+    } else if (err){ err.remove(); }
+  }
+  document.getElementById('s4Saved').textContent = '편집 중';
+}
+
+function s4Bring(sid){
+  const st = inputState[sid]; if (!st || !st.s3Record) return;
+  st.s4Edit = st.s3Record;
+  s4Render();
+  showToast('AI 기록을 옮겼어요');
+}
+
+function s4BringAll(){
+  const all = s2AllStudents();
+  const targets = all.filter(s => inputState[s.id]?.s3Record);
+  if (targets.length === 0){ showToast('옮길 AI 기록이 없어요'); return; }
+  if (!confirm(`${targets.length}명의 AI 기록을 선생님 작성 기록으로 옮길까요?\n기존 작성 기록이 있으면 덮어쓰여요.`)) return;
+  targets.forEach(s => { inputState[s.id].s4Edit = inputState[s.id].s3Record; });
+  s4Render();
+  showToast(`${targets.length}명 옮겼어요`);
+}
+
+function s4Copy(sid){
+  const st = inputState[sid]; if (!st || !st.s3Record) return;
+  if (navigator.clipboard) navigator.clipboard.writeText(st.s3Record);
+  showToast('AI 기록을 복사했어요');
+}
+
+function s4ExportExcel(){
+  showToast('엑셀 내보내기 (다음 시안)');
+}
+
+// ── 드로어 (개별 (재)생성) ──
+let s4DrawerTarget = null;
+let s4DrawerMode = 'gen';
+let s4DrawerLen = '250-400';
+
+function s4OpenDrawer(sid, mode){
+  s4DrawerTarget = sid;
+  s4DrawerMode = mode || 'gen';
+  const stu = s2AllStudents().find(s => s.id === sid);
+  document.getElementById('s4DrawerName').textContent = `${stu.id} ${stu.name} · ${mode === 'regen' ? '다시 생성' : '기록 생성'}`;
+  document.getElementById('s4DrawerSub').textContent = mode === 'regen' ? '분량·옵션·요청사항을 조정하고 다시 생성해 주세요.' : '분량과 옵션을 설정하고 생성해 주세요.';
+  document.getElementById('s4RegenSection').style.display = mode === 'regen' ? '' : 'none';
+  document.getElementById('s4RegenTextarea').value = '';
+  // 분량은 직전 값 유지
+  s4SetLen(s4DrawerLen);
+  document.getElementById('s4Drawer').classList.add('show');
+  lucide.createIcons();
+}
+function s4CloseDrawer(){
+  document.getElementById('s4Drawer').classList.remove('show');
+  s4DrawerTarget = null;
+}
+function s4SetLen(len){
+  s4DrawerLen = len;
+  document.querySelectorAll('#s4LenList .s3-len-row').forEach(r => r.classList.toggle('selected', r.dataset.len === len));
+}
+function s4ToggleBl(el){
+  el.classList.toggle('on');
+  document.getElementById('s4BlWrap').classList.toggle('show', el.classList.contains('on'));
+}
+function s4ConfirmDrawer(){
+  if (!s4DrawerTarget) return;
+  const sid = s4DrawerTarget;
+  const stu = s2AllStudents().find(s => s.id === sid);
+  const st = inputState[sid] || (inputState[sid] = {});
+  s4CloseDrawer();
+  // 진행 오버레이 잠깐 표시
+  document.getElementById('s3GenCount').textContent = 1;
+  document.getElementById('s3GenOverlay').classList.add('show');
+  lucide.createIcons();
+  setTimeout(() => {
+    st.s3Record = s3GenerateDummyRecord(stu, st);
+    document.getElementById('s3GenOverlay').classList.remove('show');
+    s4Render();
+    showToast(s4DrawerMode === 'regen' ? '기록을 다시 생성했어요' : '기록을 생성했어요');
+  }, 1800);
+}
 
 // 입력창 변경 시 키워드 태그 동기화
 document.getElementById('inputArea').addEventListener('input', syncTagsFromInput);
@@ -784,6 +2186,139 @@ document.getElementById('inputArea').addEventListener('input', syncTagsFromInput
   if(first) currentStudentId = first.id;
   renderStudents();
   if(first && typeof selectStudent === 'function') selectStudent(first.id);
+})();
+
+// ────── MOCKUP 시나리오 토글 ──────
+function setMockupScenario(s){
+  document.querySelectorAll('.mockup-toggle .mt-btn').forEach(b => b.classList.toggle('active', b.dataset.scenario === s));
+  if (s === 'empty'){
+    // 모든 학생 상태 초기화
+    inputState = {};
+    currentStudentId = null;
+    s3Selected = new Set();
+    document.getElementById('inputArea').value = '';
+    setLevel('중', true);
+    syncFileUI({});
+    syncTagsFromInput();
+    renderStudents();
+  } else {
+    // 데이터 있음: 8명에 다양한 상태 시드
+    seedMockData();
+  }
+  // 현재 단계 다시 렌더
+  if (currentStep === 1) { renderStudents(); }
+  else if (currentStep === 2) { s2RenderSidebar(); s2SelectFirst(); s2UpdateProgress(); }
+  else if (currentStep === 3) { s3Render(); }
+  else if (currentStep === 4) { s4Render(); }
+  showToast(s === 'empty' ? '빈 화면으로 초기화했어요' : '데이터를 시드했어요');
+}
+
+function seedMockData(){
+  // 1학년 1반: 김두나(완료), 김세나(기록까지), 김하나(자료+분석 안 함), 이민수(특성만), 박서연(빈)
+  // 1학년 2반: 최지호(완료), 한도윤(자료만), 윤서아(빈)
+  inputState = {
+    '10101': {
+      text: '비판적 사고, 협업, 발표 우수',
+      level: '상',
+      file: { name: '김두나_과제.pdf', meta: '1.4MB · 방금 업로드' },
+      analysisStatus: 'done',
+      analysisSummary: {
+        narrative: '김두나 학생은 실험 설계와 자료 해석 능력이 두드러지며, 모둠 활동에서 의사소통과 협업 태도가 잘 드러납니다.',
+        highlights: ['관찰 결과를 표·그래프로 정리해 핵심 변수와 추세를 명확히 제시', '실생활 사례에 개념을 적용해 깊이 있는 이해를 보임', '모둠 토의를 주도하며 팀원의 의견을 적극 수용']
+      },
+      analysisItems: [
+        { id:'r1', category:'과정·기능', competency:'탐구', recommended:true, source:'김두나_과제.pdf · 2.1 가설', rationale:'가설 설정 단계에서 변수와 가설의 인과관계를 명확히 기술함.', content:'주제에 대한 가설을 명확히 설정하고 변수 간 인과관계를 논리적으로 정리해 탐구의 방향을 분명히 함.' },
+        { id:'r2', category:'과정·기능', competency:'자료 해석', recommended:true, source:'김두나_과제.pdf · 3. 결과', rationale:'표·그래프 활용도가 높고 추세 해석이 정확함.', content:'관찰 결과를 표와 그래프로 정리해 핵심 변수와 추세를 한눈에 드러내고, 데이터에서 의미를 추출함.' },
+        { id:'r3', category:'지식·이해', competency:'개념 적용', recommended:true, source:'김두나_과제.pdf · 4. 고찰', rationale:'학습 개념을 실제 사례와 연결한 점이 돋보임.', content:'실생활 사례를 들어 개념 적용을 시도하며 학습 내용을 깊이 있게 이해함.' },
+        { id:'c1', category:'가치·태도', competency:'협업', recommended:false, source:'김두나_과제.pdf · 5. 활동 후기', rationale:'모둠 활동 후기에서 의사소통 사례 확인.', content:'모둠 활동에서 의사소통을 주도하며 팀원의 의견을 적극 수용함.' }
+      ],
+      analysisChecked: new Set(['r1','r2','r3']),
+      analysisCustoms: [],
+      s3Record: '김두나 학생은 가설 설정 단계에서 변수 간 인과관계를 명확히 기술하고, 관찰 결과를 표와 그래프로 정리해 핵심 변수와 추세를 한눈에 드러냄. 학습 내용을 실생활 사례에 적용해 깊이 있는 이해를 보이며, 모둠 활동에서는 의사소통을 주도하며 팀원의 의견을 적극 수용하는 태도가 인상적임.',
+      s3Length: '250-400'
+    },
+    '10102': {
+      text: '꼼꼼한 자료 정리, 차분한 토론 참여',
+      level: '중',
+      file: { name: '김세나_보고서.pdf', meta: '980KB · 방금 업로드' },
+      analysisStatus: 'done',
+      analysisSummary: {
+        narrative: '김세나 학생은 자료 정리와 논리적 사고가 강점이며 차분한 토론 자세가 돋보입니다.',
+        highlights: ['보고서 구조를 체계적으로 잡고 출처를 명확히 표기', '핵심 개념을 자기 언어로 재정의']
+      },
+      analysisItems: [
+        { id:'r1', category:'과정·기능', competency:'기록', recommended:true, source:'김세나_보고서.pdf · 2. 자료', rationale:'자료 인용·정리가 체계적.', content:'보고서 구조를 체계적으로 잡고 출처를 명확히 표기해 신뢰도 높은 자료 정리 능력을 보임.' },
+        { id:'r2', category:'지식·이해', competency:'개념 정리', recommended:true, source:'김세나_보고서.pdf · 3. 분석', rationale:'개념의 재정의가 정확함.', content:'핵심 개념을 자기 언어로 재정의하며 깊이 있는 이해를 보여줌.' }
+      ],
+      analysisChecked: new Set(['r1','r2']),
+      analysisCustoms: [],
+      s3Record: '김세나 학생은 보고서 구조를 체계적으로 잡고 출처를 명확히 표기해 신뢰도 높은 자료 정리 능력을 보였으며, 핵심 개념을 자기 언어로 재정의하며 깊이 있는 이해를 드러냄. 토론 활동에서는 차분하지만 정확한 의견 제시로 모둠의 논의 방향을 정리하는 데 기여함.',
+      s3Length: '250-400'
+    },
+    '10103': {
+      text: '관찰력 우수',
+      level: '중',
+      file: { name: '김하나_과제.pdf', meta: '1.1MB · 방금 업로드' },
+      analysisStatus: 'pending'  // 자료 있는데 분석 안 함
+    },
+    '10104': {
+      text: '발표 적극적, 자료 조사 우수',
+      level: '중',
+      file: null
+    },
+    '10105': { text: '', level: '중', file: null },
+    '10201': {
+      text: '시민 참여 사례 인터뷰 진행',
+      level: '상',
+      file: { name: '최지호_인터뷰.pdf', meta: '1.8MB · 방금 업로드' },
+      analysisStatus: 'done',
+      analysisSummary: {
+        narrative: '최지호 학생은 실생활 사례를 인터뷰로 직접 확보하고 분석하는 추진력이 돋보입니다.',
+        highlights: ['1차 자료를 직접 수집·분석', '사회 현상의 원인을 다각도로 해석']
+      },
+      analysisItems: [
+        { id:'r1', category:'과정·기능', competency:'자료 수집', recommended:true, source:'최지호_인터뷰.pdf · 1. 조사', rationale:'1차 자료 수집의 진정성·체계성이 높음.', content:'시민 참여 사례를 직접 인터뷰로 확보하고 핵심 의견을 정리해 1차 자료의 신뢰성을 확보함.' },
+        { id:'r2', category:'지식·이해', competency:'사회 현상 이해', recommended:true, source:'최지호_인터뷰.pdf · 3. 고찰', rationale:'다각도 해석이 인상적.', content:'사회 현상의 원인을 다각도로 해석하며 학습 개념을 실제 사례에 연결함.' }
+      ],
+      analysisChecked: new Set(['r1','r2']),
+      analysisCustoms: [],
+      s3Record: '최지호 학생은 시민 참여 사례를 직접 인터뷰로 확보하고 핵심 의견을 정리해 1차 자료의 신뢰성을 확보하였으며, 사회 현상의 원인을 다각도로 해석하면서 학습 개념을 실제 사례에 연결하는 능력을 보임. 추진력 있는 조사 자세와 차분한 해석이 돋보임.',
+      s3Length: '250-400'
+    },
+    '10202': {
+      text: '',
+      level: '중',
+      file: { name: '한도윤_보고서.pdf', meta: '760KB · 방금 업로드' },
+      analysisStatus: 'pending'
+    },
+    '10203': { text: '', level: '중', file: null }
+  };
+  currentStudentId = '10101';
+  // s3Selected 리셋 — 시나리오 진입 시 재계산되도록
+  s3Selected = new Set();
+}
+
+// MOCKUP 토글 드래그
+(function(){
+  var bar = document.querySelector('.mockup-toggle'); if (!bar) return;
+  var d=false, sx=0, sy=0, sl=0, st=0;
+  bar.addEventListener('mousedown', function(e){
+    if (e.target.closest('button')) return;
+    var r = bar.getBoundingClientRect();
+    sl=r.left; st=r.top; sx=e.clientX; sy=e.clientY; d=true;
+    bar.style.right='auto'; bar.style.bottom='auto';
+    bar.style.left=sl+'px'; bar.style.top=st+'px';
+    bar.classList.add('dragging'); e.preventDefault();
+  });
+  document.addEventListener('mousemove', function(e){
+    if(!d) return;
+    var nx=sl+(e.clientX-sx), ny=st+(e.clientY-sy);
+    var r=bar.getBoundingClientRect();
+    nx=Math.max(4, Math.min(innerWidth-r.width-4, nx));
+    ny=Math.max(4, Math.min(innerHeight-r.height-4, ny));
+    bar.style.left=nx+'px'; bar.style.top=ny+'px';
+  });
+  document.addEventListener('mouseup', function(){ if(d){d=false; bar.classList.remove('dragging');} });
 })();
 
 let _toastTimer = null;
