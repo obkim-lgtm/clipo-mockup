@@ -495,7 +495,44 @@ body.nav-expanded .sticky-cta { left: 200px; }
 .s4-table tbody tr:last-child td { border-bottom: none; }
 .s4-table th:first-child, .s4-table td:first-child { padding-left: 20px; }
 .s4-table th:last-child, .s4-table td:last-child { padding-right: 20px; }
+.s4-col-sel { width: 44px; }
 .s4-col-sid { width: 80px; }
+.s4-cb { width: 18px; height: 18px; border-radius: 3px; border: 1.5px solid #c7cbd3; background: #fff; display: inline-flex; align-items: center; justify-content: center; cursor: pointer; color: transparent; transition: all .12s; vertical-align: middle; }
+.s4-cb:hover { border-color: #416bff; }
+.s4-cb.checked { background: #365eef; border-color: #365eef; color: #fff; }
+.s4-cb.disabled { background: #f6f7f9; border-color: #e5e7eb; cursor: not-allowed; }
+.s4-cb.disabled:hover { border-color: #e5e7eb; }
+.s4-cb input { display: none; }
+
+/* 일괄 재생성·다듬기 액션바 — 상시 노출 (AI 기록 ≥1개 있을 때) */
+.s4-bulk-bar { display: none; align-items: center; gap: 12px; padding: 12px 20px; background: linear-gradient(90deg, #f4f8ff 0%, #e9f2ff 100%); border-bottom: 1px solid #d6e3ff; transition: background .2s; }
+.s4-bulk-bar.show { display: flex; }
+.s4-bulk-bar.has-sel { background: linear-gradient(90deg, #e9f2ff 0%, #d6e3ff 100%); }
+.s4-bulk-count { font-size: 14px; font-weight: 600; color: #365eef; display: inline-flex; align-items: center; gap: 6px; }
+.s4-bulk-count i { color: #365eef; }
+.s4-bulk-hint { font-size: 13px; color: #6d7381; line-height: 1.4; }
+.s4-bulk-bar.has-sel .s4-bulk-hint { display: none; }
+.s4-bulk-spacer { flex: 1; }
+.s4-bulk-clear { background: none; border: none; color: #6d7381; font-size: 13px; cursor: pointer; padding: 6px 8px; font-family: inherit; line-height: 1; text-decoration: underline; text-underline-offset: 2px; }
+.s4-bulk-clear:hover { color: #3b3f4c; }
+.s4-bulk-refine { display: inline-flex; align-items: center; justify-content: center; gap: 5px; padding: 0 16px; height: 36px; border: none; border-radius: 6px; background: #365eef; color: #fff; font-size: 13px; font-weight: 600; cursor: pointer; font-family: inherit; line-height: 1; }
+.s4-bulk-refine:hover { background: #2940be; }
+.s4-bulk-refine:disabled { background: #c7cbd3; cursor: not-allowed; }
+
+/* 기록 다듬기 모달 — 수정 방향 카드 (일반 톤) */
+.s3-refine-card { background: #fff; border: 1px solid #e5e7eb; border-radius: 10px; padding: 18px 20px; }
+.s3-refine-textarea { width: 100%; min-height: 96px; padding: 12px 14px; font-size: 14px; font-family: inherit; line-height: 1.6; border: 1px solid #d9d9d9; border-radius: 8px; resize: vertical; color: #222631; background: #fff; }
+.s3-refine-textarea:focus { outline: none; border-color: #416bff; }
+.s3-refine-required { display: inline-flex; align-items: center; gap: 3px; font-size: 12px; font-weight: 600; color: #6d7381; background: #f1f3f5; border: 1px solid #e5e7eb; padding: 2px 8px; border-radius: 4px; margin-left: 8px; vertical-align: middle; line-height: 1.3; }
+.s3-prompt-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+.s3-prompt-chip { display: inline-flex; align-items: center; gap: 4px; padding: 6px 12px; background: #fff; border: 1px solid #d9d9d9; border-radius: 16px; font-size: 13px; color: #3b3f4c; font-weight: 500; cursor: pointer; font-family: inherit; line-height: 1.4; }
+.s3-prompt-chip:hover { background: #f4f8ff; border-color: #c7d6ff; color: #365eef; }
+.s3-prompt-chip i { color: #6d7381; }
+.s3-prompt-chip:hover i { color: #365eef; }
+.s3-refine-pickbox { background: #fff; border: 1px solid #e5e7eb; border-radius: 8px; padding: 8px; display: flex; flex-direction: column; gap: 2px; max-height: 280px; overflow-y: auto; }
+.s3-refine-pickitem { display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: 6px; cursor: pointer; }
+.s3-refine-pickitem:hover { background: #f6f7f9; }
+.s3-refine-pickname { font-size: 14px; font-weight: 500; color: #222631; }
 .s4-col-name { width: 110px; }
 .s4-col-bring { width: 64px; padding: 0 !important; vertical-align: middle !important; }
 .s4-col-bytes { width: 110px; vertical-align: middle !important; }
@@ -548,7 +585,9 @@ body.nav-expanded .sticky-cta { left: 200px; }
 .drawer-section-sub { font-size: 13px; color: #6d7381; line-height: 1.55; margin: -6px 0 10px; }
 
 /* ────── AI 기록 생성 모달 (full-width) ────── */
-.gen-modal-bg { display: none; position: fixed; inset: 0; background: rgba(34,38,49,.45); z-index: 500; align-items: flex-start; justify-content: center; padding: 32px 24px; overflow-y: auto; }
+.gen-modal-bg { display: none; position: fixed; inset: 0; background: rgba(34,38,49,.45); z-index: 500; align-items: center; justify-content: center; padding: 32px 24px; overflow-y: auto; }
+.gen-modal { max-height: calc(100vh - 64px); }
+.gen-modal .s3-page { overflow-y: auto; }
 .gen-modal-bg.show { display: flex; }
 .gen-modal { background: #fff; border-radius: 16px; width: 100%; max-width: 1080px; display: flex; flex-direction: column; box-shadow: 0 12px 40px rgba(0,0,0,.18); overflow: hidden; }
 .gen-modal-hd { padding: 22px 28px; border-bottom: 1px solid #f1f3f5; display: flex; align-items: flex-start; gap: 12px; }
@@ -968,12 +1007,66 @@ body.nav-expanded .sticky-cta { left: 200px; }
   </div>
   <!-- /genModal -->
 
+  <!-- ============ 기록 다듬기 / 다시 생성 모달 (full-width) ============ -->
+  <div class="gen-modal-bg" id="refineModal" onclick="if(event.target===this)s4CloseRefineModal()">
+    <div class="gen-modal">
+      <div class="gen-modal-hd">
+        <div>
+          <div class="gen-modal-title">기록 다듬기</div>
+          <div class="gen-modal-sub" id="s4RefineSub">선택한 학생 기록을 다듬어요. 수정 방향을 자유롭게 입력하세요.</div>
+        </div>
+        <button class="modal-x" onclick="s4CloseRefineModal()"><i data-lucide="x" style="width:18px;height:18px"></i></button>
+      </div>
+
+      <div class="s3-page">
+
+        <!-- 안내 -->
+        <div class="s3-info-box">
+          <i data-lucide="info" style="width:14px;height:14px"></i>
+          <div>다듬기는 <strong>학생당 1 크레딧</strong>이 사용돼요. 기존 <strong>AI 생성 기록</strong>은 새 기록으로 교체되며 되돌릴 수 없어요. (선생님 작성 기록은 영향 없음)</div>
+        </div>
+
+        <!-- 1. 수정 방향 (선택, prominent) -->
+        <div class="s3-refine-card">
+          <div class="s3-card-title">수정 방향 <span class="s3-refine-required">선택</span></div>
+          <div class="s3-card-sub">분량·표현·강조점 등 무엇이든 자유롭게 적어주세요. <strong>비워두면 이전 생성 조건(분량·표현 정책 등) 그대로 다시 생성</strong>돼요. 모든 선택 학생에 동일 적용.</div>
+          <textarea class="s3-refine-textarea" id="s4RefineDir" maxlength="300" placeholder="예) 협업·리더십을 더 강조해 주세요. / 300자 이내로 줄여 주세요. / 사례 1~2개 추가해 주세요." oninput="s4UpdateRefineUI()"></textarea>
+          <div style="font-size:12px;color:#92400e;text-align:right;margin-top:4px"><span id="s4RefineCount">0</span> / 300</div>
+          <div class="s3-prompt-chips">
+            <span class="s3-prompt-chip" onclick="s4ApplyPrompt('분량을 조금 더 늘리고, 학생의 구체적인 활동 사례를 1~2개 추가해 주세요.')"><i data-lucide="plus" style="width:11px;height:11px"></i> 분량 늘리기 + 사례 추가</span>
+            <span class="s3-prompt-chip" onclick="s4ApplyPrompt('협업·리더십·의사소통 등 가치·태도 측면을 더 강조해 주세요.')"><i data-lucide="users" style="width:11px;height:11px"></i> 협업·태도 강조</span>
+            <span class="s3-prompt-chip" onclick="s4ApplyPrompt('탐구 과정과 사고력이 드러나도록 학생이 어떤 과정을 거쳤는지 더 구체화해 주세요.')"><i data-lucide="search" style="width:11px;height:11px"></i> 탐구 과정 구체화</span>
+            <span class="s3-prompt-chip" onclick="s4ApplyPrompt('지식·이해 측면 중심으로, 개념 적용 사례를 더 명시적으로 작성해 주세요.')"><i data-lucide="book" style="width:11px;height:11px"></i> 개념 적용 강조</span>
+            <span class="s3-prompt-chip" onclick="s4ApplyPrompt('학교생활기록부 작성 지침에 맞춰 문장을 더 간결하고 객관적으로 다듬어 주세요.')"><i data-lucide="edit-3" style="width:11px;height:11px"></i> 문장 간결화</span>
+          </div>
+        </div>
+
+        <!-- 2. 대상 학생 (체크 가능, bulk 모드에서만 노출) -->
+        <div class="s3-card" id="s4RefinePickWrap">
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:4px">
+            <div class="s3-card-title" style="margin-bottom:0">다듬을 학생 <span id="s4RefinePickCnt" style="font-size:13px;color:#6d7381;font-weight:500">(0명)</span></div>
+            <button onclick="s4ToggleRefinePickAll()" style="background:none;border:none;color:#365eef;font-size:13px;font-weight:500;cursor:pointer;font-family:inherit;text-decoration:underline;text-underline-offset:2px;padding:4px 6px;line-height:1" id="s4RefinePickAllBtn">전체 선택</button>
+          </div>
+          <div class="s3-card-sub">개별 학생을 추가/제외할 수 있어요. 다듬기는 기존 기록이 있는 학생만 가능해요.</div>
+          <div class="s3-refine-pickbox" id="s4RefinePickList"></div>
+        </div>
+
+      </div>
+
+      <div class="gen-modal-ft">
+        <button class="btn-secondary" onclick="s4CloseRefineModal()">취소</button>
+        <button class="btn-primary" id="s4RefineBtn" onclick="s4Refine()" disabled><i data-lucide="wand-2" style="width:14px;height:14px"></i> <span id="s4RefineBtnLabel">다듬기</span> · <span id="s4RefineCredit">0</span> 크레딧</button>
+      </div>
+    </div>
+  </div>
+  <!-- /refineModal -->
+
   <!-- ============ STEP 3: 기록 확인 및 수정 ============ -->
   <div id="step-3-panel" style="display:none">
     <div class="s4-card">
       <div class="s4-header">
         <div class="s4-title">반</div>
-        <select class="field-select" id="s4-classSel" onchange="s4Render()" style="height:36px;font-size:14px;width:auto;min-width:160px;margin-bottom:0;padding:0 36px 0 12px"></select>
+        <select class="field-select" id="s4-classSel" onchange="s4OnClassChange()" style="height:36px;font-size:14px;width:auto;min-width:160px;margin-bottom:0;padding:0 36px 0 12px"></select>
         <span class="s4-title" style="margin-left:8px">총 <span id="s4Count">0</span>명</span>
         <span class="s4-saved" id="s4Saved">저장된 적 없음</span>
         <div class="s4-actions">
@@ -982,10 +1075,20 @@ body.nav-expanded .sticky-cta { left: 200px; }
           <button class="btn-excel" onclick="s4ExportExcel()"><i data-lucide="download" style="width:14px;height:14px"></i> 엑셀 내보내기</button>
         </div>
       </div>
+      <!-- 일괄 재생성·다듬기 액션바 (AI 기록 ≥1개 있을 때 상시 노출) -->
+      <div class="s4-bulk-bar" id="s4BulkBar">
+        <span class="s4-bulk-count"><i data-lucide="check-circle" style="width:16px;height:16px"></i> <span id="s4BulkCount">0</span>명 선택됨</span>
+        <span class="s4-bulk-hint" id="s4BulkHint">좌측 체크박스로 학생을 선택해 한꺼번에 다시 생성·다듬을 수 있어요</span>
+        <span class="s4-bulk-spacer"></span>
+        <button class="s4-bulk-clear" id="s4BulkClear" onclick="s4ClearSelection()" style="display:none">선택 해제</button>
+        <button class="s4-bulk-refine" onclick="s4OpenRefineModal('bulk')"><i data-lucide="wand-2" style="width:14px;height:14px"></i> <span id="s4BulkBtnLabel">기록 다듬기</span></button>
+      </div>
+
       <div class="s4-table-wrap">
         <table class="s4-table">
           <thead>
             <tr>
+              <th class="s4-col-sel"><span class="s4-cb" id="s4CbAll" onclick="s4ToggleSelectAll()" title="기록이 있는 학생 전체 선택"></span></th>
               <th class="s4-col-sid">학번</th>
               <th class="s4-col-name">이름</th>
               <th>AI 생성 기록</th>
@@ -2231,12 +2334,82 @@ function s4EnsureClassSel(){
   });
 }
 
+// ───── 일괄 다듬기 선택 상태 ─────
+let s4Selected = new Set();
+
+function s4OnClassChange(){
+  s4Selected.clear();
+  s4Render();
+}
+
+function s4EligibleSids(){
+  const cls = document.getElementById('s4-classSel').value || Object.keys(STUDENT_BANK)[0];
+  const students = STUDENT_BANK[cls] || [];
+  return students.filter(s => {
+    const st = inputState[s.id] || {};
+    return !!st.s3Record && !st.s3Stale;
+  }).map(s => s.id);
+}
+
+function s4ToggleSelect(sid){
+  if (s4Selected.has(sid)) s4Selected.delete(sid);
+  else s4Selected.add(sid);
+  s4UpdateBulkBar();
+  s4Render();
+}
+
+function s4ToggleSelectAll(){
+  const eligible = s4EligibleSids();
+  if (!eligible.length) return;
+  const allSelected = eligible.every(id => s4Selected.has(id));
+  if (allSelected){
+    eligible.forEach(id => s4Selected.delete(id));
+  } else {
+    eligible.forEach(id => s4Selected.add(id));
+  }
+  s4UpdateBulkBar();
+  s4Render();
+}
+
+function s4ClearSelection(){
+  s4Selected.clear();
+  s4UpdateBulkBar();
+  s4Render();
+}
+
+function s4UpdateBulkBar(){
+  const bar = document.getElementById('s4BulkBar');
+  const cnt = document.getElementById('s4BulkCount');
+  const btnLabel = document.getElementById('s4BulkBtnLabel');
+  const clearBtn = document.getElementById('s4BulkClear');
+  const cbAll = document.getElementById('s4CbAll');
+  if (!bar) return;
+  // 현재 반에서 선택된 학생만 카운트
+  const cls = document.getElementById('s4-classSel').value || Object.keys(STUDENT_BANK)[0];
+  const students = STUDENT_BANK[cls] || [];
+  const selectedInCls = students.filter(s => s4Selected.has(s.id)).length;
+  const eligible = s4EligibleSids();
+  // 바 노출 조건: AI 기록이 ≥1개 있는 반 (= 다듬기 가능 학생 ≥1)
+  bar.classList.toggle('show', eligible.length > 0);
+  bar.classList.toggle('has-sel', selectedInCls > 0);
+  if (cnt) cnt.textContent = selectedInCls;
+  if (btnLabel) btnLabel.textContent = selectedInCls > 0 ? `${selectedInCls}명 기록 다듬기` : '기록 다듬기';
+  if (clearBtn) clearBtn.style.display = selectedInCls > 0 ? '' : 'none';
+  // 헤더 체크박스 상태
+  if (cbAll){
+    const allSelected = eligible.length > 0 && eligible.every(id => s4Selected.has(id));
+    cbAll.classList.toggle('checked', allSelected);
+    cbAll.innerHTML = allSelected ? '<svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M3 8.5l3.5 3.5 6.5-7" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>' : '';
+  }
+}
+
 function s4Render(){
   s4EnsureClassSel();
   const cls = document.getElementById('s4-classSel').value || Object.keys(STUDENT_BANK)[0];
   const students = STUDENT_BANK[cls] || [];
   document.getElementById('s4Count').textContent = students.length;
   document.getElementById('s4Rows').innerHTML = students.map(s => s4RenderRow(s)).join('');
+  s4UpdateBulkBar();
   lucide.createIcons();
 }
 
@@ -2291,7 +2464,7 @@ function s4RenderRow(s){
       : '';
     const staleActionsHtml = isStale
       ? `${goStep2Link}<button class="s4-mini-btn" onclick="s4Copy('${s.id}')"><i data-lucide="copy" style="width:12px;height:12px"></i> 복사</button>`
-      : `<button class="s4-regen-btn" onclick="s4OpenDrawer('${s.id}', 'regen')"><i data-lucide="sparkles" style="width:12px;height:12px"></i> 다시 생성</button>
+      : `<button class="s4-regen-btn" onclick="s4OpenRefineModal('single','${s.id}')"><i data-lucide="wand-2" style="width:12px;height:12px"></i> 다듬기</button>
          <button class="s4-mini-btn" onclick="s4Copy('${s.id}')"><i data-lucide="copy" style="width:12px;height:12px"></i> 복사</button>`;
     aiCell = `
       <div class="s4-ai-box" ${isStale?'style="border:1.5px dashed #f97316"':''}>
@@ -2349,7 +2522,13 @@ function s4RenderRow(s){
       ${overLimit ? '<div class="s4-bytes-err">초과</div>' : ''}
     </div>`;
 
+  const canSelect = !!aiText && !isStale;
+  const checked = s4Selected.has(s.id);
+  const cbCls = canSelect ? (checked ? 's4-cb checked' : 's4-cb') : 's4-cb disabled';
+  const cbSvg = checked ? '<svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M3 8.5l3.5 3.5 6.5-7" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>' : '';
+  const cbHandler = canSelect ? `onclick="s4ToggleSelect('${s.id}')"` : `title="다듬기는 기존 기록이 있는 학생만 가능"`;
   return `<tr>
+    <td class="s4-col-sel"><span class="${cbCls}" ${cbHandler}>${cbSvg}</span></td>
     <td class="s4-col-sid s4-cell-sid">${s.id}</td>
     <td class="s4-col-name s4-cell-name">${s.name}</td>
     <td>${aiCell}</td>
@@ -2357,6 +2536,159 @@ function s4RenderRow(s){
     <td>${editCell}</td>
     <td class="s4-col-bytes">${bytesCell}</td>
   </tr>`;
+}
+
+// ───── 기록 다듬기 모달 ─────
+let s4RefineMode = 'bulk';    // 'bulk' | 'single'
+let s4RefineSingleSid = null; // single 모드일 때 대상
+let s4RefinePicked = new Set(); // 모달 내부에서 다듬을 학생들 (사용자가 추가/제외 가능)
+
+function s4OpenRefineModal(mode, sid){
+  s4RefineMode = mode || 'bulk';
+  s4RefineSingleSid = sid || null;
+
+  // 대상 학생 picker 초기화
+  s4RefinePicked = new Set();
+  if (s4RefineMode === 'single' && sid){
+    s4RefinePicked.add(sid);
+  } else if (s4Selected.size > 0){
+    // 표에서 선택된 학생 그대로 사용
+    s4Selected.forEach(id => s4RefinePicked.add(id));
+  } else {
+    // 상단 [기록 다듬기] 진입점 — 다듬기 가능한 학생 전체 pre-check
+    s4EligibleSids().forEach(id => s4RefinePicked.add(id));
+  }
+
+  // 모달 sub-text + picker 노출 여부
+  const sub = document.getElementById('s4RefineSub');
+  const pickWrap = document.getElementById('s4RefinePickWrap');
+  if (s4RefineMode === 'single'){
+    const cls = document.getElementById('s4-classSel').value;
+    const stu = (STUDENT_BANK[cls] || []).find(x => x.id === sid);
+    if (sub) sub.textContent = stu ? `${stu.id} ${stu.name} 학생의 기록을 다듬어요.` : '학생 기록을 다듬어요.';
+    if (pickWrap) pickWrap.style.display = 'none';
+  } else {
+    if (sub) sub.textContent = '선택한 학생들의 기록을 동일한 수정 방향으로 다듬어요.';
+    if (pickWrap) pickWrap.style.display = '';
+  }
+
+  // textarea 초기화
+  const ta = document.getElementById('s4RefineDir');
+  if (ta) ta.value = '';
+  document.getElementById('s4RefineCount').textContent = '0';
+
+  // picker 렌더 + 카운트/버튼 갱신
+  s4RenderRefinePicker();
+  s4UpdateRefineUI();
+
+  // 모달 오픈
+  document.getElementById('refineModal').classList.add('show');
+  lucide.createIcons();
+}
+
+function s4CloseRefineModal(){
+  document.getElementById('refineModal').classList.remove('show');
+}
+
+function s4RenderRefinePicker(){
+  const wrap = document.getElementById('s4RefinePickList');
+  if (!wrap) return;
+  const cls = document.getElementById('s4-classSel').value || Object.keys(STUDENT_BANK)[0];
+  const students = STUDENT_BANK[cls] || [];
+  const eligible = students.filter(s => {
+    const st = inputState[s.id] || {};
+    return !!st.s3Record && !st.s3Stale;
+  });
+  if (!eligible.length){
+    wrap.innerHTML = '<div style="font-size:13px;color:#9ca3af;text-align:center;padding:24px">다듬을 수 있는 학생이 없어요</div>';
+    document.getElementById('s4RefinePickCnt').textContent = '(0명)';
+    return;
+  }
+  wrap.innerHTML = eligible.map(s => {
+    const checked = s4RefinePicked.has(s.id);
+    const cbCls = checked ? 's4-cb checked' : 's4-cb';
+    const cbSvg = checked ? '<svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M3 8.5l3.5 3.5 6.5-7" stroke="white" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>' : '';
+    return `<div class="s3-refine-pickitem" onclick="s4ToggleRefinePick('${s.id}')">
+      <span class="${cbCls}">${cbSvg}</span>
+      <div class="s3-refine-pickname">${s.id} ${s.name}</div>
+    </div>`;
+  }).join('');
+  document.getElementById('s4RefinePickCnt').textContent = `(${s4RefinePicked.size}명)`;
+  // 전체 선택/해제 버튼 라벨 동기화
+  const allBtn = document.getElementById('s4RefinePickAllBtn');
+  if (allBtn){
+    const allChecked = eligible.length > 0 && eligible.every(s => s4RefinePicked.has(s.id));
+    allBtn.textContent = allChecked ? '전체 해제' : '전체 선택';
+  }
+}
+
+function s4ToggleRefinePick(sid){
+  if (s4RefinePicked.has(sid)) s4RefinePicked.delete(sid);
+  else s4RefinePicked.add(sid);
+  s4RenderRefinePicker();
+  s4UpdateRefineUI();
+}
+
+function s4ToggleRefinePickAll(){
+  const eligible = s4EligibleSids();
+  const allChecked = eligible.length > 0 && eligible.every(id => s4RefinePicked.has(id));
+  if (allChecked){
+    eligible.forEach(id => s4RefinePicked.delete(id));
+  } else {
+    eligible.forEach(id => s4RefinePicked.add(id));
+  }
+  s4RenderRefinePicker();
+  s4UpdateRefineUI();
+}
+
+function s4ApplyPrompt(text){
+  const ta = document.getElementById('s4RefineDir');
+  if (!ta) return;
+  ta.value = text;
+  s4UpdateRefineUI();
+}
+
+function s4UpdateRefineUI(){
+  const ta = document.getElementById('s4RefineDir');
+  const cnt = document.getElementById('s4RefineCount');
+  const btn = document.getElementById('s4RefineBtn');
+  const btnLabel = document.getElementById('s4RefineBtnLabel');
+  const credit = document.getElementById('s4RefineCredit');
+  if (!ta || !btn) return;
+  if (cnt) cnt.textContent = ta.value.length;
+  const targetCount = s4RefineMode === 'single' ? 1 : s4RefinePicked.size;
+  if (btnLabel) btnLabel.textContent = `${targetCount}명 다듬기`;
+  if (credit) credit.textContent = targetCount;
+  // 타겟 0명이면 disable
+  btn.disabled = targetCount === 0;
+}
+
+function s4Refine(){
+  const ta = document.getElementById('s4RefineDir');
+  const direction = (ta.value || '').trim();
+  const hasDir = direction.length > 0;
+  const targets = s4RefineMode === 'single'
+    ? (s4RefineSingleSid ? [s4RefineSingleSid] : [])
+    : Array.from(s4RefinePicked);
+  if (!targets.length){ showToast('대상 학생을 선택해 주세요'); return; }
+  // 더미 — 방향 있으면 문장 추가, 없으면 표현 변형 (이전 조건 유지)
+  targets.forEach(sid => {
+    const st = inputState[sid] || (inputState[sid] = {});
+    if (!st.s3Record) return;
+    if (hasDir){
+      st.s3Record = st.s3Record.replace(/[.,]?\s*$/, '') + ` 또한 ${direction.replace(/[.,]?\s*$/,'')}는 점이 두드러짐.`;
+    } else {
+      st.s3Record = st.s3Record
+        .replace('두드러지며', '뚜렷하며')
+        .replace('체계적으로', '짜임새 있게')
+        .replace('명확히', '분명하게')
+        .replace('보임', '드러남');
+    }
+  });
+  s4CloseRefineModal();
+  s4ClearSelection();
+  s4Render();
+  showToast(`${targets.length}명 기록을 다듬었어요`);
 }
 
 function s4UpdateEdit(sid, val, ta){
@@ -2542,8 +2874,9 @@ function seedMockData(){
       ],
       analysisChecked: new Set(['r1','r2']),
       analysisCustoms: [],
-      s3Record: '김세나 학생은 보고서 구조를 체계적으로 잡고 출처를 명확히 표기해 신뢰도 높은 자료 정리 능력을 보였으며, 핵심 개념을 자기 언어로 재정의하며 깊이 있는 이해를 드러냄. 토론 활동에서는 차분하지만 정확한 의견 제시로 모둠의 논의 방향을 정리하는 데 기여함.',
+      s3Record: '김세나 학생은 보고서 구조를 체계적으로 잡고 출처를 명확히 표기해 신뢰도 높은 자료 정리 능력을 보였으며, 핵심 개념을 자기 언어로 재정의하며 깊이 있는 이해를 드러냄. 토론 활동에서는 차분하지만 정확한 의견 제시로 모둠의 논의 방향을 정리하는 데 기여함. 또한 협력적 태도와 의사소통 능력이 더 두드러지게 나타남.',
       s3Length: '250-400',
+      s3Refined: 1,
       // 선생님이 옮겨와서 일부 다듬은 버전
       s4Edit: '김세나 학생은 보고서 구조를 매우 체계적으로 잡고 출처를 분명히 표기하여 신뢰도 높은 자료 정리 능력을 보임. 핵심 개념을 자신만의 언어로 재정의하며 깊이 있는 이해를 보여주었으며, 토론 활동에서는 차분하지만 명확한 의견 제시로 모둠의 논의 방향을 효과적으로 정리함.'
     },
