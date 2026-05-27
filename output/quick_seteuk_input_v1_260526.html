@@ -57,14 +57,38 @@ body.nav-expanded .main-shell { margin-left: 200px; transition: margin-left .2s 
 .btn-bulk-primary { display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 0 18px; height: 40px; border: none; border-radius: 8px; background: #416bff; color: #fff; font-size: 14px; font-weight: 600; cursor: pointer; font-family: inherit; line-height: 1; flex-shrink: 0; }
 .btn-bulk-primary:hover { background: #365eef; }
 
-/* 일괄 자료 등록 picker 모달 */
-.modal-sub { font-size: 14px; color: #6d7381; margin-bottom: 18px; line-height: 1.55; }
-.bulk-pick-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-.bulk-pick-card { border: 1px solid #e5e7eb; border-radius: 10px; padding: 18px 16px; cursor: pointer; transition: all .15s; background: #fff; }
-.bulk-pick-card:hover { border-color: #416bff; background: #f4f8ff; }
-.bp-icon { width: 40px; height: 40px; border-radius: 8px; background: #eff3ff; color: #416bff; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 12px; }
-.bp-title { font-size: 15px; font-weight: 600; color: #222631; margin-bottom: 6px; }
-.bp-desc { font-size: 13px; color: #6d7381; line-height: 1.55; }
+/* 일괄 자료 등록 모달 (창체 패턴) */
+.modal-bg { display: none; position: fixed; inset: 0; background: rgba(34,38,49,.45); z-index: 500; align-items: center; justify-content: center; padding: 20px; }
+.modal-bg.show { display: flex; }
+.modal { background: #fff; border-radius: 16px; width: 100%; max-width: 560px; max-height: calc(100vh - 40px); display: flex; flex-direction: column; box-shadow: 0 12px 40px rgba(0,0,0,.18); overflow: hidden; }
+.modal.xl { max-width: 512px; }
+.modal-hd { padding: 20px 24px; border-bottom: 1px solid #f1f3f5; display: flex; align-items: center; gap: 12px; }
+.modal-title { font-size: 18px; font-weight: 700; color: #222631; line-height: 1.3; }
+.modal-sub { font-size: 13px; color: #6d7381; margin-top: 3px; }
+.modal-x { margin-left: auto; display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px; border: none; background: none; color: #6d7381; cursor: pointer; border-radius: 6px; }
+.modal-x:hover { background: #f1f3f5; color: #222631; }
+.modal-body { padding: 20px 24px; overflow-y: auto; flex: 1; }
+.reg-cards { display: flex; flex-direction: column; gap: 10px; }
+.reg-card { padding: 18px 20px; border: 1px solid #e5e7eb; border-radius: 12px; cursor: pointer; display: flex; align-items: flex-start; gap: 14px; transition: all .15s; background: #fff; text-align: left; font-family: inherit; position: relative; width: 100%; }
+.reg-card:hover { border-color: #416bff; box-shadow: 0 4px 12px rgba(65,107,255,0.08); }
+.rc-icon { width: 40px; height: 40px; border-radius: 10px; background: #eff3ff; color: #416bff; display: inline-flex; align-items: center; justify-content: center; line-height: 1; flex-shrink: 0; margin-top: 2px; }
+.rc-icon.aux { background: #f1f3f5; color: #6d7381; }
+.rc-body { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 6px; }
+.rc-title-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.rc-title { font-size: 16px; font-weight: 600; color: #222631; line-height: 1.3; }
+.rc-chip { display: inline-flex; align-items: center; gap: 4px; font-size: 11px; font-weight: 600; padding: 4px 10px; border-radius: 10px; line-height: 1.4; flex-shrink: 0; }
+.rc-chip.ai { background: #eff3ff; color: #416bff; }
+.rc-chip.draft { background: #f1f3f5; color: #6d7381; }
+.rc-desc { font-size: 13px; color: #6d7381; line-height: 1.55; }
+.pick-back { display: inline-flex; align-items: center; gap: 4px; padding: 0; font-size: 13px; color: #6d7381; background: none; border: none; cursor: pointer; font-family: inherit; line-height: 1; margin-bottom: 14px; }
+.pick-back:hover { color: #416bff; }
+.pick-cls-row { padding: 14px 16px; border: 1px solid #e5e7eb; border-radius: 10px; cursor: pointer; display: flex; align-items: center; gap: 12px; transition: all .15s; background: #fff; text-align: left; font-family: inherit; width: 100%; margin-bottom: 8px; }
+.pick-cls-row:last-child { margin-bottom: 0; }
+.pick-cls-row:hover { border-color: #416bff; background: #f4f8ff; }
+.pick-cls-name { flex: 1; font-size: 15px; font-weight: 600; color: #222631; }
+.pick-cls-cnt { font-size: 13px; color: #6d7381; }
+.pick-cls-arrow { color: #b3b6bd; display: inline-flex; }
+.pick-cls-row:hover .pick-cls-arrow { color: #416bff; }
 .step-btn { display: inline-flex; align-items: center; gap: 8px; padding: 9px 16px; border: 1px solid #e5e7eb; border-radius: 8px; background: #fff; color: #6d7381; font-size: 14px; font-weight: 500; cursor: default; line-height: 1; font-family: inherit; transition: all .15s; }
 .step-btn.active { border-color: #416bff; color: #416bff; font-weight: 600; box-shadow: 0 0 0 1px #416bff inset; }
 .step-btn.done { border-color: #bce4cf; color: #15803d; }
@@ -319,12 +343,16 @@ body.nav-expanded .sticky-cta { left: 200px; }
         </div>
       </div>
 
+      <!-- 학생 특성 입력 -->
+      <div class="input-label">학생 특성</div>
+      <textarea class="input-area" id="inputArea" placeholder="학생의 특성을 직접 입력하거나, 아래 키워드 사전에서 선택해 주세요." oninput="onInputChange()"></textarea>
+
       <!-- 키워드 사전 (토글) -->
-      <div class="kwbox" id="kwbox">
+      <div class="kwbox" id="kwbox" style="margin-top:14px">
         <div class="kwbox-head" onclick="toggleKwBox()">
           <i data-lucide="chevron-right" class="kwbox-toggle" style="width:18px;height:18px"></i>
           <span class="kwbox-title">키워드 사전</span>
-          <span class="kwbox-desc">CLIPO가 제공하는 교과별 핵심 키워드 사전에서 키워드를 선택할 수 있어요.</span>
+          <span class="kwbox-desc">CLIPO가 제공하는 교과별 핵심 키워드를 선택해 입력창에 추가할 수 있어요.</span>
         </div>
         <div class="kwbox-body">
           <div class="kw-cat">
@@ -378,10 +406,6 @@ body.nav-expanded .sticky-cta { left: 200px; }
         </div>
       </div>
 
-      <!-- 입력 -->
-      <div class="input-label">학생 특성</div>
-      <textarea class="input-area" id="inputArea" placeholder="키워드 사전에서 키워드를 선택하거나, 학생의 특성을 직접 입력해 주세요." oninput="onInputChange()"></textarea>
-
       <div class="level-label">수행 수준</div>
       <div class="level-btns">
         <button class="level-btn" data-level="상" onclick="setLevel('상')">상</button>
@@ -410,25 +434,50 @@ body.nav-expanded .sticky-cta { left: 200px; }
   </div>
 </footer>
 
-<!-- 일괄 자료 등록 picker 모달 -->
-<div class="overlay" id="bulkPickerModal" onclick="if(event.target===this)closeBulkPicker()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:300;align-items:center;justify-content:center;padding:24px">
-  <div class="modal-box" style="background:#fff;border-radius:12px;width:520px;max-width:calc(100vw - 48px);padding:24px 28px;box-shadow:0 0 1px #2226314D,0 8px 16px rgba(0,0,0,.1)">
-    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
-      <p style="font-size:18px;font-weight:700;color:#222631">일괄 자료 등록</p>
-      <button onclick="closeBulkPicker()" style="background:none;border:none;cursor:pointer;color:#6d7381;padding:6px;display:flex;border-radius:6px"><i data-lucide="x" style="width:20px;height:20px"></i></button>
+<!-- 일괄 자료 등록 모달 (창체 패턴 + 반 선택 step) -->
+<div class="modal-bg" id="bulkPickerModal" onclick="if(event.target===this)closeBulkPicker()">
+  <div class="modal xl">
+    <div class="modal-hd">
+      <div>
+        <div class="modal-title" id="bulkModalTitle">일괄 자료 등록</div>
+        <div class="modal-sub" id="bulkModalSub">학번과 이름을 기준으로 활동 자료와 학생 특성을 일괄 등록할 수 있어요.</div>
+      </div>
+      <button class="modal-x" onclick="closeBulkPicker()"><i data-lucide="x" style="width:18px;height:18px"></i></button>
     </div>
-    <p class="modal-sub">학생별 입력을 한 번에 등록할 수 있어요. 자료 유형을 선택해 주세요.</p>
-    <div class="bulk-pick-grid">
-      <div class="bulk-pick-card" onclick="onPickBulk('keyword')">
-        <div class="bp-icon"><i data-lucide="list" style="width:20px;height:20px"></i></div>
-        <div class="bp-title">학생 특성 일괄 업로드</div>
-        <div class="bp-desc">엑셀로 학생별 수행 수준 · 학생 특성을 한 번에 등록해요.</div>
+    <div class="modal-body">
+
+      <!-- Step 1: 자료 유형 선택 -->
+      <div id="bulkStep1">
+        <div class="reg-cards">
+          <button class="reg-card" data-type="activity" onclick="onPickBulk('pdf')">
+            <div class="rc-icon"><i data-lucide="file-text" style="width:22px;height:22px"></i></div>
+            <div class="rc-body">
+              <div class="rc-title-row">
+                <div class="rc-title">활동지·보고서 (PDF)</div>
+                <span class="rc-chip ai"><i data-lucide="sparkles" style="width:10px;height:10px"></i> AI 자동 분석</span>
+              </div>
+              <div class="rc-desc">학급 전체 활동지·보고서 PDF 파일을<br>학번 순서대로 묶어 일괄 등록</div>
+            </div>
+          </button>
+          <button class="reg-card" data-type="keyword" onclick="onPickBulk('keyword')">
+            <div class="rc-icon aux"><i data-lucide="pencil" style="width:22px;height:22px"></i></div>
+            <div class="rc-body">
+              <div class="rc-title-row">
+                <div class="rc-title">학생 특성 (EXCEL)</div>
+                <span class="rc-chip draft"><i data-lucide="paperclip" style="width:10px;height:10px"></i> 기록 초안 생성</span>
+              </div>
+              <div class="rc-desc">선생님이 관찰한 학생 특성을<br>제공되는 템플릿에 맞춰 직접 입력</div>
+            </div>
+          </button>
+        </div>
       </div>
-      <div class="bulk-pick-card" onclick="onPickBulk('pdf')">
-        <div class="bp-icon"><i data-lucide="file-text" style="width:20px;height:20px"></i></div>
-        <div class="bp-title">PDF 일괄 업로드</div>
-        <div class="bp-desc">학생별 과제 PDF를 한 번에 업로드해 AI 분석에 활용해요.</div>
+
+      <!-- Step 2: 반 선택 -->
+      <div id="bulkStep2" style="display:none">
+        <button class="pick-back" onclick="bulkPickerBack()"><i data-lucide="chevron-left" style="width:14px;height:14px"></i> 자료 유형 다시 선택</button>
+        <div id="bulkClassList"></div>
       </div>
+
     </div>
   </div>
 </div>
@@ -653,18 +702,71 @@ function updateSummary(){
 }
 
 // 일괄 자료 등록 picker
+const BULK_TYPE_LABELS = { pdf: '활동지·보고서 (PDF)', keyword: '학생 특성 (EXCEL)' };
+let bulkSelectedType = null;
+
 function openBulkPicker(){
-  const m = document.getElementById('bulkPickerModal');
-  m.style.display = 'flex';
+  bulkPickerToStep(1);
+  document.getElementById('bulkPickerModal').classList.add('show');
   lucide.createIcons();
 }
 function closeBulkPicker(){
-  document.getElementById('bulkPickerModal').style.display = 'none';
+  document.getElementById('bulkPickerModal').classList.remove('show');
+  bulkSelectedType = null;
 }
+
+function bulkPickerToStep(step){
+  document.getElementById('bulkStep1').style.display = step === 1 ? '' : 'none';
+  document.getElementById('bulkStep2').style.display = step === 2 ? '' : 'none';
+  if (step === 1){
+    document.getElementById('bulkModalTitle').textContent = '일괄 자료 등록';
+    document.getElementById('bulkModalSub').textContent = '학번과 이름을 기준으로 활동 자료와 학생 특성을 일괄 등록할 수 있어요.';
+  } else {
+    document.getElementById('bulkModalTitle').textContent = BULK_TYPE_LABELS[bulkSelectedType] || '반 선택';
+    document.getElementById('bulkModalSub').textContent = '어느 반의 자료를 등록할지 선택해 주세요.';
+  }
+}
+
+function bulkPickerBack(){
+  bulkSelectedType = null;
+  bulkPickerToStep(1);
+  lucide.createIcons();
+}
+
 function onPickBulk(type){
+  const classes = Object.keys(STUDENT_BANK);
+  // 반이 1개면 바로 업로드 페이지로
+  if (classes.length === 1) {
+    navigateBulkUpload(type, classes[0]);
+    return;
+  }
+  // 반이 여러 개면 step 2 → 반 선택
+  bulkSelectedType = type;
+  const list = document.getElementById('bulkClassList');
+  list.innerHTML = classes.map(cls => {
+    const n = (STUDENT_BANK[cls] || []).length;
+    return `
+      <button class="pick-cls-row" onclick="onPickBulkClass('${cls.replace(/'/g, "\\'")}')">
+        <span class="pick-cls-name">${cls}</span>
+        <span class="pick-cls-cnt">${n}명</span>
+        <span class="pick-cls-arrow"><i data-lucide="chevron-right" style="width:18px;height:18px"></i></span>
+      </button>`;
+  }).join('');
+  bulkPickerToStep(2);
+  lucide.createIcons();
+}
+
+function onPickBulkClass(cls){
+  if (!bulkSelectedType) return;
+  navigateBulkUpload(bulkSelectedType, cls);
+}
+
+function navigateBulkUpload(type, cls){
   closeBulkPicker();
-  if (type === 'keyword') showToast('학생 특성 일괄 업로드 (다음 시안)');
-  else showToast('PDF 일괄 업로드 (다음 시안)');
+  const backUrl = location.pathname + '?name=' + encodeURIComponent(groupName) + '&subject=' + encodeURIComponent(subject);
+  const params = new URLSearchParams({ type: subject, cls: cls, back: backUrl });
+  if (type === 'pdf') location.href = 'creative_activity_pdf_upload_v1_260526.html?' + params.toString();
+  else if (type === 'keyword') location.href = 'creative_activity_keyword_upload_v1_260526.html?' + params.toString();
 }
 
 function toggleKwBox(){ document.getElementById('kwbox').classList.toggle('expanded'); }

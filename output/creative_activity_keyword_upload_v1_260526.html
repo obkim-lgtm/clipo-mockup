@@ -255,6 +255,7 @@ body.nav-expanded .main-shell { margin-left: 200px; transition: margin-left .2s 
 const _params = new URLSearchParams(location.search);
 const ACTIVITY_TYPE = _params.get('type') || '자율활동';
 const CLS = _params.get('cls') || '2학년 1반';
+const BACK_URL = _params.get('back');
 document.getElementById('pt-cls').textContent = CLS;
 
 // mock 데이터
@@ -330,6 +331,7 @@ function renderResult() {
 function escapeHtml(s) { return String(s).replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c])); }
 
 function goBack() {
+  if (BACK_URL) { location.href = BACK_URL; return; }
   const params = new URLSearchParams({ type: ACTIVITY_TYPE, cls: CLS });
   location.href = 'creative_activity_input_v1_260507.html?' + params.toString();
 }
@@ -338,6 +340,7 @@ function saveAndBack() {
   try { localStorage.setItem('clipo_keyword_' + CLS, '1'); } catch(e) {}
   showToast(`${currentRows.length}명의 활동 내용을 등록했어요`);
   setTimeout(() => {
+    if (BACK_URL) { location.href = BACK_URL; return; }
     const params = new URLSearchParams({ type: ACTIVITY_TYPE, cls: CLS, demo: '1' });
     location.href = 'creative_activity_input_v1_260507.html?' + params.toString();
   }, 700);
