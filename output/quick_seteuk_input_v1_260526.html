@@ -387,9 +387,7 @@ body.nav-expanded .sticky-cta { left: 200px; }
         <button class="level-btn" data-level="상" onclick="setLevel('상')">상</button>
         <button class="level-btn active" data-level="중" onclick="setLevel('중')">중</button>
         <button class="level-btn" data-level="하" onclick="setLevel('하')">하</button>
-        <button class="level-btn" data-level="자동" onclick="setLevel('자동')">
-          <i data-lucide="sparkles" style="width:13px;height:13px"></i> 자동
-        </button>
+        <button class="level-btn" data-level="자동" onclick="setLevel('자동')">자동</button>
       </div>
       <p class="level-hint" id="levelHint">기본값은 '중'입니다. 과제물(PDF)이 업로드된 학생은 '자동'으로 분석돼요.</p>
 
@@ -542,6 +540,9 @@ function simulateFileUpload(){
     { name: '활동사진.jpg', meta: '850KB · 방금 업로드' }
   ];
   st.file = samples[Math.floor(Math.random() * samples.length)];
+  // 과제물 업로드 시 수행 수준을 '자동'으로 전환 (AI 분석 가능 상태)
+  setLevel('자동', true);
+  st.level = '자동';
   syncFileUI(st);
   renderStudents();
   showToast('자료를 업로드했어요');
@@ -674,8 +675,14 @@ function goNext(){ showToast('AI 기록 생성 단계 (다음 시안)'); }
 // 입력창 변경 시 키워드 태그 동기화
 document.getElementById('inputArea').addEventListener('input', syncTagsFromInput);
 
-// 초기 렌더
-renderStudents();
+// 초기 렌더: 1학년 1반 첫 학생 자동 선택
+(function initDefault(){
+  const cls = document.getElementById('classSel').value;
+  const first = (STUDENT_BANK[cls] || [])[0];
+  if(first) currentStudentId = first.id;
+  renderStudents();
+  if(first && typeof selectStudent === 'function') selectStudent(first.id);
+})();
 
 let _toastTimer = null;
 function showToast(msg){

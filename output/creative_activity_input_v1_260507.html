@@ -1703,7 +1703,9 @@ function closeDrawer(){
   const active = document.querySelector('.step-btn.active');
   if(active && active.id === 'step-3') renderStep3();
   const s = STUDENTS.find(x=>x.id===curDetailId);
-  if(s && s._editChanged && s.s3 && s.s3.aiText){
+  // 모달은 활동지/설문 파일이 바뀐 경우(_dirtyLevel === 'file')에만 노출.
+  // 활동내용(kw)·활동수준(items) 변경은 2단계 분석에 영향 없으므로 3단계 점만 노출하고 모달은 안 띄움.
+  if(s && s._editChanged && s.s3 && s.s3.aiText && s._dirtyLevel === 'file'){
     pendingDirtyId = s.id;
     setTimeout(()=>{
       const modal = $('modal-dirty-confirm');
@@ -2818,8 +2820,8 @@ function renderS2Sidebar(){
     else if(s2.status==='analyzing') status = `<span class="s2-stu-status analyzing">분석 중</span>`;
     else if(s2.status==='done') status = `<span class="s2-stu-status done">분석 완료</span>`;
     else status = `<span class="s2-stu-status idle">분석 필요</span>`;
-    // _dirtyLevel='items'(재분석 직후 stale 기록 케이스)는 2단계 관점에서 fresh이므로 점 제외
-    const showStep2Dot = s.dirty && s._dirtyLevel !== 'items';
+    // 2단계 점: 활동지/설문 파일이 바뀐 경우(_dirtyLevel === 'file')에만 노출
+    const showStep2Dot = s.dirty && s._dirtyLevel === 'file';
     const dirtyDot = showStep2Dot ? '<span class="dirty-dot" title="자료 변경됨 · 재분석 권장"></span>' : '';
     return `<div class="s2-stu-row ${isActive?'active':''}" onclick="selectS2Student(${s.id})">
       <span class="s2-stu-name">${s.name}${dirtyDot}</span>
@@ -2839,10 +2841,10 @@ function renderS2Main(){
   if(!s){ $('s2-main').innerHTML=''; return; }
   const s2 = getS2(s);
   const summary = `자료 ${s.files.length}건 · 활동 내용 ${s.keywords.length ? '기재' : '미기재'}${s.level?` · 활동 수준 ${ {high:'상',mid:'중',low:'하'}[s.level]||'-'}`:''}`;
-  // 자료 변경됨 안내 (자료 있는 학생이 dirty + _dirtyLevel='items'가 아닐 때)
-  // _dirtyLevel='items'는 재분석 직후 "기록만 stale" 상태 → 2단계 관점에서는 fresh이므로 안내 제외
+  // 자료 변경됨 안내: 활동지/설문 파일이 바뀐 경우(_dirtyLevel === 'file')에만 노출
+  // 활동내용(kw)·활동수준(items)·재분석 직후('items')는 2단계 분석 결과에 영향 없으므로 제외
   let dirtyNoticeHtml = '';
-  if(s.dirty && s2HasFiles(s) && s._dirtyLevel !== 'items'){
+  if(s.dirty && s2HasFiles(s) && s._dirtyLevel === 'file'){
     if(s2.status === 'done'){
       dirtyNoticeHtml = `<div class="s2-stu-hd-notice"><i data-lucide="alert-circle" style="width:14px;height:14px"></i><span>자료가 변경됐어요. 아래 표시된 결과는 <strong>이전 분석 내용</strong>이에요. 우측 <strong>[재분석]</strong>으로 다시 분석해 주세요.</span></div>`;
     } else if(s2.status === 'idle'){
