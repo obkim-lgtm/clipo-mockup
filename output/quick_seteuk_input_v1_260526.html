@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>키워드 및 활동 입력 - CLIPO</title>
+<title>학생 자료 입력 - CLIPO</title>
 <link rel="icon" type="image/svg+xml" href="favicon_gan.svg">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard-gov.min.css">
 <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
@@ -238,7 +238,7 @@ body.nav-expanded .sticky-cta { left: 200px; }
   </a>
 
   <h1 class="page-title" id="pageTitle">새 그룹</h1>
-  <p class="page-sub">학생을 선택하여 키워드 및 활동 내역을 입력해 주세요.</p>
+  <p class="page-sub">학생을 선택하여 자료와 특성을 입력해 주세요.</p>
 
   <div class="step-bar">
     <div class="step-btn active">
@@ -283,7 +283,7 @@ body.nav-expanded .sticky-cta { left: 200px; }
       <div class="stu-list" id="stuList"></div>
     </div>
 
-    <!-- 우측: 키워드 및 활동 입력 -->
+    <!-- 우측: 학생 특성 입력 -->
     <div class="card">
       <div class="rp-head">
         <p class="rp-title"><i data-lucide="user" style="width:18px;height:18px;color:#416bff"></i> <span id="rpTitleText">학생을 선택해 주세요</span></p>
@@ -379,8 +379,8 @@ body.nav-expanded .sticky-cta { left: 200px; }
       </div>
 
       <!-- 입력 -->
-      <div class="input-label">활동 내역</div>
-      <textarea class="input-area" id="inputArea" placeholder="키워드 사전에서 키워드를 선택하거나, 직접 활동 내역을 입력해 주세요." oninput="onInputChange()"></textarea>
+      <div class="input-label">학생 특성</div>
+      <textarea class="input-area" id="inputArea" placeholder="키워드 사전에서 키워드를 선택하거나, 학생의 특성을 직접 입력해 주세요." oninput="onInputChange()"></textarea>
 
       <div class="level-label">수행 수준</div>
       <div class="level-btns">
@@ -421,8 +421,8 @@ body.nav-expanded .sticky-cta { left: 200px; }
     <div class="bulk-pick-grid">
       <div class="bulk-pick-card" onclick="onPickBulk('keyword')">
         <div class="bp-icon"><i data-lucide="list" style="width:20px;height:20px"></i></div>
-        <div class="bp-title">키워드 일괄 업로드</div>
-        <div class="bp-desc">엑셀로 학생별 수행 수준 · 키워드 · 활동 내역을 한 번에 등록해요.</div>
+        <div class="bp-title">학생 특성 일괄 업로드</div>
+        <div class="bp-desc">엑셀로 학생별 수행 수준 · 학생 특성을 한 번에 등록해요.</div>
       </div>
       <div class="bulk-pick-card" onclick="onPickBulk('pdf')">
         <div class="bp-icon"><i data-lucide="file-text" style="width:20px;height:20px"></i></div>
@@ -507,7 +507,7 @@ function selectStudent(sid){
   const stu = (STUDENT_BANK[cls] || []).find(x => x.id === sid);
   if (stu) {
     document.getElementById('rpTitleText').textContent = `${stu.id} ${stu.name}`;
-    document.getElementById('rpSub').textContent = '학생 활동 자료를 업로드하거나 키워드 및 활동 내역을 입력해 주세요.';
+    document.getElementById('rpSub').textContent = '학생 자료를 업로드하거나 특성을 직접 입력해 주세요.';
   }
   document.getElementById('inputArea').value = st.text;
   setLevel(st.level, true);
@@ -610,7 +610,7 @@ function onSaveNext(){
   const st = getOrInitState(currentStudentId);
   const hasText = document.getElementById('inputArea').value.trim().length > 0;
   if (!hasText && !st.file) {
-    showToast('활동 자료 또는 키워드 중 하나는 입력해 주세요');
+    showToast('자료 또는 학생 특성 중 하나는 입력해 주세요');
     return;
   }
   flushCurrent();
@@ -663,7 +663,7 @@ function closeBulkPicker(){
 }
 function onPickBulk(type){
   closeBulkPicker();
-  if (type === 'keyword') showToast('키워드 일괄 업로드 (다음 시안)');
+  if (type === 'keyword') showToast('학생 특성 일괄 업로드 (다음 시안)');
   else showToast('PDF 일괄 업로드 (다음 시안)');
 }
 
