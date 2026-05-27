@@ -331,9 +331,10 @@ body.nav-expanded .sticky-cta{left:200px;transition:left .2s ease}
 .modal-link{color:#416bff;cursor:pointer;text-decoration:underline}
 .modal-link:hover{color:#365eef}
 .btn-primary:disabled{background:#c7d6ff;cursor:not-allowed}
-.modal-hd{padding:20px 24px;border-bottom:1px solid #f1f3f5;display:flex;align-items:center;gap:12px}
+.modal-hd{padding:20px 24px;border-bottom:1px solid #f1f3f5;display:flex;align-items:flex-start;gap:12px}
+.modal-hd .modal-x{margin-top:2px;flex-shrink:0}
 .modal-title{font-size:18px;font-weight:700;color:#222631;line-height:1.3}
-.modal-sub{font-size:13px;color:#6d7381;margin-top:3px}
+.modal-sub{font-size:14px;color:#6d7381;margin-top:10px;line-height:1.6}
 .modal-x{margin-left:auto;display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;border:none;background:none;color:#6d7381;cursor:pointer;border-radius:6px}
 .modal-x:hover{background:#f1f3f5;color:#222631}
 .modal-body{padding:20px 24px;overflow-y:auto;flex:1}
@@ -401,6 +402,14 @@ body.nav-expanded .sticky-cta{left:200px;transition:left .2s ease}
 .s3-kw-edit:hover{color:#365eef}
 
 .s3-ai-box, .s3-edit-box{display:flex;flex-direction:column;border:1px solid #d9d9d9;border-radius:8px;padding:12px 14px;background:#fff;min-height:200px;gap:0;transition:border-color .15s, box-shadow .15s}
+/* dirty 상태: 주황 점선 박스 + 상단 중앙 배지 */
+.s3-ai-wrap{position:relative;display:flex;flex-direction:column}
+.s3-ai-wrap.dirty .s3-ai-box{border:1.5px dashed #f97316}
+.s3-ai-dirty-badge{display:inline-flex;align-self:center;align-items:center;justify-content:center;gap:6px;background:#fff7ed;border:1px solid #fed7aa;color:#c2410c;font-size:12px;font-weight:600;padding:6px 14px;border-radius:999px;margin-bottom:10px;line-height:1.3;white-space:nowrap}
+.s3-ai-dirty-badge i{color:#f97316}
+/* 다시 생성 — 강조 filled primary */
+.s3-regen-btn-primary{display:inline-flex;align-items:center;justify-content:center;gap:5px;padding:7px 14px;border:none;border-radius:6px;background:#416bff;color:#fff;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;line-height:1;transition:background .15s}
+.s3-regen-btn-primary:hover{background:#365eef}
 .s3-edit-box:focus-within{border-color:#416bff;box-shadow:0 0 0 1px #416bff inset}
 .s3-text{font-size:13px;color:#222631;line-height:1.65;flex:1;overflow-y:auto;max-height:240px;white-space:pre-wrap}
 .s3-text.empty{color:#b3b6bd}
@@ -515,10 +524,10 @@ body.nav-expanded .sticky-cta{left:200px;transition:left .2s ease}
 .stu-pick-header-col.sid{width:56px;flex-shrink:0}
 .stu-pick-header-col.name{flex:1}
 .stu-pick-header-col.data{width:90px;flex-shrink:0;text-align:center}
-.stu-pick-header-col.gen{width:80px;flex-shrink:0;text-align:center}
+.stu-pick-header-col.gen{width:120px;flex-shrink:0;text-align:center}
 .stu-pick-col{display:flex;align-items:center;justify-content:center;flex-shrink:0}
 .stu-pick-col.data{width:90px}
-.stu-pick-col.gen{width:80px}
+.stu-pick-col.gen{width:120px}
 
 /* 수정 방향 프롬프트 */
 .s3-prompt-textarea{width:100%;min-height:72px;max-height:240px;padding:10px 12px;border:1px solid #d9d9d9;border-radius:8px;font-family:inherit;font-size:14px;color:#222631;line-height:1.55;resize:none;outline:none;box-sizing:border-box;overflow-y:auto}
@@ -1112,14 +1121,14 @@ body.nav-expanded .sticky-cta{left:200px;transition:left .2s ease}
   <div class="modal">
     <div class="modal-hd">
       <div>
-        <div class="modal-title">자료가 변경되었어요</div>
-        <div class="modal-sub">바뀐 자료를 반영하려면 2단계에서 다시 분석한 뒤 3단계에서 기록을 다시 생성해 주세요. 다시 생성하기 전까지 기존 기록이 유지돼요.</div>
+        <div class="modal-title">AI 자료 분석을 다시 할까요?</div>
+        <div class="modal-sub">변경한 자료를 반영하려면 2단계에서 다시 분석해야 해요. 분석 후 3단계에서 기록까지 다시 생성하면 새 자료가 반영돼요.</div>
       </div>
       <button class="modal-x" onclick="dirtyConfirmLater()"><i data-lucide="x" style="width:18px;height:18px"></i></button>
     </div>
     <div class="modal-ft">
       <button class="btn-secondary" onclick="dirtyConfirmLater()">나중에</button>
-      <button class="btn-primary" onclick="dirtyConfirmRegen()"><i data-lucide="sparkles" style="width:14px;height:14px"></i> 2단계에서 분석</button>
+      <button class="btn-primary" onclick="dirtyConfirmRegen()"><i data-lucide="sparkles" style="width:14px;height:14px"></i> 지금 다시 분석</button>
     </div>
   </div>
 </div>
@@ -1141,7 +1150,7 @@ body.nav-expanded .sticky-cta{left:200px;transition:left .2s ease}
       <div id="s3-analyze-warning" style="display:none;align-items:flex-start;gap:8px;padding:12px 14px;background:#fffbeb;border:1px solid #fde68a;border-radius:8px;margin-bottom:16px;font-size:13px;color:#92400e;line-height:1.55">
         <i data-lucide="alert-triangle" style="width:14px;height:14px;flex-shrink:0;margin-top:2px"></i>
         <div style="flex:1">
-          <div><strong>분석 필요</strong> 상태인 학생은 업로드된 자료가 기록에 반영되지 않아요. 더 정확한 기록을 위해 <strong>2단계에서 먼저 분석</strong>하는 걸 권장합니다.</div>
+          <div><strong>분석 필요</strong> 상태인 학생은 선택할 수 없어요. <strong>2단계에서 먼저 분석</strong>해 주세요.</div>
           <a onclick="openStep2InNewTab(event)" style="display:inline-flex;align-items:center;gap:4px;margin-top:6px;font-size:13px;font-weight:600;color:#92400e;text-decoration:underline;cursor:pointer">2단계에서 분석하기 <i data-lucide="external-link" style="width:13px;height:13px"></i></a>
         </div>
       </div>
@@ -1163,7 +1172,7 @@ body.nav-expanded .sticky-cta{left:200px;transition:left .2s ease}
 
       <div id="s3-prompt-section" style="display:none">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-top:20px;margin-bottom:8px;gap:8px">
-          <span style="font-size:14px;font-weight:600;color:#3b3f4c">재생성 요청사항 <span style="font-weight:500;color:#6d7381">(선택)</span></span>
+          <span style="font-size:14px;font-weight:600;color:#3b3f4c">다시 생성 요청사항 <span style="font-weight:500;color:#6d7381">(선택)</span></span>
           <span id="s3-prompt-count" style="font-size:12px;color:#b3b6bd;font-variant-numeric:tabular-nums">0 / 200</span>
         </div>
         <div id="s3-regen-hint" style="font-size:13px;color:#6d7381;margin-bottom:8px;line-height:1.55">
@@ -1850,12 +1859,12 @@ function renderDrawerBanner(s){
   const messages = {
     file: {
       title: '자료가 변경됐어요',
-      desc: is604 ? '저장 후 변경 사항이 반영돼요.' : '저장하고 추천 항목을 다시 분석할게요. 결과를 검토한 뒤 기록을 재생성하세요.',
+      desc: is604 ? '저장 후 변경 사항이 반영돼요.' : '저장하고 추천 항목을 다시 분석할게요. 결과를 검토한 뒤 기록을 다시 생성하세요.',
       btn: is604 ? '저장' : '저장 후 다시 분석'
     },
     kw: {
       title: '활동 내용이 변경됐어요',
-      desc: is604 ? '저장 후 변경 사항이 반영돼요.' : '저장하고 바뀐 활동 내용으로 추천 항목을 다시 분석할게요. 결과 검토 후 기록을 재생성하세요.',
+      desc: is604 ? '저장 후 변경 사항이 반영돼요.' : '저장하고 바뀐 활동 내용으로 추천 항목을 다시 분석할게요. 결과 검토 후 기록을 다시 생성하세요.',
       btn: is604 ? '저장' : '저장 후 다시 분석'
     },
     items: {
@@ -2455,20 +2464,32 @@ function renderS3Row(s){
     dirtyTagText = ({
       file: '자료 변경됨',
       kw: '활동 내용 변경됨',
-      items: '활동 수준 변경됨'
+      items: '활동 수준 변경됨',
+      analysis: '분석 결과 갱신됨'
     })[s._dirtyLevel] || '변경됨';
   }
 
   let aiCell;
   if(s3.aiText){
-    const regenAttention = s.dirty ? 'attention' : '';
-    aiCell = `<div class="s3-ai-box">
-      <div class="s3-text">${s3.aiText}</div>
-      <div class="s3-cell-foot">
-        <span class="s3-byte">${byteLen(s3.aiText)} Byte${s.dirty?` · <span style="color:#c2410c;font-weight:500">${dirtyTagText}</span>`:''}</span>
-        <div class="s3-cell-actions">
-          <button class="s3-mini-btn ai ${regenAttention}" onclick="regenerateOne(${s.id})"><i data-lucide="sparkles" style="width:12px;height:12px"></i> 재생성</button>
-          <button class="s3-mini-btn" onclick="copyAi(${s.id})"><i data-lucide="copy" style="width:12px;height:12px"></i> 복사</button>
+    const aiChars = (s3.aiText || '').replace(/\s/g, '').length;
+    const aiBytes = byteLen(s3.aiText);
+    // 자료(파일) 변경됐는데 재분석 안 한 경우 → 옛 분석으로 생성하면 안 됨 → [다시 생성] 대신 [2단계 자료 분석] 링크
+    const fileDirtyUnresolved = s.dirty && (
+      (s._dirtyLevels && s._dirtyLevels.has('file')) || s._dirtyLevel === 'file'
+    );
+    const actionsHtml = fileDirtyUnresolved
+      ? `<a href="#" onclick="event.preventDefault();gotoStep2ForStudent(${s.id})" style="font-size:12px;color:#416bff;text-decoration:underline;font-weight:500;cursor:pointer;display:inline-flex;align-items:center;gap:2px">2단계에서 자료 분석 →</a>
+         <button class="s3-mini-btn" onclick="copyAi(${s.id})"><i data-lucide="copy" style="width:12px;height:12px"></i> 복사</button>`
+      : `<button class="s3-regen-btn-primary" onclick="regenerateOne(${s.id})"><i data-lucide="sparkles" style="width:14px;height:14px"></i> 다시 생성</button>
+         <button class="s3-mini-btn" onclick="copyAi(${s.id})"><i data-lucide="copy" style="width:12px;height:12px"></i> 복사</button>`;
+    aiCell = `<div class="s3-ai-wrap${s.dirty ? ' dirty' : ''}">
+      <div class="s3-ai-box${s.dirty ? ' dirty' : ''}">
+        <div class="s3-text">${s3.aiText}</div>
+        <div class="s3-cell-foot">
+          <span class="s3-byte">${aiChars}자 (${aiBytes}Byte)${s.dirty?` · <span style="color:#c2410c;font-weight:600">${dirtyTagText}</span>`:''}</span>
+          <div class="s3-cell-actions">
+            ${actionsHtml}
+          </div>
         </div>
       </div>
     </div>`;
@@ -2509,7 +2530,7 @@ function renderS3Row(s){
     ${overLimit ? '<div class="s3-bytes-err">초과</div>' : ''}
   </div>`;
 
-  const dirtyDot = s.dirty ? `<span class="dirty-dot" title="${dirtyTagText} · 재생성 권장"></span>` : '';
+  const dirtyDot = s.dirty ? `<span class="dirty-dot" title="${dirtyTagText} · 다시 생성 권장"></span>` : '';
   return `<tr ${s.dirty?'class="s3-row-dirty"':''}>
     <td class="s3-col-sid s3-cell-sid">${s.sid}</td>
     <td class="s3-col-name">
@@ -2547,13 +2568,19 @@ function openLengthModal(scope){
   // 프롬프트 초기화
   const promptEl = document.getElementById('s3-prompt-input');
   if (promptEl) { promptEl.value = ''; updateS3PromptCount(); autoResizeS3Prompt(promptEl); }
-  // 요청사항 영역 노출 규칙
-  // - 'regen' (개별 자발적 재생성): 항상 노출
-  // - 'all' (전체 생성/재생성): 기존 생성된 학생이 한 명이라도 있으면 노출 (재생성 맥락)
-  // - 'one' (1·2단계 변경 후 재생성): 비노출 (변경 사항 그대로 반영하면 되므로)
+  // 요청사항 영역 노출 규칙 (단순화)
+  // - 첫 생성 케이스에만 비노출 (비교 대상 없음)
+  // - 기존 기록 있는 학생이 포함된 재생성에서는 항상 노출 (입력은 선택)
   const promptSection = document.getElementById('s3-prompt-section');
-  const hasAnyExistingRecord = STUDENTS.some(st => st.s3 && st.s3.aiText);
-  const showPrompt = scope.type === 'regen' || (scope.type === 'all' && hasAnyExistingRecord);
+  let showPrompt = false;
+  if (scope.type === 'one' || scope.type === 'regen') {
+    // 개별 재생성: 해당 학생이 기록 보유면 노출
+    const target = STUDENTS.find(st => st.id === scope.sid);
+    showPrompt = !!(target && target.s3 && target.s3.aiText);
+  } else if (scope.type === 'all') {
+    // 전체: 학생 중 1명이라도 기록 보유면 노출
+    showPrompt = STUDENTS.some(st => st.s3 && st.s3.aiText);
+  }
   if (promptSection) promptSection.style.display = showPrompt ? '' : 'none';
   $('modal-length').classList.add('show');
   lucide.createIcons();
@@ -2593,23 +2620,27 @@ function populateStuPick(){
     <span class="stu-pick-header-spacer"></span>
     <span class="stu-pick-header-col sid">학번</span>
     <span class="stu-pick-header-col name">이름</span>
-    <span class="stu-pick-header-col data">분석</span>
-    <span class="stu-pick-header-col gen">AI 기록</span>
+    <span class="stu-pick-header-col gen">상태</span>
   </div>`;
   const rows = sorted.map(s => {
     const s3 = getS3(s);
-    const canGen = s3CanGenerate(s);
-    const dataTag = dataStatusTag(s);
+    const hasData = s3CanGenerate(s);
+    const needsAnalysis = s3IsUnanalyzed(s);
+    // 일관성: 분석 안 거친 학생은 개별 흐름과 동일하게 선택 불가 (분석 필수 정책)
+    const canSelect = hasData && !needsAnalysis;
     let genTag = '';
-    if (!canGen) genTag = '<span class="stu-pick-tag disabled"><span class="dot"></span>생성 불가</span>';
-    else if (s3.aiText) genTag = s.dirty ? '<span class="stu-pick-tag warn"><span class="dot"></span>재생성 필요</span>' : '<span class="stu-pick-tag exists"><span class="dot"></span>생성 완료</span>';
+    if (!hasData) genTag = '<span class="stu-pick-tag disabled"><span class="dot"></span>생성 불가</span>';
+    else if (needsAnalysis) genTag = '<span class="stu-pick-tag muted"><span class="dot"></span>분석 필요</span>';
+    else if (s3.aiText) genTag = s.dirty ? '<span class="stu-pick-tag warn"><span class="dot"></span>다시 생성 필요</span>' : '<span class="stu-pick-tag exists"><span class="dot"></span>생성 완료</span>';
     else genTag = '<span class="stu-pick-tag muted"><span class="dot"></span>생성 전</span>';
-    const disabledCls = canGen ? '' : 'disabled';
-    return `<label class="stu-pick-row ${disabledCls}" ${canGen ? '' : 'title="자료나 활동 내용이 없어 생성할 수 없습니다"'}>
-      <input type="checkbox" class="stu-pick-cb" value="${s.id}" data-unanalyzed="${s3IsUnanalyzed(s)?'1':'0'}" ${canGen ? 'checked' : 'disabled'} onchange="updateStuPickCount()">
+    const disabledCls = canSelect ? '' : 'disabled';
+    const titleAttr = !hasData
+      ? 'title="자료나 활동 내용이 없어 생성할 수 없습니다"'
+      : (needsAnalysis ? 'title="2단계 분석을 먼저 진행해야 기록 생성이 가능해요"' : '');
+    return `<label class="stu-pick-row ${disabledCls}" ${titleAttr}>
+      <input type="checkbox" class="stu-pick-cb" value="${s.id}" data-unanalyzed="${needsAnalysis?'1':'0'}" ${canSelect ? 'checked' : 'disabled'} onchange="updateStuPickCount()">
       <span class="stu-pick-sid">${s.sid}</span>
       <span class="stu-pick-name">${s.name}</span>
-      <span class="stu-pick-col data">${dataTag}</span>
       <span class="stu-pick-col gen">${genTag}</span>
     </label>`;
   }).join('');
@@ -2629,18 +2660,19 @@ function updateStuPickCount(){
   master.indeterminate = checked > 0 && checked < cbs.length;
   const btn = document.getElementById('s3-confirm-btn');
   if (btn && pendingGenerate?.type === 'all') btn.disabled = checked === 0;
-  // 선택된 학생 중 분석 안 된 학생이 있으면 경고 노출
-  const hasUnanalyzedSelected = checkedCbs.some(cb => cb.dataset.unanalyzed === '1');
+  // 분석 안 된 학생이 한 명이라도 존재하면 안내 경고 노출 (이제는 선택 불가 상태)
+  const hasUnanalyzedAny = document.querySelectorAll('.stu-pick-cb[data-unanalyzed="1"]').length > 0;
   const warn = document.getElementById('s3-analyze-warning');
-  if (warn) warn.style.display = hasUnanalyzedSelected ? 'flex' : 'none';
-  // 요청사항 영역: 선택된 학생 중 기존 생성된 학생이 있을 때만 노출 ('all' 타입에 한정)
+  if (warn) warn.style.display = hasUnanalyzedAny ? 'flex' : 'none';
+  // 요청사항 영역 ('all' 타입): 선택된 학생 중 기존 기록 보유자가 있을 때만 노출
+  // (단순 규칙 — 재생성 맥락이면 항상 노출, 첫 생성만 비노출)
   if (pendingGenerate?.type === 'all') {
-    const hasSelectedWithRecord = checkedCbs.some(cb => {
+    const hasAnyRecord = checkedCbs.some(cb => {
       const s = STUDENTS.find(st => st.id === +cb.value);
       return s && s.s3 && s.s3.aiText;
     });
     const promptSection = document.getElementById('s3-prompt-section');
-    if (promptSection) promptSection.style.display = hasSelectedWithRecord ? '' : 'none';
+    if (promptSection) promptSection.style.display = hasAnyRecord ? '' : 'none';
   }
 }
 
@@ -2713,7 +2745,7 @@ function confirmLength(){
       delete s._dataChangedSinceGen;
       if(!s3.editText) s3.editText = s3.aiText;
       renderStep3();
-      showToast((scope.type === 'regen' ? '기록을 재생성했어요' : '기록을 생성했어요') + promptSuffix);
+      showToast((scope.type === 'regen' ? '기록을 다시 생성했어요' : '기록을 생성했어요') + promptSuffix);
     }
   }
 }
@@ -2803,7 +2835,7 @@ function refreshS3Cta(){
   const btn = $('s3-genall-btn');
   if(btn){
     btn.innerHTML = (allGenerated && generated > 0)
-      ? '<i data-lucide="refresh-ccw" style="width:14px;height:14px"></i> 전체 재생성'
+      ? '<i data-lucide="refresh-ccw" style="width:14px;height:14px"></i> 전체 다시 생성'
       : '<i data-lucide="sparkles" style="width:14px;height:14px"></i> 전체 기록 생성';
     // 모든 학생이 자료·활동 내용 둘 다 없으면 비활성
     const hasAnyData = STUDENTS.some(s => s.files.length > 0 || s.keywords.length > 0);
@@ -3142,11 +3174,13 @@ function startAnalyze(sid){
     const data = STEP2_DATA[s.sid] || {items: STEP2_DEFAULT_ITEMS.slice(0,5)};
     s2.selectedIds = new Set(data.items.filter(it=>it.source_origin==='stage1_recommended').map(it=>it.id));
     s2.unsavedChanges = false;
-    // 분석 완료 후 기존 AI 기록이 있다면 → 기록은 stale 상태. 3단계 [재생성] 유도 표시 유지
+    // 분석 완료 후 기존 AI 기록이 있다면 → 기록은 stale 상태. 3단계 [다시 생성] 유도 표시
+    // 재분석으로 data-side(file/kw) 변경은 반영 완료 → _dirtyLevels에서 제거하고 'analysis'만 남김
     if(hadRecord){
-      s._dirtyLevel = 'items';
+      s._dirtyLevels = new Set(['analysis']);
+      s._dirtyLevel = 'analysis';
       s._editChanged = true;
-      s.dirty = true; // 3단계 점/주황 안내 노출용 — 사용자가 재생성하면 generateOne 에서 false 처리됨
+      s.dirty = true; // 3단계 점/태그 노출용 — 사용자가 다시 생성하면 generateOne 에서 false 처리됨
     }
     if(s.id === s2CurStudentId){ renderS2Main(); }
     renderS2Sidebar();
