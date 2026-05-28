@@ -152,6 +152,28 @@ body.nav-expanded .main-shell { margin-left: 200px; transition: margin-left .2s 
 .rp-actions { display: flex; gap: 12px; margin-top: 24px; }
 .btn-reset { display: inline-flex; align-items: center; justify-content: center; gap: 6px; height: 48px; padding: 0 20px; border: 1px solid #d9d9d9; border-radius: 10px; background: #fff; color: #3b3f4c; font-size: 16px; font-weight: 600; cursor: pointer; line-height: 1; vertical-align: middle; flex-shrink: 0; }
 .btn-reset:hover { background: #f6f7f9; }
+/* 초기화 확인 모달 */
+.cf-bg { display: none; position: fixed; inset: 0; background: rgba(34,38,49,.45); z-index: 520; align-items: center; justify-content: center; padding: 20px; }
+.cf-bg.show { display: flex; }
+.cf-modal { background: #fff; border-radius: 16px; width: 100%; max-width: 420px; box-shadow: 0 12px 40px rgba(0,0,0,.18); overflow: hidden; }
+.cf-body { padding: 24px 24px 18px; }
+.cf-title { font-size: 18px; font-weight: 700; color: #222631; margin-bottom: 8px; }
+.cf-desc { font-size: 15px; color: #6d7381; line-height: 1.6; }
+.cf-ft { display: flex; justify-content: flex-end; gap: 10px; padding: 0 24px 20px; }
+.cf-cancel { height: 44px; padding: 0 20px; border: 1px solid #d9d9d9; border-radius: 8px; background: #fff; color: #3b3f4c; font-size: 16px; font-weight: 600; cursor: pointer; }
+.cf-cancel:hover { background: #f6f7f9; }
+.cf-ok { height: 44px; padding: 0 20px; border: none; border-radius: 8px; background: #f2525f; color: #fff; font-size: 16px; font-weight: 600; cursor: pointer; }
+.cf-ok:hover { background: #e0414e; }
+/* 마지막 학생 확인 모달 (중앙 아이콘형) */
+.lastmo { text-align: center; padding: 32px 28px 26px; }
+.lastmo-ic { width: 56px; height: 56px; border-radius: 50%; background: #eef3ff; color: #416bff; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 16px; }
+.lastmo-title { font-size: 20px; font-weight: 700; color: #222631; margin-bottom: 8px; }
+.lastmo-desc { font-size: 15px; color: #6d7381; line-height: 1.6; margin-bottom: 24px; }
+.lastmo-ft { display: flex; gap: 10px; }
+.lastmo-no { flex: 1; height: 48px; border: 1px solid #c5dbff; border-radius: 10px; background: #fff; color: #416bff; font-size: 16px; font-weight: 600; cursor: pointer; }
+.lastmo-no:hover { background: #f4f8ff; }
+.lastmo-yes { flex: 1.4; height: 48px; border: none; border-radius: 10px; background: #416bff; color: #fff; font-size: 16px; font-weight: 600; cursor: pointer; }
+.lastmo-yes:hover { background: #365eef; }
 .btn-save { display: inline-flex; align-items: center; justify-content: center; gap: 8px; flex: 1; height: 48px; border: none; border-radius: 10px; background: #416bff; color: #fff; font-size: 16px; font-weight: 600; cursor: pointer; line-height: 1; vertical-align: middle; }
 .btn-save:hover { background: #365eef; }
 
@@ -177,6 +199,10 @@ body.nav-expanded .main-shell { margin-left: 200px; transition: margin-left .2s 
 /* AI 작업 중(분석 중) 잠금 — 작업 중엔 편집·이동 차단 */
 .busy-toast { position: fixed; left: 50%; bottom: 32px; transform: translateX(-50%); background: #222631; color: #fff; font-size: 15px; padding: 12px 20px; border-radius: 10px; z-index: 600; opacity: 0; transition: opacity .2s, transform .2s; pointer-events: none; }
 .busy-toast.show { opacity: 1; transform: translateX(-50%) translateY(-4px); }
+/* 성공 토스트 (초록 + 체크) */
+.ok-toast { position: fixed; right: 32px; bottom: 32px; display: flex; align-items: center; gap: 10px; background: #1ab864; color: #fff; font-size: 16px; font-weight: 600; padding: 16px 22px; border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,.18); z-index: 600; opacity: 0; transform: translateY(8px); transition: opacity .2s, transform .2s; pointer-events: none; }
+.ok-toast.show { opacity: 1; transform: translateY(0); }
+.ok-toast .ok-ic { display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; }
 body.is-busy .left-col,
 body.is-busy .kw-box,
 body.is-busy .dropzone,
@@ -401,8 +427,8 @@ body.is-busy .back-link { opacity: .5; cursor: not-allowed; }
         </div>
 
         <div class="rp-actions">
-          <button class="btn-reset">초기화 <i data-lucide="rotate-ccw" style="width:16px;height:16px"></i></button>
-          <button class="btn-save">저장 후 다음 학생 <i data-lucide="chevron-right" style="width:18px;height:18px"></i></button>
+          <button class="btn-reset" onclick="openReset()">초기화 <i data-lucide="rotate-ccw" style="width:16px;height:16px"></i></button>
+          <button class="btn-save" onclick="saveNext()">저장 후 다음 학생 <i data-lucide="chevron-right" style="width:18px;height:18px"></i></button>
         </div>
       </div>
     </div>
@@ -411,6 +437,33 @@ body.is-busy .back-link { opacity: .5; cursor: not-allowed; }
   <div class="page-nav">
     <button class="pn-btn pn-prev"><i data-lucide="chevron-left" style="width:18px;height:18px"></i> 이전 단계</button>
     <button class="pn-btn pn-next" onclick="location.href='quick_seteuk_dev_ai_v1_260528.html'">다음 단계 <i data-lucide="chevron-right" style="width:18px;height:18px"></i></button>
+  </div>
+
+  <!-- 초기화 확인 모달 -->
+  <div class="cf-bg" id="resetModal" onclick="if(event.target===this)closeReset()">
+    <div class="cf-modal">
+      <div class="cf-body">
+        <div class="cf-title">입력 내용을 초기화할까요?</div>
+        <div class="cf-desc">업로드한 파일과 키워드·활동 입력, 수행 수준이 모두 지워져요. 되돌릴 수 없어요.</div>
+      </div>
+      <div class="cf-ft">
+        <button class="cf-cancel" onclick="closeReset()">취소</button>
+        <button class="cf-ok" onclick="doReset()">초기화</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 마지막 학생 확인 모달 -->
+  <div class="cf-bg" id="lastModal" onclick="if(event.target===this)closeLast()">
+    <div class="cf-modal lastmo">
+      <div class="lastmo-ic"><i data-lucide="circle-check" style="width:30px;height:30px"></i></div>
+      <div class="lastmo-title">마지막 학생입니다.</div>
+      <div class="lastmo-desc">입력을 완료하고 다음 단계로 넘어갈까요?</div>
+      <div class="lastmo-ft">
+        <button class="lastmo-no" onclick="closeLast()">아니오</button>
+        <button class="lastmo-yes" onclick="location.href='quick_seteuk_dev_ai_v1_260528.html'">네, 넘어갑니다.</button>
+      </div>
+    </div>
   </div>
 
 </main>
@@ -439,6 +492,30 @@ function busyToast(msg){
   t.textContent = msg; t.classList.add('show');
   clearTimeout(_busyTimer); _busyTimer = setTimeout(function(){ t.classList.remove('show'); }, 2000);
 }
+var _okTimer;
+function okToast(msg){
+  var t = document.getElementById('okToast');
+  if(!t){ t = document.createElement('div'); t.id = 'okToast'; t.className = 'ok-toast'; document.body.appendChild(t); }
+  t.innerHTML = '<span class="ok-ic"><i data-lucide="circle-check" style="width:22px;height:22px"></i></span><span>' + msg + '</span>';
+  lucide.createIcons();
+  t.classList.add('show');
+  clearTimeout(_okTimer); _okTimer = setTimeout(function(){ t.classList.remove('show'); }, 2400);
+}
+function saveNext(){
+  var items = [].slice.call(document.querySelectorAll('.stu-item'));
+  var idx = items.findIndex(function(it){ return it.classList.contains('active'); });
+  if(idx === -1) return;
+  if(idx < items.length - 1){
+    selectStu(items[idx + 1]);
+    items[idx + 1].scrollIntoView({ block: 'nearest' });
+    okToast('저장 후 다음학생으로 이동되었습니다.');
+  } else {
+    saveActive();
+    openLast();
+  }
+}
+function openLast(){ document.getElementById('lastModal').classList.add('show'); }
+function closeLast(){ document.getElementById('lastModal').classList.remove('show'); }
 function setBusy(on){
   _busy = on;
   document.body.classList.toggle('is-busy', on);
@@ -557,6 +634,28 @@ function removeFile(){
   document.getElementById('dropzone').style.display = 'block';
   document.getElementById('aiResult').style.display = 'none';
   updateActiveTags();
+}
+function openReset(){ document.getElementById('resetModal').classList.add('show'); }
+function closeReset(){ document.getElementById('resetModal').classList.remove('show'); }
+function doReset(){
+  // 파일 초기화
+  document.getElementById('fileInput').value = '';
+  document.getElementById('fileBox').style.display = 'none';
+  document.getElementById('dropzone').style.display = 'block';
+  document.getElementById('aiResult').style.display = 'none';
+  var ab = document.getElementById('analyzeBtn');
+  if(ab){ ab.disabled = false; ab.innerHTML = '<i data-lucide="sparkles" style="width:16px;height:16px"></i> AI 분석 · 크레딧 1'; }
+  // 입력 내용 초기화
+  document.getElementById('inputContent').value = '';
+  document.getElementById('aiResultText').value = '';
+  // 키워드 선택 해제
+  document.querySelectorAll('#kwBox .kw-chip.sel').forEach(function(c){ c.classList.remove('sel'); });
+  // 수행 수준 → 중
+  document.querySelectorAll('.level-btn').forEach(function(b){ b.classList.toggle('sel', b.textContent.trim()==='중'); });
+  closeReset();
+  updateActiveTags();
+  lucide.createIcons();
+  okToast('초기화되었습니다.');
 }
 function runAnalyze(){
   var btn = document.getElementById('analyzeBtn');
