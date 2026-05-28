@@ -442,6 +442,12 @@ body.nav-expanded .sticky-cta{left:200px;transition:left .2s ease}
 .s3-bring-btn:hover:not(:disabled){border-color:#416bff;color:#416bff;background:#f4f8ff}
 .s3-bring-btn:disabled{opacity:.4;cursor:not-allowed}
 
+/* AI 작업 중(분석 중·생성 중) 비활성 — 클릭 가드는 JS가 처리, title로 툴팁 */
+.busy-off{opacity:.45!important;cursor:not-allowed!important}
+.busy-off:hover{background:inherit!important;border-color:inherit!important;color:inherit!important}
+.row-spinner{width:15px;height:15px;border:2px solid #e9f2ff;border-top-color:#416bff;border-radius:50%;animation:spin .8s linear infinite;display:inline-block;flex-shrink:0}
+.s3-busy-cell{display:flex;align-items:center;gap:8px;padding:6px 0;color:#6d7381;font-size:13px}
+
 /* dirty indicator */
 .dirty-dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:#f97316;margin-left:5px;vertical-align:middle;flex-shrink:0}
 .s3-mini-btn.ai.attention{border-color:#f97316;color:#c2410c;background:#fff7ed}
@@ -1990,6 +1996,10 @@ function refreshDrawerItemCount(s){
   if($('dr-items-cnt')) $('dr-items-cnt').textContent = `${sel}/${total}`;
 }
 function renderDrawerDataPane(s){
+  // AI 작업 중(분석 중·생성 중)이면 자료/내용/수준 편집 비활성 (클릭 시 토스트 가드)
+  const busy = isStudentBusy(s);
+  const busyTitle = busy ? ` title="${BUSY_TIP}"` : '';
+  const busyCls = busy ? ' busy-off' : '';
   const renderFileRow = (f, i) => {
     const isVirtual = f.type === 'survey';
     const matchLabel = isVirtual
@@ -2005,7 +2015,7 @@ function renderDrawerDataPane(s){
         <div class="file-match-meta">${matchLabel}</div>
       </div>
       ${actionBtn}
-      <button class="icon-btn" onclick="event.stopPropagation();askRemoveStudentFile(${s.id},${i})"><i data-lucide="x" style="width:14px;height:14px"></i></button>
+      <button class="icon-btn${busyCls}"${busyTitle} onclick="event.stopPropagation();askRemoveStudentFile(${s.id},${i})"><i data-lucide="x" style="width:14px;height:14px"></i></button>
     </div>`;
   };
   const surveyFiles = s.files.map((f,i)=>({f,i})).filter(x => x.f.kindLabel === '설문');
@@ -2036,7 +2046,7 @@ function renderDrawerDataPane(s){
         <div class="dp-count">PDF ${pdfCount}개 / 1개</div>
       </div>
       ${pdfCount === 0 ? `
-        <div class="mini-dropzone" onclick="pickIndFile()">
+        <div class="mini-dropzone${busyCls}"${busyTitle} onclick="pickIndFile()">
           <i data-lucide="upload" style="width:24px;height:24px;color:#6d7381"></i>
           <div class="mini-dz-text">PDF 파일 업로드</div>
           <div class="mini-dz-hint">PDF 1개 · 최대 20MB</div>
@@ -2060,7 +2070,7 @@ function renderDrawerDataPane(s){
     ` : ''}
     <div class="dp-section">
       <div class="dp-label">활동 내용 <span class="dp-optional">(선택)</span></div>
-      <textarea class="kw-textarea" id="dr-kw-text" maxlength="1000" oninput="updateDrKwCount();autoResizeDrKw()" onblur="commitDrawerKeywords()" placeholder="예) 협력적, 적극적, 발표 잘함">${s.keywords.map(k=>k.text).join(', ')}</textarea>
+      <textarea class="kw-textarea${busyCls}" id="dr-kw-text" maxlength="1000" ${busy?'disabled':''}${busyTitle} oninput="updateDrKwCount();autoResizeDrKw()" onblur="commitDrawerKeywords()" placeholder="예) 협력적, 적극적, 발표 잘함">${s.keywords.map(k=>k.text).join(', ')}</textarea>
       <div class="kw-foot">
         <span class="kw-hint"></span>
         <span class="kw-count" id="dr-kw-count">0 / 1000자</span>
@@ -2069,10 +2079,10 @@ function renderDrawerDataPane(s){
     <div class="dp-section" style="margin-bottom:0">
       <div class="dp-label">참여 정도 <span class="dp-optional">(선택)</span></div>
       <div class="level-chips" id="dr-level-chips">
-        <button class="level-chip ${lev==='high'?'active':''}" data-level="high" onclick="setDrawerLevel('high')">상</button>
-        <button class="level-chip ${lev==='mid'?'active':''}" data-level="mid" onclick="setDrawerLevel('mid')">중</button>
-        <button class="level-chip ${lev==='low'?'active':''}" data-level="low" onclick="setDrawerLevel('low')">하</button>
-        <button class="level-chip ${lev==='none'?'active':''}" data-level="none" onclick="setDrawerLevel('none')">자동</button>
+        <button class="level-chip ${lev==='high'?'active':''}${busyCls}"${busyTitle} data-level="high" onclick="setDrawerLevel('high')">상</button>
+        <button class="level-chip ${lev==='mid'?'active':''}${busyCls}"${busyTitle} data-level="mid" onclick="setDrawerLevel('mid')">중</button>
+        <button class="level-chip ${lev==='low'?'active':''}${busyCls}"${busyTitle} data-level="low" onclick="setDrawerLevel('low')">하</button>
+        <button class="level-chip ${lev==='none'?'active':''}${busyCls}"${busyTitle} data-level="none" onclick="setDrawerLevel('none')">자동</button>
       </div>
     </div>
   `;
@@ -2098,8 +2108,8 @@ function commitDrawerKeywords(){
   if(!ta || !curDetailId) return;
   const s = STUDENTS.find(x=>x.id===curDetailId);
   if(!s) return;
-  // 파이프라인 진행 중 → 변경 무시
-  if(s.s2 && s.s2.status === 'analyzing') return;
+  // AI 작업 중 → 변경 무시 (onblur라 토스트 없이 조용히 차단)
+  if(isStudentBusy(s)) return;
   const parsed = ta.value.split(/[,，]/).map(x=>x.trim()).filter(Boolean);
   const oldText = s.keywords.map(k=>k.text).join('|');
   const newText = parsed.join('|');
@@ -2109,11 +2119,8 @@ function commitDrawerKeywords(){
 function setDrawerLevel(level){
   const s = STUDENTS.find(x=>x.id===curDetailId);
   if(!s) return;
-  // 파이프라인 진행 중 → 변경 차단
-  if(s.s2 && s.s2.status === 'analyzing'){
-    showToast('분석 진행 중에는 수정할 수 없어요. 완료 후 다시 시도해 주세요');
-    return;
-  }
+  // AI 작업 중 → 변경 차단
+  if(blockIfBusy(s)) return;
   const oldLevel = s.level;
   s.level = level === 'none' ? null : level;
   if(oldLevel !== s.level) markDirty(s, 'items');
@@ -2274,11 +2281,8 @@ function pickIndFile(){
   if(!curDetailId) return;
   const s = STUDENTS.find(x=>x.id===curDetailId);
   if(!s) return;
-  // 파이프라인 진행 중(분석 중) → 수정 차단
-  if(s.s2 && s.s2.status === 'analyzing'){
-    showToast('분석 진행 중에는 수정할 수 없어요. 완료 후 다시 시도해 주세요');
-    return;
-  }
+  // AI 작업 중 → 수정 차단
+  if(blockIfBusy(s)) return;
   // 정책: 학생당 PDF 1개 (학급 일괄 PDF '활동지' 또는 드로어 개별 PDF 중 하나만)
   const hasPdf = s.files.some(f => !f._pendingDelete && (f.kindLabel === '활동지' || f.kindLabel === '개별'));
   if(hasPdf){ showToast('이미 PDF 자료가 등록되어 있어요. 기존 자료를 삭제 후 다시 등록해 주세요'); return; }
@@ -2316,11 +2320,8 @@ let _pendingFileDel = null;
 function askRemoveStudentFile(sid, idx){
   const s = STUDENTS.find(x=>x.id===sid);
   if(!s || !s.files[idx]) return;
-  // 파이프라인 진행 중(분석 중) → 수정 차단
-  if(s.s2 && s.s2.status === 'analyzing'){
-    showToast('분석 진행 중에는 수정할 수 없어요. 완료 후 다시 시도해 주세요');
-    return;
-  }
+  // AI 작업 중 → 수정 차단
+  if(blockIfBusy(s)) return;
   _pendingFileDel = { sid, idx };
   document.getElementById('modal-file-del').classList.add('show');
   lucide.createIcons();
@@ -2501,6 +2502,38 @@ function scheduleAutoSave(){
     if($('s3-saved')) $('s3-saved').textContent = s3LastSaved;
   }, 1200);
 }
+// ───── AI 작업 중(분석 중·생성 중) 차단 헬퍼 ─────
+const BUSY_TIP = 'AI 작업 중에는 수정할 수 없어요. 완료 후 다시 시도해 주세요';
+function isStudentBusy(s){
+  return !!(s && ((s.s2 && s.s2.status === 'analyzing') || s._generating));
+}
+function anyStudentBusy(){
+  return STUDENTS.some(isStudentBusy);
+}
+// 특정 학생 또는 전체 기준으로 작업 중이면 토스트 후 true 반환
+function blockIfBusy(s){
+  const busy = s ? isStudentBusy(s) : anyStudentBusy();
+  if(busy){ showToast(BUSY_TIP); return true; }
+  return false;
+}
+// 일괄(헤더) 버튼들 비활성 동기화 — 작업 중인 학생이 한 명이라도 있으면 차단
+function refreshBusyControls(){
+  const busy = anyStudentBusy();
+  ['btn-data-add','s2-rerun-btn','s3-genall-btn','s3-bringall-btn'].forEach(id=>{
+    const el = document.getElementById(id);
+    if(!el) return;
+    if(busy){
+      el.classList.add('busy-off');
+      el.setAttribute('title', BUSY_TIP);
+      el.dataset.busyBlocked = '1';
+    } else if(el.dataset.busyBlocked === '1'){
+      el.classList.remove('busy-off');
+      el.removeAttribute('title');
+      delete el.dataset.busyBlocked;
+    }
+  });
+}
+
 function renderStep3(){
   // 데모: 설문/활동지가 있어 분석 가능한 학생만 자동 채움. 키워드만/빈화면은 AI 생성 전 상태로 유지
   STUDENTS.forEach((s, i) => {
@@ -2549,6 +2582,7 @@ function s3SourceChipsHtml(s){
 
 function renderS3Row(s){
   const s3 = getS3(s);
+  const busy = isStudentBusy(s);
   // 변경 종류 무관 단일 라벨 (백엔드 추적 부담 줄이기 — Jacob 제안 반영)
   const dirtyTagText = '변경됨';
   const srcChipsHtml = (s3 && s3.aiText) ? s3SourceChipsHtml(s) : '';
@@ -2603,6 +2637,12 @@ function renderS3Row(s){
     </div>`;
   }
 
+  // AI 작업 중(분석 중·생성 중)이면 AI 기록 셀을 스피너로 대체하고 액션 버튼 차단
+  if(busy){
+    const busyMsg = (s.s2 && s.s2.status === 'analyzing') ? '자료를 분석하고 있어요' : 'AI가 기록을 생성하고 있어요';
+    aiCell = `<div class="s3-ai-box"><div class="s3-busy-cell"><span class="row-spinner"></span><span>${busyMsg}</span></div></div>`;
+  }
+
   const editText = s3.editText || '';
   const editBytes = byteLen(editText);
   const overLimit = editBytes > 1500;
@@ -2623,7 +2663,7 @@ function renderS3Row(s){
       ${window.currentRelease === 'after' ? `<button class="s3-mini-btn" onclick="openDrawer(${s.id})"><i data-lucide="edit-3" style="width:12px;height:12px"></i> 수정</button>` : ''}
     </td>
     <td class="s3-col-ai">${aiCell}</td>
-    <td class="s3-col-bring"><button class="s3-bring-btn" onclick="bringToEdit(${s.id})" ${s3.aiText?'':'disabled'}><i data-lucide="arrow-right" style="width:14px;height:14px"></i><span>가져<br>오기</span></button></td>
+    <td class="s3-col-bring"><button class="s3-bring-btn" onclick="bringToEdit(${s.id})" ${(s3.aiText && !busy)?'':'disabled'}${busy?` title="${BUSY_TIP}"`:''}><i data-lucide="arrow-right" style="width:14px;height:14px"></i><span>가져<br>오기</span></button></td>
     <td class="s3-col-edit">${editCell}</td>
     <td class="s3-col-bytes">${bytesCell}</td>
   </tr>`;
@@ -2752,28 +2792,27 @@ function confirmLength(){
   if(!pendingGenerate) return;
   const scope = pendingGenerate;
   pendingGenerate = null;
+
+  // 생성 대상 학생 결정
+  let targets = [];
   if(scope.type === 'all'){
     const selectedIds = new Set(Array.from(document.querySelectorAll('.stu-pick-cb:checked')).map(cb => parseInt(cb.value)));
     if (selectedIds.size === 0) { showToast('생성할 학생을 선택해 주세요'); return; }
-    let n = 0;
-    STUDENTS.forEach(s=>{
-      if (!selectedIds.has(s.id)) return;
-      if(s.files.length===0 && s.keywords.length===0) return;
-      const s3 = getS3(s);
-      if(!s3.aiText || s.dirty){
-        s3.aiText = pickMockText(s);
-        s3.generatedAt = Date.now();
-        s.dirty = false;
-        s._dirtyLevel = null; if(s._dirtyLevels) s._dirtyLevels.clear();
-        if(!s3.editText) s3.editText = s3.aiText;
-        n++;
-      }
-    });
-    renderStep3();
-    showToast(`${n}명 기록을 생성했어요`);
+    targets = STUDENTS.filter(s => selectedIds.has(s.id) && (s.files.length>0 || s.keywords.length>0) && (!getS3(s).aiText || s.dirty));
   } else {
     const s = STUDENTS.find(x=>x.id===scope.sid);
-    if(s){
+    if(s) targets = [s];
+  }
+  if(targets.length === 0){ renderStep3(); return; }
+
+  // 생성 중 상태 진입 → 헤더·행 버튼 비활성 + 행 스피너 노출
+  targets.forEach(s => { s._generating = true; });
+  renderStep3();
+  refreshBusyControls();
+
+  setTimeout(()=>{
+    let n = 0;
+    targets.forEach(s=>{
       const s3 = getS3(s);
       s3.aiText = pickMockText(s);
       s3.generatedAt = Date.now();
@@ -2781,23 +2820,28 @@ function confirmLength(){
       s._dirtyLevel = null; if(s._dirtyLevels) s._dirtyLevels.clear();
       delete s._dataChangedSinceGen;
       if(!s3.editText) s3.editText = s3.aiText;
-      renderStep3();
-      showToast(scope.type === 'regen' ? '기록을 다시 생성했어요' : '기록을 생성했어요');
-    }
-  }
+      s._generating = false;
+      n++;
+    });
+    renderStep3();
+    refreshBusyControls();
+    showToast(scope.type === 'all' ? `${n}명 기록을 생성했어요` : (scope.type === 'regen' ? '기록을 다시 생성했어요' : '기록을 생성했어요'));
+  }, 1400);
 }
-function generateAllRecords(){ openLengthModal({type:'all'}); }
-function generateOne(sid){ openLengthModal({type:'one', sid}); }
-function regenerateOne(sid){ openLengthModal({type:'regen', sid}); }
+function generateAllRecords(){ if(blockIfBusy()) return; openLengthModal({type:'all'}); }
+function generateOne(sid){ const s = STUDENTS.find(x=>x.id===sid); if(blockIfBusy(s)) return; openLengthModal({type:'one', sid}); }
+function regenerateOne(sid){ const s = STUDENTS.find(x=>x.id===sid); if(blockIfBusy(s)) return; openLengthModal({type:'regen', sid}); }
 function bringToEdit(sid){
   const s = STUDENTS.find(x=>x.id===sid);
   if(!s) return;
+  if(blockIfBusy(s)) return;
   const s3 = getS3(s);
   if(!s3.aiText) return;
   s3.editText = s3.aiText;
   renderStep3();
 }
 function bringAllToEdit(){
+  if(blockIfBusy()) return;
   // 모든 학생의 AI 기록 → 선생님 작성 기록으로 일괄 옮기기
   // 이미 작성된 내용이 있는 학생이 있으면 확인 모달 표시
   const hasExisting = STUDENTS.some(s => {
@@ -3165,6 +3209,7 @@ function renderS2CustomCard(sid, c, idx){
 function toggleS2Item(sid, itemId){
   const s = STUDENTS.find(x=>x.id===sid);
   if(!s) return;
+  if(blockIfBusy(s)) return;
   const s2 = getS2(s);
   if(s2.selectedIds.has(itemId)) s2.selectedIds.delete(itemId);
   else s2.selectedIds.add(itemId);
@@ -3205,9 +3250,11 @@ function startAnalyze(sid){
   const s = STUDENTS.find(x=>x.id===sid);
   if(!s) return;
   const s2 = getS2(s);
+  if(s2.status === 'analyzing') return; // 이미 분석 중이면 중복 실행 차단
   s2.status = 'analyzing';
   renderS2Sidebar();
   renderS2Main();
+  refreshBusyControls();
   setTimeout(()=>{
     s2.status = 'done';
     const hadRecord = !!(s.s3 && s.s3.aiText);
@@ -3228,6 +3275,10 @@ function startAnalyze(sid){
     if(s.id === s2CurStudentId){ renderS2Main(); }
     renderS2Sidebar();
     refreshS2Cta();
+    refreshBusyControls();
+    // 3단계가 활성일 때 행 상태도 갱신 (분석 완료 → 생성 가능 반영)
+    const _act = document.querySelector('.step-btn.active');
+    if(_act && _act.id === 'step-3') renderStep3();
     // 드로어 열려 있으면 banner / items 갱신
     if(typeof isDrawerOpen === 'function' && isDrawerOpen() && curDetailId === s.id){
       if(typeof renderDrawerBanner === 'function') renderDrawerBanner(s);
@@ -3248,6 +3299,7 @@ function startAnalyzeAll(){
 function reanalyze(sid){
   const s = STUDENTS.find(x=>x.id===sid);
   if(!s) return;
+  if(blockIfBusy(s)) return;
   const s2 = getS2(s);
   s2.status = 'idle';
   s2.selectedIds.clear();
@@ -3323,6 +3375,7 @@ function detectInitialScenario(){
   return hasFiles ? 'data' : (hasKw ? 'keywords-only' : 'empty');
 }
 function rerunAI(){
+  if(blockIfBusy()) return;
   // 헤더의 [전체 분석 시작] / [전체 재분석] → 학생 선택 모달
   openAnalyzeModal();
 }
@@ -3435,6 +3488,7 @@ function skipStep2(){
 function addCustomItem(sid){
   const s = STUDENTS.find(x=>x.id===sid);
   if(!s) return;
+  if(blockIfBusy(s)) return;
   const s2 = getS2(s);
   if(s2.customs.length >= 1) return;  // 직접 추가는 1개만
   s2.customs.push({content:'', saved:false});
@@ -3473,6 +3527,7 @@ function updateCustom(sid, idx, content){
 function saveCustomItem(sid, idx){
   const s = STUDENTS.find(x=>x.id===sid);
   if(!s) return;
+  if(blockIfBusy(s)) return;
   const s2 = getS2(s);
   const c = s2.customs[idx];
   if(!c || !(c.content||'').trim()) return;
@@ -3600,6 +3655,7 @@ function refreshAll(){
   }
 }
 function openRegisterModal(){
+  if(blockIfBusy()) return;
   $('modal-register').classList.add('show');
   lucide.createIcons();
 }
