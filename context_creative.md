@@ -1,7 +1,7 @@
 # 창의적 체험활동 (창체) + 간편 세특 목업 — 작업 인수인계
 
 > 새 채팅 시작 시 이 문서 내용을 같이 첨부하면 즉시 컨텍스트 복원 가능
-> 마지막 갱신: 2026-05-27
+> 마지막 갱신: 2026-05-28
 
 ## 0. 빠른 시작 (다른 PC에서)
 새 채팅 첫 메시지에:
@@ -12,7 +12,7 @@
 - **Repo**: `https://github.com/obkim-lgtm/clipo-mockup` (master 브랜치)
 - **GitHub Pages 배포**: `https://obkim-lgtm.github.io/clipo-mockup/output/<파일명>`
 - **미리보기**: `preview_start('clipo-mockup')` → `localhost:3457`
-- **최근 커밋**: `81d5e9a 창체 Jacob 피드백 반영 (태그 단일화 / 케이스 통합 / 파이프라인 차단)`
+- **최근 커밋**: `4800886 창체 AI 작업 중(분석 중·생성 중) 버튼 비활성 + 통일 툴팁 반영`
 
 ## 2. 작업 대상 파일
 
@@ -66,9 +66,16 @@
 
 > Jacob 피드백 반영(2026-05-27): 3단계 태그는 변경 종류와 무관 단일 라벨 **"변경됨"** 사용 (백엔드 히스토리 추적 부담 ↓). 재분석 완료 후 케이스는 자료 변경 여부 무관 단일 케이스로 통합.
 
-### 파이프라인 진행 중 변경 차단 정책 (Jacob 피드백 반영)
-- 분석/생성 진행 중 학생: 자료/내용/수준 수정 비활성화
-- 코드 가드: `pickIndFile` / `askRemoveStudentFile` / `setDrawerLevel` / `commitDrawerKeywords` — `s.s2.status === 'analyzing'`이면 차단 + 토스트
+### AI 작업 중 차단 정책 (Jacob 피드백 반영 / 2026-05-28 확정)
+- **작업 상태 2종**: 분석 중(`s.s2.status==='analyzing'`) / 생성 중(`s._generating===true`)
+- **헬퍼**: `isStudentBusy(s)` (분석 중 OR 생성 중) / `anyStudentBusy()` / `blockIfBusy(s)` / `refreshBusyControls()` / 통일 툴팁 `BUSY_TIP`
+- **학생 단위 잠금**: 작업 중인 학생은 1·2·3단계 전 항목(자료/내용/수준/생성/가져오기) 비활성. 다른 학생은 자유
+- **글로벌 잠금(일괄만)**: 작업 중 학생 1명이라도 있으면 [일괄 자료 등록]·[전체 분석 시작]·[전체 기록 생성]·[전체 AI 기록 옮기기] 비활성 (`refreshBusyControls()` 가 id로 토글)
+- 한 학생은 분석↔생성 동시 불가(순차) — 2단계 진행 중 3단계 시작 불가, 반대도 동일
+- **UI**: disabled(`opacity:.45`+`busy-off` 클래스) + 통일 툴팁 `"AI 작업 중에는 수정할 수 없어요. 완료 후 다시 시도해 주세요"`
+- **3단계 생성 중**: 약 1.4s 비동기 상태 — 행에 `row-spinner` + "AI가 기록을 생성하고 있어요"
+- 클릭 가드: `pickIndFile`/`askRemoveStudentFile`/`setDrawerLevel`/`commitDrawerKeywords`/`generateOne`/`regenerateOne`/`bringToEdit`/`bringAllToEdit`/`toggleS2Item`/`reanalyze`/`rerunAI`/`openRegisterModal`/`addCustomItem`/`saveCustomItem` 모두 `blockIfBusy()` 가드
+- **라우팅 강제 진입**(백엔드 영역, 목업 비범위): 진입 버튼만 프론트 차단, 강제 진입 시 저장 시점 서버 에러로 처리
 - race condition 방지 + 어떤 태그 보여줄지 모호한 케이스 제거
 
 ### 1단계 모달 (자료 파일 변경 + 기록 보유 학생)
@@ -164,6 +171,7 @@ Figma 노드 처리 흐름:
 | 1단계 | `renderSummary()`, `openDrawer()`, `markDirty()` |
 | 2단계 | `renderS2Sidebar()`, `renderS2Main()`, `startAnalyze()`, `reanalyze()` |
 | 3단계 | `renderStep3()`, `renderS3Row()`, `generateAllRecords()`, `regenerateOne()`, `bringToEdit()`, `bringAllToEdit()` |
+| AI 작업 중 차단 | `isStudentBusy()`, `anyStudentBusy()`, `blockIfBusy()`, `refreshBusyControls()`, 상수 `BUSY_TIP` |
 | 데모 시드 | `seedDemoCompletedStudent()` |
 | 시나리오 토글 | `applyScenario(scenario)` |
 | 릴리스 토글 | `applyRelease(release)` |
