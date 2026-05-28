@@ -120,7 +120,8 @@ body.nav-expanded .main-shell { margin-left: 200px; transition: margin-left .2s 
 .dz-title { font-size: 16px; font-weight: 600; color: #3b3f4c; }
 .dz-title .hl { color: #416bff; }
 .dz-hint { font-size: 14px; color: #808080; margin-top: 6px; }
-.file-row { display: flex; align-items: center; gap: 12px; padding: 14px 16px; border: 1px solid #e5e7eb; border-radius: 12px; background: #fff; }
+.fileBox-row { display: flex; align-items: stretch; gap: 10px; }
+.file-row { flex: 1; min-width: 0; display: flex; align-items: center; gap: 12px; padding: 14px 16px; border: 1px solid #e5e7eb; border-radius: 12px; background: #fff; }
 .file-ic { width: 40px; height: 40px; border-radius: 10px; background: #fdeaea; color: #f2525f; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; }
 .file-meta { flex: 1; min-width: 0; }
 .file-name { font-size: 16px; font-weight: 600; color: #222631; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -128,7 +129,7 @@ body.nav-expanded .main-shell { margin-left: 200px; transition: margin-left .2s 
 .file-x { width: 32px; height: 32px; border: none; background: none; color: #9aa0ad; border-radius: 8px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; }
 .file-x:hover { background: #f1f3f5; color: #222631; }
 .analyze-row { display: flex; align-items: center; gap: 10px; margin-top: 12px; flex-wrap: wrap; }
-.btn-analyze { display: inline-flex; align-items: center; justify-content: center; gap: 6px; height: 40px; padding: 0 14px; border: none; border-radius: 8px; background: #416bff; color: #fff; font-size: 15px; font-weight: 600; cursor: pointer; line-height: 1; vertical-align: middle; white-space: nowrap; flex-shrink: 0; }
+.btn-analyze { display: inline-flex; align-items: center; justify-content: center; gap: 6px; align-self: stretch; padding: 0 18px; border: none; border-radius: 12px; background: #416bff; color: #fff; font-size: 15px; font-weight: 600; cursor: pointer; line-height: 1; vertical-align: middle; white-space: nowrap; flex-shrink: 0; }
 .btn-analyze:hover { background: #365eef; }
 .btn-analyze:disabled { background: #c7d3f6; cursor: default; }
 .credit-pill { display: inline-flex; align-items: center; gap: 4px; font-size: 13px; font-weight: 600; color: #416bff; background: #eef3ff; padding: 6px 11px; border-radius: 20px; line-height: 1; }
@@ -172,6 +173,20 @@ body.nav-expanded .main-shell { margin-left: 200px; transition: margin-left .2s 
 .ft-links a { font-size: 14px; color: #6d7381; text-decoration: none; }
 .ft-links a:hover { color: #416bff; }
 .ft-copy { font-size: 13px; color: #9aa0ad; }
+
+/* AI 작업 중(분석 중) 잠금 — 작업 중엔 편집·이동 차단 */
+.busy-toast { position: fixed; left: 50%; bottom: 32px; transform: translateX(-50%); background: #222631; color: #fff; font-size: 15px; padding: 12px 20px; border-radius: 10px; z-index: 600; opacity: 0; transition: opacity .2s, transform .2s; pointer-events: none; }
+.busy-toast.show { opacity: 1; transform: translateX(-50%) translateY(-4px); }
+body.is-busy .left-col,
+body.is-busy .kw-box,
+body.is-busy .dropzone,
+body.is-busy #fileBox .file-x,
+body.is-busy #inputContent,
+body.is-busy .level-seg,
+body.is-busy .rp-actions,
+body.is-busy .step-pill.nav,
+body.is-busy .page-nav,
+body.is-busy .back-link { opacity: .5; cursor: not-allowed; }
 </style>
 </head>
 <body>
@@ -351,14 +366,16 @@ body.nav-expanded .main-shell { margin-left: 200px; transition: margin-left .2s 
           </div>
 
           <div id="fileBox" style="display:none">
-            <div class="file-row">
-              <div class="file-ic"><i data-lucide="file-text" style="width:20px;height:20px"></i></div>
-              <div class="file-meta">
-                <div class="file-name" id="fileName">파일명.pdf</div>
-                <div class="file-size" id="fileSize">0MB</div>
+            <div class="fileBox-row">
+              <div class="file-row">
+                <div class="file-ic"><i data-lucide="file-text" style="width:20px;height:20px"></i></div>
+                <div class="file-meta">
+                  <div class="file-name" id="fileName">파일명.pdf</div>
+                  <div class="file-size" id="fileSize">0MB</div>
+                </div>
+                <button class="file-x" onclick="removeFile()"><i data-lucide="x" style="width:18px;height:18px"></i></button>
               </div>
               <button class="btn-analyze" id="analyzeBtn" onclick="runAnalyze()"><i data-lucide="sparkles" style="width:16px;height:16px"></i> AI 분석 · 크레딧 1</button>
-              <button class="file-x" onclick="removeFile()"><i data-lucide="x" style="width:18px;height:18px"></i></button>
             </div>
           </div>
 
@@ -413,6 +430,28 @@ body.nav-expanded .main-shell { margin-left: 200px; transition: margin-left .2s 
 
 <script>
 function toggleNav(){ document.getElementById('icon-sb').classList.toggle('expanded'); document.body.classList.toggle('nav-expanded'); }
+
+/* ===== AI 작업 중 잠금 (통일 원칙) ===== */
+var BUSY_TIP = 'AI 작업 중에는 수정할 수 없어요. 완료 후 다시 시도해 주세요';
+var _busy = false;
+var _busyTimer;
+function busyToast(msg){
+  var t = document.getElementById('busyToast');
+  if(!t){ t = document.createElement('div'); t.id = 'busyToast'; t.className = 'busy-toast'; document.body.appendChild(t); }
+  t.textContent = msg; t.classList.add('show');
+  clearTimeout(_busyTimer); _busyTimer = setTimeout(function(){ t.classList.remove('show'); }, 2000);
+}
+function setBusy(on){
+  _busy = on;
+  document.body.classList.toggle('is-busy', on);
+  var ta = document.getElementById('inputContent'); if(ta) ta.disabled = on;
+}
+// 작업 중엔 모든 클릭(편집·이동)을 캡처 단계에서 차단 + 토스트 (분석 버튼 스피너는 영향 없음)
+document.addEventListener('click', function(e){
+  if(!_busy) return;
+  e.preventDefault(); e.stopPropagation();
+  busyToast(BUSY_TIP);
+}, true);
 
 /* 학생별 상태(자료/입력/키워드/수준) — 목록 태그와 편집 영역을 항상 일치시킴 */
 var studentData = {
@@ -525,12 +564,14 @@ function runAnalyze(){
   var btn = document.getElementById('analyzeBtn');
   btn.disabled = true;
   btn.innerHTML = '<i data-lucide="loader-circle" class="spin" style="width:16px;height:16px"></i> 분석 중...';
+  setBusy(true);
   lucide.createIcons();
   setTimeout(function(){
-    document.getElementById('aiResultText').value = '수업 시간에 자신의 의견을 논리적으로 발표하고, 모둠 활동에서 친구들의 의견을 경청하며 토론을 이끎. 제시된 자료를 꼼꼼히 읽고 맥락을 정확히 파악하여 핵심 내용을 요약함. 영어 에세이 작성 시 자기 생각을 창의적으로 표현하고 어휘를 적절히 활용하는 모습이 관찰됨.';
+    document.getElementById('aiResultText').value = '- 수업 시간에 자신의 의견을 논리적으로 발표하고, 모둠 활동에서 친구들의 의견을 경청하며 토론을 이끎.\n- 제시된 자료를 꼼꼼히 읽고 맥락을 정확히 파악하여 핵심 내용을 요약함.\n- 영어 에세이 작성 시 자기 생각을 창의적으로 표현하고 어휘를 적절히 활용하는 모습이 관찰됨.';
     document.getElementById('aiResult').style.display = 'block';
     btn.disabled = false;
     btn.innerHTML = '<i data-lucide="rotate-ccw" style="width:16px;height:16px"></i> 다시 분석 · 크레딧 1';
+    setBusy(false);
     lucide.createIcons();
   }, 1500);
 }

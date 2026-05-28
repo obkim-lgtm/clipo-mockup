@@ -113,6 +113,16 @@ body.nav-expanded .main-shell { margin-left: 200px; transition: margin-left .2s 
 .ft-links a { font-size: 14px; color: #6d7381; text-decoration: none; }
 .ft-links a:hover { color: #416bff; }
 .ft-copy { font-size: 13px; color: #9aa0ad; }
+
+/* AI 작업 중(생성 제출) 잠금 */
+.busy-toast { position: fixed; left: 50%; bottom: 32px; transform: translateX(-50%); background: #222631; color: #fff; font-size: 15px; padding: 12px 20px; border-radius: 10px; z-index: 600; opacity: 0; transition: opacity .2s, transform .2s; pointer-events: none; }
+.busy-toast.show { opacity: 1; transform: translateX(-50%) translateY(-4px); }
+.spin { animation: spin 1s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+body.is-busy .card,
+body.is-busy .step-pill.nav,
+body.is-busy .pn-prev,
+body.is-busy .back-link { opacity: .5; cursor: not-allowed; }
 </style>
 </head>
 <body>
@@ -265,7 +275,7 @@ body.nav-expanded .main-shell { margin-left: 200px; transition: margin-left .2s 
 
   <div class="page-nav">
     <button class="pn-btn pn-prev" onclick="location.href='quick_seteuk_dev_v1_260528.html'"><i data-lucide="chevron-left" style="width:18px;height:18px"></i> 이전 단계</button>
-    <button class="pn-btn pn-next" onclick="location.href='quick_seteuk_dev_edit_v1_260528.html'"><i data-lucide="sparkles" style="width:18px;height:18px"></i> AI 기록 생성</button>
+    <button class="pn-btn pn-next" id="genSubmitBtn" onclick="startGenerate(this)"><i data-lucide="sparkles" style="width:18px;height:18px"></i> AI 기록 생성</button>
   </div>
 
 </main>
@@ -284,6 +294,38 @@ body.nav-expanded .main-shell { margin-left: 200px; transition: margin-left .2s 
 <script>
 function toggleNav(){ document.getElementById('icon-sb').classList.toggle('expanded'); document.body.classList.toggle('nav-expanded'); }
 function toggleAcc(head){ head.parentElement.classList.toggle('open'); }
+
+/* ===== AI 작업 중 잠금 (통일 원칙) ===== */
+var BUSY_TIP = 'AI 작업 중에는 수정할 수 없어요. 완료 후 다시 시도해 주세요';
+var _busy = false;
+var _busyTimer;
+function busyToast(msg){
+  var t = document.getElementById('busyToast');
+  if(!t){ t = document.createElement('div'); t.id = 'busyToast'; t.className = 'busy-toast'; document.body.appendChild(t); }
+  t.textContent = msg; t.classList.add('show');
+  clearTimeout(_busyTimer); _busyTimer = setTimeout(function(){ t.classList.remove('show'); }, 2000);
+}
+function setBusy(on){
+  _busy = on;
+  document.body.classList.toggle('is-busy', on);
+  document.querySelectorAll('.gen-cb').forEach(function(cb){ if(on){ cb.dataset.wasDis = cb.disabled ? '1':'0'; cb.disabled = true; } else if(cb.dataset.wasDis === '0'){ cb.disabled = false; } });
+}
+function startGenerate(btn){
+  if(_busy) return;
+  // 선택 학생 수 집계
+  var n = document.querySelectorAll('.gen-cb:not(.gen-all):checked').length;
+  if(n === 0){ busyToast('기록을 생성할 학생을 선택해 주세요'); return; }
+  setBusy(true);
+  btn.innerHTML = '<i data-lucide="loader-circle" class="spin" style="width:18px;height:18px"></i> 생성 중...';
+  lucide.createIcons();
+  setTimeout(function(){ location.href = 'quick_seteuk_dev_edit_v1_260528.html'; }, 1300);
+}
+// 작업 중엔 모든 클릭 차단 + 토스트
+document.addEventListener('click', function(e){
+  if(!_busy) return;
+  e.preventDefault(); e.stopPropagation();
+  busyToast(BUSY_TIP);
+}, true);
 
 function updateClsCount(acc){
   var boxes = [...acc.querySelectorAll('tbody .gen-cb')];
