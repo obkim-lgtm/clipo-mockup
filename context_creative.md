@@ -69,12 +69,16 @@
 ### AI 작업 중 차단 정책 (Jacob 피드백 반영 / 2026-05-28 확정)
 - **작업 상태 2종**: 분석 중(`s.s2.status==='analyzing'`) / 생성 중(`s._generating===true`)
 - **헬퍼**: `isStudentBusy(s)` (분석 중 OR 생성 중) / `anyStudentBusy()` / `blockIfBusy(s)` / `refreshBusyControls()` / 통일 툴팁 `BUSY_TIP`
-- **학생 단위 잠금**: 작업 중인 학생은 1·2·3단계 전 항목(자료/내용/수준/생성/가져오기) 비활성. 다른 학생은 자유
-- **글로벌 잠금(일괄만)**: 작업 중 학생 1명이라도 있으면 [일괄 자료 등록]·[전체 분석 시작]·[전체 기록 생성]·[전체 AI 기록 옮기기] 비활성 (`refreshBusyControls()` 가 id로 토글)
+- **학생 단위 잠금만**: 작업 중인 학생은 1·2·3단계 개별 항목(자료/내용/수준/개별 생성·다시 생성/가져오기) 비활성. 다른 학생은 자유
+- **일괄(전체) 버튼은 열어둠** (Jacob 제안 / 2026-05-28): [일괄 자료 등록]·[전체 분석 시작]·[전체 기록 생성]·[전체 AI 기록 옮기기] 잠그지 않음
+  - 전체 분석·전체 생성: 선택 모달(`populateAnalyzeStuPick`/`populateStuPick`)에서 작업 중 학생만 선택 불가(태그 "분석 중"/"작업 중")로 제외
+  - 전체 AI 기록 옮기기(`doBringAllToEdit`): 작업 중 학생 루프에서 skip
+  - 일괄 자료 등록: 진입 허용, 충돌은 저장 시 서버 검증
+  - `refreshBusyControls()` 는 이제 헤더 busy-off 흔적 정리(cleanup)만 함
 - 한 학생은 분석↔생성 동시 불가(순차) — 2단계 진행 중 3단계 시작 불가, 반대도 동일
 - **UI**: disabled(`opacity:.45`+`busy-off` 클래스) + 통일 툴팁 `"AI 작업 중에는 수정할 수 없어요. 완료 후 다시 시도해 주세요"`
 - **3단계 생성 중**: 약 1.4s 비동기 상태 — 행에 `row-spinner` + "AI가 기록을 생성하고 있어요"
-- 클릭 가드: `pickIndFile`/`askRemoveStudentFile`/`setDrawerLevel`/`commitDrawerKeywords`/`generateOne`/`regenerateOne`/`bringToEdit`/`bringAllToEdit`/`toggleS2Item`/`reanalyze`/`rerunAI`/`openRegisterModal`/`addCustomItem`/`saveCustomItem` 모두 `blockIfBusy()` 가드
+- 클릭 가드(개별만): `pickIndFile`/`askRemoveStudentFile`/`setDrawerLevel`/`commitDrawerKeywords`/`generateOne`/`regenerateOne`/`bringToEdit`/`toggleS2Item`/`reanalyze`/`addCustomItem`/`saveCustomItem` `blockIfBusy(s)` 가드 (일괄 버튼 `rerunAI`/`generateAllRecords`/`bringAllToEdit`/`openRegisterModal` 은 가드 제거)
 - **라우팅 강제 진입**(백엔드 영역, 목업 비범위): 진입 버튼만 프론트 차단, 강제 진입 시 저장 시점 서버 에러로 처리
 - race condition 방지 + 어떤 태그 보여줄지 모호한 케이스 제거
 
