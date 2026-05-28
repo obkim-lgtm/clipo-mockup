@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>키워드 및 활동 입력 - CLIPO</title>
+<link rel="icon" type="image/svg+xml" href="favicon_gan_orange.svg?v=1">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard-gov.min.css">
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<style>
+* { font-family: 'Pretendard GOV', -apple-system, sans-serif; box-sizing: border-box; margin: 0; padding: 0; }
+body { background: #f6f7f9; color: #222631; }
+button { font-family: inherit; }
+
+/* 헤더 */
+.g-hd { height: 56px; background: #fff; border-bottom: 1px solid #d9d9d9; display: flex; align-items: center; padding: 0 20px 0 8px; position: fixed; top: 0; left: 0; right: 0; z-index: 200; }
+.g-hd-r { margin-left: auto; display: flex; align-items: center; gap: 6px; font-size: 14px; color: #3b3f4c; }
+.plan-badge { background: #eef3ff; color: #416bff; font-size: 12px; font-weight: 600; padding: 3px 10px; border-radius: 12px; }
+.hd-div { width: 1px; height: 14px; background: #d9d9d9; margin: 0 4px; }
+.credit-wrap { display: flex; align-items: center; gap: 4px; font-size: 14px; font-weight: 500; color: #3b3f4c; }
+.user-btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 0; border: none; background: none; font-size: 14px; color: #222631; cursor: pointer; line-height: 1; font-weight: 500; }
+
+/* 사이드바 */
+.icon-sb { width: 56px; background: #fff; border-right: 1px solid #d9d9d9; position: fixed; top: 56px; bottom: 0; left: 0; display: flex; flex-direction: column; padding: 8px 0; z-index: 150; transition: width .2s ease; }
+.icon-sb.expanded { width: 200px; }
+.si { height: 40px; display: flex; align-items: center; border-radius: 8px; color: #6d7381; cursor: pointer; margin: 0 8px 2px; position: relative; padding: 0 4px 0 8px; gap: 10px; white-space: nowrap; flex-shrink: 0; }
+.si:hover { background: #f1f3f5; }
+.si.active { background: #e9f2ff; color: #416bff; }
+.si-icon { width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.si-label { font-size: 13px; font-weight: 500; opacity: 0; transition: opacity .1s; overflow: hidden; }
+.icon-sb.expanded .si-label { opacity: 1; }
+.si-tip { position: absolute; left: 48px; top: 50%; transform: translateY(-50%); background: #222631; color: #fff; font-size: 11px; padding: 3px 8px; border-radius: 4px; white-space: nowrap; display: none; z-index: 300; pointer-events: none; }
+.si:hover .si-tip { display: block; }
+.icon-sb.expanded .si-tip { display: none !important; }
+.nav-bottom { margin-top: auto; width: 100%; }
+.nav-div { height: 1px; background: #f1f3f5; margin: 4px 8px; }
+body.nav-expanded .main-shell { margin-left: 200px; transition: margin-left .2s ease; }
+
+/* 메인 */
+.main-shell { margin-left: 56px; margin-top: 56px; min-height: calc(100vh - 56px); transition: margin-left .2s ease; }
+.main { max-width: none; padding: 28px 28px 40px; }
+
+.back-link { display: inline-flex; align-items: center; gap: 4px; font-size: 15px; color: #416bff; text-decoration: none; margin-bottom: 14px; cursor: pointer; font-weight: 500; }
+.page-title { font-size: 20px; font-weight: 700; color: #222631; margin-bottom: 8px; line-height: 1.3; }
+.page-sub { font-size: 16px; color: #6d7381; margin-bottom: 24px; line-height: 1.55; }
+
+/* 스텝 바 */
+.step-bar { display: flex; align-items: center; gap: 8px; margin-bottom: 24px; flex-wrap: wrap; }
+.step-pill { display: inline-flex; align-items: center; justify-content: center; gap: 6px; height: 40px; padding: 0 18px; border: 1px solid #e5e7eb; border-radius: 8px; background: #fff; color: #6d7381; font-size: 15px; font-weight: 500; line-height: 1; vertical-align: middle; cursor: default; }
+.step-pill .si-i { width: 16px; height: 16px; flex-shrink: 0; }
+.step-pill.nav { cursor: pointer; }
+.step-pill.nav:hover { border-color: #b3b6bd; }
+.step-pill.active { border-color: #416bff; background: #eef3ff; color: #416bff; font-weight: 600; box-shadow: 0 0 0 1px #416bff inset; }
+.step-sep { color: #c5c8d0; display: inline-flex; align-items: center; flex-shrink: 0; }
+
+/* 2단 레이아웃 */
+.two-col { display: grid; grid-template-columns: 300px 1fr; gap: 16px; align-items: start; }
+.card { background: #fff; border: 1px solid #e5e7eb; border-radius: 16px; padding: 22px; }
+
+/* 좌측: 학생 선택 */
+.lp-title { font-size: 18px; font-weight: 700; color: #222631; margin-bottom: 16px; }
+.field-select { width: 100%; height: 44px; padding: 0 40px 0 14px; font-size: 16px; font-family: inherit; border: 1px solid #d9d9d9; border-radius: 8px; color: #222631; background: #fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='18' height='18' viewBox='0 0 24 24' fill='none' stroke='%236d7381' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E") no-repeat right 14px center; appearance: none; cursor: pointer; line-height: 1; margin-bottom: 18px; }
+.field-select:focus { outline: none; border-color: #416bff; }
+.stu-count { font-size: 14px; font-weight: 400; color: #222631; margin-bottom: 10px; }
+.stu-list { display: flex; flex-direction: column; gap: 8px; max-height: 470px; overflow-y: auto; padding-right: 2px; }
+.stu-item { display: flex; flex-direction: column; gap: 8px; padding: 12px 14px; border: 1px solid #e5e7eb; border-radius: 10px; cursor: pointer; transition: all .15s; background: #fff; }
+.stu-item:hover { border-color: #b3b6bd; }
+.stu-item.active { border-color: #416bff; background: #f4f8ff; }
+.stu-row1 { display: flex; align-items: center; gap: 10px; }
+.stu-radio { width: 18px; height: 18px; border: 1.5px solid #b3b6bd; border-radius: 50%; flex-shrink: 0; position: relative; }
+.stu-item.active .stu-radio { border-color: #416bff; }
+.stu-item.active .stu-radio::after { content: ''; width: 9px; height: 9px; background: #416bff; border-radius: 50%; position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); }
+.stu-name { font-size: 15px; font-weight: 400; color: #222631; }
+.stu-tags { display: flex; flex-wrap: nowrap; gap: 5px; padding-left: 28px; }
+.stu-tag { font-size: 12px; font-weight: 500; color: #5563d6; background: #eef3ff; padding: 3px 7px; border-radius: 5px; line-height: 1.3; white-space: nowrap; }
+.stu-tag.off { color: #9aa0ad; background: #f1f3f5; }
+
+/* 우측 컬럼 */
+.right-col { display: flex; flex-direction: column; gap: 14px; }
+.rp-head { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+.rp-title { font-size: 18px; font-weight: 700; color: #222631; }
+.rp-sub { font-size: 16px; color: #6d7381; margin-bottom: 20px; line-height: 1.5; }
+
+/* 우측 카드: flex 정렬로 키워드 사전을 '학생 입력 내용' 아래로 배치 */
+.kw-card { display: flex; flex-direction: column; align-items: stretch; }
+.kw-card .kw-box { order: 5; }
+.kw-card .level-wrap { order: 6; }
+.kw-card .rp-actions { order: 7; }
+
+/* 키워드 사전 (토글 접힘) */
+.kw-box { border: 1px solid #e5e7eb; border-radius: 12px; background: #fafbfc; overflow: hidden; margin-top: 24px; }
+.kw-head { display: flex; align-items: center; gap: 10px; padding: 16px 18px; cursor: pointer; user-select: none; }
+.kw-head:hover { background: #f1f3f5; }
+.kw-toggle { color: #6d7381; transition: transform .15s; flex-shrink: 0; display: inline-flex; }
+.kw-box.expanded .kw-toggle { transform: rotate(90deg); }
+.kw-head-title { font-size: 15px; font-weight: 500; color: #3b3f4c; flex-shrink: 0; }
+.kw-head-sub { font-size: 14px; color: #6d7381; flex: 1; line-height: 1.4; }
+.kw-body { display: none; padding: 18px 18px 20px; background: #fafbfc; }
+.kw-box.expanded .kw-body { display: block; }
+.kw-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 28px 40px; }
+.kw-group-title { font-size: 15px; font-weight: 700; color: #222631; margin-bottom: 12px; }
+.kw-chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.kw-chip { font-size: 14px; font-weight: 500; color: #3b3f4c; background: #fff; border: 1px solid #e5e7eb; padding: 6px 13px; border-radius: 6px; cursor: pointer; line-height: 1.2; transition: all .12s; }
+.kw-chip:hover { border-color: #b3b6bd; }
+.kw-chip.sel { background: #e8efff; color: #416bff; border-color: #c5dbff; font-weight: 500; }
+
+/* 입력 영역 */
+.in-label { font-size: 15px; font-weight: 600; color: #222631; margin-bottom: 10px; }
+.in-textarea { width: 100%; min-height: 98px; padding: 14px; font-size: 16px; font-family: inherit; line-height: 1.6; color: #222631; border: 1px solid #d9d9d9; border-radius: 10px; resize: vertical; }
+.in-textarea::placeholder { color: #aab0bb; }
+.in-textarea:focus { outline: none; border-color: #416bff; }
+
+/* 활동 자료 업로드 */
+.up-sec { margin-top: 4px; }
+.up-sub { font-size: 14px; color: #6d7381; margin: -2px 0 10px; line-height: 1.5; }
+.new-badge { display: inline-flex; align-items: center; font-size: 10px; font-weight: 700; color: #416bff; background: #e9f2ff; padding: 2px 6px; border-radius: 10px; letter-spacing: .3px; margin-left: 6px; vertical-align: middle; line-height: 1.4; }
+.dropzone { border: 1.5px dashed #cdd2db; border-radius: 12px; padding: 26px 20px; text-align: center; cursor: pointer; background: #fafbfc; transition: all .15s; }
+.dropzone:hover, .dropzone.over { border-color: #416bff; background: #f4f8ff; }
+.dz-icon { width: 40px; height: 40px; border-radius: 10px; background: #eef3ff; color: #416bff; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 10px; }
+.dz-title { font-size: 16px; font-weight: 600; color: #3b3f4c; }
+.dz-title .hl { color: #416bff; }
+.dz-hint { font-size: 14px; color: #808080; margin-top: 6px; }
+.file-row { display: flex; align-items: center; gap: 12px; padding: 14px 16px; border: 1px solid #e5e7eb; border-radius: 12px; background: #fff; }
+.file-ic { width: 40px; height: 40px; border-radius: 10px; background: #fdeaea; color: #f2525f; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.file-meta { flex: 1; min-width: 0; }
+.file-name { font-size: 16px; font-weight: 600; color: #222631; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.file-size { font-size: 13px; color: #808080; margin-top: 2px; }
+.file-x { width: 32px; height: 32px; border: none; background: none; color: #9aa0ad; border-radius: 8px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.file-x:hover { background: #f1f3f5; color: #222631; }
+.analyze-row { display: flex; align-items: center; gap: 10px; margin-top: 12px; flex-wrap: wrap; }
+.btn-analyze { display: inline-flex; align-items: center; justify-content: center; gap: 6px; height: 40px; padding: 0 14px; border: none; border-radius: 8px; background: #416bff; color: #fff; font-size: 15px; font-weight: 600; cursor: pointer; line-height: 1; vertical-align: middle; white-space: nowrap; flex-shrink: 0; }
+.btn-analyze:hover { background: #365eef; }
+.btn-analyze:disabled { background: #c7d3f6; cursor: default; }
+.credit-pill { display: inline-flex; align-items: center; gap: 4px; font-size: 13px; font-weight: 600; color: #416bff; background: #eef3ff; padding: 6px 11px; border-radius: 20px; line-height: 1; }
+.analyze-note { font-size: 13px; color: #808080; }
+.ai-result { margin-top: 20px; }
+.ai-result-head { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+.ai-badge { display: inline-flex; align-items: center; gap: 4px; font-size: 12px; font-weight: 700; color: #416bff; background: #eef3ff; padding: 4px 9px; border-radius: 6px; line-height: 1; }
+.ai-result-note { font-size: 14px; color: #6d7381; margin-bottom: 10px; line-height: 1.5; }
+.spin { animation: spin 1s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.level-wrap { margin-top: 24px; }
+.level-seg { display: inline-flex; border: 1px solid #d9d9d9; border-radius: 8px; overflow: hidden; }
+.level-btn { display: inline-flex; align-items: center; justify-content: center; width: 44px; height: 38px; border: none; border-right: 1px solid #d9d9d9; background: #fff; color: #3b3f4c; font-size: 16px; font-weight: 500; cursor: pointer; line-height: 1; vertical-align: middle; }
+.level-btn:last-child { border-right: none; }
+.level-btn.sel { background: #eef3ff; color: #416bff; font-weight: 700; }
+.level-note { font-size: 14px; color: #808080; margin-top: 12px; }
+
+/* 카드 하단 액션 */
+.rp-actions { display: flex; gap: 12px; margin-top: 24px; }
+.btn-reset { display: inline-flex; align-items: center; justify-content: center; gap: 6px; height: 48px; padding: 0 20px; border: 1px solid #d9d9d9; border-radius: 10px; background: #fff; color: #3b3f4c; font-size: 16px; font-weight: 600; cursor: pointer; line-height: 1; vertical-align: middle; flex-shrink: 0; }
+.btn-reset:hover { background: #f6f7f9; }
+.btn-save { display: inline-flex; align-items: center; justify-content: center; gap: 8px; flex: 1; height: 48px; border: none; border-radius: 10px; background: #416bff; color: #fff; font-size: 16px; font-weight: 600; cursor: pointer; line-height: 1; vertical-align: middle; }
+.btn-save:hover { background: #365eef; }
+
+/* 키워드 일괄 업로드 (좌측 학생 패널 하단) */
+.btn-bulk { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; height: 56px; margin-top: 16px; border: none; border-radius: 10px; background: #eef3ff; color: #416bff; font-size: 16px; font-weight: 600; cursor: pointer; line-height: 1; }
+.btn-bulk:hover { background: #e0e9ff; }
+
+/* 페이지 하단 단계 이동 */
+.page-nav { display: flex; justify-content: flex-end; gap: 10px; margin-top: 24px; }
+.pn-btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; height: 48px; padding: 0 22px; border-radius: 10px; font-size: 16px; font-weight: 600; cursor: pointer; line-height: 1; vertical-align: middle; }
+.pn-prev { border: 1px solid #c5dbff; background: #fff; color: #416bff; }
+.pn-prev:hover { background: #f4f8ff; }
+.pn-next { border: none; background: #416bff; color: #fff; }
+.pn-next:hover { background: #365eef; }
+
+/* 푸터 */
+.g-ft { text-align: center; padding: 36px 20px 28px; }
+.ft-links { display: flex; justify-content: center; gap: 28px; margin-bottom: 14px; }
+.ft-links a { font-size: 14px; color: #6d7381; text-decoration: none; }
+.ft-links a:hover { color: #416bff; }
+.ft-copy { font-size: 13px; color: #9aa0ad; }
+</style>
+</head>
+<body>
+
+<header class="g-hd">
+  <button onclick="toggleNav()" style="width:36px;height:36px;border:none;background:none;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;color:#3b3f4c;margin-right:8px;line-height:1">
+    <i data-lucide="menu" style="width:20px;height:20px"></i>
+  </button>
+  <svg width="76" height="16" viewBox="0 0 76 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M11.3613 4.03516H4.09668V11.9629H8.88281L8.88086 11.9648H15.6016V16H4.02539C1.80242 15.9998 0 14.223 0 12.0322V3.96777C0 1.77696 1.80242 0.000177874 4.02539 0H15.4561L11.3613 4.03516ZM22.0703 11.9648H33.5781V16H22.002C19.7788 16 17.9756 14.2231 17.9756 12.0322V0H22.0703V11.9648ZM40.0459 16H35.9521V0H40.0459V16ZM54.5381 0C56.4564 0 58.0138 1.53228 58.0186 3.42285L58.0166 3.4248V8.54297C58.014 10.4333 56.4567 11.9648 54.5361 11.9648H46.5107L42.416 16V0H54.5381ZM71.9746 0C74.0086 0.000134956 75.6887 1.49046 75.958 3.42285H76V12.5771H75.958C75.6887 14.5095 74.011 15.9999 71.9746 16H64.4238C62.3897 16 60.7098 14.5096 60.4404 12.5771C60.4145 12.398 60.3984 12.2184 60.3984 12.0322V3.96777C60.3984 3.78159 60.4145 3.60205 60.4404 3.42285C60.7098 1.49037 62.3873 0 64.4238 0H71.9746ZM64.4922 12.5771H71.9062V3.42285H64.4922V12.5771ZM46.5107 3.42285V8.54004H53.9238V3.42285H46.5107Z" fill="#365EEF"/>
+  </svg>
+  <div class="g-hd-r">
+    <span class="plan-badge">학교 유료</span>
+    <span style="font-size:14px;color:#3b3f4c">D-180</span>
+    <div class="hd-div"></div>
+    <i data-lucide="sparkles" style="width:18px;height:18px;color:#416bff"></i>
+    <div class="credit-wrap">AI 크레딧 200</div>
+    <div class="hd-div"></div>
+    <button class="user-btn">최대표 선생님(대표교사) <i data-lucide="chevron-down" style="width:16px;height:16px"></i></button>
+  </div>
+</header>
+
+<nav class="icon-sb" id="icon-sb">
+  <div class="si"><div class="si-icon"><i data-lucide="home" style="width:20px;height:20px"></i></div><span class="si-label">홈</span><span class="si-tip">홈</span></div>
+  <div class="si"><div class="si-icon"><i data-lucide="scissors" style="width:20px;height:20px"></i></div><span class="si-label">평가계획</span><span class="si-tip">평가계획</span></div>
+  <div class="si"><div class="si-icon"><i data-lucide="layout-grid" style="width:20px;height:20px"></i></div><span class="si-label">수업</span><span class="si-tip">수업</span></div>
+  <div class="si"><div class="si-icon"><i data-lucide="notebook-pen" style="width:20px;height:20px"></i></div><span class="si-label">창의적 체험활동 <span style="font-size:10px;background:#416bff;color:#fff;padding:1px 5px;border-radius:3px;margin-left:2px">Beta</span></span><span class="si-tip">창의적 체험활동</span></div>
+  <div class="si active"><div class="si-icon"><i data-lucide="zap" style="width:20px;height:20px"></i></div><span class="si-label">세특 간편 생성기</span><span class="si-tip">세특 간편 생성기</span></div>
+  <div class="si"><div class="si-icon"><i data-lucide="smile" style="width:20px;height:20px"></i></div><span class="si-label">행동특성 및 종합기록</span><span class="si-tip">행동특성 및 종합기록</span></div>
+  <div class="si"><div class="si-icon"><i data-lucide="bar-chart-2" style="width:20px;height:20px"></i></div><span class="si-label">리포트</span><span class="si-tip">리포트</span></div>
+  <div class="si"><div class="si-icon"><i data-lucide="building-2" style="width:20px;height:20px"></i></div><span class="si-label">학교 설정</span><span class="si-tip">학교 설정</span></div>
+  <div class="nav-bottom">
+    <div class="nav-div"></div>
+    <div class="si"><div class="si-icon"><i data-lucide="file-down" style="width:20px;height:20px"></i></div><span class="si-label">매뉴얼 다운로드</span><span class="si-tip">매뉴얼 다운로드</span></div>
+    <div class="si"><div class="si-icon"><i data-lucide="credit-card" style="width:20px;height:20px"></i></div><span class="si-label">요금제</span><span class="si-tip">요금제</span></div>
+    <div class="si"><div class="si-icon"><i data-lucide="help-circle" style="width:20px;height:20px"></i></div><span class="si-label">고객센터</span><span class="si-tip">고객센터</span></div>
+  </div>
+</nav>
+
+<div class="main-shell">
+<main class="main">
+
+  <a class="back-link"><i data-lucide="chevron-left" style="width:16px;height:16px"></i> 이전으로</a>
+  <h1 class="page-title">세특 간편 생성기 : 테스트</h1>
+  <p class="page-sub">교과목, 성취기준, 키워드 및 활동 입력 후 세특 초안을 생성할 수 있습니다.</p>
+
+  <!-- 스텝 바 -->
+  <div class="step-bar">
+    <div class="step-pill"><i data-lucide="settings-2" class="si-i"></i> 기본 정보 설정</div>
+    <span class="step-sep"><i data-lucide="chevron-right" style="width:18px;height:18px"></i></span>
+    <div class="step-pill"><i data-lucide="users" class="si-i"></i> 그룹 구성</div>
+    <span class="step-sep"><i data-lucide="chevron-right" style="width:18px;height:18px"></i></span>
+    <div class="step-pill active"><i data-lucide="pencil" class="si-i"></i> 키워드 및 활동 입력</div>
+    <span class="step-sep"><i data-lucide="chevron-right" style="width:18px;height:18px"></i></span>
+    <div class="step-pill nav" onclick="location.href='quick_seteuk_dev_ai_v1_260528.html'"><i data-lucide="wand-2" class="si-i"></i> AI 기록 생성</div>
+    <span class="step-sep"><i data-lucide="chevron-right" style="width:18px;height:18px"></i></span>
+    <div class="step-pill nav" onclick="location.href='quick_seteuk_dev_edit_v1_260528.html'"><i data-lucide="file-pen-line" class="si-i"></i> 기록 편집</div>
+  </div>
+
+  <div class="two-col">
+    <!-- 좌측: 학생 선택 -->
+    <div class="left-col">
+    <div class="card">
+      <div class="lp-title">학생 선택</div>
+      <select class="field-select">
+        <option>1학년 1반</option>
+        <option>1학년 2반</option>
+        <option>1학년 3반</option>
+      </select>
+      <div class="stu-count">학생 목록 (40명)</div>
+      <div class="stu-list">
+        <div class="stu-item active" onclick="selectStu(this)">
+          <div class="stu-row1"><span class="stu-radio"></span><span class="stu-name">10101 김하나</span></div>
+          <div class="stu-tags"><span class="stu-tag off">자료 X</span><span class="stu-tag">입력 O</span><span class="stu-tag">수준 중</span></div>
+        </div>
+        <div class="stu-item" onclick="selectStu(this)">
+          <div class="stu-row1"><span class="stu-radio"></span><span class="stu-name">10102 김두나</span></div>
+          <div class="stu-tags"><span class="stu-tag">자료 O</span><span class="stu-tag off">입력 X</span><span class="stu-tag">수준 중</span></div>
+        </div>
+        <div class="stu-item" onclick="selectStu(this)"><div class="stu-row1"><span class="stu-radio"></span><span class="stu-name">10103 박서연</span></div></div>
+        <div class="stu-item" onclick="selectStu(this)"><div class="stu-row1"><span class="stu-radio"></span><span class="stu-name">10104 이준호</span></div></div>
+        <div class="stu-item" onclick="selectStu(this)"><div class="stu-row1"><span class="stu-radio"></span><span class="stu-name">10105 최유진</span></div></div>
+        <div class="stu-item" onclick="selectStu(this)"><div class="stu-row1"><span class="stu-radio"></span><span class="stu-name">10106 정민서</span></div></div>
+        <div class="stu-item" onclick="selectStu(this)"><div class="stu-row1"><span class="stu-radio"></span><span class="stu-name">10107 강하준</span></div></div>
+        <div class="stu-item" onclick="selectStu(this)"><div class="stu-row1"><span class="stu-radio"></span><span class="stu-name">10108 윤지아</span></div></div>
+        <div class="stu-item" onclick="selectStu(this)"><div class="stu-row1"><span class="stu-radio"></span><span class="stu-name">10109 임도윤</span></div></div>
+      </div>
+    </div>
+      <button class="btn-bulk"><i data-lucide="upload" style="width:18px;height:18px"></i> 키워드 일괄 업로드</button>
+    </div>
+
+    <!-- 우측: 키워드 및 활동 입력 -->
+    <div class="right-col">
+      <div class="card kw-card">
+        <div class="rp-head"><span class="rp-title"><span id="curStuName">10101 김하나</span> 키워드 및 활동 입력</span></div>
+        <p class="rp-sub">학생을 선택하여 키워드 및 활동 내역을 입력해 주세요.</p>
+
+        <!-- 키워드 사전 (토글 접힘) — 마커, 실제 위치는 학생 입력 내용 아래 -->
+        <div class="kw-box" id="kwBox">
+          <div class="kw-head" onclick="toggleKwBox()">
+            <i data-lucide="chevron-right" class="kw-toggle" style="width:18px;height:18px"></i>
+            <span class="kw-head-title">키워드 사전</span>
+            <span class="kw-head-sub">클리포에서 제공하는 교과별 핵심 키워드 사전에서 키워드를 선택할 수 있습니다.</span>
+          </div>
+          <div class="kw-body">
+            <div class="kw-grid">
+              <div>
+                <div class="kw-group-title">자신과의 관계</div>
+                <div class="kw-chips">
+                  <span class="kw-chip sel" onclick="toggleChip(this)">감정조절</span>
+                  <span class="kw-chip" onclick="toggleChip(this)">자기 이해</span>
+                  <span class="kw-chip" onclick="toggleChip(this)">자기 성찰</span>
+                  <span class="kw-chip" onclick="toggleChip(this)">자기 조절</span>
+                  <span class="kw-chip sel" onclick="toggleChip(this)">자기 관리</span>
+                  <span class="kw-chip" onclick="toggleChip(this)">자율</span>
+                  <span class="kw-chip" onclick="toggleChip(this)">인내</span>
+                  <span class="kw-chip" onclick="toggleChip(this)">인성</span>
+                  <span class="kw-chip" onclick="toggleChip(this)">성찰적 사고</span>
+                  <span class="kw-chip" onclick="toggleChip(this)">도덕적 사고</span>
+                  <span class="kw-chip" onclick="toggleChip(this)">도덕적 판단</span>
+                  <span class="kw-chip" onclick="toggleChip(this)">판단</span>
+                </div>
+              </div>
+              <div>
+                <div class="kw-group-title">타인과의 관계</div>
+                <div class="kw-chips">
+                  <span class="kw-chip" onclick="toggleChip(this)">공감</span>
+                  <span class="kw-chip" onclick="toggleChip(this)">배려</span>
+                  <span class="kw-chip sel" onclick="toggleChip(this)">타인배려</span>
+                  <span class="kw-chip sel" onclick="toggleChip(this)">타인존중</span>
+                  <span class="kw-chip" onclick="toggleChip(this)">존중</span>
+                  <span class="kw-chip" onclick="toggleChip(this)">정직</span>
+                  <span class="kw-chip" onclick="toggleChip(this)">협동</span>
+                  <span class="kw-chip" onclick="toggleChip(this)">협력</span>
+                </div>
+              </div>
+              <div>
+                <div class="kw-group-title">사회 및 공동체와의 관계</div>
+                <div class="kw-chips">
+                  <span class="kw-chip" onclick="toggleChip(this)">가치 탐구</span>
+                  <span class="kw-chip" onclick="toggleChip(this)">가치 판단</span>
+                  <span class="kw-chip" onclick="toggleChip(this)">공동체 의식</span>
+                  <span class="kw-chip" onclick="toggleChip(this)">공정성</span>
+                  <span class="kw-chip" onclick="toggleChip(this)">규범 이해</span>
+                  <span class="kw-chip" onclick="toggleChip(this)">봉사정신</span>
+                  <span class="kw-chip sel" onclick="toggleChip(this)">사회참여</span>
+                  <span class="kw-chip" onclick="toggleChip(this)">시민의식</span>
+                  <span class="kw-chip" onclick="toggleChip(this)">윤리의식</span>
+                  <span class="kw-chip" onclick="toggleChip(this)">실천</span>
+                  <span class="kw-chip" onclick="toggleChip(this)">책임감</span>
+                  <span class="kw-chip" onclick="toggleChip(this)">평화적 태도</span>
+                </div>
+              </div>
+              <div>
+                <div class="kw-group-title">자연과의 관계</div>
+                <div class="kw-chips">
+                  <span class="kw-chip" onclick="toggleChip(this)">지속가능성 가치</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 활동 자료 업로드 + AI 분석 -->
+        <div class="up-sec">
+          <div class="in-label">활동 자료 업로드 <span class="new-badge">NEW</span></div>
+          <div class="up-sub">활동지·보고서를 올린 뒤 [AI 분석]을 누르면 AI가 활동·특성을 분석해 드려요.</div>
+
+          <input type="file" id="fileInput" accept=".pdf,.png,.jpg,.jpeg" style="display:none" onchange="onFilePick(this)">
+
+          <div class="dropzone" id="dropzone" onclick="document.getElementById('fileInput').click()"
+               ondragover="event.preventDefault();this.classList.add('over')" ondragleave="this.classList.remove('over')"
+               ondrop="event.preventDefault();this.classList.remove('over');onFileDrop(event)">
+            <div class="dz-icon"><i data-lucide="upload-cloud" style="width:22px;height:22px"></i></div>
+            <div class="dz-title"><span class="hl">파일을 선택</span>하거나 끌어다 놓으세요</div>
+            <div class="dz-hint">PDF, PNG, JPG · 1개 · 20MB 이하</div>
+          </div>
+
+          <div id="fileBox" style="display:none">
+            <div class="file-row">
+              <div class="file-ic"><i data-lucide="file-text" style="width:20px;height:20px"></i></div>
+              <div class="file-meta">
+                <div class="file-name" id="fileName">파일명.pdf</div>
+                <div class="file-size" id="fileSize">0MB</div>
+              </div>
+              <button class="btn-analyze" id="analyzeBtn" onclick="runAnalyze()"><i data-lucide="sparkles" style="width:16px;height:16px"></i> AI 분석 · 크레딧 1</button>
+              <button class="file-x" onclick="removeFile()"><i data-lucide="x" style="width:18px;height:18px"></i></button>
+            </div>
+          </div>
+
+          <div class="ai-result" id="aiResult" style="display:none">
+            <div class="ai-result-head">
+              <span class="in-label" style="margin:0">AI 활동 분석 결과</span>
+              <span class="ai-badge"><i data-lucide="sparkles" style="width:12px;height:12px"></i> AI 추출</span>
+            </div>
+            <div class="ai-result-note">AI가 자료에서 추출한 학생 활동 및 특성이에요. 자유롭게 수정할 수 있어요.</div>
+            <textarea class="in-textarea" id="aiResultText" style="min-height:140px"></textarea>
+          </div>
+        </div>
+
+        <div class="in-label" style="margin-top:24px" id="inputLabel">키워드 및 활동 직접 입력</div>
+        <textarea class="in-textarea" id="inputContent" placeholder="교과와 관련된 학생의 활동 내역을 입력해 보세요." oninput="updateActiveTags()"></textarea>
+
+        <div class="level-wrap">
+          <div class="in-label">수행 수준</div>
+          <div class="level-seg">
+            <button class="level-btn" onclick="selectLevel(this)">상</button>
+            <button class="level-btn sel" onclick="selectLevel(this)">중</button>
+            <button class="level-btn" onclick="selectLevel(this)">하</button>
+          </div>
+          <div class="level-note">*수행 수준의 기본값은 ‘중’입니다.</div>
+        </div>
+
+        <div class="rp-actions">
+          <button class="btn-reset">초기화 <i data-lucide="rotate-ccw" style="width:16px;height:16px"></i></button>
+          <button class="btn-save">저장 후 다음 학생 <i data-lucide="chevron-right" style="width:18px;height:18px"></i></button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="page-nav">
+    <button class="pn-btn pn-prev"><i data-lucide="chevron-left" style="width:18px;height:18px"></i> 이전 단계</button>
+    <button class="pn-btn pn-next" onclick="location.href='quick_seteuk_dev_ai_v1_260528.html'">다음 단계 <i data-lucide="chevron-right" style="width:18px;height:18px"></i></button>
+  </div>
+
+</main>
+
+<footer class="g-ft">
+  <div class="ft-links">
+    <a href="#">회사소개</a>
+    <a href="#">이용약관</a>
+    <a href="#">개인정보처리방침</a>
+    <a href="#">고객센터</a>
+  </div>
+  <div class="ft-copy">© 2026 Datadriven Inc. All rights reserved.</div>
+</footer>
+</div>
+
+<script>
+function toggleNav(){ document.getElementById('icon-sb').classList.toggle('expanded'); document.body.classList.toggle('nav-expanded'); }
+
+/* 학생별 상태(자료/입력/키워드/수준) — 목록 태그와 편집 영역을 항상 일치시킴 */
+var studentData = {
+  '10101': { file:null, content:'감정조절, 자기 관리, 타인배려, 타인존중, 사회참여', keywords:['감정조절','자기 관리','타인배려','타인존중','사회참여'], level:'중' },
+  '10102': { file:{name:'김두나_활동보고서.pdf', size:'1.8MB'}, content:'', keywords:[], level:'중' }
+};
+var activeId = null;
+function getId(item){ return item.querySelector('.stu-name').textContent.trim().split(' ')[0]; }
+function dataFor(id){ if(!studentData[id]) studentData[id]={file:null,content:'',keywords:[],level:'중'}; return studentData[id]; }
+
+function renderTags(item){
+  var d = dataFor(getId(item));
+  var holder = item.querySelector('.stu-tags');
+  var hasInput = d.content.trim().length > 0;
+  var hasAny = !!d.file || hasInput;
+  if(!hasAny){ if(holder) holder.remove(); return; }
+  if(!holder){ holder = document.createElement('div'); holder.className='stu-tags'; item.appendChild(holder); }
+  holder.innerHTML =
+    '<span class="stu-tag'+(d.file?'':' off')+'">자료 '+(d.file?'O':'X')+'</span>'+
+    '<span class="stu-tag'+(hasInput?'':' off')+'">입력 '+(hasInput?'O':'X')+'</span>'+
+    '<span class="stu-tag">수준 '+d.level+'</span>';
+}
+
+function loadStudent(id){
+  var d = dataFor(id);
+  if(d.file){
+    document.getElementById('fileName').textContent = d.file.name;
+    document.getElementById('fileSize').textContent = d.file.size;
+    document.getElementById('dropzone').style.display = 'none';
+    document.getElementById('fileBox').style.display = 'block';
+  } else {
+    document.getElementById('fileInput').value = '';
+    document.getElementById('fileBox').style.display = 'none';
+    document.getElementById('dropzone').style.display = 'block';
+  }
+  document.getElementById('aiResult').style.display = 'none';
+  var btn = document.getElementById('analyzeBtn');
+  btn.disabled = false;
+  btn.innerHTML = '<i data-lucide="sparkles" style="width:16px;height:16px"></i> AI 분석 · 크레딧 1';
+  document.getElementById('inputContent').value = d.content;
+  document.querySelectorAll('#kwBox .kw-chip').forEach(function(c){ c.classList.toggle('sel', d.keywords.indexOf(c.textContent.trim())>-1); });
+  document.querySelectorAll('.level-btn').forEach(function(b){ b.classList.toggle('sel', b.textContent.trim()===d.level); });
+  lucide.createIcons();
+}
+function saveActive(){
+  if(!activeId) return;
+  var d = dataFor(activeId);
+  d.content = document.getElementById('inputContent').value;
+  d.file = document.getElementById('fileBox').style.display==='block'
+    ? { name: document.getElementById('fileName').textContent, size: document.getElementById('fileSize').textContent } : null;
+  d.keywords = [...document.querySelectorAll('#kwBox .kw-chip.sel')].map(c=>c.textContent.trim());
+  var lv = document.querySelector('.level-btn.sel'); d.level = lv ? lv.textContent.trim() : '중';
+}
+/* 편집 변경 시: 활성 학생 저장 + 해당 목록 태그 갱신 */
+function updateActiveTags(){
+  saveActive();
+  var item = document.querySelector('.stu-item.active');
+  if(item) renderTags(item);
+}
+
+function selectStu(el){
+  if(activeId) saveActive();
+  document.querySelectorAll('.stu-item').forEach(s=>s.classList.remove('active'));
+  el.classList.add('active');
+  activeId = getId(el);
+  document.getElementById('curStuName').textContent = el.querySelector('.stu-name').textContent;
+  loadStudent(activeId);
+}
+function toggleChip(el){
+  el.classList.toggle('sel');
+  var ta = document.getElementById('inputContent');
+  var kw = el.textContent.trim();
+  var parts = ta.value.split(',').map(s=>s.trim()).filter(Boolean);
+  if(el.classList.contains('sel')){
+    if(parts.indexOf(kw) === -1) parts.push(kw);
+  } else {
+    parts = parts.filter(p => p !== kw);
+  }
+  ta.value = parts.join(', ');
+  updateActiveTags();
+}
+function selectLevel(el){
+  el.parentElement.querySelectorAll('.level-btn').forEach(b=>b.classList.remove('sel'));
+  el.classList.add('sel');
+  updateActiveTags();
+}
+function toggleKwBox(){ document.getElementById('kwBox').classList.toggle('expanded'); }
+
+function showFile(f){
+  if(!/\.(pdf|png|jpe?g)$/i.test(f.name)){ alert('PDF, PNG, JPG 파일만 업로드할 수 있어요.'); return; }
+  if(f.size > 20*1024*1024){ alert('20MB 이하 파일만 업로드할 수 있어요.'); return; }
+  document.getElementById('fileName').textContent = f.name;
+  document.getElementById('fileSize').textContent = (f.size/1024/1024).toFixed(1) + 'MB';
+  document.getElementById('dropzone').style.display = 'none';
+  document.getElementById('fileBox').style.display = 'block';
+  document.getElementById('aiResult').style.display = 'none';
+  updateActiveTags();
+  lucide.createIcons();
+}
+function onFilePick(inp){ if(inp.files[0]) showFile(inp.files[0]); }
+function onFileDrop(e){ var f = e.dataTransfer.files[0]; if(f) showFile(f); }
+function removeFile(){
+  document.getElementById('fileInput').value = '';
+  document.getElementById('fileBox').style.display = 'none';
+  document.getElementById('dropzone').style.display = 'block';
+  document.getElementById('aiResult').style.display = 'none';
+  updateActiveTags();
+}
+function runAnalyze(){
+  var btn = document.getElementById('analyzeBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<i data-lucide="loader-circle" class="spin" style="width:16px;height:16px"></i> 분석 중...';
+  lucide.createIcons();
+  setTimeout(function(){
+    document.getElementById('aiResultText').value = '수업 시간에 자신의 의견을 논리적으로 발표하고, 모둠 활동에서 친구들의 의견을 경청하며 토론을 이끎. 제시된 자료를 꼼꼼히 읽고 맥락을 정확히 파악하여 핵심 내용을 요약함. 영어 에세이 작성 시 자기 생각을 창의적으로 표현하고 어휘를 적절히 활용하는 모습이 관찰됨.';
+    document.getElementById('aiResult').style.display = 'block';
+    btn.disabled = false;
+    btn.innerHTML = '<i data-lucide="rotate-ccw" style="width:16px;height:16px"></i> 다시 분석 · 크레딧 1';
+    lucide.createIcons();
+  }, 1500);
+}
+function init(){
+  var act = document.querySelector('.stu-item.active');
+  activeId = act ? getId(act) : null;
+  document.querySelectorAll('.stu-item').forEach(renderTags);
+  if(activeId) loadStudent(activeId);
+}
+init();
+lucide.createIcons();
+</script>
+</body>
+</html>

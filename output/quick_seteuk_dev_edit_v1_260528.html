@@ -1,0 +1,555 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>기록 편집 - CLIPO</title>
+<link rel="icon" type="image/svg+xml" href="favicon_gan_orange.svg?v=1">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard-gov.min.css">
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<style>
+* { font-family: 'Pretendard GOV', -apple-system, sans-serif; box-sizing: border-box; margin: 0; padding: 0; }
+body { background: #f6f7f9; color: #222631; }
+button { font-family: inherit; }
+
+/* 헤더 */
+.g-hd { height: 56px; background: #fff; border-bottom: 1px solid #d9d9d9; display: flex; align-items: center; padding: 0 20px 0 8px; position: fixed; top: 0; left: 0; right: 0; z-index: 200; }
+.g-hd-r { margin-left: auto; display: flex; align-items: center; gap: 6px; font-size: 14px; color: #3b3f4c; }
+.plan-badge { background: #eef3ff; color: #416bff; font-size: 12px; font-weight: 600; padding: 3px 10px; border-radius: 12px; }
+.hd-div { width: 1px; height: 14px; background: #d9d9d9; margin: 0 4px; }
+.credit-wrap { display: flex; align-items: center; gap: 4px; font-size: 14px; font-weight: 500; color: #3b3f4c; }
+.user-btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 0; border: none; background: none; font-size: 14px; color: #222631; cursor: pointer; line-height: 1; font-weight: 500; }
+
+/* 사이드바 */
+.icon-sb { width: 56px; background: #fff; border-right: 1px solid #d9d9d9; position: fixed; top: 56px; bottom: 0; left: 0; display: flex; flex-direction: column; padding: 8px 0; z-index: 150; transition: width .2s ease; }
+.icon-sb.expanded { width: 200px; }
+.si { height: 40px; display: flex; align-items: center; border-radius: 8px; color: #6d7381; cursor: pointer; margin: 0 8px 2px; position: relative; padding: 0 4px 0 8px; gap: 10px; white-space: nowrap; flex-shrink: 0; }
+.si:hover { background: #f1f3f5; }
+.si.active { background: #e9f2ff; color: #416bff; }
+.si-icon { width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.si-label { font-size: 13px; font-weight: 500; opacity: 0; transition: opacity .1s; overflow: hidden; }
+.icon-sb.expanded .si-label { opacity: 1; }
+.si-tip { position: absolute; left: 48px; top: 50%; transform: translateY(-50%); background: #222631; color: #fff; font-size: 11px; padding: 3px 8px; border-radius: 4px; white-space: nowrap; display: none; z-index: 300; pointer-events: none; }
+.si:hover .si-tip { display: block; }
+.icon-sb.expanded .si-tip { display: none !important; }
+.nav-bottom { margin-top: auto; width: 100%; }
+.nav-div { height: 1px; background: #f1f3f5; margin: 4px 8px; }
+body.nav-expanded .main-shell { margin-left: 200px; transition: margin-left .2s ease; }
+
+/* 메인 */
+.main-shell { margin-left: 56px; margin-top: 56px; min-height: calc(100vh - 56px); transition: margin-left .2s ease; }
+.main { max-width: none; padding: 28px 28px 40px; }
+
+.title-row { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; }
+.back-link { display: inline-flex; align-items: center; gap: 4px; font-size: 15px; color: #416bff; text-decoration: none; margin-bottom: 14px; cursor: pointer; font-weight: 500; }
+.page-title { font-size: 20px; font-weight: 700; color: #222631; margin-bottom: 8px; line-height: 1.3; }
+.page-sub { font-size: 16px; color: #6d7381; margin-bottom: 24px; line-height: 1.55; }
+.btn-batch { display: inline-flex; align-items: center; justify-content: center; gap: 8px; height: 44px; padding: 0 18px; border: 1px solid #c5dbff; border-radius: 22px; background: #fff; color: #416bff; font-size: 16px; font-weight: 600; cursor: pointer; line-height: 1; vertical-align: middle; flex-shrink: 0; margin-top: 24px; }
+.btn-batch:hover { background: #f4f8ff; }
+
+/* 스텝 바 */
+.step-bar { display: flex; align-items: center; gap: 8px; margin-bottom: 24px; flex-wrap: wrap; }
+.step-pill { display: inline-flex; align-items: center; justify-content: center; gap: 6px; height: 40px; padding: 0 18px; border: 1px solid #e5e7eb; border-radius: 8px; background: #fff; color: #6d7381; font-size: 15px; font-weight: 500; line-height: 1; vertical-align: middle; cursor: default; }
+.step-pill .si-i { width: 16px; height: 16px; flex-shrink: 0; }
+.step-pill.nav { cursor: pointer; }
+.step-pill.nav:hover { border-color: #b3b6bd; }
+.step-pill.active { border-color: #416bff; background: #eef3ff; color: #416bff; font-weight: 600; box-shadow: 0 0 0 1px #416bff inset; }
+.step-sep { color: #c5c8d0; display: inline-flex; align-items: center; flex-shrink: 0; }
+
+/* 상단 액션 줄 */
+.edit-top { display: flex; align-items: center; gap: 12px; margin-bottom: 8px; }
+.field-select { height: 44px; padding: 0 40px 0 16px; font-size: 16px; font-weight: 700; font-family: inherit; border: 1px solid #d9d9d9; border-radius: 8px; color: #222631; background: #fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='18' height='18' viewBox='0 0 24 24' fill='none' stroke='%236d7381' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E") no-repeat right 14px center; appearance: none; cursor: pointer; line-height: 1; width: 300px; }
+.field-select:focus { outline: none; border-color: #416bff; }
+.edit-top-right { margin-left: auto; display: flex; align-items: center; gap: 10px; }
+.saved-at { font-size: 14px; color: #808080; margin-right: 4px; }
+.btn-outline { display: inline-flex; align-items: center; justify-content: center; gap: 8px; height: 44px; padding: 0 16px; border: 1px solid #d9d9d9; border-radius: 8px; background: #fff; color: #3b3f4c; font-size: 16px; font-weight: 600; cursor: pointer; line-height: 1; vertical-align: middle; }
+.btn-outline:hover { background: #f6f7f9; }
+.btn-save { display: inline-flex; align-items: center; justify-content: center; gap: 8px; height: 44px; padding: 0 20px; border: none; border-radius: 8px; background: #416bff; color: #fff; font-size: 16px; font-weight: 600; cursor: pointer; line-height: 1; vertical-align: middle; }
+.btn-save:hover { background: #365eef; }
+.btn-dl { display: inline-flex; align-items: center; justify-content: center; width: 44px; height: 44px; border: none; border-radius: 8px; background: #1ab864; color: #fff; cursor: pointer; line-height: 1; vertical-align: middle; }
+.btn-dl:hover { background: #159c54; }
+
+/* 스텝바 아래 전체를 흰색 카드 한 덩어리로 */
+.edit-card { background: #fff; border: 1px solid #e5e7eb; border-radius: 16px; padding: 22px 24px; }
+
+/* 기록 편집 테이블 */
+.rec-table { width: 100%; table-layout: fixed; border-collapse: collapse; background: #fff; margin-top: 16px; }
+.rec-table th { font-size: 15px; font-weight: 600; color: #6d7381; padding: 12px; text-align: center; background: #f6f7f9; border-bottom: 1px solid #e5e7eb; white-space: nowrap; }
+.rec-table thead tr th:first-child { border-top-left-radius: 8px; border-bottom-left-radius: 8px; }
+.rec-table thead tr th:last-child { border-top-right-radius: 8px; border-bottom-right-radius: 8px; }
+.rec-table td { padding: 22px 14px; text-align: center; vertical-align: middle; border-bottom: 1px solid #eef0f3; font-size: 16px; color: #222631; }
+.col-no { width: 5%; font-weight: 600; }
+.col-name { width: 6%; }
+.col-level { width: 5%; }
+.col-kw { width: 11%; }
+.col-kw .kw-text { font-size: 16px; line-height: 1.6; color: #3b3f4c; }
+.col-kw .kw-trunc { display: inline-block; max-width: 122px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; vertical-align: bottom; }
+.col-ai { width: 31.5%; }
+.col-import { width: 6%; }
+.col-teacher { width: 31.5%; }
+
+/* AI 기록 셀 */
+.ai-box { background: #f6f7f9; border-radius: 10px; padding: 16px 18px; display: flex; flex-direction: column; min-height: 120px; }
+.ai-text { font-size: 16px; line-height: 1.7; color: #222631; text-align: left; }
+.ai-empty { font-size: 16px; color: #9aa0ad; text-align: left; }
+.ai-error { font-size: 16px; line-height: 1.7; color: #f2525f; text-align: left; }
+.ai-foot { display: flex; align-items: center; gap: 10px; margin-top: auto; padding-top: 14px; }
+.ai-foot.end { justify-content: flex-end; }
+.ai-count { font-size: 14px; color: #808080; }
+.ai-tools { margin-left: auto; display: flex; align-items: center; gap: 6px; }
+.icon-btn { display: inline-flex; align-items: center; justify-content: center; width: 34px; height: 34px; border: 1px solid #e5e7eb; border-radius: 8px; background: #fff; color: #6d7381; cursor: pointer; line-height: 1; vertical-align: middle; }
+.icon-btn:hover { background: #f1f3f5; color: #222631; }
+.icon-btn.plain { border: none; background: none; }
+.btn-regen, .btn-gen { display: inline-flex; align-items: center; justify-content: center; gap: 6px; height: 38px; padding: 0 16px; border: none; border-radius: 8px; background: #416bff; color: #fff; font-size: 15px; font-weight: 600; cursor: pointer; line-height: 1; vertical-align: middle; }
+.btn-regen:hover, .btn-gen:hover { background: #365eef; }
+.btn-genating { display: inline-flex; align-items: center; justify-content: center; gap: 6px; height: 38px; padding: 0 16px; border: none; border-radius: 8px; background: #eef0f3; color: #9aa0ad; font-size: 15px; font-weight: 600; cursor: default; line-height: 1; vertical-align: middle; }
+.spin { animation: spin 1s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* 스켈레톤 */
+.sk-bar { height: 14px; border-radius: 6px; background: linear-gradient(90deg,#e7e9ee 25%,#f1f3f5 50%,#e7e9ee 75%); background-size: 400% 100%; animation: shimmer 1.4s ease infinite; margin-bottom: 12px; }
+@keyframes shimmer { 0% { background-position: 100% 0; } 100% { background-position: -100% 0; } }
+
+/* 가져오기 버튼 */
+.btn-import { display: inline-flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; width: 52px; padding: 12px 6px; border: 1px solid #d9d9d9; border-radius: 8px; background: #fff; color: #3b3f4c; font-size: 14px; font-weight: 500; cursor: pointer; line-height: 1.3; }
+.btn-import:hover { background: #f6f7f9; border-color: #b3b6bd; }
+.btn-import.dis { color: #c5c8d0; border-color: #ebedf0; background: #fafbfc; cursor: default; }
+
+/* 선생님 직접 작성 */
+.teacher-cell { text-align: left; }
+.teacher-area { width: 100%; min-height: 160px; padding: 16px; font-size: 16px; font-family: inherit; line-height: 1.6; color: #222631; border: 1px solid #d9d9d9; border-radius: 10px; resize: vertical; }
+.teacher-area::placeholder { color: #aab0bb; }
+.teacher-area:focus { outline: none; border-color: #416bff; }
+
+/* 기록 다듬기 — 체크박스 / 일괄 액션바 */
+.rf-col-cb { width: 4%; }
+.rf-cb { width: 18px; height: 18px; accent-color: #416bff; cursor: pointer; }
+.rf-cb:disabled { cursor: default; }
+.rec-table tbody tr.rf-sel td { background: #f4f8ff; }
+.rf-bar { display: flex; align-items: center; gap: 12px; padding: 12px 18px; border: 1px solid #d6e3ff; background: linear-gradient(90deg,#f4f8ff,#e9f2ff); border-radius: 10px; margin-top: 16px; }
+.rf-bar.has-sel { background: linear-gradient(90deg,#e9f2ff,#d6e3ff); }
+.rf-bar-count { display: none; font-size: 15px; font-weight: 700; color: #365eef; align-items: center; gap: 6px; }
+.rf-bar.has-sel .rf-bar-count { display: inline-flex; }
+.rf-bar-hint { font-size: 15px; color: #365eef; font-weight: 600; }
+.rf-bar.has-sel .rf-bar-hint { display: none; }
+.rf-bar-spacer { flex: 1; }
+.rf-bar-clear { background: none; border: none; color: #6d7381; font-size: 14px; cursor: pointer; text-decoration: underline; text-underline-offset: 2px; }
+.rf-bar-clear:hover { color: #3b3f4c; }
+.rf-bar-btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; height: 40px; padding: 0 16px; border: none; border-radius: 8px; background: #365eef; color: #fff; font-size: 15px; font-weight: 600; cursor: pointer; line-height: 1; }
+.rf-bar-btn:hover { background: #2940be; }
+
+/* 다듬기 모달 */
+.rf-modal-bg { display: none; position: fixed; inset: 0; background: rgba(34,38,49,.45); z-index: 500; align-items: center; justify-content: center; padding: 20px; }
+.rf-modal-bg.show { display: flex; }
+.rf-modal { background: #fff; border-radius: 16px; width: 100%; max-width: 640px; max-height: calc(100vh - 40px); display: flex; flex-direction: column; box-shadow: 0 12px 40px rgba(0,0,0,.18); overflow: hidden; }
+.rf-modal-hd { padding: 20px 24px; border-bottom: 1px solid #f1f3f5; display: flex; align-items: flex-start; gap: 12px; }
+.rf-modal-title { font-size: 20px; font-weight: 700; color: #222631; }
+.rf-modal-sub { font-size: 15px; color: #6d7381; margin-top: 4px; line-height: 1.5; }
+.rf-modal-x { margin-left: auto; width: 32px; height: 32px; border: none; background: none; color: #6d7381; cursor: pointer; border-radius: 6px; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.rf-modal-x:hover { background: #f1f3f5; color: #222631; }
+.rf-modal-body { padding: 20px 24px; overflow-y: auto; flex: 1; display: flex; flex-direction: column; gap: 16px; }
+.rf-info { display: flex; gap: 8px; align-items: flex-start; background: #eef3ff; border-radius: 10px; padding: 13px 16px; font-size: 15px; color: #3b3f4c; line-height: 1.55; }
+.rf-info i { color: #416bff; margin-top: 2px; flex-shrink: 0; }
+.rf-card { border: 1px solid #e5e7eb; border-radius: 10px; padding: 18px 20px; }
+.rf-card-title { font-size: 16px; font-weight: 700; color: #222631; margin-bottom: 4px; }
+.rf-req { display: inline-flex; align-items: center; font-size: 12px; font-weight: 600; color: #6d7381; background: #f1f3f5; border: 1px solid #e5e7eb; padding: 2px 8px; border-radius: 4px; margin-left: 6px; vertical-align: middle; }
+.rf-card-sub { font-size: 14px; color: #6d7381; line-height: 1.55; margin-bottom: 12px; }
+.rf-textarea { width: 100%; min-height: 96px; padding: 12px 14px; font-size: 16px; font-family: inherit; line-height: 1.6; border: 1px solid #d9d9d9; border-radius: 8px; resize: vertical; color: #222631; }
+.rf-textarea:focus { outline: none; border-color: #416bff; }
+.rf-count { font-size: 12px; color: #808080; text-align: right; margin-top: 4px; }
+.rf-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; }
+.rf-chip { display: inline-flex; align-items: center; gap: 5px; padding: 8px 14px; background: #fff; border: 1px solid #d9d9d9; border-radius: 16px; font-size: 15px; color: #3b3f4c; font-weight: 500; cursor: pointer; line-height: 1.3; }
+.rf-chip:hover { background: #f4f8ff; border-color: #c7d6ff; color: #365eef; }
+.rf-pickhead { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 4px; }
+.rf-pickall { background: none; border: none; color: #365eef; font-size: 14px; font-weight: 500; cursor: pointer; text-decoration: underline; text-underline-offset: 2px; }
+.rf-pickbox { border: 1px solid #e5e7eb; border-radius: 8px; padding: 8px; display: flex; flex-direction: column; gap: 2px; max-height: 220px; overflow-y: auto; margin-top: 10px; }
+.rf-pickitem { display: flex; align-items: center; gap: 10px; padding: 9px 10px; border-radius: 6px; cursor: pointer; }
+.rf-pickitem:hover { background: #f6f7f9; }
+.rf-pickname { font-size: 16px; font-weight: 500; color: #222631; }
+.rf-modal-ft { padding: 16px 24px; border-top: 1px solid #f1f3f5; display: flex; justify-content: flex-end; gap: 10px; }
+.rf-btn-cancel { height: 44px; padding: 0 20px; border: 1px solid #d9d9d9; border-radius: 8px; background: #fff; color: #3b3f4c; font-size: 16px; font-weight: 600; cursor: pointer; }
+.rf-btn-cancel:hover { background: #f6f7f9; }
+.rf-btn-go { display: inline-flex; align-items: center; gap: 6px; height: 44px; padding: 0 20px; border: none; border-radius: 8px; background: #416bff; color: #fff; font-size: 16px; font-weight: 600; cursor: pointer; }
+.rf-btn-go:hover { background: #365eef; }
+.rf-btn-go:disabled { background: #c7d3f6; cursor: default; }
+.rf-toast { position: fixed; left: 50%; bottom: 32px; transform: translateX(-50%); background: #222631; color: #fff; font-size: 15px; padding: 12px 20px; border-radius: 10px; z-index: 600; opacity: 0; transition: opacity .2s, transform .2s; pointer-events: none; }
+.rf-toast.show { opacity: 1; transform: translateX(-50%) translateY(-4px); }
+
+/* 푸터 */
+.g-ft { text-align: center; padding: 36px 20px 28px; }
+.ft-links { display: flex; justify-content: center; gap: 28px; margin-bottom: 14px; }
+.ft-links a { font-size: 14px; color: #6d7381; text-decoration: none; }
+.ft-links a:hover { color: #416bff; }
+.ft-copy { font-size: 13px; color: #9aa0ad; }
+</style>
+</head>
+<body>
+
+<header class="g-hd">
+  <button onclick="toggleNav()" style="width:36px;height:36px;border:none;background:none;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;color:#3b3f4c;margin-right:8px;line-height:1">
+    <i data-lucide="menu" style="width:20px;height:20px"></i>
+  </button>
+  <svg width="76" height="16" viewBox="0 0 76 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M11.3613 4.03516H4.09668V11.9629H8.88281L8.88086 11.9648H15.6016V16H4.02539C1.80242 15.9998 0 14.223 0 12.0322V3.96777C0 1.77696 1.80242 0.000177874 4.02539 0H15.4561L11.3613 4.03516ZM22.0703 11.9648H33.5781V16H22.002C19.7788 16 17.9756 14.2231 17.9756 12.0322V0H22.0703V11.9648ZM40.0459 16H35.9521V0H40.0459V16ZM54.5381 0C56.4564 0 58.0138 1.53228 58.0186 3.42285L58.0166 3.4248V8.54297C58.014 10.4333 56.4567 11.9648 54.5361 11.9648H46.5107L42.416 16V0H54.5381ZM71.9746 0C74.0086 0.000134956 75.6887 1.49046 75.958 3.42285H76V12.5771H75.958C75.6887 14.5095 74.011 15.9999 71.9746 16H64.4238C62.3897 16 60.7098 14.5096 60.4404 12.5771C60.4145 12.398 60.3984 12.2184 60.3984 12.0322V3.96777C60.3984 3.78159 60.4145 3.60205 60.4404 3.42285C60.7098 1.49037 62.3873 0 64.4238 0H71.9746ZM64.4922 12.5771H71.9062V3.42285H64.4922V12.5771ZM46.5107 3.42285V8.54004H53.9238V3.42285H46.5107Z" fill="#365EEF"/>
+  </svg>
+  <div class="g-hd-r">
+    <span class="plan-badge">학교 유료</span>
+    <span style="font-size:14px;color:#3b3f4c">D-180</span>
+    <div class="hd-div"></div>
+    <i data-lucide="sparkles" style="width:18px;height:18px;color:#416bff"></i>
+    <div class="credit-wrap">AI 크레딧 200</div>
+    <div class="hd-div"></div>
+    <button class="user-btn">최대표 선생님(대표교사) <i data-lucide="chevron-down" style="width:16px;height:16px"></i></button>
+  </div>
+</header>
+
+<nav class="icon-sb" id="icon-sb">
+  <div class="si"><div class="si-icon"><i data-lucide="home" style="width:20px;height:20px"></i></div><span class="si-label">홈</span><span class="si-tip">홈</span></div>
+  <div class="si"><div class="si-icon"><i data-lucide="scissors" style="width:20px;height:20px"></i></div><span class="si-label">평가계획</span><span class="si-tip">평가계획</span></div>
+  <div class="si"><div class="si-icon"><i data-lucide="layout-grid" style="width:20px;height:20px"></i></div><span class="si-label">수업</span><span class="si-tip">수업</span></div>
+  <div class="si"><div class="si-icon"><i data-lucide="notebook-pen" style="width:20px;height:20px"></i></div><span class="si-label">창의적 체험활동 <span style="font-size:10px;background:#416bff;color:#fff;padding:1px 5px;border-radius:3px;margin-left:2px">Beta</span></span><span class="si-tip">창의적 체험활동</span></div>
+  <div class="si active"><div class="si-icon"><i data-lucide="zap" style="width:20px;height:20px"></i></div><span class="si-label">세특 간편 생성기</span><span class="si-tip">세특 간편 생성기</span></div>
+  <div class="si"><div class="si-icon"><i data-lucide="smile" style="width:20px;height:20px"></i></div><span class="si-label">행동특성 및 종합기록</span><span class="si-tip">행동특성 및 종합기록</span></div>
+  <div class="si"><div class="si-icon"><i data-lucide="bar-chart-2" style="width:20px;height:20px"></i></div><span class="si-label">리포트</span><span class="si-tip">리포트</span></div>
+  <div class="si"><div class="si-icon"><i data-lucide="building-2" style="width:20px;height:20px"></i></div><span class="si-label">학교 설정</span><span class="si-tip">학교 설정</span></div>
+  <div class="nav-bottom">
+    <div class="nav-div"></div>
+    <div class="si"><div class="si-icon"><i data-lucide="file-down" style="width:20px;height:20px"></i></div><span class="si-label">매뉴얼 다운로드</span><span class="si-tip">매뉴얼 다운로드</span></div>
+    <div class="si"><div class="si-icon"><i data-lucide="credit-card" style="width:20px;height:20px"></i></div><span class="si-label">요금제</span><span class="si-tip">요금제</span></div>
+    <div class="si"><div class="si-icon"><i data-lucide="help-circle" style="width:20px;height:20px"></i></div><span class="si-label">고객센터</span><span class="si-tip">고객센터</span></div>
+  </div>
+</nav>
+
+<div class="main-shell">
+<main class="main">
+
+  <div class="title-row">
+    <div>
+      <a class="back-link"><i data-lucide="chevron-left" style="width:16px;height:16px"></i> 이전으로</a>
+      <h1 class="page-title">세특 간편 생성기 : 테스트</h1>
+      <p class="page-sub">교과목, 성취기준, 키워드 및 활동 입력 후 세특 초안을 생성할 수 있습니다.</p>
+    </div>
+  </div>
+
+  <!-- 스텝 바 -->
+  <div class="step-bar">
+    <div class="step-pill"><i data-lucide="settings-2" class="si-i"></i> 기본 정보 설정</div>
+    <span class="step-sep"><i data-lucide="chevron-right" style="width:18px;height:18px"></i></span>
+    <div class="step-pill"><i data-lucide="users" class="si-i"></i> 그룹 구성</div>
+    <span class="step-sep"><i data-lucide="chevron-right" style="width:18px;height:18px"></i></span>
+    <div class="step-pill nav" onclick="location.href='quick_seteuk_dev_v1_260528.html'"><i data-lucide="pencil" class="si-i"></i> 키워드 및 활동 입력</div>
+    <span class="step-sep"><i data-lucide="chevron-right" style="width:18px;height:18px"></i></span>
+    <div class="step-pill nav" onclick="location.href='quick_seteuk_dev_ai_v1_260528.html'"><i data-lucide="wand-2" class="si-i"></i> AI 기록 생성</div>
+    <span class="step-sep"><i data-lucide="chevron-right" style="width:18px;height:18px"></i></span>
+    <div class="step-pill active"><i data-lucide="file-pen-line" class="si-i"></i> 기록 편집</div>
+  </div>
+
+  <div class="edit-card">
+  <!-- 상단 액션 -->
+  <div class="edit-top">
+    <select class="field-select">
+      <option>이동수업 로봇공학 전문공학 A반</option>
+      <option>1학년 1반</option>
+      <option>1학년 2반</option>
+    </select>
+    <div class="edit-top-right">
+      <span class="saved-at">09/08 15:38 저장됨</span>
+      <button class="btn-outline"><i data-lucide="send" style="width:18px;height:18px"></i> 전체 기록 옮기기</button>
+      <button class="btn-save"><i data-lucide="check" style="width:18px;height:18px"></i> 저장</button>
+      <button class="btn-dl"><i data-lucide="download" style="width:20px;height:20px"></i></button>
+    </div>
+  </div>
+
+  <!-- 일괄 다듬기 액션바 -->
+  <div class="rf-bar" id="rfBar">
+    <span class="rf-bar-count"><i data-lucide="check-circle" style="width:16px;height:16px"></i> <span id="rfCount">0</span>명 선택됨</span>
+    <span class="rf-bar-hint">체크박스로 학생을 선택해 한꺼번에 AI가 생성한 기록을 다듬을 수 있어요.</span>
+    <span class="rf-bar-spacer"></span>
+    <button class="rf-bar-clear" id="rfClear" onclick="rfClearSel()" style="display:none">선택 해제</button>
+    <button class="rf-bar-btn" onclick="rfOpenModal('bulk')"><i data-lucide="wand-2" style="width:15px;height:15px"></i> <span id="rfBarBtnLabel">기록 다듬기</span></button>
+  </div>
+
+  <!-- 테이블 -->
+  <table class="rec-table">
+    <thead>
+      <tr>
+        <th class="rf-col-cb"><input type="checkbox" class="rf-cb" id="rfAll" onclick="rfSelectAll(this)"></th>
+        <th class="col-no">학번</th>
+        <th class="col-name">이름</th>
+        <th class="col-kw">키워드 및 활동</th>
+        <th class="col-level">수행 수준</th>
+        <th class="col-ai">AI Assistant가 생성한 기록</th>
+        <th class="col-import"></th>
+        <th class="col-teacher">선생님 직접 작성</th>
+      </tr>
+    </thead>
+    <tbody>
+      <!-- 상태1: 생성 완료 -->
+      <tr>
+        <td class="rf-col-cb"><input type="checkbox" class="rf-cb" data-sid="10101" data-name="김하나" onclick="rfRowCb(this)"></td>
+        <td class="col-no">10101</td>
+        <td class="col-name">김하나</td>
+        <td class="col-kw"><span class="kw-text">경청, 문제해결, 사용, 의도관점 파악, 이해, 향유</span></td>
+        <td class="col-level">상</td>
+        <td class="col-ai">
+          <div class="ai-box">
+            <div class="ai-text">인간의 성장 과정을 다룬 작품을 읽으며 주인공의 변화와 내면적 성장에 주목하는 모습을 보임. 등장인물의 심리와 행동을 분석하는 과정에서 작가의 사용 의도와 관점을 파악하였으며, 장면마다 드러나는 상징적 요소와 서술적 기법을 비교함. 또한 원작과 재구성된 작품의 구조와 표현상의 차이를 분석하며 각 작품이 드러내는 변화 양상을 체계적으로 정리함. 자신의 삶과 연관된 경험을 바탕으로 주요 주제에 대해 개인의 생각을 개성적으로 표현하였고, 작품을 다양한 방식으로 감상하고 공유하는 과정에서 경청 태도와 타인의 의견을 존중하는 자세가 관찰됨. 작품 속 문제 상황을 설정하여 해결 방안을 탐구하고 대안을 제시하는 활동을 수행하는 동시에 텍스트를 주체적으로 이해하고, 문학 향유 능력을 발전시키는 모습을 보여줌.</div>
+            <div class="ai-foot">
+              <span class="ai-count">302자 (981Byte)</span>
+              <div class="ai-tools">
+                <button class="icon-btn plain"><i data-lucide="chevron-left" style="width:18px;height:18px"></i></button>
+                <button class="icon-btn plain"><i data-lucide="chevron-right" style="width:18px;height:18px"></i></button>
+                <button class="icon-btn"><i data-lucide="copy" style="width:16px;height:16px"></i></button>
+                <button class="btn-regen" onclick="rfOpenModal('single','10101','김하나')"><i data-lucide="wand-2" style="width:16px;height:16px"></i> 다듬기</button>
+              </div>
+            </div>
+          </div>
+        </td>
+        <td class="col-import"><button class="btn-import"><i data-lucide="send" style="width:18px;height:18px"></i> 가져오기</button></td>
+        <td class="col-teacher teacher-cell"><textarea class="teacher-area" placeholder="작성된 기록이 없습니다."></textarea></td>
+      </tr>
+
+      <!-- 상태2: 생성 전 -->
+      <tr>
+        <td class="rf-col-cb"><input type="checkbox" class="rf-cb" disabled></td>
+        <td class="col-no">10101</td>
+        <td class="col-name">김하나</td>
+        <td class="col-kw"><span class="kw-text kw-trunc">키워드 및 활동 내역…</span></td>
+        <td class="col-level">상</td>
+        <td class="col-ai">
+          <div class="ai-box">
+            <div class="ai-empty">생성된 기록이 없습니다.</div>
+            <div class="ai-foot end">
+              <button class="btn-gen"><i data-lucide="wand-2" style="width:16px;height:16px"></i> 기록 생성</button>
+            </div>
+          </div>
+        </td>
+        <td class="col-import"><button class="btn-import dis"><i data-lucide="send" style="width:18px;height:18px"></i> 가져오기</button></td>
+        <td class="col-teacher teacher-cell"><textarea class="teacher-area" placeholder="작성된 기록이 없습니다."></textarea></td>
+      </tr>
+
+      <!-- 상태3: 생성 중 -->
+      <tr>
+        <td class="rf-col-cb"><input type="checkbox" class="rf-cb" disabled></td>
+        <td class="col-no">10101</td>
+        <td class="col-name">김하나</td>
+        <td class="col-kw"><span class="kw-text kw-trunc">키워드 및 활동 내역…</span></td>
+        <td class="col-level">상</td>
+        <td class="col-ai">
+          <div class="ai-box">
+            <div class="sk-bar" style="width:100%"></div>
+            <div class="sk-bar" style="width:92%"></div>
+            <div class="sk-bar" style="width:55%;margin-bottom:0"></div>
+            <div class="ai-foot end">
+              <button class="btn-genating"><i data-lucide="loader-circle" class="spin" style="width:16px;height:16px"></i> 생성중</button>
+            </div>
+          </div>
+        </td>
+        <td class="col-import"><button class="btn-import dis"><i data-lucide="send" style="width:18px;height:18px"></i> 가져오기</button></td>
+        <td class="col-teacher teacher-cell"><textarea class="teacher-area" placeholder="작성된 기록이 없습니다."></textarea></td>
+      </tr>
+
+      <!-- 상태4: 자료 없음 -->
+      <tr>
+        <td class="rf-col-cb"><input type="checkbox" class="rf-cb" disabled></td>
+        <td class="col-no">10101</td>
+        <td class="col-name">김하나</td>
+        <td class="col-kw"><span class="kw-text">-</span></td>
+        <td class="col-level">중</td>
+        <td class="col-ai">
+          <div class="ai-box">
+            <div class="ai-empty">자료나 활동 내용을 등록하면 기록 초안을 만들어 드려요.</div>
+            <div class="ai-foot">
+              <span class="ai-count">0 Byte</span>
+              <div class="ai-tools"><button class="btn-gen"><i data-lucide="wand-2" style="width:16px;height:16px"></i> 기록 생성</button></div>
+            </div>
+          </div>
+        </td>
+        <td class="col-import"><button class="btn-import dis"><i data-lucide="send" style="width:18px;height:18px"></i> 가져오기</button></td>
+        <td class="col-teacher teacher-cell"><textarea class="teacher-area" placeholder="작성된 기록이 없습니다."></textarea></td>
+      </tr>
+
+      <!-- 상태5: 생성 실패(에러) -->
+      <tr>
+        <td class="rf-col-cb"><input type="checkbox" class="rf-cb" disabled></td>
+        <td class="col-no">10101</td>
+        <td class="col-name">김하나</td>
+        <td class="col-kw"><span class="kw-text kw-trunc">키워드 및 활동 내역…</span></td>
+        <td class="col-level">하</td>
+        <td class="col-ai">
+          <div class="ai-box">
+            <div class="ai-error">네트워크 오류가 발생하여 기록 생성에 실패했어요.<br>AI 크레딧이 반환되었으니 다시 실행해 주세요.</div>
+            <div class="ai-foot end">
+              <button class="icon-btn plain"><i data-lucide="undo-2" style="width:18px;height:18px"></i></button>
+              <button class="btn-gen"><i data-lucide="wand-2" style="width:16px;height:16px"></i> 기록 생성</button>
+            </div>
+          </div>
+        </td>
+        <td class="col-import"><button class="btn-import dis"><i data-lucide="send" style="width:18px;height:18px"></i> 가져오기</button></td>
+        <td class="col-teacher teacher-cell"><textarea class="teacher-area" placeholder="작성된 기록이 없습니다."></textarea></td>
+      </tr>
+    </tbody>
+  </table>
+  </div>
+
+  <!-- ===== 기록 다듬기 모달 ===== -->
+  <div class="rf-modal-bg" id="rfModal" onclick="if(event.target===this)rfClose()">
+    <div class="rf-modal">
+      <div class="rf-modal-hd">
+        <div>
+          <div class="rf-modal-title">기록 다듬기</div>
+          <div class="rf-modal-sub" id="rfSub">선택한 학생들의 기록을 동일한 수정 방향으로 다듬어요.</div>
+        </div>
+        <button class="rf-modal-x" onclick="rfClose()"><i data-lucide="x" style="width:18px;height:18px"></i></button>
+      </div>
+      <div class="rf-modal-body">
+        <div class="rf-info">
+          <i data-lucide="info" style="width:16px;height:16px"></i>
+          <div>다듬기는 <strong>학생당 1 크레딧</strong>이 사용돼요. 기존 <strong>AI 생성 기록</strong>은 새 기록으로 교체되며 되돌릴 수 없어요. (선생님 작성 기록은 영향 없음)</div>
+        </div>
+        <div class="rf-card">
+          <div class="rf-card-title">수정 방향 <span class="rf-req">선택</span></div>
+          <div class="rf-card-sub">분량·표현·강조점 등 무엇이든 자유롭게 적어주세요. <strong>비워두면 이전 생성 조건 그대로 다시 생성</strong>돼요. 모든 선택 학생에 동일 적용.</div>
+          <textarea class="rf-textarea" id="rfDir" maxlength="300" placeholder="예) 협업·리더십을 더 강조해 주세요. / 300자 이내로 줄여 주세요. / 사례 1~2개 추가해 주세요." oninput="rfUpdateUI()"></textarea>
+          <div class="rf-count"><span id="rfDirCount">0</span> / 300</div>
+          <div class="rf-chips">
+            <span class="rf-chip" onclick="rfApplyPrompt('분량을 조금 더 늘리고, 학생의 구체적인 활동 사례를 1~2개 추가해 주세요.')"><i data-lucide="plus" style="width:12px;height:12px"></i> 분량 늘리기 + 사례 추가</span>
+            <span class="rf-chip" onclick="rfApplyPrompt('협업·리더십·의사소통 등 가치·태도 측면을 더 강조해 주세요.')"><i data-lucide="users" style="width:12px;height:12px"></i> 협업·태도 강조</span>
+            <span class="rf-chip" onclick="rfApplyPrompt('탐구 과정과 사고력이 드러나도록 학생이 어떤 과정을 거쳤는지 더 구체화해 주세요.')"><i data-lucide="search" style="width:12px;height:12px"></i> 탐구 과정 구체화</span>
+            <span class="rf-chip" onclick="rfApplyPrompt('지식·이해 측면 중심으로, 개념 적용 사례를 더 명시적으로 작성해 주세요.')"><i data-lucide="book" style="width:12px;height:12px"></i> 개념 적용 강조</span>
+            <span class="rf-chip" onclick="rfApplyPrompt('학교생활기록부 작성 지침에 맞춰 문장을 더 간결하고 객관적으로 다듬어 주세요.')"><i data-lucide="edit-3" style="width:12px;height:12px"></i> 문장 간결화</span>
+          </div>
+        </div>
+        <div class="rf-card" id="rfPickWrap">
+          <div class="rf-pickhead">
+            <div class="rf-card-title" style="margin:0">다듬을 학생 <span id="rfPickCnt" style="font-size:14px;color:#6d7381;font-weight:500">(0명)</span></div>
+            <button class="rf-pickall" id="rfPickAll" onclick="rfTogglePickAll()">전체 선택</button>
+          </div>
+          <div class="rf-card-sub" style="margin:0">개별 학생을 추가/제외할 수 있어요. 다듬기는 기존 기록이 있는 학생만 가능해요.</div>
+          <div class="rf-pickbox" id="rfPickList"></div>
+        </div>
+      </div>
+      <div class="rf-modal-ft">
+        <button class="rf-btn-cancel" onclick="rfClose()">취소</button>
+        <button class="rf-btn-go" id="rfGo" onclick="rfRun()" disabled><i data-lucide="wand-2" style="width:15px;height:15px"></i> <span id="rfGoLabel">다듬기</span> · <span id="rfCredit">0</span> 크레딧</button>
+      </div>
+    </div>
+  </div>
+  <div class="rf-toast" id="rfToast"></div>
+
+</main>
+
+<footer class="g-ft">
+  <div class="ft-links">
+    <a href="#">회사소개</a>
+    <a href="#">이용약관</a>
+    <a href="#">개인정보처리방침</a>
+    <a href="#">고객센터</a>
+  </div>
+  <div class="ft-copy">© 2026 Datadriven Inc. All rights reserved.</div>
+</footer>
+</div>
+
+<script>
+function toggleNav(){ document.getElementById('icon-sb').classList.toggle('expanded'); document.body.classList.toggle('nav-expanded'); }
+
+/* ===== 기록 다듬기 ===== */
+var rfEligible = [{id:'10101', name:'김하나'}]; // AI 기록 보유 학생(다듬기 가능)
+var rfSel = new Set();
+var rfMode = 'bulk';
+var rfPicked = new Set();
+
+function rfRowCb(cb){
+  if(cb.checked) rfSel.add(cb.dataset.sid); else rfSel.delete(cb.dataset.sid);
+  cb.closest('tr').classList.toggle('rf-sel', cb.checked);
+  rfUpdateBar();
+}
+function rfSelectAll(all){
+  document.querySelectorAll('.rec-table tbody .rf-cb').forEach(function(cb){
+    if(cb.disabled) return;
+    cb.checked = all.checked;
+    cb.closest('tr').classList.toggle('rf-sel', all.checked);
+    if(all.checked) rfSel.add(cb.dataset.sid); else rfSel.delete(cb.dataset.sid);
+  });
+  rfUpdateBar();
+}
+function rfClearSel(){
+  rfSel.clear();
+  document.querySelectorAll('.rec-table tbody .rf-cb').forEach(function(cb){ cb.checked=false; cb.closest('tr').classList.remove('rf-sel'); });
+  var all=document.getElementById('rfAll'); if(all){ all.checked=false; all.indeterminate=false; }
+  rfUpdateBar();
+}
+function rfUpdateBar(){
+  var n = rfSel.size;
+  document.getElementById('rfBar').classList.toggle('has-sel', n>0);
+  document.getElementById('rfCount').textContent = n;
+  document.getElementById('rfClear').style.display = n>0 ? '' : 'none';
+  document.getElementById('rfBarBtnLabel').textContent = n>0 ? (n+'명 기록 다듬기') : '기록 다듬기';
+  var elig = [...document.querySelectorAll('.rec-table tbody .rf-cb')].filter(c=>!c.disabled);
+  var on = elig.filter(c=>c.checked).length;
+  var all = document.getElementById('rfAll');
+  all.checked = elig.length>0 && on===elig.length;
+  all.indeterminate = on>0 && on<elig.length;
+}
+function rfOpenModal(mode, sid, name){
+  rfMode = mode || 'bulk';
+  rfPicked = new Set();
+  if(rfMode==='single' && sid){ rfPicked.add(sid); }
+  else if(rfSel.size>0){ rfSel.forEach(id=>rfPicked.add(id)); }
+  else { rfEligible.forEach(s=>rfPicked.add(s.id)); }
+  var sub = document.getElementById('rfSub');
+  var pickWrap = document.getElementById('rfPickWrap');
+  if(rfMode==='single'){
+    sub.textContent = (sid&&name) ? (sid+' '+name+' 학생의 기록을 다듬어요.') : '학생 기록을 다듬어요.';
+    pickWrap.style.display='none';
+  } else {
+    sub.textContent = '선택한 학생들의 기록을 동일한 수정 방향으로 다듬어요.';
+    pickWrap.style.display='';
+  }
+  document.getElementById('rfDir').value=''; document.getElementById('rfDirCount').textContent='0';
+  rfRenderPick(); rfUpdateUI();
+  document.getElementById('rfModal').classList.add('show');
+  lucide.createIcons();
+}
+function rfClose(){ document.getElementById('rfModal').classList.remove('show'); }
+function rfRenderPick(){
+  var wrap = document.getElementById('rfPickList');
+  if(!rfEligible.length){ wrap.innerHTML='<div style="font-size:14px;color:#9ca3af;text-align:center;padding:24px">다듬을 수 있는 학생이 없어요</div>'; document.getElementById('rfPickCnt').textContent='(0명)'; return; }
+  wrap.innerHTML = rfEligible.map(function(s){
+    var ck = rfPicked.has(s.id) ? 'checked' : '';
+    return '<label class="rf-pickitem"><input type="checkbox" class="rf-cb" '+ck+' onclick="rfTogglePick(\''+s.id+'\')"><span class="rf-pickname">'+s.id+' '+s.name+'</span></label>';
+  }).join('');
+  document.getElementById('rfPickCnt').textContent = '('+rfPicked.size+'명)';
+  document.getElementById('rfPickAll').textContent = rfEligible.every(s=>rfPicked.has(s.id)) ? '전체 해제' : '전체 선택';
+}
+function rfTogglePick(sid){ if(rfPicked.has(sid)) rfPicked.delete(sid); else rfPicked.add(sid); rfRenderPick(); rfUpdateUI(); }
+function rfTogglePickAll(){
+  var allChecked = rfEligible.every(s=>rfPicked.has(s.id));
+  if(allChecked) rfEligible.forEach(s=>rfPicked.delete(s.id)); else rfEligible.forEach(s=>rfPicked.add(s.id));
+  rfRenderPick(); rfUpdateUI();
+}
+function rfApplyPrompt(t){ document.getElementById('rfDir').value=t; rfUpdateUI(); }
+function rfUpdateUI(){
+  var ta = document.getElementById('rfDir');
+  document.getElementById('rfDirCount').textContent = ta.value.length;
+  var n = rfMode==='single' ? 1 : rfPicked.size;
+  document.getElementById('rfGoLabel').textContent = n+'명 다듬기';
+  document.getElementById('rfCredit').textContent = n;
+  document.getElementById('rfGo').disabled = n===0;
+}
+function rfRun(){
+  var n = rfMode==='single' ? 1 : rfPicked.size;
+  if(n===0){ rfToast('대상 학생을 선택해 주세요'); return; }
+  rfClose(); rfClearSel();
+  rfToast(n+'명 기록을 다듬었어요');
+}
+var rfToastTimer;
+function rfToast(msg){
+  var t=document.getElementById('rfToast'); t.textContent=msg; t.classList.add('show');
+  clearTimeout(rfToastTimer); rfToastTimer=setTimeout(function(){ t.classList.remove('show'); }, 2200);
+}
+rfUpdateBar();
+lucide.createIcons();
+</script>
+</body>
+</html>
