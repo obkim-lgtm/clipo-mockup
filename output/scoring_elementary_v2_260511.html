@@ -912,28 +912,9 @@ select.field-input{appearance:none;-webkit-appearance:none;background-image:url(
           </div>
         </div>
       </div>
-      <div class="field" id="rerunModeField">
-        <span class="field-lbl">기존 결과 처리</span>
-        <div class="modal-radio-group">
-          <label class="modal-radio-item selected" data-mode="overwrite" onclick="selectRerunMode(this)">
-            <div class="radio-ring checked"></div>
-            <div class="modal-radio-content">
-              <span class="modal-radio-text">덮어쓰기</span>
-              <span class="modal-radio-desc">모든 AI 채점 결과를 새로 생성해요. 직접 수정한 내용은 사라져요.</span>
-            </div>
-          </label>
-          <label class="modal-radio-item" data-mode="append" onclick="selectRerunMode(this)">
-            <div class="radio-ring"></div>
-            <div class="modal-radio-content">
-              <span class="modal-radio-text">이어쓰기</span>
-              <span class="modal-radio-desc">직접 수정한 내용은 그대로 두고, 비어 있거나 손대지 않은 영역만 새로 생성해요.</span>
-            </div>
-          </label>
-        </div>
-      </div>
       <div class="modal-warning" id="rerunWarning" style="display:none">
         <i data-lucide="alert-triangle" class="modal-warning-icon" style="width:16px;height:16px"></i>
-        <span class="modal-warning-text"><strong>수정한 내용이 있어요.</strong> [덮어쓰기]로 실행하면 직접 수정한 내용이 모두 사라져요.</span>
+        <span class="modal-warning-text"><strong>다시 채점하면 아래 내용이 모두 새 AI 결과로 덮어써져요.</strong> 직접 수정하신 부분도 함께 사라지니 확인해 주세요.<br>· 채점요소별·문항별 점수<br>· 문항별 채점 근거<br>· 문항별·채점요소별 피드백<br>· 선생님 한마디</span>
       </div>
     </div>
     <div class="modal-ft">
@@ -958,28 +939,9 @@ select.field-input{appearance:none;-webkit-appearance:none;background-image:url(
         <i data-lucide="info" class="modal-info-icon" style="width:16px;height:16px"></i>
         <div class="modal-info-text">선택한 채점요소별 점수를 기반으로 <strong>채점기준에 맞는 피드백</strong>을 만들어요.</div>
       </div>
-      <div class="field" id="rubricAiModeField" style="display:none">
-        <span class="field-lbl">기존 결과 처리</span>
-        <div class="modal-radio-group">
-          <label class="modal-radio-item selected" data-mode="overwrite" onclick="selectRubricAiMode(this)">
-            <div class="radio-ring checked"></div>
-            <div class="modal-radio-content">
-              <span class="modal-radio-text">덮어쓰기</span>
-              <span class="modal-radio-desc">모든 AI 피드백을 새로 생성해요. 직접 수정한 내용은 사라져요.</span>
-            </div>
-          </label>
-          <label class="modal-radio-item" data-mode="append" onclick="selectRubricAiMode(this)">
-            <div class="radio-ring"></div>
-            <div class="modal-radio-content">
-              <span class="modal-radio-text">이어쓰기</span>
-              <span class="modal-radio-desc">직접 수정한 피드백은 그대로 두고, 손대지 않은 영역만 새로 생성해요.</span>
-            </div>
-          </label>
-        </div>
-      </div>
       <div class="modal-warning" id="rubricAiWarning" style="display:none">
         <i data-lucide="alert-triangle" class="modal-warning-icon" style="width:16px;height:16px"></i>
-        <span class="modal-warning-text"><strong>수정한 내용이 있어요.</strong> [덮어쓰기]로 다시 생성하면 직접 수정한 피드백이 모두 사라져요.</span>
+        <span class="modal-warning-text"><strong>다시 생성하면 채점기준 기반 피드백이 모두 새 AI 결과로 덮어써져요.</strong> 직접 수정하신 피드백도 함께 사라지니 확인해 주세요.</span>
       </div>
     </div>
     <div class="modal-ft">
@@ -1596,30 +1558,12 @@ function rerunAi(){
     labelsRoot.children[i].textContent = labelSet[i];
   }
   updateScoringLevelLabels();
-  // 모드 선택은 항상 '덮어쓰기' 기본으로 리셋
-  selectRerunMode(document.querySelector('#rerunModeField .modal-radio-item[data-mode="overwrite"]'));
-  // 최초 실행 학생(이전 AI 채점 결과 없음)이면 모드 선택 자체를 숨김
-  var modeField = document.getElementById('rerunModeField');
-  if(modeField) modeField.style.display = isFirstRunStudent() ? 'none' : 'flex';
+  // 재실행은 항상 전체 덮어쓰기 (덮어쓰기/이어쓰기 모드 미제공)
   updateRerunWarning();
   // 채점 실패 학생은 이전 크레딧이 반환됐다는 안심 배너 노출
   var refundBanner = document.getElementById('rerunRefundNotice');
   if(refundBanner) refundBanner.style.display = (studentName === '채점실패') ? 'flex' : 'none';
   document.getElementById('rerunConfirmModal').classList.add('show');
-}
-function selectRerunMode(el){
-  if(!el) return;
-  document.querySelectorAll('#rerunModeField .modal-radio-item').forEach(function(it){
-    it.classList.remove('selected');
-    var ring = it.querySelector('.radio-ring'); if(ring) ring.classList.remove('checked');
-  });
-  el.classList.add('selected');
-  var ring = el.querySelector('.radio-ring'); if(ring) ring.classList.add('checked');
-  updateRerunWarning();
-}
-function getRerunMode(){
-  var sel = document.querySelector('#rerunModeField .modal-radio-item.selected');
-  return sel ? sel.getAttribute('data-mode') : 'overwrite';
 }
 function updateRerunWarning(){
   var hasDirtyBlocks = document.querySelectorAll('.ec-block.dirty').length > 0;
@@ -1628,17 +1572,15 @@ function updateRerunWarning(){
   var origDraft = ta ? (ta.getAttribute('data-ai-draft') || '') : '';
   var tfDirty = !!(ta && origDraft && ta.value !== origDraft);
   var hasDirty = hasDirtyBlocks || tfDirty;
-  var isOverwrite = getRerunMode() === 'overwrite';
-  // 수정한 내용이 있고 + 덮어쓰기 모드일 때만 경고 표시
-  document.getElementById('rerunWarning').style.display = (hasDirty && isOverwrite) ? 'flex' : 'none';
+  // 재실행은 항상 전체 덮어쓰기 → 수정한 내용이 있으면 항상 경고 표시
+  document.getElementById('rerunWarning').style.display = hasDirty ? 'flex' : 'none';
 }
 function closeRerunConfirm(){ document.getElementById('rerunConfirmModal').classList.remove('show'); }
 function confirmRerun(){
   var level = parseInt(document.getElementById('scoringLevelSlider').value,10);
   localStorage.setItem(RERUN_LEVEL_KEY, level);
-  var mode = getRerunMode();
   closeRerunConfirm();
-  doRerunAi(mode);
+  doRerunAi('overwrite');
 }
 function doRerunAi(mode){
   showToast('success', 'AI 채점을 실행합니다.');
@@ -2191,25 +2133,13 @@ function resetRubricAiSection(){
   }
 }
 
-function selectRubricAiMode(el){
-  var group = el.parentNode;
-  group.querySelectorAll('.modal-radio-item').forEach(function(it){
-    it.classList.toggle('selected', it === el);
-    var ring = it.querySelector('.radio-ring');
-    if(ring) ring.classList.toggle('checked', it === el);
-  });
-  updateRubricAiWarning();
-}
-function getRubricAiMode(){
-  var sel = document.querySelector('#rubricAiModeField .modal-radio-item.selected');
-  return sel ? sel.getAttribute('data-mode') : 'overwrite';
-}
+function getRubricAiMode(){ return 'overwrite'; } // 재생성은 항상 전체 덮어쓰기 (모드 미제공)
 function updateRubricAiWarning(){
   var isRegen = document.querySelectorAll('#rubricAiPane .rai-card').length > 0;
   var hasDirty = document.querySelectorAll('#rubricAiPane .ec-block.dirty').length > 0;
-  var isOverwrite = getRubricAiMode() === 'overwrite';
   var warning = document.getElementById('rubricAiWarning');
-  if(warning) warning.style.display = (isRegen && hasDirty && isOverwrite) ? 'flex' : 'none';
+  // 다시 생성 + 수정한 내용 있으면 항상 경고 표시
+  if(warning) warning.style.display = (isRegen && hasDirty) ? 'flex' : 'none';
 }
 function runRubricAi(){
   // 전제 조건: 모든 채점요소에 점수가 선택되어야 실행 가능
@@ -2223,14 +2153,7 @@ function runRubricAi(){
     return;
   }
   // 다시 생성 여부 (이미 생성된 카드 있으면 regen 모드)
-  var isRegen = document.querySelectorAll('#rubricAiPane .rai-card').length > 0;
-  // 모드 필드: 다시 생성 시에만 노출, 디폴트 '덮어쓰기'로 리셋
-  var modeField = document.getElementById('rubricAiModeField');
-  if(modeField){
-    modeField.style.display = isRegen ? 'flex' : 'none';
-    var ow = modeField.querySelector('.modal-radio-item[data-mode="overwrite"]');
-    if(ow) selectRubricAiMode(ow);
-  }
+  // 재생성은 항상 전체 덮어쓰기 (덮어쓰기/이어쓰기 모드 미제공)
   updateRubricAiWarning();
   document.getElementById('rubricAiConfirmModal').classList.add('show');
   lucide.createIcons();
