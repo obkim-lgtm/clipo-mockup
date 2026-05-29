@@ -489,25 +489,6 @@ body{background:#f6f7f9;color:#222631;min-height:100vh}
             </div>
           </div>
         </div>
-        <div class="field" id="bulkAiModeField" style="display:none">
-          <span class="field-lbl">기존 결과 처리</span>
-          <div class="modal-radio-group">
-            <label class="modal-radio-item selected" data-mode="overwrite" onclick="selectBulkAiMode(this)">
-              <div class="radio-ring checked"></div>
-              <div class="modal-radio-content">
-                <span class="modal-radio-text">덮어쓰기</span>
-                <span class="modal-radio-desc">선택한 학생의 AI 채점 결과를 새로 생성해요. 직접 수정한 내용은 사라져요.</span>
-              </div>
-            </label>
-            <label class="modal-radio-item" data-mode="append" onclick="selectBulkAiMode(this)">
-              <div class="radio-ring"></div>
-              <div class="modal-radio-content">
-                <span class="modal-radio-text">이어쓰기</span>
-                <span class="modal-radio-desc">직접 수정한 내용은 그대로 두고, 비어 있거나 손대지 않은 영역만 새로 생성해요.</span>
-              </div>
-            </label>
-          </div>
-        </div>
       </div>
       <div class="modal-ft">
         <span class="credit-notice">
@@ -622,13 +603,7 @@ function runBulkAi(){
   // Step 1 초기엔 0명 (의도하지 않은 크레딧 사용 방지) — Step 2 첫 진입 시 전체 선택 디폴트
   BULK_AI_STATE.selected = new Set();
   BULK_AI_STATE.step2Initialized = false;
-  // 모드 필드: 학급에 채점 완료된 학생이 1명이라도 있을 때만 노출
-  var hasGraded = STUDENTS.some(function(s){ return s.statusCls === 'done'; });
-  var modeField = document.getElementById('bulkAiModeField');
-  if(modeField) modeField.style.display = hasGraded ? 'flex' : 'none';
-  // 모드는 항상 '덮어쓰기' 디폴트로 리셋
-  var ow = document.querySelector('#bulkAiModeField .modal-radio-item[data-mode="overwrite"]');
-  if(ow) selectBulkAiMode(ow);
+  // 재실행은 항상 전체 덮어쓰기 (덮어쓰기/이어쓰기 모드 미제공)
   // 슬라이더 리셋
   document.getElementById('bulkAiLevelSlider').value = 1;
   updateBulkAiLevelLabels();
@@ -658,16 +633,6 @@ function bulkAiNextStep(){
 }
 function bulkAiPrevStep(){ showBulkAiStep(1); }
 function closeBulkAiModal(){ document.getElementById('bulkAiModal').classList.remove('show'); }
-
-function selectBulkAiMode(el){
-  var group = el.parentNode;
-  group.querySelectorAll('.modal-radio-item').forEach(function(it){
-    it.classList.toggle('selected', it === el);
-    var ring = it.querySelector('.radio-ring');
-    if(ring) ring.classList.toggle('checked', it === el);
-  });
-  BULK_AI_STATE.mode = el.getAttribute('data-mode');
-}
 
 function updateBulkAiLevelLabels(){
   var v = parseInt(document.getElementById('bulkAiLevelSlider').value, 10);
