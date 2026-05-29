@@ -450,6 +450,7 @@ select.field-input{appearance:none;-webkit-appearance:none;background-image:url(
 .delete-confirm-sub{font-size:13px;color:#6d7381}
 
 /* ══════ 슬라이더 (채점 수준) ══════ */
+.scoring-level-desc{font-size:14px;color:#6d7381;line-height:1.55;margin-bottom:12px}
 .scoring-level{display:flex;flex-direction:column;gap:10px;padding:4px 0}
 .scoring-level-slider{width:100%;-webkit-appearance:none;appearance:none;height:6px;background:linear-gradient(to right,#365eef 0%,#365eef 50%,#dde1e8 50%,#dde1e8 100%);border-radius:3px;outline:none;cursor:pointer;margin:0}
 .scoring-level-slider::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:22px;height:22px;border-radius:50%;background:#fff;cursor:pointer;border:3px solid #365eef;box-shadow:0 1px 3px rgba(0,0,0,.15)}
@@ -902,13 +903,14 @@ select.field-input{appearance:none;-webkit-appearance:none;background-image:url(
         </div>
       </div>
       <div class="field">
-        <span class="field-lbl">채점 수준</span>
+        <span class="field-lbl">점수 수준</span>
+        <div class="scoring-level-desc" id="scoringLevelDesc">채점요소별 점수를 얼마나 높게 또는 낮게 줄지 정해요. 점수에 맞춰 피드백도 함께 조절돼요.</div>
         <div class="scoring-level">
           <input type="range" class="scoring-level-slider" id="scoringLevelSlider" min="0" max="2" step="1" value="1" oninput="updateScoringLevelLabels()">
           <div class="scoring-level-labels" id="scoringLevelLabels">
-            <span>관대하게</span>
-            <span class="active">보통</span>
-            <span>엄격하게</span>
+            <span>점수 높게</span>
+            <span class="active">표준</span>
+            <span>점수 낮게</span>
           </div>
         </div>
       </div>
@@ -1530,8 +1532,10 @@ function toggleRerunModelCard(){
   section.classList.toggle('expanded', isCollapsed);
 }
 var RERUN_LEVEL_KEY = 'clipo_last_scoring_level';
-var SCORING_LEVEL_LABELS_FIRST = ['관대하게','보통','엄격하게'];
-var SCORING_LEVEL_LABELS_RERUN = ['이전보다 관대','이전과 유사','이전보다 엄격'];
+var SCORING_LEVEL_LABELS_FIRST = ['점수 높게','표준','점수 낮게'];
+var SCORING_LEVEL_LABELS_RERUN = ['직전보다 높게','직전과 비슷','직전보다 낮게'];
+var SCORING_LEVEL_DESC_FIRST = '채점요소별 점수를 얼마나 높게 또는 낮게 줄지 정해요. 점수에 맞춰 피드백도 함께 조절돼요.';
+var SCORING_LEVEL_DESC_RERUN = '이 학생의 직전 채점 결과와 비교해 점수를 조절해요. 점수에 맞춰 피드백도 함께 조절돼요.';
 // 최초 실행(이전 AI 채점 결과 없음) 학생 — 라벨에 "이전" 단어 제거
 var FIRST_RUN_STUDENTS = ['채점전','채점실패'];
 // 페이지 안에서 채점 실행한 적 있는지 — 실행 후엔 더 이상 'first run'이 아님
@@ -1553,10 +1557,13 @@ function rerunAi(){
   document.getElementById('scoringLevelSlider').value = lastLevel;
   // 최초 실행 여부에 따라 슬라이더 라벨 텍스트 갱신
   var labelsRoot = document.getElementById('scoringLevelLabels');
-  var labelSet = isFirstRunStudent() ? SCORING_LEVEL_LABELS_FIRST : SCORING_LEVEL_LABELS_RERUN;
+  var first = isFirstRunStudent();
+  var labelSet = first ? SCORING_LEVEL_LABELS_FIRST : SCORING_LEVEL_LABELS_RERUN;
   for(var i=0;i<labelsRoot.children.length;i++){
     labelsRoot.children[i].textContent = labelSet[i];
   }
+  var descEl = document.getElementById('scoringLevelDesc');
+  if(descEl) descEl.textContent = first ? SCORING_LEVEL_DESC_FIRST : SCORING_LEVEL_DESC_RERUN;
   updateScoringLevelLabels();
   // 재실행은 항상 전체 덮어쓰기 (덮어쓰기/이어쓰기 모드 미제공)
   updateRerunWarning();
