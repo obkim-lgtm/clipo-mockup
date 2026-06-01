@@ -132,11 +132,21 @@ body.nav-expanded .main-shell { margin-left: 200px; transition: margin-left .2s 
 .btn-analyze { display: inline-flex; align-items: center; justify-content: center; gap: 6px; height: 40px; padding: 0 16px; border: none; border-radius: 8px; background: #416bff; color: #fff; font-size: 15px; font-weight: 600; cursor: pointer; line-height: 1; white-space: nowrap; flex-shrink: 0; }
 .btn-analyze:hover { background: #365eef; }
 .btn-analyze:disabled { background: #c7d3f6; cursor: default; }
+/* 업로드 직후 분석 버튼 펄스(주의 환기) */
+@keyframes pulse-cta {
+  0%   { box-shadow: 0 0 0 0 rgba(65,107,255,.30); }
+  60%  { box-shadow: 0 0 0 6px rgba(65,107,255,0); }
+  100% { box-shadow: 0 0 0 0 rgba(65,107,255,0); }
+}
+.btn-analyze.pulse { animation: pulse-cta 1.2s ease-out 0s 2; }
 .credit-pill { display: inline-flex; align-items: center; gap: 4px; font-size: 13px; font-weight: 600; color: #416bff; background: #eef3ff; padding: 6px 11px; border-radius: 20px; line-height: 1; }
 .analyze-note { font-size: 13px; color: #808080; }
 .ai-result { margin-top: 20px; }
 .ai-result-head { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
 .ai-badge { display: inline-flex; align-items: center; gap: 4px; font-size: 12px; font-weight: 700; color: #416bff; background: #eef3ff; padding: 4px 9px; border-radius: 6px; line-height: 1; }
+/* AI 분석 결과 textarea — 직접 입력란과 구분 위해 연하늘 배경 */
+#aiResultText { background: #f4f8ff; }
+#aiResultText:focus { background: #fff; }
 .ai-result-note { font-size: 14px; color: #6d7381; margin-bottom: 10px; line-height: 1.5; }
 .spin { animation: spin 1s linear infinite; }
 @keyframes spin { to { transform: rotate(360deg); } }
@@ -315,7 +325,7 @@ body.is-busy .back-link { opacity: .5; cursor: not-allowed; }
     <div class="right-col">
       <div class="card kw-card">
         <div class="rp-head"><span class="rp-title"><span id="curStuName">10101 김하나</span> 키워드 및 활동 입력</span></div>
-        <p class="rp-sub">학생을 선택하여 키워드 및 활동 내역을 입력해 주세요.</p>
+        <p class="rp-sub">학생을 선택해 활동 자료를 업로드하거나 키워드 및 활동을 직접 입력해 주세요.</p>
 
         <!-- 키워드 사전 (토글 접힘) — 마커, 실제 위치는 학생 입력 내용 아래 -->
         <div class="kw-box" id="kwBox">
@@ -413,7 +423,6 @@ body.is-busy .back-link { opacity: .5; cursor: not-allowed; }
           <div class="ai-result" id="aiResult" style="display:none">
             <div class="ai-result-head">
               <span class="in-label" style="margin:0">AI 활동 분석 결과</span>
-              <span class="ai-badge"><i data-lucide="sparkles" style="width:12px;height:12px"></i> AI 추출</span>
             </div>
             <div class="ai-result-note">AI가 자료에서 추출한 학생 활동 및 특성이에요. 자유롭게 수정할 수 있어요.</div>
             <textarea class="in-textarea" id="aiResultText" style="min-height:140px"></textarea>
@@ -569,6 +578,7 @@ function loadStudent(id){
     document.getElementById('dropzone').style.display = 'block';
   }
   document.getElementById('aiResult').style.display = 'none';
+  document.getElementById('inputContent').placeholder = '교과와 관련된 학생의 활동 내역을 입력해 보세요.';
   var btn = document.getElementById('analyzeBtn');
   btn.disabled = false;
   btn.innerHTML = '<i data-lucide="sparkles" style="width:16px;height:16px"></i> AI 분석 · 크레딧 1';
@@ -629,16 +639,35 @@ function showFile(f){
   document.getElementById('dropzone').style.display = 'none';
   document.getElementById('fileBox').style.display = 'block';
   document.getElementById('aiResult').style.display = 'none';
+  document.getElementById('inputContent').placeholder = '교과와 관련된 학생의 활동 내역을 입력해 보세요.';
   updateActiveTags();
   lucide.createIcons();
+  pulseAnalyze();
+}
+var _pulseTimer;
+function pulseAnalyze(){
+  var btn = document.getElementById('analyzeBtn');
+  if(!btn) return;
+  btn.classList.remove('pulse');
+  void btn.offsetWidth; // 재트리거를 위한 reflow
+  btn.classList.add('pulse');
+  clearTimeout(_pulseTimer);
+  _pulseTimer = setTimeout(function(){ btn.classList.remove('pulse'); }, 2500);
+}
+function stopPulse(){
+  var btn = document.getElementById('analyzeBtn');
+  if(btn) btn.classList.remove('pulse');
+  clearTimeout(_pulseTimer);
 }
 function onFilePick(inp){ if(inp.files[0]) showFile(inp.files[0]); }
 function onFileDrop(e){ var f = e.dataTransfer.files[0]; if(f) showFile(f); }
 function removeFile(){
+  stopPulse();
   document.getElementById('fileInput').value = '';
   document.getElementById('fileBox').style.display = 'none';
   document.getElementById('dropzone').style.display = 'block';
   document.getElementById('aiResult').style.display = 'none';
+  document.getElementById('inputContent').placeholder = '교과와 관련된 학생의 활동 내역을 입력해 보세요.';
   updateActiveTags();
 }
 function openReset(){ document.getElementById('resetModal').classList.add('show'); }
@@ -649,6 +678,7 @@ function doReset(){
   document.getElementById('fileBox').style.display = 'none';
   document.getElementById('dropzone').style.display = 'block';
   document.getElementById('aiResult').style.display = 'none';
+  document.getElementById('inputContent').placeholder = '교과와 관련된 학생의 활동 내역을 입력해 보세요.';
   var ab = document.getElementById('analyzeBtn');
   if(ab){ ab.disabled = false; ab.innerHTML = '<i data-lucide="sparkles" style="width:16px;height:16px"></i> AI 분석 · 크레딧 1'; }
   // 입력 내용 초기화
@@ -664,6 +694,7 @@ function doReset(){
   okToast('초기화되었습니다.');
 }
 function runAnalyze(){
+  stopPulse();
   var btn = document.getElementById('analyzeBtn');
   btn.disabled = true;
   btn.innerHTML = '<i data-lucide="loader-circle" class="spin" style="width:16px;height:16px"></i> 분석 중...';
@@ -672,6 +703,7 @@ function runAnalyze(){
   setTimeout(function(){
     document.getElementById('aiResultText').value = '- 수업 시간에 자신의 의견을 논리적으로 발표하고, 모둠 활동에서 친구들의 의견을 경청하며 토론을 이끎.\n- 제시된 자료를 꼼꼼히 읽고 맥락을 정확히 파악하여 핵심 내용을 요약함.\n- 영어 에세이 작성 시 자기 생각을 창의적으로 표현하고 어휘를 적절히 활용하는 모습이 관찰됨.';
     document.getElementById('aiResult').style.display = 'block';
+    document.getElementById('inputContent').placeholder = 'AI 분석에 없는 키워드·활동을 추가로 입력해 보세요.';
     btn.disabled = false;
     btn.innerHTML = '<i data-lucide="rotate-ccw" style="width:16px;height:16px"></i> 다시 분석 · 크레딧 1';
     setBusy(false);
