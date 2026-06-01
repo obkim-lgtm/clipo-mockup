@@ -148,8 +148,9 @@ body.nav-expanded .main-shell { margin-left: 200px; transition: margin-left .2s 
 .rf-modal-x { margin-left: auto; width: 32px; height: 32px; border: none; background: none; color: #6d7381; cursor: pointer; border-radius: 6px; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; }
 .rf-modal-x:hover { background: #f1f3f5; color: #222631; }
 .rf-modal-body { padding: 20px 24px; overflow-y: auto; flex: 1; display: flex; flex-direction: column; gap: 16px; }
-.rf-info { display: flex; gap: 8px; align-items: flex-start; background: #eef3ff; border-radius: 10px; padding: 13px 16px; font-size: 15px; color: #3b3f4c; line-height: 1.55; }
-.rf-info i { color: #416bff; margin-top: 2px; flex-shrink: 0; }
+.rf-info { display: flex; gap: 8px; align-items: flex-start; background: #f6f7f9; border-radius: 10px; padding: 13px 16px; font-size: 14px; color: #6d7381; line-height: 1.55; }
+.rf-info i { color: #9aa0ad; margin-top: 2px; flex-shrink: 0; }
+.rf-info strong { color: #3b3f4c; font-weight: 600; }
 .rf-card { border: 1px solid #e5e7eb; border-radius: 10px; padding: 18px 20px; }
 .rf-card-title { font-size: 16px; font-weight: 700; color: #222631; margin-bottom: 4px; }
 .rf-req { display: inline-flex; align-items: center; font-size: 12px; font-weight: 600; color: #6d7381; background: #f1f3f5; border: 1px solid #e5e7eb; padding: 2px 8px; border-radius: 4px; margin-left: 6px; vertical-align: middle; }
@@ -158,7 +159,7 @@ body.nav-expanded .main-shell { margin-left: 200px; transition: margin-left .2s 
 .rf-textarea:focus { outline: none; border-color: #416bff; }
 .rf-count { font-size: 12px; color: #808080; text-align: right; margin-top: 4px; }
 .rf-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 12px; }
-.rf-chip { display: inline-flex; align-items: center; gap: 5px; padding: 8px 14px; background: #fff; border: 1px solid #d9d9d9; border-radius: 16px; font-size: 15px; color: #3b3f4c; font-weight: 500; cursor: pointer; line-height: 1.3; }
+.rf-chip { display: inline-flex; align-items: center; gap: 5px; padding: 7px 12px; background: #fff; border: 1px solid #d9d9d9; border-radius: 16px; font-size: 14px; color: #3b3f4c; font-weight: 500; cursor: pointer; line-height: 1.3; }
 .rf-chip:hover { background: #f4f8ff; border-color: #c7d6ff; color: #365eef; }
 .rf-pickhead { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 4px; }
 .rf-pickall { background: none; border: none; color: #365eef; font-size: 14px; font-weight: 500; cursor: pointer; text-decoration: underline; text-underline-offset: 2px; }
@@ -410,28 +411,26 @@ body.is-busy .back-link { opacity: .6; cursor: not-allowed; }
       <div class="rf-modal-body">
         <div class="rf-info">
           <i data-lucide="info" style="width:16px;height:16px"></i>
-          <div>다듬기는 <strong>학생당 1 크레딧</strong>이 사용돼요. 기존 <strong>AI 생성 기록</strong>은 새 기록으로 교체되며 되돌릴 수 없어요. (선생님 작성 기록은 영향 없음)</div>
-        </div>
-        <div class="rf-card">
-          <div class="rf-card-title">수정 방향 <span class="rf-req">선택</span></div>
-          <div class="rf-card-sub">분량·표현·강조점 등 무엇이든 자유롭게 적어주세요. <strong>비워두면 이전 생성 조건 그대로 다시 생성</strong>돼요. 모든 선택 학생에 동일 적용.</div>
-          <textarea class="rf-textarea" id="rfDir" maxlength="300" placeholder="예) 협업·리더십을 더 강조해 주세요. / 300자 이내로 줄여 주세요. / 사례 1~2개 추가해 주세요." oninput="rfUpdateUI()"></textarea>
-          <div class="rf-count"><span id="rfDirCount">0</span> / 300</div>
-          <div class="rf-chips">
-            <span class="rf-chip" onclick="rfApplyPrompt('분량을 조금 더 늘리고, 학생의 구체적인 활동 사례를 1~2개 추가해 주세요.')"><i data-lucide="plus" style="width:12px;height:12px"></i> 분량 늘리기 + 사례 추가</span>
-            <span class="rf-chip" onclick="rfApplyPrompt('협업·리더십·의사소통 등 가치·태도 측면을 더 강조해 주세요.')"><i data-lucide="users" style="width:12px;height:12px"></i> 협업·태도 강조</span>
-            <span class="rf-chip" onclick="rfApplyPrompt('탐구 과정과 사고력이 드러나도록 학생이 어떤 과정을 거쳤는지 더 구체화해 주세요.')"><i data-lucide="search" style="width:12px;height:12px"></i> 탐구 과정 구체화</span>
-            <span class="rf-chip" onclick="rfApplyPrompt('지식·이해 측면 중심으로, 개념 적용 사례를 더 명시적으로 작성해 주세요.')"><i data-lucide="book" style="width:12px;height:12px"></i> 개념 적용 강조</span>
-            <span class="rf-chip" onclick="rfApplyPrompt('학교생활기록부 작성 지침에 맞춰 문장을 더 간결하고 객관적으로 다듬어 주세요.')"><i data-lucide="edit-3" style="width:12px;height:12px"></i> 문장 간결화</span>
-          </div>
+          <div>기존 AI 생성 기록은 새 기록으로 교체되며 <strong>되돌릴 수 없어요.</strong> 선생님 작성 기록은 영향 없어요.</div>
         </div>
         <div class="rf-card" id="rfPickWrap">
           <div class="rf-pickhead">
             <div class="rf-card-title" style="margin:0">다듬을 학생 <span id="rfPickCnt" style="font-size:14px;color:#6d7381;font-weight:500">(0명)</span></div>
-            <button class="rf-pickall" id="rfPickAll" onclick="rfTogglePickAll()">전체 선택</button>
           </div>
           <div class="rf-card-sub" style="margin:0">개별 학생을 추가/제외할 수 있어요. 다듬기는 기존 기록이 있는 학생만 가능해요.</div>
           <div class="rf-pickbox" id="rfPickList"></div>
+        </div>
+        <div class="rf-card">
+          <div class="rf-card-title">수정 방향 <span class="rf-req">선택</span></div>
+          <div class="rf-card-sub">원하는 수정 방향을 자유롭게 적을 수 있어요. 아래 예시를 누르면 자동으로 채워져요. 비워두면 같은 조건으로 다시 생성돼요.</div>
+          <textarea class="rf-textarea" id="rfDir" maxlength="300" placeholder="예) 협업·리더십을 더 강조해 주세요. / 300자 이내로 줄여 주세요. / 사례 1~2개 추가해 주세요." oninput="rfUpdateUI()"></textarea>
+          <div class="rf-count"><span id="rfDirCount">0</span> / 300</div>
+          <div class="rf-chips">
+            <span class="rf-chip" onclick="rfApplyPrompt('분량을 200자 내외로 줄여 주세요.')"><i data-lucide="ruler" style="width:12px;height:12px"></i> 분량 줄이기</span>
+            <span class="rf-chip" onclick="rfApplyPrompt('평가나 일반적인 서술보다 학생이 한 활동이 중심이 되도록 다시 정리해 주세요.')"><i data-lucide="list-checks" style="width:12px;height:12px"></i> 활동 중심으로</span>
+            <span class="rf-chip" onclick="rfApplyPrompt('○○ 계열(학과)을 희망하는 학생의 진로 역량이 드러나도록 작성해 주세요.')"><i data-lucide="compass" style="width:12px;height:12px"></i> 진로 역량 강조</span>
+            <span class="rf-chip" onclick="rfApplyPrompt('긍정적인 내용 위주로 다듬어 주세요.')"><i data-lucide="smile" style="width:12px;height:12px"></i> 긍정적으로</span>
+          </div>
         </div>
       </div>
       <div class="rf-modal-ft">
@@ -557,7 +556,6 @@ function rfRenderPick(){
     return '<label class="rf-pickitem"><input type="checkbox" class="rf-cb" '+ck+' onclick="rfTogglePick(\''+s.id+'\')"><span class="rf-pickname">'+s.id+' '+s.name+'</span></label>';
   }).join('');
   document.getElementById('rfPickCnt').textContent = '('+rfPicked.size+'명)';
-  document.getElementById('rfPickAll').textContent = rfEligible.every(s=>rfPicked.has(s.id)) ? '전체 해제' : '전체 선택';
 }
 function rfTogglePick(sid){ if(rfPicked.has(sid)) rfPicked.delete(sid); else rfPicked.add(sid); rfRenderPick(); rfUpdateUI(); }
 function rfTogglePickAll(){
