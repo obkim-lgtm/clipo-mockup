@@ -88,6 +88,11 @@ body.nav-expanded .main-shell { margin-left: 200px; transition: margin-left .2s 
 .col-name { width: 110px; }
 .col-level { width: 96px; }
 .col-kw2 { text-align: left; font-size: 15px; color: #3b3f4c; line-height: 1.55; }
+.kw-clip { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.kw-clip.tr { cursor: help; }
+/* 키워드 전체 원문 툴팁 */
+.kw-tip { position: fixed; z-index: 700; max-width: 420px; background: #222631; color: #fff; font-size: 14px; line-height: 1.6; padding: 10px 14px; border-radius: 8px; box-shadow: 0 6px 20px rgba(0,0,0,.22); opacity: 0; transform: translateY(4px); transition: opacity .12s, transform .12s; pointer-events: none; white-space: normal; word-break: break-word; }
+.kw-tip.show { opacity: 1; transform: translateY(0); }
 .col-st { width: 110px; }
 .gen-cb { width: 18px; height: 18px; accent-color: #416bff; cursor: pointer; }
 .gen-cb:disabled { cursor: default; }
@@ -350,6 +355,42 @@ function onSelectAll(allCb){
   updateClsCount(acc);
 }
 document.querySelectorAll('.cls-acc').forEach(updateClsCount);
+
+/* 키워드 및 활동 내역: 2줄 클램프 + 잘렸을 때만 호버 툴팁 */
+var _kwTip;
+function ensureKwTip(){
+  if(!_kwTip){ _kwTip = document.createElement('div'); _kwTip.className = 'kw-tip'; document.body.appendChild(_kwTip); }
+  return _kwTip;
+}
+function setupKwClamp(){
+  document.querySelectorAll('.col-kw2').forEach(function(td){
+    var txt = td.textContent.trim();
+    if(txt === '-' || txt === '') return;
+    td.innerHTML = '<span class="kw-clip">' + txt.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;') + '</span>';
+    var clip = td.querySelector('.kw-clip');
+    clip.dataset.full = txt;
+    // 클램프로 실제 잘렸는지 판정
+    if(clip.scrollHeight - clip.clientHeight > 1){
+      clip.classList.add('tr');
+      clip.addEventListener('mouseenter', showKwTip);
+      clip.addEventListener('mousemove', moveKwTip);
+      clip.addEventListener('mouseleave', hideKwTip);
+    }
+  });
+}
+function showKwTip(e){ var t = ensureKwTip(); t.textContent = e.currentTarget.dataset.full; t.classList.add('show'); moveKwTip(e); }
+function moveKwTip(e){
+  var t = ensureKwTip(); if(!t.classList.contains('show')) return;
+  var pad = 14, w = t.offsetWidth, h = t.offsetHeight;
+  var x = e.clientX + 16, y = e.clientY + 16;
+  if(x + w + pad > window.innerWidth) x = e.clientX - w - 16;
+  if(y + h + pad > window.innerHeight) y = e.clientY - h - 16;
+  t.style.left = Math.max(pad, x) + 'px';
+  t.style.top = Math.max(pad, y) + 'px';
+}
+function hideKwTip(){ if(_kwTip) _kwTip.classList.remove('show'); }
+setupKwClamp();
+
 lucide.createIcons();
 </script>
 </body>
