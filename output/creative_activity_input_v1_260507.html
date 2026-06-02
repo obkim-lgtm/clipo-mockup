@@ -741,9 +741,9 @@ body.nav-expanded .sticky-cta{left:200px;transition:left .2s ease}
 .s2-badge-rec{display:inline-flex;align-items:center;gap:4px;height:24px;padding:0 8px;background:#365eef;color:#fff;border-radius:9999px;font-size:12px;font-weight:500;line-height:1.25}
 .s2-badge-comp{display:inline-flex;align-items:center;gap:4px;height:24px;padding:0 8px;background:#e9f2ff;color:#3151c4;border:1px solid #ccdfff;border-radius:9999px;font-size:12px;font-weight:500;line-height:1.25}
 .s2-item-new .s2-item-content{font-size:14px;color:#222631;line-height:1.55;font-weight:500;margin-bottom:0}
-.s2-rationale-box{background:#f4f8ff;border-left:4px solid #365eef;border-radius:6px;padding:10px 16px;display:flex;flex-direction:column;gap:4px}
-.s2-rationale-label{font-size:13px;font-weight:600;color:#365eef;line-height:1.25}
-.s2-rationale-text{font-size:14px;color:#222631;line-height:1.55;font-weight:500}
+.s2-rationale-box{background:#f6f7f9;border-radius:6px;padding:10px 14px;display:flex;flex-direction:column;gap:2px}
+.s2-rationale-label{font-size:12px;font-weight:500;color:#6d7381;line-height:1.25}
+.s2-rationale-text{font-size:14px;color:#3b3f4c;line-height:1.55;font-weight:400}
 .s2-source-chip{display:inline-flex;align-self:flex-start;align-items:center;gap:4px;height:20px;padding:0 6px;border:1px solid #dde1e8;border-radius:4px;font-size:13px;font-weight:500;color:#3b3f4c;line-height:1.25}
 .s2-source-chip i{color:#6d7381}
 
@@ -3111,8 +3111,7 @@ function renderS2Done(s){
     <div class="s2-panel">
       <div class="s2-analysis-hd">
         <div class="s2-analysis-title">AI 자료 분석 내용</div>
-        <div class="s2-analysis-sub">AI가 자료에서 발견한 학생 활동을 항목 단위로 정리했어요. <strong>체크한 항목만</strong> 다음 단계 AI 기록 생성에 반영돼요.</div>
-        ${fileChipsHtml ? `<div class="s2-file-chips-row">${fileChipsHtml}</div>` : ''}
+        <div class="s2-analysis-sub">AI가 추천한 항목을 확인하고, 기록에 반영할 활동을 골라 <strong>체크</strong>해 주세요.</div>
       </div>
       <div class="s2-items-list" style="margin-top:16px">${itemsHtml}</div>
     </div>`;
@@ -3155,24 +3154,14 @@ function renderS2ItemCard(sid, item){
   const isRec = item.source_origin === 'stage1_recommended';
   const cls = `s2-item-new ${isRec?'recommended':'narrative'} ${checked?'checked':''}`;
   const esc = (str) => String(str||'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-  const recBadge = isRec ? `<span class="s2-badge-rec"><i data-lucide="thumbs-up" style="width:12px;height:12px"></i>AI 추천</span>` : '';
-  const compBadge = item.competency ? `<span class="s2-badge-comp"><i data-lucide="sparkles" style="width:12px;height:12px"></i>발견한 역량 : ${esc(item.competency)}</span>` : '';
-  const badgesRow = (recBadge || compBadge) ? `<div class="s2-badges-row">${recBadge}${compBadge}</div>` : '';
+  // 배지(AI 추천 / 발견한 역량)·자료 출처 chip 제거 — 불필요 정보(2026-06-02)
   const rationaleBox = item.rationale ? `<div class="s2-rationale-box"><div class="s2-rationale-label">추천 근거</div><div class="s2-rationale-text">${esc(item.rationale)}</div></div>` : '';
-  // 자료 source: 첫 번째 file만 chip으로
-  let sourceChip = '';
-  if(item.sources && item.sources.length){
-    const first = item.sources[0];
-    sourceChip = `<span class="s2-source-chip"><i data-lucide="paperclip" style="width:12px;height:12px"></i>${esc(first.file)}${first.section ? ' · '+esc(first.section) : ''}</span>`;
-  }
   const checkSvg = checked ? '<svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8.5l3.5 3.5 6.5-7" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>' : '';
   return `<div class="${cls}" onclick="toggleS2Item(${sid}, '${item.id}')">
     <span class="s2-item-cb">${checkSvg}</span>
     <div class="s2-item-body">
-      ${badgesRow}
       <div class="s2-item-content">${esc(item.content)}</div>
       ${rationaleBox}
-      ${sourceChip}
     </div>
   </div>`;
 }

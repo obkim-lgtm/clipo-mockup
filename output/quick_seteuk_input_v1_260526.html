@@ -180,6 +180,31 @@ body.nav-expanded .main-shell { margin-left: 200px; transition: margin-left .2s 
 .input-area:focus { outline: none; border-color: #416bff; }
 .input-area::placeholder { color: #b3b6bd; }
 
+/* 입력 도움말 — 한 줄 힌트 + 예시 토글 */
+.kw-hint { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 10px; }
+.kw-hint-text { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; color: #6d7381; line-height: 1.45; }
+.kw-hint-text i { width: 15px; height: 15px; color: #f59e0b; flex-shrink: 0; }
+.kw-hint-toggle { display: inline-flex; align-items: center; justify-content: center; gap: 4px; line-height: 1; vertical-align: middle; flex-shrink: 0; padding: 4px 6px; background: none; border: none; color: #416bff; font-size: 13px; font-weight: 600; cursor: pointer; font-family: inherit; }
+.kw-hint-toggle i { width: 14px; height: 14px; transition: transform .15s; }
+.kw-hint-toggle.open i { transform: rotate(180deg); }
+
+/* 입력이 약할 때만 노출되는 넛지 */
+.kw-nudge { display: none; align-items: flex-start; gap: 6px; margin-top: 10px; padding: 10px 12px; background: #fff7ed; border: 1px solid #fed7aa; border-radius: 8px; font-size: 13px; line-height: 1.5; color: #9a3412; }
+.kw-nudge.show { display: flex; }
+.kw-nudge i { width: 15px; height: 15px; color: #f59e0b; flex-shrink: 0; margin-top: 1px; }
+.kw-nudge button { background: none; border: none; padding: 0; margin-left: 2px; color: #c2410c; font-weight: 600; font-size: 13px; cursor: pointer; font-family: inherit; text-decoration: underline; }
+
+/* 예시 펼침 박스 */
+.kw-guide { display: none; margin: 10px 0 0; padding: 14px 16px; background: #f6f7f9; border: 1px solid #e5e7eb; border-radius: 10px; }
+.kw-guide.show { display: block; }
+.kw-guide-row { display: flex; align-items: flex-start; gap: 8px; font-size: 14px; line-height: 1.55; color: #3b3f4c; }
+.kw-guide-row + .kw-guide-row { margin-top: 8px; }
+.kw-guide-badge { flex-shrink: 0; display: inline-flex; align-items: center; justify-content: center; line-height: 1; vertical-align: middle; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: 600; }
+.kw-guide-badge.good { background: #e6f7ee; color: #128a4e; }
+.kw-guide-badge.bad { background: #fdeaec; color: #d23947; }
+.kw-guide-text b { color: #222631; font-weight: 600; }
+.kw-guide-note { color: #6d7381; font-size: 13px; }
+
 .level-label { font-size: 15px; font-weight: 600; color: #222631; margin: 24px 0 10px; }
 .level-btns { display: flex; gap: 8px; }
 .level-btn { display: inline-flex; align-items: center; justify-content: center; min-width: 64px; height: 40px; padding: 0 16px; border: 1px solid #d9d9d9; border-radius: 8px; background: #fff; color: #3b3f4c; font-size: 14px; font-weight: 500; cursor: pointer; font-family: inherit; line-height: 1; }
@@ -777,7 +802,31 @@ body.nav-expanded .sticky-cta { left: 200px; }
 
       <!-- 학생 특성 입력 -->
       <div class="input-label">학생 특성</div>
-      <textarea class="input-area" id="inputArea" placeholder="학생의 특성을 직접 입력하거나, 아래 키워드 사전에서 선택해 주세요." oninput="onInputChange()"></textarea>
+      <textarea class="input-area" id="inputArea" placeholder="예) 과학적 탐구, 자료 해석, 협업, 발표 / 멸종위기 동물의 서식지 변화를 조사해 카드뉴스로 발표함.&#10;키워드는 콤마(,)로 구분하고, 인상 깊은 활동이 있으면 한 문장 덧붙여 주세요. 아래 키워드 사전에서 골라 넣어도 돼요." oninput="onInputChange()"></textarea>
+
+      <!-- 입력이 약할 때만 뜨는 넛지 -->
+      <div class="kw-nudge" id="kwNudge">
+        <i data-lucide="alert-circle"></i>
+        <span>키워드가 너무 적어요. 키워드를 더하거나 인상 깊은 활동을 한 문장 적으면 기록이 훨씬 좋아져요. <button type="button" onclick="openGuide()">예시 보기</button></span>
+      </div>
+
+      <!-- 한 줄 힌트 + 예시 토글 -->
+      <div class="kw-hint">
+        <span class="kw-hint-text"><i data-lucide="lightbulb"></i> 키워드 4~8개 + 활동 한 문장을 함께 적으면 기록이 풍부해져요.</span>
+        <button type="button" class="kw-hint-toggle" id="kwGuideToggle" onclick="toggleGuide()">입력 예시 보기 <i data-lucide="chevron-down"></i></button>
+      </div>
+
+      <!-- 예시 펼침 박스 (기본 접힘) -->
+      <div class="kw-guide" id="kwGuide">
+        <div class="kw-guide-row good">
+          <span class="kw-guide-badge good">좋은 예시</span>
+          <span class="kw-guide-text">과학적 탐구, 자료 해석, 협업, 발표 <b>+ 인상 깊은 활동 한 문장</b><br>— 멸종위기 동물의 서식지 변화를 조사해 카드뉴스로 정리하고 모둠 발표를 이끎.</span>
+        </div>
+        <div class="kw-guide-row bad">
+          <span class="kw-guide-badge bad">아쉬운 예시</span>
+          <span class="kw-guide-text">발표 <span class="kw-guide-note">— 키워드 1개만으론 기록이 단조로워요</span></span>
+        </div>
+      </div>
 
       <!-- 키워드 사전 (토글) -->
       <div class="kwbox" id="kwbox" style="margin-top:14px">
@@ -1442,6 +1491,25 @@ function flushCurrent(){
 
 function onInputChange(){ if (currentStudentId) inputState[currentStudentId].text = document.getElementById('inputArea').value; updateProgress(); }
 
+// 예시 박스 토글
+function toggleGuide(){
+  const open = document.getElementById('kwGuide').classList.toggle('show');
+  document.getElementById('kwGuideToggle').classList.toggle('open', open);
+}
+function openGuide(){
+  document.getElementById('kwGuide').classList.add('show');
+  document.getElementById('kwGuideToggle').classList.add('open');
+}
+
+// 스마트 넛지 — 키워드 1개 이하 & 짧고 문장형 아님 → 약한 입력일 때만 안내
+function updateKwNudge(){
+  const v = document.getElementById('inputArea').value.trim();
+  const parts = v.split(',').map(s => s.trim()).filter(Boolean);
+  const sentence = /[다요함임음됨][.!]?\s*$/.test(v) || v.length >= 25;
+  const weak = v.length > 0 && parts.length <= 1 && !sentence;
+  document.getElementById('kwNudge').classList.toggle('show', weak);
+}
+
 function setLevel(lv, silent){
   document.querySelectorAll('.level-btn').forEach(b => b.classList.toggle('active', b.dataset.level === lv));
   if (currentStudentId) { inputState[currentStudentId].level = lv; if (!silent) renderStudents(); }
@@ -1469,6 +1537,7 @@ function syncTagsFromInput(){
   document.querySelectorAll('.kw-tag').forEach(t => {
     t.classList.toggle('selected', parts.includes(t.textContent.trim()));
   });
+  updateKwNudge();
 }
 
 function onReset(){
@@ -1918,8 +1987,7 @@ function s2RenderDone(stu, st){
     <div class="s2-panel">
       <div class="s2-analysis-hd">
         <div class="s2-analysis-title">AI 자료 분석 내용</div>
-        <div class="s2-analysis-sub">AI가 자료에서 발견한 학생 활동을 항목 단위로 정리했어요. <strong>체크한 항목만</strong> 다음 단계 AI 기록 생성에 반영돼요.</div>
-        ${fileChipsHtml ? `<div class="s2-file-chips-row">${fileChipsHtml}</div>` : ''}
+        <div class="s2-analysis-sub">AI가 추천한 항목을 확인하고, 기록에 반영할 활동을 골라 <strong>체크</strong>해 주세요.</div>
       </div>
       <div class="s2-items-list" style="margin-top:16px">${items.map(renderItem).join('')}</div>
     </div>`;
