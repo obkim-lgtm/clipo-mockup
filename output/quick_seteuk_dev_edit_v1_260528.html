@@ -84,9 +84,9 @@ body.nav-expanded .main-shell { margin-left: 200px; transition: margin-left .2s 
 .col-kw { width: 11%; }
 .col-kw .kw-text { font-size: 16px; line-height: 1.6; color: #3b3f4c; }
 .col-kw .kw-trunc { display: inline-block; max-width: 122px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; vertical-align: bottom; }
-.col-ai { width: 31.5%; }
+.col-ai { width: 33.5%; }
 .col-import { width: 6%; }
-.col-teacher { width: 31.5%; }
+.col-teacher { width: 33.5%; }
 
 /* AI 기록 셀 */
 .ai-box { background: #f6f7f9; border-radius: 10px; padding: 16px 18px; display: flex; flex-direction: column; min-height: 120px; }
@@ -122,7 +122,6 @@ body.nav-expanded .main-shell { margin-left: 200px; transition: margin-left .2s 
 .teacher-area:focus { outline: none; border-color: #416bff; }
 
 /* 기록 다듬기 — 체크박스 / 일괄 액션바 */
-.rf-col-cb { width: 4%; }
 .rf-cb { width: 18px; height: 18px; accent-color: #416bff; cursor: pointer; }
 .rf-cb:disabled { cursor: default; }
 .rec-table tbody tr.rf-sel td { background: #f4f8ff; }
@@ -139,18 +138,20 @@ body.nav-expanded .main-shell { margin-left: 200px; transition: margin-left .2s 
 .rf-bar-btn:hover { background: #2940be; }
 
 /* 다듬기 모달 */
-.rf-modal-bg { display: none; position: fixed; inset: 0; background: rgba(34,38,49,.45); z-index: 500; align-items: center; justify-content: center; padding: 20px; }
-.rf-modal-bg.show { display: flex; }
-.rf-modal { background: #fff; border-radius: 16px; width: 100%; max-width: 640px; max-height: calc(100vh - 40px); display: flex; flex-direction: column; box-shadow: 0 12px 40px rgba(0,0,0,.18); overflow: hidden; }
-.rf-modal-hd { padding: 20px 24px; border-bottom: 1px solid #f1f3f5; display: flex; align-items: flex-start; gap: 12px; }
+/* 딤 없는 떠있는 드래그 패널 — 기록 보면서 다듬기 */
+.rf-modal-bg { display: none; position: fixed; inset: 0; z-index: 500; pointer-events: none; }
+.rf-modal-bg.show { display: block; }
+.rf-modal { pointer-events: auto; position: fixed; top: 96px; right: 28px; width: 440px; max-width: calc(100vw - 40px); max-height: calc(100vh - 120px); background: #fff; border: 1px solid #e5e7eb; border-radius: 16px; display: flex; flex-direction: column; box-shadow: 0 16px 48px rgba(0,0,0,.22); overflow: hidden; }
+.rf-modal-hd { padding: 16px 20px; border-bottom: 1px solid #f1f3f5; display: flex; align-items: flex-start; gap: 12px; cursor: move; user-select: none; }
+.rf-modal-hd .rf-grip { color: #c5c8d0; flex-shrink: 0; margin-top: 2px; }
 .rf-modal-title { font-size: 20px; font-weight: 700; color: #222631; }
 .rf-modal-sub { font-size: 15px; color: #6d7381; margin-top: 4px; line-height: 1.5; }
 .rf-modal-x { margin-left: auto; width: 32px; height: 32px; border: none; background: none; color: #6d7381; cursor: pointer; border-radius: 6px; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; }
 .rf-modal-x:hover { background: #f1f3f5; color: #222631; }
 .rf-modal-body { padding: 20px 24px; overflow-y: auto; flex: 1; display: flex; flex-direction: column; gap: 16px; }
-.rf-info { display: flex; gap: 8px; align-items: flex-start; background: #f6f7f9; border-radius: 10px; padding: 13px 16px; font-size: 14px; color: #6d7381; line-height: 1.55; }
-.rf-info i { color: #9aa0ad; margin-top: 2px; flex-shrink: 0; }
-.rf-info strong { color: #3b3f4c; font-weight: 600; }
+.rf-info { display: flex; gap: 6px; align-items: flex-start; padding: 0; font-size: 13px; color: #9aa0ad; line-height: 1.5; }
+.rf-info i { color: #b3b6bd; margin-top: 1px; flex-shrink: 0; }
+.rf-info strong { color: #6d7381; font-weight: 600; }
 .rf-card { border: 1px solid #e5e7eb; border-radius: 10px; padding: 18px 20px; }
 .rf-card-title { font-size: 16px; font-weight: 700; color: #222631; margin-bottom: 4px; }
 .rf-req { display: inline-flex; align-items: center; font-size: 12px; font-weight: 600; color: #6d7381; background: #f1f3f5; border: 1px solid #e5e7eb; padding: 2px 8px; border-radius: 4px; margin-left: 6px; vertical-align: middle; }
@@ -268,18 +269,15 @@ body.is-busy .back-link { opacity: .6; cursor: not-allowed; }
 
   <!-- 일괄 다듬기 액션바 -->
   <div class="rf-bar" id="rfBar">
-    <span class="rf-bar-count"><i data-lucide="check-circle" style="width:16px;height:16px"></i> <span id="rfCount">0</span>명 선택됨</span>
-    <span class="rf-bar-hint">체크박스로 학생을 선택해 한꺼번에 AI가 생성한 기록을 다듬을 수 있어요.</span>
+    <span class="rf-bar-hint">AI가 생성한 기록을 원하는 방향으로 다듬어 보세요.</span>
     <span class="rf-bar-spacer"></span>
-    <button class="rf-bar-clear" id="rfClear" onclick="rfClearSel()" style="display:none">선택 해제</button>
-    <button class="rf-bar-btn" onclick="rfOpenModal('bulk')"><i data-lucide="wand-2" style="width:15px;height:15px"></i> <span id="rfBarBtnLabel">기록 다듬기</span></button>
+    <button class="rf-bar-btn" onclick="rfOpenModal('bulk')"><i data-lucide="wand-2" style="width:15px;height:15px"></i> 기록 다듬기</button>
   </div>
 
   <!-- 테이블 -->
   <table class="rec-table">
     <thead>
       <tr>
-        <th class="rf-col-cb"><input type="checkbox" class="rf-cb" id="rfAll" onclick="rfSelectAll(this)"></th>
         <th class="col-no">학번</th>
         <th class="col-name">이름</th>
         <th class="col-kw">키워드 및 활동</th>
@@ -292,7 +290,6 @@ body.is-busy .back-link { opacity: .6; cursor: not-allowed; }
     <tbody>
       <!-- 상태1: 생성 완료 -->
       <tr>
-        <td class="rf-col-cb"><input type="checkbox" class="rf-cb" data-sid="10101" data-name="김하나" onclick="rfRowCb(this)"></td>
         <td class="col-no">10101</td>
         <td class="col-name">김하나</td>
         <td class="col-kw"><span class="kw-text">경청, 문제해결, 사용, 의도관점 파악, 이해, 향유</span></td>
@@ -317,7 +314,6 @@ body.is-busy .back-link { opacity: .6; cursor: not-allowed; }
 
       <!-- 상태2: 생성 전 -->
       <tr>
-        <td class="rf-col-cb"><input type="checkbox" class="rf-cb" disabled></td>
         <td class="col-no">10101</td>
         <td class="col-name">김하나</td>
         <td class="col-kw"><span class="kw-text kw-trunc">키워드 및 활동 내역…</span></td>
@@ -336,7 +332,6 @@ body.is-busy .back-link { opacity: .6; cursor: not-allowed; }
 
       <!-- 상태3: 생성 중 -->
       <tr>
-        <td class="rf-col-cb"><input type="checkbox" class="rf-cb" disabled></td>
         <td class="col-no">10101</td>
         <td class="col-name">김하나</td>
         <td class="col-kw"><span class="kw-text kw-trunc">키워드 및 활동 내역…</span></td>
@@ -357,7 +352,6 @@ body.is-busy .back-link { opacity: .6; cursor: not-allowed; }
 
       <!-- 상태4: 자료 없음 -->
       <tr>
-        <td class="rf-col-cb"><input type="checkbox" class="rf-cb" disabled></td>
         <td class="col-no">10101</td>
         <td class="col-name">김하나</td>
         <td class="col-kw"><span class="kw-text">-</span></td>
@@ -377,7 +371,6 @@ body.is-busy .back-link { opacity: .6; cursor: not-allowed; }
 
       <!-- 상태5: 생성 실패(에러) -->
       <tr>
-        <td class="rf-col-cb"><input type="checkbox" class="rf-cb" disabled></td>
         <td class="col-no">10101</td>
         <td class="col-name">김하나</td>
         <td class="col-kw"><span class="kw-text kw-trunc">키워드 및 활동 내역…</span></td>
@@ -399,20 +392,16 @@ body.is-busy .back-link { opacity: .6; cursor: not-allowed; }
   </div>
 
   <!-- ===== 기록 다듬기 모달 ===== -->
-  <div class="rf-modal-bg" id="rfModal" onclick="if(event.target===this)rfClose()">
-    <div class="rf-modal">
-      <div class="rf-modal-hd">
-        <div>
+  <div class="rf-modal-bg" id="rfModal">
+    <div class="rf-modal" id="rfPanel">
+      <div class="rf-modal-hd" id="rfDragHandle">
+        <i data-lucide="grip-horizontal" class="rf-grip" style="width:18px;height:18px"></i>
+        <div style="flex:1">
           <div class="rf-modal-title">기록 다듬기</div>
-          <div class="rf-modal-sub" id="rfSub">선택한 학생들의 기록을 동일한 수정 방향으로 다듬어요.</div>
         </div>
         <button class="rf-modal-x" onclick="rfClose()"><i data-lucide="x" style="width:18px;height:18px"></i></button>
       </div>
       <div class="rf-modal-body">
-        <div class="rf-info">
-          <i data-lucide="info" style="width:16px;height:16px"></i>
-          <div>기존 AI 생성 기록은 새 기록으로 교체되며 <strong>되돌릴 수 없어요.</strong> 선생님 작성 기록은 영향 없어요.</div>
-        </div>
         <div class="rf-card" id="rfPickWrap">
           <div class="rf-pickhead">
             <div class="rf-card-title" style="margin:0">다듬을 학생 <span id="rfPickCnt" style="font-size:14px;color:#6d7381;font-weight:500">(0명)</span></div>
@@ -491,63 +480,53 @@ function genOne(btn){
 
 /* ===== 기록 다듬기 ===== */
 var rfEligible = [{id:'10101', name:'김하나'}]; // AI 기록 보유 학생(다듬기 가능)
-var rfSel = new Set();
 var rfMode = 'bulk';
 var rfPicked = new Set();
 
-function rfRowCb(cb){
-  if(cb.checked) rfSel.add(cb.dataset.sid); else rfSel.delete(cb.dataset.sid);
-  cb.closest('tr').classList.toggle('rf-sel', cb.checked);
-  rfUpdateBar();
-}
-function rfSelectAll(all){
-  document.querySelectorAll('.rec-table tbody .rf-cb').forEach(function(cb){
-    if(cb.disabled) return;
-    cb.checked = all.checked;
-    cb.closest('tr').classList.toggle('rf-sel', all.checked);
-    if(all.checked) rfSel.add(cb.dataset.sid); else rfSel.delete(cb.dataset.sid);
-  });
-  rfUpdateBar();
-}
-function rfClearSel(){
-  rfSel.clear();
-  document.querySelectorAll('.rec-table tbody .rf-cb').forEach(function(cb){ cb.checked=false; cb.closest('tr').classList.remove('rf-sel'); });
-  var all=document.getElementById('rfAll'); if(all){ all.checked=false; all.indeterminate=false; }
-  rfUpdateBar();
-}
-function rfUpdateBar(){
-  var n = rfSel.size;
-  document.getElementById('rfBar').classList.toggle('has-sel', n>0);
-  document.getElementById('rfCount').textContent = n;
-  document.getElementById('rfClear').style.display = n>0 ? '' : 'none';
-  document.getElementById('rfBarBtnLabel').textContent = n>0 ? (n+'명 기록 다듬기') : '기록 다듬기';
-  var elig = [...document.querySelectorAll('.rec-table tbody .rf-cb')].filter(c=>!c.disabled);
-  var on = elig.filter(c=>c.checked).length;
-  var all = document.getElementById('rfAll');
-  all.checked = elig.length>0 && on===elig.length;
-  all.indeterminate = on>0 && on<elig.length;
-}
 function rfOpenModal(mode, sid, name){
   rfMode = mode || 'bulk';
   rfPicked = new Set();
   if(rfMode==='single' && sid){ rfPicked.add(sid); }
-  else if(rfSel.size>0){ rfSel.forEach(id=>rfPicked.add(id)); }
   else { rfEligible.forEach(s=>rfPicked.add(s.id)); }
-  var sub = document.getElementById('rfSub');
   var pickWrap = document.getElementById('rfPickWrap');
-  if(rfMode==='single'){
-    sub.textContent = (sid&&name) ? (sid+' '+name+' 학생의 기록을 다듬어요.') : '학생 기록을 다듬어요.';
-    pickWrap.style.display='none';
-  } else {
-    sub.textContent = '선택한 학생들의 기록을 동일한 수정 방향으로 다듬어요.';
-    pickWrap.style.display='';
-  }
+  pickWrap.style.display = (rfMode==='single') ? 'none' : '';
   document.getElementById('rfDir').value=''; document.getElementById('rfDirCount').textContent='0';
   rfRenderPick(); rfUpdateUI();
+  rfResetPos();
   document.getElementById('rfModal').classList.add('show');
   lucide.createIcons();
 }
 function rfClose(){ document.getElementById('rfModal').classList.remove('show'); }
+
+/* 떠있는 패널: 위치 초기화 + 드래그 이동 */
+function rfResetPos(){
+  var p = document.getElementById('rfPanel');
+  p.style.left = 'auto'; p.style.right = '28px'; p.style.top = '96px';
+}
+(function(){
+  var p, sx, sy, ox, oy, dragging=false;
+  var handle = document.getElementById('rfDragHandle');
+  if(!handle) return;
+  handle.addEventListener('mousedown', function(e){
+    if(e.target.closest('.rf-modal-x')) return; // 닫기 버튼은 제외
+    p = document.getElementById('rfPanel');
+    var r = p.getBoundingClientRect();
+    // right 기준 → left 기준으로 전환(드래그 계산 일관성)
+    p.style.left = r.left + 'px'; p.style.right = 'auto'; p.style.top = r.top + 'px';
+    sx = e.clientX; sy = e.clientY; ox = r.left; oy = r.top; dragging = true;
+    document.body.style.userSelect = 'none';
+    e.preventDefault();
+  });
+  document.addEventListener('mousemove', function(e){
+    if(!dragging) return;
+    var nx = ox + (e.clientX - sx), ny = oy + (e.clientY - sy);
+    var w = p.offsetWidth, h = p.offsetHeight;
+    nx = Math.max(8, Math.min(nx, window.innerWidth - w - 8));
+    ny = Math.max(64, Math.min(ny, window.innerHeight - 60));
+    p.style.left = nx + 'px'; p.style.top = ny + 'px';
+  });
+  document.addEventListener('mouseup', function(){ dragging=false; document.body.style.userSelect=''; });
+})();
 function rfRenderPick(){
   var wrap = document.getElementById('rfPickList');
   if(!rfEligible.length){ wrap.innerHTML='<div style="font-size:14px;color:#9ca3af;text-align:center;padding:24px">다듬을 수 있는 학생이 없어요</div>'; document.getElementById('rfPickCnt').textContent='(0명)'; return; }
@@ -580,7 +559,6 @@ function rfRun(){
   rfToast(n+'명 기록을 다듬고 있어요…');
   setTimeout(function(){
     setBusy(false);
-    rfClearSel();
     rfToast(n+'명 기록을 다듬었어요');
   }, 1600);
 }
@@ -589,7 +567,6 @@ function rfToast(msg){
   var t=document.getElementById('rfToast'); t.textContent=msg; t.classList.add('show');
   clearTimeout(rfToastTimer); rfToastTimer=setTimeout(function(){ t.classList.remove('show'); }, 2200);
 }
-rfUpdateBar();
 lucide.createIcons();
 </script>
 </body>
