@@ -171,6 +171,8 @@ body.before-ai-rerun .score-btn.ai-suggest:hover{background:#f4f8ff;border-color
 .eval-card.ac-purple{--ac:#7c3aed;--ac-bg:#f5f3ff;--ac-text:#6d28d9;--ac-soft:#faf8ff}
 .eval-card.ac-green{--ac:#3e7d71;--ac-bg:#e1eeeb;--ac-text:#356b62;--ac-soft:#f2f8f6}
 .eval-card.ac-amber{--ac:#8a7038;--ac-bg:#f3eeda;--ac-text:#7d6630;--ac-soft:#faf7ee}
+/* 채점요소 카드 — 단일 중립 컬러(도달 수준 색상 미적용, 점수는 이미 명시됨) */
+.eval-card.ac-neutral{--ac:#5e6678;--ac-bg:#eef0f4;--ac-text:#515869;--ac-soft:#f6f7f9}
 
 .ec-card-header{display:flex;align-items:center;gap:10px;padding:14px 18px;background:var(--ac-bg);border-radius:14px 14px 0 0;cursor:pointer;transition:background .15s}
 .ec-card-header:hover{filter:brightness(.97)}
@@ -182,13 +184,13 @@ body.before-ai-rerun .score-btn.ai-suggest:hover{background:#f4f8ff;border-color
 .ec-level{display:inline-flex;align-items:center;justify-content:center;height:24px;padding:0 10px;border-radius:100px;font-size:12px;font-weight:700;line-height:1;flex-shrink:0;gap:4px;white-space:nowrap}
 /* 도달 수준 — 진한 솔리드 칩(왼쪽), 색은 카드 액센트 --ac (도달=틸 / 부분=머스터드 / 미도달=테라코타) */
 .ec-level.lv-correct,.ec-level.lv-high,.ec-level.lv-mid,.ec-level.lv-wrong,.ec-level.lv-low{height:26px;padding:0 12px;font-size:13px;background:var(--ac);color:#fff}
-.ec-level.lv-score{background:var(--ac-bg);color:var(--ac-text)}
+.ec-level.lv-score{background:#fff;color:var(--ac-text);border:1px solid #dfe3ea;min-width:88px}
 .ec-level .ai-suggest-note{font-size:11px;font-weight:500;color:#6d7381;margin-left:4px}
 .ec-level .ai-suggest-prefix{font-size:11px;font-weight:500;color:#6d7381;margin-right:4px}
 .ec-summary{flex:1;font-size:15px;font-weight:600;color:#222631;line-height:1.4}
 /* 문항 제목 1줄 말줄임 + 호버 시 전체 텍스트 디자인 툴팁(블랙, .credit-tooltip 룰과 동일) */
 .ec-summary-wrap{flex:1;min-width:0;position:relative;display:flex}
-#pane-instruction .ec-summary-wrap>.ec-summary{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#pane-instruction .ec-summary-wrap>.ec-summary,#pane-rubric .ec-summary-wrap>.ec-summary{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .ec-summary-tip{position:absolute;left:0;bottom:calc(100% + 8px);background:#222631;color:#fff;font-size:13px;line-height:1.5;font-weight:500;padding:8px 12px;border-radius:8px;max-width:340px;opacity:0;visibility:hidden;transition:opacity .15s,visibility .15s;z-index:1100;pointer-events:none;box-shadow:0 4px 16px rgba(0,0,0,.25);text-align:left;white-space:normal}
 .ec-summary-tip::after{content:"";position:absolute;top:100%;left:16px;border:5px solid transparent;border-top-color:#222631}
 .ec-summary-wrap.has-tip:hover .ec-summary-tip{opacity:1;visibility:visible}
@@ -1340,6 +1342,7 @@ function switchTab(tab){
   var tabRub = document.getElementById('tab-rubric');
   if(tabInst) tabInst.classList.toggle('active', tab==='instruction');
   if(tabRub) tabRub.classList.toggle('active', tab==='rubric');
+  requestAnimationFrame(applySummaryTips);
 }
 
 // ══════ 오일일 데이터 ══════
@@ -1483,12 +1486,14 @@ function renderInstructionCards(){
 
 // 실제로 말줄임된 제목에만 툴팁 활성화 (잘리지 않은 제목은 툴팁 숨김)
 function applySummaryTips(){
-  var pane = document.getElementById('pane-instruction');
-  if(!pane || pane.offsetParent === null) return;
-  pane.querySelectorAll('.ec-summary-wrap').forEach(function(wrap){
-    var sum = wrap.querySelector('.ec-summary');
-    if(!sum) return;
-    wrap.classList.toggle('has-tip', sum.scrollWidth > sum.clientWidth + 1);
+  ['pane-instruction','pane-rubric'].forEach(function(id){
+    var pane = document.getElementById(id);
+    if(!pane || pane.offsetParent === null) return;
+    pane.querySelectorAll('.ec-summary-wrap').forEach(function(wrap){
+      var sum = wrap.querySelector('.ec-summary');
+      if(!sum) return;
+      wrap.classList.toggle('has-tip', sum.scrollWidth > sum.clientWidth + 1);
+    });
   });
 }
 window.addEventListener('resize', applySummaryTips);
@@ -1496,7 +1501,7 @@ window.addEventListener('resize', applySummaryTips);
 function renderElementCards(){
   var pane = document.getElementById('pane-rubric');
   pane.innerHTML = ELEMENTS.map(function(el,i){
-    var ac = levelAccent(el.level);
+    var ac = 'ac-neutral'; // 채점요소는 단일 중립 컬러 (도달 수준 색상은 문항 단위까지만)
     var rubricId = i + 1;
     var teacherScore = scores[rubricId];
     var scoreHtml;
@@ -1512,8 +1517,8 @@ function renderElementCards(){
     }
     return '<div class="eval-card '+ac+'" data-kind="element" data-idx="'+i+'">'
       +'<div class="ec-card-header readonly-header">'
-      +'<span class="ec-summary">'+escHtml(el.name)+'</span>'
       +'<span class="ec-level lv-score">'+scoreHtml+'</span>'
+      +'<span class="ec-summary-wrap"><span class="ec-summary">'+escHtml(el.name)+'</span><span class="ec-summary-tip">'+escHtml(el.name)+'</span></span>'
       +'</div>'
       +'<div class="ec-card-body">'
       +groundBlock(el.explanation)
@@ -1523,6 +1528,8 @@ function renderElementCards(){
   }).join('');
   pane.innerHTML += renderTabActions('element');
   bindEditableHandlers();
+  requestAnimationFrame(applySummaryTips);
+  if(document.fonts && document.fonts.ready){ document.fonts.ready.then(applySummaryTips); }
 }
 
 function bindEditableHandlers(){
