@@ -1130,6 +1130,21 @@ body.nav-expanded .sticky-cta{left:200px;transition:left .2s ease}
   </div>
 </div>
 
+<!-- ── 재분석 확인 모달 ── -->
+<div class="modal-bg" id="modal-reanalyze" style="z-index:700">
+  <div class="modal" style="max-width:400px">
+    <div style="padding:32px 28px 20px;text-align:center">
+      <div style="width:56px;height:56px;border-radius:50%;background:#fff7ed;color:#f97316;display:flex;align-items:center;justify-content:center;margin:0 auto 18px"><i data-lucide="refresh-ccw" style="width:24px;height:24px"></i></div>
+      <div style="font-size:18px;font-weight:700;color:#222631;line-height:1.5;margin-bottom:10px">자료를 다시 분석할까요?</div>
+      <div style="font-size:14px;color:#6d7381;line-height:1.6">기존 분석 결과와 선택한 항목이 모두 지워지고<br>새로 분석돼요. 분석 실행 시 <strong style="color:#416bff">1 크레딧</strong>이 차감돼요.</div>
+    </div>
+    <div style="padding:0 28px 24px;display:flex;gap:8px">
+      <button onclick="cancelReanalyze()" style="flex:1;padding:13px;border:1px solid #d9d9d9;border-radius:6px;background:#fff;color:#3b3f4c;font-size:14px;font-weight:600;font-family:inherit;cursor:pointer;line-height:1">취소</button>
+      <button onclick="confirmReanalyze()" style="flex:1;padding:13px;border:none;border-radius:6px;background:#416bff;color:#fff;font-size:14px;font-weight:600;font-family:inherit;cursor:pointer;line-height:1;display:inline-flex;align-items:center;justify-content:center;gap:6px"><i data-lucide="sparkles" style="width:15px;height:15px"></i> 다시 분석 · 1 크레딧</button>
+    </div>
+  </div>
+</div>
+
 <!-- ── 설문 응답 모달 (가상 항목 클릭 시) ── -->
 <div class="modal-bg" id="modal-survey">
   <div class="modal lg">
@@ -3285,10 +3300,27 @@ function startAnalyzeAll(){
   });
   showToast('전체 학생 분석을 시작했어요');
 }
+let _pendingReanalyzeId = null;
 function reanalyze(sid){
   const s = STUDENTS.find(x=>x.id===sid);
   if(!s) return;
   if(blockIfBusy(s)) return;
+  // 기존 분석 결과·크레딧 차감 안내 후 진행
+  _pendingReanalyzeId = sid;
+  document.getElementById('modal-reanalyze').classList.add('show');
+  lucide.createIcons();
+}
+function cancelReanalyze(){
+  _pendingReanalyzeId = null;
+  closeModal('modal-reanalyze');
+}
+function confirmReanalyze(){
+  const sid = _pendingReanalyzeId;
+  _pendingReanalyzeId = null;
+  closeModal('modal-reanalyze');
+  if(sid == null) return;
+  const s = STUDENTS.find(x=>x.id===sid);
+  if(!s) return;
   const s2 = getS2(s);
   s2.status = 'idle';
   s2.selectedIds.clear();
