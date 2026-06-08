@@ -584,6 +584,104 @@
   </div>
 </div>
 
+<!-- ── 첫 진입 온보딩 팝업 (3스텝 안내) ── -->
+<div id="ob-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:900;align-items:center;justify-content:center">
+  <div class="cob-modal">
+    <button onclick="closeOb()" class="cob-x"><i data-lucide="x" style="width:18px;height:18px"></i></button>
+
+    <!-- Slide 1 — 학생 자료 입력 -->
+    <div class="cob-slide" data-step="1">
+      <div class="cob-hero">
+        <div class="cob-card">
+          <div class="cob-card-name">10101 김하나</div>
+          <div class="cob-chips">
+            <span class="cob-chip"><i data-lucide="paperclip" style="width:12px;height:12px"></i> 활동지_스캔본.pdf</span>
+            <span class="cob-chip"><i data-lucide="list-checks" style="width:12px;height:12px"></i> 자율_설문(행)</span>
+          </div>
+          <div class="cob-card-box">자유낙하 실험 활동, 환경 정화 활동에 참여함. 탐구력·봉사 정신·집중력·의사소통이 돋보임.</div>
+          <div class="cob-card-foot"><span class="cob-card-pill"><i data-lucide="sparkles" style="width:13px;height:13px"></i> AI 자료 분석</span></div>
+        </div>
+      </div>
+      <div class="cob-desc">학생별로 <b>활동지·설문 자료를 올리거나</b> 활동 내용을 직접 입력해요.<br>자료가 없어도 활동 내용만으로 기록을 만들 수 있어요.</div>
+    </div>
+
+    <!-- Slide 2 — AI 자료 분석 -->
+    <div class="cob-slide" data-step="2" style="display:none">
+      <div class="cob-hero">
+        <div class="cob-card">
+          <div class="cob-card-name">AI 자료 분석 내용</div>
+          <div class="cob-check on"><span class="cob-cb"><i data-lucide="check" style="width:12px;height:12px"></i></span> 자유낙하 실험을 주도적으로 설계하고 변인을 통제함</div>
+          <div class="cob-check on"><span class="cob-cb"><i data-lucide="check" style="width:12px;height:12px"></i></span> 동료와 원활히 소통하며 협력적으로 탐구함</div>
+          <div class="cob-check"><span class="cob-cb"></span> 실험 결과를 체계적으로 정리하고 통찰을 도출함</div>
+        </div>
+      </div>
+      <div class="cob-desc">올린 자료를 <b>AI가 분석해 활동·역량을 항목으로 정리</b>해 드려요.<br>기록에 넣을 항목을 골라 체크하면 돼요.</div>
+    </div>
+
+    <!-- Slide 3 — 기록 확인 및 수정 -->
+    <div class="cob-slide" data-step="3" style="display:none">
+      <div class="cob-hero">
+        <div class="cob-card">
+          <div class="cob-card-head">
+            <span class="cob-card-name" style="display:inline-flex;align-items:center;gap:5px"><i data-lucide="sparkles" style="width:15px;height:15px;color:#416bff"></i> AI Assistant 생성 기록</span>
+            <span class="cob-card-pill sm"><i data-lucide="refresh-ccw" style="width:12px;height:12px"></i> 다시 생성</span>
+          </div>
+          <div class="cob-card-box tall">탐구력과 집중력이 뛰어나 자유낙하 실험 활동에 적극적으로 참여하여 실험 과정을 철저히 분석하고 관찰함. 실험 도중 예상치 못한 변수가 발생했을 때도 침착하게 대처하며 해결 방법을 모색함으로써 실험 결과에 대한 깊이 있는 통찰을 보임. 실험 후반부에 동료들과 원활한 의사소통을…</div>
+        </div>
+      </div>
+      <div class="cob-desc">선택한 항목으로 <b>AI가 기록 초안을 만들어 드려요.</b><br>직접 다듬어 최종 기록을 완성하면 끝이에요. 그럼 시작해 볼까요?</div>
+    </div>
+
+    <!-- Footer: prev / dots / next -->
+    <div class="cob-foot">
+      <button class="cob-nav prev" id="cobPrev" onclick="cobPrev()">이전으로</button>
+      <div class="cob-dots">
+        <span class="cob-dot active" data-d="1"></span>
+        <span class="cob-dot" data-d="2"></span>
+        <span class="cob-dot" data-d="3"></span>
+      </div>
+      <button class="cob-nav next" id="cobNext" onclick="cobNext()">다음으로</button>
+    </div>
+  </div>
+</div>
+<style>
+#ob-overlay.show{display:flex !important}
+.cob-modal{background:#fff;border-radius:16px;width:512px;max-width:calc(100vw - 40px);box-shadow:0 16px 48px rgba(0,0,0,.2);position:relative;overflow:hidden;padding:20px 20px 16px}
+.cob-x{position:absolute;top:14px;right:14px;width:32px;height:32px;border:none;background:none;cursor:pointer;color:#6d7381;display:flex;align-items:center;justify-content:center;border-radius:6px;z-index:3}
+.cob-x:hover{background:#f1f3f5;color:#222631}
+/* 미니 프리뷰 히어로 */
+.cob-hero{height:218px;background:#a8b1f0;border-radius:14px;padding:26px 26px 0;overflow:hidden;display:flex;justify-content:center}
+.cob-card{width:100%;background:#fff;border-radius:12px 12px 0 0;box-shadow:0 6px 20px rgba(40,50,90,.16);padding:18px 18px 20px;text-align:left}
+.cob-card-name{font-size:15px;font-weight:700;color:#222631;margin-bottom:12px}
+.cob-card-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:12px}
+.cob-card-head .cob-card-name{margin-bottom:0}
+.cob-chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px}
+.cob-chip{display:inline-flex;align-items:center;gap:4px;padding:5px 9px;background:#f1f3f5;border-radius:6px;font-size:12px;font-weight:500;color:#3b3f4c;line-height:1}
+.cob-card-box{background:#f6f7f9;border-radius:8px;padding:12px 14px;font-size:13px;color:#3b3f4c;line-height:1.6}
+.cob-card-box.tall{min-height:120px}
+.cob-card-foot{display:flex;justify-content:flex-end;margin-top:12px}
+.cob-card-pill{display:inline-flex;align-items:center;gap:5px;padding:8px 14px;background:#416bff;color:#fff;border-radius:8px;font-size:13px;font-weight:600;line-height:1}
+.cob-card-pill.sm{padding:5px 10px;background:#eef3ff;color:#416bff;border:1px solid #d6e3ff;border-radius:14px;font-size:12px}
+.cob-check{display:flex;align-items:flex-start;gap:8px;font-size:13px;color:#3b3f4c;line-height:1.5;padding:8px 0}
+.cob-check .cob-cb{flex-shrink:0;width:18px;height:18px;border-radius:5px;border:1.5px solid #c5c8d0;background:#fff;display:inline-flex;align-items:center;justify-content:center;margin-top:1px}
+.cob-check.on .cob-cb{background:#416bff;border-color:#416bff;color:#fff}
+.cob-check.on{color:#222631;font-weight:500}
+/* 설명 */
+.cob-desc{text-align:center;font-size:15px;color:#3b3f4c;line-height:1.65;padding:20px 8px 8px}
+.cob-desc b{font-weight:700;color:#222631}
+/* 푸터 */
+.cob-foot{display:flex;align-items:center;justify-content:space-between;padding:8px 6px 4px;min-height:40px}
+.cob-nav{border:none;background:none;font-family:inherit;font-size:15px;font-weight:600;cursor:pointer;line-height:1;padding:8px 4px}
+.cob-nav.prev{color:#9aa0ad}
+.cob-nav.prev:hover{color:#6d7381}
+.cob-nav.next{color:#416bff}
+.cob-nav.next:hover{color:#365eef}
+.cob-nav.hidden{visibility:hidden}
+.cob-dots{display:flex;gap:7px;align-items:center}
+.cob-dot{width:7px;height:7px;border-radius:50%;background:#d4d7dd;transition:all .15s}
+.cob-dot.active{background:#416bff;width:8px;height:8px}
+</style>
+
 <script>
   lucide.createIcons();
   function toggleNav() {
@@ -606,9 +704,44 @@
   }
 
   function openOnboardingDemo() {
-    try { localStorage.removeItem('clipo_creative_onboarding_seen'); } catch(e) {}
-    location.href = 'creative_activity_input_v1_260507.html?type=' + encodeURIComponent('자율활동') + '&cls=' + encodeURIComponent('2학년 1반') + '&ob=1';
+    // 같은 페이지에서 온보딩 모달 표시 (DEMO 카드 트리거)
+    showOb();
   }
+
+  // ── 온보딩 팝업 (3스텝 캐러셀) ──
+  let cobStep = 1;
+  const COB_TOTAL = 3;
+  function showOb(){ cobStep = 1; cobRender(); document.getElementById('ob-overlay').classList.add('show'); lucide.createIcons(); }
+  function closeOb(){ document.getElementById('ob-overlay').classList.remove('show'); try{localStorage.setItem('clipo_creative_onboarding_seen','1');}catch(e){} }
+  function cobRender(){
+    document.querySelectorAll('.cob-slide').forEach(sl=>{ sl.style.display = (+sl.dataset.step === cobStep) ? '' : 'none'; });
+    document.querySelectorAll('.cob-dot').forEach(d=>{ d.classList.toggle('active', +d.dataset.d === cobStep); });
+    document.getElementById('cobPrev').classList.toggle('hidden', cobStep === 1);
+    document.getElementById('cobNext').textContent = (cobStep === COB_TOTAL) ? '시작하기' : '다음으로';
+    lucide.createIcons();
+  }
+  function cobPrev(){ if(cobStep > 1){ cobStep--; cobRender(); } }
+  function cobNext(){
+    if(cobStep < COB_TOTAL){ cobStep++; cobRender(); }
+    else { startFromOnboarding(); }
+  }
+  function startFromOnboarding(){
+    closeOb();
+    // 활동 카드가 하나도 없으면 활동 추가 모달로 유도, 있으면 그냥 닫기
+    const cardCount = document.querySelectorAll('.cards-grid .card:not(.demo-card)').length;
+    if (cardCount === 0 && typeof openAddModal === 'function') {
+      setTimeout(openAddModal, 150);
+    }
+  }
+  // 첫 진입 시 1회 노출 (localStorage). ?ob=1 강제 표시
+  (function maybeShowOb(){
+    const params = new URLSearchParams(location.search);
+    const force = params.get('ob') === '1';
+    if (!force) {
+      try { if (localStorage.getItem('clipo_creative_onboarding_seen') === '1') return; } catch(e) {}
+    }
+    setTimeout(showOb, 300);
+  })();
   function openTutorialDemo() {
     try { localStorage.removeItem('clipo_creative_onboarding_seen'); } catch(e) {}
     location.href = 'creative_activity_input_v1_260507.html?type=' + encodeURIComponent('자율활동') + '&cls=' + encodeURIComponent('2학년 1반') + '&tour=1';
