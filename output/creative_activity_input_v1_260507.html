@@ -669,6 +669,7 @@ body.nav-expanded .sticky-cta{left:200px;transition:left .2s ease}
 .s2-stu-status.analyzing{background:#fef3c7;color:#b45309}
 .s2-stu-status.done{background:#dcfce7;color:#15803d}
 .s2-stu-status.empty{background:#fff3e0;color:#f97316}
+.s2-stu-status.ready{background:#e9f2ff;color:#2c5ce0}
 
 /* 추천/후보 그룹 */
 .s2-group-hd{display:flex;align-items:center;gap:8px;padding:6px 4px;margin-top:4px}
@@ -712,6 +713,7 @@ body.nav-expanded .sticky-cta{left:200px;transition:left .2s ease}
 .s2-badge-sm.b-done{background:#dcfce7;color:#15803d}
 .s2-badge-sm.b-need{background:#fff3e0;color:#f97316}
 .s2-badge-sm.b-empty{background:#f1f3f5;color:#6d7381}
+.s2-badge-sm.b-ready{background:#e9f2ff;color:#2c5ce0}
 .s2-badge-sm.b-analyzing{background:#fef3c7;color:#b45309}
 .btn-reanalyze{display:inline-flex;align-items:center;justify-content:center;gap:4px;height:36px;padding:0 12px;background:#365eef;color:#fff;border:none;border-radius:4px;font-size:14px;font-weight:500;cursor:pointer;font-family:inherit;line-height:1}
 .btn-reanalyze:hover{background:#2940be}
@@ -2921,8 +2923,10 @@ function renderS2Sidebar(){
     const stState = s2State(s);
     const isActive = s.id === s2CurStudentId;
     let status = '';
-    // 자료(설문/활동지) 없으면 활동 내용 유무와 관계없이 '자료 없음'
-    if(!s2HasFiles(s)) status = `<span class="s2-stu-status empty">자료 없음</span>`;
+    // 자료(설문/활동지) 없을 때: 활동 내용만 있으면 '생성 가능'(분석 없이 바로 기록 생성), 아무것도 없으면 '자료 없음'
+    if(!s2HasFiles(s)) status = (s.keywords && s.keywords.length > 0)
+      ? `<span class="s2-stu-status ready">생성 가능</span>`
+      : `<span class="s2-stu-status empty">자료 없음</span>`;
     else if(s2.status==='analyzing') status = `<span class="s2-stu-status analyzing">분석 중</span>`;
     else if(s2.status==='done') status = `<span class="s2-stu-status done">분석 완료</span>`;
     else status = `<span class="s2-stu-status idle">분석 필요</span>`;
@@ -2954,7 +2958,7 @@ function renderS2Main(){
   // 상태 배지
   let badgeCls, badgeLabel;
   if(stState === 'empty'){ badgeCls='b-empty'; badgeLabel='자료 없음'; }
-  else if(stState === 'keywords-only'){ badgeCls='b-empty'; badgeLabel='자료 없음'; }
+  else if(stState === 'keywords-only'){ badgeCls='b-ready'; badgeLabel='생성 가능'; }
   else if(dataChanged){ badgeCls='b-need'; badgeLabel='분석 필요'; }
   else if(s2.status === 'done'){ badgeCls='b-done'; badgeLabel='분석 완료'; }
   else if(s2.status === 'analyzing'){ badgeCls='b-analyzing'; badgeLabel='분석 중'; }
