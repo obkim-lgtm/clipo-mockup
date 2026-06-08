@@ -743,6 +743,9 @@ body.nav-expanded .sticky-cta{left:200px;transition:left .2s ease}
 .s2-badge-rec{display:inline-flex;align-items:center;gap:4px;height:24px;padding:0 8px;background:#365eef;color:#fff;border-radius:9999px;font-size:12px;font-weight:500;line-height:1.25}
 .s2-badge-comp{display:inline-flex;align-items:center;gap:4px;height:24px;padding:0 8px;background:#e9f2ff;color:#3151c4;border:1px solid #ccdfff;border-radius:9999px;font-size:12px;font-weight:500;line-height:1.25}
 .s2-item-new .s2-item-content{font-size:14px;color:#222631;line-height:1.55;font-weight:500;margin-bottom:0}
+.s2-empty-rec{display:flex;align-items:flex-start;gap:10px;margin-top:16px;padding:14px 16px;background:#fff7ed;border-radius:10px;font-size:14px;color:#9a3412;line-height:1.6}
+.s2-empty-rec i,.s2-empty-rec svg{color:#f97316;margin-top:1px}
+.s2-empty-rec strong{font-weight:700;color:#7c2d12}
 .s2-rationale-box{background:#f6f7f9;border-radius:6px;padding:10px 14px;display:flex;flex-direction:column;gap:2px}
 .s2-rationale-label{font-size:12px;font-weight:500;color:#6d7381;line-height:1.25}
 .s2-rationale-text{font-size:14px;color:#3b3f4c;line-height:1.55;font-weight:400}
@@ -1395,6 +1398,9 @@ let STUDENTS = [
     {name:'학기말_자율설문 (행)', type:'survey', source:'bulk', kindLabel:'설문'},
     {name:'2학년1반_활동지_스캔본.pdf', size:'12.4MB', type:'pdf', source:'bulk', kindLabel:'활동지'}
   ], keywords:[{text:'성실함',source:'bulk'},{text:'주도성',source:'bulk'}], demoDirtyLevels:['file','items']},
+  {id:9, sid:'20109', name:'한도윤', files:[
+    {name:'2학년1반_활동지_스캔본.pdf', size:'12.4MB', type:'pdf', source:'bulk', kindLabel:'활동지'}
+  ], keywords:[], demoNoRecItems:true}, // H. 분석 완료했지만 AI 추천 항목 0개
 ];
 
 // 원본 데모 데이터 백업 (시나리오 토글용)
@@ -2497,6 +2503,7 @@ function renderStep3(){
   STUDENTS.forEach((s, i) => {
     const s3 = getS3(s);
     if (s.demoSkipAutoAnalyze) return; // 분석필요 케이스 데모용
+    if (s.demoNoRecItems) return; // H 케이스 — 추천 0개라 기록 자동 생성 안 함
     if (window._tourActive) return; // 투어 중엔 자동 채움 금지 (사용자가 직접 트리거)
     if(!s3.aiText && s2HasFiles(s)){
       s3.aiText = S3_MOCK_TEXTS[i % S3_MOCK_TEXTS.length];
@@ -3072,14 +3079,34 @@ function renderS2Done(s){
   // 분석 항목
   const itemsHtml = items.map(it => renderS2ItemCard(s.id, it)).join('');
 
+  // 생성할 재료가 하나도 없을 때만 안내 (선택 0 + 활동 내용 0 + 보충 0 = 셋 다 비어야 노출)
+  // → 활동 내용·보충이 하나라도 있으면 그걸로 생성되므로 경고 불필요 (3단계 생성 차단 조건과 동일)
+  const noItems = items.length === 0;                    // AI가 추천을 아예 못 뽑음
+  const noSelection = s2.selectedIds.size === 0;          // 체크된 항목이 0개
+  const noKeywords = (s.keywords || []).length === 0;     // 1단계 활동 내용 0자
+  const noCustom = s2.customs.filter(c => c.saved).length === 0; // 저장된 보충 0개
+  const nothingToGenerate = noSelection && noKeywords && noCustom;
+  const analysisSub = noItems
+    ? 'AI가 자료에서 추천할 항목을 찾지 못했어요.'
+    : 'AI가 추천한 항목을 확인하고, 기록에 반영할 활동을 골라 <strong>체크</strong>해 주세요.';
+  const warnBox = nothingToGenerate
+    ? `<div class="s2-empty-rec">
+         <i data-lucide="alert-circle" style="width:18px;height:18px;flex-shrink:0"></i>
+         <div>${noItems
+           ? `추천할 항목을 찾지 못했어요. <strong>AI 기록 생성</strong>을 위해 <strong>보충 내용</strong>을 입력해 주세요.`
+           : `선택한 항목이 없어요. <strong>AI 기록 생성</strong>을 위해 항목을 체크하거나 <strong>보충 내용</strong>을 입력해 주세요.`}</div>
+       </div>`
+    : '';
+  const listHtml = noItems ? '' : `<div class="s2-items-list" style="margin-top:16px">${itemsHtml}</div>`;
+
   // AI 자료 분석 panel
   const analysisPanel = `
     <div class="s2-panel">
       <div class="s2-analysis-hd">
         <div class="s2-analysis-title">AI 자료 분석 내용</div>
-        <div class="s2-analysis-sub">AI가 추천한 항목을 확인하고, 기록에 반영할 활동을 골라 <strong>체크</strong>해 주세요.</div>
+        <div class="s2-analysis-sub">${analysisSub}</div>
       </div>
-      <div class="s2-items-list" style="margin-top:16px">${itemsHtml}</div>
+      ${warnBox}${listHtml}
     </div>`;
 
   // 활동 내용 panel
@@ -3732,6 +3759,17 @@ function seedDemoCompletedStudent(){
   STUDENTS.forEach((s, idx) => {
     if (s.files.length === 0) return; // 자료 없는 학생 (A 케이스)은 건너뜀
     if (s.demoSkipAutoAnalyze) return; // B 케이스 — 분석 필요 상태로 유지
+
+    // H 케이스: 분석은 완료됐지만 AI 추천 항목이 0개
+    if (s.demoNoRecItems) {
+      const s2h = getS2(s);
+      s2h.status = 'done';
+      STEP2_DATA[s.sid] = { items: [] };
+      s2h.selectedIds = new Set();
+      s2h.unsavedChanges = false;
+      s.dirty = false; s._dirtyLevel = null; if (s._dirtyLevels) s._dirtyLevels.clear();
+      return; // 3단계 기록 미생성 (생성 불가 케이스)
+    }
 
     // 2단계 분석 완료 시드
     const s2 = getS2(s);
