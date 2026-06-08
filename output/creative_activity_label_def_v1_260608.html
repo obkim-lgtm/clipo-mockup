@@ -40,13 +40,13 @@ h1{font-size:22px;font-weight:700;margin-bottom:4px}
 .badges{display:flex;flex-wrap:wrap;gap:6px;padding-left:28px}
 
 /* 2단계: 이름 + 자료 상태 + 플래그를 한 줄로 (v2 단순화) */
-#tab-2 .stu{display:flex;align-items:center;flex-wrap:wrap;gap:8px}
-#tab-2 .stu .stu-row1{display:contents}
-#tab-2 .stu .badges{display:contents}
-#tab-2 .stu .radio{order:0;margin:0}
-#tab-2 .stu .stu-name{order:1}
-#tab-2 .stu .badges .b{order:2}
-#tab-2 .stu .flag{order:3;margin-left:0}
+#tab-2sim .stu{display:flex;align-items:center;flex-wrap:wrap;gap:8px}
+#tab-2sim .stu .stu-row1{display:contents}
+#tab-2sim .stu .badges{display:contents}
+#tab-2sim .stu .radio{order:0;margin:0}
+#tab-2sim .stu .stu-name{order:1}
+#tab-2sim .stu .badges .b{order:2}
+#tab-2sim .stu .flag{order:3;margin-left:0}
 
 /* 배지 */
 .b{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:6px;font-size:12.5px;font-weight:600;line-height:1.4;white-space:nowrap}
@@ -107,9 +107,9 @@ table.gen tr.dis td{opacity:.5}
 .spin{display:inline-block;animation:sp 1s linear infinite}@keyframes sp{to{transform:rotate(360deg)}}
 
 /* 2단계 탭: 정의 표를 케이스 시안 위로 */
-#tab-2{display:flex;flex-direction:column;align-items:flex-start}
-#tab-2 .tbl-sec{order:-1;margin-top:0;margin-bottom:36px}
-#tab-2 .sec-h,#tab-2 > .cap,#tab-2 .case{align-self:stretch}
+#tab-2,#tab-2sim{display:flex;flex-direction:column;align-items:flex-start}
+#tab-2 .tbl-sec,#tab-2sim .tbl-sec{order:-1;margin-top:0;margin-bottom:36px}
+#tab-2 .sec-h,#tab-2 > .cap,#tab-2 .case,#tab-2sim .sec-h,#tab-2sim > .cap,#tab-2sim .case{align-self:stretch}
 
 /* 요약 표 */
 .tbl-sec{margin-top:48px;max-width:1280px}
@@ -128,14 +128,200 @@ table.def td .b,table.def td .flag{margin:0}
 <div class="page-head">
   <h1 class="page-title">창체 라벨 정의</h1>
   <div class="switch" id="switch">
-    <button class="sw-btn active" data-tab="2" onclick="showTab('2')">2단계 · AI 분석</button>
+    <button class="sw-btn active" data-tab="2" onclick="showTab('2')">2단계 · 상세</button>
+    <button class="sw-btn" data-tab="2sim" onclick="showTab('2sim')">2단계 · 간소화</button>
     <button class="sw-btn" data-tab="3" onclick="showTab('3')">3단계 · 기록 생성</button>
   </div>
 </div>
 
 <!-- ===================== 2단계 ===================== -->
 <div class="tab" id="tab-2">
-<h2 class="sec-h">2단계 (AI 분석) — 학생 목록 배지 전체 케이스</h2>
+<h2 class="sec-h">2단계 · 상세 (v1) — 학생 목록 배지 전체 케이스</h2>
+<div class="cap">왼쪽 = 학생 카드 시안 · 오른쪽 = 케이스 설명 · 자료 상태(파일·설문) + 활동 내역(활동 내용) 2축</div>
+
+<!-- 1 -->
+<div class="case">
+  <div class="left"><div class="stu">
+    <div class="stu-row1"><span class="radio"></span><span class="stu-name">10101 김하나</span><span class="flag block" title="자료·활동 내용·보충 내용이 모두 없어 기록을 생성할 수 없어요">기록 생성 불가</span></div>
+    <div class="badges"><span class="b b-none">자료 없음</span><span class="b b-kwX">활동 내용 X</span></div>
+  </div></div>
+  <div class="right">
+    <div class="case-name">완전 빈 학생</div>
+    <div class="case-desc">파일·설문·활동 내용 모두 없음. 분석할 재료도, 기록에 넣을 재료도 없어 <b>기록 생성 불가</b>. (이름 옆 주황 플래그)</div>
+    <div class="able"><span class="no">분석 ✗</span><span class="no">3단계 생성 ✗</span></div>
+  </div>
+</div>
+
+<!-- 2 -->
+<div class="case">
+  <div class="left"><div class="stu">
+    <div class="stu-row1"><span class="radio"></span><span class="stu-name">10102 이서아</span></div>
+    <div class="badges"><span class="b b-none">자료 없음</span><span class="b b-kwO">활동 내용 O</span></div>
+  </div></div>
+  <div class="right">
+    <div class="case-name">활동 내용만 있음</div>
+    <div class="case-desc">파일·설문은 없고 활동 내용만 입력함. 분석할 파일이 없어 <b>분석은 불필요</b>하지만, 활동 내용으로 3단계 기록 생성은 가능해요.</div>
+    <div class="able"><span class="no">분석 ✗</span><span class="ok">3단계 생성 ✓</span></div>
+  </div>
+</div>
+
+<!-- 3 -->
+<div class="case">
+  <div class="left"><div class="stu">
+    <div class="stu-row1"><span class="radio"></span><span class="stu-name">10103 박도현</span></div>
+    <div class="badges"><span class="b b-need">분석 필요</span><span class="b b-kwX">활동 내용 X</span></div>
+  </div></div>
+  <div class="right">
+    <div class="case-name">분석 필요 (파일만)</div>
+    <div class="case-desc">파일/설문은 업로드됐지만 아직 분석을 실행하지 않음. 분석을 돌려야 추천 항목이 나와요.</div>
+    <div class="able"><span class="wait">분석 실행 필요</span></div>
+  </div>
+</div>
+
+<!-- 4 -->
+<div class="case">
+  <div class="left"><div class="stu">
+    <div class="stu-row1"><span class="radio"></span><span class="stu-name">10104 최예나</span></div>
+    <div class="badges"><span class="b b-need">분석 필요</span><span class="b b-kwO">활동 내용 O</span></div>
+  </div></div>
+  <div class="right">
+    <div class="case-name">분석 필요 (파일 + 활동 내용)</div>
+    <div class="case-desc">파일/설문과 활동 내용이 모두 있으나 아직 분석 전. 분석하면 자료 기반 추천 항목이 더해져요.</div>
+    <div class="able"><span class="wait">분석 실행 필요</span></div>
+  </div>
+</div>
+
+<!-- 5 -->
+<div class="case">
+  <div class="left"><div class="stu">
+    <div class="stu-row1"><span class="radio"></span><span class="stu-name">10105 정시후</span></div>
+    <div class="badges"><span class="b b-ana"><span class="spin">✲</span> 자료 분석 중</span><span class="b b-kwX">활동 내용 X</span></div>
+  </div></div>
+  <div class="right">
+    <div class="case-name">분석 중</div>
+    <div class="case-desc">AI 분석이 진행 중. 완료까지 대기하며, 이 학생의 자료·내용 수정은 잠겨요.</div>
+    <div class="able"><span class="wait">진행 중 · 수정 잠금</span></div>
+  </div>
+</div>
+
+<!-- 6 -->
+<div class="case">
+  <div class="left"><div class="stu">
+    <div class="stu-row1"><span class="radio"></span><span class="stu-name">10106 강민지</span></div>
+    <div class="badges"><span class="b b-done">분석 완료</span><span class="b b-kwX">활동 내용 X</span></div>
+  </div></div>
+  <div class="right">
+    <div class="case-name">분석 완료</div>
+    <div class="case-desc">분석이 정상 완료됨. 추천 항목을 골라 3단계에서 기록을 생성할 수 있어요.</div>
+    <div class="able"><span class="ok">3단계 생성 ✓</span></div>
+  </div>
+</div>
+
+<!-- 7 -->
+<div class="case">
+  <div class="left"><div class="stu">
+    <div class="stu-row1"><span class="radio"></span><span class="stu-name">10107 유태성</span><span class="flag">자료 변경됨</span></div>
+    <div class="badges"><span class="b b-done">분석 완료</span><span class="b b-kwO">활동 내용 O</span></div>
+  </div></div>
+  <div class="right">
+    <div class="case-name">분석 완료 + 자료 변경됨</div>
+    <div class="case-desc">분석은 끝났지만 <b>그 후 자료가 바뀜</b>. 현재 분석 결과는 옛 자료 기준이라, 새 자료를 반영하려면 재분석을 권장해요. (이름 옆 <b>주황 플래그</b>로 표시)</div>
+    <div class="able"><span class="wait">재분석 권장</span><span class="ok">생성은 가능</span></div>
+  </div>
+</div>
+
+<!-- 7-2: 분석 완료인데 생성할 재료 0 → 생성 불가 플래그 -->
+<div class="case">
+  <div class="left"><div class="stu">
+    <div class="stu-row1"><span class="radio"></span><span class="stu-name">10108 한도윤</span><span class="flag block" title="선택 항목·활동 내용·보충 내용이 모두 없어 기록을 생성할 수 없어요">기록 생성 불가</span></div>
+    <div class="badges"><span class="b b-done">분석 완료</span><span class="b b-kwX">활동 내용 X</span></div>
+  </div></div>
+  <div class="right">
+    <div class="case-name">분석 완료 + 생성 불가</div>
+    <div class="case-desc">분석은 됐지만 <b>선택된 추천 항목·활동 내용·보충 내용이 모두 없음</b>. 기록에 넣을 재료가 없어 이대로는 생성 불가. 추천 항목을 체크하거나 보충 내용을 입력하면 가능해요. (이름 옆 <b>주황 플래그</b> + 호버 툴팁)</div>
+    <div class="able"><span class="no">3단계 생성 ✗</span><span class="wait">항목 체크 / 보충 입력 필요</span></div>
+  </div>
+</div>
+
+<!-- 8 -->
+<div class="case">
+  <div class="left"><div class="stu">
+    <div class="stu-row1"><span class="radio"></span><span class="stu-name">10109 송예린</span></div>
+    <div class="badges"><span class="b b-fail">분석 실패</span><span class="b b-kwX">활동 내용 X</span></div>
+  </div></div>
+  <div class="right">
+    <div class="case-name">분석 실패</div>
+    <div class="case-desc">분석 중 오류가 발생함. 크레딧은 반환되며 다시 시도할 수 있어요.</div>
+    <div class="able"><span class="wait">재시도 가능</span></div>
+  </div>
+</div>
+
+<!-- 9 -->
+<div class="case">
+  <div class="left"><div class="stu">
+    <div class="stu-row1"><span class="radio"></span><span class="stu-name">10109 한도윤</span></div>
+    <div class="badges"><span class="b b-gen"><span class="spin">✲</span> 기록 생성 중</span><span class="b b-kwX">활동 내용 X</span></div>
+  </div></div>
+  <div class="right">
+    <div class="case-name">기록 생성 중 (3단계 작업)</div>
+    <div class="case-desc">3단계 기록 생성이 도는 중이라 분석을 실행할 수 없어요. (AI 작업 중 차단)</div>
+    <div class="able"><span class="wait">진행 중 · 분석 잠금</span></div>
+  </div>
+</div>
+
+<!-- ===== 한눈에 보는 정의 표 ===== -->
+<div class="tbl-sec">
+  <h1 style="margin-top:0">📋 2단계 배지 정의 · 상세</h1>
+  <div class="tnote">한 학생은 <b>① 자료 상태</b> + <b>② 활동 내역</b> 배지 + (해당 시) <b>이름 옆 플래그</b>로 표시. (아래는 케이스별 시각화 시안)</div>
+
+  <h2>① 자료 상태 <span style="font-size:13px;font-weight:400;color:#6d7381">— 파일·설문 기준 (filled 배지)</span></h2>
+  <table class="def">
+    <thead><tr><th style="width:170px">배지</th><th class="nowrap" style="width:110px">색</th><th>언제</th><th style="width:130px">분석 실행</th></tr></thead>
+    <tbody>
+      <tr><td><span class="b b-none">자료 없음</span></td><td class="nowrap"><span class="swatch" style="background:#f4f4f5"></span>회색</td><td>파일·설문 없음</td><td>✗</td></tr>
+      <tr><td><span class="b b-need">분석 필요</span></td><td class="nowrap"><span class="swatch" style="background:#fff7ed"></span>주황</td><td>파일/설문 있는데 아직 분석 안 함</td><td>✓ 실행 필요</td></tr>
+      <tr><td><span class="b b-ana"><span class="spin">✲</span> 자료 분석 중</span></td><td class="nowrap"><span class="swatch" style="background:#eff6ff"></span>파랑</td><td>분석 진행 중 (수정 잠금)</td><td>진행 중</td></tr>
+      <tr><td><span class="b b-done">분석 완료</span></td><td class="nowrap"><span class="swatch" style="background:#f0fdf4"></span>초록</td><td>분석 정상 완료</td><td>✓ 재분석</td></tr>
+      <tr><td><span class="b b-fail">분석 실패</span></td><td class="nowrap"><span class="swatch" style="background:#fef2f2"></span>빨강</td><td>분석 중 오류 (크레딧 반환)</td><td>✓ 재시도</td></tr>
+      <tr><td><span class="b b-gen"><span class="spin">✲</span> 기록 생성 중</span></td><td class="nowrap"><span class="swatch" style="background:#eff6ff"></span>파랑</td><td>3단계 생성이 도는 중 → 분석 잠금</td><td>✗ 잠금</td></tr>
+    </tbody>
+  </table>
+
+  <h2>② 활동 내역 <span style="font-size:13px;font-weight:400;color:#6d7381">— 활동 내용 기준 (line 배지, 부가 정보)</span></h2>
+  <table class="def">
+    <thead><tr><th style="width:170px">배지</th><th class="nowrap" style="width:110px">색</th><th>언제</th></tr></thead>
+    <tbody>
+      <tr><td><span class="b b-kwO">활동 내용 O</span></td><td class="nowrap"><span class="swatch" style="background:#fff;border-color:#bfd4ff"></span>파랑 테두리</td><td>활동 내용 입력함</td></tr>
+      <tr><td><span class="b b-kwX">활동 내용 X</span></td><td class="nowrap"><span class="swatch" style="background:#fff;border-color:#d4d4d8"></span>회색 테두리</td><td>활동 내용 없음</td></tr>
+    </tbody>
+  </table>
+
+  <h2>이름 옆 플래그 <span style="font-size:13px;font-weight:400;color:#6d7381">— 주의 알림 (주황, 해당 학생만)</span></h2>
+  <table class="def">
+    <thead><tr><th style="width:170px">플래그</th><th>언제</th><th style="width:170px">생성</th></tr></thead>
+    <tbody>
+      <tr><td><span class="flag">자료 변경됨</span></td><td>분석(또는 생성) 후 자료가 바뀜 → 결과가 옛것</td><td>가능 · 재분석 권장</td></tr>
+      <tr><td><span class="flag block">기록 생성 불가</span></td><td>선택 항목·활동 내용·보충 내용이 모두 없음 (완전 빈 학생 포함)</td><td>✗ 항목 체크/보충 입력 필요</td></tr>
+    </tbody>
+  </table>
+
+  <h2>색상 규칙 <span style="font-size:13px;font-weight:400;color:#6d7381">— 의미가 안 겹치게</span></h2>
+  <table class="def">
+    <thead><tr><th style="width:120px">색</th><th>의미</th><th>배지</th></tr></thead>
+    <tbody>
+      <tr><td class="nowrap"><span class="swatch" style="background:#f4f4f5"></span>회색</td><td>없음 · 중립</td><td>자료 없음, 활동 내용 X</td></tr>
+      <tr><td class="nowrap"><span class="swatch" style="background:#fff7ed"></span>주황</td><td>선생님이 할 일 · 주의</td><td>분석 필요, 자료 변경됨, 기록 생성 불가</td></tr>
+      <tr><td class="nowrap"><span class="swatch" style="background:#eff6ff"></span>파랑</td><td>AI 작동 중 · 있음</td><td>자료 분석 중, 기록 생성 중, 활동 내용 O</td></tr>
+      <tr><td class="nowrap"><span class="swatch" style="background:#f0fdf4"></span>초록</td><td>완료</td><td>분석 완료</td></tr>
+      <tr><td class="nowrap"><span class="swatch" style="background:#fef2f2"></span>빨강</td><td>오류</td><td>분석 실패</td></tr>
+    </tbody>
+  </table>
+  <div class="tnote" style="margin-top:10px">※ 진행 중(자료 분석 중·기록 생성 중)은 파랑이 겹치지만 <b>스피너(✲)</b>로 구분. 활동 내용 O도 파랑이지만 <b>line(테두리)</b>이라 구분.</div>
+</div>
+</div><!-- /tab-2 -->
+
+<div class="tab" id="tab-2sim" style="display:none">
+<h2 class="sec-h">2단계 · 간소화 (v2) — 학생 목록 배지</h2>
 <div class="cap">왼쪽 = 학생 카드 시안 · 오른쪽 = 케이스 설명 · <b>v2 단순화</b>: 자료 상태 배지 1개 + (변경 시) 자료 변경됨. 활동 내역 표시 안 함</div>
 
 <!-- 1 -->
@@ -270,7 +456,7 @@ table.def td .b,table.def td .flag{margin:0}
 
 <!-- ===== 한눈에 보는 정의 표 ===== -->
 <div class="tbl-sec">
-  <h1 style="margin-top:0">📋 2단계 배지 정의</h1>
+  <h1 style="margin-top:0">📋 2단계 배지 정의 · 간소화</h1>
   <div class="tnote">한 학생은 <b>자료 상태 배지 1개</b> + (해당 시) <b>이름 옆 플래그</b>로 표시. <b>v2 단순화</b> — 활동 내역(O/X)은 표시 안 함(3단계 모달에서 확인). (아래는 케이스별 시각화 시안)</div>
 
   <h2>자료 상태 <span style="font-size:13px;font-weight:400;color:#6d7381">— 파일·설문 기준 (배지 1개)</span></h2>
