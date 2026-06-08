@@ -358,7 +358,18 @@ table.def td .b,table.def td .flag{margin:0}
       </tbody>
     </table>
 
-    <h2>체크박스 활성 규칙 <span style="font-size:13px;font-weight:400;color:#6d7381">— 누구를 생성할 수 있나</span></h2>
+    <h2>체크박스 활성 규칙 <span style="font-size:13px;font-weight:400;color:#6d7381">— 위에서부터 순서대로 판정</span></h2>
+
+    <div style="font-size:13.5px;font-weight:700;color:#c2410c;margin:6px 0 6px">0순위 — 진행 중이면 무조건 비활성 (다른 조건 무시)</div>
+    <table class="def">
+      <thead><tr><th style="width:200px">상태</th><th style="width:80px">체크</th><th>이유</th></tr></thead>
+      <tbody>
+        <tr><td>자료 분석 = <span class="b b-ana"><span class="spin">✲</span> 분석 중</span></td><td><span class="ablechk off">비활성</span></td><td>2단계 분석 도는 중 → 생성 대기</td></tr>
+        <tr><td>AI 기록 = <span class="b b-gen"><span class="spin">✲</span> 생성 중</span></td><td><span class="ablechk off">비활성</span></td><td>이미 생성이 도는 중 (AI 작업 중 차단)</td></tr>
+      </tbody>
+    </table>
+
+    <div style="font-size:13.5px;font-weight:700;color:#3b3f4c;margin:18px 0 6px">그다음 — 자료 분석 × 활동 내용으로 판정 (진행 중 아닐 때)</div>
     <table class="def">
       <thead><tr><th style="width:140px">자료 분석</th><th class="nowrap" style="width:90px">활동 내용</th><th style="width:80px">체크</th><th>이유</th></tr></thead>
       <tbody>
@@ -366,13 +377,11 @@ table.def td .b,table.def td .flag{margin:0}
         <tr><td><span class="b b-none">자료 없음</span></td><td>O</td><td><span class="ablechk on">활성</span></td><td>활동 내용으로 생성 가능 (무시될 파일 없음)</td></tr>
         <tr><td><span class="b b-fail">분석 실패</span></td><td>O</td><td><span class="ablechk on">활성</span></td><td>분석 막다른 길 → 활동 내용으로라도 생성</td></tr>
         <tr><td><span class="b b-need">분석 필요</span></td><td>O / X</td><td><span class="ablechk off">비활성</span></td><td>아직 분석 안 함 → <b>2단계 먼저</b> (자료 살릴 수 있음)</td></tr>
-        <tr><td><span class="b b-ana"><span class="spin">✲</span> 분석 중</span></td><td>O / X</td><td><span class="ablechk off">비활성</span></td><td>진행 중 → 대기</td></tr>
         <tr><td><span class="b b-fail">분석 실패</span></td><td>X</td><td><span class="ablechk off">비활성</span></td><td>자료도 활동도 없음(재료 0) → 분석 재시도</td></tr>
         <tr><td><span class="b b-none">자료 없음</span></td><td>X</td><td><span class="ablechk off">비활성</span></td><td>완전 빈 학생 → 생성 불가</td></tr>
-        <tr><td colspan="2" style="text-align:center;color:#6d7381">AI 기록 = <span class="b b-gen" style="font-size:11px"><span class="spin">✲</span> 생성 중</span></td><td><span class="ablechk off">비활성</span></td><td>이미 생성이 도는 중</td></tr>
       </tbody>
     </table>
-    <div class="tnote" style="margin-top:10px">※ 정렬은 <b>학번 순 고정</b>(상태별 재정렬 안 함). 비활성 학생은 행을 흐리게 + 체크 잠금으로 구분.<br><b>핵심:</b> "아직 안 한 것(분석 필요)"은 막고, "해봤는데 실패(분석 실패)"는 활동 내용 있으면 열어줌.</div>
+    <div class="tnote" style="margin-top:10px">※ <b>AI 기록이 <span style="color:#16a34a">생성 완료</span>·<span style="color:#dc2626">생성 실패</span></b>여도 — 위 자료 판정대로 활성이면 <b>재생성·재시도</b>로 다시 선택 가능. (생성 이력은 체크 가능 여부를 막지 않음)<br>※ 정렬은 <b>학번 순 고정</b>. 비활성 학생은 흐리게 + 체크 잠금.<br><b>핵심:</b> "아직 안 한 것(분석 필요)"은 막고, "해봤는데 실패(분석 실패)"는 활동 내용 있으면 열어줌.</div>
   </div>
 
   <!-- 모달 시안 -->
