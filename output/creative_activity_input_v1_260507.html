@@ -259,8 +259,7 @@ body.nav-expanded .sticky-cta{left:200px;transition:left .2s ease}
 .kw-tag .tag-x:hover{opacity:1}
 .kw-input{flex:1;border:none;outline:none;font-size:14px;font-family:inherit;color:#222631;min-width:120px;background:none}
 .kw-input::placeholder{color:#b3b6bd}
-.kw-hint{font-size:12px;color:#6d7381;flex:1;margin-right:10px}
-.kw-hint strong{color:#416bff;font-weight:700}
+.kw-hint{font-size:12px;color:#b3b6bd}
 .kw-textarea{width:100%;border:1px solid #d9d9d9;border-radius:8px;padding:12px 14px;font-size:14px;font-family:inherit;color:#222631;line-height:1.6;resize:none;min-height:88px;max-height:280px;overflow-y:auto;outline:none;transition:border-color .15s}
 .kw-textarea:focus{border-color:#416bff}
 .kw-textarea::placeholder{color:#b3b6bd}
@@ -721,9 +720,6 @@ body.nav-expanded .sticky-cta{left:200px;transition:left .2s ease}
 .s2-stale-alert{background:#ffedd5;border:1px solid #fed7aa;border-radius:8px;padding:14px 16px;display:flex;align-items:flex-start;gap:10px;font-size:14px;color:#92310a;line-height:1.55;font-weight:500}
 .s2-stale-alert i{flex-shrink:0;color:#c2410c;margin-top:1px}
 .s2-stale-alert strong{color:#7c2d12;font-weight:700}
-.s2-info-alert{background:#eff3ff;border:1px solid #dbe4ff;border-radius:8px;padding:14px 16px;display:flex;align-items:flex-start;gap:10px;font-size:14px;color:#3b3f4c;line-height:1.55;font-weight:500;margin-bottom:16px}
-.s2-info-alert i{flex-shrink:0;color:#416bff;margin-top:1px}
-.s2-info-alert strong{color:#2952cc;font-weight:700}
 
 .s2-analysis-panel{display:flex;flex-direction:column;gap:16px}
 .s2-analysis-hd{display:flex;flex-direction:column;gap:12px}
@@ -970,7 +966,7 @@ body.nav-expanded .sticky-cta{left:200px;transition:left .2s ease}
         <div class="dp-label">활동 내용 <span class="hint">활동 자료에서 자동 추출되지만 직접 추가도 가능해요</span></div>
         <textarea class="kw-textarea" id="md-kw-text" maxlength="1000" oninput="updateKwCount();autoResizeKw()" onblur="commitKeywords()" placeholder="예) 협력적, 적극적, 발표 잘함"></textarea>
         <div class="kw-foot">
-          <span class="kw-hint">키워드나 문장으로 자유롭게, <strong>3개 이상</strong> 입력하면 더 풍성한 기록이 생성돼요</span>
+          <span class="kw-hint"></span>
           <span class="kw-count" id="md-kw-count">0 / 1000</span>
         </div>
       </div>
@@ -1365,14 +1361,6 @@ const _params = new URLSearchParams(location.search);
 const ACTIVITY_TYPE = _params.get('type') || '자율활동';
 const CLS = _params.get('cls') || '2학년 1반';
 const IS_DEMO = _params.get('demo') === '1';
-// 활동 유형별 활동 내용 입력 placeholder (키워드/문장 자유 입력 유도)
-const KW_PLACEHOLDER = {
-  '자율활동': '예) 학급 회장, 회의 진행, 갈등 조정, 규칙 제안',
-  '동아리활동': '예) 미세먼지 주제 탐구, 실험 설계, 자료 조사, 발표',
-  '진로활동': '예) 인공지능 분야 관심, 학과 체험, 진로검사, 직업인 인터뷰 진행',
-  '봉사활동': '예) 요양원 봉사, 배식 도움, 꾸준히 참여, 공감'
-};
-const KW_PH = KW_PLACEHOLDER[ACTIVITY_TYPE] || KW_PLACEHOLDER['자율활동'];
 document.getElementById('pt-title').textContent = ACTIVITY_TYPE + ' : ' + CLS;
 if(ACTIVITY_TYPE === '동아리활동'){
   const lbl = document.getElementById('btn-student-label');
@@ -2052,9 +2040,9 @@ function renderDrawerDataPane(s){
     ` : ''}
     <div class="dp-section">
       <div class="dp-label">활동 내용 <span class="dp-optional">(선택)</span></div>
-      <textarea class="kw-textarea${busyCls}" id="dr-kw-text" maxlength="1000" ${busy?'disabled':''}${busyTitle} oninput="updateDrKwCount();autoResizeDrKw()" onblur="commitDrawerKeywords()" placeholder="${KW_PH}">${s.keywords.map(k=>k.text).join(', ')}</textarea>
+      <textarea class="kw-textarea${busyCls}" id="dr-kw-text" maxlength="1000" ${busy?'disabled':''}${busyTitle} oninput="updateDrKwCount();autoResizeDrKw()" onblur="commitDrawerKeywords()" placeholder="예) 협력적, 적극적, 발표 잘함">${s.keywords.map(k=>k.text).join(', ')}</textarea>
       <div class="kw-foot">
-        <span class="kw-hint">키워드나 문장으로 자유롭게, <strong>3개 이상</strong> 입력하면 더 풍성한 기록이 생성돼요</span>
+        <span class="kw-hint"></span>
         <span class="kw-count" id="dr-kw-count">0 / 1000자</span>
       </div>
     </div>
@@ -2198,7 +2186,6 @@ function renderDetailModal(){
     </div>`;
   }).join('');
   $('md-kw-text').value = s.keywords.map(k=>k.text).join(', ');
-  $('md-kw-text').setAttribute('placeholder', KW_PH);
   updateKwCount();
   autoResizeKw();
   const lev = s.level || 'none';
@@ -3032,12 +3019,7 @@ function renderS2Main(){
   } else if(stState === 'keywords-only'){
     const esc0 = (str) => String(str).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
     const kwText0 = s.keywords.map(k=>k.text).join(', ');
-    // 자료 삭제 후 활동 내용만 남은 케이스: 이전 분석 결과가 무효 → 중립 전환 안내 (주황 경고 X)
-    const wasAnalyzed = (s2.status === 'done') || s._filesDeleted;
-    const deletedAlert = wasAnalyzed
-      ? `<div class="s2-info-alert"><i data-lucide="info" style="width:18px;height:18px"></i><span><strong>분석에 사용한 자료가 삭제되어 이전 분석 결과는 사용할 수 없어요.</strong> 남은 활동 내용으로 바로 기록을 생성할 수 있어요.</span></div>`
-      : '';
-    body = deletedAlert + `<div class="s2-panel" style="text-align:center;padding:48px 24px">
+    body = `<div class="s2-panel" style="text-align:center;padding:48px 24px">
       <div style="background:#f1f3f5;color:#6d7381;width:48px;height:48px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;margin-bottom:14px"><i data-lucide="pencil" style="width:22px;height:22px"></i></div>
       <div class="s2-state-title">활동 내용만 입력되어 있어요</div>
       <div class="s2-state-desc">활동 자료가 없으면 AI 분석이 불필요해요.<br>다음 단계에서 활동 내용을 기반으로 기록 초안이 생성돼요.</div>
@@ -3374,10 +3356,7 @@ function applyScenario(scenario){
     s.s3 = { aiText:'', editText:'', generatedAt:null };
     s.dirty = false;
     s._dirtyLevel = null; if(s._dirtyLevels) s._dirtyLevels.clear();
-    s._filesDeleted = false;
   });
-  // 데모: '활동 내용만' 시나리오의 첫 학생은 '자료 삭제 후 활동 내용만 남음' 케이스로 표시
-  if(scenario === 'keywords-only' && STUDENTS[0]) STUDENTS[0]._filesDeleted = true;
   // '자료 있음' 시나리오에서는 자료 있는 모든 학생을 분석/기록 완료 상태로 재시드
   // (1/2/3단계 상태 일관화 — 자료가 있으면 분석/기록도 있다고 가정)
   if(scenario === 'data' && typeof seedDemoCompletedStudent === 'function') seedDemoCompletedStudent();
