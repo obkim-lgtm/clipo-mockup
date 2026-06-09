@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" type="image/png" href="clipo_favicon.png">
+<title>2단계 · 자료 삭제 후 활동 내용만 남은 케이스 (제안)</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard-gov.min.css">
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<style>
+*{font-family:'Pretendard GOV',sans-serif;box-sizing:border-box;margin:0;padding:0}
+body{background:#f6f7f9;color:#222631;padding:40px 32px 80px;display:flex;justify-content:center}
+.wrap{width:1180px;max-width:100%}
+
+/* 상단 */
+.pt-title{font-size:24px;font-weight:700;margin-bottom:8px}
+.pt-desc{font-size:15px;color:#6d7381;margin-bottom:22px}
+.stepbar{display:flex;align-items:center;gap:10px;margin-bottom:26px}
+.step-btn{display:inline-flex;align-items:center;gap:8px;height:44px;padding:0 20px;border-radius:10px;border:1px solid #e3e6ee;background:#fff;font-size:15px;font-weight:600;color:#8a93a3}
+.step-btn .n{display:inline-flex;align-items:center;justify-content:center;width:22px;height:22px;border-radius:50%;background:#eef1f5;color:#8a93a3;font-size:13px;font-weight:700}
+.step-btn.active{border-color:#416bff;color:#416bff}
+.step-btn.active .n{background:#416bff;color:#fff}
+.step-sep{color:#c4cad4}
+
+/* AI 자료 분석 섹션 */
+.sec{background:#fff;border:1px solid #ededf0;border-radius:14px;padding:24px 26px;box-shadow:0 2px 12px rgba(0,0,0,.03)}
+.sec-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
+.sec-hd .l .t{font-size:19px;font-weight:700}
+.sec-hd .l .m{font-size:14px;color:#6d7381;margin-top:4px}
+.btn-bulk{display:inline-flex;align-items:center;justify-content:center;gap:8px;height:46px;padding:0 22px;border-radius:10px;background:#416bff;color:#fff;font-size:15px;font-weight:700;border:0;cursor:pointer;line-height:1;vertical-align:middle}
+
+.cols{display:flex;gap:20px;align-items:flex-start}
+
+/* 학생 목록 */
+.stu{width:280px;flex-shrink:0;border:1px solid #ededf0;border-radius:12px;padding:16px}
+.stu-hd{display:flex;align-items:center;justify-content:space-between;font-weight:700;font-size:15px;margin-bottom:12px}
+.stu-hd .c{color:#6d7381;font-weight:600;font-size:14px}
+.stu-row{display:flex;align-items:center;gap:8px;padding:12px 12px;border-radius:9px;font-size:15px;cursor:pointer;color:#3b3f4c}
+.stu-row.active{background:#f3f6ff;font-weight:700;color:#222631}
+.stu-row .nm{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.stu-row .dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.dot-green{background:#22c55e}.dot-gray{background:#c4cad4}
+.tag{font-size:12px;font-weight:700;padding:3px 9px;border-radius:6px;flex-shrink:0}
+.tag-ready{background:#e7f7ee;color:#18794e}
+.tag-empty{background:#f1f3f5;color:#8a93a3}
+
+/* 메인 */
+.main{flex:1;display:flex;flex-direction:column;gap:16px}
+.panel{border:1px solid #ededf0;border-radius:12px;padding:22px 24px}
+.info-row{display:flex;align-items:center;justify-content:space-between}
+.info-name{font-size:19px;font-weight:700;display:flex;align-items:center;gap:10px}
+.info-meta{font-size:14px;color:#6d7381;margin-top:6px}
+.badge-ready{font-size:13px;font-weight:700;padding:4px 11px;border-radius:7px;background:#e7f7ee;color:#18794e}
+
+/* 중립 전환 안내 (주황X · 좌측바X · 배경+아이콘) */
+.info-alert{display:flex;align-items:flex-start;gap:11px;background:#eff3ff;border:1px solid #dbe4ff;border-radius:10px;padding:15px 17px;font-size:15px;line-height:1.6;color:#3b3f4c;font-weight:500}
+.info-alert i{flex-shrink:0;color:#416bff;margin-top:1px}
+.info-alert strong{color:#2952cc;font-weight:700}
+
+/* 활동 내용만 → 바로 생성 패널 */
+.gen{text-align:center;padding:34px 24px 26px}
+.gen-ic{width:50px;height:50px;border-radius:50%;background:#f1f3f5;color:#6d7381;display:inline-flex;align-items:center;justify-content:center;margin-bottom:14px}
+.gen-t{font-size:18px;font-weight:700;margin-bottom:6px}
+.gen-d{font-size:15px;color:#6d7381;line-height:1.55}
+.kw-label{font-size:14px;font-weight:700;color:#3b3f4c;margin:20px 0 8px;text-align:left}
+.kw-box{background:#f6f7f9;border:1px solid #ededf0;border-radius:9px;padding:16px 18px;font-size:16px;color:#3b3f4c;line-height:1.6;text-align:left;min-height:56px}
+.gen-cta{display:inline-flex;align-items:center;justify-content:center;gap:8px;height:48px;padding:0 24px;border-radius:10px;background:#416bff;color:#fff;font-size:16px;font-weight:700;border:0;cursor:pointer;margin-top:22px;line-height:1;vertical-align:middle}
+
+.tagline{font-size:13px;color:#9aa3b2;margin:30px 0 10px;font-weight:600}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="pt-title">자율활동 : 1학년 1반</div>
+  <div class="pt-desc">학생별로 자료와 활동 내용을 등록해 주세요. 다음 단계에서 AI가 분석해 기록에 들어갈 내용을 추천해 드려요.</div>
+
+  <div class="stepbar">
+    <span class="step-btn"><span class="n">1</span> 학생 자료 입력</span>
+    <span class="step-sep">›</span>
+    <span class="step-btn active"><span class="n">2</span> AI 자료 분석</span>
+    <span class="step-sep">›</span>
+    <span class="step-btn"><span class="n">3</span> 기록 확인 및 수정</span>
+  </div>
+
+  <div class="sec">
+    <div class="sec-hd">
+      <div class="l">
+        <div class="t">AI 자료 분석</div>
+        <div class="m">완료 0명 · 분석 필요 0명 · 자료 없음 1명</div>
+      </div>
+      <button class="btn-bulk"><i data-lucide="wand-sparkles" style="width:18px;height:18px"></i> 일괄 AI 분석</button>
+    </div>
+
+    <div class="cols">
+      <!-- 학생 목록 -->
+      <div class="stu">
+        <div class="stu-hd"><span>학생 목록</span><span class="c">3명</span></div>
+        <div class="stu-row active"><span class="dot dot-green"></span><span class="nm">10101 김하나</span><span class="tag tag-ready">생성 가능</span></div>
+        <div class="stu-row"><span class="dot dot-green"></span><span class="nm">10102 김두나</span><span class="tag tag-ready">생성 가능</span></div>
+        <div class="stu-row"><span class="dot dot-gray"></span><span class="nm">10103 김세나</span><span class="tag tag-empty">자료 없음</span></div>
+      </div>
+
+      <!-- 메인 (제안: 자료 삭제 후 활동 내용만 남은 케이스) -->
+      <div class="main">
+        <!-- 1) 학생 정보 (재분석 버튼 없음) -->
+        <div class="panel">
+          <div class="info-row">
+            <div>
+              <div class="info-name">10101 김하나 <span class="badge-ready">생성 가능</span></div>
+              <div class="info-meta">자료 0건 · 활동 내용 기재</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 2) 중립 전환 안내 (주황 경고 대신) -->
+        <div class="info-alert">
+          <i data-lucide="info" style="width:19px;height:19px"></i>
+          <span><strong>분석에 사용한 자료가 삭제되어 이전 분석 결과는 사용할 수 없어요.</strong> 남은 활동 내용으로 바로 기록을 생성할 수 있어요.</span>
+        </div>
+
+        <!-- 3) 활동 내용만 → 바로 생성 -->
+        <div class="panel gen">
+          <div class="gen-ic"><i data-lucide="pencil" style="width:23px;height:23px"></i></div>
+          <div class="gen-t">활동 내용만 작성되어 있어요</div>
+          <div class="gen-d">자료 분석 없이 바로 기록을 생성할 수 있어요.</div>
+          <div class="kw-label">활동 내용</div>
+          <div class="kw-box">협력적</div>
+          <button class="gen-cta">기록 생성하러 가기 <i data-lucide="arrow-right" style="width:17px;height:17px"></i></button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="tagline">※ 제안 변경: 주황 "다시 분석" 배너 · 낡은 AI 추천 항목 제거 → 중립 전환 안내 + 바로 생성으로 통일</div>
+
+</div>
+<script>lucide.createIcons();</script>
+</body>
+</html>
