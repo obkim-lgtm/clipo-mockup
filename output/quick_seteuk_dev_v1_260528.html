@@ -185,6 +185,18 @@ body.nav-expanded .main-shell { margin-left: 200px; transition: margin-left .2s 
 .ai-result-note { font-size: 14px; color: #6d7381; margin-bottom: 10px; line-height: 1.5; }
 .spin { animation: spin 1s linear infinite; }
 @keyframes spin { to { transform: rotate(360deg); } }
+/* AI 분석 실패 상태 (좌측 액센트 띠 없이 배경+아이콘) */
+.ai-fail { margin-top: 20px; display: flex; gap: 12px; align-items: flex-start; background: #fef2f3; border-radius: 12px; padding: 16px 18px; }
+.ai-fail-ic { width: 36px; height: 36px; border-radius: 9px; background: #fde2e4; color: #f2525f; display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.ai-fail-body { flex: 1; min-width: 0; }
+.ai-fail-title { font-size: 16px; font-weight: 700; color: #c0303c; margin-bottom: 4px; }
+.ai-fail-desc { font-size: 14px; color: #8a3b42; line-height: 1.55; }
+/* 데모 토글 (목업 전용 — 우측 하단) */
+.demo-toggle { position: fixed; right: 20px; bottom: 20px; z-index: 400; display: flex; align-items: center; gap: 8px; background: #222631; color: #fff; padding: 8px 10px 8px 12px; border-radius: 10px; box-shadow: 0 6px 20px rgba(0,0,0,.22); font-size: 12px; cursor: move; user-select: none; }
+.demo-toggle-label { font-weight: 600; opacity: .8; }
+.demo-seg { display: inline-flex; background: #3a3f4c; border-radius: 7px; overflow: hidden; }
+.demo-seg button { border: none; background: none; color: #c5c8d0; font-size: 12px; font-weight: 600; padding: 5px 12px; cursor: pointer; font-family: inherit; }
+.demo-seg button.on { background: #416bff; color: #fff; }
 
 .level-wrap { margin-top: 24px; }
 .level-seg { display: inline-flex; border: 1px solid #d9d9d9; border-radius: 8px; overflow: hidden; }
@@ -464,6 +476,14 @@ body.is-busy .back-link { opacity: .5; cursor: not-allowed; }
             <div class="ai-result-note">AI가 자료에서 추출한 학생 활동 및 특성이에요. 자유롭게 수정할 수 있어요.</div>
             <textarea class="in-textarea" id="aiResultText" style="min-height:140px" oninput="autoGrow(this)"></textarea>
           </div>
+
+          <div class="ai-fail" id="aiFail" style="display:none">
+            <div class="ai-fail-ic"><i data-lucide="alert-circle" style="width:20px;height:20px"></i></div>
+            <div class="ai-fail-body">
+              <div class="ai-fail-title">분석에 실패했어요</div>
+              <div class="ai-fail-desc">네트워크 문제로 분석을 완료하지 못했어요. 사용한 크레딧 1개는 자동으로 반환됐어요. 위 [다시 분석]을 눌러 다시 시도해 주세요.</div>
+            </div>
+          </div>
         </div>
 
         <div class="in-label" style="margin-top:24px" id="inputLabel">키워드 및 활동 직접 입력</div>
@@ -585,6 +605,15 @@ body.is-busy .back-link { opacity: .5; cursor: not-allowed; }
 </footer>
 </div>
 
+<!-- 데모 토글 (목업 검토용 — AI 분석 결과 전환) -->
+<div class="demo-toggle" id="demoToggle">
+  <span class="demo-toggle-label">데모 · AI 분석</span>
+  <span class="demo-seg">
+    <button id="demoOk" class="on" onclick="setDemoFail(false)">성공</button>
+    <button id="demoFailBtn" onclick="setDemoFail(true)">실패</button>
+  </span>
+</div>
+
 <script>
 function toggleNav(){ document.getElementById('icon-sb').classList.toggle('expanded'); document.body.classList.toggle('nav-expanded'); }
 
@@ -669,6 +698,7 @@ function loadStudent(id){
     document.getElementById('dropzone').style.display = 'flex';
   }
   document.getElementById('aiResult').style.display = 'none';
+  document.getElementById('aiFail').style.display = 'none';
   document.getElementById('inputContent').placeholder = '예) 의도·관점 파악, 표현력, 탐구 / 토론에서 근거를 들어 설득력 있게 발표함';
   var _ih1 = document.getElementById('inputHelp'); if(_ih1) _ih1.style.display = '';
   var btn = document.getElementById('analyzeBtn');
@@ -757,6 +787,7 @@ function showFile(f){
   document.getElementById('dropzone').style.display = 'none';
   document.getElementById('fileBox').style.display = 'block';
   document.getElementById('aiResult').style.display = 'none';
+  document.getElementById('aiFail').style.display = 'none';
   document.getElementById('inputContent').placeholder = '예) 의도·관점 파악, 표현력, 탐구 / 토론에서 근거를 들어 설득력 있게 발표함';
   var _ih1 = document.getElementById('inputHelp'); if(_ih1) _ih1.style.display = '';
   updateActiveTags();
@@ -786,6 +817,7 @@ function removeFile(){
   document.getElementById('fileBox').style.display = 'none';
   document.getElementById('dropzone').style.display = 'flex';
   document.getElementById('aiResult').style.display = 'none';
+  document.getElementById('aiFail').style.display = 'none';
   document.getElementById('inputContent').placeholder = '예) 의도·관점 파악, 표현력, 탐구 / 토론에서 근거를 들어 설득력 있게 발표함';
   var _ih1 = document.getElementById('inputHelp'); if(_ih1) _ih1.style.display = '';
   updateActiveTags();
@@ -798,6 +830,7 @@ function doReset(){
   document.getElementById('fileBox').style.display = 'none';
   document.getElementById('dropzone').style.display = 'flex';
   document.getElementById('aiResult').style.display = 'none';
+  document.getElementById('aiFail').style.display = 'none';
   document.getElementById('inputContent').placeholder = '예) 의도·관점 파악, 표현력, 탐구 / 토론에서 근거를 들어 설득력 있게 발표함';
   var _ih1 = document.getElementById('inputHelp'); if(_ih1) _ih1.style.display = '';
   var ab = document.getElementById('analyzeBtn');
@@ -817,14 +850,31 @@ function doReset(){
   lucide.createIcons();
   okToast('초기화되었습니다.');
 }
+var demoFail = false;
+function setDemoFail(on){
+  demoFail = on;
+  document.getElementById('demoOk').classList.toggle('on', !on);
+  document.getElementById('demoFailBtn').classList.toggle('on', on);
+}
 function runAnalyze(){
   stopPulse();
   var btn = document.getElementById('analyzeBtn');
   btn.disabled = true;
   btn.innerHTML = '<i data-lucide="loader-circle" class="spin" style="width:16px;height:16px"></i> 분석 중...';
+  document.getElementById('aiFail').style.display = 'none';
   setBusy(true);
   lucide.createIcons();
   setTimeout(function(){
+    if(demoFail){
+      // 분석 실패: 결과 숨김 + 실패 안내, 버튼은 '다시 분석'으로 (크레딧 반환)
+      document.getElementById('aiResult').style.display = 'none';
+      document.getElementById('aiFail').style.display = 'flex';
+      btn.disabled = false;
+      btn.innerHTML = '<i data-lucide="rotate-ccw" style="width:16px;height:16px"></i> 다시 분석 · 크레딧 1';
+      setBusy(false);
+      lucide.createIcons();
+      return;
+    }
     document.getElementById('aiResultText').value = '- 수업 시간에 자신의 의견을 논리적으로 발표하고, 모둠 활동에서 친구들의 의견을 경청하며 토론을 이끎.\n- 제시된 자료를 꼼꼼히 읽고 맥락을 정확히 파악하여 핵심 내용을 요약함.\n- 영어 에세이 작성 시 자기 생각을 창의적으로 표현하고 어휘를 적절히 활용하는 모습이 관찰됨.';
     document.getElementById('aiResult').style.display = 'block';
     autoGrow(document.getElementById('aiResultText'));
@@ -843,6 +893,23 @@ function init(){
   if(activeId) loadStudent(activeId);
 }
 init();
+/* 데모 토글 드래그 이동 */
+(function(){
+  var t=document.getElementById('demoToggle'); if(!t) return;
+  var sx,sy,ox,oy,drag=false;
+  t.addEventListener('mousedown',function(e){
+    if(e.target.closest('button')) return;
+    var r=t.getBoundingClientRect();
+    t.style.right='auto'; t.style.bottom='auto'; t.style.left=r.left+'px'; t.style.top=r.top+'px';
+    sx=e.clientX; sy=e.clientY; ox=r.left; oy=r.top; drag=true; e.preventDefault();
+  });
+  document.addEventListener('mousemove',function(e){
+    if(!drag) return;
+    t.style.left=Math.max(8,Math.min(ox+(e.clientX-sx),window.innerWidth-t.offsetWidth-8))+'px';
+    t.style.top=Math.max(8,Math.min(oy+(e.clientY-sy),window.innerHeight-t.offsetHeight-8))+'px';
+  });
+  document.addEventListener('mouseup',function(){ drag=false; });
+})();
 lucide.createIcons();
 </script>
 </body>
