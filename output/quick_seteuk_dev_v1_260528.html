@@ -759,13 +759,19 @@ function loadStudent(id){
     fail.style.display = 'flex';
     btn.innerHTML = '<i data-lucide="rotate-ccw" style="width:16px;height:16px"></i> 다시 분석 · 크레딧 1';
   } else if(d.aiStatus==='stale'){
-    // 창체와 동일: 기존 결과 흐리게 유지 + 주황 배너 (교체/삭제 모두 단일 케이스, 문구만 분기)
+    // 창체와 동일: 기존 결과 + 주황 배너. 단, 결과를 직접 고쳤으면(editedAfterStale) 흐림 해제 + 문구 변경
     banner.classList.add('show');
-    document.getElementById('staleDesc').textContent = d.file
-      ? '아래 분석 결과는 이전 자료 기준이에요. [다시 분석]을 누르면 새 자료 기준으로 갱신돼요.'
-      : '자료가 삭제되었어요. 아래 분석 결과는 이전 자료 기준이에요. 새 자료를 올리면 다시 분석할 수 있어요.';
     document.getElementById('aiResultText').value = d.aiText;
-    result.style.display = 'block'; result.classList.add('stale');
+    result.style.display = 'block';
+    if(d.editedAfterStale){
+      result.classList.remove('stale');
+      document.getElementById('staleDesc').textContent = '직접 수정한 내용은 유지돼요. 다시 분석하면 덮어써요.';
+    } else {
+      result.classList.add('stale');
+      document.getElementById('staleDesc').textContent = d.file
+        ? '아래 분석 결과는 이전 자료 기준이에요. [다시 분석]을 누르면 새 자료 기준으로 갱신돼요.'
+        : '자료가 삭제되었어요. 아래 분석 결과는 이전 자료 기준이에요. 새 자료를 올리면 다시 분석할 수 있어요.';
+    }
     btn.innerHTML = '<i data-lucide="rotate-ccw" style="width:16px;height:16px"></i> 다시 분석 · 크레딧 1';
   } else {
     btn.innerHTML = '<i data-lucide="sparkles" style="width:16px;height:16px"></i> AI 분석 · 크레딧 1';
@@ -845,7 +851,17 @@ function onInputContent(){
   refreshCount();
   updateActiveTags();
 }
-function onAiResultInput(ta){ autoGrow(ta); dataFor(activeId).aiText = ta.value; }
+function onAiResultInput(ta){
+  autoGrow(ta);
+  var d = dataFor(activeId);
+  d.aiText = ta.value;
+  // stale 상태에서 흐린 결과를 직접 고치면 → 흐림 해제 + 배너 문구 변경 (빌 코멘트 ① 반영)
+  if(d.aiStatus==='stale' && !d.editedAfterStale){
+    d.editedAfterStale = true;
+    document.getElementById('aiResult').classList.remove('stale');
+    document.getElementById('staleDesc').textContent = '직접 수정한 내용은 유지돼요. 다시 분석하면 덮어써요.';
+  }
+}
 function openMax(){ document.getElementById('maxModal').classList.add('show'); }
 function closeMax(){ document.getElementById('maxModal').classList.remove('show'); }
 function openExamples(){ document.getElementById('exModal').classList.add('show'); lucide.createIcons(); }
@@ -855,8 +871,8 @@ function showFile(f){
   if(!/\.(pdf|png|jpe?g)$/i.test(f.name)){ alert('PDF, PNG, JPG 파일만 업로드할 수 있어요.'); return; }
   if(f.size > 20*1024*1024){ alert('20MB 이하 파일만 업로드할 수 있어요.'); return; }
   var d = dataFor(activeId);
-  // 자동 감지: 분석한 적 있는 학생의 자료 교체 → stale (창체 단일 케이스)
-  if(d.aiStatus==='done' || d.aiStatus==='stale') d.aiStatus = 'stale';
+  // 자동 감지: 분석한 적 있는 학생의 자료 교체 → stale (창체 단일 케이스). 새 자료니 흐림 다시 적용
+  if(d.aiStatus==='done' || d.aiStatus==='stale'){ d.aiStatus = 'stale'; d.editedAfterStale = false; }
   else d.aiStatus = null; // 분석 전/실패 상태에서 교체 → 새로 분석
   d.file = { name: f.name, size: (f.size/1024/1024).toFixed(1) + 'MB' };
   loadStudent(activeId);
@@ -884,7 +900,7 @@ function removeFile(){
   stopPulse();
   var d = dataFor(activeId);
   // 자동 감지: 분석한 적 있는 학생의 자료 삭제도 동일하게 stale (창체: 삭제 전용 분리 없이 '자료 변경' 단일 케이스)
-  if(d.aiStatus==='done' || d.aiStatus==='stale') d.aiStatus = 'stale';
+  if(d.aiStatus==='done' || d.aiStatus==='stale'){ d.aiStatus = 'stale'; d.editedAfterStale = false; }
   else d.aiStatus = null;
   d.file = null;
   loadStudent(activeId);
@@ -922,6 +938,7 @@ function runAnalyze(){
   loadStudent(id);                         // 분석 중 UI(버튼 스피너 + 해당 학생 패널 잠금)
   setTimeout(function(){
     d.aiStatus = demoFail ? 'failed' : 'done';
+    d.editedAfterStale = false;  // 재분석 완료 → stale 해제
     if(!demoFail) d.aiText = DUMMY_AI_TEXT;
     if(item) renderTags(item);
     var name = item ? item.querySelector('.stu-name').textContent : id;
