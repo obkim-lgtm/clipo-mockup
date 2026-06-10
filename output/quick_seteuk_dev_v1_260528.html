@@ -759,7 +759,7 @@ function loadStudent(id){
     fail.style.display = 'flex';
     btn.innerHTML = '<i data-lucide="rotate-ccw" style="width:16px;height:16px"></i> 다시 분석 · 크레딧 1';
   } else if(d.aiStatus==='stale'){
-    // 창체와 동일: 기존 결과 + 주황 배너. 단, 결과를 직접 고쳤으면(editedAfterStale) 흐림 해제 + 문구 변경
+    // 창체와 동일: 기존 결과 + 주황 배너. 교체·삭제·재업로드 모두 동일 문구(빌 확인). 결과를 직접 고쳤으면(editedAfterStale) 흐림 해제 + 문구 변경
     banner.classList.add('show');
     document.getElementById('aiResultText').value = d.aiText;
     result.style.display = 'block';
@@ -768,9 +768,7 @@ function loadStudent(id){
       document.getElementById('staleDesc').textContent = '직접 수정한 내용은 유지돼요. 다시 분석하면 덮어써요.';
     } else {
       result.classList.add('stale');
-      document.getElementById('staleDesc').textContent = d.file
-        ? '아래 분석 결과는 이전 자료 기준이에요. [다시 분석]을 누르면 새 자료 기준으로 갱신돼요.'
-        : '자료가 삭제되었어요. 아래 분석 결과는 이전 자료 기준이에요. 새 자료를 올리면 다시 분석할 수 있어요.';
+      document.getElementById('staleDesc').textContent = '아래 분석 결과는 이전 자료 기준이에요. 다시 분석하면 새 자료 기준으로 갱신돼요.';
     }
     btn.innerHTML = '<i data-lucide="rotate-ccw" style="width:16px;height:16px"></i> 다시 분석 · 크레딧 1';
   } else {
