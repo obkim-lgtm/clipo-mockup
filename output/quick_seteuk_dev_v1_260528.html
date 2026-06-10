@@ -74,6 +74,25 @@ body.nav-expanded .main-shell { margin-left: 200px; transition: margin-left .2s 
 .stu-tags { display: flex; flex-wrap: nowrap; gap: 5px; padding-left: 28px; }
 .stu-tag { font-size: 12px; font-weight: 500; color: #5563d6; background: #eef3ff; padding: 3px 7px; border-radius: 5px; line-height: 1.3; white-space: nowrap; }
 .stu-tag.off { color: #9aa0ad; background: #f1f3f5; }
+/* 상태 뱃지 — 분석 중 / 분석 실패 / 자료 변경(stale) */
+.stu-tag.analyzing { display: inline-flex; align-items: center; gap: 5px; color: #416bff; background: #eef3ff; }
+.mini-spin { width: 10px; height: 10px; border: 2px solid rgba(65,107,255,.25); border-top-color: #416bff; border-radius: 50%; display: inline-block; animation: spin 1s linear infinite; flex-shrink: 0; }
+.stu-tag.fail { color: #f2525f; background: #fdeaea; }
+.stu-tag.stale { color: #f97316; background: #fff4e6; }
+/* 자료 변경(stale) 배너 — 창체와 동일: 주황 단일 케이스, 기존 결과 흐리게 유지 */
+.stale-banner { display: none; margin-top: 20px; align-items: flex-start; gap: 10px; background: #fff4e6; border-radius: 12px; padding: 14px 16px; }
+.stale-banner.show { display: flex; }
+.stale-banner i { color: #f97316; flex-shrink: 0; margin-top: 2px; }
+.stale-banner-body { flex: 1; min-width: 0; }
+.stale-banner-title { font-size: 15px; font-weight: 700; color: #c2410c; margin-bottom: 2px; }
+.stale-banner-desc { font-size: 14px; color: #9a4b0f; line-height: 1.5; }
+#aiResult.stale { opacity: .55; }
+/* 분석 중 — 해당 학생 편집 영역만 잠금 (학생 단위 차단) */
+.kw-card.locked .up-sec, .kw-card.locked #inputLabel, .kw-card.locked #inputHelp,
+.kw-card.locked #inputContent, .kw-card.locked .in-count, .kw-card.locked #kwBox,
+.kw-card.locked .level-wrap, .kw-card.locked .rp-actions { pointer-events: none; opacity: .55; }
+.lock-hint { display: none; align-items: center; gap: 6px; font-size: 13px; font-weight: 600; color: #416bff; margin-left: 10px; }
+.kw-card.locked .lock-hint { display: inline-flex; }
 
 /* 우측 컬럼 */
 .right-col { display: flex; flex-direction: column; gap: 14px; }
@@ -371,7 +390,7 @@ body.is-busy .back-link { opacity: .5; cursor: not-allowed; }
     <!-- 우측: 키워드 및 활동 입력 -->
     <div class="right-col">
       <div class="card kw-card">
-        <div class="rp-head"><span class="rp-title"><span id="curStuName">10101 김하나</span> 키워드 및 활동 입력</span></div>
+        <div class="rp-head"><span class="rp-title"><span id="curStuName">10101 김하나</span> 키워드 및 활동 입력</span><span class="lock-hint"><span class="mini-spin"></span> AI 분석 중 — 완료 후 수정할 수 있어요</span></div>
 
         <!-- 키워드 사전 (토글 접힘) — 마커, 실제 위치는 학생 입력 내용 아래 -->
         <div class="kw-box" id="kwBox">
@@ -469,12 +488,20 @@ body.is-busy .back-link { opacity: .5; cursor: not-allowed; }
             </div>
           </div>
 
+          <div class="stale-banner" id="staleBanner">
+            <i data-lucide="refresh-cw" style="width:18px;height:18px"></i>
+            <div class="stale-banner-body">
+              <div class="stale-banner-title">자료가 변경되었어요</div>
+              <div class="stale-banner-desc" id="staleDesc">아래 분석 결과는 이전 자료 기준이에요. [다시 분석]을 누르면 새 자료 기준으로 갱신돼요.</div>
+            </div>
+          </div>
+
           <div class="ai-result" id="aiResult" style="display:none">
             <div class="ai-result-head">
               <span class="in-label" style="margin:0">AI 활동 분석 결과</span>
             </div>
             <div class="ai-result-note">AI가 자료에서 추출한 학생 활동 및 특성이에요. 자유롭게 수정할 수 있어요.</div>
-            <textarea class="in-textarea" id="aiResultText" style="min-height:140px" oninput="autoGrow(this)"></textarea>
+            <textarea class="in-textarea" id="aiResultText" style="min-height:140px" oninput="onAiResultInput(this)"></textarea>
           </div>
 
           <div class="ai-fail" id="aiFail" style="display:none">
@@ -663,26 +690,40 @@ document.addEventListener('click', function(e){
   busyToast(BUSY_TIP);
 }, true);
 
-/* 학생별 상태(자료/입력/키워드/수준) — 목록 태그와 편집 영역을 항상 일치시킴 */
+/* 학생별 상태(자료/입력/키워드/수준 + AI 분석 상태) — 목록 태그와 편집 영역을 항상 일치시킴 */
+/* aiStatus: null(분석 전) | 'analyzing'(분석 중) | 'done'(완료) | 'failed'(실패) | 'stale'(자료 변경됨) */
+var DUMMY_AI_TEXT = '- 수업 시간에 자신의 의견을 논리적으로 발표하고, 모둠 활동에서 친구들의 의견을 경청하며 토론을 이끎.\n- 제시된 자료를 꼼꼼히 읽고 맥락을 정확히 파악하여 핵심 내용을 요약함.\n- 영어 에세이 작성 시 자기 생각을 창의적으로 표현하고 어휘를 적절히 활용하는 모습이 관찰됨.';
 var studentData = {
-  '10101': { file:null, content:'감정조절, 자기 관리, 타인배려, 타인존중, 사회참여', keywords:['감정조절','자기 관리','타인배려','타인존중','사회참여'], level:'중' },
-  '10102': { file:{name:'김두나_활동보고서.pdf', size:'1.8MB'}, content:'', keywords:[], level:'중' }
+  '10101': { file:null, content:'감정조절, 자기 관리, 타인배려, 타인존중, 사회참여', keywords:['감정조절','자기 관리','타인배려','타인존중','사회참여'], level:'중', aiStatus:null, aiText:'' },
+  '10102': { file:{name:'김두나_활동보고서.pdf', size:'1.8MB'}, content:'', keywords:[], level:'중', aiStatus:null, aiText:'' },
+  '10103': { file:{name:'박서연_활동지_v2.pdf', size:'2.1MB'}, content:'', keywords:[], level:'중', aiStatus:'stale', aiText:DUMMY_AI_TEXT },
+  '10104': { file:{name:'이준호_보고서.pdf', size:'3.4MB'}, content:'', keywords:[], level:'중', aiStatus:'failed', aiText:'' }
 };
 var activeId = null;
 function getId(item){ return item.querySelector('.stu-name').textContent.trim().split(' ')[0]; }
-function dataFor(id){ if(!studentData[id]) studentData[id]={file:null,content:'',keywords:[],level:'중'}; return studentData[id]; }
+function dataFor(id){ if(!studentData[id]) studentData[id]={file:null,content:'',keywords:[],level:'중',aiStatus:null,aiText:''}; return studentData[id]; }
 
 function renderTags(item){
   var d = dataFor(getId(item));
   var holder = item.querySelector('.stu-tags');
   var hasInput = d.content.trim().length > 0;
-  var hasAny = !!d.file || hasInput;
+  var hasAny = !!d.file || hasInput || d.aiStatus;
   if(!hasAny){ if(holder) holder.remove(); return; }
   if(!holder){ holder = document.createElement('div'); holder.className='stu-tags'; item.appendChild(holder); }
-  holder.innerHTML =
-    '<span class="stu-tag'+(d.file?'':' off')+'">자료 '+(d.file?'O':'X')+'</span>'+
+  // 첫 뱃지 = 자료 상태 (분석 중/실패/자료 변경이 자료 O/X보다 우선)
+  var first;
+  if(d.aiStatus==='analyzing')   first = '<span class="stu-tag analyzing"><span class="mini-spin"></span>분석 중</span>';
+  else if(d.aiStatus==='failed') first = '<span class="stu-tag fail">분석 실패</span>';
+  else if(d.aiStatus==='stale')  first = '<span class="stu-tag stale">자료 변경</span>';
+  else first = '<span class="stu-tag'+(d.file?'':' off')+'">자료 '+(d.file?'O':'X')+'</span>';
+  holder.innerHTML = first +
     '<span class="stu-tag'+(hasInput?'':' off')+'">입력 '+(hasInput?'O':'X')+'</span>'+
     '<span class="stu-tag">수준 '+d.level+'</span>';
+}
+
+/* 분석 중 — 보고 있는 학생의 편집 영역만 잠금 (학생 단위 차단, 다른 학생은 자유) */
+function setPanelLock(on){
+  document.querySelector('.kw-card').classList.toggle('locked', on);
 }
 
 function loadStudent(id){
@@ -697,18 +738,48 @@ function loadStudent(id){
     document.getElementById('fileBox').style.display = 'none';
     document.getElementById('dropzone').style.display = 'flex';
   }
-  document.getElementById('aiResult').style.display = 'none';
-  document.getElementById('aiFail').style.display = 'none';
-  document.getElementById('inputContent').placeholder = '예) 의도·관점 파악, 표현력, 탐구 / 토론에서 근거를 들어 설득력 있게 발표함';
-  var _ih1 = document.getElementById('inputHelp'); if(_ih1) _ih1.style.display = '';
+  // AI 분석 상태별 복원
   var btn = document.getElementById('analyzeBtn');
+  var result = document.getElementById('aiResult');
+  var fail = document.getElementById('aiFail');
+  var banner = document.getElementById('staleBanner');
+  result.style.display='none'; result.classList.remove('stale');
+  fail.style.display='none'; banner.classList.remove('show');
+  setPanelLock(false);
   btn.disabled = false;
-  btn.innerHTML = '<i data-lucide="sparkles" style="width:16px;height:16px"></i> AI 분석 · 크레딧 1';
+  if(d.aiStatus==='analyzing'){
+    btn.disabled = true;
+    btn.innerHTML = '<i data-lucide="loader-circle" class="spin" style="width:16px;height:16px"></i> 분석 중...';
+    setPanelLock(true);
+  } else if(d.aiStatus==='done'){
+    document.getElementById('aiResultText').value = d.aiText;
+    result.style.display = 'block';
+    btn.innerHTML = '<i data-lucide="rotate-ccw" style="width:16px;height:16px"></i> 다시 분석 · 크레딧 1';
+  } else if(d.aiStatus==='failed'){
+    fail.style.display = 'flex';
+    btn.innerHTML = '<i data-lucide="rotate-ccw" style="width:16px;height:16px"></i> 다시 분석 · 크레딧 1';
+  } else if(d.aiStatus==='stale'){
+    // 창체와 동일: 기존 결과 흐리게 유지 + 주황 배너 (교체/삭제 모두 단일 케이스, 문구만 분기)
+    banner.classList.add('show');
+    document.getElementById('staleDesc').textContent = d.file
+      ? '아래 분석 결과는 이전 자료 기준이에요. [다시 분석]을 누르면 새 자료 기준으로 갱신돼요.'
+      : '자료가 삭제되었어요. 아래 분석 결과는 이전 자료 기준이에요. 새 자료를 올리면 다시 분석할 수 있어요.';
+    document.getElementById('aiResultText').value = d.aiText;
+    result.style.display = 'block'; result.classList.add('stale');
+    btn.innerHTML = '<i data-lucide="rotate-ccw" style="width:16px;height:16px"></i> 다시 분석 · 크레딧 1';
+  } else {
+    btn.innerHTML = '<i data-lucide="sparkles" style="width:16px;height:16px"></i> AI 분석 · 크레딧 1';
+  }
+  // 직접 입력 placeholder/도움말 (분석 결과 유무 기준)
+  var hasAi = (d.aiStatus==='done' || d.aiStatus==='stale');
+  document.getElementById('inputContent').placeholder = hasAi ? 'AI 분석에 없는 키워드·활동을 추가로 입력해 보세요.' : '예) 의도·관점 파악, 표현력, 탐구 / 토론에서 근거를 들어 설득력 있게 발표함';
+  var _ih1 = document.getElementById('inputHelp'); if(_ih1) _ih1.style.display = hasAi ? 'none' : '';
   document.getElementById('inputContent').value = d.content;
   document.querySelectorAll('#kwBox .kw-chip').forEach(function(c){ c.classList.toggle('sel', d.keywords.indexOf(c.textContent.trim())>-1); });
   document.querySelectorAll('.level-btn').forEach(function(b){ b.classList.toggle('sel', b.textContent.trim()===d.level); });
   refreshCount();
   autoGrow(document.getElementById('inputContent'));
+  if(d.aiStatus==='done' || d.aiStatus==='stale') autoGrow(document.getElementById('aiResultText'));
   lucide.createIcons();
 }
 function saveActive(){
@@ -774,6 +845,7 @@ function onInputContent(){
   refreshCount();
   updateActiveTags();
 }
+function onAiResultInput(ta){ autoGrow(ta); dataFor(activeId).aiText = ta.value; }
 function openMax(){ document.getElementById('maxModal').classList.add('show'); }
 function closeMax(){ document.getElementById('maxModal').classList.remove('show'); }
 function openExamples(){ document.getElementById('exModal').classList.add('show'); lucide.createIcons(); }
@@ -782,16 +854,13 @@ function closeExamples(){ document.getElementById('exModal').classList.remove('s
 function showFile(f){
   if(!/\.(pdf|png|jpe?g)$/i.test(f.name)){ alert('PDF, PNG, JPG 파일만 업로드할 수 있어요.'); return; }
   if(f.size > 20*1024*1024){ alert('20MB 이하 파일만 업로드할 수 있어요.'); return; }
-  document.getElementById('fileName').textContent = f.name;
-  document.getElementById('fileSize').textContent = (f.size/1024/1024).toFixed(1) + 'MB';
-  document.getElementById('dropzone').style.display = 'none';
-  document.getElementById('fileBox').style.display = 'block';
-  document.getElementById('aiResult').style.display = 'none';
-  document.getElementById('aiFail').style.display = 'none';
-  document.getElementById('inputContent').placeholder = '예) 의도·관점 파악, 표현력, 탐구 / 토론에서 근거를 들어 설득력 있게 발표함';
-  var _ih1 = document.getElementById('inputHelp'); if(_ih1) _ih1.style.display = '';
+  var d = dataFor(activeId);
+  // 자동 감지: 분석한 적 있는 학생의 자료 교체 → stale (창체 단일 케이스)
+  if(d.aiStatus==='done' || d.aiStatus==='stale') d.aiStatus = 'stale';
+  else d.aiStatus = null; // 분석 전/실패 상태에서 교체 → 새로 분석
+  d.file = { name: f.name, size: (f.size/1024/1024).toFixed(1) + 'MB' };
+  loadStudent(activeId);
   updateActiveTags();
-  lucide.createIcons();
   pulseAnalyze();
 }
 var _pulseTimer;
@@ -813,41 +882,26 @@ function onFilePick(inp){ if(inp.files[0]) showFile(inp.files[0]); }
 function onFileDrop(e){ var f = e.dataTransfer.files[0]; if(f) showFile(f); }
 function removeFile(){
   stopPulse();
-  document.getElementById('fileInput').value = '';
-  document.getElementById('fileBox').style.display = 'none';
-  document.getElementById('dropzone').style.display = 'flex';
-  document.getElementById('aiResult').style.display = 'none';
-  document.getElementById('aiFail').style.display = 'none';
-  document.getElementById('inputContent').placeholder = '예) 의도·관점 파악, 표현력, 탐구 / 토론에서 근거를 들어 설득력 있게 발표함';
-  var _ih1 = document.getElementById('inputHelp'); if(_ih1) _ih1.style.display = '';
+  var d = dataFor(activeId);
+  // 자동 감지: 분석한 적 있는 학생의 자료 삭제도 동일하게 stale (창체: 삭제 전용 분리 없이 '자료 변경' 단일 케이스)
+  if(d.aiStatus==='done' || d.aiStatus==='stale') d.aiStatus = 'stale';
+  else d.aiStatus = null;
+  d.file = null;
+  loadStudent(activeId);
   updateActiveTags();
 }
 function openReset(){ document.getElementById('resetModal').classList.add('show'); }
 function closeReset(){ document.getElementById('resetModal').classList.remove('show'); }
 function doReset(){
-  // 파일 초기화
+  // 데이터 초기화 (파일·AI 분석 상태·입력·키워드·수준)
+  var d = dataFor(activeId);
+  d.file = null; d.aiStatus = null; d.aiText = '';
+  d.content = ''; d.keywords = []; d.level = '중';
   document.getElementById('fileInput').value = '';
-  document.getElementById('fileBox').style.display = 'none';
-  document.getElementById('dropzone').style.display = 'flex';
-  document.getElementById('aiResult').style.display = 'none';
-  document.getElementById('aiFail').style.display = 'none';
-  document.getElementById('inputContent').placeholder = '예) 의도·관점 파악, 표현력, 탐구 / 토론에서 근거를 들어 설득력 있게 발표함';
-  var _ih1 = document.getElementById('inputHelp'); if(_ih1) _ih1.style.display = '';
-  var ab = document.getElementById('analyzeBtn');
-  if(ab){ ab.disabled = false; ab.innerHTML = '<i data-lucide="sparkles" style="width:16px;height:16px"></i> AI 분석 · 크레딧 1'; }
-  // 입력 내용 초기화
-  document.getElementById('inputContent').value = '';
   document.getElementById('aiResultText').value = '';
-  // 키워드 선택 해제
-  document.querySelectorAll('#kwBox .kw-chip.sel').forEach(function(c){ c.classList.remove('sel'); });
-  // 수행 수준 → 중
-  document.querySelectorAll('.level-btn').forEach(function(b){ b.classList.toggle('sel', b.textContent.trim()==='중'); });
   closeReset();
-  refreshCount();
-  autoGrow(document.getElementById('inputContent'));
-  autoGrow(document.getElementById('aiResultText'));
+  loadStudent(activeId);   // 데이터 기준으로 화면 전체 복원 (배너·결과·실패 박스 정리 포함)
   updateActiveTags();
-  lucide.createIcons();
   okToast('초기화되었습니다.');
 }
 var demoFail = false;
@@ -856,35 +910,28 @@ function setDemoFail(on){
   document.getElementById('demoOk').classList.toggle('on', !on);
   document.getElementById('demoFailBtn').classList.toggle('on', on);
 }
+/* AI 분석 — 학생 단위 잠금(확정): 분석 중인 학생만 잠그고, 다른 학생은 자유롭게 편집 */
 function runAnalyze(){
   stopPulse();
-  var btn = document.getElementById('analyzeBtn');
-  btn.disabled = true;
-  btn.innerHTML = '<i data-lucide="loader-circle" class="spin" style="width:16px;height:16px"></i> 분석 중...';
-  document.getElementById('aiFail').style.display = 'none';
-  setBusy(true);
-  lucide.createIcons();
+  var id = activeId;                       // 분석 대상 학생 캡처 (전환해도 그 학생에 결과 귀속)
+  var d = dataFor(id);
+  var item = [].slice.call(document.querySelectorAll('.stu-item')).find(function(it){ return getId(it)===id; });
+  saveActive();                            // 분석 직전 입력 보존
+  d.aiStatus = 'analyzing';
+  if(item) renderTags(item);
+  loadStudent(id);                         // 분석 중 UI(버튼 스피너 + 해당 학생 패널 잠금)
   setTimeout(function(){
-    if(demoFail){
-      // 분석 실패: 결과 숨김 + 실패 안내, 버튼은 '다시 분석'으로 (크레딧 반환)
-      document.getElementById('aiResult').style.display = 'none';
-      document.getElementById('aiFail').style.display = 'flex';
-      btn.disabled = false;
-      btn.innerHTML = '<i data-lucide="rotate-ccw" style="width:16px;height:16px"></i> 다시 분석 · 크레딧 1';
-      setBusy(false);
-      lucide.createIcons();
-      return;
+    d.aiStatus = demoFail ? 'failed' : 'done';
+    if(!demoFail) d.aiText = DUMMY_AI_TEXT;
+    if(item) renderTags(item);
+    var name = item ? item.querySelector('.stu-name').textContent : id;
+    if(activeId === id){
+      loadStudent(id);                     // 보고 있으면 결과/실패 UI로 갱신 + 잠금 해제
     }
-    document.getElementById('aiResultText').value = '- 수업 시간에 자신의 의견을 논리적으로 발표하고, 모둠 활동에서 친구들의 의견을 경청하며 토론을 이끎.\n- 제시된 자료를 꼼꼼히 읽고 맥락을 정확히 파악하여 핵심 내용을 요약함.\n- 영어 에세이 작성 시 자기 생각을 창의적으로 표현하고 어휘를 적절히 활용하는 모습이 관찰됨.';
-    document.getElementById('aiResult').style.display = 'block';
-    autoGrow(document.getElementById('aiResultText'));
-    document.getElementById('inputContent').placeholder = 'AI 분석에 없는 키워드·활동을 추가로 입력해 보세요.';
-    var _ih2 = document.getElementById('inputHelp'); if(_ih2) _ih2.style.display = 'none';
-    btn.disabled = false;
-    btn.innerHTML = '<i data-lucide="rotate-ccw" style="width:16px;height:16px"></i> 다시 분석 · 크레딧 1';
-    setBusy(false);
-    lucide.createIcons();
-  }, 1500);
+    // 다른 학생 보고 있어도 완료를 알 수 있게 토스트
+    if(demoFail) busyToast(name + ' 분석에 실패했어요. 크레딧은 반환됐어요.');
+    else okToast(name + ' 분석이 완료됐어요.');
+  }, 2200);
 }
 function init(){
   var act = document.querySelector('.stu-item.active');
