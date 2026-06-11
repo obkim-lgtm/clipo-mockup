@@ -116,6 +116,40 @@ button, .btn, a.btn {
 .obs-input input::placeholder { color:#b3b6bd; }
 .kw { display:inline-flex; align-items:center; height:28px; padding:0 10px; border:1px solid #ccdfff; color:#3151c4; border-radius:6px; font-size:13px; font-weight:500; margin:0 6px 8px 0; cursor:pointer; background:#fff; }
 
+/* ───────── 수업 홈 2안 (리뉴얼) ───────── */
+.class-banner.slim { padding:18px 28px; }
+.class-banner.slim .cb-title { font-size:22px; }
+.class-banner.slim .cb-meta { margin-bottom:6px; }
+.sec-sub { font-size:20px; font-weight:600; margin:26px 0 14px; display:flex; align-items:center; gap:8px; }
+.sec-sub .cnt { font-size:14px; font-weight:500; color:#6d7381; }
+.todo-strip { display:grid; grid-template-columns:repeat(3,1fr); gap:14px; }
+.todo-card { background:#fff; border-radius:12px; box-shadow:0 0 1px #2226314D, 0 4px 8px #0000001A;
+  padding:18px; display:flex; align-items:center; gap:12px; }
+.todo-ic { width:40px; height:40px; border-radius:10px; display:inline-flex; align-items:center; justify-content:center; flex-shrink:0; }
+.todo-ic svg { width:20px; height:20px; }
+.todo-ic.blue { background:#e9f2ff; color:#365eef; }
+.todo-ic.orange { background:#fff7ed; color:#ea580c; }
+.todo-ic.green { background:#eefcf4; color:#1ab864; }
+.todo-main { flex:1; min-width:0; }
+.todo-title { font-size:16px; font-weight:600; }
+.todo-sub { font-size:14px; color:#6d7381; margin-top:3px; }
+.eval-card2 { background:#fff; border-radius:12px; box-shadow:0 0 1px #2226314D, 0 4px 8px #0000001A; padding:24px 28px; }
+.eval-card2 + .eval-card2 { margin-top:16px; }
+.ec2-head { display:flex; justify-content:space-between; gap:12px; align-items:flex-start; }
+.ec2-stage { font-size:13px; font-weight:600; color:#3151c4; background:#e9f2ff; border-radius:100px; padding:4px 11px; }
+.ec2-metrics { display:flex; gap:22px; margin-top:16px; flex-wrap:wrap; }
+.metric { font-size:14px; color:#6d7381; display:inline-flex; align-items:baseline; gap:7px; }
+.metric b { font-size:17px; color:#222631; }
+.progress-track { height:6px; background:#f1f3f5; border-radius:100px; margin-top:14px; overflow:hidden; }
+.progress-fill { height:100%; background:#416bff; border-radius:100px; }
+.ec2-foot { margin-top:16px; padding-top:16px; border-top:1px solid #f1f3f5;
+  display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap; }
+.reviewer-chip { display:inline-flex; align-items:center; gap:6px; height:30px; padding:0 12px; background:#f6f7f9; border-radius:100px; font-size:14px; font-weight:500; }
+.rv-row { display:flex; align-items:center; justify-content:space-between; gap:8px; padding:12px 0; border-bottom:1px solid #f1f3f5; font-size:15px; }
+.rv-row:last-child { border-bottom:none; padding-bottom:0; }
+.card-note { margin-top:14px; background:#f6f7f9; border-radius:8px; padding:10px 12px; font-size:13px; color:#6d7381; display:flex; gap:7px; align-items:flex-start; line-height:1.5; }
+.card-note svg { width:14px; height:14px; flex-shrink:0; margin-top:2px; }
+
 /* ───────── 홈(검토자) ───────── */
 .home-grid { display:grid; grid-template-columns:1fr 340px; gap:24px; }
 .inbox-card { background:#fff; border:1px solid #ccdfff; border-radius:12px; padding:24px 28px; margin-bottom:28px; }
@@ -153,8 +187,12 @@ button, .btn, a.btn {
 .rail-row .d { color:#6d7381; font-size:13px; flex-shrink:0; }
 
 /* ───────── 검토 모드 ───────── */
+/* 검토 모드: 기존 채점 화면을 iframe으로 풀스크린 + 하단 도크 */
+body.review-full .topbar, body.review-full .sidebar { display:none; }
+.review-frame { position:fixed; top:0; left:0; width:100%; height:calc(100vh - 66px); border:none; background:#fff; z-index:55; }
+
 /* 하단 검토 도크 */
-.review-dock { position:fixed; left:56px; right:0; bottom:0; z-index:60; background:#fff;
+.review-dock { position:fixed; left:0; right:0; bottom:0; z-index:60; background:#fff;
   border-top:1px solid #dde1e8; box-shadow:0 -8px 24px rgba(0,0,0,.08); }
 .rd-expand { max-height:0; overflow:hidden; transition:max-height .25s ease; padding:0 28px; }
 .review-dock.open .rd-expand { max-height:280px; padding-top:18px; border-bottom:1px solid #f1f3f5; }
@@ -394,6 +432,135 @@ input[type="checkbox"] { width:18px; height:18px; accent-color:#416bff; cursor:p
   </div>
 </section>
 
+<!-- ═════════ Scene 1-B : 수업 홈 2안 리뉴얼 (소유자) ═════════ -->
+<section class="scene" id="sceneClass2">
+  <div class="content with-fold">
+    <div class="class-tabs">
+      <div class="ct active">수업 홈</div><div class="ct">수행평가 설계</div><div class="ct">과제물 관리</div>
+      <div class="ct">수행평가 채점</div><div class="ct">세부능력 및 특기사항 지원</div>
+    </div>
+
+    <div class="class-banner slim">
+      <div>
+        <div class="cb-meta">2026학년도 1학기 ｜ 사회</div>
+        <div class="cb-title">3학년 2반 사회 <i data-lucide="pencil" style="width:18px;height:18px;opacity:.85"></i></div>
+      </div>
+      <div class="cb-right">
+        <span class="cb-stat"><i data-lucide="users" style="width:18px;height:18px"></i> 참여 학생 3명</span>
+        <button class="btn-banner">관리</button>
+        <button class="btn-banner" onclick="openModal('modalShare')"><i data-lucide="user-check" style="width:16px;height:16px"></i> 공동 확인 ON</button>
+      </div>
+    </div>
+
+    <!-- 지금 할 일 -->
+    <div class="sec-sub">지금 할 일 <span class="cnt">3건</span></div>
+    <div class="todo-strip">
+      <div class="todo-card">
+        <span class="todo-ic blue"><i data-lucide="pen-line"></i></span>
+        <div class="todo-main">
+          <div class="todo-title">채점 이어서 하기</div>
+          <div class="todo-sub">미래 예측 시나리오 작성 1 · 2명 남음</div>
+        </div>
+        <button class="btn-outline btn-sm">채점</button>
+      </div>
+      <div class="todo-card">
+        <span class="todo-ic orange"><i data-lucide="user-check"></i></span>
+        <div class="todo-main">
+          <div class="todo-title">공동 확인 요청</div>
+          <div class="todo-sub">작성 2 채점이 끝났어요</div>
+        </div>
+        <button class="btn-outline btn-sm" onclick="openModal('modalRequest')">요청</button>
+      </div>
+      <div class="todo-card">
+        <span class="todo-ic green"><i data-lucide="zap"></i></span>
+        <div class="todo-main">
+          <div class="todo-title">세특 작성 시작</div>
+          <div class="todo-sub">작성 2 평가가 마감됐어요</div>
+        </div>
+        <button class="btn-outline btn-sm">세특</button>
+      </div>
+    </div>
+
+    <div class="grid-2" style="grid-template-columns:1.7fr 1fr">
+      <!-- 수행평가 카드 -->
+      <div>
+        <div class="sec-sub" style="margin-top:30px">수행평가 <span class="cnt">2개</span></div>
+        <div class="eval-card2">
+          <div class="ec2-head">
+            <div>
+              <div class="eval-name">미래 예측 시나리오 작성 2</div>
+              <div style="font-size:14px;color:#6d7381;margin-top:6px">06/05 등록 · 총 10점</div>
+            </div>
+            <span class="ec2-stage">평가 마감</span>
+          </div>
+          <div class="progress-track"><div class="progress-fill" style="width:80%"></div></div>
+          <div class="ec2-metrics">
+            <span class="metric"><b>3/3</b> 제출</span>
+            <span class="metric"><b>3/3</b> 채점</span>
+            <span class="metric">공동 확인 <span id="evalA2-status"><span class="badge bdg-wait"><i data-lucide="clock"></i> 확인 대기</span></span></span>
+          </div>
+          <div class="ec2-foot">
+            <span style="font-size:14px;color:#6d7381">다음 단계 — 공동 확인 후 세특 작성</span>
+            <span style="display:flex;gap:8px">
+              <button class="btn-outline btn-sm" onclick="openModal('modalRequest')">확인 요청</button>
+              <button class="btn-subtle btn-sm">세특 작성</button>
+            </span>
+          </div>
+        </div>
+        <div class="eval-card2">
+          <div class="ec2-head">
+            <div>
+              <div class="eval-name">미래 예측 시나리오 작성 1</div>
+              <div style="font-size:14px;color:#6d7381;margin-top:6px">06/05 등록 · 총 10점</div>
+            </div>
+            <span class="ec2-stage" style="background:#fff7ed;color:#ea580c">채점 진행</span>
+          </div>
+          <div class="progress-track"><div class="progress-fill" style="width:40%;background:#f97316"></div></div>
+          <div class="ec2-metrics">
+            <span class="metric"><b>3/3</b> 제출</span>
+            <span class="metric"><b>1/3</b> 채점</span>
+            <span class="metric">공동 확인 <span class="badge bdg-none">채점 전</span></span>
+          </div>
+          <div class="ec2-foot">
+            <span style="font-size:14px;color:#6d7381">다음 단계 — 남은 학생 2명 채점</span>
+            <button class="btn-outline btn-sm">채점 이어서</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 우측: 공동 확인 + 관찰 기록 -->
+      <div>
+        <div class="sec-sub" style="margin-top:30px">공동 확인</div>
+        <div class="card" style="padding:24px">
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <span class="reviewer-chip"><i data-lucide="user" style="width:15px;height:15px;color:#6d7381"></i> 김하나 선생님</span>
+            <span class="reviewer-chip"><i data-lucide="user" style="width:15px;height:15px;color:#6d7381"></i> 박지현 선생님</span>
+            <button class="btn-ghost btn-sm" onclick="openModal('modalShare')" style="height:30px">관리</button>
+          </div>
+          <div style="margin-top:14px" id="rvRows2">
+            <div class="rv-row"><span>미래 예측 시나리오 작성 2</span><span id="evalA2-row"><span class="badge bdg-wait"><i data-lucide="clock"></i> 확인 대기</span></span></div>
+            <div class="rv-row"><span>미래 예측 시나리오 작성 1</span><span class="badge bdg-none">채점 전</span></div>
+          </div>
+          <div class="card-note"><i data-lucide="info"></i>
+            <span>학교 설정에서 공동 확인을 켠 수업에만 보여요. 사용하지 않는 학교(초등 등)에는 표시되지 않아요.</span></div>
+        </div>
+
+        <div class="sec-sub" style="margin-top:24px">관찰 기록</div>
+        <div class="card" style="padding:24px">
+          <div>
+            <span class="kw">질문 활동</span><span class="kw">활발함</span><span class="kw">적극적</span>
+            <span class="kw">협력</span><span class="kw">리더십</span>
+          </div>
+          <div class="obs-input" style="margin-top:12px">
+            <input type="text" placeholder="기억에 남는 학생 모습 입력">
+            <button class="btn-solid">등록</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
 <!-- ═════════ Scene 2 : 클리포 홈 (검토자) ═════════ -->
 <section class="scene" id="sceneHome">
   <div class="content with-expand">
@@ -414,7 +581,7 @@ input[type="checkbox"] { width:18px; height:18px; accent-color:#416bff; cursor:p
                 <span class="ii-memo"><i data-lucide="message-square" style="width:13px;height:13px"></i> 서술형 부분점수 위주로 봐주세요</span>
               </div>
             </div>
-            <button class="btn-solid" onclick="goStep(3)">검토</button>
+            <button class="btn-solid" onclick="goStep(4)">검토</button>
           </div>
         </div>
 
@@ -436,7 +603,7 @@ input[type="checkbox"] { width:18px; height:18px; accent-color:#416bff; cursor:p
           <span style="font-size:14px;font-weight:400;color:#6d7381">동료 선생님이 공동 확인을 위해 공유한 수업이에요.</span>
         </div>
         <div class="class-cards">
-          <div class="class-card" onclick="goStep(3)">
+          <div class="class-card" onclick="goStep(4)">
             <span class="cc-noti">1</span>
             <div class="cc-title">3학년 2반 사회</div>
             <div class="cc-meta">수행평가 2개 · 확인 요청 1건</div>
@@ -459,64 +626,31 @@ input[type="checkbox"] { width:18px; height:18px; accent-color:#416bff; cursor:p
 
 <!-- ═════════ Scene 3 : 검토 모드 (검토자) ═════════ -->
 <section class="scene" id="sceneReview">
-  <div class="content with-fold" style="padding-bottom:110px">
-    <div class="gr-head">
-      <div class="stu-select">
-        <button class="stu-nav" onclick="moveStu(-1)"><i data-lucide="chevron-left" style="width:20px;height:20px"></i></button>
-        <span class="stu-dd"><span id="stuName">10101 김두나</span><i data-lucide="chevron-down" style="width:20px;height:20px;color:#6d7381"></i></span>
-        <button class="stu-nav" onclick="moveStu(1)"><i data-lucide="chevron-right" style="width:20px;height:20px"></i></button>
-        <span class="gr-count">3명 중 3명 채점 완료</span>
-      </div>
-      <button class="btn-ghost btn-sm" onclick="goStep(2)"><i data-lucide="arrow-left" style="width:15px;height:15px"></i> 홈으로</button>
-    </div>
+  <!-- 기존 학생 개별 채점 화면을 그대로 사용 (읽기 전용 주입) -->
+  <iframe class="review-frame" id="reviewFrame" title="학생 개별 채점 (검토 모드)"></iframe>
 
-    <div class="gr-grid">
-      <!-- 좌: 학생 답안 -->
-      <div class="panel-sec answer-card">
-        <h3><i data-lucide="file-text" style="width:20px;height:20px;color:#6d7381"></i> 학생 답안</h3>
-        <div class="answer-body" id="answerBody"></div>
-      </div>
-
-      <!-- 우: 채점 결과 + 검토 -->
-      <div>
-        <div class="panel-sec">
-          <h3><i data-lucide="circle-check-big" style="width:20px;height:20px;color:#1ab864"></i> 채점 결과</h3>
-          <div style="margin-top:16px" class="total-line"><span class="total-score" id="stuTotal">8</span><span class="total-of">/ 10점</span></div>
-          <div style="margin-top:10px" id="critRows"></div>
-          <div class="readonly-note"><i data-lucide="lock"></i><span>검토 모드에서는 점수를 수정할 수 없어요. 이견이 있으면 하단 바의 [의견]으로 남겨주세요.</span></div>
-        </div>
-
-        <div class="panel-sec">
-          <h3><i data-lucide="bot" style="width:20px;height:20px;color:#6d7381"></i> AI 채점 근거</h3>
-          <div class="ai-basis" id="aiBasis"></div>
-        </div>
+  <!-- 하단 검토 도크: 의견 입력(펼침) + 검토 상태 바(상시) -->
+  <div class="review-dock" id="reviewDock">
+    <div class="rd-expand">
+      <div class="os-title"><i data-lucide="message-square-warning" style="width:20px;height:20px;color:#ea580c"></i>
+        검토 의견 — <span class="stu" id="osStu">10101 김하나</span>
+        <span class="sub">의견은 최대표 선생님에게 표시돼요. 점수에는 영향이 없어요.</span></div>
+      <textarea id="opinionInput" placeholder="점수에 이견이 있거나 함께 논의할 내용이 있으면 남겨주세요. (예: '작성 분량 수준' 2점은 분량 기준상 1점이 맞아 보여요)"></textarea>
+      <div class="rd-exp-actions">
+        <button class="btn-outline" onclick="closeOpinion()">취소</button>
+        <button class="btn-solid" onclick="saveOpinion()">등록</button>
       </div>
     </div>
-
-    <!-- 하단 검토 도크: 의견 입력(펼침) + 검토 상태 바(상시) -->
-    <div class="review-dock" id="reviewDock">
-      <div class="rd-expand">
-        <div class="os-title"><i data-lucide="message-square-warning" style="width:20px;height:20px;color:#ea580c"></i>
-          검토 의견 — <span class="stu" id="osStu">10101 김두나</span>
-          <span class="sub">의견은 최대표 선생님에게 표시돼요. 점수에는 영향이 없어요.</span></div>
-        <textarea id="opinionInput" placeholder="점수에 이견이 있거나 함께 논의할 내용이 있으면 남겨주세요. (예: '작성 분량 수준' 2점은 분량 기준상 1점이 맞아 보여요)"></textarea>
-        <div class="rd-exp-actions">
-          <button class="btn-outline" onclick="closeOpinion()">취소</button>
-          <button class="btn-solid" onclick="saveOpinion()">등록</button>
-        </div>
+    <div class="rd-bar">
+      <div class="rd-ctx">
+        <i data-lucide="eye" style="width:20px;height:20px;flex-shrink:0"></i>
+        <span class="txt"><b>검토 모드</b> · 최대표 선생님의 <b>3학년 2반 사회 — 미래 예측 시나리오 작성 2</b></span>
+        <span class="ro">보기 전용 · 점수 수정 불가</span>
       </div>
-      <div class="rd-bar">
-        <div class="rd-ctx">
-          <i data-lucide="eye" style="width:20px;height:20px;flex-shrink:0"></i>
-          <span class="txt"><b>검토 모드</b> · 최대표 선생님의 <b>3학년 2반 사회 — 미래 예측 시나리오 작성 2</b></span>
-          <span class="ro">보기 전용</span>
-        </div>
-        <div class="rd-right">
-          <span class="rd-hint" id="rvHint">모든 학생 열람 후 확인할 수 있어요</span>
-          <span class="rd-progress" id="rvProgress">열람 1 / 3명</span>
-          <button class="btn-outline" id="btnOpinion" onclick="toggleOpinion()"><i data-lucide="message-square-plus" style="width:16px;height:16px"></i> 의견</button>
-          <button class="btn-solid" id="btnConfirm" onclick="openConfirm()" disabled>확인</button>
-        </div>
+      <div class="rd-right">
+        <button class="btn-ghost" onclick="goStep(3)">나가기</button>
+        <button class="btn-outline" id="btnOpinion" onclick="toggleOpinion()"><i data-lucide="message-square-plus" style="width:16px;height:16px"></i> 의견</button>
+        <button class="btn-solid" id="btnConfirm" onclick="openConfirm()">확인</button>
       </div>
     </div>
   </div>
@@ -601,7 +735,7 @@ input[type="checkbox"] { width:18px; height:18px; accent-color:#416bff; cursor:p
       <button class="icon-btn40" onclick="closeModal('modalDissent')"><i data-lucide="x" style="width:20px;height:20px"></i></button></div>
     <div class="modal-body">
       <div class="dissent-detail">
-        <div class="dd-head"><i data-lucide="message-square-warning" style="width:17px;height:17px"></i> 10102 김세나 — 작성 분량 수준</div>
+        <div class="dd-head"><i data-lucide="message-square-warning" style="width:17px;height:17px"></i> 10102 김기덕 — 작성 분량 수준</div>
         <div class="dd-body">'작성 분량 수준' 2점은 분량 기준상 1점이 맞아 보여요. 협의 후 반영 부탁드려요.</div>
         <div class="dd-meta">김하나 선생님 · 06/11 14:32</div>
       </div>
@@ -620,98 +754,133 @@ input[type="checkbox"] { width:18px; height:18px; accent-color:#416bff; cursor:p
 <!-- ═════════ 데모 내비게이터 ═════════ -->
 <div class="demo-nav" id="demoNav">
   <div class="dn-title"><span>DEMO FLOW</span><i data-lucide="grip-horizontal" style="width:16px;height:16px"></i></div>
-  <div class="dn-step on" data-step="1" onclick="goStep(1)"><span class="n">1</span>수업 홈 · 확인 요청<span class="dn-persona owner">소유자</span></div>
-  <div class="dn-step" data-step="2" onclick="goStep(2)"><span class="n">2</span>홈 · 요청 수신<span class="dn-persona reviewer">검토자</span></div>
-  <div class="dn-step" data-step="3" onclick="goStep(3)"><span class="n">3</span>검토 모드 · 확인<span class="dn-persona reviewer">검토자</span></div>
-  <div class="dn-step" data-step="4" onclick="goStep(4)"><span class="n">4</span>확인 완료 · 의견 수신<span class="dn-persona owner">소유자</span></div>
+  <div class="dn-step on" data-step="1" onclick="goStep(1)"><span class="n">1</span>수업 홈 1안 · 현행<span class="dn-persona owner">소유자</span></div>
+  <div class="dn-step" data-step="2" onclick="goStep(2)"><span class="n">2</span>수업 홈 2안 · 리뉴얼<span class="dn-persona owner">소유자</span></div>
+  <div class="dn-step" data-step="3" onclick="goStep(3)"><span class="n">3</span>홈 · 요청 수신<span class="dn-persona reviewer">검토자</span></div>
+  <div class="dn-step" data-step="4" onclick="goStep(4)"><span class="n">4</span>검토 모드 · 확인<span class="dn-persona reviewer">검토자</span></div>
+  <div class="dn-step" data-step="5" onclick="goStep(5)"><span class="n">5</span>확인 완료 · 의견 수신<span class="dn-persona owner">소유자</span></div>
 </div>
 
 <script>
 /* ───── 상태 ───── */
 const S = { step:1, requested:false, confirmed:false, opinions:{}, stuIdx:0, seen:new Set([0]) };
 
-const STUDENTS = [
-  { id:'10101', name:'김두나', total:8, crits:[['작성 내용의 구체성',4,4],['작성 분량 수준',2,3],['작성의 창의성',2,3]],
-    basis:'학생은 해수와 담수의 관점에서 지구상의 물 부족 현상을 설명함. 해수 담수화와 같은 현대 기술을 통해 물 부족 문제를 해결할 수 있는 방안을 제시함. 주제에 대한 이해도와 정확성을 보임.',
-    answer:['미래의 물 부족 문제는 해수와 담수의 불균형에서 비롯된다. 지구상의 물 중 97%는 해수이며, 인간이 활용 가능한 담수는 매우 제한적이다.','해수 담수화 기술이 상용화되면 연안 도시의 물 공급 구조가 크게 변화할 것이다. 다만 에너지 비용과 염수 배출 문제를 함께 고려해야 한다.'] },
-  { id:'10102', name:'김세나', total:6, crits:[['작성 내용의 구체성',3,4],['작성 분량 수준',2,3],['작성의 창의성',1,3]],
-    basis:'물 부족의 원인을 기후 변화 중심으로 서술함. 해결 방안 제시가 일반적인 수준에 머물러 구체성이 다소 부족하나, 분량 기준은 충족함.',
-    answer:['기후 변화로 인해 강수 패턴이 불규칙해지면서 물 부족이 심화될 것이다. 농업용수 확보가 가장 큰 과제가 될 것으로 예상한다.','정부와 지역사회가 함께 절수 정책을 추진해야 하며, 빗물 저장 시설 확대가 필요하다.'] },
-  { id:'10103', name:'박이안', total:9, crits:[['작성 내용의 구체성',4,4],['작성 분량 수준',3,3],['작성의 창의성',2,3]],
-    basis:'수권과 해수의 순환에 대한 이해를 바탕으로 물 부족의 원인과 해결책을 체계적으로 설명함. 기술적·경제적 측면의 근거 제시가 우수함.',
-    answer:['수권의 순환 구조를 보면 인간이 접근 가능한 담수는 빙하와 지하수에 편중되어 있다. 2050년에는 세계 인구의 절반이 물 스트레스 지역에 살게 될 것이다.','스마트 관개 시스템과 폐수 재이용 기술의 결합으로 도시 단위의 물 자립이 가능해질 것이며, 이는 새로운 산업 생태계를 만들 것이다.'] }
-];
-
-/* ───── scene 전환 ───── */
+/* ───── scene 전환 ─────
+   1: 수업 홈 1안(소유자) · 2: 수업 홈 2안 리뉴얼(소유자) · 3: 클리포 홈(검토자)
+   4: 검토 모드(검토자) · 5: 확인 완료(소유자, 1안 화면) */
 function goStep(n) {
   S.step = n;
   document.querySelectorAll('.dn-step').forEach(el => el.classList.toggle('on', +el.dataset.step === n));
   document.querySelectorAll('.scene').forEach(el => el.classList.remove('active'));
   const sb = document.getElementById('sidebar');
   document.querySelectorAll('.si').forEach(el => el.classList.remove('active'));
+  document.body.classList.toggle('review-full', n === 4);
 
-  if (n === 1 || n === 4) {
+  if (n === 1 || n === 5) {
     document.getElementById('sceneClass').classList.add('active');
-    document.getElementById('hdrUser').textContent = '최대표 선생님(대표교사)';
-    document.getElementById('hdrCredit').textContent = '200';
+    setHeader('owner');
     sb.classList.remove('expanded');
     document.querySelector('[data-nav="class"]').classList.add('active');
-    renderOwnerState(n === 4);
+    renderOwnerState(n === 5);
   } else if (n === 2) {
+    document.getElementById('sceneClass2').classList.add('active');
+    setHeader('owner');
+    sb.classList.remove('expanded');
+    document.querySelector('[data-nav="class"]').classList.add('active');
+  } else if (n === 3) {
     document.getElementById('sceneHome').classList.add('active');
-    document.getElementById('hdrUser').textContent = '김하나 선생님(일반교사)';
-    document.getElementById('hdrCredit').textContent = '340';
+    setHeader('reviewer');
     sb.classList.add('expanded');
     document.querySelector('[data-nav="home"]').classList.add('active');
-  } else if (n === 3) {
+  } else if (n === 4) {
     document.getElementById('sceneReview').classList.add('active');
-    document.getElementById('hdrUser').textContent = '김하나 선생님(일반교사)';
-    document.getElementById('hdrCredit').textContent = '340';
+    setHeader('reviewer');
     sb.classList.remove('expanded');
-    document.querySelector('[data-nav="class"]').classList.add('active');
-    renderStudent();
+    initReviewFrame();
   }
   window.scrollTo(0, 0);
   lucide.createIcons();
 }
+function setHeader(p) {
+  document.getElementById('hdrUser').textContent = p === 'owner' ? '최대표 선생님(대표교사)' : '김하나 선생님(일반교사)';
+  document.getElementById('hdrCredit').textContent = p === 'owner' ? '200' : '340';
+}
 
-/* ───── 소유자 상태 렌더 ───── */
+/* ───── 소유자 상태 렌더 (1안 + 2안 동기화) ───── */
+function badgeFor(state) {
+  if (state === 'done') return '<span class="badge bdg-done"><i data-lucide="circle-check"></i> 확인 완료</span>';
+  if (state === 'req') return '<span class="badge bdg-req"><i data-lucide="send"></i> 요청됨</span>';
+  return '<span class="badge bdg-wait"><i data-lucide="clock"></i> 확인 대기</span>';
+}
 function renderOwnerState(done) {
   const st = document.getElementById('evalA-status');
   const meta = document.getElementById('evalA-meta');
   const act = document.getElementById('evalA-action');
+  let state;
   if (done || S.confirmed) {
-    st.innerHTML = '<span class="badge bdg-done"><i data-lucide="circle-check"></i> 확인 완료</span>' +
+    state = 'done';
+    st.innerHTML = badgeFor('done') +
       ' <span class="badge bdg-dissent" onclick="openModal(\'modalDissent\')"><i data-lucide="message-square-warning"></i> 의견 1건</span>';
     meta.textContent = '김하나 선생님 확인 · 06/11 14:35';
     act.innerHTML = '<button class="btn-ghost btn-sm">확인 기록</button>';
   } else if (S.requested) {
-    st.innerHTML = '<span class="badge bdg-req"><i data-lucide="send"></i> 요청됨</span>';
+    state = 'req';
+    st.innerHTML = badgeFor('req');
     meta.textContent = '김하나 선생님에게 요청 · 06/11';
     act.innerHTML = '<button class="btn-ghost btn-sm" onclick="openModal(\'modalRequest\')">재요청</button>';
   } else {
-    st.innerHTML = '<span class="badge bdg-wait"><i data-lucide="clock"></i> 확인 대기</span>';
+    state = 'wait';
+    st.innerHTML = badgeFor('wait');
     meta.textContent = '3학년 2반 · 채점 완료 3/3명';
     act.innerHTML = '<button class="btn-outline btn-sm" onclick="openModal(\'modalRequest\')">확인 요청</button>';
   }
+  // 2안 화면의 같은 평가 상태도 동기화
+  const st2 = document.getElementById('evalA2-status');
+  const row2 = document.getElementById('evalA2-row');
+  if (st2) st2.innerHTML = badgeFor(state);
+  if (row2) row2.innerHTML = badgeFor(state);
   lucide.createIcons();
 }
 
-/* ───── 검토 모드 렌더 ───── */
-function renderStudent() {
-  const s = STUDENTS[S.stuIdx];
-  S.seen.add(S.stuIdx);
-  document.getElementById('stuName').textContent = s.id + ' ' + s.name;
-  document.getElementById('stuTotal').textContent = s.total;
-  document.getElementById('critRows').innerHTML = s.crits.map(c =>
-    '<div class="crit-row"><span class="crit-name">' + c[0] + '</span><span class="crit-score">' + c[1] + ' / ' + c[2] + '점</span></div>').join('');
-  document.getElementById('aiBasis').textContent = s.basis;
-  document.getElementById('answerBody').innerHTML = s.answer.map(p => '<p>' + p + '</p>').join('');
-  document.getElementById('rvProgress').textContent = '열람 ' + S.seen.size + ' / 3명';
-  document.getElementById('btnConfirm').disabled = S.seen.size < 3;
-  document.getElementById('rvHint').style.display = S.seen.size < 3 ? 'inline' : 'none';
-  // 이 학생에게 의견이 등록돼 있으면 버튼이 주황으로 바뀜
-  const has = !!S.opinions[S.stuIdx];
+/* ───── 검토 모드: 기존 채점 화면(grading_individual_v3)을 iframe으로 재사용 ───── */
+const FRAME_SRC = 'grading_individual_v3_260406.html';
+function initReviewFrame() {
+  const f = document.getElementById('reviewFrame');
+  if (!f.getAttribute('src')) {
+    f.addEventListener('load', onFrameLoad);
+    f.setAttribute('src', FRAME_SRC);
+  }
+  updateOpinionBtn();
+}
+function onFrameLoad() {
+  const f = document.getElementById('reviewFrame');
+  try {
+    const d = f.contentDocument, w = f.contentWindow;
+    // 읽기 전용 주입: 점수·제출상태·피드백 편집 잠금, 저장/재실행 숨김
+    const st = d.createElement('style');
+    st.textContent = '.submit-radios{pointer-events:none;opacity:.5}' +
+      '.cr-scores{pointer-events:none}' +
+      '.btn-save,.btn-regen-all{display:none}';
+    d.head.appendChild(st);
+    d.querySelectorAll('[contenteditable]').forEach(el => el.setAttribute('contenteditable', 'false'));
+    // 학생 전환 시 도크의 의견 버튼 상태 갱신
+    ['selectStudent', 'navStudent'].forEach(fn => {
+      if (typeof w[fn] === 'function') {
+        const orig = w[fn];
+        w[fn] = function() { orig.apply(this, arguments); setTimeout(updateOpinionBtn, 0); };
+      }
+    });
+    updateOpinionBtn();
+  } catch (e) { /* cross-origin 등 — 주입 실패해도 화면은 표시 */ }
+}
+function currentStudent() {
+  try {
+    const t = document.getElementById('reviewFrame').contentDocument.getElementById('selectedStudent').textContent.trim();
+    return t.replace(/\s*\(.*\)\s*$/, '');
+  } catch (e) { return '학생'; }
+}
+function updateOpinionBtn() {
+  const has = !!S.opinions[currentStudent()];
   const btn = document.getElementById('btnOpinion');
   btn.classList.toggle('btn-opinion-on', has);
   btn.innerHTML = has
@@ -720,10 +889,6 @@ function renderStudent() {
   closeOpinion();
   lucide.createIcons();
 }
-function moveStu(d) {
-  S.stuIdx = (S.stuIdx + d + STUDENTS.length) % STUDENTS.length;
-  renderStudent();
-}
 
 /* ───── 검토 도크 (의견 펼침) ───── */
 function toggleOpinion() {
@@ -731,9 +896,9 @@ function toggleOpinion() {
   openOpinion();
 }
 function openOpinion() {
-  const s = STUDENTS[S.stuIdx];
-  document.getElementById('osStu').textContent = s.id + ' ' + s.name;
-  document.getElementById('opinionInput').value = S.opinions[S.stuIdx] || '';
+  const label = currentStudent();
+  document.getElementById('osStu').textContent = label;
+  document.getElementById('opinionInput').value = S.opinions[label] || '';
   document.getElementById('reviewDock').classList.add('open');
   document.getElementById('opinionInput').focus();
   lucide.createIcons();
@@ -744,10 +909,10 @@ function closeOpinion() {
 function saveOpinion() {
   const v = document.getElementById('opinionInput').value.trim();
   if (!v) { showToast('의견을 입력해 주세요'); return; }
-  S.opinions[S.stuIdx] = v;
+  S.opinions[currentStudent()] = v;
   closeOpinion();
   showToast('의견이 등록되었어요');
-  renderStudent();
+  updateOpinionBtn();
 }
 
 /* ───── 플로우 액션 ───── */
@@ -766,7 +931,7 @@ function doConfirm() {
   S.confirmed = true;
   closeModal('modalConfirm');
   showToast('확인이 기록되었어요 · 최대표 선생님에게 표시됩니다');
-  setTimeout(() => goStep(4), 1200);
+  setTimeout(() => goStep(5), 1200);
 }
 
 /* ───── 공통 ───── */
@@ -787,10 +952,10 @@ function showToast(msg) {
 function toggleNav() {
   const sb = document.getElementById('sidebar');
   sb.classList.toggle('expanded');
-  if (S.step === 1 || S.step === 4) {
-    document.getElementById('classContent').classList.toggle('with-fold', !sb.classList.contains('expanded'));
-    document.getElementById('classContent').classList.toggle('with-expand', sb.classList.contains('expanded'));
-  }
+  document.querySelectorAll('.scene.active .content').forEach(c => {
+    c.classList.toggle('with-fold', !sb.classList.contains('expanded'));
+    c.classList.toggle('with-expand', sb.classList.contains('expanded'));
+  });
 }
 
 /* ───── 데모 내비 드래그 ───── */
