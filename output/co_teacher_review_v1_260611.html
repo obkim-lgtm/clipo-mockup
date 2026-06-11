@@ -1,0 +1,791 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CLIPO — 채점 결과 공동 확인</title>
+<link rel="icon" type="image/png" href="clipo_favicon.png">
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<style>
+@import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard-gov.min.css');
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:'Pretendard GOV', -apple-system, sans-serif; background:#f6f7f9; color:#222631; font-size:16px; }
+
+button, .btn, a.btn {
+  display:inline-flex; align-items:center; justify-content:center;
+  line-height:1; vertical-align:middle;
+  font-family:inherit; cursor:pointer; border:none; background:none; gap:8px;
+}
+.btn-solid { height:40px; border-radius:4px; padding:10px 16px; background:#365eef; color:#fff; font-size:14px; font-weight:600; }
+.btn-solid:disabled { background:#dde1e8; color:#b3b6bd; cursor:not-allowed; }
+.btn-outline { height:40px; border-radius:4px; padding:10px 16px; background:#fff; border:1px solid #a3c3ff; color:#3151c4; font-size:14px; font-weight:600; }
+.btn-subtle { height:40px; border-radius:4px; padding:10px 16px; background:#e9f2ff; color:#365eef; font-size:14px; font-weight:600; }
+.btn-ghost { height:40px; border-radius:4px; padding:10px 16px; background:transparent; color:#3b3f4c; font-size:14px; font-weight:600; }
+.btn-ghost:hover { background:#f1f3f5; }
+.btn-sm { height:32px; padding:6px 12px; font-size:13px; }
+
+/* ───────── header ───────── */
+.topbar { position:fixed; top:0; left:0; right:0; height:56px; background:#fff; z-index:50;
+  display:flex; align-items:center; justify-content:space-between; padding:0 20px 0 8px; }
+.topbar-left { display:flex; align-items:center; gap:8px; }
+.icon-btn40 { width:40px; height:40px; border-radius:4px; color:#3b3f4c; }
+.icon-btn40:hover { background:#f1f3f5; }
+.logo { font-size:21px; font-weight:800; color:#365eef; letter-spacing:1px; padding-left:4px; }
+.topbar-right { display:flex; align-items:center; gap:12px; }
+.plan-badge { height:24px; display:inline-flex; align-items:center; padding:0 10px; border-radius:100px;
+  background:#e9f2ff; border:1px solid #ccdfff; font-size:13px; font-weight:500; color:#3151c4; }
+.tb-meta { font-size:15px; font-weight:500; color:#222631; display:inline-flex; align-items:center; gap:6px; }
+.tb-sep { width:0; height:14px; border-left:1px solid #dde1e8; }
+.tb-user { font-size:15px; font-weight:500; color:#222631; display:inline-flex; align-items:center; gap:4px; }
+
+/* ───────── sidebar ───────── */
+.sidebar { position:fixed; top:56px; left:0; bottom:0; background:#fff; border-right:1px solid #dde1e8;
+  width:56px; transition:width .2s ease; z-index:40; padding:8px; display:flex; flex-direction:column; }
+.sidebar.expanded { width:222px; }
+.si { display:flex; align-items:center; gap:10px; padding:10px; border-radius:4px; color:#3b3f4c;
+  font-size:15px; font-weight:500; cursor:pointer; white-space:nowrap; position:relative; }
+.si:hover { background:#f6f7f9; }
+.si.active { background:#e9f2ff; color:#3151c4; font-weight:600; }
+.si svg { width:20px; height:20px; flex-shrink:0; }
+.si .si-label { opacity:0; transition:opacity .1s; overflow:hidden; }
+.sidebar.expanded .si-label { opacity:1; }
+.si .beta { font-size:11px; font-weight:600; color:#5d26c4; background:#ebdfff; border-radius:4px; padding:2px 5px; }
+.sb-div { border-top:1px solid #dde1e8; margin:8px 2px; }
+.sb-grow { flex:1; }
+
+/* ───────── layout ───────── */
+.scene { display:none; }
+.scene.active { display:block; }
+.content { margin-top:56px; padding:28px; transition:margin-left .2s ease; }
+.with-fold { margin-left:56px; }
+.with-expand { margin-left:222px; }
+
+/* 수업 상단 탭 */
+.class-tabs { position:sticky; top:56px; z-index:30; background:#fff; border-bottom:1px solid #dde1e8;
+  display:flex; gap:8px; padding:0 28px; margin:-28px -28px 28px; }
+.ct { padding:18px 16px 15px; font-size:16px; font-weight:500; color:#6d7381; border-bottom:3px solid transparent; cursor:pointer; }
+.ct.active { color:#3151c4; font-weight:600; border-bottom-color:#416bff; }
+
+/* 수업 배너 */
+.class-banner { background:#416bff; border-radius:12px; color:#fff; padding:28px 32px; display:flex; justify-content:space-between; align-items:center; }
+.cb-meta { font-size:14px; font-weight:500; opacity:.9; margin-bottom:10px; display:flex; align-items:center; gap:8px; }
+.cb-title { font-size:26px; font-weight:600; display:flex; align-items:center; gap:10px; }
+.cb-right { display:flex; align-items:center; gap:10px; }
+.cb-stat { font-size:15px; font-weight:500; display:inline-flex; align-items:center; gap:6px; margin-right:6px; }
+.btn-banner { height:40px; padding:10px 18px; border-radius:100px; border:1.5px solid rgba(255,255,255,.7); color:#fff; font-size:14px; font-weight:600; background:transparent; }
+.btn-banner:hover { background:rgba(255,255,255,.12); }
+
+.grid-2 { display:grid; grid-template-columns:1fr 1.6fr; gap:24px; margin-top:24px; }
+.card { background:#fff; border-radius:12px; box-shadow:0 0 1px #2226314D, 0 4px 8px #0000001A; padding:28px; }
+.card-title { font-size:20px; font-weight:600; display:flex; align-items:center; gap:8px; }
+.card-head { display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; }
+
+/* 수행평가 목록 */
+.eval-item { padding:24px 0; border-bottom:1px solid #f1f3f5; }
+.eval-item:last-of-type { border-bottom:none; }
+.eval-top { display:flex; justify-content:space-between; align-items:flex-start; gap:12px; }
+.eval-name { font-size:20px; font-weight:600; }
+.eval-date { font-size:14px; color:#6d7381; flex-shrink:0; }
+.eval-desc { font-size:16px; color:#3b3f4c; margin-top:10px; }
+.eval-desc a { color:#365eef; font-weight:500; }
+.steps { display:flex; align-items:center; margin-top:16px; }
+.step { height:32px; display:inline-flex; align-items:center; padding:0 14px; border-radius:100px;
+  border:1px solid #ccdfff; color:#3151c4; background:#fff; font-size:13px; font-weight:500; }
+.step.dim { border-color:#dde1e8; color:#b3b6bd; }
+.step-line { width:18px; border-top:1px solid #dde1e8; }
+
+/* 공동 확인 행 */
+.review-row { margin-top:16px; padding:14px 16px; background:#f6f7f9; border-radius:8px;
+  display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; }
+.review-left { display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+.review-label { font-size:14px; font-weight:600; color:#3b3f4c; display:inline-flex; align-items:center; gap:6px; }
+.review-meta { font-size:14px; color:#6d7381; }
+
+.badge { height:24px; display:inline-flex; align-items:center; gap:5px; padding:0 9px; border-radius:4px; font-size:13px; font-weight:600; }
+.badge svg { width:14px; height:14px; }
+.bdg-wait { background:#fff7ed; color:#ea580c; }
+.bdg-req { background:#e9f2ff; color:#3151c4; }
+.bdg-done { background:#eefcf4; color:#27724b; }
+.bdg-dissent { background:#fff3f4; color:#db3e51; cursor:pointer; }
+.bdg-dissent:hover { background:#fee2e2; }
+.bdg-none { background:#f1f3f5; color:#6d7381; }
+
+/* 관찰 기록(좌 카드) 간단판 */
+.obs-input { display:flex; gap:8px; margin-top:16px; }
+.obs-input input { flex:1; height:40px; border:1px solid #d9d9d9; border-radius:4px; padding:0 12px; font-size:14px; font-family:inherit; }
+.obs-input input::placeholder { color:#b3b6bd; }
+.kw { display:inline-flex; align-items:center; height:28px; padding:0 10px; border:1px solid #ccdfff; color:#3151c4; border-radius:6px; font-size:13px; font-weight:500; margin:0 6px 8px 0; cursor:pointer; background:#fff; }
+
+/* ───────── 홈(검토자) ───────── */
+.home-grid { display:grid; grid-template-columns:1fr 340px; gap:24px; }
+.inbox-card { background:#fff; border:1px solid #ccdfff; border-radius:12px; padding:24px 28px; margin-bottom:28px; }
+.inbox-head { display:flex; align-items:center; gap:10px; margin-bottom:6px; }
+.inbox-title { font-size:20px; font-weight:600; color:#222631; display:flex; align-items:center; gap:8px; }
+.inbox-count { min-width:24px; height:24px; padding:0 8px; border-radius:100px; background:#416bff; color:#fff;
+  font-size:13px; font-weight:700; display:inline-flex; align-items:center; justify-content:center; }
+.inbox-sub { font-size:14px; color:#6d7381; margin-bottom:16px; }
+.inbox-item { display:flex; align-items:center; justify-content:space-between; gap:12px;
+  padding:16px; background:#f4f8ff; border-radius:8px; }
+.inbox-item + .inbox-item { margin-top:10px; }
+.ii-main { font-size:16px; font-weight:600; }
+.ii-meta { font-size:14px; color:#6d7381; margin-top:4px; display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+.ii-memo { font-size:14px; color:#3151c4; background:#e9f2ff; border-radius:4px; padding:3px 8px; display:inline-flex; align-items:center; gap:5px; }
+
+.sec-title { font-size:26px; font-weight:600; margin:4px 0 18px; display:flex; align-items:center; gap:10px; }
+.class-cards { display:grid; grid-template-columns:repeat(auto-fill, minmax(250px,1fr)); gap:16px; }
+.class-card { background:#fff; border-radius:12px; box-shadow:0 0 1px #2226314D, 0 4px 8px #0000001A;
+  padding:20px; cursor:pointer; position:relative; transition:box-shadow .15s; }
+.class-card:hover { box-shadow:0 0 1px #2226314D, 0 8px 16px rgba(0,0,0,.12); }
+.cc-title { font-size:18px; font-weight:600; padding-right:30px; }
+.cc-meta { font-size:14px; color:#6d7381; margin-top:8px; }
+.cc-tags { display:flex; gap:6px; margin-top:14px; flex-wrap:wrap; }
+.tag { height:22px; display:inline-flex; align-items:center; padding:0 8px; border-radius:4px; font-size:12px; font-weight:500; }
+.tag-class { background:#e9f2ff; color:#3151c4; }
+.tag-subj { background:#f1f3f5; color:#3b3f4c; }
+.tag-owner { background:#ebdfff; color:#5d26c4; }
+.cc-noti { position:absolute; top:-8px; right:-8px; min-width:26px; height:26px; padding:0 8px; border-radius:100px;
+  background:#f2525f; color:#fff; font-size:13px; font-weight:700; display:inline-flex; align-items:center; justify-content:center;
+  box-shadow:0 2px 6px rgba(242,82,95,.45); }
+.rail-card { background:#fff; border-radius:12px; box-shadow:0 0 1px #2226314D, 0 4px 8px #0000001A; padding:24px; }
+.rail-title { font-size:18px; font-weight:600; display:flex; align-items:center; gap:6px; margin-bottom:14px; }
+.rail-row { display:flex; justify-content:space-between; gap:10px; padding:11px 0; border-bottom:1px solid #f1f3f5; font-size:15px; }
+.rail-row:last-child { border-bottom:none; }
+.rail-row .d { color:#6d7381; font-size:13px; flex-shrink:0; }
+
+/* ───────── 검토 모드 ───────── */
+.review-banner { background:#e9f2ff; border:1px solid #ccdfff; border-radius:8px;
+  padding:14px 18px; display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:20px; }
+.rb-left { display:flex; align-items:center; gap:10px; font-size:15px; color:#3151c4; }
+.rb-left b { font-weight:700; }
+.rb-progress { font-size:14px; font-weight:600; color:#3151c4; background:#fff; border:1px solid #ccdfff; border-radius:100px; padding:6px 14px; }
+
+.gr-head { display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:20px; flex-wrap:wrap; }
+.stu-select { display:flex; align-items:center; gap:8px; }
+.stu-dd { height:40px; min-width:240px; border:1px solid #d9d9d9; border-radius:4px; background:#fff;
+  padding:0 12px; font-size:16px; font-weight:600; display:inline-flex; align-items:center; justify-content:space-between; gap:8px; }
+.stu-nav { width:40px; height:40px; border:1px solid #d9d9d9; border-radius:4px; background:#fff; color:#3b3f4c; }
+.stu-nav:hover { background:#f6f7f9; }
+.gr-count { font-size:15px; color:#6d7381; margin-left:6px; }
+
+.gr-grid { display:grid; grid-template-columns:1.15fr 1fr; gap:24px; align-items:start; }
+.answer-card h3, .panel-sec h3 { font-size:18px; font-weight:600; display:flex; align-items:center; gap:8px; }
+.answer-body { margin-top:18px; font-size:16px; line-height:1.75; color:#222631; }
+.answer-body p + p { margin-top:14px; }
+.panel-sec { background:#fff; border-radius:12px; box-shadow:0 0 1px #2226314D, 0 4px 8px #0000001A; padding:24px; }
+.panel-sec + .panel-sec { margin-top:16px; }
+.total-line { display:flex; align-items:baseline; gap:10px; }
+.total-score { font-size:32px; font-weight:700; color:#365eef; }
+.total-of { font-size:16px; color:#6d7381; }
+.crit-row { display:flex; align-items:center; justify-content:space-between; padding:13px 0; border-bottom:1px solid #f1f3f5; }
+.crit-row:last-child { border-bottom:none; }
+.crit-name { font-size:16px; font-weight:500; }
+.crit-score { font-size:16px; font-weight:700; color:#222631; background:#f6f7f9; border-radius:6px; padding:6px 12px; }
+.readonly-note { margin-top:14px; background:#f4f8ff; border:1px solid #ccdfff; border-radius:8px;
+  padding:11px 14px; font-size:14px; color:#3151c4; display:flex; align-items:flex-start; gap:7px; }
+.readonly-note svg { width:16px; height:16px; flex-shrink:0; margin-top:1px; }
+.ai-basis { margin-top:14px; font-size:16px; line-height:1.65; color:#3b3f4c; }
+.review-box textarea { width:100%; min-height:96px; border:1px solid #d9d9d9; border-radius:8px;
+  padding:12px 14px; font-size:16px; font-family:inherit; resize:vertical; margin-top:14px; }
+.review-box textarea::placeholder { color:#b3b6bd; }
+.rv-actions { display:flex; justify-content:flex-end; gap:8px; margin-top:12px; }
+.dissent-chip { margin-top:14px; background:#fff3f4; border-radius:8px; padding:12px 14px; font-size:15px; color:#db3e51;
+  display:flex; align-items:flex-start; gap:8px; }
+.dissent-chip svg { width:16px; height:16px; flex-shrink:0; margin-top:2px; }
+
+.confirm-bar { position:sticky; bottom:0; margin:24px -28px -28px; background:#fff; border-top:1px solid #dde1e8;
+  padding:16px 28px; display:flex; align-items:center; justify-content:space-between; gap:12px; z-index:20; }
+.cbar-left { font-size:15px; color:#3b3f4c; display:flex; align-items:center; gap:8px; }
+.cbar-left b { color:#3151c4; }
+
+/* ───────── modal ───────── */
+.overlay { position:fixed; inset:0; background:rgba(0,0,0,.4); z-index:90; display:none; }
+.overlay.open { display:flex; align-items:center; justify-content:center; }
+.modal { width:672px; max-width:94vw; max-height:88vh; overflow:auto; background:#fff; border-radius:12px;
+  box-shadow:0 0 1px #2226314D, 0 8px 16px rgba(0,0,0,.1); }
+.modal-head { padding:24px 24px 16px; display:flex; align-items:center; justify-content:space-between; }
+.modal-head h2 { font-size:20px; font-weight:600; }
+.modal-body { padding:8px 24px 8px; }
+.modal-foot { padding:8px 24px 16px; display:flex; justify-content:flex-end; gap:8px; }
+.fld-label { font-size:14px; font-weight:500; color:#222631; margin:24px 0 10px; display:flex; align-items:center; gap:6px; }
+.fld-label:first-child { margin-top:8px; }
+.fld-label .opt { font-weight:400; color:#6d7381; }
+.target-box { background:#f4f8ff; border:1px solid #ccdfff; border-radius:8px; padding:16px; }
+.target-name { font-size:16px; font-weight:600; }
+.target-meta { font-size:14px; color:#3151c4; margin-top:6px; display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+.search-input { position:relative; }
+.search-input input { width:100%; height:40px; border:1px solid #d9d9d9; border-radius:4px; padding:0 12px 0 38px; font-size:14px; font-family:inherit; }
+.search-input input::placeholder { color:#b3b6bd; }
+.search-input svg { position:absolute; left:12px; top:10px; width:20px; height:20px; color:#b3b6bd; }
+table.t-list { width:100%; border-collapse:collapse; margin-top:4px; }
+.t-list th { height:40px; background:#f6f7f9; font-size:14px; font-weight:500; color:#3b3f4c; text-align:center; }
+.t-list td { height:48px; font-size:15px; border-bottom:1px solid #f1f3f5; text-align:center; }
+.t-list .role { font-size:13px; color:#6d7381; }
+.checkrow { display:flex; align-items:center; justify-content:center; }
+input[type="checkbox"] { width:18px; height:18px; accent-color:#416bff; cursor:pointer; }
+.memo-area { width:100%; min-height:84px; border:1px solid #d9d9d9; border-radius:4px; padding:12px; font-size:14px; font-family:inherit; resize:vertical; }
+.memo-area::placeholder { color:#b3b6bd; }
+.modal-note { background:#f4f8ff; border:1px solid #ccdfff; border-radius:8px; padding:12px 14px;
+  font-size:14px; color:#3151c4; line-height:1.55; display:flex; gap:8px; margin-top:20px; }
+.modal-note svg { width:18px; height:18px; flex-shrink:0; margin-top:1px; }
+
+.confirm-modal { width:420px; padding:28px 24px; text-align:center; }
+.confirm-modal h3 { font-size:18px; font-weight:600; margin:14px 0 10px; }
+.confirm-modal p { font-size:15px; color:#3b3f4c; line-height:1.6; }
+.confirm-modal .ic { width:48px; height:48px; border-radius:100px; background:#e9f2ff; color:#365eef;
+  display:inline-flex; align-items:center; justify-content:center; }
+.confirm-modal .acts { display:flex; gap:8px; justify-content:center; margin-top:22px; }
+
+/* 이견 모달 */
+.dissent-detail { background:#fff3f4; border-radius:8px; padding:16px; margin-top:4px; }
+.dd-head { font-size:15px; font-weight:600; color:#db3e51; display:flex; align-items:center; gap:7px; }
+.dd-body { font-size:16px; line-height:1.6; margin-top:10px; color:#222631; }
+.dd-meta { font-size:13px; color:#6d7381; margin-top:10px; }
+
+/* ───────── toast / demo nav ───────── */
+.toast { position:fixed; bottom:32px; left:50%; transform:translateX(-50%) translateY(20px); opacity:0;
+  background:#222631; color:#fff; font-size:15px; font-weight:500; border-radius:100px; padding:13px 24px;
+  display:flex; align-items:center; gap:8px; z-index:200; pointer-events:none; transition:all .25s; }
+.toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
+.toast svg { width:18px; height:18px; color:#93e3b9; }
+
+.demo-nav { position:fixed; right:24px; bottom:24px; z-index:150; background:#222631; color:#fff;
+  border-radius:14px; padding:14px 16px; width:252px; cursor:move; box-shadow:0 8px 24px rgba(0,0,0,.3); user-select:none; }
+.dn-title { font-size:12px; font-weight:700; letter-spacing:1.5px; color:#b3b6bd; margin-bottom:10px; display:flex; align-items:center; justify-content:space-between; }
+.dn-step { display:flex; align-items:center; gap:9px; padding:7px 8px; border-radius:8px; font-size:13.5px; font-weight:500; color:#c7cbd3; cursor:pointer; }
+.dn-step:hover { background:#3b3f4c; }
+.dn-step.on { background:#416bff; color:#fff; font-weight:600; }
+.dn-step .n { width:20px; height:20px; border-radius:100px; background:#3b3f4c; font-size:11.5px; font-weight:700;
+  display:inline-flex; align-items:center; justify-content:center; flex-shrink:0; }
+.dn-step.on .n { background:rgba(255,255,255,.25); }
+.dn-persona { font-size:10.5px; font-weight:700; padding:2px 6px; border-radius:4px; margin-left:auto; flex-shrink:0; }
+.dn-persona.owner { background:#fff7ed; color:#ea580c; }
+.dn-persona.reviewer { background:#eefcf4; color:#27724b; }
+</style>
+</head>
+<body>
+
+<!-- ═════════ Header ═════════ -->
+<header class="topbar">
+  <div class="topbar-left">
+    <button class="icon-btn40" onclick="toggleNav()"><i data-lucide="menu" style="width:20px;height:20px"></i></button>
+    <span class="logo">CLIPO</span>
+  </div>
+  <div class="topbar-right">
+    <span class="plan-badge">학교 유료</span>
+    <span class="tb-meta">D-180</span>
+    <span class="tb-meta"><i data-lucide="wand-sparkles" style="width:20px;height:20px"></i> AI 크레딧 <span id="hdrCredit">200</span></span>
+    <span class="tb-sep"></span>
+    <button class="tb-user"><span id="hdrUser">최대표 선생님(대표교사)</span> <i data-lucide="chevron-down" style="width:20px;height:20px"></i></button>
+  </div>
+</header>
+
+<!-- ═════════ Sidebar ═════════ -->
+<nav class="sidebar" id="sidebar">
+  <div class="si" data-nav="home"><i data-lucide="home"></i><span class="si-label">홈</span></div>
+  <div class="si" data-nav="plan"><i data-lucide="scissors"></i><span class="si-label">평가계획</span></div>
+  <div class="si" data-nav="class"><i data-lucide="layout-grid"></i><span class="si-label">수업</span></div>
+  <div class="sb-div"></div>
+  <div class="si"><i data-lucide="zap"></i><span class="si-label">세특 간편 생성기</span></div>
+  <div class="si"><i data-lucide="notebook-pen"></i><span class="si-label">창의적 체험활동 <span class="beta">Beta</span></span></div>
+  <div class="si"><i data-lucide="smile"></i><span class="si-label">행동특성 및 종합기록 지원</span></div>
+  <div class="si"><i data-lucide="bar-chart-2"></i><span class="si-label">리포트</span></div>
+  <div class="sb-grow"></div>
+  <div class="sb-div"></div>
+  <div class="si"><i data-lucide="school"></i><span class="si-label">튜토리얼 체험</span></div>
+  <div class="si"><i data-lucide="credit-card"></i><span class="si-label">요금제 알아보기</span></div>
+  <div class="si"><i data-lucide="megaphone"></i><span class="si-label">연수센터</span></div>
+  <div class="si"><i data-lucide="headphones"></i><span class="si-label">고객센터</span></div>
+</nav>
+
+<!-- ═════════ Scene 1·4 : 수업 홈 (소유자) ═════════ -->
+<section class="scene" id="sceneClass">
+  <div class="content with-fold" id="classContent">
+    <div class="class-tabs">
+      <div class="ct active">수업 홈</div><div class="ct">수행평가 설계</div><div class="ct">과제물 관리</div>
+      <div class="ct">수행평가 채점</div><div class="ct">세부능력 및 특기사항 지원</div>
+    </div>
+
+    <div class="class-banner">
+      <div>
+        <div class="cb-meta">2026학년도 1학기 ｜ 사회</div>
+        <div class="cb-title">3학년 2반 사회 <i data-lucide="pencil" style="width:20px;height:20px;opacity:.85"></i></div>
+      </div>
+      <div class="cb-right">
+        <span class="cb-stat"><i data-lucide="users" style="width:18px;height:18px"></i> 참여 학생 3명</span>
+        <button class="btn-banner">관리</button>
+        <button class="btn-banner" onclick="openModal('modalShare')"><i data-lucide="user-check" style="width:16px;height:16px"></i> 공동 확인 <span id="shareCount">2명</span></button>
+      </div>
+    </div>
+
+    <div class="grid-2">
+      <!-- 관찰 기록 -->
+      <div class="card">
+        <div class="card-head">
+          <div class="card-title">관찰 기록</div>
+          <button class="btn-ghost btn-sm">상세 보기</button>
+        </div>
+        <div>
+          <span class="kw">질문 활동</span><span class="kw">활발함</span><span class="kw">뛰어난 집중력</span><span class="kw">적극적</span>
+          <span class="kw">참여</span><span class="kw">소통</span><span class="kw">배려</span><span class="kw">협력</span>
+          <span class="kw">리더십</span><span class="kw">토론 기여도</span><span class="kw">목표 설정</span>
+        </div>
+        <div class="obs-input">
+          <input type="text" placeholder="기억에 남는 학생 모습을 입력해 주세요.">
+          <button class="btn-solid">등록</button>
+        </div>
+        <p style="font-size:14px;color:#6d7381;margin-top:10px">* 키워드는 중복으로 입력할 수 있어요.</p>
+      </div>
+
+      <!-- 수행평가 목록 -->
+      <div class="card">
+        <div class="card-head"><div class="card-title">수행평가 목록</div></div>
+
+        <!-- 평가 A -->
+        <div class="eval-item">
+          <div class="eval-top"><span class="eval-name">미래 예측 시나리오 작성 2</span><span class="eval-date">06/05 등록</span></div>
+          <div class="eval-desc">수행평가가 마감되었습니다. <a href="#">세부능력 및 특기사항 지원</a>에서 학급별 AI 기록을 생성할 수 있습니다.</div>
+          <div class="steps">
+            <span class="step">수행평가 설계</span><span class="step-line"></span><span class="step">과제물 제출</span><span class="step-line"></span>
+            <span class="step">채점 진행</span><span class="step-line"></span><span class="step">평가 마감</span><span class="step-line"></span><span class="step dim">세특 작성</span>
+          </div>
+          <!-- 공동 확인 상태 -->
+          <div class="review-row">
+            <div class="review-left">
+              <span class="review-label"><i data-lucide="user-check" style="width:16px;height:16px"></i> 공동 확인</span>
+              <span id="evalA-status">
+                <span class="badge bdg-wait"><i data-lucide="clock"></i> 확인 대기</span>
+              </span>
+              <span class="review-meta" id="evalA-meta">3학년 2반 · 채점 완료 3/3명</span>
+            </div>
+            <span id="evalA-action">
+              <button class="btn-outline btn-sm" onclick="openModal('modalRequest')">확인 요청</button>
+            </span>
+          </div>
+        </div>
+
+        <!-- 평가 B -->
+        <div class="eval-item">
+          <div class="eval-top"><span class="eval-name">미래 예측 시나리오 작성 1</span><span class="eval-date">06/05 등록</span></div>
+          <div class="eval-desc">수행평가 제출이 진행 중입니다. <a href="#">과제물 관리</a>에서 학생의 제출 현황을 확인할 수 있습니다.</div>
+          <div class="steps">
+            <span class="step">수행평가 설계</span><span class="step-line"></span><span class="step">과제물 제출</span><span class="step-line"></span>
+            <span class="step dim">채점 진행</span><span class="step-line"></span><span class="step dim">평가 마감</span><span class="step-line"></span><span class="step dim">세특 작성</span>
+          </div>
+          <div class="review-row">
+            <div class="review-left">
+              <span class="review-label"><i data-lucide="user-check" style="width:16px;height:16px"></i> 공동 확인</span>
+              <span class="badge bdg-none">채점 전</span>
+              <span class="review-meta">채점이 끝나면 확인을 요청할 수 있어요.</span>
+            </div>
+            <button class="btn-outline btn-sm" disabled style="opacity:.45;cursor:not-allowed">확인 요청</button>
+          </div>
+        </div>
+
+        <p style="font-size:15px;color:#6d7381;margin-top:18px;display:flex;align-items:center;gap:6px">
+          <i data-lucide="info" style="width:16px;height:16px"></i> 새로운 수행평가는 <a href="#" style="color:#365eef;font-weight:500">수행평가 설계</a>에서 생성할 수 있습니다.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═════════ Scene 2 : 클리포 홈 (검토자) ═════════ -->
+<section class="scene" id="sceneHome">
+  <div class="content with-expand">
+    <div class="home-grid">
+      <div>
+        <!-- 확인 요청 요약 블록 -->
+        <div class="inbox-card" id="inboxCard">
+          <div class="inbox-head">
+            <span class="inbox-title"><i data-lucide="user-check" style="width:22px;height:22px;color:#365eef"></i> 확인 요청</span>
+            <span class="inbox-count">1</span>
+          </div>
+          <div class="inbox-sub">동료 선생님이 채점 결과 확인을 요청했어요. 공동평가 확인 기록이 함께 저장됩니다.</div>
+          <div class="inbox-item">
+            <div>
+              <div class="ii-main">미래 예측 시나리오 작성 2</div>
+              <div class="ii-meta">
+                <span>3학년 2반 사회 · 최대표 선생님</span><span>·</span><span>06/11 요청</span>
+                <span class="ii-memo"><i data-lucide="message-square" style="width:13px;height:13px"></i> 서술형 부분점수 위주로 봐주세요</span>
+              </div>
+            </div>
+            <button class="btn-solid" onclick="goStep(3)">검토</button>
+          </div>
+        </div>
+
+        <div class="sec-title">내 수업</div>
+        <div class="class-cards">
+          <div class="class-card">
+            <div class="cc-title">3학년 1반 사회</div>
+            <div class="cc-meta">수행평가 3개</div>
+            <div class="cc-tags"><span class="tag tag-class">3학년 1반</span><span class="tag tag-subj">사회</span></div>
+          </div>
+          <div class="class-card">
+            <div class="cc-title">3학년 3반 사회</div>
+            <div class="cc-meta">수행평가 2개</div>
+            <div class="cc-tags"><span class="tag tag-class">3학년 3반</span><span class="tag tag-subj">사회</span></div>
+          </div>
+        </div>
+
+        <div class="sec-title" style="margin-top:34px">공유받은 수업
+          <span style="font-size:14px;font-weight:400;color:#6d7381">동료 선생님이 공동 확인을 위해 공유한 수업이에요.</span>
+        </div>
+        <div class="class-cards">
+          <div class="class-card" onclick="goStep(3)">
+            <span class="cc-noti">1</span>
+            <div class="cc-title">3학년 2반 사회</div>
+            <div class="cc-meta">수행평가 2개 · 확인 요청 1건</div>
+            <div class="cc-tags"><span class="tag tag-class">3학년 2반</span><span class="tag tag-subj">사회</span><span class="tag tag-owner">최대표 선생님</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div class="rail-card">
+          <div class="rail-title">공지사항 <i data-lucide="chevron-right" style="width:18px;height:18px;color:#6d7381"></i></div>
+          <div class="rail-row"><span>자동 채점 대상 과제가 확대됐어요!</span><span class="d">26/06/02</span></div>
+          <div class="rail-row"><span>리포트 기능 업데이트</span><span class="d">26/05/20</span></div>
+          <div class="rail-row"><span>지식샘터 진행</span><span class="d">26/05/02</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═════════ Scene 3 : 검토 모드 (검토자) ═════════ -->
+<section class="scene" id="sceneReview">
+  <div class="content with-fold" style="padding-bottom:0">
+    <div class="review-banner">
+      <div class="rb-left">
+        <i data-lucide="eye" style="width:20px;height:20px"></i>
+        <span><b>검토 모드</b> · 최대표 선생님의 <b>3학년 2반 사회 — 미래 예측 시나리오 작성 2</b> 채점 결과예요. 점수는 수정할 수 없고, 확인과 의견만 남길 수 있어요.</span>
+      </div>
+      <span class="rb-progress" id="rvProgress">열람 1 / 3명</span>
+    </div>
+
+    <div class="gr-head">
+      <div class="stu-select">
+        <button class="stu-nav" onclick="moveStu(-1)"><i data-lucide="chevron-left" style="width:20px;height:20px"></i></button>
+        <span class="stu-dd"><span id="stuName">10101 김두나</span><i data-lucide="chevron-down" style="width:20px;height:20px;color:#6d7381"></i></span>
+        <button class="stu-nav" onclick="moveStu(1)"><i data-lucide="chevron-right" style="width:20px;height:20px"></i></button>
+        <span class="gr-count">3명 중 3명 채점 완료</span>
+      </div>
+      <button class="btn-ghost btn-sm" onclick="goStep(2)"><i data-lucide="arrow-left" style="width:15px;height:15px"></i> 홈으로</button>
+    </div>
+
+    <div class="gr-grid">
+      <!-- 좌: 학생 답안 -->
+      <div class="panel-sec answer-card">
+        <h3><i data-lucide="file-text" style="width:20px;height:20px;color:#6d7381"></i> 학생 답안</h3>
+        <div class="answer-body" id="answerBody"></div>
+      </div>
+
+      <!-- 우: 채점 결과 + 검토 -->
+      <div>
+        <div class="panel-sec">
+          <h3><i data-lucide="circle-check-big" style="width:20px;height:20px;color:#1ab864"></i> 채점 결과</h3>
+          <div style="margin-top:16px" class="total-line"><span class="total-score" id="stuTotal">8</span><span class="total-of">/ 10점</span></div>
+          <div style="margin-top:10px" id="critRows"></div>
+          <div class="readonly-note"><i data-lucide="lock"></i><span>검토 모드에서는 점수를 수정할 수 없어요. 이견이 있으면 아래에 의견을 남겨주세요.</span></div>
+        </div>
+
+        <div class="panel-sec">
+          <h3><i data-lucide="bot" style="width:20px;height:20px;color:#6d7381"></i> AI 채점 근거</h3>
+          <div class="ai-basis" id="aiBasis"></div>
+        </div>
+
+        <div class="panel-sec review-box">
+          <h3><i data-lucide="message-square-warning" style="width:20px;height:20px;color:#ea580c"></i> 검토 의견 <span style="font-size:14px;font-weight:400;color:#6d7381">선택</span></h3>
+          <div id="dissentDone" style="display:none" class="dissent-chip">
+            <i data-lucide="message-square-warning"></i>
+            <span><b>이견 등록됨</b> — '작성 분량 수준' 2점은 분량 기준상 1점이 맞아 보여요. 협의 후 반영 부탁드려요.</span>
+          </div>
+          <textarea id="dissentInput" placeholder="점수에 이견이 있거나 함께 논의할 내용이 있으면 남겨주세요. 의견은 최대표 선생님에게 표시돼요."></textarea>
+          <div class="rv-actions"><button class="btn-subtle btn-sm" onclick="addDissent()">의견 등록</button></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="confirm-bar">
+      <span class="cbar-left"><i data-lucide="info" style="width:17px;height:17px;color:#6d7381"></i>
+        <span><b id="seenCount">1</b>/3명 열람 — 모든 학생의 채점 결과를 확인한 뒤 기록해 주세요.</span></span>
+      <button class="btn-solid" id="btnConfirm" onclick="openConfirm()" disabled>확인</button>
+    </div>
+  </div>
+</section>
+
+<!-- ═════════ 모달: 공동 확인 설정 ═════════ -->
+<div class="overlay" id="modalShare">
+  <div class="modal">
+    <div class="modal-head"><h2>공동 확인 설정</h2>
+      <button class="icon-btn40" onclick="closeModal('modalShare')"><i data-lucide="x" style="width:20px;height:20px"></i></button></div>
+    <div class="modal-body">
+      <div class="fld-label">검토자 추가</div>
+      <div class="search-input">
+        <i data-lucide="search"></i>
+        <input type="text" placeholder="우리 학교 선생님 이름 또는 이메일로 검색해 주세요.">
+      </div>
+      <div class="fld-label" style="margin-top:28px">이 수업의 검토자 <span class="opt">2명</span></div>
+      <table class="t-list">
+        <thead><tr><th>이름</th><th>아이디(이메일)</th><th>권한</th><th>삭제</th></tr></thead>
+        <tbody>
+          <tr><td>김하나 선생님</td><td>hana@clipo.com</td><td class="role">보기 · 의견 · 확인</td>
+            <td><button class="btn-ghost btn-sm" style="color:#db3e51">삭제</button></td></tr>
+          <tr><td>박지현 선생님</td><td>jihyun@clipo.com</td><td class="role">보기 · 의견 · 확인</td>
+            <td><button class="btn-ghost btn-sm" style="color:#db3e51">삭제</button></td></tr>
+        </tbody>
+      </table>
+      <div class="modal-note"><i data-lucide="info"></i>
+        <span>검토자는 이 수업의 <b>채점 결과를 보고, 의견을 남기고, 확인 기록</b>을 남길 수 있어요. 점수와 피드백 수정은 할 수 없어요. 세부능력 및 특기사항은 공유되지 않아요.</span></div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn-outline" onclick="closeModal('modalShare')">닫기</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═════════ 모달: 확인 요청 ═════════ -->
+<div class="overlay" id="modalRequest">
+  <div class="modal">
+    <div class="modal-head"><h2>채점 확인 요청</h2>
+      <button class="icon-btn40" onclick="closeModal('modalRequest')"><i data-lucide="x" style="width:20px;height:20px"></i></button></div>
+    <div class="modal-body">
+      <div class="fld-label">확인 대상</div>
+      <div class="target-box">
+        <div class="target-name">미래 예측 시나리오 작성 2</div>
+        <div class="target-meta"><span>3학년 2반 사회</span><span>·</span><span>채점 완료 3/3명</span><span>·</span><span>총 10점 만점</span></div>
+      </div>
+      <div class="fld-label">받는 사람</div>
+      <table class="t-list">
+        <thead><tr><th style="width:64px">선택</th><th>이름</th><th>아이디(이메일)</th></tr></thead>
+        <tbody>
+          <tr><td><span class="checkrow"><input type="checkbox" checked></span></td><td>김하나 선생님</td><td>hana@clipo.com</td></tr>
+          <tr><td><span class="checkrow"><input type="checkbox"></span></td><td>박지현 선생님</td><td>jihyun@clipo.com</td></tr>
+        </tbody>
+      </table>
+      <div class="fld-label">메모 <span class="opt">선택</span></div>
+      <textarea class="memo-area" placeholder="함께 봐주었으면 하는 부분이 있으면 적어주세요. (예: 서술형 2번 부분점수 위주로 봐주세요)">서술형 부분점수 위주로 봐주세요</textarea>
+    </div>
+    <div class="modal-foot">
+      <button class="btn-outline" onclick="closeModal('modalRequest')">취소</button>
+      <button class="btn-solid" onclick="sendRequest()">요청</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═════════ 모달: 확인 기록 컨펌 ═════════ -->
+<div class="overlay" id="modalConfirm">
+  <div class="modal confirm-modal">
+    <span class="ic"><i data-lucide="user-check" style="width:24px;height:24px"></i></span>
+    <h3>채점 결과를 확인했음으로 기록할까요?</h3>
+    <p>확인 기록(김하나 · 06/11)이 남고, 최대표 선생님에게 표시돼요.<br>등록한 의견 1건도 함께 전달됩니다.</p>
+    <div class="acts">
+      <button class="btn-outline" onclick="closeModal('modalConfirm')">취소</button>
+      <button class="btn-solid" onclick="doConfirm()">확인</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═════════ 모달: 이견 보기 (소유자) ═════════ -->
+<div class="overlay" id="modalDissent">
+  <div class="modal">
+    <div class="modal-head"><h2>검토 의견 1건</h2>
+      <button class="icon-btn40" onclick="closeModal('modalDissent')"><i data-lucide="x" style="width:20px;height:20px"></i></button></div>
+    <div class="modal-body">
+      <div class="dissent-detail">
+        <div class="dd-head"><i data-lucide="message-square-warning" style="width:17px;height:17px"></i> 10102 김세나 — 작성 분량 수준</div>
+        <div class="dd-body">'작성 분량 수준' 2점은 분량 기준상 1점이 맞아 보여요. 협의 후 반영 부탁드려요.</div>
+        <div class="dd-meta">김하나 선생님 · 06/11 14:32</div>
+      </div>
+      <div class="modal-note"><i data-lucide="info"></i>
+        <span>점수를 수정하면 이 평가의 확인 기록이 무효화되고, 검토자에게 <b>재확인 요청</b>이 필요해요.</span></div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn-outline" onclick="closeModal('modalDissent')">닫기</button>
+      <button class="btn-solid" onclick="closeModal('modalDissent'); showToast('채점 화면은 데모 범위 밖이에요')">채점 화면으로 이동</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"><i data-lucide="circle-check"></i><span id="toastMsg"></span></div>
+
+<!-- ═════════ 데모 내비게이터 ═════════ -->
+<div class="demo-nav" id="demoNav">
+  <div class="dn-title"><span>DEMO FLOW</span><i data-lucide="grip-horizontal" style="width:16px;height:16px"></i></div>
+  <div class="dn-step on" data-step="1" onclick="goStep(1)"><span class="n">1</span>수업 홈 · 확인 요청<span class="dn-persona owner">소유자</span></div>
+  <div class="dn-step" data-step="2" onclick="goStep(2)"><span class="n">2</span>홈 · 요청 수신<span class="dn-persona reviewer">검토자</span></div>
+  <div class="dn-step" data-step="3" onclick="goStep(3)"><span class="n">3</span>검토 모드 · 확인<span class="dn-persona reviewer">검토자</span></div>
+  <div class="dn-step" data-step="4" onclick="goStep(4)"><span class="n">4</span>확인 완료 · 의견 수신<span class="dn-persona owner">소유자</span></div>
+</div>
+
+<script>
+/* ───── 상태 ───── */
+const S = { step:1, requested:false, confirmed:false, dissent:false, stuIdx:0, seen:new Set([0]) };
+
+const STUDENTS = [
+  { id:'10101', name:'김두나', total:8, crits:[['작성 내용의 구체성',4,4],['작성 분량 수준',2,3],['작성의 창의성',2,3]],
+    basis:'학생은 해수와 담수의 관점에서 지구상의 물 부족 현상을 설명함. 해수 담수화와 같은 현대 기술을 통해 물 부족 문제를 해결할 수 있는 방안을 제시함. 주제에 대한 이해도와 정확성을 보임.',
+    answer:['미래의 물 부족 문제는 해수와 담수의 불균형에서 비롯된다. 지구상의 물 중 97%는 해수이며, 인간이 활용 가능한 담수는 매우 제한적이다.','해수 담수화 기술이 상용화되면 연안 도시의 물 공급 구조가 크게 변화할 것이다. 다만 에너지 비용과 염수 배출 문제를 함께 고려해야 한다.'] },
+  { id:'10102', name:'김세나', total:6, crits:[['작성 내용의 구체성',3,4],['작성 분량 수준',2,3],['작성의 창의성',1,3]],
+    basis:'물 부족의 원인을 기후 변화 중심으로 서술함. 해결 방안 제시가 일반적인 수준에 머물러 구체성이 다소 부족하나, 분량 기준은 충족함.',
+    answer:['기후 변화로 인해 강수 패턴이 불규칙해지면서 물 부족이 심화될 것이다. 농업용수 확보가 가장 큰 과제가 될 것으로 예상한다.','정부와 지역사회가 함께 절수 정책을 추진해야 하며, 빗물 저장 시설 확대가 필요하다.'] },
+  { id:'10103', name:'박이안', total:9, crits:[['작성 내용의 구체성',4,4],['작성 분량 수준',3,3],['작성의 창의성',2,3]],
+    basis:'수권과 해수의 순환에 대한 이해를 바탕으로 물 부족의 원인과 해결책을 체계적으로 설명함. 기술적·경제적 측면의 근거 제시가 우수함.',
+    answer:['수권의 순환 구조를 보면 인간이 접근 가능한 담수는 빙하와 지하수에 편중되어 있다. 2050년에는 세계 인구의 절반이 물 스트레스 지역에 살게 될 것이다.','스마트 관개 시스템과 폐수 재이용 기술의 결합으로 도시 단위의 물 자립이 가능해질 것이며, 이는 새로운 산업 생태계를 만들 것이다.'] }
+];
+
+/* ───── scene 전환 ───── */
+function goStep(n) {
+  S.step = n;
+  document.querySelectorAll('.dn-step').forEach(el => el.classList.toggle('on', +el.dataset.step === n));
+  document.querySelectorAll('.scene').forEach(el => el.classList.remove('active'));
+  const sb = document.getElementById('sidebar');
+  document.querySelectorAll('.si').forEach(el => el.classList.remove('active'));
+
+  if (n === 1 || n === 4) {
+    document.getElementById('sceneClass').classList.add('active');
+    document.getElementById('hdrUser').textContent = '최대표 선생님(대표교사)';
+    document.getElementById('hdrCredit').textContent = '200';
+    sb.classList.remove('expanded');
+    document.querySelector('[data-nav="class"]').classList.add('active');
+    renderOwnerState(n === 4);
+  } else if (n === 2) {
+    document.getElementById('sceneHome').classList.add('active');
+    document.getElementById('hdrUser').textContent = '김하나 선생님(일반교사)';
+    document.getElementById('hdrCredit').textContent = '340';
+    sb.classList.add('expanded');
+    document.querySelector('[data-nav="home"]').classList.add('active');
+  } else if (n === 3) {
+    document.getElementById('sceneReview').classList.add('active');
+    document.getElementById('hdrUser').textContent = '김하나 선생님(일반교사)';
+    document.getElementById('hdrCredit').textContent = '340';
+    sb.classList.remove('expanded');
+    document.querySelector('[data-nav="class"]').classList.add('active');
+    renderStudent();
+  }
+  window.scrollTo(0, 0);
+  lucide.createIcons();
+}
+
+/* ───── 소유자 상태 렌더 ───── */
+function renderOwnerState(done) {
+  const st = document.getElementById('evalA-status');
+  const meta = document.getElementById('evalA-meta');
+  const act = document.getElementById('evalA-action');
+  if (done || S.confirmed) {
+    st.innerHTML = '<span class="badge bdg-done"><i data-lucide="circle-check"></i> 확인 완료</span>' +
+      (S.dissent !== false ? ' <span class="badge bdg-dissent" onclick="openModal(\'modalDissent\')"><i data-lucide="message-square-warning"></i> 의견 1건</span>' : '');
+    meta.textContent = '김하나 선생님 확인 · 06/11 14:35';
+    act.innerHTML = '<button class="btn-ghost btn-sm">확인 기록</button>';
+  } else if (S.requested) {
+    st.innerHTML = '<span class="badge bdg-req"><i data-lucide="send"></i> 요청됨</span>';
+    meta.textContent = '김하나 선생님에게 요청 · 06/11';
+    act.innerHTML = '<button class="btn-ghost btn-sm" onclick="openModal(\'modalRequest\')">재요청</button>';
+  } else {
+    st.innerHTML = '<span class="badge bdg-wait"><i data-lucide="clock"></i> 확인 대기</span>';
+    meta.textContent = '3학년 2반 · 채점 완료 3/3명';
+    act.innerHTML = '<button class="btn-outline btn-sm" onclick="openModal(\'modalRequest\')">확인 요청</button>';
+  }
+  lucide.createIcons();
+}
+
+/* ───── 검토 모드 렌더 ───── */
+function renderStudent() {
+  const s = STUDENTS[S.stuIdx];
+  S.seen.add(S.stuIdx);
+  document.getElementById('stuName').textContent = s.id + ' ' + s.name;
+  document.getElementById('stuTotal').textContent = s.total;
+  document.getElementById('critRows').innerHTML = s.crits.map(c =>
+    '<div class="crit-row"><span class="crit-name">' + c[0] + '</span><span class="crit-score">' + c[1] + ' / ' + c[2] + '점</span></div>').join('');
+  document.getElementById('aiBasis').textContent = s.basis;
+  document.getElementById('answerBody').innerHTML = s.answer.map(p => '<p>' + p + '</p>').join('');
+  document.getElementById('seenCount').textContent = S.seen.size;
+  document.getElementById('rvProgress').textContent = '열람 ' + S.seen.size + ' / 3명';
+  document.getElementById('btnConfirm').disabled = S.seen.size < 3;
+  // 김세나(idx 1)에 등록된 이견 표시
+  const isDissentStu = S.stuIdx === 1 && S.dissent;
+  document.getElementById('dissentDone').style.display = isDissentStu ? 'flex' : 'none';
+  document.getElementById('dissentInput').style.display = isDissentStu ? 'none' : 'block';
+  document.querySelector('.rv-actions').style.display = isDissentStu ? 'none' : 'flex';
+  lucide.createIcons();
+}
+function moveStu(d) {
+  S.stuIdx = (S.stuIdx + d + STUDENTS.length) % STUDENTS.length;
+  renderStudent();
+}
+function addDissent() {
+  const v = document.getElementById('dissentInput').value.trim();
+  if (S.stuIdx === 1 || v) {
+    S.dissent = true;
+    if (S.stuIdx !== 1) { S.stuIdx = S.stuIdx; }
+    showToast('의견이 등록되었어요');
+    renderStudent();
+  } else {
+    // 데모 편의: 김세나가 아니어도 의견 입력 없이 누르면 안내
+    showToast('의견을 입력해 주세요');
+  }
+}
+
+/* ───── 플로우 액션 ───── */
+function sendRequest() {
+  S.requested = true;
+  closeModal('modalRequest');
+  renderOwnerState(false);
+  showToast('김하나 선생님에게 확인을 요청했어요');
+}
+function openConfirm() { openModal('modalConfirm'); }
+function doConfirm() {
+  S.confirmed = true;
+  closeModal('modalConfirm');
+  showToast('확인이 기록되었어요 · 최대표 선생님에게 표시됩니다');
+  setTimeout(() => goStep(4), 1200);
+}
+
+/* ───── 공통 ───── */
+function openModal(id) { document.getElementById(id).classList.add('open'); lucide.createIcons(); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+document.querySelectorAll('.overlay').forEach(o => o.addEventListener('click', e => { if (e.target === o) o.classList.remove('open'); }));
+
+let toastTimer;
+function showToast(msg) {
+  document.getElementById('toastMsg').textContent = msg;
+  const t = document.getElementById('toast');
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 2400);
+  lucide.createIcons();
+}
+
+function toggleNav() {
+  const sb = document.getElementById('sidebar');
+  sb.classList.toggle('expanded');
+  if (S.step === 1 || S.step === 4) {
+    document.getElementById('classContent').classList.toggle('with-fold', !sb.classList.contains('expanded'));
+    document.getElementById('classContent').classList.toggle('with-expand', sb.classList.contains('expanded'));
+  }
+}
+
+/* ───── 데모 내비 드래그 ───── */
+(function() {
+  const nav = document.getElementById('demoNav');
+  let drag = null;
+  nav.addEventListener('mousedown', e => {
+    if (e.target.closest('.dn-step')) return;
+    const r = nav.getBoundingClientRect();
+    drag = { dx: e.clientX - r.left, dy: e.clientY - r.top };
+    e.preventDefault();
+  });
+  document.addEventListener('mousemove', e => {
+    if (!drag) return;
+    nav.style.left = (e.clientX - drag.dx) + 'px';
+    nav.style.top = (e.clientY - drag.dy) + 'px';
+    nav.style.right = 'auto'; nav.style.bottom = 'auto';
+  });
+  document.addEventListener('mouseup', () => drag = null);
+})();
+
+goStep(1);
+lucide.createIcons();
+</script>
+</body>
+</html>
