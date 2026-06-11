@@ -184,13 +184,21 @@ button, .btn, a.btn {
   padding:11px 14px; font-size:14px; color:#3151c4; display:flex; align-items:flex-start; gap:7px; }
 .readonly-note svg { width:16px; height:16px; flex-shrink:0; margin-top:1px; }
 .ai-basis { margin-top:14px; font-size:16px; line-height:1.65; color:#3b3f4c; }
-.review-box textarea { width:100%; min-height:96px; border:1px solid #d9d9d9; border-radius:8px;
+.chip-opinion { height:28px; display:inline-flex; align-items:center; gap:6px; padding:0 11px; border-radius:100px;
+  background:#fff7ed; color:#ea580c; font-size:13px; font-weight:600; cursor:pointer; border:1px solid #fed7aa; }
+.chip-opinion:hover { background:#ffedd5; }
+.chip-opinion svg { width:14px; height:14px; }
+
+.opinion-sheet { position:fixed; left:56px; right:0; bottom:0; background:#fff; border-top:1px solid #dde1e8;
+  box-shadow:0 -8px 24px rgba(0,0,0,.1); padding:20px 28px 24px; z-index:60;
+  transform:translateY(110%); transition:transform .25s ease; }
+.opinion-sheet.open { transform:translateY(0); }
+.os-title { font-size:18px; font-weight:600; display:flex; align-items:center; gap:8px; }
+.os-title .stu { color:#3151c4; }
+.opinion-sheet textarea { width:100%; min-height:88px; border:1px solid #d9d9d9; border-radius:8px;
   padding:12px 14px; font-size:16px; font-family:inherit; resize:vertical; margin-top:14px; }
-.review-box textarea::placeholder { color:#b3b6bd; }
-.rv-actions { display:flex; justify-content:flex-end; gap:8px; margin-top:12px; }
-.dissent-chip { margin-top:14px; background:#fff3f4; border-radius:8px; padding:12px 14px; font-size:15px; color:#db3e51;
-  display:flex; align-items:flex-start; gap:8px; }
-.dissent-chip svg { width:16px; height:16px; flex-shrink:0; margin-top:2px; }
+.opinion-sheet textarea::placeholder { color:#b3b6bd; }
+.os-actions { display:flex; justify-content:flex-end; gap:8px; margin-top:12px; }
 
 .rb-right { display:flex; align-items:center; gap:10px; flex-shrink:0; }
 .rb-hint { font-size:13px; color:#6d7381; }
@@ -471,8 +479,12 @@ input[type="checkbox"] { width:18px; height:18px; accent-color:#416bff; cursor:p
         <span class="stu-dd"><span id="stuName">10101 김두나</span><i data-lucide="chevron-down" style="width:20px;height:20px;color:#6d7381"></i></span>
         <button class="stu-nav" onclick="moveStu(1)"><i data-lucide="chevron-right" style="width:20px;height:20px"></i></button>
         <span class="gr-count">3명 중 3명 채점 완료</span>
+        <span class="chip-opinion" id="opinionChip" style="display:none" onclick="openOpinion()"><i data-lucide="message-square-warning"></i> 의견 등록됨</span>
       </div>
-      <button class="btn-ghost btn-sm" onclick="goStep(2)"><i data-lucide="arrow-left" style="width:15px;height:15px"></i> 홈으로</button>
+      <div style="display:flex;align-items:center;gap:8px">
+        <button class="btn-outline btn-sm" id="btnOpinion" onclick="openOpinion()"><i data-lucide="message-square-plus" style="width:15px;height:15px"></i> 의견</button>
+        <button class="btn-ghost btn-sm" onclick="goStep(2)"><i data-lucide="arrow-left" style="width:15px;height:15px"></i> 홈으로</button>
+      </div>
     </div>
 
     <div class="gr-grid">
@@ -495,16 +507,18 @@ input[type="checkbox"] { width:18px; height:18px; accent-color:#416bff; cursor:p
           <h3><i data-lucide="bot" style="width:20px;height:20px;color:#6d7381"></i> AI 채점 근거</h3>
           <div class="ai-basis" id="aiBasis"></div>
         </div>
+      </div>
+    </div>
 
-        <div class="panel-sec review-box">
-          <h3><i data-lucide="message-square-warning" style="width:20px;height:20px;color:#ea580c"></i> 검토 의견 <span style="font-size:14px;font-weight:400;color:#6d7381">선택</span></h3>
-          <div id="dissentDone" style="display:none" class="dissent-chip">
-            <i data-lucide="message-square-warning"></i>
-            <span><b>이견 등록됨</b> — '작성 분량 수준' 2점은 분량 기준상 1점이 맞아 보여요. 협의 후 반영 부탁드려요.</span>
-          </div>
-          <textarea id="dissentInput" placeholder="점수에 이견이 있거나 함께 논의할 내용이 있으면 남겨주세요. 의견은 최대표 선생님에게 표시돼요."></textarea>
-          <div class="rv-actions"><button class="btn-subtle btn-sm" onclick="addDissent()">의견 등록</button></div>
-        </div>
+    <!-- 검토 의견 입력 시트 -->
+    <div class="opinion-sheet" id="opinionSheet">
+      <div class="os-title"><i data-lucide="message-square-warning" style="width:20px;height:20px;color:#ea580c"></i>
+        검토 의견 — <span class="stu" id="osStu">10101 김두나</span>
+        <span style="font-size:14px;font-weight:400;color:#6d7381">의견은 최대표 선생님에게 표시돼요. 점수에는 영향이 없어요.</span></div>
+      <textarea id="opinionInput" placeholder="점수에 이견이 있거나 함께 논의할 내용이 있으면 남겨주세요. (예: '작성 분량 수준' 2점은 분량 기준상 1점이 맞아 보여요)"></textarea>
+      <div class="os-actions">
+        <button class="btn-outline" onclick="closeOpinion()">취소</button>
+        <button class="btn-solid" onclick="saveOpinion()">등록</button>
       </div>
     </div>
   </div>
@@ -574,7 +588,7 @@ input[type="checkbox"] { width:18px; height:18px; accent-color:#416bff; cursor:p
   <div class="modal confirm-modal">
     <span class="ic"><i data-lucide="user-check" style="width:24px;height:24px"></i></span>
     <h3>채점 결과를 확인했음으로 기록할까요?</h3>
-    <p>확인 기록(김하나 · 06/11)이 남고, 최대표 선생님에게 표시돼요.<br>등록한 의견 1건도 함께 전달됩니다.</p>
+    <p>확인 기록(김하나 · 06/11)이 남고, 최대표 선생님에게 표시돼요.<br><span id="cfOpinionLine">등록한 의견 1건도 함께 전달됩니다.</span></p>
     <div class="acts">
       <button class="btn-outline" onclick="closeModal('modalConfirm')">취소</button>
       <button class="btn-solid" onclick="doConfirm()">확인</button>
@@ -616,7 +630,7 @@ input[type="checkbox"] { width:18px; height:18px; accent-color:#416bff; cursor:p
 
 <script>
 /* ───── 상태 ───── */
-const S = { step:1, requested:false, confirmed:false, dissent:false, stuIdx:0, seen:new Set([0]) };
+const S = { step:1, requested:false, confirmed:false, opinions:{}, stuIdx:0, seen:new Set([0]) };
 
 const STUDENTS = [
   { id:'10101', name:'김두나', total:8, crits:[['작성 내용의 구체성',4,4],['작성 분량 수준',2,3],['작성의 창의성',2,3]],
@@ -670,7 +684,7 @@ function renderOwnerState(done) {
   const act = document.getElementById('evalA-action');
   if (done || S.confirmed) {
     st.innerHTML = '<span class="badge bdg-done"><i data-lucide="circle-check"></i> 확인 완료</span>' +
-      (S.dissent !== false ? ' <span class="badge bdg-dissent" onclick="openModal(\'modalDissent\')"><i data-lucide="message-square-warning"></i> 의견 1건</span>' : '');
+      ' <span class="badge bdg-dissent" onclick="openModal(\'modalDissent\')"><i data-lucide="message-square-warning"></i> 의견 1건</span>';
     meta.textContent = '김하나 선생님 확인 · 06/11 14:35';
     act.innerHTML = '<button class="btn-ghost btn-sm">확인 기록</button>';
   } else if (S.requested) {
@@ -698,28 +712,37 @@ function renderStudent() {
   document.getElementById('rvProgress').textContent = '열람 ' + S.seen.size + ' / 3명';
   document.getElementById('btnConfirm').disabled = S.seen.size < 3;
   document.getElementById('rvHint').style.display = S.seen.size < 3 ? 'inline' : 'none';
-  // 김세나(idx 1)에 등록된 이견 표시
-  const isDissentStu = S.stuIdx === 1 && S.dissent;
-  document.getElementById('dissentDone').style.display = isDissentStu ? 'flex' : 'none';
-  document.getElementById('dissentInput').style.display = isDissentStu ? 'none' : 'block';
-  document.querySelector('.rv-actions').style.display = isDissentStu ? 'none' : 'flex';
+  // 이 학생에게 등록된 의견 칩
+  const has = !!S.opinions[S.stuIdx];
+  document.getElementById('opinionChip').style.display = has ? 'inline-flex' : 'none';
+  document.getElementById('btnOpinion').style.display = has ? 'none' : 'inline-flex';
+  closeOpinion();
   lucide.createIcons();
 }
 function moveStu(d) {
   S.stuIdx = (S.stuIdx + d + STUDENTS.length) % STUDENTS.length;
   renderStudent();
 }
-function addDissent() {
-  const v = document.getElementById('dissentInput').value.trim();
-  if (S.stuIdx === 1 || v) {
-    S.dissent = true;
-    if (S.stuIdx !== 1) { S.stuIdx = S.stuIdx; }
-    showToast('의견이 등록되었어요');
-    renderStudent();
-  } else {
-    // 데모 편의: 김세나가 아니어도 의견 입력 없이 누르면 안내
-    showToast('의견을 입력해 주세요');
-  }
+
+/* ───── 검토 의견 시트 ───── */
+function openOpinion() {
+  const s = STUDENTS[S.stuIdx];
+  document.getElementById('osStu').textContent = s.id + ' ' + s.name;
+  document.getElementById('opinionInput').value = S.opinions[S.stuIdx] || '';
+  document.getElementById('opinionSheet').classList.add('open');
+  document.getElementById('opinionInput').focus();
+  lucide.createIcons();
+}
+function closeOpinion() {
+  document.getElementById('opinionSheet').classList.remove('open');
+}
+function saveOpinion() {
+  const v = document.getElementById('opinionInput').value.trim();
+  if (!v) { showToast('의견을 입력해 주세요'); return; }
+  S.opinions[S.stuIdx] = v;
+  closeOpinion();
+  showToast('의견이 등록되었어요');
+  renderStudent();
 }
 
 /* ───── 플로우 액션 ───── */
@@ -729,7 +752,11 @@ function sendRequest() {
   renderOwnerState(false);
   showToast('김하나 선생님에게 확인을 요청했어요');
 }
-function openConfirm() { openModal('modalConfirm'); }
+function openConfirm() {
+  const n = Object.keys(S.opinions).length;
+  document.getElementById('cfOpinionLine').textContent = n > 0 ? '등록한 의견 ' + n + '건도 함께 전달됩니다.' : '';
+  openModal('modalConfirm');
+}
 function doConfirm() {
   S.confirmed = true;
   closeModal('modalConfirm');
