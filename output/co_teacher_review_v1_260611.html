@@ -153,11 +153,28 @@ button, .btn, a.btn {
 .rail-row .d { color:#6d7381; font-size:13px; flex-shrink:0; }
 
 /* ───────── 검토 모드 ───────── */
-.review-banner { background:#e9f2ff; border:1px solid #ccdfff; border-radius:8px;
-  padding:14px 18px; display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:20px; }
-.rb-left { display:flex; align-items:center; gap:10px; font-size:15px; color:#3151c4; }
-.rb-left b { font-weight:700; }
-.rb-progress { font-size:14px; font-weight:600; color:#3151c4; background:#fff; border:1px solid #ccdfff; border-radius:100px; padding:6px 14px; }
+/* 하단 검토 도크 */
+.review-dock { position:fixed; left:56px; right:0; bottom:0; z-index:60; background:#fff;
+  border-top:1px solid #dde1e8; box-shadow:0 -8px 24px rgba(0,0,0,.08); }
+.rd-expand { max-height:0; overflow:hidden; transition:max-height .25s ease; padding:0 28px; }
+.review-dock.open .rd-expand { max-height:280px; padding-top:18px; border-bottom:1px solid #f1f3f5; }
+.rd-expand textarea { width:100%; min-height:88px; border:1px solid #d9d9d9; border-radius:8px;
+  padding:12px 14px; font-size:16px; font-family:inherit; resize:vertical; margin-top:12px; }
+.rd-expand textarea::placeholder { color:#b3b6bd; }
+.rd-exp-actions { display:flex; justify-content:flex-end; gap:8px; margin:12px 0 14px; }
+.os-title { font-size:17px; font-weight:600; display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+.os-title .stu { color:#3151c4; }
+.os-title .stu { white-space:nowrap; }
+.os-title .sub { font-size:14px; font-weight:400; color:#6d7381; flex-basis:100%; }
+.rd-bar { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:13px 28px; }
+.rd-ctx { display:flex; align-items:center; gap:9px; font-size:15px; color:#3151c4; min-width:0; }
+.rd-ctx b { font-weight:700; }
+.rd-ctx .txt { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.rd-ctx .ro { font-size:13px; font-weight:600; color:#3151c4; background:#e9f2ff; border:1px solid #ccdfff; border-radius:100px; padding:4px 10px; flex-shrink:0; }
+.rd-right { display:flex; align-items:center; gap:10px; flex-shrink:0; }
+.rd-hint { font-size:13px; color:#6d7381; }
+.rd-progress { font-size:14px; font-weight:600; color:#3151c4; background:#f4f8ff; border:1px solid #ccdfff; border-radius:100px; padding:6px 14px; }
+.btn-opinion-on { background:#fff7ed !important; border:1px solid #fed7aa !important; color:#ea580c !important; }
 
 .gr-head { display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:20px; flex-wrap:wrap; }
 .stu-select { display:flex; align-items:center; gap:8px; }
@@ -184,24 +201,6 @@ button, .btn, a.btn {
   padding:11px 14px; font-size:14px; color:#3151c4; display:flex; align-items:flex-start; gap:7px; }
 .readonly-note svg { width:16px; height:16px; flex-shrink:0; margin-top:1px; }
 .ai-basis { margin-top:14px; font-size:16px; line-height:1.65; color:#3b3f4c; }
-.chip-opinion { height:28px; display:inline-flex; align-items:center; gap:6px; padding:0 11px; border-radius:100px;
-  background:#fff7ed; color:#ea580c; font-size:13px; font-weight:600; cursor:pointer; border:1px solid #fed7aa; }
-.chip-opinion:hover { background:#ffedd5; }
-.chip-opinion svg { width:14px; height:14px; }
-
-.opinion-sheet { position:fixed; left:56px; right:0; bottom:0; background:#fff; border-top:1px solid #dde1e8;
-  box-shadow:0 -8px 24px rgba(0,0,0,.1); padding:20px 28px 24px; z-index:60;
-  transform:translateY(110%); transition:transform .25s ease; }
-.opinion-sheet.open { transform:translateY(0); }
-.os-title { font-size:18px; font-weight:600; display:flex; align-items:center; gap:8px; }
-.os-title .stu { color:#3151c4; }
-.opinion-sheet textarea { width:100%; min-height:88px; border:1px solid #d9d9d9; border-radius:8px;
-  padding:12px 14px; font-size:16px; font-family:inherit; resize:vertical; margin-top:14px; }
-.opinion-sheet textarea::placeholder { color:#b3b6bd; }
-.os-actions { display:flex; justify-content:flex-end; gap:8px; margin-top:12px; }
-
-.rb-right { display:flex; align-items:center; gap:10px; flex-shrink:0; }
-.rb-hint { font-size:13px; color:#6d7381; }
 
 /* ───────── modal ───────── */
 .overlay { position:fixed; inset:0; background:rgba(0,0,0,.4); z-index:90; display:none; }
@@ -460,31 +459,15 @@ input[type="checkbox"] { width:18px; height:18px; accent-color:#416bff; cursor:p
 
 <!-- ═════════ Scene 3 : 검토 모드 (검토자) ═════════ -->
 <section class="scene" id="sceneReview">
-  <div class="content with-fold">
-    <div class="review-banner">
-      <div class="rb-left">
-        <i data-lucide="eye" style="width:20px;height:20px"></i>
-        <span><b>검토 모드</b> · 최대표 선생님의 <b>3학년 2반 사회 — 미래 예측 시나리오 작성 2</b> 채점 결과예요. 점수는 수정할 수 없고, 확인과 의견만 남길 수 있어요.</span>
-      </div>
-      <div class="rb-right">
-        <span class="rb-hint" id="rvHint">모든 학생 열람 후 확인할 수 있어요</span>
-        <span class="rb-progress" id="rvProgress">열람 1 / 3명</span>
-        <button class="btn-solid" id="btnConfirm" onclick="openConfirm()" disabled>확인</button>
-      </div>
-    </div>
-
+  <div class="content with-fold" style="padding-bottom:110px">
     <div class="gr-head">
       <div class="stu-select">
         <button class="stu-nav" onclick="moveStu(-1)"><i data-lucide="chevron-left" style="width:20px;height:20px"></i></button>
         <span class="stu-dd"><span id="stuName">10101 김두나</span><i data-lucide="chevron-down" style="width:20px;height:20px;color:#6d7381"></i></span>
         <button class="stu-nav" onclick="moveStu(1)"><i data-lucide="chevron-right" style="width:20px;height:20px"></i></button>
         <span class="gr-count">3명 중 3명 채점 완료</span>
-        <span class="chip-opinion" id="opinionChip" style="display:none" onclick="openOpinion()"><i data-lucide="message-square-warning"></i> 의견 등록됨</span>
       </div>
-      <div style="display:flex;align-items:center;gap:8px">
-        <button class="btn-outline btn-sm" id="btnOpinion" onclick="openOpinion()"><i data-lucide="message-square-plus" style="width:15px;height:15px"></i> 의견</button>
-        <button class="btn-ghost btn-sm" onclick="goStep(2)"><i data-lucide="arrow-left" style="width:15px;height:15px"></i> 홈으로</button>
-      </div>
+      <button class="btn-ghost btn-sm" onclick="goStep(2)"><i data-lucide="arrow-left" style="width:15px;height:15px"></i> 홈으로</button>
     </div>
 
     <div class="gr-grid">
@@ -500,7 +483,7 @@ input[type="checkbox"] { width:18px; height:18px; accent-color:#416bff; cursor:p
           <h3><i data-lucide="circle-check-big" style="width:20px;height:20px;color:#1ab864"></i> 채점 결과</h3>
           <div style="margin-top:16px" class="total-line"><span class="total-score" id="stuTotal">8</span><span class="total-of">/ 10점</span></div>
           <div style="margin-top:10px" id="critRows"></div>
-          <div class="readonly-note"><i data-lucide="lock"></i><span>검토 모드에서는 점수를 수정할 수 없어요. 이견이 있으면 아래에 의견을 남겨주세요.</span></div>
+          <div class="readonly-note"><i data-lucide="lock"></i><span>검토 모드에서는 점수를 수정할 수 없어요. 이견이 있으면 하단 바의 [의견]으로 남겨주세요.</span></div>
         </div>
 
         <div class="panel-sec">
@@ -510,15 +493,30 @@ input[type="checkbox"] { width:18px; height:18px; accent-color:#416bff; cursor:p
       </div>
     </div>
 
-    <!-- 검토 의견 입력 시트 -->
-    <div class="opinion-sheet" id="opinionSheet">
-      <div class="os-title"><i data-lucide="message-square-warning" style="width:20px;height:20px;color:#ea580c"></i>
-        검토 의견 — <span class="stu" id="osStu">10101 김두나</span>
-        <span style="font-size:14px;font-weight:400;color:#6d7381">의견은 최대표 선생님에게 표시돼요. 점수에는 영향이 없어요.</span></div>
-      <textarea id="opinionInput" placeholder="점수에 이견이 있거나 함께 논의할 내용이 있으면 남겨주세요. (예: '작성 분량 수준' 2점은 분량 기준상 1점이 맞아 보여요)"></textarea>
-      <div class="os-actions">
-        <button class="btn-outline" onclick="closeOpinion()">취소</button>
-        <button class="btn-solid" onclick="saveOpinion()">등록</button>
+    <!-- 하단 검토 도크: 의견 입력(펼침) + 검토 상태 바(상시) -->
+    <div class="review-dock" id="reviewDock">
+      <div class="rd-expand">
+        <div class="os-title"><i data-lucide="message-square-warning" style="width:20px;height:20px;color:#ea580c"></i>
+          검토 의견 — <span class="stu" id="osStu">10101 김두나</span>
+          <span class="sub">의견은 최대표 선생님에게 표시돼요. 점수에는 영향이 없어요.</span></div>
+        <textarea id="opinionInput" placeholder="점수에 이견이 있거나 함께 논의할 내용이 있으면 남겨주세요. (예: '작성 분량 수준' 2점은 분량 기준상 1점이 맞아 보여요)"></textarea>
+        <div class="rd-exp-actions">
+          <button class="btn-outline" onclick="closeOpinion()">취소</button>
+          <button class="btn-solid" onclick="saveOpinion()">등록</button>
+        </div>
+      </div>
+      <div class="rd-bar">
+        <div class="rd-ctx">
+          <i data-lucide="eye" style="width:20px;height:20px;flex-shrink:0"></i>
+          <span class="txt"><b>검토 모드</b> · 최대표 선생님의 <b>3학년 2반 사회 — 미래 예측 시나리오 작성 2</b></span>
+          <span class="ro">보기 전용</span>
+        </div>
+        <div class="rd-right">
+          <span class="rd-hint" id="rvHint">모든 학생 열람 후 확인할 수 있어요</span>
+          <span class="rd-progress" id="rvProgress">열람 1 / 3명</span>
+          <button class="btn-outline" id="btnOpinion" onclick="toggleOpinion()"><i data-lucide="message-square-plus" style="width:16px;height:16px"></i> 의견</button>
+          <button class="btn-solid" id="btnConfirm" onclick="openConfirm()" disabled>확인</button>
+        </div>
       </div>
     </div>
   </div>
@@ -712,10 +710,13 @@ function renderStudent() {
   document.getElementById('rvProgress').textContent = '열람 ' + S.seen.size + ' / 3명';
   document.getElementById('btnConfirm').disabled = S.seen.size < 3;
   document.getElementById('rvHint').style.display = S.seen.size < 3 ? 'inline' : 'none';
-  // 이 학생에게 등록된 의견 칩
+  // 이 학생에게 의견이 등록돼 있으면 버튼이 주황으로 바뀜
   const has = !!S.opinions[S.stuIdx];
-  document.getElementById('opinionChip').style.display = has ? 'inline-flex' : 'none';
-  document.getElementById('btnOpinion').style.display = has ? 'none' : 'inline-flex';
+  const btn = document.getElementById('btnOpinion');
+  btn.classList.toggle('btn-opinion-on', has);
+  btn.innerHTML = has
+    ? '<i data-lucide="message-square-warning" style="width:16px;height:16px"></i> 의견 등록됨'
+    : '<i data-lucide="message-square-plus" style="width:16px;height:16px"></i> 의견';
   closeOpinion();
   lucide.createIcons();
 }
@@ -724,17 +725,21 @@ function moveStu(d) {
   renderStudent();
 }
 
-/* ───── 검토 의견 시트 ───── */
+/* ───── 검토 도크 (의견 펼침) ───── */
+function toggleOpinion() {
+  if (document.getElementById('reviewDock').classList.contains('open')) { closeOpinion(); return; }
+  openOpinion();
+}
 function openOpinion() {
   const s = STUDENTS[S.stuIdx];
   document.getElementById('osStu').textContent = s.id + ' ' + s.name;
   document.getElementById('opinionInput').value = S.opinions[S.stuIdx] || '';
-  document.getElementById('opinionSheet').classList.add('open');
+  document.getElementById('reviewDock').classList.add('open');
   document.getElementById('opinionInput').focus();
   lucide.createIcons();
 }
 function closeOpinion() {
-  document.getElementById('opinionSheet').classList.remove('open');
+  document.getElementById('reviewDock').classList.remove('open');
 }
 function saveOpinion() {
   const v = document.getElementById('opinionInput').value.trim();
