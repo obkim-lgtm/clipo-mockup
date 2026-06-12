@@ -656,8 +656,9 @@ input[type="checkbox"] { width:18px; height:18px; accent-color:#416bff; cursor:p
       </div>
       <div class="rd-right">
         <button class="btn-ghost" onclick="goStep(3)">나가기</button>
+        <span class="rd-progress" id="cfProgress">확인 0 / 21명</span>
         <button class="btn-outline" id="btnOpinion" onclick="toggleOpinion()"><i data-lucide="message-square-plus" style="width:16px;height:16px"></i> 의견</button>
-        <button class="btn-solid" id="btnConfirm" onclick="openConfirm()">확인</button>
+        <button class="btn-solid" id="btnConfirmNext" onclick="confirmStudent()"><i data-lucide="circle-check-big" style="width:16px;height:16px"></i> 확인 후 다음</button>
       </div>
     </div>
   </div>
@@ -726,8 +727,8 @@ input[type="checkbox"] { width:18px; height:18px; accent-color:#416bff; cursor:p
 <div class="overlay" id="modalConfirm">
   <div class="modal confirm-modal">
     <span class="ic"><i data-lucide="user-check" style="width:24px;height:24px"></i></span>
-    <h3>채점 결과를 확인했음으로 기록할까요?</h3>
-    <p>확인 기록(김하나 · 06/11)이 남고, 최대표 선생님에게 표시돼요.<br><span id="cfOpinionLine">등록한 의견 1건도 함께 전달됩니다.</span></p>
+    <h3>모든 학생 확인을 마쳤어요</h3>
+    <p>이 평가의 확인 기록(김하나 · 06/11)이 남고, 최대표 선생님에게 표시돼요.<br><span id="cfOpinionLine">등록한 의견 1건도 함께 전달됩니다.</span></p>
     <div class="acts">
       <button class="btn-outline" onclick="closeModal('modalConfirm')">취소</button>
       <button class="btn-solid" onclick="doConfirm()">확인</button>
@@ -770,7 +771,7 @@ input[type="checkbox"] { width:18px; height:18px; accent-color:#416bff; cursor:p
 
 <script>
 /* ───── 상태 ───── */
-const S = { step:1, requested:false, confirmed:false, opinions:{}, stuIdx:0, seen:new Set([0]) };
+const S = { step:1, requested:false, confirmed:false, opinions:{}, confirmedStu:new Set() };
 
 /* ───── scene 전환 ─────
    1: 수업 홈 1안(소유자) · 2: 수업 홈 2안 리뉴얼(소유자) · 3: 클리포 홈(검토자)
@@ -857,7 +858,7 @@ function initReviewFrame() {
     f.addEventListener('load', onFrameLoad);
     f.setAttribute('src', FRAME_SRC);
   }
-  updateOpinionBtn();
+  updateDockState();
 }
 function onFrameLoad() {
   const f = document.getElementById('reviewFrame');
@@ -874,10 +875,10 @@ function onFrameLoad() {
     ['selectStudent', 'navStudent'].forEach(fn => {
       if (typeof w[fn] === 'function') {
         const orig = w[fn];
-        w[fn] = function() { orig.apply(this, arguments); setTimeout(updateOpinionBtn, 0); };
+        w[fn] = function() { orig.apply(this, arguments); setTimeout(updateDockState, 0); };
       }
     });
-    updateOpinionBtn();
+    updateDockState();
   } catch (e) { /* cross-origin 등 — 주입 실패해도 화면은 표시 */ }
 }
 function currentStudent() {
@@ -886,15 +887,41 @@ function currentStudent() {
     return t.replace(/\s*\(.*\)\s*$/, '');
   } catch (e) { return '학생'; }
 }
-function updateOpinionBtn() {
-  const has = !!S.opinions[currentStudent()];
-  const btn = document.getElementById('btnOpinion');
-  btn.classList.toggle('btn-opinion-on', has);
-  btn.innerHTML = has
+function studentTotal() {
+  try {
+    return document.getElementById('reviewFrame').contentDocument.querySelectorAll('.sd-item').length || 21;
+  } catch (e) { return 21; }
+}
+function updateDockState() {
+  const label = currentStudent();
+  // 의견 버튼 — 이 학생에게 의견이 있으면 주황
+  const has = !!S.opinions[label];
+  const ob = document.getElementById('btnOpinion');
+  ob.classList.toggle('btn-opinion-on', has);
+  ob.innerHTML = has
     ? '<i data-lucide="message-square-warning" style="width:16px;height:16px"></i> 의견 등록됨'
     : '<i data-lucide="message-square-plus" style="width:16px;height:16px"></i> 의견';
+  // 확인 진행 카운터
+  const n = S.confirmedStu.size, t = studentTotal();
+  document.getElementById('cfProgress').textContent = '확인 ' + n + ' / ' + t + '명' + (t - n > 0 ? ' · ' + (t - n) + '명 남음' : '');
+  // 확인 버튼 — 이미 확인한 학생이면 "다음 학생"으로
+  const cb = document.getElementById('btnConfirmNext');
+  cb.innerHTML = S.confirmedStu.has(label)
+    ? '<i data-lucide="circle-check-big" style="width:16px;height:16px"></i> 확인됨 — 다음 학생'
+    : '<i data-lucide="circle-check-big" style="width:16px;height:16px"></i> 확인 후 다음';
   closeOpinion();
   lucide.createIcons();
+}
+function confirmStudent() {
+  const label = currentStudent();
+  const already = S.confirmedStu.has(label);
+  if (!already) {
+    S.confirmedStu.add(label);
+    showToast(label + ' 확인 (' + S.confirmedStu.size + '/' + studentTotal() + '명)');
+  }
+  if (S.confirmedStu.size >= studentTotal()) { updateDockState(); openConfirm(); return; }
+  try { document.getElementById('reviewFrame').contentWindow.navStudent(1); } catch (e) {}
+  updateDockState();
 }
 
 /* ───── 검토 도크 (의견 펼침) ───── */
@@ -919,7 +946,7 @@ function saveOpinion() {
   S.opinions[currentStudent()] = v;
   closeOpinion();
   showToast('의견이 등록되었어요');
-  updateOpinionBtn();
+  updateDockState();
 }
 
 /* ───── 플로우 액션 ───── */
