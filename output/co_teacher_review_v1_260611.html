@@ -292,8 +292,8 @@ input[type="checkbox"] { width:18px; height:18px; accent-color:#416bff; cursor:p
 .toast svg { width:18px; height:18px; color:#93e3b9; }
 
 .demo-nav { position:fixed; right:24px; bottom:24px; z-index:150; background:#222631; color:#fff;
-  border-radius:14px; padding:14px 16px; width:252px; cursor:move; box-shadow:0 8px 24px rgba(0,0,0,.3); user-select:none; }
-.dn-title { font-size:12px; font-weight:700; letter-spacing:1.5px; color:#b3b6bd; margin-bottom:10px; display:flex; align-items:center; justify-content:space-between; }
+  border-radius:14px; padding:14px 16px; width:252px; box-shadow:0 8px 24px rgba(0,0,0,.3); user-select:none; }
+.dn-title { font-size:12px; font-weight:700; letter-spacing:1.5px; color:#b3b6bd; margin-bottom:10px; display:flex; align-items:center; justify-content:space-between; cursor:move; padding:2px 0 6px; }
 .dn-step { display:flex; align-items:center; gap:9px; padding:7px 8px; border-radius:8px; font-size:13.5px; font-weight:500; color:#c7cbd3; cursor:pointer; }
 .dn-step:hover { background:#3b3f4c; }
 .dn-step.on { background:#416bff; color:#fff; font-weight:600; }
@@ -754,11 +754,11 @@ input[type="checkbox"] { width:18px; height:18px; accent-color:#416bff; cursor:p
 <!-- ═════════ 데모 내비게이터 ═════════ -->
 <div class="demo-nav" id="demoNav">
   <div class="dn-title"><span>DEMO FLOW</span><i data-lucide="grip-horizontal" style="width:16px;height:16px"></i></div>
-  <div class="dn-step on" data-step="1" onclick="goStep(1)"><span class="n">1</span>수업 홈 1안 · 현행<span class="dn-persona owner">소유자</span></div>
-  <div class="dn-step" data-step="2" onclick="goStep(2)"><span class="n">2</span>수업 홈 2안 · 리뉴얼<span class="dn-persona owner">소유자</span></div>
-  <div class="dn-step" data-step="3" onclick="goStep(3)"><span class="n">3</span>홈 · 요청 수신<span class="dn-persona reviewer">검토자</span></div>
-  <div class="dn-step" data-step="4" onclick="goStep(4)"><span class="n">4</span>검토 모드 · 확인<span class="dn-persona reviewer">검토자</span></div>
-  <div class="dn-step" data-step="5" onclick="goStep(5)"><span class="n">5</span>확인 완료 · 의견 수신<span class="dn-persona owner">소유자</span></div>
+  <div class="dn-step on" data-step="1"><span class="n">1</span>수업 홈 1안 · 현행<span class="dn-persona owner">소유자</span></div>
+  <div class="dn-step" data-step="2"><span class="n">2</span>수업 홈 2안 · 리뉴얼<span class="dn-persona owner">소유자</span></div>
+  <div class="dn-step" data-step="3"><span class="n">3</span>홈 · 요청 수신<span class="dn-persona reviewer">검토자</span></div>
+  <div class="dn-step" data-step="4"><span class="n">4</span>검토 모드 · 확인<span class="dn-persona reviewer">검토자</span></div>
+  <div class="dn-step" data-step="5"><span class="n">5</span>확인 완료 · 의견 수신<span class="dn-persona owner">소유자</span></div>
 </div>
 
 <script>
@@ -958,12 +958,21 @@ function toggleNav() {
   });
 }
 
-/* ───── 데모 내비 드래그 ───── */
+/* ───── 데모 내비: 스텝은 mousedown 즉시 전환, 드래그는 타이틀 바에서만 ───── */
 (function() {
   const nav = document.getElementById('demoNav');
+  // 스텝 전환 — click(mouseup 대기) 대신 mousedown에서 바로 반응
+  nav.querySelectorAll('.dn-step').forEach(el => {
+    el.addEventListener('mousedown', e => {
+      e.stopPropagation();
+      e.preventDefault();
+      goStep(+el.dataset.step);
+    });
+  });
+  // 드래그 — DEMO FLOW 타이틀 바 전용
+  const handle = nav.querySelector('.dn-title');
   let drag = null;
-  nav.addEventListener('mousedown', e => {
-    if (e.target.closest('.dn-step')) return;
+  handle.addEventListener('mousedown', e => {
     const r = nav.getBoundingClientRect();
     drag = { dx: e.clientX - r.left, dy: e.clientY - r.top };
     e.preventDefault();
@@ -976,6 +985,9 @@ function toggleNav() {
   });
   document.addEventListener('mouseup', () => drag = null);
 })();
+
+/* 검토 모드 iframe 미리 로드 — 4번 진입 시 버벅임 방지 */
+setTimeout(initReviewFrame, 1500);
 
 goStep(1);
 lucide.createIcons();
