@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/png" href="clipo_favicon.png">
+  <title>홈 — 내 수업 (CLIPO)</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard-gov.min.css">
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+  <style>
+    *{ font-family:'Pretendard GOV',-apple-system,sans-serif; box-sizing:border-box; }
+    body{ margin:0; background:#f6f7f9; color:#222631; font-size:16px; min-width:1280px; }
+    a{ text-decoration:none; color:inherit; }
+    button{ font-family:inherit; }
+
+    /* ===== Global Header (CLIPO 표준) ===== */
+    .g-hd { height:56px; background:#fff; border-bottom:1px solid #d9d9d9; display:flex; align-items:center; padding:0 20px 0 8px; position:fixed; top:0; left:0; right:0; z-index:200; }
+    .gh-menu-btn { width:36px; height:36px; border:none; background:none; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; color:#3b3f4c; margin-right:8px; line-height:1; }
+    .gh-logo { display:inline-flex; align-items:center; cursor:pointer; padding:4px; border-radius:4px; }
+    .g-hd-r { margin-left:auto; display:flex; align-items:center; gap:6px; font-size:14px; color:#3b3f4c; }
+    .plan-badge { background:#eef3ff; color:#416bff; font-size:12px; font-weight:600; padding:3px 10px; border-radius:12px; }
+    .hd-div { width:1px; height:14px; background:#d9d9d9; margin:0 4px; }
+    .credit-wrap { display:flex; align-items:center; gap:4px; font-size:14px; font-weight:500; color:#3b3f4c; }
+    .user-btn { display:inline-flex; align-items:center; justify-content:center; gap:6px; padding:0; border:none; background:none; font-size:14px; color:#222631; cursor:pointer; line-height:1; font-weight:500; }
+
+    /* ===== Sidebar (CLIPO 표준 icon-sb) ===== */
+    .icon-sb { width:56px; background:#fff; border-right:1px solid #d9d9d9; position:fixed; top:56px; bottom:0; left:0; display:flex; flex-direction:column; padding:8px 0; z-index:150; transition:width .2s ease; }
+    .icon-sb.expanded { width:200px; }
+    .si { height:40px; display:flex; align-items:center; border-radius:8px; color:#6d7381; cursor:pointer; margin:0 8px 2px; position:relative; padding:0 4px 0 8px; gap:10px; white-space:nowrap; flex-shrink:0; }
+    .si:hover { background:#f1f3f5; }
+    .si.active { background:#e9f2ff; color:#416bff; }
+    .si-icon { width:24px; height:24px; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+    .si-label { font-size:13px; font-weight:500; opacity:0; transition:opacity .1s; overflow:hidden; }
+    .icon-sb.expanded .si-label { opacity:1; }
+    .si-tip { position:absolute; left:48px; top:50%; transform:translateY(-50%); background:#222631; color:#fff; font-size:11px; padding:3px 8px; border-radius:4px; white-space:nowrap; display:none; z-index:300; pointer-events:none; }
+    .si:hover .si-tip { display:block; }
+    .icon-sb.expanded .si-tip { display:none !important; }
+    .nav-bottom { margin-top:auto; width:100%; }
+    .nav-div { height:1px; background:#f1f3f5; margin:4px 8px; }
+
+    /* ===== Layout ===== */
+    .main-wrap{ padding-top:56px; padding-left:56px; transition:padding-left .2s; min-height:100vh; display:flex; flex-direction:column; }
+    body.nav-expanded .main-wrap{ padding-left:200px; }
+    .page-wrap{ max-width:1320px; width:100%; margin:0 auto; padding:28px 32px 0; flex:1; display:flex; flex-direction:column; }
+    .home-cols{ display:flex; gap:24px; align-items:flex-start; }
+    .home-main{ flex:1; min-width:0; }
+    .home-rail{ width:320px; flex-shrink:0; display:flex; flex-direction:column; gap:20px; }
+
+    /* ===== 확인 요청 스트립 (공동교사) — 공지가 아닌 '내 할 일'이라 한 줄로 슬림하게 ===== */
+    .rv-strip{ background:#e9f2ff; border:1px solid #ccdfff; border-radius:10px; padding:10px 12px 10px 16px; margin-bottom:14px; }
+    .rv-row{ display:flex; align-items:center; gap:12px; min-height:36px; }
+    .rv-row + .rv-row{ border-top:1px solid #ccdfff; margin-top:8px; padding-top:8px; }
+    .rv-label{ display:inline-flex; align-items:center; gap:6px; font-size:15px; font-weight:700; color:#3151c4; flex-shrink:0; }
+    .rv-cnt{ min-width:20px; height:20px; border-radius:100px; background:#416bff; color:#fff; font-size:12px; font-weight:700; display:inline-flex; align-items:center; justify-content:center; padding:0 6px; }
+    .rv-info{ flex:1; min-width:0; font-size:15px; color:#3b3f4c; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+    .rv-info strong{ color:#222631; font-weight:600; }
+    .rv-more-btn{ background:none; border:none; cursor:pointer; font-family:inherit; font-size:14px; font-weight:600; color:#3151c4; flex-shrink:0; display:inline-flex; align-items:center; gap:2px; padding:4px 6px; border-radius:4px; line-height:1; }
+    .rv-more-btn:hover{ background:#dbe8ff; }
+    .rv-go{ height:34px; padding:0 16px; border-radius:6px; background:#416bff; color:#fff; border:none; font-size:14px; font-weight:600; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; line-height:1; flex-shrink:0; }
+    .rv-go:hover{ background:#365eef; }
+
+    /* ===== 온보딩 배너 ===== */
+    .ob-banner{ background:#e9f2ff; border:1px solid #ccdfff; border-radius:12px; padding:22px 24px; display:flex; gap:18px; align-items:flex-start; margin-bottom:28px; position:relative; }
+    .ob-emoji{ font-size:40px; line-height:1; flex-shrink:0; }
+    .ob-title{ font-size:18px; font-weight:700; color:#222631; margin:0 0 6px; }
+    .ob-desc{ font-size:15px; color:#3b3f4c; line-height:1.55; margin:0 0 14px; }
+    .ob-actions{ display:flex; gap:8px; }
+    .ob-meta{ position:absolute; top:16px; right:18px; display:flex; align-items:center; gap:14px; font-size:14px; color:#3b3f4c; }
+    .ob-meta label{ display:inline-flex; align-items:center; gap:6px; cursor:pointer; user-select:none; }
+    .ob-meta button{ background:none; border:none; cursor:pointer; color:#3b3f4c; font-size:14px; display:inline-flex; align-items:center; gap:2px; padding:2px 4px; line-height:1; }
+
+    /* ===== 내 수업 헤더 ===== */
+    .my-hd{ display:flex; align-items:center; justify-content:space-between; gap:14px; margin-bottom:18px; }
+    .my-title{ font-size:26px; font-weight:700; margin:0; }
+    .my-tools{ display:flex; align-items:center; gap:14px; }
+    .tgl{ display:inline-flex; align-items:center; gap:8px; cursor:pointer; user-select:none; font-size:15px; color:#3b3f4c; }
+    .tgl-track{ width:40px; height:22px; border-radius:100px; background:#d9d9d9; position:relative; transition:background .15s; flex-shrink:0; }
+    .tgl-knob{ position:absolute; top:2px; left:2px; width:18px; height:18px; border-radius:50%; background:#fff; transition:left .15s; box-shadow:0 1px 3px rgba(0,0,0,.2); }
+    .tgl.on .tgl-track{ background:#416bff; }
+    .tgl.on .tgl-knob{ left:20px; }
+    .sort-sel{ height:38px; padding:0 10px; border:1px solid #d9d9d9; border-radius:6px; font-family:inherit; font-size:14px; color:#3b3f4c; background:#fff; cursor:pointer; }
+    .btn-make{ height:40px; border-radius:100px; padding:0 18px; background:#416bff; color:#fff; border:none; font-size:15px; font-weight:600; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; line-height:1; vertical-align:middle; gap:6px; }
+    .btn-make:hover{ background:#365eef; }
+
+    /* ===== 학기 섹션 ===== */
+    .sem{ margin-bottom:10px; }
+    .sem-hd{ display:flex; align-items:center; gap:12px; padding:14px 0; cursor:pointer; user-select:none; }
+    .sem-title{ font-size:20px; font-weight:700; }
+    .sem-meta{ font-size:14px; color:#6d7381; }
+    .sem-chev{ margin-left:auto; color:#6d7381; transition:transform .15s; }
+    .sem.closed .sem-chev{ transform:rotate(180deg); }
+    .sem.closed .sem-body{ display:none; }
+    .sem-body{ padding-bottom:18px; }
+    .sem-grid{ display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:18px; }
+    /* 학기 내 서브 그룹 구분 (공유받은 수업 / 보관 중) */
+    .sub-div{ display:flex; align-items:center; gap:10px; margin:22px 0 14px; }
+    .sub-div-label{ font-size:15px; font-weight:600; color:#3b3f4c; display:inline-flex; align-items:center; gap:6px; flex-shrink:0; }
+    .sub-div-desc{ font-size:13px; color:#9ea3ad; flex-shrink:0; }
+    .sub-div-line{ flex:1; height:1px; background:#dde1e8; }
+
+    /* ===== 수업 카드 ===== */
+    .cc{ background:#fff; border-radius:12px; padding:20px; min-height:172px; display:flex; flex-direction:column; cursor:pointer; box-shadow:0 0 1px #2226314D, 0 2px 8px #0000000F; position:relative; transition:box-shadow .12s; }
+    .cc:hover{ box-shadow:0 0 0 1.5px #ccdfff, 0 4px 12px #0000001A; }
+    .cc.arch{ background:#fbfbfc; }
+    .cc.arch .cc-name, .cc.arch .cc-evals{ color:#9ea3ad; }
+    .cc-top{ display:flex; align-items:flex-start; justify-content:space-between; gap:8px; }
+    .cc-name{ font-size:17px; font-weight:600; line-height:1.45; margin:0; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+    .cc-menu-btn{ width:30px; height:30px; border:none; background:none; border-radius:6px; cursor:pointer; color:#6d7381; display:inline-flex; align-items:center; justify-content:center; flex-shrink:0; }
+    .cc-menu-btn:hover{ background:#f1f3f5; }
+    .cc-evals{ font-size:15px; color:#3b3f4c; margin-top:14px; }
+    .cc-tags{ display:flex; align-items:center; gap:6px; margin-top:auto; padding-top:16px; flex-wrap:wrap; }
+    .tag-subj{ display:inline-flex; align-items:center; justify-content:center; background:#e9f2ff; color:#3151c4; font-size:13px; font-weight:600; border-radius:6px; padding:3px 10px; }
+    .tag-shared{ display:inline-flex; align-items:center; justify-content:center; gap:4px; background:#eefcf4; color:#27724b; font-size:13px; font-weight:600; border-radius:6px; padding:3px 10px; }
+    .tag-arch{ display:inline-flex; align-items:center; justify-content:center; gap:4px; background:#f1f3f5; color:#6d7381; font-size:13px; font-weight:600; border-radius:6px; padding:3px 10px; }
+    .tag-owner{ display:inline-flex; align-items:center; justify-content:center; background:#ebdfff; color:#6f34db; font-size:13px; font-weight:600; border-radius:6px; padding:3px 10px; }
+    .cc-noti{ position:absolute; top:-9px; right:-9px; min-width:24px; height:24px; border-radius:100px; background:#f2525f; color:#fff; font-size:13px; font-weight:700; display:flex; align-items:center; justify-content:center; padding:0 7px; box-shadow:0 1px 4px rgba(0,0,0,.2); z-index:5; }
+    .cc-pop{ position:absolute; top:46px; right:14px; background:#fff; border-radius:8px; box-shadow:0 0 1px #2226314D, 0 8px 24px #00000026; padding:6px; z-index:50; min-width:148px; display:none; }
+    .cc-pop.open{ display:block; }
+    .cc-pop button{ width:100%; display:flex; align-items:center; gap:8px; padding:9px 12px; border:none; background:none; border-radius:6px; font-size:14px; color:#222631; cursor:pointer; text-align:left; }
+    .cc-pop button:hover{ background:#f6f7f9; }
+
+    /* ===== 우측 레일 ===== */
+    .rail-card{ background:#fff; border-radius:12px; padding:20px; box-shadow:0 0 1px #2226314D, 0 2px 8px #0000000F; }
+    .rail-hd{ display:flex; align-items:center; justify-content:space-between; margin-bottom:14px; }
+    .rail-title{ font-size:17px; font-weight:700; }
+    .rail-more{ font-size:13px; color:#6d7381; background:none; border:none; cursor:pointer; display:inline-flex; align-items:center; gap:2px; }
+    .notice-row{ display:flex; align-items:center; gap:8px; padding:7px 0; font-size:14px; color:#3b3f4c; cursor:pointer; }
+    .notice-row:hover{ color:#222631; }
+    .notice-txt{ flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+    .notice-date{ font-size:13px; color:#9ea3ad; flex-shrink:0; }
+    .event-card{ background:#ffedd5; border-radius:12px; padding:18px 20px; cursor:pointer; }
+    .event-title{ font-size:15px; font-weight:700; color:#7c2d12; line-height:1.5; margin:0 0 8px; }
+    .event-link{ font-size:13px; font-weight:600; color:#9a4806; display:inline-flex; align-items:center; gap:2px; }
+    .res-row{ display:flex; align-items:flex-start; gap:10px; border-radius:8px; padding:12px; cursor:pointer; }
+    .res-row:hover{ background:#f6f7f9; }
+    .res-name{ font-size:14px; font-weight:600; color:#222631; margin:0 0 3px; }
+    .res-desc{ font-size:13px; color:#6d7381; margin:0; line-height:1.45; }
+    .school-row{ display:flex; gap:10px; margin-top:10px; }
+    .school-stat{ flex:1; background:#f6f7f9; border-radius:8px; padding:12px 14px; display:flex; align-items:center; justify-content:space-between; font-size:14px; color:#3b3f4c; }
+    .school-stat strong{ font-size:16px; color:#222631; }
+
+    /* ===== Toast / Footer ===== */
+    .toast{ position:fixed; bottom:28px; left:50%; transform:translateX(-50%) translateY(12px); opacity:0; min-width:320px; max-width:520px; padding:14px 22px 14px 16px; border-radius:4px; display:flex; align-items:center; gap:12px; font-size:15px; font-weight:600; box-shadow:0 0 1px #2226314D, 0 4px 12px #00000026; z-index:9999; transition:opacity .2s, transform .2s; pointer-events:none; background:#319d64; color:#fff; }
+    .toast.show{ opacity:1; transform:translateX(-50%) translateY(0); }
+    .toast.info{ background:#416bff; }
+    .site-footer{ margin-top:auto; padding:48px 0 40px; display:flex; flex-direction:column; align-items:center; gap:16px; }
+    .sf-links{ display:flex; align-items:center; }
+    .sf-links a{ font-size:14px; color:#3b3f4c; padding:0 16px; }
+    .sf-links a + a{ border-left:1px solid #dde1e8; }
+    .sf-copy{ font-size:14px; color:#9aa0ad; }
+  </style>
+</head>
+<body>
+
+<!-- ===== Global Header ===== -->
+<header class="g-hd">
+  <button class="gh-menu-btn" onclick="toggleNav()"><i data-lucide="menu" style="width:20px;height:20px"></i></button>
+  <a class="gh-logo" href="home_v1_260612.html" title="홈으로">
+    <svg width="76" height="16" viewBox="0 0 76 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M11.3613 4.03516H4.09668V11.9629H8.88281L8.88086 11.9648H15.6016V16H4.02539C1.80242 15.9998 0 14.223 0 12.0322V3.96777C0 1.77696 1.80242 0.000177874 4.02539 0H15.4561L11.3613 4.03516ZM22.0703 11.9648H33.5781V16H22.002C19.7788 16 17.9756 14.2231 17.9756 12.0322V0H22.0703V11.9648ZM40.0459 16H35.9521V0H40.0459V16ZM54.5381 0C56.4564 0 58.0138 1.53228 58.0186 3.42285L58.0166 3.4248V8.54297C58.014 10.4333 56.4567 11.9648 54.5361 11.9648H46.5107L42.416 16V0H54.5381ZM71.9746 0C74.0086 0.000134956 75.6887 1.49046 75.958 3.42285H76V12.5771H75.958C75.6887 14.5095 74.011 15.9999 71.9746 16H64.4238C62.3897 16 60.7098 14.5096 60.4404 12.5771C60.4145 12.398 60.3984 12.2184 60.3984 12.0322V3.96777C60.3984 3.78159 60.4145 3.60205 60.4404 3.42285C60.7098 1.49037 62.3873 0 64.4238 0H71.9746ZM64.4922 12.5771H71.9062V3.42285H64.4922V12.5771ZM46.5107 3.42285V8.54004H53.9238V3.42285H46.5107Z" fill="#365EEF"/></svg>
+  </a>
+  <div class="g-hd-r">
+    <span class="plan-badge">학교 유료</span>
+    <span style="font-size:14px;color:#3b3f4c">D-180</span>
+    <div class="hd-div"></div>
+    <i data-lucide="sparkles" style="width:18px;height:18px;color:#416bff"></i>
+    <div class="credit-wrap">AI 크레딧 200</div>
+    <div class="hd-div"></div>
+    <button class="user-btn">최대표 선생님(대표교사) <i data-lucide="chevron-down" style="width:16px;height:16px"></i></button>
+  </div>
+</header>
+
+<!-- ===== Sidebar ===== -->
+<nav class="icon-sb" id="icon-sb">
+  <div class="si active"><div class="si-icon"><i data-lucide="home" style="width:20px;height:20px"></i></div><span class="si-label">홈</span><span class="si-tip">홈</span></div>
+  <div class="si"><div class="si-icon"><i data-lucide="scissors" style="width:20px;height:20px"></i></div><span class="si-label">평가계획</span><span class="si-tip">평가계획</span></div>
+  <div class="si" onclick="location.href='co_teacher_review_v1_260611.html'"><div class="si-icon"><i data-lucide="layout-grid" style="width:20px;height:20px"></i></div><span class="si-label">수업</span><span class="si-tip">수업</span></div>
+  <div class="si" onclick="location.href='creative_activity_list_v6_260507.html'"><div class="si-icon"><i data-lucide="notebook-pen" style="width:20px;height:20px"></i></div><span class="si-label">창의적 체험활동 <span style="font-size:10px;background:#416bff;color:#fff;padding:1px 5px;border-radius:3px;margin-left:2px">Beta</span></span><span class="si-tip">창의적 체험활동</span></div>
+  <div class="si" onclick="location.href='quick_seteuk_dev_list_v1_260604.html'"><div class="si-icon"><i data-lucide="zap" style="width:20px;height:20px"></i></div><span class="si-label">세특 간편 생성기</span><span class="si-tip">세특 간편 생성기</span></div>
+  <div class="si"><div class="si-icon"><i data-lucide="smile" style="width:20px;height:20px"></i></div><span class="si-label">행동특성 및 종합기록</span><span class="si-tip">행동특성 및 종합기록</span></div>
+  <div class="si"><div class="si-icon"><i data-lucide="bar-chart-2" style="width:20px;height:20px"></i></div><span class="si-label">리포트</span><span class="si-tip">리포트</span></div>
+  <div class="si"><div class="si-icon"><i data-lucide="building-2" style="width:20px;height:20px"></i></div><span class="si-label">학교 설정</span><span class="si-tip">학교 설정</span></div>
+  <div class="nav-bottom">
+    <div class="nav-div"></div>
+    <div class="si"><div class="si-icon"><i data-lucide="file-down" style="width:20px;height:20px"></i></div><span class="si-label">매뉴얼 다운로드</span><span class="si-tip">매뉴얼 다운로드</span></div>
+    <div class="si"><div class="si-icon"><i data-lucide="credit-card" style="width:20px;height:20px"></i></div><span class="si-label">요금제</span><span class="si-tip">요금제</span></div>
+    <div class="si"><div class="si-icon"><i data-lucide="help-circle" style="width:20px;height:20px"></i></div><span class="si-label">고객센터</span><span class="si-tip">고객센터</span></div>
+  </div>
+</nav>
+
+<div class="main-wrap">
+<div class="page-wrap">
+
+  <!-- 확인 요청 스트립 (공동교사) — 한 줄 슬림, 온보딩 배너와 공존 -->
+  <div class="rv-strip" id="rv-banner" style="display:none;"></div>
+
+  <!-- 온보딩 배너 -->
+  <div class="ob-banner" id="ob-banner">
+    <div class="ob-emoji">🚀</div>
+    <div style="flex:1;min-width:0;">
+      <p class="ob-title">클리포가 처음이신가요?</p>
+      <p class="ob-desc">클리포의 주요 메뉴 살펴보고, 평가 설계부터 AI 채점까지의 과정을 미리 체험할 수 있어요. 체험 완료하시면 AI 크레딧도 드려요!</p>
+      <div class="ob-actions">
+        <button class="btn-make" style="border-radius:6px;" onclick="toastMsg('체험 모드는 이 목업에서 제공하지 않습니다.', true)">체험 시작하기 <i data-lucide="chevron-right" style="width:15px;height:15px"></i></button>
+        <button style="height:40px;border-radius:6px;padding:0 16px;background:#fff;border:1px solid #ccdfff;color:#3151c4;font-size:15px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;line-height:1;gap:6px;" onclick="toastMsg('AI 채점 예시는 이 목업에서 제공하지 않습니다.', true)"><i data-lucide="wand-sparkles" style="width:15px;height:15px"></i>AI 채점 예시</button>
+      </div>
+    </div>
+    <div class="ob-meta">
+      <label><input type="checkbox" style="width:15px;height:15px;accent-color:#416bff;"> 다시 보지 않기</label>
+      <button onclick="document.getElementById('ob-banner').style.display='none'"><i data-lucide="x" style="width:15px;height:15px"></i> 닫기</button>
+    </div>
+  </div>
+
+  <div class="home-cols">
+    <!-- ===== 메인: 내 수업 ===== -->
+    <div class="home-main">
+      <div class="my-hd">
+        <h1 class="my-title">내 수업</h1>
+        <div class="my-tools">
+          <select class="sort-sel" id="sort-sel" onchange="renderAll()">
+            <option value="recent">최근 활동순</option>
+            <option value="name">수업명순</option>
+          </select>
+          <span class="tgl" id="arch-tgl" onclick="toggleArchived()">
+            <span class="tgl-track"><span class="tgl-knob"></span></span>
+            보관한 수업 보기
+          </span>
+          <button class="btn-make" onclick="location.href='class_create_v1_260429.html'"><i data-lucide="plus" style="width:16px;height:16px"></i>수업 만들기</button>
+        </div>
+      </div>
+      <div id="sem-list"></div>
+    </div>
+
+    <!-- ===== 우측 레일 ===== -->
+    <div class="home-rail">
+      <div class="rail-card">
+        <div class="rail-hd">
+          <span class="rail-title">공지사항</span>
+          <button class="rail-more" onclick="toastMsg('공지사항 목록은 이 목업에서 제공하지 않습니다.', true)">더보기 <i data-lucide="chevron-right" style="width:13px;height:13px"></i></button>
+        </div>
+        <div class="notice-row" onclick="toastMsg('공지 본문은 이 목업에서 제공하지 않습니다.', true)">🔔 <span class="notice-txt">클리포 충남교육청 '인수레' 연수 안내</span><span class="notice-date">26/06/12</span></div>
+        <div class="notice-row" onclick="toastMsg('공지 본문은 이 목업에서 제공하지 않습니다.', true)">🔔 <span class="notice-txt">[신규] 창의적 체험활동 기록 지원 오픈</span><span class="notice-date">26/06/09</span></div>
+        <div class="notice-row" onclick="toastMsg('공지 본문은 이 목업에서 제공하지 않습니다.', true)">🔔 <span class="notice-txt">선생님의 1학기 마무리를 도와드려요</span><span class="notice-date">26/06/05</span></div>
+        <div class="notice-row" onclick="toastMsg('공지 본문은 이 목업에서 제공하지 않습니다.', true)"><span style="width:18px;"></span><span class="notice-txt">[6/1 적용] 클리포 채점이 더 정확해져요</span><span class="notice-date">26/05/29</span></div>
+      </div>
+
+      <div class="event-card" onclick="toastMsg('이용권 혜택 안내는 이 목업에서 제공하지 않습니다.', true)">
+        <p class="event-title">🎁 [EVENT] 6개월권 기간 연장<br>지금 구매하면 12/31까지 쭉!</p>
+        <span class="event-link">이용권 혜택 보기 <i data-lucide="chevron-right" style="width:13px;height:13px"></i></span>
+      </div>
+
+      <div class="rail-card" style="padding:14px;">
+        <div class="rail-hd" style="padding:6px 6px 0;"><span class="rail-title">자료실</span></div>
+        <div class="res-row" onclick="toastMsg('외부 링크는 이 목업에서 연결하지 않습니다.', true)">
+          <span style="font-size:18px;">▶️</span>
+          <div><p class="res-name">클리포 유튜브</p><p class="res-desc">기능별 가이드 영상을 보며 따라해 보세요.</p></div>
+        </div>
+        <div class="res-row" onclick="toastMsg('외부 링크는 이 목업에서 연결하지 않습니다.', true)">
+          <span style="font-size:18px;">✅</span>
+          <div><p class="res-name">학습지원 소프트웨어 체크리스트</p><p class="res-desc">학운위 심의 참고 자료를 확인해 보세요.</p></div>
+        </div>
+        <div class="res-row" onclick="toastMsg('외부 링크는 이 목업에서 연결하지 않습니다.', true)">
+          <span style="font-size:18px;">✏️</span>
+          <div><p class="res-name">개인정보 동의서 양식</p><p class="res-desc">학부모 안내용 가정통신문으로 활용하세요.</p></div>
+        </div>
+      </div>
+
+      <div class="rail-card">
+        <div class="rail-hd">
+          <span class="rail-title">학교 정보</span>
+          <button class="rail-more" onclick="toastMsg('학교 설정은 이 목업에서 제공하지 않습니다.', true)">더보기 <i data-lucide="chevron-right" style="width:13px;height:13px"></i></button>
+        </div>
+        <div style="font-size:13px;color:#6d7381;margin-bottom:4px;">학교명</div>
+        <div style="font-size:16px;font-weight:600;">경기도테스트중학교</div>
+        <div style="font-size:13px;color:#6d7381;margin-top:14px;">선생님</div>
+        <div class="school-row" style="margin-top:6px;">
+          <div class="school-stat">대표교사 <strong>1명</strong></div>
+          <div class="school-stat">일반교사 <strong>4명</strong></div>
+        </div>
+        <div style="font-size:13px;color:#6d7381;margin-top:14px;">등록 학생</div>
+        <div class="school-row" style="margin-top:6px;">
+          <div class="school-stat">2026학년도 <strong>31명</strong></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer class="site-footer">
+    <div class="sf-links"><a href="#" onclick="return false;">회사소개</a><a href="#" onclick="return false;">이용약관</a><a href="#" onclick="return false;">개인정보처리방침</a><a href="#" onclick="return false;">고객센터</a></div>
+    <div class="sf-copy">© 2026. Datadriven Inc. All rights reserved.</div>
+  </footer>
+</div>
+</div>
+
+<div class="toast" id="toast"><span id="toast-msg"></span></div>
+
+<script>
+function toggleNav(){ document.getElementById('icon-sb').classList.toggle('expanded'); document.body.classList.toggle('nav-expanded'); }
+var _toastTimer = null;
+function toastMsg(msg, info){
+  var t = document.getElementById('toast');
+  document.getElementById('toast-msg').textContent = msg;
+  t.classList.toggle('info', !!info);
+  t.classList.add('show');
+  clearTimeout(_toastTimer);
+  _toastTimer = setTimeout(function(){ t.classList.remove('show'); }, 2400);
+}
+
+// ── 수업 데이터 ──
+// shared: 공유받은 수업(다른 선생님 소유) / archived: 보관(숨김, 삭제 아님) / last: 최근 활동(정렬용)
+var CLASSES = [
+  { id:'c1',  sem:'2026학년도 2학기', name:'사회',     evals:5, subj:'사회', shared:false, archived:false, last:260610 },
+  { id:'c5',  sem:'2026학년도 1학기', name:'사회',     evals:2, subj:'사회', shared:false, archived:false, last:260612, link:'co_teacher_review_v1_260611.html' },
+  { id:'c6',  sem:'2026학년도 1학기', name:'미술',     evals:1, subj:'미술', shared:false, archived:false, last:260520 },
+  { id:'c11', sem:'2026학년도 1학기', name:'한국사',   evals:2, subj:'사회', shared:true,  sharedBy:'최대표 선생님', reviewReq:1, archived:false, last:260611, link:'co_teacher_review_v1_260611.html#step4' },
+  { id:'c7',  sem:'2026학년도 1학기', name:'역사',     evals:1, subj:'사회', shared:true,  sharedBy:'김하나 선생님', reviewReq:1, archived:false, last:260610, link:'co_teacher_review_v1_260611.html#step4' },
+  { id:'c8',  sem:'2026학년도 1학기', name:'통합사회', evals:1, subj:'사회', shared:true,  sharedBy:'박지원 선생님', archived:false, last:260601 },
+  { id:'c9',  sem:'2026학년도 1학기', name:'국어',     evals:1, subj:'국어', shared:false, archived:true,  last:260430 },
+  { id:'c10', sem:'2026학년도 1학기', name:'도덕',     evals:1, subj:'사회', shared:false, archived:true,  last:260422 }
+];
+var SEM_ORDER = ['2026학년도 2학기', '2026학년도 1학기'];
+var showArchived = false;
+var closedSems = {};
+
+// ── 정렬 규칙: 내 수업 → 공유받은 수업 → (토글 시) 보관 중 / 그룹 안에서는 선택한 정렬 기준 ──
+function sortCards(list){
+  var mode = document.getElementById('sort-sel').value;
+  function group(c){ return c.archived ? 2 : (c.shared ? 1 : 0); }
+  return list.slice().sort(function(a, b){
+    if (group(a) !== group(b)) return group(a) - group(b);
+    if (mode === 'name') return a.name.localeCompare(b.name, 'ko');
+    return b.last - a.last;
+  });
+}
+
+function cardHTML(c){
+  // 공유/보관 여부는 서브 그룹 헤더가 이미 말해주므로 카드에는 공유자 태그만 남긴다
+  var tags = '<span class="tag-subj">' + c.subj + '</span>';
+  if (c.shared) tags += '<span class="tag-owner" title="' + c.sharedBy + '이 공유한 수업이에요">' + c.sharedBy + '</span>';
+  var noti = c.reviewReq ? '<span class="cc-noti">' + c.reviewReq + '</span>' : '';
+  var evalsTxt = '수행평가 ' + c.evals + '개' + (c.reviewReq ? ' · 확인 요청 ' + c.reviewReq + '건' : '');
+  var open = c.link ? "location.href='" + c.link + "'" : "toastMsg('수업 홈은 내 수업의 사회 카드에서 체험할 수 있어요.', true)";
+  return '<div class="cc' + (c.archived ? ' arch' : '') + '" onclick="' + open + '">'
+    + noti
+    + '<div class="cc-top">'
+    + '<h3 class="cc-name">' + c.name + '</h3>'
+    + '<button class="cc-menu-btn" onclick="event.stopPropagation();togglePop(\'' + c.id + '\')"><i data-lucide="more-vertical" style="width:17px;height:17px"></i></button>'
+    + '</div>'
+    + '<div class="cc-evals">' + evalsTxt + '</div>'
+    + '<div class="cc-tags">' + tags + '</div>'
+    + '<div class="cc-pop" id="pop-' + c.id + '" onclick="event.stopPropagation()">'
+    + (c.archived
+        ? '<button onclick="setArchived(\'' + c.id + '\', false)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="5" rx="1"/><path d="M4 8v11a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8"/><path d="m9.5 17 5-5"/><path d="m9.5 12 5 5"/></svg>보관 해제</button>'
+        : '<button onclick="setArchived(\'' + c.id + '\', true)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="5" rx="1"/><path d="M4 8v11a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8"/><path d="M10 12h4"/></svg>보관하기</button>')
+    + '<button onclick="toastMsg(\'수업 정보 수정은 이 목업에서 제공하지 않습니다.\', true)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg>수업 정보 수정</button>'
+    + '</div>'
+    + '</div>';
+}
+
+function renderAll(){
+  var wrap = document.getElementById('sem-list');
+  var html = '';
+  SEM_ORDER.forEach(function(sem){
+    var all = CLASSES.filter(function(c){ return c.sem === sem; });
+    var mine = all.filter(function(c){ return !c.archived && !c.shared; });
+    var shared = all.filter(function(c){ return !c.archived && c.shared; });
+    var archived = all.filter(function(c){ return c.archived; });
+    var meta = '진행 중 ' + (mine.length + shared.length) + '개'
+      + (shared.length ? ' (공유받음 ' + shared.length + '개)' : '')
+      + ' · 보관 중 ' + archived.length + '개';
+    var closed = !!closedSems[sem];
+
+    // 학기 안 서브 그룹: 내 수업 → 공유받은 수업 → (토글 시) 보관 중
+    var body = '<div class="sem-grid">' + sortCards(mine).map(cardHTML).join('') + '</div>';
+    if (shared.length) {
+      body += '<div class="sub-div">'
+        + '<span class="sub-div-label"><i data-lucide="users" style="width:15px;height:15px;color:#27724b;"></i>공유받은 수업 ' + shared.length + '</span>'
+        + '<span class="sub-div-desc">동료 선생님이 공동 확인을 위해 공유한 수업이에요</span>'
+        + '<span class="sub-div-line"></span>'
+        + '</div>'
+        + '<div class="sem-grid">' + sortCards(shared).map(cardHTML).join('') + '</div>';
+    }
+    if (showArchived && archived.length) {
+      body += '<div class="sub-div">'
+        + '<span class="sub-div-label"><i data-lucide="archive" style="width:15px;height:15px;color:#6d7381;"></i>보관 중 ' + archived.length + '</span>'
+        + '<span class="sub-div-desc">목록에서 숨겨둔 수업이에요 · 보관 해제하면 다시 표시돼요</span>'
+        + '<span class="sub-div-line"></span>'
+        + '</div>'
+        + '<div class="sem-grid">' + sortCards(archived).map(cardHTML).join('') + '</div>';
+    }
+
+    html += '<div class="sem' + (closed ? ' closed' : '') + '" id="sem-' + sem.replace(/\s/g,'') + '">'
+      + '<div class="sem-hd" onclick="toggleSem(\'' + sem + '\')">'
+      + '<span class="sem-title">' + sem + '</span>'
+      + '<span class="sem-meta">' + meta + '</span>'
+      + '<i data-lucide="chevron-up" class="sem-chev" style="width:20px;height:20px"></i>'
+      + '</div>'
+      + '<div class="sem-body">' + body + '</div>'
+      + '</div>';
+  });
+  wrap.innerHTML = html;
+  lucide.createIcons();
+}
+
+function toggleSem(sem){ closedSems[sem] = !closedSems[sem]; renderAll(); }
+function toggleArchived(){
+  showArchived = !showArchived;
+  document.getElementById('arch-tgl').classList.toggle('on', showArchived);
+  renderAll();
+}
+function togglePop(id){
+  var target = document.getElementById('pop-' + id);
+  var wasOpen = target.classList.contains('open');
+  document.querySelectorAll('.cc-pop').forEach(function(p){ p.classList.remove('open'); });
+  if (!wasOpen) target.classList.add('open');
+}
+document.addEventListener('click', function(){ document.querySelectorAll('.cc-pop').forEach(function(p){ p.classList.remove('open'); }); });
+function setArchived(id, on){
+  var c = CLASSES.find(function(x){ return x.id === id; });
+  if (!c) return;
+  c.archived = on;
+  renderAll();
+  toastMsg(on
+    ? '수업을 보관했어요. 삭제가 아니라 목록에서만 숨겨져요 — \'보관한 수업 보기\'를 켜면 다시 볼 수 있어요.'
+    : '보관을 해제했어요. 수업이 다시 목록에 표시됩니다.');
+}
+
+// ── 확인 요청 스트립: '내 할 일'이라 한 줄로 표시, 여러 건이면 +N건 펼침 ──
+var REVIEW_REQUESTS = [
+  { evalName:'미래 예측 시나리오 작성 2', cls:'한국사', by:'최대표 선생님', date:'06/11', msg:'서술형 부분점수 위주로 봐주세요', link:'co_teacher_review_v1_260611.html#step4' },
+  { evalName:'설득하는 글쓰기', cls:'역사', by:'김하나 선생님', date:'06/12', msg:'근거 채점요소 위주로 확인 부탁드려요', link:'co_teacher_review_v1_260611.html#step4' }
+];
+var rvExpanded = false;
+function rvRowHTML(req, withLabel){
+  var label = withLabel
+    ? '<span class="rv-label"><i data-lucide="user-check" style="width:16px;height:16px;"></i>확인 요청<span class="rv-cnt">' + REVIEW_REQUESTS.length + '</span></span>'
+    : '<span class="rv-label" style="visibility:hidden;"><i data-lucide="user-check" style="width:16px;height:16px;"></i>확인 요청<span class="rv-cnt">' + REVIEW_REQUESTS.length + '</span></span>';
+  var moreBtn = (withLabel && REVIEW_REQUESTS.length > 1)
+    ? '<button class="rv-more-btn" onclick="rvToggleMore()">' + (rvExpanded ? '접기' : '+' + (REVIEW_REQUESTS.length - 1) + '건 보기') + ' <i data-lucide="' + (rvExpanded ? 'chevron-up' : 'chevron-down') + '" style="width:13px;height:13px;"></i></button>'
+    : '';
+  return '<div class="rv-row">'
+    + label
+    + '<span class="rv-info" title="' + req.by + ' · ' + req.date + ' 요청 · 💬 ' + req.msg + '"><strong>' + req.evalName + '</strong> · ' + req.cls + ' — ' + req.by + ' · ' + req.date + ' 요청</span>'
+    + moreBtn
+    + '<button class="rv-go" onclick="location.href=\'' + req.link + '\'">검토</button>'
+    + '</div>';
+}
+function renderReviewStrip(){
+  var el = document.getElementById('rv-banner');
+  if (!REVIEW_REQUESTS.length) { el.style.display = 'none'; return; }
+  var html = rvRowHTML(REVIEW_REQUESTS[0], true);
+  if (rvExpanded) {
+    REVIEW_REQUESTS.slice(1).forEach(function(req){ html += rvRowHTML(req, false); });
+  }
+  el.innerHTML = html;
+  el.style.display = '';
+  lucide.createIcons();
+}
+function rvToggleMore(){ rvExpanded = !rvExpanded; renderReviewStrip(); }
+
+renderReviewStrip();
+renderAll();
+lucide.createIcons();
+</script>
+
+</body>
+</html>
