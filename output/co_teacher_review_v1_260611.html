@@ -795,6 +795,7 @@ function goStep(n) {
     setHeader('owner');
     sb.classList.remove('expanded');
     document.querySelector('[data-nav="class"]').classList.add('active');
+    renderOwnerState(false);
   } else if (n === 3) {
     document.getElementById('sceneHome').classList.add('active');
     setHeader('reviewer');
@@ -842,11 +843,12 @@ function renderOwnerState(done) {
     meta.textContent = '3학년 2반 · 채점 완료 3/3명';
     act.innerHTML = '<button class="btn-outline btn-sm" onclick="openModal(\'modalRequest\')">확인 요청</button>';
   }
-  // 2안 화면의 같은 평가 상태도 동기화
+  // 2안 화면의 같은 평가 상태도 동기화 (완료 시 의견 칩 포함)
+  const chip = ' <span class="badge bdg-dissent" onclick="openModal(\'modalDissent\')"><i data-lucide="message-square-warning"></i> 의견 1건</span>';
   const st2 = document.getElementById('evalA2-status');
   const row2 = document.getElementById('evalA2-row');
-  if (st2) st2.innerHTML = badgeFor(state);
-  if (row2) row2.innerHTML = badgeFor(state);
+  if (st2) st2.innerHTML = badgeFor(state) + (state === 'done' ? chip : '');
+  if (row2) row2.innerHTML = badgeFor(state) + (state === 'done' ? chip : '');
   lucide.createIcons();
 }
 
@@ -966,7 +968,7 @@ function doConfirm() {
   S.confirmed = true;
   closeModal('modalConfirm');
   showToast('확인 기록이 저장되었어요 · 최대표 선생님에게 전달됩니다');
-  setTimeout(() => goStep(5), 1200);
+  setTimeout(() => goStep(2), 1200);
 }
 
 /* ───── 공통 ───── */
