@@ -1,0 +1,780 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/png" href="clipo_favicon.png">
+  <title>수행평가(과제) 설계 — CLIPO</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard-gov.min.css">
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+  <style>
+    *{ font-family:'Pretendard GOV',-apple-system,sans-serif; box-sizing:border-box; }
+    body{ margin:0; background:#f6f7f9; color:#222631; font-size:16px; min-width:1280px; }
+    a{ text-decoration:none; color:inherit; }
+    button{ font-family:inherit; }
+
+    /* ===== Global Header ===== */
+    .g-hd { height:56px; background:#fff; border-bottom:1px solid #d9d9d9; display:flex; align-items:center; padding:0 20px 0 8px; position:fixed; top:0; left:0; right:0; z-index:200; }
+    .gh-menu-btn { width:36px; height:36px; border:none; background:none; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; color:#3b3f4c; margin-right:8px; line-height:1; }
+    .g-hd-r { margin-left:auto; display:flex; align-items:center; gap:6px; font-size:14px; color:#3b3f4c; }
+    .plan-badge { background:#eef3ff; color:#416bff; font-size:12px; font-weight:600; padding:3px 10px; border-radius:12px; }
+    .hd-div { width:1px; height:14px; background:#d9d9d9; margin:0 4px; }
+    .credit-wrap { display:flex; align-items:center; gap:4px; font-size:14px; font-weight:500; color:#3b3f4c; }
+    .user-btn { display:inline-flex; align-items:center; justify-content:center; gap:6px; padding:0; border:none; background:none; font-size:14px; color:#222631; cursor:pointer; line-height:1; font-weight:500; }
+
+    /* ===== Sidebar ===== */
+    .icon-sb { width:56px; background:#fff; border-right:1px solid #d9d9d9; position:fixed; top:56px; bottom:0; left:0; display:flex; flex-direction:column; padding:8px 0; z-index:150; transition:width .2s ease; }
+    .icon-sb.expanded { width:200px; }
+    .si { height:40px; display:flex; align-items:center; border-radius:8px; color:#6d7381; cursor:pointer; margin:0 8px 2px; position:relative; padding:0 4px 0 8px; gap:10px; white-space:nowrap; flex-shrink:0; }
+    .si:hover { background:#f1f3f5; }
+    .si.active { background:#e9f2ff; color:#416bff; }
+    .si-icon { width:24px; height:24px; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+    .si-label { font-size:13px; font-weight:500; opacity:0; transition:opacity .1s; overflow:hidden; }
+    .icon-sb.expanded .si-label { opacity:1; }
+    .si-tip { position:absolute; left:48px; top:50%; transform:translateY(-50%); background:#222631; color:#fff; font-size:11px; padding:3px 8px; border-radius:4px; white-space:nowrap; display:none; z-index:300; pointer-events:none; }
+    .si:hover .si-tip { display:block; }
+    .icon-sb.expanded .si-tip { display:none !important; }
+    .nav-bottom { margin-top:auto; width:100%; }
+    .nav-div { height:1px; background:#f1f3f5; margin:4px 8px; }
+
+    /* ===== Layout ===== */
+    .main-wrap{ padding-top:56px; padding-left:56px; transition:padding-left .2s; min-height:100vh; display:flex; flex-direction:column; }
+    body.nav-expanded .main-wrap{ padding-left:200px; }
+
+    /* ===== Tab band ===== */
+    .tab-band{ background:white; border-bottom:1px solid #dde1e8; }
+    .tab-band-inner{ max-width:1080px; margin:0 auto; padding:0 32px; display:flex; gap:8px; }
+    .sub-tab{ padding:18px 14px; font-size:16px; font-weight:500; color:#3b3f4c; border:none; background:none; cursor:pointer; font-family:inherit; border-bottom:2px solid transparent; margin-bottom:-1px; display:inline-flex; align-items:center; justify-content:center; line-height:1; }
+    .sub-tab:hover{ color:#222631; }
+    .sub-tab.on{ color:#416bff; border-bottom:2px solid #416bff; font-weight:600; }
+
+    /* ===== Page ===== */
+    .page-wrap{ max-width:1080px; width:100%; margin:0 auto; padding:24px 32px 0; flex:1; display:flex; flex-direction:column; }
+    .back-link{ display:inline-flex; align-items:center; line-height:1; gap:4px; font-size:15px; font-weight:600; color:#222631; background:none; border:none; cursor:pointer; font-family:inherit; padding:0; margin-bottom:14px; align-self:flex-start; }
+    .back-link i{ color:#416bff; }
+    .page-h1{ font-size:22px; font-weight:700; margin:0 0 8px; }
+    .page-sub{ font-size:16px; color:#3b3f4c; margin:0 0 24px; line-height:1.55; }
+
+    /* ===== Section card ===== */
+    .sec{ background:#fff; border-radius:12px; padding:24px; box-shadow:0 0 1px #2226314D, 0 2px 8px #0000000F; margin-bottom:20px; }
+    .sec-hd{ display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:6px; }
+    .sec-title{ font-size:18px; font-weight:700; display:inline-flex; align-items:center; gap:6px; }
+    .sec-title .help{ color:#9ea3ad; cursor:pointer; display:inline-flex; }
+    .sec-desc{ font-size:14px; color:#6d7381; margin:0 0 18px; line-height:1.55; }
+    .sec-count{ font-size:14px; font-weight:600; color:#416bff; }
+
+    .field-label{ font-size:15px; font-weight:600; color:#222631; margin-bottom:8px; display:block; }
+    .inp{ width:100%; height:48px; border:1px solid #d9d9d9; border-radius:8px; padding:0 14px; font-size:16px; font-family:inherit; color:#222631; outline:none; background:#fff; }
+    .inp:focus{ border-color:#416bff; box-shadow:0 0 0 3px rgba(65,107,255,.12); }
+    .inp-wrap{ position:relative; }
+    .inp-ai{ position:absolute; right:10px; top:50%; transform:translateY(-50%); width:30px; height:30px; border:none; background:none; cursor:pointer; color:#416bff; display:inline-flex; align-items:center; justify-content:center; border-radius:6px; }
+    .inp-ai:hover{ background:#e9f2ff; }
+
+    /* radio (line) */
+    .radio-line{ display:flex; gap:24px; margin-top:14px; }
+    .rad{ display:inline-flex; align-items:center; gap:8px; cursor:pointer; font-size:16px; color:#222631; }
+    .rad .ring{ width:20px; height:20px; border-radius:50%; border:1.5px solid #c7cbd3; background:#fff; flex-shrink:0; }
+    .rad.on .ring{ border:6.5px solid #416bff; }
+
+    /* 기준 카드 (성취/채점 공통) */
+    .crit{ border:1px solid #dde1e8; border-radius:10px; padding:18px; margin-bottom:14px; position:relative; }
+    .crit-hd{ display:flex; align-items:center; justify-content:space-between; margin-bottom:12px; }
+    .crit-name{ font-size:15px; font-weight:600; color:#3b3f4c; }
+    .crit-x{ width:28px; height:28px; border:none; background:none; cursor:pointer; color:#9ea3ad; border-radius:6px; display:inline-flex; align-items:center; justify-content:center; }
+    .crit-x:hover{ background:#f6f7f9; color:#db3e51; }
+    .crit-tools{ display:flex; gap:8px; margin-top:12px; }
+    .chk-inline{ display:inline-flex; align-items:center; gap:6px; font-size:14px; color:#3b3f4c; cursor:pointer; user-select:none; }
+    .chk-inline input{ width:16px; height:16px; accent-color:#416bff; }
+
+    .sel{ width:100%; height:48px; border:1px solid #d9d9d9; border-radius:8px; padding:0 14px; font-size:16px; font-family:inherit; color:#222631; background:#fff; cursor:pointer; appearance:none; background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%236d7381' stroke-width='2'><path d='M6 9l6 6 6-6'/></svg>"); background-repeat:no-repeat; background-position:right 12px center; }
+
+    /* 수준 테이블 (상/중/하) */
+    .lv-tbl{ width:100%; border:1px solid #dde1e8; border-radius:8px; overflow:hidden; margin-top:12px; }
+    .lv-row{ display:flex; align-items:stretch; border-bottom:1px solid #eceef2; }
+    .lv-row:last-child{ border-bottom:none; }
+    .lv-tag{ width:56px; flex-shrink:0; background:#f6f7f9; display:flex; align-items:center; justify-content:center; font-size:15px; font-weight:600; color:#3b3f4c; border-right:1px solid #eceef2; }
+    .lv-desc{ flex:1; padding:12px 14px; font-size:15px; color:#222631; line-height:1.55; }
+    .lv-desc[contenteditable]:focus{ outline:none; background:#f4f8ff; }
+
+    /* 채점요소 행 (점수+내용) */
+    .sc-row{ display:flex; align-items:stretch; border-bottom:1px solid #eceef2; }
+    /* 채점요소(왼쪽) — 오른쪽 급간 표 높이에 맞춰 stretch */
+    .rub-elem{ flex:0 0 200px; align-self:stretch; height:auto; border:1px solid #d9d9d9; border-radius:8px; padding:14px; font-size:16px; font-family:inherit; color:#222631; outline:none; background:#fff; resize:none; line-height:1.5; }
+    .rub-elem:focus{ border-color:#416bff; box-shadow:0 0 0 3px rgba(65,107,255,.12); }
+    .rub-elem::placeholder{ color:#9ea3ad; }
+    .sc-tbl{ border:1px solid #dde1e8; border-radius:8px; overflow:hidden; }
+    .sc-tbl .sc-row:last-child{ border-bottom:none; }
+    .sc-score{ width:64px; flex-shrink:0; border-right:1px solid #eceef2; }
+    .sc-score input{ width:100%; height:100%; min-height:48px; border:none; text-align:center; font-size:16px; font-weight:600; color:#222631; outline:none; background:#fff; font-family:inherit; }
+    .sc-desc{ flex:1; position:relative; }
+    .sc-desc input{ width:100%; height:100%; min-height:48px; border:none; padding:0 14px; font-size:15px; color:#222631; outline:none; background:#fff; font-family:inherit; }
+    .sc-desc input:focus{ background:#f4f8ff; }
+    .sc-ai{ position:absolute; right:8px; top:50%; transform:translateY(-50%); width:28px; height:28px; border:none; background:none; cursor:pointer; color:#416bff; border-radius:6px; display:inline-flex; align-items:center; justify-content:center; }
+    .sc-ai:hover{ background:#e9f2ff; }
+
+    /* AI 생성 프로모 박스 */
+    .ai-promo{ border:1px dashed #a3c3ff; background:#f4f8ff; border-radius:10px; padding:22px; text-align:center; margin-bottom:16px; }
+    .ai-promo-title{ font-size:16px; font-weight:700; color:#222631; margin:0 0 6px; }
+    .ai-promo-desc{ font-size:14px; color:#6d7381; margin:0 0 16px; }
+    .ai-promo-actions{ display:flex; align-items:center; justify-content:center; gap:12px; }
+    .promo-or{ font-size:14px; color:#9ea3ad; }
+
+    /* buttons */
+    .btn{ height:40px; border-radius:8px; font-size:14px; font-weight:600; font-family:inherit; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; line-height:1; gap:6px; padding:0 14px; border:1px solid transparent; }
+    .btn-sm{ height:34px; font-size:13px; padding:0 12px; }
+    .btn-primary{ background:#416bff; color:#fff; }
+    .btn-primary:hover{ background:#365eef; }
+    .btn-secondary{ background:#fff; color:#3151c4; border:1px solid #ccdfff; }
+    .btn-secondary:hover{ background:#e9f2ff; }
+    .btn-outline{ background:#fff; color:#3b3f4c; border:1px solid #d9d9d9; }
+    .btn-outline:hover{ background:#f6f7f9; }
+    .btn-ai{ background:#416bff; color:#fff; }
+    .btn-ai:hover{ background:#365eef; }
+    .btn-add{ background:#fff; color:#416bff; border:1px solid #ccdfff; width:100%; height:44px; }
+    .btn-add:hover{ background:#e9f2ff; }
+
+    /* 점수 산출 표 */
+    .score-tbl{ border:1px solid #dde1e8; border-radius:8px; overflow:hidden; max-width:420px; margin-top:16px; }
+    .score-tbl-row{ display:flex; }
+    .score-tbl-row.head .score-cell{ background:#f6f7f9; font-weight:600; color:#3b3f4c; font-size:14px; }
+    .score-cell{ flex:1; padding:0; border-right:1px solid #eceef2; }
+    .score-cell:last-child{ border-right:none; }
+    .score-cell.head{ padding:12px; text-align:center; }
+    .score-cell input{ width:100%; height:52px; border:none; text-align:center; font-size:16px; font-weight:600; outline:none; font-family:inherit; background:#fff; }
+    .miss-row{ display:flex; gap:20px; margin-top:18px; }
+    .miss-item{ flex:0 0 200px; }
+    .miss-item .field-label{ font-size:14px; }
+    .miss-inp{ width:100%; height:44px; border:1px solid #d9d9d9; border-radius:8px; text-align:center; font-size:16px; font-family:inherit; outline:none; }
+
+    /* 업로드 방법 라디오 카드 */
+    .up-cards{ display:grid; grid-template-columns:repeat(3,1fr); gap:14px; margin-top:4px; }
+    .up-card{ border:1.5px solid #dde1e8; border-radius:10px; padding:18px; cursor:pointer; transition:border-color .12s, background .12s; position:relative; }
+    .up-card:hover{ border-color:#a3c3ff; }
+    .up-card.on{ border-color:#416bff; background:#f4f8ff; }
+    .up-card-radio{ position:absolute; top:16px; right:16px; width:20px; height:20px; border-radius:50%; border:1.5px solid #c7cbd3; background:#fff; }
+    .up-card.on .up-card-radio{ border:6.5px solid #416bff; }
+    .up-card-title{ font-size:16px; font-weight:700; color:#222631; margin:0 0 8px; padding-right:28px; }
+    .up-card-desc{ font-size:14px; color:#6d7381; line-height:1.55; margin:0 0 14px; min-height:42px; }
+    .up-badge{ display:inline-flex; align-items:center; gap:4px; font-size:13px; font-weight:600; border-radius:6px; padding:4px 10px; }
+    .up-badge.on{ background:#ebdfff; color:#6f34db; }
+    .up-badge.off{ background:#f1f3f5; color:#9ea3ad; }
+
+    /* ===== 학생 제출 방법 설정 (업로드 방법=학생 선택 시) ===== */
+    .sub-block{ border:1px solid #dde1e8; border-radius:10px; padding:20px; margin-bottom:14px; }
+    .sub-block:last-child{ margin-bottom:0; }
+    .sub-block-title{ font-size:15px; font-weight:700; color:#222631; margin:0 0 14px; }
+    .cbx{ display:flex; align-items:center; gap:10px; cursor:pointer; user-select:none; font-size:16px; color:#222631; padding:6px 0; }
+    .cbx-box{ width:22px; height:22px; border-radius:5px; border:1.5px solid #c7cbd3; background:#fff; flex-shrink:0; display:flex; align-items:center; justify-content:center; }
+    .cbx.on .cbx-box{ background:#416bff; border-color:#416bff; }
+    .cbx.on .cbx-box::after{ content:''; width:6px; height:11px; border:solid #fff; border-width:0 2px 2px 0; transform:rotate(45deg) translateY(-1px); }
+    .sw{ display:inline-flex; align-items:center; gap:10px; cursor:pointer; user-select:none; font-size:15px; color:#3b3f4c; }
+    .sw-track{ width:40px; height:22px; border-radius:100px; background:#d9d9d9; position:relative; flex-shrink:0; transition:background .15s; }
+    .sw-knob{ position:absolute; top:2px; left:2px; width:18px; height:18px; border-radius:50%; background:#fff; transition:left .15s; box-shadow:0 1px 3px rgba(0,0,0,.2); }
+    .sw.on .sw-track{ background:#416bff; }
+    .sw.on .sw-knob{ left:20px; }
+    .hstep{ display:inline-flex; align-items:center; height:44px; border:1px solid #d9d9d9; border-radius:8px; overflow:hidden; }
+    .hstep button{ width:44px; height:100%; border:none; background:#fff; cursor:pointer; color:#3b3f4c; font-size:18px; display:flex; align-items:center; justify-content:center; }
+    .hstep button:hover{ background:#f6f7f9; }
+    .hstep .hstep-val{ min-width:64px; text-align:center; font-size:15px; font-weight:600; color:#222631; border-left:1px solid #eceef2; border-right:1px solid #eceef2; height:100%; display:flex; align-items:center; justify-content:center; }
+    .alert-info{ display:flex; gap:10px; background:#f4f8ff; border-radius:8px; padding:14px 16px; margin-top:16px; }
+    .alert-info i{ color:#416bff; flex-shrink:0; margin-top:2px; }
+    .alert-info .ai-txt{ font-size:14px; color:#3b3f4c; line-height:1.65; }
+    .dp{ flex:1; height:44px; border:1px solid #d9d9d9; border-radius:8px; padding:0 40px 0 14px; font-size:15px; font-family:inherit; color:#222631; outline:none; background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='18' height='18' viewBox='0 0 24 24' fill='none' stroke='%236d7381' stroke-width='2'><rect x='3' y='4' width='18' height='18' rx='2'/><path d='M16 2v4M8 2v4M3 10h18'/></svg>"); background-repeat:no-repeat; background-position:right 12px center; }
+    .dp::placeholder{ color:#b3b6bd; }
+    .dp.err{ border-color:#f2525f; }
+    .dp-row{ display:flex; align-items:center; gap:12px; }
+    .dp-row .tilde{ color:#6d7381; }
+    .class-period{ margin-bottom:14px; }
+    .class-period .cp-label{ font-size:14px; font-weight:600; color:#3b3f4c; margin-bottom:8px; }
+    .helper-err{ font-size:14px; color:#f2525f; margin-top:8px; }
+    .radio-line.wrap{ flex-wrap:wrap; }
+
+    /* footer actions */
+    .form-actions{ display:flex; justify-content:flex-end; gap:10px; margin-top:8px; }
+    .btn-lg{ height:44px; padding:0 22px; font-size:15px; }
+
+    /* ===== 채점기준 AI 생성 드로워 ===== */
+    .dw-ov{ position:fixed; inset:0; background:rgba(0,0,0,.4); z-index:1600; display:none; }
+    .dw-ov.open{ display:block; }
+    .dw{ position:fixed; top:0; right:0; bottom:0; width:720px; max-width:94vw; background:#fff; box-shadow:-8px 0 30px rgba(0,0,0,.18); transform:translateX(100%); transition:transform .25s ease; display:flex; flex-direction:column; z-index:1601; }
+    .dw-ov.open .dw{ transform:translateX(0); }
+    .dw-hd{ display:flex; align-items:center; justify-content:space-between; padding:22px 24px 18px; flex-shrink:0; }
+    .dw-title{ font-size:20px; font-weight:700; color:#222631; }
+    .dw-close{ width:36px; height:36px; border:none; background:none; cursor:pointer; color:#6d7381; border-radius:6px; display:inline-flex; align-items:center; justify-content:center; }
+    .dw-close:hover{ background:#f1f3f5; }
+    .dw-body{ flex:1; overflow:auto; padding:0 24px 16px; }
+    .dw-ft{ flex-shrink:0; padding:16px 24px 20px; display:flex; justify-content:flex-end; border-top:1px solid #f1f3f5; }
+
+    .mode-list{ border:1px solid #dde1e8; border-radius:10px; overflow:hidden; margin-bottom:26px; }
+    .mode-card{ display:flex; gap:14px; align-items:flex-start; padding:18px; cursor:pointer; border-bottom:1px solid #eceef2; }
+    .mode-card:last-child{ border-bottom:none; }
+    .mode-card.on{ background:#f4f8ff; box-shadow:inset 0 0 0 2px #416bff; border-radius:8px; }
+    .mode-ic{ width:40px; height:40px; border-radius:8px; flex-shrink:0; display:flex; align-items:center; justify-content:center; background:#f1f3f5; color:#6d7381; }
+    .mode-card.on .mode-ic{ background:#e9f2ff; color:#416bff; }
+    .mode-name{ font-size:16px; font-weight:700; color:#222631; margin:0 0 4px; }
+    .mode-card-desc{ font-size:14px; color:#6d7381; line-height:1.5; margin:0; }
+    .dw-sub{ font-size:16px; font-weight:700; color:#222631; margin:0 0 12px; }
+
+    /* 자유롭게 입력 */
+    .free-box{ border:1px solid #d9d9d9; border-radius:10px; padding:16px; }
+    .free-box:focus-within{ border-color:#416bff; box-shadow:0 0 0 3px rgba(65,107,255,.12); }
+    .free-box textarea{ width:100%; min-height:120px; border:none; outline:none; resize:vertical; font-family:inherit; font-size:16px; color:#222631; line-height:1.6; }
+    .free-box textarea::placeholder{ color:#9ea3ad; }
+    .ex-btns{ display:flex; gap:8px; margin-top:14px; }
+
+    /* 채점요소 입력 */
+    .elem-row{ display:flex; gap:10px; align-items:center; margin-bottom:10px; }
+    .elem-row .inp{ flex:1; }
+    .stepper{ display:flex; align-items:center; width:88px; height:48px; border:1px solid #d9d9d9; border-radius:8px; overflow:hidden; flex-shrink:0; }
+    .stepper input{ width:52px; border:none; text-align:center; font-size:16px; font-weight:600; outline:none; font-family:inherit; }
+    .stepper .step-btns{ display:flex; flex-direction:column; border-left:1px solid #eceef2; }
+    .stepper .step-btns button{ flex:1; width:34px; border:none; background:#f6f7f9; cursor:pointer; color:#6d7381; display:flex; align-items:center; justify-content:center; padding:0; }
+    .stepper .step-btns button:hover{ background:#eceef2; }
+    .step-x{ width:48px; height:48px; border:1px solid #ccdfff; background:#fff; color:#3151c4; border-radius:8px; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; flex-shrink:0; }
+    .step-x:hover{ background:#e9f2ff; }
+
+    /* 루브릭 이미지 업로드 */
+    .dropzone{ border:1.5px dashed #a3c3ff; border-radius:10px; min-height:200px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:10px; cursor:pointer; color:#6d7381; background:#fbfcff; }
+    .dropzone:hover{ background:#f4f8ff; }
+    .dropzone .dz-ic{ width:48px; height:48px; border-radius:10px; background:#e9f2ff; color:#416bff; display:flex; align-items:center; justify-content:center; }
+    .dropzone .dz-main{ font-size:15px; color:#3b3f4c; }
+    .dropzone .dz-sub{ font-size:13px; color:#9ea3ad; }
+
+    .site-footer{ margin-top:auto; padding:48px 0 40px; display:flex; flex-direction:column; align-items:center; gap:16px; }
+    .sf-links{ display:flex; align-items:center; }
+    .sf-links a{ font-size:14px; color:#3b3f4c; padding:0 16px; }
+    .sf-links a + a{ border-left:1px solid #dde1e8; }
+    .sf-copy{ font-size:14px; color:#9aa0ad; }
+
+    .toast{ position:fixed; bottom:28px; left:50%; transform:translateX(-50%) translateY(12px); opacity:0; min-width:300px; max-width:520px; padding:14px 22px; border-radius:8px; font-size:15px; font-weight:600; box-shadow:0 4px 12px #00000026; z-index:9999; transition:opacity .2s, transform .2s; pointer-events:none; background:#416bff; color:#fff; text-align:center; }
+    .toast.show{ opacity:1; transform:translateX(-50%) translateY(0); }
+  </style>
+</head>
+<body>
+
+<!-- ===== Header ===== -->
+<header class="g-hd">
+  <button class="gh-menu-btn" onclick="toggleNav()"><i data-lucide="menu" style="width:20px;height:20px"></i></button>
+  <svg width="76" height="16" viewBox="0 0 76 16" fill="none" xmlns="http://www.w3.org/2000/svg" style="cursor:pointer" onclick="location.href='home_v1_260612.html'"><path d="M11.3613 4.03516H4.09668V11.9629H8.88281L8.88086 11.9648H15.6016V16H4.02539C1.80242 15.9998 0 14.223 0 12.0322V3.96777C0 1.77696 1.80242 0.000177874 4.02539 0H15.4561L11.3613 4.03516ZM22.0703 11.9648H33.5781V16H22.002C19.7788 16 17.9756 14.2231 17.9756 12.0322V0H22.0703V11.9648ZM40.0459 16H35.9521V0H40.0459V16ZM54.5381 0C56.4564 0 58.0138 1.53228 58.0186 3.42285L58.0166 3.4248V8.54297C58.014 10.4333 56.4567 11.9648 54.5361 11.9648H46.5107L42.416 16V0H54.5381ZM71.9746 0C74.0086 0.000134956 75.6887 1.49046 75.958 3.42285H76V12.5771H75.958C75.6887 14.5095 74.011 15.9999 71.9746 16H64.4238C62.3897 16 60.7098 14.5096 60.4404 12.5771C60.4145 12.398 60.3984 12.2184 60.3984 12.0322V3.96777C60.3984 3.78159 60.4145 3.60205 60.4404 3.42285C60.7098 1.49037 62.3873 0 64.4238 0H71.9746ZM64.4922 12.5771H71.9062V3.42285H64.4922V12.5771ZM46.5107 3.42285V8.54004H53.9238V3.42285H46.5107Z" fill="#365EEF"/></svg>
+  <div class="g-hd-r">
+    <span class="plan-badge">학교 유료</span>
+    <span style="font-size:14px;color:#3b3f4c">D-180</span>
+    <div class="hd-div"></div>
+    <i data-lucide="sparkles" style="width:18px;height:18px;color:#416bff"></i>
+    <div class="credit-wrap">AI 크레딧 200</div>
+    <div class="hd-div"></div>
+    <button class="user-btn">최대표 선생님(대표교사) <i data-lucide="chevron-down" style="width:16px;height:16px"></i></button>
+  </div>
+</header>
+
+<!-- ===== Sidebar ===== -->
+<nav class="icon-sb" id="icon-sb">
+  <div class="si" onclick="location.href='home_v1_260612.html'"><div class="si-icon"><i data-lucide="home" style="width:20px;height:20px"></i></div><span class="si-label">홈</span><span class="si-tip">홈</span></div>
+  <div class="si" onclick="notReady('평가계획')"><div class="si-icon"><i data-lucide="scissors" style="width:20px;height:20px"></i></div><span class="si-label">평가계획</span><span class="si-tip">평가계획</span></div>
+  <div class="si active" onclick="location.href='co_teacher_review_v1_260611.html'"><div class="si-icon"><i data-lucide="layout-grid" style="width:20px;height:20px"></i></div><span class="si-label">수업</span><span class="si-tip">수업</span></div>
+  <div class="si" onclick="location.href='creative_activity_list_v6_260507.html'"><div class="si-icon"><i data-lucide="notebook-pen" style="width:20px;height:20px"></i></div><span class="si-label">창의적 체험활동 <span style="font-size:10px;background:#416bff;color:#fff;padding:1px 5px;border-radius:3px;margin-left:2px">Beta</span></span><span class="si-tip">창의적 체험활동</span></div>
+  <div class="si" onclick="location.href='quick_seteuk_dev_list_v1_260604.html'"><div class="si-icon"><i data-lucide="zap" style="width:20px;height:20px"></i></div><span class="si-label">세특 간편 생성기</span><span class="si-tip">세특 간편 생성기</span></div>
+  <div class="si" onclick="notReady('행동특성 및 종합기록')"><div class="si-icon"><i data-lucide="smile" style="width:20px;height:20px"></i></div><span class="si-label">행동특성 및 종합기록</span><span class="si-tip">행동특성 및 종합기록</span></div>
+  <div class="si" onclick="notReady('리포트')"><div class="si-icon"><i data-lucide="bar-chart-2" style="width:20px;height:20px"></i></div><span class="si-label">리포트</span><span class="si-tip">리포트</span></div>
+  <div class="si" onclick="notReady('학교 설정')"><div class="si-icon"><i data-lucide="building-2" style="width:20px;height:20px"></i></div><span class="si-label">학교 설정</span><span class="si-tip">학교 설정</span></div>
+  <div class="nav-bottom">
+    <div class="nav-div"></div>
+    <div class="si" onclick="notReady('매뉴얼 다운로드')"><div class="si-icon"><i data-lucide="file-down" style="width:20px;height:20px"></i></div><span class="si-label">매뉴얼 다운로드</span><span class="si-tip">매뉴얼 다운로드</span></div>
+    <div class="si" onclick="notReady('요금제')"><div class="si-icon"><i data-lucide="credit-card" style="width:20px;height:20px"></i></div><span class="si-label">요금제</span><span class="si-tip">요금제</span></div>
+    <div class="si" onclick="notReady('고객센터')"><div class="si-icon"><i data-lucide="help-circle" style="width:20px;height:20px"></i></div><span class="si-label">고객센터</span><span class="si-tip">고객센터</span></div>
+  </div>
+</nav>
+
+<div class="main-wrap">
+  <div class="tab-band">
+    <div class="tab-band-inner">
+      <button class="sub-tab" onclick="location.href='co_teacher_review_v1_260611.html'">수업 홈</button>
+      <button class="sub-tab on" onclick="goDesignList()">수행평가 설계</button>
+      <button class="sub-tab" onclick="location.href='task_ocr_review_v2_260612.html'">과제물 관리</button>
+      <button class="sub-tab" onclick="location.href='task_ocr_review_v2_260612.html#scoring'">수행평가 채점</button>
+      <button class="sub-tab" onclick="notReady('세부능력 및 특기사항 지원')">세부능력 및 특기사항 지원</button>
+    </div>
+  </div>
+
+  <div class="page-wrap">
+    <button class="back-link" onclick="goDesignList()"><i data-lucide="chevron-left" style="width:18px;height:18px"></i>이전으로</button>
+    <h1 class="page-h1">수행평가(과제) 설계</h1>
+    <p class="page-sub">성취기준과 채점기준 등을 입력하여 과제 제출 방식을 설정할 수 있습니다.</p>
+
+    <!-- 기본 정보 -->
+    <div class="sec">
+      <div class="sec-hd"><span class="sec-title">기본 정보</span></div>
+      <label class="field-label">수행평가명</label>
+      <div class="inp-wrap">
+        <input class="inp" placeholder="수행평가(과제)명을 입력해 주세요.">
+        <button class="inp-ai" title="AI 추천" onclick="toastMsg('AI 추천은 이 목업에서 제공하지 않습니다.')"><i data-lucide="sparkles" style="width:18px;height:18px"></i></button>
+      </div>
+      <div class="radio-line">
+        <span class="rad on" onclick="pickRadio(this)"><span class="ring"></span>교내 공개</span>
+        <span class="rad" onclick="pickRadio(this)"><span class="ring"></span>비공개</span>
+      </div>
+    </div>
+
+    <!-- 성취기준 -->
+    <div class="sec">
+      <div class="sec-hd">
+        <span class="sec-title">성취기준 <span class="help" title="과제와 직접 관련된 성취기준을 입력하세요"><i data-lucide="help-circle" style="width:16px;height:16px"></i></span></span>
+        <span class="sec-count"><span id="ach-count">3</span>개 / 10개</span>
+      </div>
+      <p class="sec-desc">성취기준은 최대 10개까지 입력 가능합니다. 과제와 직접적으로 관련된 성취기준을 입력해 주세요.</p>
+      <div id="ach-list">
+        <!-- 빈 성취기준 -->
+        <div class="crit">
+          <div class="crit-hd"><span class="crit-name">성취기준 1</span><button class="crit-x" onclick="removeCrit(this,'ach')"><i data-lucide="x" style="width:18px;height:18px"></i></button></div>
+          <div style="display:flex;align-items:center;gap:12px;">
+            <select class="sel"><option>성취기준을 검색하여 선택해 주세요.</option><option>[9사(일사)12-01] 사회 변동의 의미를 이해하고…</option></select>
+            <label class="chk-inline"><input type="checkbox" onchange="toggleDirect(this)">직접 입력</label>
+          </div>
+          <div class="crit-tools">
+            <button class="btn btn-secondary btn-sm" onclick="addLevel(this)"><i data-lucide="plus" style="width:14px;height:14px"></i>수준 추가</button>
+            <button class="btn btn-outline btn-sm" onclick="removeLevel(this)"><i data-lucide="minus" style="width:14px;height:14px"></i>수준 제거</button>
+          </div>
+        </div>
+        <!-- 채워진 성취기준 (드롭다운 선택) -->
+        <div class="crit">
+          <div class="crit-hd"><span class="crit-name">성취기준 2</span><button class="crit-x" onclick="removeCrit(this,'ach')"><i data-lucide="x" style="width:18px;height:18px"></i></button></div>
+          <div style="display:flex;align-items:center;gap:12px;">
+            <select class="sel"><option>[9사(일사)12-01] 사회 변동의 의미를 이해하고, 현대사회의 변동 양상과 문제점을 분석한다.</option></select>
+            <label class="chk-inline"><input type="checkbox" onchange="toggleDirect(this)">직접 입력</label>
+          </div>
+          <div class="lv-tbl">
+            <div class="lv-row"><div class="lv-tag">상</div><div class="lv-desc" contenteditable>사회 변동의 의미를 이해하고, 현대사회의 변동 양상과 문제점을 잘 분석한다.</div></div>
+            <div class="lv-row"><div class="lv-tag">중</div><div class="lv-desc" contenteditable>사회 변동의 의미를 이해하고, 현대사회의 변동 양상과 문제점을 그냥 분석한다.</div></div>
+            <div class="lv-row"><div class="lv-tag">하</div><div class="lv-desc" contenteditable>사회 변동의 의미를 이해하지 못한다.</div></div>
+          </div>
+          <div class="crit-tools">
+            <button class="btn btn-secondary btn-sm" onclick="addLevel(this)"><i data-lucide="plus" style="width:14px;height:14px"></i>수준 추가</button>
+            <button class="btn btn-outline btn-sm" onclick="removeLevel(this)"><i data-lucide="minus" style="width:14px;height:14px"></i>수준 제거</button>
+          </div>
+        </div>
+        <!-- 직접 입력 성취기준 -->
+        <div class="crit">
+          <div class="crit-hd"><span class="crit-name">성취기준 3</span><button class="crit-x" onclick="removeCrit(this,'ach')"><i data-lucide="x" style="width:18px;height:18px"></i></button></div>
+          <div style="display:flex;align-items:center;gap:12px;">
+            <input class="inp" value="사회 변동의 의미를 이해하고, 현대사회의 변동 양상과 문제점을 분석한다." style="flex:1;">
+            <label class="chk-inline"><input type="checkbox" checked onchange="toggleDirect(this)">직접 입력</label>
+          </div>
+          <div class="lv-tbl">
+            <div class="lv-row"><div class="lv-tag">상</div><div class="lv-desc" contenteditable>사회 변동의 의미를 이해하고, 현대사회의 변동 양상과 문제점을 잘 분석한다.</div></div>
+            <div class="lv-row"><div class="lv-tag">중</div><div class="lv-desc" contenteditable>사회 변동의 의미를 이해하고, 현대사회의 변동 양상과 문제점을 그냥 분석한다.</div></div>
+            <div class="lv-row"><div class="lv-tag">하</div><div class="lv-desc" contenteditable>사회 변동의 의미를 이해하지 못한다.</div></div>
+          </div>
+          <div class="crit-tools">
+            <button class="btn btn-secondary btn-sm" onclick="addLevel(this)"><i data-lucide="plus" style="width:14px;height:14px"></i>수준 추가</button>
+            <button class="btn btn-outline btn-sm" onclick="removeLevel(this)"><i data-lucide="minus" style="width:14px;height:14px"></i>수준 제거</button>
+          </div>
+        </div>
+      </div>
+      <button class="btn btn-add" onclick="addAch()"><i data-lucide="plus" style="width:16px;height:16px"></i>성취기준 추가</button>
+    </div>
+
+    <!-- 채점기준 -->
+    <div class="sec">
+      <div class="sec-hd">
+        <span class="sec-title">채점기준 <span class="help" title="구체적일수록 AI 채점 정확도가 향상됩니다"><i data-lucide="help-circle" style="width:16px;height:16px"></i></span></span>
+        <span class="sec-count"><span id="rub-count">3</span>개 / 15개</span>
+      </div>
+      <p class="sec-desc">채점기준은 최대 15개까지 입력 가능합니다. 채점기준이 구체적일수록 AI 채점 정확도가 향상됩니다.</p>
+
+      <div class="ai-promo">
+        <p class="ai-promo-title">채점기준을 AI로 빠르게 만들어보세요!</p>
+        <p class="ai-promo-desc">성취기준과 입력된 자료를 분석하여 AI가 초안을 제안합니다.</p>
+        <div class="ai-promo-actions">
+          <button class="btn btn-ai" onclick="openRubAi()"><i data-lucide="wand-sparkles" style="width:16px;height:16px"></i>채점기준 AI 생성</button>
+          <span class="promo-or">또는</span>
+          <button class="btn btn-secondary" onclick="addRub()"><i data-lucide="plus" style="width:16px;height:16px"></i>직접 추가</button>
+        </div>
+      </div>
+
+      <div id="rub-list">
+        <!-- 채점기준 (채워짐) -->
+        <div class="crit">
+          <div class="crit-hd"><span class="crit-name">채점기준 1</span><button class="crit-x" onclick="removeCrit(this,'rub')"><i data-lucide="x" style="width:18px;height:18px"></i></button></div>
+          <div style="display:flex;gap:12px;align-items:stretch;">
+            <textarea class="rub-elem">화산 지형의 이해</textarea>
+            <div class="sc-tbl" style="flex:1;">
+              <div class="sc-row"><div class="sc-score"><input value="6"></div><div class="sc-desc"><input value="입력하면 나오는 텍스트입니다. 입력하면 나오는 텍스트입니다."></div></div>
+              <div class="sc-row"><div class="sc-score"><input value="4"></div><div class="sc-desc"><input value="입력하면 나오는 텍스트입니다. 입력하면 나오는 텍스트입니다."></div></div>
+            </div>
+          </div>
+          <div class="crit-tools">
+            <button class="btn btn-secondary btn-sm" onclick="addScoreRow(this)"><i data-lucide="plus" style="width:14px;height:14px"></i>채점요소 AI 생성</button>
+            <button class="btn btn-outline btn-sm" onclick="removeScoreRow(this)"><i data-lucide="minus" style="width:14px;height:14px"></i>급간 제거</button>
+          </div>
+        </div>
+        <!-- 채점기준 (빈) -->
+        <div class="crit">
+          <div class="crit-hd"><span class="crit-name">채점기준 2</span><button class="crit-x" onclick="removeCrit(this,'rub')"><i data-lucide="x" style="width:18px;height:18px"></i></button></div>
+          <div style="display:flex;gap:12px;align-items:stretch;">
+            <textarea class="rub-elem" placeholder="채점요소를 입력해 주세요."></textarea>
+            <div class="sc-tbl" style="flex:1;">
+              <div class="sc-row"><div class="sc-score"><input value="0"></div><div class="sc-desc"><input placeholder="내용을 입력해 주세요."></div></div>
+              <div class="sc-row"><div class="sc-score"><input value="0"></div><div class="sc-desc"><input placeholder="내용을 입력해 주세요."></div></div>
+              <div class="sc-row"><div class="sc-score"><input value="0"></div><div class="sc-desc"><input placeholder="내용을 입력해 주세요."></div></div>
+            </div>
+          </div>
+          <div class="crit-tools">
+            <button class="btn btn-secondary btn-sm" onclick="addScoreRow(this)"><i data-lucide="plus" style="width:14px;height:14px"></i>채점요소 AI 생성</button>
+            <button class="btn btn-outline btn-sm" onclick="removeScoreRow(this)"><i data-lucide="minus" style="width:14px;height:14px"></i>급간 제거</button>
+          </div>
+        </div>
+      </div>
+
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-top:4px;">
+        <div style="display:flex;gap:8px;">
+          <button class="btn btn-secondary btn-sm" onclick="addRub()"><i data-lucide="plus" style="width:14px;height:14px"></i>기준 추가</button>
+          <button class="btn btn-ai btn-sm" onclick="openRubAi()"><i data-lucide="wand-sparkles" style="width:14px;height:14px"></i>AI 생성</button>
+        </div>
+        <button style="background:none;border:none;cursor:pointer;font-family:inherit;font-size:14px;font-weight:600;color:#416bff;display:inline-flex;align-items:center;gap:4px;" onclick="toastMsg('입력 가이드는 이 목업에서 제공하지 않습니다.')">어떻게 입력해야 하나요? <i data-lucide="help-circle" style="width:14px;height:14px"></i></button>
+      </div>
+    </div>
+
+    <!-- 점수 산출 방법 -->
+    <div class="sec">
+      <div class="sec-hd"><span class="sec-title">점수 산출 방법</span></div>
+      <p class="sec-desc">채점기준 배점 그대로 점수를 산출하거나 등급으로 환산할 수 있습니다.</p>
+      <div class="radio-line" style="margin-top:0;">
+        <span class="rad on" onclick="pickRadio(this)"><span class="ring"></span>채점기준 배점 그대로 적용</span>
+        <span class="rad" onclick="pickRadio(this)"><span class="ring"></span>점수 구간별 등급으로 환산</span>
+      </div>
+      <div class="score-tbl">
+        <div class="score-tbl-row head"><div class="score-cell head">영역 만점</div><div class="score-cell head">최소 점수</div></div>
+        <div class="score-tbl-row"><div class="score-cell"><input value="60"></div><div class="score-cell"><input value="20"></div></div>
+      </div>
+      <div class="miss-row">
+        <div class="miss-item"><label class="field-label">미제출</label><input class="miss-inp" value="0"></div>
+        <div class="miss-item"><label class="field-label">미응시</label><input class="miss-inp" value="0"></div>
+      </div>
+    </div>
+
+    <!-- 과제물 업로드 방법 -->
+    <div class="sec">
+      <div class="sec-hd"><span class="sec-title">과제물 업로드 방법</span></div>
+      <div class="up-cards">
+        <div class="up-card on" data-method="teacher" onclick="pickUpload(this)">
+          <div class="up-card-radio"></div>
+          <p class="up-card-title">선생님 직접 일괄 업로드</p>
+          <p class="up-card-desc">학생 과제물을 PDF나 이미지 파일(JPG, PNG)로 업로드합니다.</p>
+          <span class="up-badge on"><i data-lucide="wand-sparkles" style="width:13px;height:13px"></i>AI 자동 채점 지원</span>
+        </div>
+        <div class="up-card" data-method="student" onclick="pickUpload(this)">
+          <div class="up-card-radio"></div>
+          <p class="up-card-title">학생 직접 입력 또는 제출</p>
+          <p class="up-card-desc">학생이 클리포에서 과제를 직접 입력하거나 파일을 제출합니다.</p>
+          <span class="up-badge on"><i data-lucide="wand-sparkles" style="width:13px;height:13px"></i>AI 자동 채점 지원</span>
+        </div>
+        <div class="up-card" data-method="none" onclick="pickUpload(this)">
+          <div class="up-card-radio"></div>
+          <p class="up-card-title">과제물 없이 바로 채점</p>
+          <p class="up-card-desc">과제물을 업로드하지 않고 AI 채점을 진행합니다.</p>
+          <span class="up-badge off">AI 자동 채점 미지원</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 학생 직접 입력 또는 제출 : 제출 방법 설정 (업로드 방법=학생 선택 시 노출) -->
+    <div class="sec" id="student-submit-sec" style="display:none;">
+      <div class="sec-hd"><span class="sec-title">학생 직접 입력 또는 제출 : 제출 방법 설정</span></div>
+      <p class="sec-desc">학생이 클리포 학생 화면에서 과제를 직접 입력하거나 파일을 제출합니다.</p>
+
+      <!-- 1. 과제 설명 -->
+      <div class="sub-block">
+        <p class="sub-block-title">1. 과제 설명 (선택)</p>
+        <textarea class="inp" style="height:auto;min-height:80px;padding:12px 14px;resize:vertical;" placeholder="내용을 입력해 주세요."></textarea>
+        <button class="btn btn-primary btn-sm" style="margin-top:12px;" onclick="toastMsg('파일 업로드는 이 목업에서 제공하지 않습니다.')"><i data-lucide="upload" style="width:15px;height:15px"></i>파일 업로드</button>
+      </div>
+
+      <!-- 2. 제출 형식 및 설정 -->
+      <div class="sub-block">
+        <p class="sub-block-title">2. 제출 형식 및 설정</p>
+        <span class="cbx on" onclick="toggleCbx(this)"><span class="cbx-box"></span>클리포를 통한 직접 입력</span>
+        <span class="cbx on" onclick="toggleCbx(this)"><span class="cbx-box"></span>PDF, JPG, PNG 이미지 파일</span>
+        <span class="cbx" onclick="toggleCbx(this)"><span class="cbx-box"></span>HWP, DOC, PPT 등 기타 파일 (미리보기, AI 채점 미지원)</span>
+        <div style="margin-top:16px;">
+          <span class="sw" onclick="toggleSw(this)"><span class="sw-track"><span class="sw-knob"></span></span>직접 입력 시, 복사 및 붙여넣기 불가</span>
+        </div>
+        <div style="margin-top:18px;">
+          <p style="font-size:14px;font-weight:600;color:#3b3f4c;margin:0 0 8px;">최대 제출 파일 수</p>
+          <div class="hstep">
+            <button onclick="hstep(this,-1)">−</button>
+            <span class="hstep-val" id="max-file">2개</span>
+            <button onclick="hstep(this,1)">+</button>
+          </div>
+        </div>
+        <div class="alert-info">
+          <i data-lucide="info" style="width:18px;height:18px"></i>
+          <div class="ai-txt">여러 파일이 업로드된 경우, 최종 제출된 1개의 파일에 대해서만 AI 채점이 가능합니다.<br>PDF와 이미지 파일(JPG, PNG)이 아닌 다른 형태의 파일은 미리보기 및 AI 채점이 불가합니다.</div>
+        </div>
+      </div>
+
+      <!-- 3. 제출 기간 -->
+      <div class="sub-block">
+        <p class="sub-block-title">3. 제출 기간</p>
+        <div class="radio-line wrap" style="margin-top:0;">
+          <span class="rad" data-period="none" onclick="pickPeriod(this)"><span class="ring"></span>기간 설정 없음</span>
+          <span class="rad on" data-period="all" onclick="pickPeriod(this)"><span class="ring"></span>전체 학급 동일 기간</span>
+          <span class="rad" data-period="class" onclick="pickPeriod(this)"><span class="ring"></span>학급별 다른 기간</span>
+        </div>
+
+        <!-- 전체 학급 동일 기간 -->
+        <div id="period-all" style="margin-top:18px;">
+          <div class="class-period">
+            <div class="cp-label">전체</div>
+            <div class="dp-row">
+              <input class="dp" value="2025. 10. 29. 오후 12:59:59">
+              <span class="tilde">~</span>
+              <input class="dp" placeholder="연도. 월. 일. -- --:--:--">
+            </div>
+          </div>
+          <span class="sw" onclick="toggleSw(this)" style="margin-top:6px;"><span class="sw-track"><span class="sw-knob"></span></span>마감일 이후 제출 허용</span>
+        </div>
+
+        <!-- 학급별 다른 기간 -->
+        <div id="period-class" style="margin-top:18px;display:none;">
+          <div class="class-period">
+            <div class="cp-label">1-1반</div>
+            <div class="dp-row"><input class="dp" value="2025. 10. 29. 오후 12:59:59"><span class="tilde">~</span><input class="dp" placeholder="연도. 월. 일. -- --:--:--"></div>
+          </div>
+          <div class="class-period">
+            <div class="cp-label">1-2반</div>
+            <div class="dp-row"><input class="dp" value="2025. 10. 29. 오후 12:59:59"><span class="tilde">~</span><input class="dp err" value="2025. 10. 24. 오후 12:59:59"></div>
+          </div>
+          <div class="class-period">
+            <div class="cp-label">1-3반</div>
+            <div class="dp-row"><input class="dp err" placeholder="연도-월-일 -- --:--:--"><span class="tilde">~</span><input class="dp" placeholder="연도-월-일 -- --:--:--"></div>
+          </div>
+          <span class="sw" onclick="toggleSw(this)" style="margin-top:6px;"><span class="sw-track"><span class="sw-knob"></span></span>마감일 이후 제출 허용</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-actions">
+      <button class="btn btn-outline btn-lg" onclick="toastMsg('임시 저장되었습니다.')">임시 저장</button>
+      <button class="btn btn-primary btn-lg" onclick="saveDesign()"><i data-lucide="check" style="width:16px;height:16px"></i>설계 저장</button>
+    </div>
+
+    <footer class="site-footer">
+      <div class="sf-links"><a href="#" onclick="return false;">회사소개</a><a href="#" onclick="return false;">이용약관</a><a href="#" onclick="return false;">개인정보처리방침</a><a href="#" onclick="return false;">고객센터</a></div>
+      <div class="sf-copy">© 2026. Datadriven Inc. All rights reserved.</div>
+    </footer>
+  </div>
+</div>
+
+<!-- ===== 채점기준 AI 생성 드로워 ===== -->
+<div class="dw-ov" id="rubAiDrawer" onclick="if(event.target===this) closeRubAi()">
+  <div class="dw">
+    <div class="dw-hd">
+      <span class="dw-title">채점기준 AI 생성</span>
+      <button class="dw-close" onclick="closeRubAi()"><i data-lucide="x" style="width:20px;height:20px"></i></button>
+    </div>
+    <div class="dw-body">
+      <div class="mode-list">
+        <div class="mode-card on" data-mode="free" onclick="pickMode('free')">
+          <div class="mode-ic"><i data-lucide="message-square-text" style="width:20px;height:20px"></i></div>
+          <div><p class="mode-name">자유롭게 입력</p><p class="mode-card-desc">채점기준 표나 활동지 이미지를 활용하거나, 자유롭게 입력하여 채점기준을 생성합니다.</p></div>
+        </div>
+        <div class="mode-card" data-mode="elem" onclick="pickMode('elem')">
+          <div class="mode-ic"><i data-lucide="list" style="width:20px;height:20px"></i></div>
+          <div><p class="mode-name">채점요소 입력</p><p class="mode-card-desc">채점요소와 급간 수를 입력하면, 채점기준을 생성합니다.</p></div>
+        </div>
+        <div class="mode-card" data-mode="img" onclick="pickMode('img')">
+          <div class="mode-ic"><i data-lucide="image" style="width:20px;height:20px"></i></div>
+          <div><p class="mode-name">루브릭 이미지 업로드</p><p class="mode-card-desc">채점기준표 이미지를 업로드하면, 편집 가능한 텍스트로 자동 변환합니다.</p></div>
+        </div>
+      </div>
+
+      <!-- 모드: 자유롭게 입력 -->
+      <div id="mode-free">
+        <p class="dw-sub">자유롭게 입력</p>
+        <div class="free-box">
+          <textarea placeholder="자유롭게 입력해 보세요."></textarea>
+          <button class="btn btn-primary btn-sm" onclick="toastMsg('이미지 업로드는 이 목업에서 제공하지 않습니다.')"><i data-lucide="image" style="width:15px;height:15px"></i>이미지 업로드</button>
+        </div>
+        <div class="ex-btns">
+          <button class="btn btn-outline btn-sm" onclick="toastMsg('예시는 이 목업에서 제공하지 않습니다.')">텍스트 예시</button>
+          <button class="btn btn-outline btn-sm" onclick="toastMsg('예시는 이 목업에서 제공하지 않습니다.')">이미지+텍스트 예시</button>
+        </div>
+      </div>
+
+      <!-- 모드: 채점요소 입력 -->
+      <div id="mode-elem" style="display:none;">
+        <p class="dw-sub">채점요소 / 급간의 갯수</p>
+        <div id="elem-rows">
+          <div class="elem-row">
+            <input class="inp" placeholder="채점요소 입력">
+            <div class="stepper"><input value="0"><div class="step-btns"><button onclick="stepNum(this,1)"><i data-lucide="chevron-up" style="width:14px;height:14px"></i></button><button onclick="stepNum(this,-1)"><i data-lucide="chevron-down" style="width:14px;height:14px"></i></button></div></div>
+            <button class="step-x" onclick="removeElemRow(this)"><i data-lucide="minus" style="width:18px;height:18px"></i></button>
+          </div>
+        </div>
+        <button class="btn btn-secondary btn-sm" onclick="addElemRow()" style="margin-top:4px;"><i data-lucide="plus-circle" style="width:15px;height:15px"></i>채점요소 추가</button>
+      </div>
+
+      <!-- 모드: 루브릭 이미지 업로드 -->
+      <div id="mode-img" style="display:none;">
+        <p class="dw-sub">루브릭 이미지 업로드</p>
+        <div class="dropzone" onclick="toastMsg('이미지 업로드는 이 목업에서 제공하지 않습니다.')">
+          <div class="dz-ic"><i data-lucide="image-plus" style="width:24px;height:24px"></i></div>
+          <div class="dz-main">클릭 혹은 파일을 이곳에 드롭하세요.</div>
+          <div class="dz-sub">JPG, PNG 가능</div>
+        </div>
+        <div class="ex-btns">
+          <button class="btn btn-outline btn-sm" onclick="toastMsg('예시는 이 목업에서 제공하지 않습니다.')">예시 1</button>
+          <button class="btn btn-outline btn-sm" onclick="toastMsg('예시는 이 목업에서 제공하지 않습니다.')">예시 2</button>
+        </div>
+      </div>
+    </div>
+    <div class="dw-ft">
+      <button class="btn btn-primary btn-lg" onclick="runRubAi()"><i data-lucide="wand-sparkles" style="width:16px;height:16px"></i>채점기준 AI 생성</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+function toggleNav(){ document.getElementById('icon-sb').classList.toggle('expanded'); document.body.classList.toggle('nav-expanded'); }
+var _tt=null;
+function toastMsg(m){ var t=document.getElementById('toast'); t.textContent=m; t.classList.add('show'); clearTimeout(_tt); _tt=setTimeout(function(){t.classList.remove('show');},2200); }
+function notReady(n){ toastMsg((n||'해당 화면')+' 은(는) 아직 준비 중입니다.'); }
+function goDesignList(){ location.href='task_ocr_review_v2_260612.html#design'; }
+
+// 라디오(라인)
+function pickRadio(el){ var line=el.closest('.radio-line'); line.querySelectorAll('.rad').forEach(function(r){r.classList.remove('on');}); el.classList.add('on'); }
+
+// 업로드 방법 카드 → 학생 선택 시 제출 방법 설정 섹션 노출
+function pickUpload(el){
+  document.querySelectorAll('.up-card').forEach(function(c){c.classList.remove('on');});
+  el.classList.add('on');
+  var sec = document.getElementById('student-submit-sec');
+  sec.style.display = (el.getAttribute('data-method')==='student') ? 'block' : 'none';
+}
+// 체크박스 / 스위치 / 가로 스테퍼 / 제출 기간 라디오
+function toggleCbx(el){ el.classList.toggle('on'); }
+function toggleSw(el){ el.classList.toggle('on'); }
+function hstep(btn, dir){
+  var el=document.getElementById('max-file');
+  var v=Math.max(1, (parseInt(el.textContent,10)||1)+dir);
+  el.textContent=v+'개';
+}
+function pickPeriod(el){
+  document.querySelectorAll('#student-submit-sec .rad[data-period]').forEach(function(r){r.classList.remove('on');});
+  el.classList.add('on');
+  var p=el.getAttribute('data-period');
+  document.getElementById('period-all').style.display = (p==='all')?'block':'none';
+  document.getElementById('period-class').style.display = (p==='class')?'block':'none';
+}
+
+// 직접 입력 토글: select ↔ text input
+function toggleDirect(chk){
+  var row = chk.closest('.crit').querySelector('div[style*="align-items:center"]');
+  var sel = row.querySelector('.sel');
+  var txt = row.querySelector('input.inp');
+  if(chk.checked){
+    if(sel){ var i=document.createElement('input'); i.className='inp'; i.style.flex='1'; i.placeholder='성취기준을 직접 입력해 주세요.'; sel.replaceWith(i); }
+  } else {
+    if(txt){ var s=document.createElement('select'); s.className='sel'; s.innerHTML='<option>성취기준을 검색하여 선택해 주세요.</option>'; txt.replaceWith(s); }
+  }
+}
+
+// 수준(상/중/하) 추가/제거
+function addLevel(btn){
+  var card=btn.closest('.crit'); var tbl=card.querySelector('.lv-tbl');
+  if(!tbl){ tbl=document.createElement('div'); tbl.className='lv-tbl'; card.querySelector('.crit-tools').before(tbl); }
+  var row=document.createElement('div'); row.className='lv-row';
+  row.innerHTML='<div class="lv-tag">·</div><div class="lv-desc" contenteditable>수준 설명을 입력해 주세요.</div>';
+  tbl.appendChild(row);
+}
+function removeLevel(btn){
+  var tbl=btn.closest('.crit').querySelector('.lv-tbl');
+  if(tbl && tbl.children.length>0){ tbl.lastElementChild.remove(); if(tbl.children.length===0) tbl.remove(); }
+}
+
+// 채점요소 행 추가/제거
+function addScoreRow(btn){
+  var tbl=btn.closest('.crit').querySelector('.sc-tbl');
+  var row=document.createElement('div'); row.className='sc-row';
+  row.innerHTML='<div class="sc-score"><input value="0"></div><div class="sc-desc"><input placeholder="내용을 입력해 주세요."></div>';
+  tbl.appendChild(row); lucide.createIcons();
+}
+function removeScoreRow(btn){
+  var tbl=btn.closest('.crit').querySelector('.sc-tbl');
+  if(tbl && tbl.children.length>1){ tbl.lastElementChild.remove(); }
+}
+
+// 성취/채점 기준 카드 추가·제거 + 카운트·번호 갱신
+function renumber(listId, prefix, countId){
+  var list=document.getElementById(listId);
+  var cards=list.querySelectorAll('.crit');
+  cards.forEach(function(c,i){ c.querySelector('.crit-name').textContent=prefix+' '+(i+1); });
+  document.getElementById(countId).textContent=cards.length;
+}
+function removeCrit(btn, kind){
+  btn.closest('.crit').remove();
+  if(kind==='ach') renumber('ach-list','성취기준','ach-count');
+  else renumber('rub-list','채점기준','rub-count');
+}
+function addAch(){
+  var list=document.getElementById('ach-list');
+  if(list.querySelectorAll('.crit').length>=10){ toastMsg('성취기준은 최대 10개까지 입력할 수 있어요.'); return; }
+  var d=document.createElement('div'); d.className='crit';
+  d.innerHTML='<div class="crit-hd"><span class="crit-name">성취기준</span><button class="crit-x" onclick="removeCrit(this,\'ach\')"><i data-lucide="x" style="width:18px;height:18px"></i></button></div>'
+    +'<div style="display:flex;align-items:center;gap:12px;"><select class="sel"><option>성취기준을 검색하여 선택해 주세요.</option></select><label class="chk-inline"><input type="checkbox" onchange="toggleDirect(this)">직접 입력</label></div>'
+    +'<div class="crit-tools"><button class="btn btn-secondary btn-sm" onclick="addLevel(this)"><i data-lucide="plus" style="width:14px;height:14px"></i>수준 추가</button><button class="btn btn-outline btn-sm" onclick="removeLevel(this)"><i data-lucide="minus" style="width:14px;height:14px"></i>수준 제거</button></div>';
+  list.appendChild(d); renumber('ach-list','성취기준','ach-count'); lucide.createIcons();
+}
+function addRub(){
+  var list=document.getElementById('rub-list');
+  if(list.querySelectorAll('.crit').length>=15){ toastMsg('채점기준은 최대 15개까지 입력할 수 있어요.'); return; }
+  var d=document.createElement('div'); d.className='crit';
+  d.innerHTML='<div class="crit-hd"><span class="crit-name">채점기준</span><button class="crit-x" onclick="removeCrit(this,\'rub\')"><i data-lucide="x" style="width:18px;height:18px"></i></button></div>'
+    +'<div style="display:flex;gap:12px;align-items:stretch;"><textarea class="rub-elem" placeholder="채점요소를 입력해 주세요."></textarea><div class="sc-tbl" style="flex:1;"><div class="sc-row"><div class="sc-score"><input value="0"></div><div class="sc-desc"><input placeholder="내용을 입력해 주세요."></div></div></div></div>'
+    +'<div class="crit-tools"><button class="btn btn-secondary btn-sm" onclick="addScoreRow(this)"><i data-lucide="plus" style="width:14px;height:14px"></i>채점요소 AI 생성</button><button class="btn btn-outline btn-sm" onclick="removeScoreRow(this)"><i data-lucide="minus" style="width:14px;height:14px"></i>급간 제거</button></div>';
+  list.appendChild(d); renumber('rub-list','채점기준','rub-count'); lucide.createIcons();
+}
+
+function saveDesign(){
+  toastMsg('수행평가 설계가 저장되었습니다.');
+  setTimeout(function(){ location.href='task_ocr_review_v2_260612.html#design'; }, 1200);
+}
+
+// ── 채점기준 AI 생성 드로워 ──
+function openRubAi(){ document.getElementById('rubAiDrawer').classList.add('open'); lucide.createIcons(); }
+function closeRubAi(){ document.getElementById('rubAiDrawer').classList.remove('open'); }
+function pickMode(mode){
+  document.querySelectorAll('.mode-card').forEach(function(c){ c.classList.toggle('on', c.getAttribute('data-mode')===mode); });
+  ['free','elem','img'].forEach(function(m){ document.getElementById('mode-'+m).style.display = (m===mode)?'block':'none'; });
+  lucide.createIcons();
+}
+function stepNum(btn, dir){
+  var inp = btn.closest('.stepper').querySelector('input');
+  var v = Math.max(0, (parseInt(inp.value,10)||0) + dir);
+  inp.value = v;
+}
+function addElemRow(){
+  var wrap = document.getElementById('elem-rows');
+  var row = document.createElement('div'); row.className='elem-row';
+  row.innerHTML='<input class="inp" placeholder="채점요소 입력"><div class="stepper"><input value="0"><div class="step-btns"><button onclick="stepNum(this,1)"><i data-lucide="chevron-up" style="width:14px;height:14px"></i></button><button onclick="stepNum(this,-1)"><i data-lucide="chevron-down" style="width:14px;height:14px"></i></button></div></div><button class="step-x" onclick="removeElemRow(this)"><i data-lucide="minus" style="width:18px;height:18px"></i></button>';
+  wrap.appendChild(row); lucide.createIcons();
+}
+function removeElemRow(btn){
+  var wrap = document.getElementById('elem-rows');
+  if(wrap.children.length>1) btn.closest('.elem-row').remove();
+  else toastMsg('채점요소는 최소 1개가 필요해요.');
+}
+function runRubAi(){
+  closeRubAi();
+  toastMsg('AI가 채점기준 초안을 생성합니다…');
+}
+
+renumber('ach-list','성취기준','ach-count');
+renumber('rub-list','채점기준','rub-count');
+lucide.createIcons();
+</script>
+
+</body>
+</html>
