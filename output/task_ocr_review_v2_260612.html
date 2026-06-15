@@ -200,6 +200,8 @@
     .b-doing{ background:#fff7ed; color:#ea580c; }
 
     /* ===== OCR Textarea ===== */
+    /* 학생 제출 현황 표 본문 폰트 통일 (상태/학번/이름 등) */
+    #student-table-body td{ font-size:14px; }
     .ocr-textarea{ width:100%; min-height:60px; border:1px solid #dde1e8; border-radius:4px; padding:14px 16px; font-size:16px; font-family:inherit; resize:none; outline:none; color:#222631; line-height:1.75; background:white; overflow-y:hidden; box-sizing:border-box; display:block; }
     .ocr-textarea:focus{ border-color:#416bff; box-shadow:0 0 0 2px rgba(65,107,255,.12); }
 
@@ -224,6 +226,13 @@
     .section-editing .rubric-ocr-header{ background:#e9f2ff; }
     .editing-badge{ font-size:11px; font-weight:600; color:#3151c4; background:#e9f2ff; border-radius:100px; padding:2px 8px; }
     .saved-badge{ font-size:12px; font-weight:600; color:#1ab864; display:inline-flex; align-items:center; gap:3px; transition:opacity .4s; }
+    /* 수식 입력기 기호 버튼 */
+    .fbtn{ height:32px; min-width:40px; padding:0 10px; background:white; border:1px solid #d9d9d9; border-radius:6px; color:#3b3f4c; font-family:inherit; font-size:14px; font-weight:700; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; line-height:1; }
+    .fbtn:hover{ background:#f6f7f9; border-color:#b3b3b3; }
+    /* 답안 편집 중에만 노출되는 수식 버튼 */
+    .formula-insert-btn{ display:none; }
+    .section-editing .formula-insert-btn{ display:inline-flex; }
+    .section-editing .rubric-suspect-chip{ display:none; }
 
     /* OCR uncertain span */
     .ocr-uncertain{ background:#fef9c3; border-bottom:2px solid #f97316; border-radius:2px; padding:0 1px; cursor:help; position:relative; }
@@ -297,7 +306,7 @@
   </div>
   <div class="page-wrap">
     <h1 class="page-h1">1학년 국어 과제물 관리</h1>
-    <p class="page-sub">학생 제출 현황을 실시간으로 확인하고, 필요한 경우 직접 업로드할 수 있습니다.</p>
+    <p class="page-sub">학생 제출 현황을 실시간으로 확인하고, 필요하면 과제를 직접 올릴 수도 있습니다. 제출된 과제는 AI 채점을 위해 OCR 인식을 진행해 주세요.</p>
 
       <div style="display:flex;flex-direction:column;gap:20px;">
 
@@ -322,18 +331,17 @@
           <table class="tbl2">
             <thead>
               <tr>
-                <th style="width:70px;text-align:center;">반</th>
-                <th style="width:80px;text-align:center;">상태</th>
-                <th>제출 현황</th>
+                <th style="width:70px;text-align:center;">학급</th>
+                <th style="width:240px;">제출 현황</th>
                 <th style="width:70px;text-align:center;">미제출</th>
-                <th style="width:260px;">기간</th>
-                <th style="width:150px;text-align:center;">관리</th>
+                <th style="width:260px;">과제 제출 기간</th>
+                <th style="width:110px;text-align:center;">OCR 상태</th>
+                <th style="width:150px;text-align:center;">상세 보기</th>
               </tr>
             </thead>
             <tbody>
               <tr>
                 <td style="text-align:center;font-weight:500;">1-1반</td>
-                <td style="text-align:center;"><span class="badge badge-blue">진행</span></td>
                 <td>
                   <div style="display:flex;align-items:center;gap:12px;">
                     <div style="flex:1;height:10px;background:#e9f2ff;border-radius:4px;overflow:hidden;"><div style="width:57%;height:100%;background:#416bff;"></div></div>
@@ -342,6 +350,7 @@
                 </td>
                 <td style="text-align:center;">6</td>
                 <td style="font-size:14px;color:#3b3f4c;">10월 16일 18:55 ~ 10월 17일 23:59</td>
+                <td style="text-align:center;"><span class="badge badge-red">확인 필요</span></td>
                 <td style="text-align:center;">
                   <button onclick="showListForClass(1,'A')" style="background:none;border:none;cursor:pointer;font-family:inherit;font-size:14px;font-weight:600;color:#416bff;display:inline-flex;align-items:center;gap:4px;padding:6px 10px;border-radius:4px;" onmouseover="this.style.background='#e9f2ff'" onmouseout="this.style.background='none'">
                     <i data-lucide="clipboard-list" style="width:14px;height:14px;"></i>과제 제출 현황
@@ -350,7 +359,6 @@
               </tr>
               <tr>
                 <td style="text-align:center;font-weight:500;">1-2반</td>
-                <td style="text-align:center;"><span class="badge badge-blue">진행</span></td>
                 <td>
                   <div style="display:flex;align-items:center;gap:12px;">
                     <div style="flex:1;height:10px;background:#e9f2ff;border-radius:4px;overflow:hidden;"><div style="width:0%;height:100%;background:#416bff;"></div></div>
@@ -359,6 +367,7 @@
                 </td>
                 <td style="text-align:center;">14</td>
                 <td style="font-size:14px;color:#3b3f4c;">10월 16일 18:55 ~ 10월 17일 23:59</td>
+                <td style="text-align:center;color:#b3b3b3;">—</td>
                 <td style="text-align:center;">
                   <button onclick="showListForClass(2,'A')" style="background:none;border:none;cursor:pointer;font-family:inherit;font-size:14px;font-weight:600;color:#416bff;display:inline-flex;align-items:center;gap:4px;padding:6px 10px;border-radius:4px;" onmouseover="this.style.background='#e9f2ff'" onmouseout="this.style.background='none'">
                     <i data-lucide="clipboard-list" style="width:14px;height:14px;"></i>과제 제출 현황
@@ -367,7 +376,6 @@
               </tr>
               <tr>
                 <td style="text-align:center;font-weight:500;">1-3반</td>
-                <td style="text-align:center;"><span class="badge badge-green">완료</span></td>
                 <td>
                   <div style="display:flex;align-items:center;gap:12px;">
                     <div style="flex:1;height:10px;background:#e9f2ff;border-radius:4px;overflow:hidden;"><div style="width:100%;height:100%;background:#1ab864;"></div></div>
@@ -376,6 +384,7 @@
                 </td>
                 <td style="text-align:center;">0</td>
                 <td style="font-size:14px;color:#3b3f4c;">10월 16일 18:55 ~ 10월 17일 23:59</td>
+                <td style="text-align:center;"><span class="badge badge-green">완료</span></td>
                 <td style="text-align:center;">
                   <button onclick="showListForClass(3,'A')" style="background:none;border:none;cursor:pointer;font-family:inherit;font-size:14px;font-weight:600;color:#416bff;display:inline-flex;align-items:center;gap:4px;padding:6px 10px;border-radius:4px;" onmouseover="this.style.background='#e9f2ff'" onmouseout="this.style.background='none'">
                     <i data-lucide="clipboard-list" style="width:14px;height:14px;"></i>과제 제출 현황
@@ -407,18 +416,17 @@
           <table class="tbl2">
             <thead>
               <tr>
-                <th style="width:70px;text-align:center;">반</th>
-                <th style="width:80px;text-align:center;">상태</th>
-                <th>제출 현황</th>
+                <th style="width:70px;text-align:center;">학급</th>
+                <th style="width:240px;">제출 현황</th>
                 <th style="width:70px;text-align:center;">미제출</th>
-                <th style="width:260px;">기간</th>
-                <th style="width:150px;text-align:center;">관리</th>
+                <th style="width:260px;">과제 제출 기간</th>
+                <th style="width:110px;text-align:center;">OCR 상태</th>
+                <th style="width:150px;text-align:center;">상세 보기</th>
               </tr>
             </thead>
             <tbody>
               <tr>
                 <td style="text-align:center;font-weight:500;">1-1반</td>
-                <td style="text-align:center;"><span class="badge badge-blue">진행</span></td>
                 <td>
                   <div style="display:flex;align-items:center;gap:12px;">
                     <div style="flex:1;height:10px;background:#e9f2ff;border-radius:4px;overflow:hidden;"><div style="width:100%;height:100%;background:#416bff;"></div></div>
@@ -427,6 +435,7 @@
                 </td>
                 <td style="text-align:center;">0</td>
                 <td style="font-size:14px;color:#3b3f4c;">10월 16일 18:55 ~ 10월 17일 23:59</td>
+                <td style="text-align:center;"><span class="badge badge-red">확인 필요</span></td>
                 <td style="text-align:center;">
                   <button onclick="showListForClass(1,'B')" style="background:none;border:none;cursor:pointer;font-family:inherit;font-size:14px;font-weight:600;color:#416bff;display:inline-flex;align-items:center;gap:4px;padding:6px 10px;border-radius:4px;" onmouseover="this.style.background='#e9f2ff'" onmouseout="this.style.background='none'">
                     <i data-lucide="clipboard-list" style="width:14px;height:14px;"></i>과제 제출 현황
@@ -435,7 +444,6 @@
               </tr>
               <tr>
                 <td style="text-align:center;font-weight:500;">1-2반</td>
-                <td style="text-align:center;"><span class="badge badge-blue">진행</span></td>
                 <td>
                   <div style="display:flex;align-items:center;gap:12px;">
                     <div style="flex:1;height:10px;background:#e9f2ff;border-radius:4px;overflow:hidden;"><div style="width:86%;height:100%;background:#416bff;"></div></div>
@@ -444,6 +452,7 @@
                 </td>
                 <td style="text-align:center;">2</td>
                 <td style="font-size:14px;color:#3b3f4c;">10월 16일 18:55 ~ 10월 17일 23:59</td>
+                <td style="text-align:center;"><span class="badge badge-orange">미진행</span></td>
                 <td style="text-align:center;">
                   <button onclick="showListForClass(2,'B')" style="background:none;border:none;cursor:pointer;font-family:inherit;font-size:14px;font-weight:600;color:#416bff;display:inline-flex;align-items:center;gap:4px;padding:6px 10px;border-radius:4px;" onmouseover="this.style.background='#e9f2ff'" onmouseout="this.style.background='none'">
                     <i data-lucide="clipboard-list" style="width:14px;height:14px;"></i>과제 제출 현황
@@ -452,7 +461,6 @@
               </tr>
               <tr>
                 <td style="text-align:center;font-weight:500;">1-3반</td>
-                <td style="text-align:center;"><span class="badge badge-green">완료</span></td>
                 <td>
                   <div style="display:flex;align-items:center;gap:12px;">
                     <div style="flex:1;height:10px;background:#e9f2ff;border-radius:4px;overflow:hidden;"><div style="width:100%;height:100%;background:#1ab864;"></div></div>
@@ -461,6 +469,7 @@
                 </td>
                 <td style="text-align:center;">0</td>
                 <td style="font-size:14px;color:#3b3f4c;">10월 16일 18:55 ~ 10월 17일 23:59</td>
+                <td style="text-align:center;"><span class="badge badge-green">완료</span></td>
                 <td style="text-align:center;">
                   <button onclick="showListForClass(3,'B')" style="background:none;border:none;cursor:pointer;font-family:inherit;font-size:14px;font-weight:600;color:#416bff;display:inline-flex;align-items:center;gap:4px;padding:6px 10px;border-radius:4px;" onmouseover="this.style.background='#e9f2ff'" onmouseout="this.style.background='none'">
                     <i data-lucide="clipboard-list" style="width:14px;height:14px;"></i>과제 제출 현황
@@ -515,7 +524,7 @@
   </div>
   <div class="page-wrap">
     <h1 class="page-h1">1학년 국어 수행평가 채점</h1>
-    <p class="page-sub">AI가 채점 초안을 만들어 드립니다. 선생님이 검토 후 최종 확정해 주세요.</p>
+    <p class="page-sub">AI가 과제 채점과 피드백 작성을 도와드려요. AI 결과는 참고용이며, 선생님이 확인하신 뒤 최종 점수로 반영됩니다.</p>
 
     <div style="display:flex;flex-direction:column;gap:20px;">
 
@@ -730,52 +739,29 @@
           </button>
         </div>
       </div>
-      <p id="list-eval-desc" class="page-sub">[미래사회 예측 시나리오(A안)] 과제 제출 현황을 확인하고 파일을 직접 업로드할 수 있습니다.</p>
 
-      <!-- 독립 미제출 학생 배너 (OCR 여부와 무관, 상단 고정) -->
-      <div id="list-absent-banner" style="display:none;align-items:flex-start;gap:10px;padding:14px 16px;background:#fff3f4;border:1px solid #f2525f;border-radius:8px;margin-bottom:16px;">
-        <i data-lucide="alert-circle" style="width:18px;height:18px;color:#db3e51;flex-shrink:0;margin-top:2px;"></i>
-        <div style="display:flex;flex-direction:column;gap:4px;flex:1;min-width:0;">
-          <span style="font-size:15px;color:#db3e51;font-weight:600;">미제출 학생</span>
-          <span id="list-absent-names" style="font-size:14px;color:#db3e51;line-height:1.6;word-break:keep-all;"></span>
+      <p id="list-eval-desc" class="page-sub">과제 제출 현황을 확인하고, 필요하면 과제를 직접 올릴 수도 있습니다. 제출된 과제는 AI 채점을 위해 OCR 인식을 진행해 주세요.</p>
+
+      <!-- 미제출 학생 배너 (제출 추적 — 실시간으로 누가 안 냈는지) -->
+      <div id="absent-banner" style="display:none;align-items:flex-start;gap:10px;background:#fff3f4;border:1px solid #f5b5bc;border-radius:8px;padding:12px 14px;margin-bottom:12px;">
+        <i data-lucide="user-x" style="width:18px;height:18px;color:#db3e51;flex-shrink:0;margin-top:2px;"></i>
+        <div style="display:flex;flex-direction:column;gap:3px;flex:1;min-width:0;">
+          <span style="font-size:14px;color:#db3e51;font-weight:700;">미제출 <span id="absent-banner-cnt"></span>명</span>
+          <span id="absent-banner-names" style="font-size:13px;color:#c0394a;line-height:1.6;word-break:keep-all;"></span>
         </div>
-        <div style="display:flex;align-items:center;gap:6px;flex-shrink:0;color:#6d7381;font-size:13px;">
-          <span id="list-absent-ts">10/22 15:00:00 기준</span>
-          <button onclick="refreshAbsentBanner()" style="background:none;border:none;cursor:pointer;color:#6d7381;padding:2px;display:inline-flex;align-items:center;" title="새로고침"><i data-lucide="refresh-cw" style="width:14px;height:14px;"></i></button>
+        <div style="display:flex;align-items:center;gap:6px;flex-shrink:0;color:#9aa0ab;font-size:12px;">
+          <span id="absent-banner-ts">기준</span>
+          <button onclick="refreshAbsentBanner()" style="background:none;border:none;cursor:pointer;color:#9aa0ab;padding:2px;display:inline-flex;align-items:center;" title="새로고침"><i data-lucide="refresh-cw" style="width:13px;height:13px;"></i></button>
         </div>
       </div>
 
-      <!-- A안: OCR 확인 필요 배너 -->
-      <div id="list-ocr-banner" style="display:flex;align-items:flex-start;gap:10px;padding:12px 16px;background:#fff3f4;border:1px solid #f2525f;border-radius:4px;margin-bottom:20px;">
-        <i data-lucide="alert-circle" style="width:16px;height:16px;color:#db3e51;flex-shrink:0;margin-top:2px;"></i>
-        <div style="display:flex;flex-direction:column;gap:4px;">
-          <span style="font-size:14px;color:#db3e51;font-weight:600;">OCR 인식 결과 확인이 필요한 학생입니다.</span>
-          <span style="font-size:14px;color:#db3e51;">10102 이준호 &nbsp;·&nbsp; 10103 박지민</span>
-        </div>
+      <!-- 처리 필요 액션 바 (OCR 관련 — 요약 1줄 + 조건부 버튼 2개) -->
+      <div id="class-action-bar" style="display:none;align-items:center;justify-content:space-between;gap:10px;background:#fff7ed;border:1px solid #fdba74;border-radius:8px;padding:11px 14px;margin-bottom:12px;flex-wrap:wrap;">
+        <span id="cab-summary" style="font-size:14px;color:#3b3f4c;"></span>
+        <div id="cab-actions" style="display:flex;gap:8px;flex-shrink:0;"></div>
       </div>
-
-      <!-- B안 1반: OCR 확인 필요 배너 -->
-      <div id="list-b1-ocr-banner" style="display:none;align-items:flex-start;gap:10px;padding:12px 16px;background:#fff3f4;border:1px solid #f2525f;border-radius:4px;margin-bottom:20px;">
-        <i data-lucide="alert-circle" style="width:16px;height:16px;color:#db3e51;flex-shrink:0;margin-top:2px;"></i>
-        <div style="display:flex;flex-direction:column;gap:4px;">
-          <span style="font-size:14px;color:#db3e51;font-weight:600;">OCR 인식 결과 확인이 필요한 학생입니다.</span>
-          <span id="list-b1-ocr-banner-names" style="font-size:14px;color:#db3e51;"></span>
-        </div>
-      </div>
-
-      <!-- B안 2반: OCR 미진행 배너 -->
-      <div id="list-b-ocr-pending-banner" style="display:none;align-items:center;justify-content:space-between;gap:10px;padding:12px 16px;background:#fff7ed;border:1px solid #f97316;border-radius:4px;margin-bottom:20px;">
-        <div style="display:flex;align-items:center;gap:10px;">
-          <i data-lucide="clock" style="width:16px;height:16px;color:#ea580c;flex-shrink:0;"></i>
-          <div style="display:flex;flex-direction:column;gap:3px;">
-            <span style="font-size:14px;color:#ea580c;font-weight:600;">OCR 인식이 아직 진행되지 않았습니다.</span>
-            <span style="font-size:13px;color:#9a4806;">파일이 업로드된 상태입니다. OCR 인식을 진행하면 AI 채점을 시작할 수 있습니다.</span>
-          </div>
-        </div>
-        <button onclick="startOcrFromBanner()" style="flex-shrink:0;height:32px;background:#f97316;color:white;border:none;border-radius:4px;padding:0 14px;font-size:13px;font-weight:600;font-family:inherit;cursor:pointer;white-space:nowrap;display:inline-flex;align-items:center;gap:6px;">
-          <i data-lucide="scan-text" style="width:14px;height:14px;"></i>지금 OCR 진행
-        </button>
-      </div>
+      <!-- OCR 진행 애니메이션 호스트 -->
+      <div id="list-b-ocr-pending-banner" style="display:none;align-items:center;justify-content:space-between;gap:10px;padding:12px 16px;background:#fff7ed;border:1px solid #f97316;border-radius:8px;margin-bottom:12px;"></div>
 
       <div class="ev-card">
       <table class="tbl2">
@@ -784,10 +770,10 @@
             <th style="width:80px;text-align:center;">상태</th>
             <th style="width:70px;">학번</th>
             <th style="width:80px;">이름</th>
-            <th style="width:170px;">최근 제출일시</th>
-            <th>최근 제출 파일명</th>
+            <th style="width:200px;">제출 파일</th>
+            <th style="width:175px;white-space:nowrap;">최근 제출 일시</th>
             <th style="width:150px;text-align:center;">OCR 결과</th>
-            <th style="width:120px;text-align:center;">과제 제출 관리</th>
+            <th style="width:150px;text-align:center;">과제 제출 관리</th>
           </tr>
         </thead>
         <tbody id="student-table-body"></tbody>
@@ -998,9 +984,6 @@
           <div style="width:1px;height:20px;background:#dde1e8;"></div>
           <button id="btn-next" onclick="navStudent(1)" style="background:none;border:none;font-size:15px;font-weight:600;color:#3b3f4c;cursor:pointer;padding:0 12px;font-family:inherit;">다음 학생 &gt;</button>
         </div>
-        <button class="btn btn-primary" id="btn-save-next" onclick="saveAndNext()" style="height:40px;">
-          <i data-lucide="check" style="width:16px;height:16px;"></i>저장
-        </button>
       </div>
     </div>
   </div>
@@ -1014,7 +997,7 @@
   </div>
 
   <!-- 좌우 대조 영역 -->
-  <div id="ocr-split" style="display:flex;height:calc(100vh - 56px - 68px);">
+  <div id="ocr-split" style="display:flex;height:calc(100vh - 68px);">
     <!-- 좌측: 원본 스캔 -->
     <div style="width:56%;min-width:0;display:flex;flex-direction:column;border-right:1px solid #dde1e8;">
       <div style="display:flex;align-items:center;justify-content:center;gap:12px;background:#3a3a3a;padding:8px 16px;flex-shrink:0;position:relative;">
@@ -1048,9 +1031,12 @@
     <!-- 우측: OCR 결과 -->
     <div style="width:44%;min-width:0;overflow-y:auto;background:white;">
       <div style="padding:16px 20px 0;">
-        <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">
-          <i data-lucide="scan-text" style="width:16px;height:16px;color:#416bff;"></i>
-          <span style="font-size:16px;font-weight:600;color:#222631;">OCR 인식 결과</span>
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:12px;">
+          <div style="display:flex;align-items:center;gap:8px;">
+            <i data-lucide="scan-text" style="width:16px;height:16px;color:#416bff;"></i>
+            <span style="font-size:16px;font-weight:600;color:#222631;">OCR 인식 결과</span>
+          </div>
+          <button onclick="openQuestionEditModal()" style="display:inline-flex;align-items:center;justify-content:center;line-height:1;gap:5px;height:30px;padding:0 12px;background:white;border:1px solid #b3c6ff;border-radius:6px;color:#416bff;font-family:inherit;font-size:13px;font-weight:700;cursor:pointer;" onmouseover="this.style.background='#e9f2ff'" onmouseout="this.style.background='white'"><i data-lucide="pencil" style="width:13px;height:13px;"></i>문항 수정</button>
         </div>
       </div>
       <div id="ocr-text-area" style="padding:0 20px 20px;"></div>
@@ -1098,7 +1084,7 @@
     </span>
   </div>
 
-  <div id="ocr-b-split" style="display:flex;height:calc(100vh - 56px - 68px);">
+  <div id="ocr-b-split" style="display:flex;height:calc(100vh - 68px);">
     <div style="width:56%;min-width:0;display:flex;flex-direction:column;border-right:1px solid #dde1e8;background:#5a5a5a;">
       <div style="background:#222631;display:flex;align-items:center;gap:20px;padding:4px 20px;flex-shrink:0;min-height:44px;">
         <div style="width:294px;font-size:15px;color:white;line-height:1.4;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">1학년1반과제파일.pdf</div>
@@ -1133,9 +1119,12 @@
     </div>
     <div style="width:44%;min-width:0;overflow-y:auto;background:white;">
       <div style="padding:16px 20px 0;">
-        <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;">
-          <i data-lucide="scan-text" style="width:16px;height:16px;color:#416bff;"></i>
-          <span style="font-size:16px;font-weight:600;color:#222631;">OCR 인식 결과</span>
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:12px;">
+          <div style="display:flex;align-items:center;gap:8px;">
+            <i data-lucide="scan-text" style="width:16px;height:16px;color:#416bff;"></i>
+            <span style="font-size:16px;font-weight:600;color:#222631;">OCR 인식 결과</span>
+          </div>
+          <button onclick="openQuestionEditModal()" style="display:inline-flex;align-items:center;justify-content:center;line-height:1;gap:5px;height:30px;padding:0 12px;background:white;border:1px solid #b3c6ff;border-radius:6px;color:#416bff;font-family:inherit;font-size:13px;font-weight:700;cursor:pointer;" onmouseover="this.style.background='#e9f2ff'" onmouseout="this.style.background='white'"><i data-lucide="pencil" style="width:13px;height:13px;"></i>문항 수정</button>
         </div>
         <div style="padding:10px 14px;background:#e9f2ff;border-radius:4px;display:flex;gap:8px;align-items:flex-start;margin-bottom:16px;">
           <i data-lucide="pencil-line" style="width:14px;height:14px;color:#3151c4;flex-shrink:0;margin-top:2px;"></i>
@@ -1151,6 +1140,49 @@
 </div>
 
 </div><!-- /main-wrap -->
+
+<!-- 문항 수정 모달 (이 평가의 모든 학생 공통 적용) -->
+<div id="questionEditModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.4);z-index:1100;align-items:center;justify-content:center;">
+  <div style="background:white;border-radius:16px;box-shadow:0 8px 24px rgba(0,0,0,0.16);width:600px;max-width:92vw;max-height:86vh;display:flex;flex-direction:column;position:relative;">
+    <button onclick="closeQuestionEditModal()" style="position:absolute;top:11px;right:11px;width:36px;height:36px;background:none;border:none;cursor:pointer;border-radius:6px;display:flex;align-items:center;justify-content:center;" onmouseover="this.style.background='#f6f7f9'" onmouseout="this.style.background='none'"><i data-lucide="x" style="width:18px;height:18px;color:#6d7381;"></i></button>
+    <div style="padding:24px 24px 8px;"><h3 style="font-size:18px;font-weight:700;color:#222631;margin:0;">문항 수정</h3></div>
+    <div style="padding:0 24px 8px;"><p style="font-size:13px;color:#6d7381;line-height:1.55;margin:0;">수정한 문항은 <strong style="color:#3b3f4c;">이 평가의 모든 학생 OCR 결과</strong>에 동일하게 적용됩니다. 학생별로 따로 수정할 필요가 없습니다.</p></div>
+    <div id="qedit-list" style="padding:8px 24px 8px;overflow-y:auto;flex:1;"></div>
+    <div style="padding:12px 24px 16px;display:flex;justify-content:flex-end;gap:10px;border-top:1px solid #eceef2;">
+      <button onclick="closeQuestionEditModal()" class="btn btn-outline">취소</button>
+      <button onclick="saveQuestionEditModal()" class="btn btn-primary">모든 학생에 적용</button>
+    </div>
+  </div>
+</div>
+
+<!-- 수식 입력기 모달 -->
+<div id="formulaModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.4);z-index:1200;align-items:center;justify-content:center;">
+  <div style="background:white;border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,0.16);width:420px;max-width:92vw;position:relative;">
+    <div style="padding:20px 20px 12px;display:flex;align-items:center;gap:8px;"><i data-lucide="sigma" style="width:18px;height:18px;color:#416bff;"></i><h3 style="font-size:16px;font-weight:700;color:#222631;margin:0;">수식 입력</h3></div>
+    <div style="padding:0 20px 16px;display:flex;flex-direction:column;gap:10px;">
+      <input id="formula-input" type="text" placeholder="예: x^2 + y^2 = r^2" style="height:42px;border:1px solid #d9d9d9;border-radius:8px;padding:0 12px;font-family:inherit;font-size:15px;color:#222631;outline:none;" onfocus="this.style.borderColor='#416bff'" onblur="this.style.borderColor='#d9d9d9'">
+      <div style="display:flex;flex-wrap:wrap;gap:6px;">
+        <button onclick="fSym('x^2')" class="fbtn">x²</button>
+        <button onclick="fSym('x^n')" class="fbtn">xⁿ</button>
+        <button onclick="fSym('x_n')" class="fbtn">xₙ</button>
+        <button onclick="fSym('\\frac{a}{b}')" class="fbtn">a/b</button>
+        <button onclick="fSym('\\sqrt{x}')" class="fbtn">√x</button>
+        <button onclick="fSym('\\pi')" class="fbtn">π</button>
+        <button onclick="fSym('\\times')" class="fbtn">×</button>
+        <button onclick="fSym('\\div')" class="fbtn">÷</button>
+        <button onclick="fSym('\\pm')" class="fbtn">±</button>
+        <button onclick="fSym('\\leq')" class="fbtn">≤</button>
+        <button onclick="fSym('\\geq')" class="fbtn">≥</button>
+        <button onclick="fSym('\\neq')" class="fbtn">≠</button>
+      </div>
+      <span style="font-size:12px;color:#6d7381;line-height:1.5;">자주 쓰는 기호를 누르거나 직접 입력하세요. 입력한 수식은 문항에 <strong>$수식$</strong> 형태로 삽입됩니다.</span>
+    </div>
+    <div style="padding:8px 20px 16px;display:flex;justify-content:flex-end;gap:10px;">
+      <button onclick="closeFormulaModal()" class="btn btn-outline btn-sm">취소</button>
+      <button onclick="applyFormula()" class="btn btn-primary btn-sm">삽입</button>
+    </div>
+  </div>
+</div>
 
 <!-- Toast -->
 <input type="file" id="blank-form-input" accept="application/pdf" style="display:none;" onchange="onBlankFormPicked(event)">
@@ -1186,21 +1218,16 @@
       <p id="student-upload-title" style="font-size:20px;font-weight:600;line-height:1.25;color:#222631;margin:0;">학생 파일 추가/제거</p>
     </div>
     <div style="padding:0 24px;display:flex;flex-direction:column;gap:20px;">
-      <p style="font-size:16px;font-weight:400;line-height:1.55;color:#222631;margin:0;">업로드된 파일을 기준으로 채점이 진행됩니다.</p>
+      <p style="font-size:16px;font-weight:400;line-height:1.55;color:#222631;margin:0;">가장 먼저 올린 파일 1개만 채점·OCR 대상이 됩니다. 나머지 파일은 참고용으로 함께 보관됩니다.</p>
       <div style="background:#e9f2ff;border:1px solid #ccdfff;border-radius:4px;padding:12px;">
         <ul style="list-style:disc;padding-left:24px;margin:0;font-size:15px;font-weight:400;line-height:1.55;color:#3151c4;">
-          <li>제출 가능한 최대 파일 수 : 1</li>
+          <li>여러 파일을 올릴 수 있어요 (채점·OCR은 가장 먼저 올린 파일만)</li>
           <li>제출 가능한 파일 형식 : PDF, PNG, JPG</li>
         </ul>
       </div>
       <div style="display:flex;flex-direction:column;gap:12px;">
         <p style="font-size:15px;font-weight:500;line-height:1.4;color:#222631;margin:0;">파일 추가</p>
-        <div id="student-upload-chip" style="display:none;align-self:flex-start;background:#e9f2ff;border:1px solid #ccdfff;border-radius:4px;height:24px;padding:0 8px;gap:4px;align-items:center;">
-          <span id="student-upload-chip-name" style="font-size:13px;font-weight:600;line-height:1.25;color:#3151c4;">파일명.jpg</span>
-          <button onclick="removeStudentUploadFile()" style="background:none;border:none;padding:0;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;">
-            <i data-lucide="x" style="width:12px;height:12px;color:#3151c4;"></i>
-          </button>
-        </div>
+        <div id="student-upload-list" style="display:flex;flex-direction:column;gap:8px;"></div>
         <button id="student-upload-btn" onclick="pickStudentUploadFile()" style="align-self:flex-start;height:34px;padding:0 12px;background:transparent;border:none;border-radius:4px;display:inline-flex;align-items:center;gap:8px;cursor:pointer;font-family:inherit;">
           <i data-lucide="upload" style="width:18px;height:18px;color:#416bff;"></i>
           <span style="font-size:15px;font-weight:600;line-height:1.25;color:#416bff;">파일 업로드</span>
@@ -1224,7 +1251,7 @@
     <div class="rm-hd">
       <div style="display:flex;align-items:center;gap:10px;padding-right:36px;">
         <i data-lucide="triangle-alert" style="width:22px;height:22px;color:#f97316;flex-shrink:0;"></i>
-        <span class="rm-title">OCR 미확인 학생이 있습니다</span>
+        <span class="rm-title">OCR 확인 필요 학생이 있습니다</span>
       </div>
       <button class="rm-close" onclick="closeRmModal('ocrWarnModal')"><i data-lucide="x" style="width:20px;height:20px"></i></button>
     </div>
@@ -1289,9 +1316,10 @@
         </div>
         <div class="rm-note">* 항상 가장 좋은 성능으로 채점해드리기 위해, 여러 채점 모델을 하나로 통합했어요.</div>
       </div>
-      <!-- 채점 수준 -->
+      <!-- AI 점수 수준 (HIAI 동일: 점수 자체를 조절) -->
       <div class="rm-field">
-        <span class="rm-label">채점 수준</span>
+        <span class="rm-label">AI 점수 수준</span>
+        <p style="font-size:14px;color:#6d7381;margin:2px 0 6px;line-height:1.5;">AI가 매길 점수를 조절합니다. 점수에 맞춰 피드백 내용도 함께 바뀝니다.</p>
         <div>
           <div class="rm-slider-bar" id="rm-slider" onclick="rmSliderClick(event)">
             <div class="rm-slider-fill" id="rm-slider-fill" style="width:50%;"></div>
@@ -1300,9 +1328,9 @@
             <div class="rm-slider-thumb" id="rm-slider-thumb" style="left:50%;"></div>
           </div>
           <div class="rm-slider-marks">
-            <span onclick="rmSetLevel(0)">관대하게</span>
-            <span onclick="rmSetLevel(50)" style="margin-left:14px;">기본값</span>
-            <span onclick="rmSetLevel(100)">엄격하게</span>
+            <span onclick="rmSetLevel(0)">더 낮은 점수</span>
+            <span onclick="rmSetLevel(50)" style="margin-left:14px;">기본 점수</span>
+            <span onclick="rmSetLevel(100)">더 높은 점수</span>
           </div>
         </div>
       </div>
@@ -1526,15 +1554,15 @@ function toggleNav() {
 
 // ── 데이터 ──
 const STUDENTS = [
-  { id:'10101', name:'김서윤', status:'제출', date:'07/21 14:31 선생님 업로드', files:1, ocrStatus:'confirmed', needsReview:false, pages:[3,4] },
+  { id:'10101', name:'김서윤', status:'제출', date:'07/21 14:31 선생님 업로드', files:3, ocrStatus:'confirmed', needsReview:false, pages:[3,4] },
   { id:'10102', name:'이준호', status:'제출', date:'07/21 14:31 선생님 업로드', files:1, ocrStatus:'unconfirmed', needsReview:true, pages:[5,6] },
-  { id:'10103', name:'박지민', status:'제출', date:'07/21 14:31 선생님 업로드', files:1, ocrStatus:'unconfirmed', needsReview:true, pages:[7,8] },
-  { id:'10104', name:'최유진', status:'제출', date:'07/21 14:31 선생님 업로드', files:1, ocrStatus:'processing', needsReview:false, pages:[9,10] },
-  { id:'10105', name:'정현우', status:'제출', date:'07/21 14:31 선생님 업로드', files:1, ocrStatus:'unconfirmed', needsReview:false, pages:[11,12] },
+  { id:'10103', name:'박지민', status:'제출', date:'07/21 14:31 선생님 업로드', files:2, ocrStatus:'unconfirmed', needsReview:false, pages:[7,8] },
+  { id:'10104', name:'최유진', status:'제출', date:'07/21 14:31 선생님 업로드', files:1, ocrStatus:'failed', needsReview:false, pages:[9,10] },
+  { id:'10105', name:'정현우', status:'제출', date:'07/21 14:31 선생님 업로드', files:1, ocrStatus:'waiting', needsReview:false, pages:[11,12] },
   { id:'10106', name:'한지우', status:'미제출', date:'-', files:0, ocrStatus:null, pages:[] },
   { id:'10107', name:'조민재', status:'미제출', date:'-', files:0, ocrStatus:null, pages:[] },
   { id:'10108', name:'윤하은', status:'미제출', date:'-', files:0, ocrStatus:null, pages:[] },
-  { id:'10109', name:'임도윤', status:'제출', date:'07/21 14:31 선생님 업로드', files:1, ocrStatus:'unconfirmed', needsReview:false, pages:[13,14] }
+  { id:'10109', name:'임도윤', status:'제출', date:'07/21 14:31 선생님 업로드', files:1, ocrStatus:'processing', needsReview:false, pages:[13,14] }
 ];
 
 const OCR_DATA = {
@@ -1642,6 +1670,7 @@ var currentStudentIdx = 0;
 var currentPageIdx = 0;
 
 // ── 학급 제출 상세 테이블 렌더 ──
+var completedClasses = { 3: true }; // 데모: 채점·OCR 완료된 학급 (목록 '완료'와 상세 일치용)
 function renderTable() {
   if (currentEvalType === 'B') { renderTableB(); return; }
   // A안(선생님 업로드) thead 복원 — B안이 덮어쓴 경우 대비
@@ -1651,59 +1680,68 @@ function renderTable() {
       + '<th style="width:80px;text-align:center;">상태</th>'
       + '<th style="width:70px;">학번</th>'
       + '<th style="width:80px;">이름</th>'
-      + '<th style="width:170px;">최근 제출일시</th>'
-      + '<th>최근 제출 파일명</th>'
+      + '<th style="width:200px;">제출 파일</th>'
+      + '<th style="width:175px;white-space:nowrap;">최근 제출 일시</th>'
       + '<th style="width:150px;text-align:center;">OCR 결과</th>'
-      + '<th style="width:120px;text-align:center;">과제 제출 관리</th>'
+      + '<th style="width:150px;text-align:center;">과제 제출 관리</th>'
       + '</tr>';
   }
   var tbody = document.getElementById('student-table-body');
   var html = '';
-  var allAbsent = currentListClass !== 1;
+  var allDone = !!completedClasses[currentListClass];          // 데모: 채점/OCR 완료 학급 (예: 1-3반)
+  var allAbsent = currentListClass !== 1 && !allDone;
   var bulkUp = !!bulkUploadedClasses[currentListClass];
   var ocrPhase = bulkOcrStateA[currentListClass] || null;
   STUDENTS.forEach(function(s, i) {
-    var effectiveStatus = allAbsent ? ((bulkUp && s.status === '제출') ? '제출' : '미제출') : s.status;
+    var effectiveStatus = allDone ? '제출' : (allAbsent ? ((bulkUp && s.status === '제출') ? '제출' : '미제출') : s.status);
     var statusBadge = effectiveStatus === '제출'
       ? '<span class="badge badge-green">제출 완료</span>'
       : '<span class="badge badge-red">미제출</span>';
     var ocrCell = '-';
-    if (effectiveStatus === '제출' && bulkUp && ocrPhase === 'pending') {
-      ocrCell = '<span style="display:inline-flex;align-items:center;gap:4px;color:#6d7381;font-weight:600;font-size:13px;"><i data-lucide="clock" style="width:14px;height:14px;"></i>미진행</span>';
-    } else if (effectiveStatus === '제출' && bulkUp && ocrPhase === 'running') {
-      ocrCell = '<span style="display:inline-flex;align-items:center;gap:4px;color:#f97316;font-weight:600;font-size:13px;"><i data-lucide="loader" style="width:14px;height:14px;" class="spin"></i>처리중</span>';
-    } else if (effectiveStatus === '제출' && bulkUp && ocrPhase === 'done') {
-      if (s.needsReview) {
-        var uCnt = (OCR_DATA[s.id] && OCR_DATA[s.id].questions)
-          ? OCR_DATA[s.id].questions.filter(function(q){ return !!q.uncertainty; }).length : 0;
-        ocrCell = '<span style="display:inline-flex;align-items:center;gap:4px;color:#db3e51;font-weight:600;font-size:13px;cursor:pointer;white-space:nowrap;" onclick="goToOCR(' + i + ')"><i data-lucide="alert-circle" style="width:14px;height:14px;flex-shrink:0;"></i>확인 필요<span style="font-weight:600;font-size:11px;background:#fff3f4;border-radius:100px;padding:1px 6px;margin-left:2px;white-space:nowrap;">' + uCnt + '개 문항</span></span>';
-      } else {
-        ocrCell = '<span style="display:inline-flex;align-items:center;gap:4px;color:#6d7381;font-weight:600;font-size:13px;cursor:pointer;" onclick="goToOCR(' + i + ')"><i data-lucide="circle" style="width:14px;height:14px;"></i>미확인</span>';
-      }
-    } else if (!allAbsent && effectiveStatus === '제출') {
-      if (s.ocrStatus === 'confirmed') {
-        ocrCell = '<span style="display:inline-flex;align-items:center;gap:4px;color:#319d64;font-weight:600;font-size:13px;cursor:pointer;" onclick="goToOCR(' + i + ')"><i data-lucide="circle-check" style="width:14px;height:14px;"></i>확인완료</span>';
-      } else if (s.ocrStatus === 'unconfirmed' && s.needsReview) {
-        var uCount = (OCR_DATA[s.id] && OCR_DATA[s.id].questions)
-          ? OCR_DATA[s.id].questions.filter(function(q){ return !!q.uncertainty; }).length : 0;
-        ocrCell = '<span style="display:inline-flex;align-items:center;gap:4px;color:#db3e51;font-weight:600;font-size:13px;cursor:pointer;white-space:nowrap;" onclick="goToOCR(' + i + ')"><i data-lucide="alert-circle" style="width:14px;height:14px;flex-shrink:0;"></i>확인 필요<span style="font-weight:600;font-size:11px;background:#fff3f4;border-radius:100px;padding:1px 6px;margin-left:2px;white-space:nowrap;">' + uCount + '개 문항</span></span>';
-      } else if (s.ocrStatus === 'unconfirmed') {
-        ocrCell = '<span style="display:inline-flex;align-items:center;gap:4px;color:#6d7381;font-weight:600;font-size:13px;cursor:pointer;" onclick="goToOCR(' + i + ')"><i data-lucide="circle" style="width:14px;height:14px;"></i>미확인</span>';
-      } else if (s.ocrStatus === 'processing') {
-        ocrCell = '<span style="display:inline-flex;align-items:center;gap:4px;color:#f97316;font-weight:600;font-size:13px;cursor:pointer;" onclick="goToOCR(' + i + ')"><i data-lucide="loader" style="width:14px;height:14px;" class="spin"></i>처리중</span>';
+    if (effectiveStatus === '제출') {
+      if (allDone) {
+        ocrCell = ocrResultCell('confirmed', 0, null);
+      } else if (bulkUp && ocrPhase === 'pending') {
+        ocrCell = ocrResultCell('waiting');
+      } else if (bulkUp && ocrPhase === 'running') {
+        ocrCell = ocrResultCell('processing');
+      } else if (bulkUp && ocrPhase === 'done') {
+        if (s.needsReview) {
+          var uCnt = (OCR_DATA[s.id] && OCR_DATA[s.id].questions)
+            ? OCR_DATA[s.id].questions.filter(function(q){ return !!q.uncertainty; }).length : 0;
+          ocrCell = ocrResultCell('review', uCnt, 'goToOCR(' + i + ')');
+        } else {
+          ocrCell = ocrResultCell('unconfirmed', 0, 'goToOCR(' + i + ')');
+        }
+      } else if (!allAbsent) {
+        if (s.ocrStatus === 'confirmed') {
+          ocrCell = ocrResultCell('confirmed', 0, 'goToOCR(' + i + ')');
+        } else if (s.ocrStatus === 'unconfirmed' && s.needsReview) {
+          var uCount = (OCR_DATA[s.id] && OCR_DATA[s.id].questions)
+            ? OCR_DATA[s.id].questions.filter(function(q){ return !!q.uncertainty; }).length : 0;
+          ocrCell = ocrResultCell('review', uCount, 'goToOCR(' + i + ')');
+        } else if (s.ocrStatus === 'unconfirmed') {
+          ocrCell = ocrResultCell('unconfirmed', 0, 'goToOCR(' + i + ')');
+        } else if (s.ocrStatus === 'processing') {
+          ocrCell = ocrResultCell('processing');
+        } else if (s.ocrStatus === 'waiting') {
+          ocrCell = ocrResultCell('waiting');
+        } else if (s.ocrStatus === 'failed') {
+          ocrCell = ocrResultCell('failed', 0, null, s.id);
+        }
       }
     }
-    var actionCell = '<button onclick="openStudentUploadModal(\'' + s.id + '\', \'' + s.name + '\')" style="background:none;border:none;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:4px;color:#416bff;font-size:13px;font-weight:600;padding:4px 8px;border-radius:4px;" onmouseover="this.style.background=\'#e9f2ff\'" onmouseout="this.style.background=\'none\'"><i data-lucide="paperclip" style="width:13px;height:13px;flex-shrink:0;"></i>파일 추가/제거</button>';
-    var displayDate = effectiveStatus !== '제출' ? '-' : (bulkUp ? bulkUploadStamp[currentListClass] : (allAbsent ? '-' : s.date));
+    var actionCell = '<button onclick="openStudentUploadModal(\'' + s.id + '\', \'' + s.name + '\')" style="background:none;border:none;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:4px;color:#416bff;font-size:13px;font-weight:600;padding:4px 8px;border-radius:4px;white-space:nowrap;" onmouseover="this.style.background=\'#e9f2ff\'" onmouseout="this.style.background=\'none\'"><i data-lucide="paperclip" style="width:13px;height:13px;flex-shrink:0;"></i>파일 추가/제거</button>';
+    var displayDate = effectiveStatus !== '제출' ? '-' : (allDone ? '04/20 09:10 선생님 업로드' : (bulkUp ? bulkUploadStamp[currentListClass] : (allAbsent ? '-' : s.date)));
     var fileNameCellA = (effectiveStatus !== '제출')
       ? '<span style="color:#b3b6bd;">-</span>'
-      : '<span style="color:#3b3f4c;font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:inline-block;max-width:280px;vertical-align:middle;">' + s.id + '_미래시나리오.pdf</span>';
+      : scoredFileCell(s.id + '_미래시나리오.pdf', s.files);
     html += '<tr>';
     html += '<td style="text-align:center;">' + statusBadge + '</td>';
     html += '<td style="font-weight:600;">' + s.id + '</td>';
     html += '<td>' + s.name + '</td>';
-    html += '<td style="color:' + (displayDate === '-' ? '#b3b6bd' : '#222631') + ';">' + displayDate + '</td>';
     html += '<td>' + fileNameCellA + '</td>';
+    html += '<td style="font-size:13px;white-space:nowrap;color:' + (displayDate === '-' ? '#b3b6bd' : '#6d7381') + ';">' + displayDate + '</td>';
     html += '<td style="text-align:center;">' + ocrCell + '</td>';
     html += '<td style="text-align:center;">' + actionCell + '</td>';
     html += '</tr>';
@@ -1714,9 +1752,9 @@ function renderTable() {
 
 // ── B안 학생 데이터 (CLIPO: 학생 업로드 — 파일/타이핑 혼합) ──
 const STUDENTS_B1 = [
-  { id:'10101', name:'김서윤', state:'submitted', date:'04/18 09:12 학생 제출', files:1, ocrStatus:'confirmed',   needsReview:false, submissionMethod:'file',   fileName:'김서윤_비평.pdf' },
+  { id:'10101', name:'김서윤', state:'submitted', date:'04/18 09:12 학생 제출', files:3, ocrStatus:'confirmed',   needsReview:false, submissionMethod:'file',   fileName:'김서윤_비평.pdf' },
   { id:'10102', name:'이준호', state:'submitted', date:'04/18 09:14 학생 제출', files:1, ocrStatus:'unconfirmed', needsReview:true,  submissionMethod:'file',   fileName:'이준호_비평.pdf' },
-  { id:'10103', name:'박지민', state:'submitted', date:'04/18 09:18 학생 제출', files:1, ocrStatus:'confirmed',   needsReview:false, submissionMethod:'file',   fileName:'박지민_비평.pdf' },
+  { id:'10103', name:'박지민', state:'submitted', date:'04/18 09:18 학생 제출', files:2, ocrStatus:'confirmed',   needsReview:false, submissionMethod:'file',   fileName:'박지민_비평.pdf' },
   { id:'10104', name:'최유진', state:'submitted', date:'04/18 09:22 학생 제출', files:1, ocrStatus:'confirmed',   needsReview:false, submissionMethod:'file',   fileName:'최유진_비평.pdf' },
   { id:'10105', name:'정현우', state:'submitted', date:'04/18 09:35 학생 제출', files:0, ocrStatus:null,           needsReview:false, submissionMethod:'typing', typingSnippet:'책에서 인상 깊었던 점은 원소들이 발견되는 과정에서...' },
   { id:'10106', name:'한지우', state:'submitted', date:'04/18 09:41 학생 제출', files:0, ocrStatus:null,           needsReview:false, submissionMethod:'typing', typingSnippet:'저는 이 책을 통해 과학자들의 헌신과 경쟁이 만든...' },
@@ -1922,80 +1960,271 @@ function updateAbsentBanner(classNum, rawType) {
   if (tsEl) tsEl.textContent = _absentTsNow();
 }
 function refreshAbsentBanner() {
-  var rawType = currentEvalType || 'A';
-  updateAbsentBanner(currentListClass, rawType);
+  renderActionBanners(currentListClass, window.currentRawType || currentEvalType || 'A');
   if (typeof showToast === 'function') showToast('제출 현황을 새로고침했습니다.', 'success');
+}
+
+// ── 통합 처리 현황 배너 ──
+// 상태 버킷: absent(미제출) / waiting(OCR 대기) / processing(진행 중) / review(확인 필요) / done(완료)
+// 정책: PDF·이미지는 모두 OCR 인식 대상, 텍스트 직접입력만 OCR 불필요(=done 처리)
+function getClassStatusCounts(classNum, rawType) {
+  var c = { absent:0, waiting:0, processing:0, failed:0, review:0, done:0 };
+  var type = (rawType === 'C') ? 'B' : (rawType || 'A');
+  function bumpA(s) {
+    if (s.status === '미제출') { c.absent++; return; }
+    if (s.ocrStatus === 'waiting') c.waiting++;
+    else if (s.ocrStatus === 'processing') c.processing++;
+    else if (s.ocrStatus === 'failed') c.failed++;
+    else if (s.ocrStatus === 'unconfirmed' && s.needsReview) c.review++;
+    else c.done++; // confirmed · unconfirmed(불확실 없음=OCR완료)
+  }
+  function bumpB(s, started) {
+    if (s.state === 'absent') { c.absent++; return; }
+    if (s.submissionMethod === 'typing') { c.done++; return; } // 직접입력 = OCR 불필요
+    if (started === false) { c.waiting++; return; }
+    var st = s.ocrStatusAfter || s.ocrStatus;
+    if (st === 'processing') c.processing++;
+    else if (st === 'failed') c.failed++;
+    else if (st === 'unconfirmed' && s.needsReview) c.review++;
+    else c.done++;
+  }
+  if (type === 'B') {
+    var stateCls = (rawType === 'C') ? (classNum === 1 ? 3 : classNum === 2 ? 1 : 2) : classNum;
+    if (stateCls === 1) {
+      STUDENTS_B1.forEach(function(s){ bumpB(s, true); });
+    } else if (stateCls === 2) {
+      STUDENTS_B2.forEach(function(s){ bumpB(s, isB2OcrStartedFor(s.id)); });
+    } else {
+      var bulkUp3 = !!bulkUploadedClasses[classNum];
+      STUDENTS.forEach(function(s){
+        var up = bulkUp3 || !!individuallyUploadedIds[s.id];
+        if (!up) c.absent++; else c.waiting++;
+      });
+    }
+  } else {
+    if (classNum === 1) {
+      STUDENTS.forEach(bumpA);
+    } else {
+      var bulkUp = !!bulkUploadedClasses[classNum];
+      var phase = bulkOcrStateA[classNum];
+      STUDENTS.forEach(function(s){
+        if (!bulkUp) { c.absent++; return; }
+        if (phase === 'running') c.processing++;
+        else if (phase === 'done') c.done++;
+        else c.waiting++; // pending
+      });
+    }
+  }
+  return c;
+}
+
+// ── 액션 배너 (액션 필요한 것만: 미제출 / OCR 미진행 / 확인 필요. 각 배너에 '누구인지' 이름 표시) ──
+function getClassActionLists(classNum, rawType) {
+  var L = { absent: [], pending: [], review: [] };
+  var type = (rawType === 'C') ? 'B' : (rawType || 'A');
+  function nm(s) { return s.id + ' ' + s.name; }
+  if (type === 'B') {
+    var stateCls = (rawType === 'C') ? (classNum === 1 ? 3 : classNum === 2 ? 1 : 2) : classNum;
+    if (stateCls === 1) {
+      STUDENTS_B1.forEach(function(s) {
+        if (s.state === 'absent') { L.absent.push(nm(s)); return; }
+        if (s.submissionMethod === 'typing') return;
+        if (s.ocrStatus === 'unconfirmed' && s.needsReview) L.review.push(nm(s));
+      });
+    } else if (stateCls === 2) {
+      STUDENTS_B2.forEach(function(s) {
+        if (s.state === 'absent') { L.absent.push(nm(s)); return; }
+        if (s.submissionMethod === 'typing') return;
+        if (!isB2OcrStartedFor(s.id)) { L.pending.push(nm(s)); return; }
+        if (s.ocrStatusAfter === 'unconfirmed' && s.needsReview) L.review.push(nm(s));
+      });
+    } else {
+      if (completedClasses[classNum]) return L; // 완료 학급 — 액션 없음
+      var bulkUp3 = !!bulkUploadedClasses[classNum];
+      STUDENTS.forEach(function(s) {
+        var up = bulkUp3 || !!individuallyUploadedIds[s.id];
+        if (!up) L.absent.push(nm(s)); else L.pending.push(nm(s));
+      });
+    }
+  } else {
+    if (classNum === 1) {
+      STUDENTS.forEach(function(s) {
+        if (s.status === '미제출') L.absent.push(nm(s));
+        else if (s.ocrStatus === 'waiting') L.pending.push(nm(s));
+        else if (s.ocrStatus === 'unconfirmed' && s.needsReview) L.review.push(nm(s));
+      });
+    } else if (completedClasses[classNum]) {
+      // 완료 학급 — 액션 없음
+    } else {
+      var bulkUp = !!bulkUploadedClasses[classNum];
+      var phase = bulkOcrStateA[classNum];
+      STUDENTS.forEach(function(s) {
+        if (!bulkUp) { L.absent.push(nm(s)); return; }
+        if (phase === 'done') { if (s.needsReview) L.review.push(nm(s)); }
+        else if (phase !== 'running') L.pending.push(nm(s));
+      });
+    }
+  }
+  return L;
+}
+function pendingBannerHtml(list) {
+  return '<div style="display:flex;align-items:flex-start;gap:10px;flex:1;min-width:0;">'
+      + '<i data-lucide="clock" style="width:18px;height:18px;color:#ea580c;flex-shrink:0;margin-top:2px;"></i>'
+      + '<div style="display:flex;flex-direction:column;gap:4px;flex:1;min-width:0;">'
+        + '<span style="font-size:15px;color:#ea580c;font-weight:700;">OCR 미진행 ' + list.length + '명</span>'
+        + '<span style="font-size:13px;color:#9a4806;line-height:1.6;">제출됐지만 아직 OCR 인식 전이에요. AI 채점을 시작하려면 OCR을 먼저 진행해 주세요.</span>'
+      + '</div>'
+    + '</div>'
+    + '<button onclick="startOcrFromBanner()" style="flex-shrink:0;height:34px;background:#f97316;color:white;border:none;border-radius:8px;padding:0 14px;font-size:14px;font-weight:700;font-family:inherit;cursor:pointer;white-space:nowrap;display:inline-flex;align-items:center;gap:6px;"><i data-lucide="scan-text" style="width:16px;height:16px;"></i>지금 OCR 진행</button>';
+}
+function renderActionBanners(classNum, rawType) {
+  var L = getClassActionLists(classNum, rawType);
+  var pb = document.getElementById('list-b-ocr-pending-banner');
+  if (pb) pb.style.display = 'none'; // OCR 진행 애니메이션 전용 — 평상시 숨김
+  // 미제출 배너 (별도 — 제출 추적)
+  var ab = document.getElementById('absent-banner');
+  if (ab) {
+    if (L.absent.length) {
+      ab.style.display = 'flex';
+      document.getElementById('absent-banner-cnt').textContent = L.absent.length;
+      document.getElementById('absent-banner-names').textContent = L.absent.join(', ');
+      var ts = document.getElementById('absent-banner-ts'); if (ts) ts.textContent = _absentTsNow();
+    } else { ab.style.display = 'none'; }
+  }
+  // 처리 필요 액션 바 (OCR 관련만)
+  var bar = document.getElementById('class-action-bar');
+  var sumEl = document.getElementById('cab-summary');
+  var actEl = document.getElementById('cab-actions');
+  if (!bar) return;
+  var total = L.pending.length + L.review.length;
+  if (total === 0) { bar.style.display = 'none'; return; }
+  bar.style.display = 'flex';
+  var parts = [];
+  if (L.pending.length) parts.push('OCR 미진행 ' + L.pending.length);
+  if (L.review.length) parts.push('확인 필요 ' + L.review.length);
+  sumEl.innerHTML = '<i data-lucide="alert-circle" style="width:16px;height:16px;color:#ea580c;vertical-align:-3px;margin-right:5px;"></i>처리 필요 <b style="font-weight:700;color:#222631;">' + total + '건</b> · ' + parts.join(' · ');
+  // 조건부 버튼 2개: OCR 미진행 → 지금 OCR 진행 / 확인 필요 → 해당 학생 OCR 상세로
+  var btns = '';
+  if (L.pending.length) btns += '<button onclick="startOcrFromBanner()" style="height:34px;background:#f97316;color:white;border:none;border-radius:8px;padding:0 14px;font-size:13px;font-weight:700;font-family:inherit;cursor:pointer;white-space:nowrap;display:inline-flex;align-items:center;justify-content:center;line-height:1;gap:6px;"><i data-lucide="scan-text" style="width:15px;height:15px;"></i>지금 OCR 진행</button>';
+  if (L.review.length) btns += '<button onclick="goToFirstReview()" style="height:34px;background:white;color:#db3e51;border:1px solid #f2a5ad;border-radius:8px;padding:0 14px;font-size:13px;font-weight:700;font-family:inherit;cursor:pointer;white-space:nowrap;display:inline-flex;align-items:center;justify-content:center;line-height:1;gap:6px;"><i data-lucide="search-check" style="width:15px;height:15px;"></i>확인 필요 학생 보기</button>';
+  actEl.innerHTML = btns;
+  if (typeof lucide !== 'undefined') lucide.createIcons();
+}
+function goToFirstReview() {
+  var rt = window.currentRawType || currentEvalType || 'A';
+  var L = getClassActionLists(currentListClass, rt);
+  if (!L.review.length) return;
+  var id = L.review[0].split(' ')[0];
+  var type = (rt === 'C') ? 'B' : rt;
+  if (type === 'B') {
+    var bi = STUDENTS_B1.findIndex(function(s){ return s.id === id; });
+    if (bi !== -1 && typeof goToOCR_B === 'function') { goToOCR_B(bi); return; }
+  }
+  goToOCRById(id);
+}
+
+function renderClassStatusBanner(classNum, rawType) {
+  var counts = getClassStatusCounts(classNum, rawType);
+  var titleEl = document.getElementById('csb-title');
+  var tsEl = document.getElementById('csb-ts');
+  var countsEl = document.getElementById('csb-counts');
+  var ctaWrap = document.getElementById('csb-cta-wrap');
+  if (!countsEl) return;
+  if (titleEl) titleEl.textContent = '1-' + classNum + '반 처리 현황';
+  if (tsEl) tsEl.textContent = _absentTsNow();
+
+  // 카운트 칩 (0이면 흐리게). 미제출·확인 필요는 클릭 가능(해당 행으로 이동)
+  function chip(label, n, color, bg, clickAttr) {
+    var dim = n === 0;
+    var style = 'display:inline-flex;align-items:center;gap:5px;border-radius:100px;padding:3px 10px;font-size:13px;font-weight:700;white-space:nowrap;'
+      + (dim ? 'background:#f6f7f9;color:#b3b6bd;' : 'background:' + bg + ';color:' + color + ';')
+      + (!dim && clickAttr ? 'cursor:pointer;' : '');
+    return '<span style="' + style + '"' + (!dim && clickAttr ? ' ' + clickAttr : '') + '>' + label + ' <b style="font-weight:800;">' + n + '</b></span>';
+  }
+  function groupLabel(t) {
+    return '<span style="display:inline-flex;align-items:center;justify-content:center;min-width:44px;height:22px;padding:0 8px;background:#eef1f5;color:#6d7381;border-radius:6px;font-size:12px;font-weight:700;flex-shrink:0;">' + t + '</span>';
+  }
+  var submitted = counts.waiting + counts.processing + counts.failed + counts.review + counts.done;
+  countsEl.innerHTML =
+      '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">'
+        + groupLabel('제출')
+        + chip('미제출', counts.absent, '#db3e51', '#fff3f4', 'onclick="scrollToFirstStatus(\'absent\')"')
+        + chip('제출', submitted, '#3b3f4c', '#f1f3f5', '')
+      + '</div>'
+      + '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">'
+        + groupLabel('OCR')
+        + chip('미진행', counts.waiting, '#ea580c', '#fff7ed', '')
+        + chip('진행 중', counts.processing, '#365eef', '#eef3ff', '')
+        + chip('인식 실패', counts.failed, '#6d7381', '#f1f3f5', 'onclick="scrollToFirstStatus(\'failed\')"')
+        + chip('확인 필요', counts.review, '#db3e51', '#fff3f4', 'onclick="scrollToFirstStatus(\'review\')"')
+        + chip('완료', counts.done, '#319d64', '#eefcf4', '')
+      + '</div>';
+
+  // 대표 CTA: 대기>0 → OCR 진행 / 아니면 확인필요>0 → OCR 결과 확인 / 그 외 없음
+  var cta = '';
+  if (counts.waiting > 0) {
+    cta = '<button onclick="startOcrFromBanner()" style="height:36px;background:#f97316;color:white;border:none;border-radius:8px;padding:0 14px;font-size:14px;font-weight:700;font-family:inherit;cursor:pointer;white-space:nowrap;display:inline-flex;align-items:center;justify-content:center;line-height:1;gap:6px;"><i data-lucide="scan-text" style="width:16px;height:16px;"></i>지금 OCR 진행 (' + counts.waiting + '명)</button>';
+  } else if (counts.review > 0) {
+    cta = '<button onclick="scrollToFirstStatus(\'review\')" class="btn btn-secondary btn-sm" style="white-space:nowrap;"><i data-lucide="alert-circle" style="width:16px;height:16px;"></i>OCR 결과 확인 (' + counts.review + '명)</button>';
+  }
+  if (ctaWrap) ctaWrap.innerHTML = cta;
+  if (typeof lucide !== 'undefined') lucide.createIcons();
+}
+function refreshClassStatusBanner() {
+  renderActionBanners(currentListClass, window.currentRawType || currentEvalType || 'A');
+  if (typeof showToast === 'function') showToast('제출 현황을 새로고침했습니다.', 'success');
+}
+// 카운트 칩 클릭 → 해당 상태 첫 학생 행으로 스크롤 + 잠깐 하이라이트
+function scrollToFirstStatus(kind) {
+  var rows = document.querySelectorAll('#student-table-body tr');
+  for (var i = 0; i < rows.length; i++) {
+    var txt = rows[i].textContent;
+    var hit = (kind === 'absent') ? /미제출/.test(txt) : (kind === 'failed') ? /인식 실패/.test(txt) : /확인 필요/.test(txt);
+    if (hit) {
+      rows[i].scrollIntoView({ behavior:'smooth', block:'center' });
+      var orig = rows[i].style.background;
+      rows[i].style.transition = 'background .3s';
+      rows[i].style.background = '#fff7d6';
+      setTimeout(function(r, o){ return function(){ r.style.background = o; }; }(rows[i], orig), 1400);
+      return;
+    }
+  }
 }
 
 function showListForClass(classNum, evalType) {
   currentListClass = classNum;
   var rawType = evalType || 'A';
+  window.currentRawType = rawType;
   currentEvalType = (rawType === 'C') ? 'B' : rawType;
   var evalLabel = (rawType === 'C') ? '평가명(최종)'
                 : (currentEvalType === 'B') ? '창작 문화 비평 (학생 업로드)'
                 : '미래사회 예측 시나리오 (선생님 업로드)';
   var descEl = document.getElementById('list-eval-desc');
-  if (descEl) descEl.textContent = '[' + evalLabel + '] 과제 제출 현황을 확인하고 파일을 직접 업로드 할 수 있습니다.';
+  if (descEl) descEl.textContent = '과제 제출 현황을 확인하고, 필요하면 과제를 직접 올릴 수도 있습니다. 제출된 과제는 AI 채점을 위해 OCR 인식을 진행해 주세요.';
   var titleEl = document.getElementById('list-class-title');
   if (titleEl) titleEl.textContent = '1-' + classNum + '반 과제 제출 현황';
 
-  var bannerA = document.getElementById('list-ocr-banner');
-  var bannerB1 = document.getElementById('list-b1-ocr-banner');
-  var bannerB2 = document.getElementById('list-b-ocr-pending-banner');
   var ocrBtn = document.getElementById('btn-ocr-confirm');
   var ocrWrap = document.getElementById('btn-ocr-confirm-wrap');
+  function enableOcrBtn() { if (ocrBtn) { ocrBtn.disabled = false; ocrBtn.style.opacity = '1'; ocrBtn.style.cursor = 'pointer'; ocrBtn.style.pointerEvents = ''; } if (ocrWrap) { ocrWrap.removeAttribute('title'); ocrWrap.style.cursor = ''; } }
+  function disableOcrBtn(tip) { if (ocrBtn) { ocrBtn.disabled = true; ocrBtn.style.opacity = '0.4'; ocrBtn.style.cursor = 'not-allowed'; ocrBtn.style.pointerEvents = 'none'; } if (ocrWrap) { ocrWrap.setAttribute('title', tip); ocrWrap.style.cursor = 'not-allowed'; } }
 
-  if (bannerA) bannerA.style.display = 'none';
-  if (bannerB1) bannerB1.style.display = 'none';
-  if (bannerB2) bannerB2.style.display = 'none';
-
-  // 독립 미제출 학생 배너 (OCR 여부와 무관하게 미제출이 있을 때 노출)
-  updateAbsentBanner(classNum, rawType);
+  // 액션 배너 (미제출 / OCR 미진행 / 확인 필요) — 액션 필요한 것만, 누구인지 이름 표시
+  renderActionBanners(classNum, rawType);
 
   if (currentEvalType === 'B') {
     var stateClass;
-    if (rawType === 'C') {
-      if (classNum === 1) stateClass = 3;
-      else if (classNum === 2) stateClass = 1;
-      else stateClass = 2;
-    } else {
-      stateClass = classNum;
-    }
+    if (rawType === 'C') { stateClass = (classNum === 1) ? 3 : (classNum === 2) ? 1 : 2; }
+    else { stateClass = classNum; }
     currentStateClass = stateClass;
-
-    if (stateClass === 1) {
-      var reviewStudents = STUDENTS_B1.filter(function(s){ return s.needsReview; });
-      if (bannerB1 && reviewStudents.length > 0) {
-        var namesEl = document.getElementById('list-b1-ocr-banner-names');
-        if (namesEl) namesEl.textContent = reviewStudents.map(function(s){ return s.id + ' ' + s.name; }).join(' · ');
-        bannerB1.style.display = 'flex';
-      }
-      if (ocrBtn) { ocrBtn.disabled = false; ocrBtn.style.opacity = '1'; ocrBtn.style.cursor = 'pointer'; ocrBtn.style.pointerEvents = ''; }
-      if (ocrWrap) { ocrWrap.removeAttribute('title'); ocrWrap.style.cursor = ''; }
-    } else if (stateClass === 2) {
-      if (bannerB2) bannerB2.style.display = 'flex';
-      if (ocrBtn) { ocrBtn.disabled = true; ocrBtn.style.opacity = '0.4'; ocrBtn.style.cursor = 'not-allowed'; ocrBtn.style.pointerEvents = 'none'; }
-      if (ocrWrap) { ocrWrap.setAttribute('title', 'OCR 인식 후 이용가능합니다.'); ocrWrap.style.cursor = 'not-allowed'; }
-    } else {
-      if (ocrBtn) { ocrBtn.disabled = true; ocrBtn.style.opacity = '0.4'; ocrBtn.style.cursor = 'not-allowed'; ocrBtn.style.pointerEvents = 'none'; }
-      if (ocrWrap) { ocrWrap.setAttribute('title', '과제물 업로드 후 이용가능합니다.'); ocrWrap.style.cursor = 'not-allowed'; }
-    }
+    if (stateClass === 1) enableOcrBtn();
+    else if (stateClass === 2) disableOcrBtn('OCR 인식 후 이용가능합니다.');
+    else disableOcrBtn('과제물 업로드 후 이용가능합니다.');
   } else {
-    if (classNum === 1) {
-      if (bannerA) bannerA.style.display = 'flex';
-      if (ocrBtn) { ocrBtn.disabled = false; ocrBtn.style.opacity = '1'; ocrBtn.style.cursor = 'pointer'; ocrBtn.style.pointerEvents = ''; }
-      if (ocrWrap) { ocrWrap.removeAttribute('title'); ocrWrap.style.cursor = ''; }
-    } else if (bulkOcrStateA[classNum] === 'done') {
-      if (ocrBtn) { ocrBtn.disabled = false; ocrBtn.style.opacity = '1'; ocrBtn.style.cursor = 'pointer'; ocrBtn.style.pointerEvents = ''; }
-      if (ocrWrap) { ocrWrap.removeAttribute('title'); ocrWrap.style.cursor = ''; }
-    } else if (bulkUploadedClasses[classNum]) {
-      if (bannerB2) bannerB2.style.display = 'flex';
-      if (ocrBtn) { ocrBtn.disabled = true; ocrBtn.style.opacity = '0.4'; ocrBtn.style.cursor = 'not-allowed'; ocrBtn.style.pointerEvents = 'none'; }
-      if (ocrWrap) { ocrWrap.setAttribute('title', 'OCR 인식 후 이용가능합니다.'); ocrWrap.style.cursor = 'not-allowed'; }
-    } else {
-      if (ocrBtn) { ocrBtn.disabled = true; ocrBtn.style.opacity = '0.4'; ocrBtn.style.cursor = 'not-allowed'; ocrBtn.style.pointerEvents = 'none'; }
-      if (ocrWrap) { ocrWrap.setAttribute('title', '과제물 업로드 후 이용가능합니다.'); ocrWrap.style.cursor = 'not-allowed'; }
-    }
+    if (classNum === 1) enableOcrBtn();
+    else if (bulkOcrStateA[classNum] === 'done') enableOcrBtn();
+    else if (bulkUploadedClasses[classNum]) disableOcrBtn('OCR 인식 후 이용가능합니다.');
+    else disableOcrBtn('과제물 업로드 후 이용가능합니다.');
   }
 
   renderTable();
@@ -2092,10 +2321,10 @@ function renderOCRView_B() {
   var split = document.getElementById('ocr-b-split');
   if (student.needsReview) {
     banner.style.display = 'flex';
-    if (split) split.style.height = 'calc(100vh - 56px - 68px - 42px)';
+    if (split) split.style.height = 'calc(100vh - 68px - 42px)';
   } else {
     banner.style.display = 'none';
-    if (split) split.style.height = 'calc(100vh - 56px - 68px)';
+    if (split) split.style.height = 'calc(100vh - 68px)';
   }
 
   var btnConfirm = document.getElementById('ocr-b-btn-confirm');
@@ -2194,6 +2423,7 @@ function renderOcrBText(student) {
     html += '<span class="badge badge-purple" style="font-size:12px;padding:3px 10px;">' + q.label + '</span>';
     html += '<span class="rubric-ocr-desc">' + q.desc + '</span>';
     html += chipHtml;
+    html += '<button class="formula-insert-btn" onmousedown="event.preventDefault()" onclick="openFormulaInput(\'group-ta-' + qi + '\')" title="수식 입력" style="align-items:center;justify-content:center;line-height:1;gap:3px;height:24px;padding:0 8px;background:white;border:1px solid #d9d9d9;border-radius:6px;color:#3b3f4c;font-family:inherit;font-size:11px;font-weight:700;cursor:pointer;flex-shrink:0;"><i data-lucide="sigma" style="width:11px;height:11px;"></i>수식</button>';
     html += '<button onclick="editSection(this,' + qi + ')" title="편집" style="background:none;border:none;cursor:pointer;color:#b3b6bd;padding:2px 4px;flex-shrink:0;display:flex;align-items:center;">';
     html += '<i data-lucide="pencil" style="width:13px;height:13px;"></i></button>';
     html += '</div>';
@@ -2272,10 +2502,10 @@ function renderOCRView() {
   var ocrSplit = document.getElementById('ocr-split');
   if (student.needsReview) {
     reviewBanner.style.display = 'flex';
-    ocrSplit.style.height = 'calc(100vh - 56px - 68px - 42px)';
+    ocrSplit.style.height = 'calc(100vh - 68px - 42px)';
   } else {
     reviewBanner.style.display = 'none';
-    ocrSplit.style.height = 'calc(100vh - 56px - 68px)';
+    ocrSplit.style.height = 'calc(100vh - 68px)';
   }
   document.getElementById('nav-student-name').textContent = student.name + ' (' + student.id + ')';
   var confirmedCount = 0;
@@ -2300,8 +2530,6 @@ function renderOCRView() {
   document.getElementById('btn-prev').style.opacity = currentStudentIdx === 0 ? '0.4' : '1';
   document.getElementById('btn-next').disabled = currentStudentIdx === ocrStudents.length - 1;
   document.getElementById('btn-next').style.opacity = currentStudentIdx === ocrStudents.length - 1 ? '0.4' : '1';
-  var btnSaveNext = document.getElementById('btn-save-next');
-  btnSaveNext.innerHTML = '<i data-lucide="check" style="width:16px;height:16px;"></i>저장';
   renderOCRText(student);
   currentPageIdx = 0;
   renderScanPage(student);
@@ -2330,6 +2558,7 @@ function renderOCRText(student) {
       html += '<span class="badge badge-purple" style="font-size:12px;padding:3px 10px;">' + group.label + '</span>';
       html += '<span class="rubric-ocr-desc">' + group.desc + '</span>';
       html += chipHtml;
+      html += '<button class="formula-insert-btn" onmousedown="event.preventDefault()" onclick="openFormulaInput(\'group-ta-' + gi + '\')" title="수식 입력" style="align-items:center;justify-content:center;line-height:1;gap:3px;height:24px;padding:0 8px;background:white;border:1px solid #d9d9d9;border-radius:6px;color:#3b3f4c;font-family:inherit;font-size:11px;font-weight:700;cursor:pointer;flex-shrink:0;"><i data-lucide="sigma" style="width:11px;height:11px;"></i>수식</button>';
       html += '<button onclick="editSection(this,' + gi + ')" title="편집" style="background:none;border:none;cursor:pointer;color:#b3b6bd;padding:2px 4px;flex-shrink:0;display:flex;align-items:center;">';
       html += '<i data-lucide="pencil" style="width:13px;height:13px;"></i></button>';
       html += '</div>';
@@ -2484,7 +2713,82 @@ function openSectionEdit(gi) {
 function questionHasUncertainty(q) {
   return !!q.uncertainty || !!q.uncertain || (q.spans && q.spans.some(function(s){ return s.uncertain; }));
 }
+
+// ── 문항 수정 (이 평가의 모든 학생 공통 적용) + 수식 입력기 ──
+function _ocrCtx() {
+  var isB = document.getElementById('screen-ocr-b').classList.contains('active');
+  if (isB) {
+    var sB = STUDENTS_B1[currentOcrBStudentIdx];
+    var dB = (typeof OCR_DATA_B !== 'undefined') ? OCR_DATA_B[sB && sB.id] : null;
+    return { isB:true, student:sB, dataMap:(typeof OCR_DATA_B !== 'undefined' ? OCR_DATA_B : {}), groups: dB ? dB.questions : [], rerender:function(){ renderOcrBText(sB); } };
+  }
+  var sA = ocrStudents[currentStudentIdx];
+  var dA = OCR_DATA[sA && sA.id];
+  return { isB:false, student:sA, dataMap:OCR_DATA, groups: dA ? (dA.type === 'rubric' ? dA.rubricGroups : dA.questions) : [], rerender:function(){ renderOCRText(sA); } };
+}
+function openQuestionEditModal() {
+  var ctx = _ocrCtx();
+  if (!ctx.student) return;
+  var qs = ctx.groups || [];
+  var html = '';
+  qs.forEach(function(q, i) {
+    html += '<div style="margin-bottom:14px;">'
+      + '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">'
+        + '<span style="font-size:13px;font-weight:700;color:#416bff;">' + q.label + '</span>'
+        + '<button onclick="openFormulaInput(\'qedit-ta-' + i + '\')" style="display:inline-flex;align-items:center;justify-content:center;line-height:1;gap:4px;height:26px;padding:0 10px;background:white;border:1px solid #d9d9d9;border-radius:6px;color:#3b3f4c;font-family:inherit;font-size:12px;font-weight:700;cursor:pointer;"><i data-lucide="sigma" style="width:12px;height:12px;"></i>수식 입력</button>'
+      + '</div>'
+      + '<textarea id="qedit-ta-' + i + '" rows="2" style="width:100%;border:1px solid #d9d9d9;border-radius:8px;padding:10px 12px;font-family:inherit;font-size:14px;line-height:1.6;color:#222631;outline:none;resize:vertical;box-sizing:border-box;" onfocus="this.style.borderColor=\'#416bff\'" onblur="this.style.borderColor=\'#d9d9d9\'">' + (q.desc || '') + '</textarea>'
+    + '</div>';
+  });
+  document.getElementById('qedit-list').innerHTML = html;
+  document.getElementById('questionEditModal').style.display = 'flex';
+  lucide.createIcons();
+}
+function closeQuestionEditModal() { document.getElementById('questionEditModal').style.display = 'none'; }
+function saveQuestionEditModal() {
+  var ctx = _ocrCtx();
+  if (!ctx.student) return;
+  var qs = ctx.groups || [];
+  var newDescs = qs.map(function(q, i) { var ta = document.getElementById('qedit-ta-' + i); return ta ? ta.value : q.desc; });
+  Object.keys(ctx.dataMap).forEach(function(id) {
+    var d = ctx.dataMap[id];
+    var sq = d ? (d.type === 'rubric' ? d.rubricGroups : d.questions) : null;
+    if (!sq) return;
+    newDescs.forEach(function(desc, i) { if (sq[i]) sq[i].desc = desc; });
+  });
+  closeQuestionEditModal();
+  ctx.rerender();
+  showToast('문항이 모든 학생에게 적용되었습니다.', 'success');
+}
+// 수식 입력기
+var _formulaTargetId = null;
+var _formulaOpen = false; // 수식 모달 열림 — 답안 편집 textarea의 blur 저장 보류용
+function openFormulaInput(taId) {
+  _formulaTargetId = taId; _formulaOpen = true;
+  var inp = document.getElementById('formula-input'); if (inp) inp.value = '';
+  document.getElementById('formulaModal').style.display = 'flex';
+  lucide.createIcons();
+  if (inp) setTimeout(function(){ inp.focus(); }, 50);
+}
+function fSym(sym) { var inp = document.getElementById('formula-input'); if (inp) { inp.value += sym; inp.focus(); } }
+function closeFormulaModal() {
+  document.getElementById('formulaModal').style.display = 'none';
+  _formulaOpen = false;
+  var ta = _formulaTargetId ? document.getElementById(_formulaTargetId) : null;
+  if (ta && ta.style.display !== 'none') ta.focus();
+}
+function applyFormula() {
+  var ta = document.getElementById(_formulaTargetId);
+  var fm = (document.getElementById('formula-input').value || '').trim();
+  if (ta && fm) {
+    var sep = (ta.value && !/\s$/.test(ta.value)) ? ' ' : '';
+    ta.value += sep + '$' + fm + '$';
+    if (ta.style.display !== 'none') { ta.style.height = 'auto'; ta.style.height = ta.scrollHeight + 'px'; }
+  }
+  closeFormulaModal();
+}
 function saveSection(ta, gi) {
+  if (_formulaOpen) return; // 수식 입력 중에는 편집 모드 유지
   if (ta.style.display === 'none') return;
   _editingSection = null;
   var body = document.getElementById('group-body-' + gi);
@@ -2539,7 +2843,8 @@ function saveSection(ta, gi) {
     return;
   }
 
-  // 불확실하지 않던 문항 편집 → 기존 인라인 저장 UX 유지
+  // 불확실하지 않던 문항 편집 → 자동 저장 (blur 시 토스트)
+  if (typeof showToast === 'function') showToast('저장되었습니다.', 'success');
   body.innerHTML = '<span style="color:#222631;">' + newText.replace(/\n/g, '<br>') + '</span>';
   body.style.display = '';
   ta.style.display = 'none';
@@ -2653,13 +2958,67 @@ function renderSubmissionMethodCell(method) {
   }
   return '<span style="display:inline-flex;align-items:center;gap:4px;color:#3b3f4c;background:#f1f3f5;border-radius:100px;padding:2px 8px;font-size:13px;font-weight:600;"><i data-lucide="paperclip" style="width:13px;height:13px;"></i>파일</span>';
 }
+// 제출 파일 셀: 첫(=채점 대상) 파일명 + 여러 개면 '외 N개'. 정책 — 가장 먼저 올린 파일만 채점·OCR.
+function scoredFileCell(name, count) {
+  count = count || 1;
+  var extra = count > 1 ? '<span style="font-size:13px;color:#6d7381;flex-shrink:0;">외 ' + (count - 1) + '개</span>' : '';
+  return '<span style="display:inline-flex;align-items:center;gap:6px;max-width:185px;vertical-align:middle;">'
+    + '<span style="font-size:14px;color:#3b3f4c;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' + name + '</span>'
+    + extra
+    + '</span>';
+}
+
+// OCR 결과 셀 — 전 케이스 통합 (HIAI 동일 Lucide 아이콘). state: waiting/processing/failed/review/unconfirmed/confirmed
+function ocrResultCell(state, count, clickFn, id) {
+  var clickAttr = clickFn ? ' onclick="' + clickFn + '"' : '';
+  var clickCss = clickFn ? 'cursor:pointer;' : '';
+  var chev = clickFn ? '<i data-lucide="chevron-right" style="width:13px;height:13px;opacity:0.5;"></i>' : '';
+  if (state === 'waiting') {
+    return '<span style="display:inline-flex;align-items:center;gap:4px;color:#ea580c;font-weight:600;font-size:13px;"><i data-lucide="clock" style="width:14px;height:14px;"></i>미진행</span>';
+  }
+  if (state === 'processing') {
+    return '<span style="display:inline-flex;align-items:center;gap:4px;color:#365eef;font-weight:600;font-size:13px;"><i data-lucide="loader" class="spin" style="width:14px;height:14px;"></i>진행 중</span>';
+  }
+  if (state === 'failed') {
+    return '<span style="display:inline-flex;align-items:center;justify-content:center;gap:8px;">'
+      + '<span style="display:inline-flex;align-items:center;gap:4px;color:#6d7381;font-weight:600;font-size:13px;white-space:nowrap;"><i data-lucide="circle-x" style="width:14px;height:14px;flex-shrink:0;"></i>인식 실패</span>'
+      + '<button onclick="retryOcr(\'' + id + '\')" style="display:inline-flex;align-items:center;gap:3px;background:none;border:none;cursor:pointer;color:#416bff;font-family:inherit;font-size:12px;font-weight:700;padding:2px 6px;border-radius:4px;white-space:nowrap;" onmouseover="this.style.background=\'#e9f2ff\'" onmouseout="this.style.background=\'none\'"><i data-lucide="rotate-cw" style="width:12px;height:12px;"></i>다시하기</button>'
+      + '</span>';
+  }
+  if (state === 'review') {
+    return '<span' + clickAttr + ' style="display:inline-flex;align-items:center;gap:4px;color:#db3e51;font-weight:600;font-size:13px;' + clickCss + 'white-space:nowrap;"><i data-lucide="triangle-alert" style="width:14px;height:14px;flex-shrink:0;"></i>확인 필요<span style="font-weight:700;font-size:11px;background:#fff3f4;border-radius:100px;padding:1px 6px;margin-left:2px;white-space:nowrap;">' + (count || 0) + '개 문항</span>' + chev + '</span>';
+  }
+  // confirmed · unconfirmed(불확실 없음) → 완료 (HIAI 동일: OCR 결과 '확인' 단계 없음, 불확실할 때만 '확인 필요')
+  return '<span' + clickAttr + ' style="display:inline-flex;align-items:center;gap:4px;color:#319d64;font-weight:600;font-size:13px;' + clickCss + '"><i data-lucide="circle-check" style="width:14px;height:14px;"></i>완료' + chev + '</span>';
+}
+
+// OCR 인식 실패 → 다시하기 (재시도 → 진행 중 → 미확인)
+function retryOcr(id) {
+  var s = STUDENTS.filter(function(x){ return x.id === id; })[0]
+        || STUDENTS_B1.filter(function(x){ return x.id === id; })[0]
+        || (typeof STUDENTS_B2 !== 'undefined' ? STUDENTS_B2.filter(function(x){ return x.id === id; })[0] : null);
+  if (!s) return;
+  s.ocrStatus = 'processing';
+  if ('ocrStatusAfter' in s) s.ocrStatusAfter = 'processing';
+  renderTable();
+  renderActionBanners(currentListClass, window.currentRawType || currentEvalType || 'A');
+  if (typeof showToast === 'function') showToast('OCR 인식을 다시 시도합니다.', 'info');
+  setTimeout(function(){
+    s.ocrStatus = 'unconfirmed';
+    if ('ocrStatusAfter' in s) s.ocrStatusAfter = 'unconfirmed';
+    s.needsReview = false;
+    renderTable();
+    renderActionBanners(currentListClass, window.currentRawType || currentEvalType || 'A');
+  }, 2000);
+}
 function renderFileNameCell(s) {
   if (s.submissionMethod === 'typing') {
     var snip = s.typingSnippet || '타이핑 입력';
     return '<span title="' + snip.replace(/"/g,'&quot;') + '" style="color:#6d7381;font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:inline-block;max-width:240px;vertical-align:middle;">' + snip + '</span>';
   }
   var name = s.fileName || '-';
-  return '<span style="color:#3b3f4c;font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:inline-block;max-width:240px;vertical-align:middle;">' + name + '</span>';
+  if (name === '-') return '<span style="color:#b3b6bd;">-</span>';
+  return scoredFileCell(name, s.files);
 }
 
 // ── B안 테이블 (CLIPO: 학생 업로드 — 제출방식 컬럼 포함) ──
@@ -2675,29 +3034,30 @@ function renderTableB() {
     + '<th style="width:70px;">학번</th>'
     + '<th style="width:80px;">이름</th>'
     + '<th style="width:92px;text-align:center;">제출방식</th>'
-    + '<th style="width:170px;">최근 제출일시</th>'
-    + '<th>최근 제출 파일명</th>'
+    + '<th style="width:200px;">제출 파일</th>'
+    + '<th style="width:175px;white-space:nowrap;">최근 제출 일시</th>'
     + '<th style="width:150px;text-align:center;">OCR 결과</th>'
-    + '<th style="width:120px;text-align:center;">과제 제출 관리</th>'
+    + '<th style="width:150px;text-align:center;">과제 제출 관리</th>'
     + '</tr>';
   if (thead) thead.innerHTML = theadRow;
   var students = isB1 ? STUDENTS_B1 : (isB2 ? STUDENTS_B2 : []);
   var html = '';
   if (!isUploaded) {
     var bulkUploaded = !!bulkUploadedClasses[currentListClass];
+    var allDoneB = !!completedClasses[currentListClass]; // 완료 학급 (예: 1-3반)
     STUDENTS.forEach(function(s, idx) {
-      var uploaded = bulkUploaded || !!individuallyUploadedIds[s.id];
-      var ocrStarted = isB2OcrStartedFor(s.id) || (bulkUploaded && b2OcrStartedIds === 'all');
+      var uploaded = bulkUploaded || !!individuallyUploadedIds[s.id] || allDoneB;
+      var ocrStarted = isB2OcrStartedFor(s.id) || (bulkUploaded && b2OcrStartedIds === 'all') || allDoneB;
       var statusCell, dateCell, fileNameCell, methodCell, ocrCell;
       if (uploaded) {
         if (ocrStarted) {
-          statusCell = '<span class="badge badge-blue">OCR완료</span>';
-          ocrCell = '<span style="display:inline-flex;align-items:center;gap:4px;color:#6d7381;font-weight:600;font-size:13px;cursor:pointer;" onclick="goToOCR_B(' + idx + ')"><i data-lucide="circle" style="width:14px;height:14px;"></i>미확인</span>';
+          statusCell = '<span class="badge badge-green">제출 완료</span>';
+          ocrCell = ocrResultCell('confirmed', 0, 'goToOCR_B(' + idx + ')');
         } else {
           statusCell = '<span class="badge badge-green">제출 완료</span>';
-          ocrCell = '<span style="display:inline-flex;align-items:center;gap:4px;color:#b3b6bd;font-weight:600;font-size:13px;"><i data-lucide="clock" style="width:14px;height:14px;"></i>대기중</span>';
+          ocrCell = ocrResultCell('waiting');
         }
-        dateCell = '<td>04/24 선생님 업로드</td>';
+        dateCell = '<td style="font-size:13px;color:#6d7381;white-space:nowrap;">04/24 선생님 업로드</td>';
         fileNameCell = '<td>' + renderFileNameCell({submissionMethod:'file', fileName:s.name+'_비평.pdf'}) + '</td>';
         methodCell = '<td style="text-align:center;">' + renderSubmissionMethodCell('file') + '</td>';
       } else {
@@ -2711,10 +3071,10 @@ function renderTableB() {
       cols += '<td style="font-weight:600;">' + s.id + '</td>';
       cols += '<td>' + s.name + '</td>';
       cols += methodCell;
-      cols += dateCell;
       cols += fileNameCell;
+      cols += dateCell;
       cols += '<td style="text-align:center;">' + ocrCell + '</td>';
-      cols += '<td style="text-align:center;"><button onclick="openStudentUploadModal(\'' + s.id + '\',\'' + s.name + '\')" style="background:none;border:none;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:4px;color:#416bff;font-size:13px;font-weight:600;padding:4px 8px;border-radius:4px;" onmouseover="this.style.background=\'#e9f2ff\'" onmouseout="this.style.background=\'none\'"><i data-lucide="paperclip" style="width:13px;height:13px;flex-shrink:0;"></i>파일 추가/제거</button></td>';
+      cols += '<td style="text-align:center;"><button onclick="openStudentUploadModal(\'' + s.id + '\',\'' + s.name + '\')" style="background:none;border:none;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:4px;color:#416bff;font-size:13px;font-weight:600;padding:4px 8px;border-radius:4px;white-space:nowrap;" onmouseover="this.style.background=\'#e9f2ff\'" onmouseout="this.style.background=\'none\'"><i data-lucide="paperclip" style="width:13px;height:13px;flex-shrink:0;"></i>파일 추가/제거</button></td>';
       html += '<tr>' + cols + '</tr>';
     });
   } else {
@@ -2727,59 +3087,47 @@ function renderTableB() {
         absentCols += '<td style="color:#b3b6bd;">-</td>';
         absentCols += '<td style="color:#b3b6bd;">-</td>';
         absentCols += '<td style="text-align:center;color:#b3b6bd;">-</td>';
-        absentCols += '<td style="text-align:center;"><button onclick="openStudentUploadModal(\'' + s.id + '\',\'' + s.name + '\')" style="background:none;border:none;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:4px;color:#416bff;font-size:13px;font-weight:600;padding:4px 8px;border-radius:4px;" onmouseover="this.style.background=\'#e9f2ff\'" onmouseout="this.style.background=\'none\'"><i data-lucide="paperclip" style="width:13px;height:13px;flex-shrink:0;"></i>파일 추가/제거</button></td>';
+        absentCols += '<td style="text-align:center;"><button onclick="openStudentUploadModal(\'' + s.id + '\',\'' + s.name + '\')" style="background:none;border:none;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:4px;color:#416bff;font-size:13px;font-weight:600;padding:4px 8px;border-radius:4px;white-space:nowrap;" onmouseover="this.style.background=\'#e9f2ff\'" onmouseout="this.style.background=\'none\'"><i data-lucide="paperclip" style="width:13px;height:13px;flex-shrink:0;"></i>파일 추가/제거</button></td>';
         html += '<tr>' + absentCols + '</tr>';
         return;
       }
       var isTyping = (s.submissionMethod === 'typing');
-      var statusBadge;
-      if (!isB2 || !isB2OcrStartedFor(s.id)) {
-        statusBadge = '<span class="badge badge-green">제출 완료</span>';
-      } else {
-        var st2 = s.ocrStatusAfter;
-        if (isTyping) statusBadge = '<span class="badge badge-green">제출 완료</span>';
-        else if (st2 === 'processing') statusBadge = '<span class="badge badge-blue">OCR처리중</span>';
-        else if (st2 === 'confirmed') statusBadge = '<span class="badge badge-green">확인완료</span>';
-        else statusBadge = '<span class="badge badge-blue">OCR완료</span>';
-      }
+      // 상태(제출) 컬럼은 제출 완료/미제출 2종만 (PRD 3-3). OCR 진행 상태는 OCR 결과 컬럼이 담당
+      var statusBadge = '<span class="badge badge-green">제출 완료</span>';
       var cols = '<td style="text-align:center;">' + statusBadge + '</td>';
       cols += '<td style="font-weight:600;">' + s.id + '</td>';
       cols += '<td>' + s.name + '</td>';
       cols += '<td style="text-align:center;">' + renderSubmissionMethodCell(s.submissionMethod) + '</td>';
-      cols += '<td>' + s.date + '</td>';
       cols += '<td>' + renderFileNameCell(s) + '</td>';
+      cols += '<td style="font-size:13px;color:#6d7381;white-space:nowrap;">' + s.date + '</td>';
       // OCR 컬럼: 타이핑은 OCR 불필요
       if (isTyping) {
         cols += '<td style="text-align:center;"><span style="display:inline-flex;align-items:center;gap:4px;color:#b3b6bd;font-weight:600;font-size:13px;"><i data-lucide="minus-circle" style="width:14px;height:14px;"></i>불필요</span></td>';
       } else if (isB1) {
         var ocrCell = '-';
-        if (s.ocrStatus === 'confirmed') {
-          ocrCell = '<span style="display:inline-flex;align-items:center;gap:4px;color:#319d64;font-weight:600;font-size:13px;cursor:pointer;" onclick="goToOCR_B(' + i + ')"><i data-lucide="circle-check" style="width:14px;height:14px;"></i>확인완료</span>';
-        } else if (s.ocrStatus === 'unconfirmed' && s.needsReview) {
-          ocrCell = '<span style="display:inline-flex;align-items:center;gap:4px;color:#db3e51;font-weight:600;font-size:13px;cursor:pointer;white-space:nowrap;" onclick="goToOCR_B(' + i + ')"><i data-lucide="alert-circle" style="width:14px;height:14px;flex-shrink:0;"></i>확인 필요</span>';
-        } else if (s.ocrStatus === 'unconfirmed') {
-          ocrCell = '<span style="display:inline-flex;align-items:center;gap:4px;color:#6d7381;font-weight:600;font-size:13px;cursor:pointer;" onclick="goToOCR_B(' + i + ')"><i data-lucide="circle" style="width:14px;height:14px;"></i>미확인</span>';
-        }
+        var ucB1 = (OCR_DATA[s.id] && OCR_DATA[s.id].questions) ? OCR_DATA[s.id].questions.filter(function(q){ return !!q.uncertainty; }).length : 0;
+        if (s.ocrStatus === 'confirmed') ocrCell = ocrResultCell('confirmed', 0, 'goToOCR_B(' + i + ')');
+        else if (s.ocrStatus === 'unconfirmed' && s.needsReview) ocrCell = ocrResultCell('review', ucB1, 'goToOCR_B(' + i + ')');
+        else if (s.ocrStatus === 'unconfirmed') ocrCell = ocrResultCell('unconfirmed', 0, 'goToOCR_B(' + i + ')');
+        else if (s.ocrStatus === 'processing') ocrCell = ocrResultCell('processing');
+        else if (s.ocrStatus === 'failed') ocrCell = ocrResultCell('failed', 0, null, s.id);
         cols += '<td style="text-align:center;">' + ocrCell + '</td>';
       } else if (isB2) {
         var b2OcrCell;
         if (!isB2OcrStartedFor(s.id)) {
-          b2OcrCell = '<span style="display:inline-flex;align-items:center;gap:4px;color:#b3b6bd;font-weight:600;font-size:13px;"><i data-lucide="clock" style="width:14px;height:14px;"></i>대기중</span>';
+          b2OcrCell = ocrResultCell('waiting');
         } else {
           var st = s.ocrStatusAfter;
-          if (st === 'confirmed') {
-            b2OcrCell = '<span style="display:inline-flex;align-items:center;gap:4px;color:#319d64;font-weight:600;font-size:13px;cursor:pointer;" onclick="goToOCR_B(' + i + ')"><i data-lucide="circle-check" style="width:14px;height:14px;"></i>확인완료</span>';
-          } else if (st === 'unconfirmed' && s.needsReview) {
-            b2OcrCell = '<span style="display:inline-flex;align-items:center;gap:4px;color:#db3e51;font-weight:600;font-size:13px;cursor:pointer;white-space:nowrap;" onclick="goToOCR_B(' + i + ')"><i data-lucide="alert-circle" style="width:14px;height:14px;flex-shrink:0;"></i>확인 필요</span>';
-          } else if (st === 'unconfirmed') {
-            b2OcrCell = '<span style="display:inline-flex;align-items:center;gap:4px;color:#6d7381;font-weight:600;font-size:13px;cursor:pointer;" onclick="goToOCR_B(' + i + ')"><i data-lucide="circle" style="width:14px;height:14px;"></i>미확인</span>';
-          } else {
-            b2OcrCell = '<span style="display:inline-flex;align-items:center;gap:4px;color:#416bff;font-weight:600;font-size:13px;"><i data-lucide="loader" style="width:14px;height:14px;" class="spin"></i>처리중</span>';
-          }
+          var ucB2 = (OCR_DATA[s.id] && OCR_DATA[s.id].questions) ? OCR_DATA[s.id].questions.filter(function(q){ return !!q.uncertainty; }).length : 0;
+          if (st === 'confirmed') b2OcrCell = ocrResultCell('confirmed', 0, 'goToOCR_B(' + i + ')');
+          else if (st === 'unconfirmed' && s.needsReview) b2OcrCell = ocrResultCell('review', ucB2, 'goToOCR_B(' + i + ')');
+          else if (st === 'unconfirmed') b2OcrCell = ocrResultCell('unconfirmed', 0, 'goToOCR_B(' + i + ')');
+          else if (st === 'failed') b2OcrCell = ocrResultCell('failed', 0, null, s.id);
+          else b2OcrCell = ocrResultCell('processing');
         }
         cols += '<td style="text-align:center;">' + b2OcrCell + '</td>';
       }
-      cols += '<td style="text-align:center;"><button onclick="openStudentUploadModal(\'' + s.id + '\',\'' + s.name + '\')" style="background:none;border:none;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:4px;color:#416bff;font-size:13px;font-weight:600;padding:4px 8px;border-radius:4px;" onmouseover="this.style.background=\'#e9f2ff\'" onmouseout="this.style.background=\'none\'"><i data-lucide="paperclip" style="width:13px;height:13px;flex-shrink:0;"></i>' + (isTyping ? '타이핑 보기' : '파일 추가/제거') + '</button></td>';
+      cols += '<td style="text-align:center;"><button onclick="openStudentUploadModal(\'' + s.id + '\',\'' + s.name + '\')" style="background:none;border:none;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:4px;color:#416bff;font-size:13px;font-weight:600;padding:4px 8px;border-radius:4px;white-space:nowrap;" onmouseover="this.style.background=\'#e9f2ff\'" onmouseout="this.style.background=\'none\'"><i data-lucide="paperclip" style="width:13px;height:13px;flex-shrink:0;"></i>' + (isTyping ? '타이핑 보기' : '파일 추가/제거') + '</button></td>';
       html += '<tr>' + cols + '</tr>';
     });
   }
@@ -2846,6 +3194,8 @@ function closeOcrAskB(startNow) {
     if (ocrBtn2) { ocrBtn2.disabled = false; ocrBtn2.style.opacity = '1'; ocrBtn2.style.cursor = 'pointer'; ocrBtn2.style.pointerEvents = ''; }
     if (ocrWrap2) { ocrWrap2.removeAttribute('title'); ocrWrap2.style.cursor = ''; }
     showToast('OCR 인식을 시작합니다. 완료 후 결과를 확인해 주세요.', 'success');
+    var csbSum0 = document.getElementById('class-action-bar');
+    if (csbSum0) csbSum0.style.display = 'none';
     var bannerB2 = document.getElementById('list-b-ocr-pending-banner');
     if (bannerB2) {
       bannerB2.style.background = '#f4f8ff';
@@ -2871,37 +3221,28 @@ function closeOcrAskB(startNow) {
           p = 100;
           clearInterval(progTimer);
           STUDENTS_B2.forEach(function(s){ if (s.ocrStatusAfter === 'processing') s.ocrStatusAfter = 'unconfirmed'; });
+          STUDENTS.forEach(function(s){ if (s.ocrStatus === 'waiting' || s.ocrStatus === 'processing') s.ocrStatus = 'unconfirmed'; });
           if (currentEvalType !== 'B' && bulkOcrStateA[currentListClass] === 'running') bulkOcrStateA[currentListClass] = 'done';
           renderTable();
+          renderActionBanners(currentListClass, window.currentRawType || currentEvalType || 'A');
           lucide.createIcons();
         }
         if (fill) fill.style.width = p + '%';
         if (pct) pct.textContent = Math.round(p) + '%';
       }, 220);
-      setTimeout(function() { if (bannerB2) bannerB2.style.display = 'none'; }, 5000);
+      setTimeout(function() {
+        if (bannerB2) bannerB2.style.display = 'none';
+        renderActionBanners(currentListClass, window.currentRawType || currentEvalType || 'A');
+      }, 5000);
     }
     renderTable();
     lucide.createIcons();
   } else {
     showToast('OCR 인식을 나중에 진행할 수 있습니다.', 'success');
     var bannerB2 = document.getElementById('list-b-ocr-pending-banner');
-    if (bannerB2) {
-      bannerB2.style.background = '#fff7ed';
-      bannerB2.style.borderColor = '#f97316';
-      bannerB2.innerHTML =
-        '<div style="display:flex;align-items:center;gap:10px;">' +
-          '<i data-lucide="clock" style="width:16px;height:16px;color:#ea580c;flex-shrink:0;"></i>' +
-          '<div style="display:flex;flex-direction:column;gap:3px;">' +
-            '<span style="font-size:14px;color:#ea580c;font-weight:600;">OCR 인식이 아직 진행되지 않았습니다.</span>' +
-            '<span style="font-size:13px;color:#9a4806;">파일이 업로드된 상태입니다. OCR 인식을 진행하면 AI 채점을 시작할 수 있습니다.</span>' +
-          '</div>' +
-        '</div>' +
-        '<button onclick="startOcrFromBanner()" style="flex-shrink:0;height:32px;background:#f97316;color:white;border:none;border-radius:4px;padding:0 14px;font-size:13px;font-weight:600;font-family:inherit;cursor:pointer;white-space:nowrap;display:inline-flex;align-items:center;gap:6px;">' +
-          '<i data-lucide="scan-text" style="width:14px;height:14px;"></i>지금 OCR 진행' +
-        '</button>';
-      bannerB2.style.display = 'flex';
-      lucide.createIcons();
-    }
+    if (bannerB2) bannerB2.style.display = 'none';
+    renderActionBanners(currentListClass, window.currentRawType || currentEvalType || 'A');
+    lucide.createIcons();
   }
 }
 
@@ -2920,28 +3261,49 @@ function openStudentUploadModal(studentId, studentName) {
   document.getElementById('studentUploadModal').style.display = 'flex';
   lucide.createIcons();
 }
+var studentUploadFiles = [];
 function resetStudentUploadState() {
-  var chip = document.getElementById('student-upload-chip');
-  var uploadBtn = document.getElementById('student-upload-btn');
+  studentUploadFiles = [];
+  renderStudentUploadList();
+}
+function renderStudentUploadList() {
+  var list = document.getElementById('student-upload-list');
   var saveBtn = document.getElementById('student-upload-save');
-  if (chip) chip.style.display = 'none';
-  if (uploadBtn) { uploadBtn.style.opacity = '1'; uploadBtn.style.cursor = 'pointer'; uploadBtn.disabled = false; }
-  if (saveBtn) { saveBtn.style.opacity = '0.5'; saveBtn.style.cursor = 'not-allowed'; saveBtn.disabled = true; }
+  if (list) {
+    if (studentUploadFiles.length === 0) {
+      list.innerHTML = '<span style="font-size:14px;color:#b3b6bd;">아직 추가된 파일이 없습니다.</span>';
+    } else {
+      list.innerHTML = studentUploadFiles.map(function(name, i) {
+        var tag = (i === 0)
+          ? '<span style="font-size:11px;font-weight:700;background:#e9f2ff;color:#3151c4;border-radius:100px;padding:1px 8px;white-space:nowrap;flex-shrink:0;">채점 대상</span>'
+          : '<span style="font-size:11px;font-weight:600;background:#f1f3f5;color:#6d7381;border-radius:100px;padding:1px 8px;white-space:nowrap;flex-shrink:0;">참고용</span>';
+        return '<div style="display:flex;align-items:center;gap:8px;background:#f6f7f9;border:1px solid #e6e8ec;border-radius:6px;padding:6px 10px;">'
+          + '<i data-lucide="file-text" style="width:16px;height:16px;color:#6d7381;flex-shrink:0;"></i>'
+          + '<span style="flex:1;min-width:0;font-size:14px;font-weight:600;color:#222631;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' + name + '</span>'
+          + tag
+          + '<button onclick="removeStudentUploadFile(' + i + ')" style="background:none;border:none;padding:0;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;flex-shrink:0;"><i data-lucide="x" style="width:14px;height:14px;color:#6d7381;"></i></button>'
+          + '</div>';
+      }).join('');
+    }
+  }
+  if (saveBtn) {
+    var on = studentUploadFiles.length > 0;
+    saveBtn.style.opacity = on ? '1' : '0.5';
+    saveBtn.style.cursor = on ? 'pointer' : 'not-allowed';
+    saveBtn.disabled = !on;
+  }
+  lucide.createIcons();
 }
 function pickStudentUploadFile() {
-  var chip = document.getElementById('student-upload-chip');
-  var chipName = document.getElementById('student-upload-chip-name');
-  var uploadBtn = document.getElementById('student-upload-btn');
-  var saveBtn = document.getElementById('student-upload-save');
-  if (chipName) chipName.textContent = '과제_제출본.pdf';
-  if (chip) chip.style.display = 'inline-flex';
-  if (uploadBtn) { uploadBtn.style.opacity = '0.5'; uploadBtn.style.cursor = 'not-allowed'; uploadBtn.disabled = true; }
-  if (saveBtn) { saveBtn.style.opacity = '1'; saveBtn.style.cursor = 'pointer'; saveBtn.disabled = false; }
-  lucide.createIcons();
+  // 데모: 업로드할 때마다 파일 1개 추가 (멀티파일 정책 — 첫 파일만 채점 대상)
+  var demoNames = ['과제_제출본.pdf', '추가제출_1.pdf', '추가제출_2.pdf', '추가제출_3.pdf'];
+  var name = demoNames[studentUploadFiles.length] || ('추가제출_' + studentUploadFiles.length + '.pdf');
+  studentUploadFiles.push(name);
+  renderStudentUploadList();
 }
-function removeStudentUploadFile() {
-  resetStudentUploadState();
-  lucide.createIcons();
+function removeStudentUploadFile(i) {
+  studentUploadFiles.splice(i, 1);
+  renderStudentUploadList();
 }
 function submitStudentUpload() {
   var saveBtn = document.getElementById('student-upload-save');
@@ -3108,7 +3470,7 @@ var RUN_STUDENTS = [
   { id:'10109', name:'박수란', ai:'-',    t:'미채점',   checked:true },
   { id:'10110', name:'박수란', ai:'-',    t:'미채점',   checked:true },
   { id:'10111', name:'안유림', ai:'absent', t:'미채점', absent:true },
-  { id:'10112', name:'안지영', ai:'-',    t:'미채점',   checked:true },
+  { id:'10112', name:'안지영', ai:'ocrfail', t:'미채점', ocrfail:true },
   { id:'10113', name:'김도윤', ai:'-',    t:'미채점',   checked:true }
 ];
 function rmTeacherBadge(t) {
@@ -3117,6 +3479,7 @@ function rmTeacherBadge(t) {
   return '<span class="badge" style="background:#fff7ed;color:#ea580c;">미채점</span>';
 }
 function rmAiCell(s) {
+  if (s.ocrfail || s.ai === 'ocrfail') return '<span style="color:#6d7381;">OCR 미인식</span>';
   if (s.ai === 'fail') return '<span style="color:#db3e51;font-weight:600;">채점 실패</span>';
   if (s.ai === 'absent') return '<span style="color:#b3b6bd;">미제출</span>';
   return '<span style="color:#6d7381;">-</span>';
@@ -3125,9 +3488,10 @@ function renderRunStudents() {
   var tbody = document.getElementById('rm-student-tbody');
   var html = '';
   RUN_STUDENTS.forEach(function(s, i) {
-    var cls = s.absent ? 'dis' : (s.checked ? 'sel' : '');
+    var disabled = s.absent || s.ocrfail; // 미제출·OCR 미인식 → 채점 대상 제외 (PRD 2-7)
+    var cls = disabled ? 'dis' : (s.checked ? 'sel' : '');
     html += '<tr class="' + cls + '">'
-      + '<td><input type="checkbox" class="rm-chk" ' + (s.absent ? 'disabled' : (s.checked ? 'checked' : '')) + ' onchange="rmToggle(' + i + ', this.checked)"></td>'
+      + '<td><input type="checkbox" class="rm-chk" ' + (disabled ? 'disabled' : (s.checked ? 'checked' : '')) + ' onchange="rmToggle(' + i + ', this.checked)"></td>'
       + '<td>' + s.id + '</td>'
       + '<td>' + s.name + '</td>'
       + '<td>' + rmAiCell(s) + '</td>'
@@ -3142,12 +3506,12 @@ function rmToggle(i, on) {
   renderRunStudents();
 }
 function rmToggleAll(el) {
-  RUN_STUDENTS.forEach(function(s){ if (!s.absent) s.checked = el.checked; });
+  RUN_STUDENTS.forEach(function(s){ if (!s.absent && !s.ocrfail) s.checked = el.checked; });
   renderRunStudents();
 }
 function rmUpdateCount() {
-  var n = RUN_STUDENTS.filter(function(s){ return !s.absent && s.checked; }).length;
-  var eligible = RUN_STUDENTS.filter(function(s){ return !s.absent; }).length;
+  var n = RUN_STUDENTS.filter(function(s){ return !s.absent && !s.ocrfail && s.checked; }).length;
+  var eligible = RUN_STUDENTS.filter(function(s){ return !s.absent && !s.ocrfail; }).length;
   document.getElementById('rm-exec-count').textContent = n;
   var all = document.getElementById('rm-chk-all');
   if (all) { all.checked = n === eligible; all.indeterminate = n > 0 && n < eligible; }
@@ -3155,7 +3519,7 @@ function rmUpdateCount() {
   if (btn) { btn.disabled = n === 0; btn.style.opacity = n === 0 ? '.5' : '1'; btn.style.cursor = n === 0 ? 'not-allowed' : 'pointer'; }
 }
 function rmExec() {
-  var n = RUN_STUDENTS.filter(function(s){ return !s.absent && s.checked; }).length;
+  var n = RUN_STUDENTS.filter(function(s){ return !s.absent && !s.ocrfail && s.checked; }).length;
   if (n === 0) return;
   closeRmModal('runModal2');
   showToast(n + '명의 AI 채점을 시작합니다. 완료되면 결과 확인에서 볼 수 있어요.', 'success');
