@@ -4,42 +4,49 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>1학년 1반 채점 현황 | CLIPO</title>
-<link rel="icon" type="image/svg+xml" href="clipo_favicon_elem.svg">
+<link rel="icon" type="image/png" href="clipo_favicon.png">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard-gov.min.css">
 <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
 <style>
 *{font-family:'Pretendard GOV',-apple-system,sans-serif;box-sizing:border-box;margin:0;padding:0}
 body{background:#f6f7f9;color:#222631;min-height:100vh}
 
-/* ══════ 글로벌 헤더 (56px) ══════ */
-.global-header{height:56px;background:#fff;display:flex;align-items:center;justify-content:space-between;position:fixed;top:0;left:0;right:0;z-index:210;padding:0 20px 0 8px;border-bottom:1px solid #f1f3f5}
-.gh-left{display:flex;align-items:center;gap:8px}
-.gh-menu-btn{width:40px;height:40px;display:inline-flex;align-items:center;justify-content:center;border:none;background:none;cursor:pointer;color:#3b3f4c;border-radius:4px}
-.gh-menu-btn:hover{background:#f6f7f9}
-.gh-product-tag{display:inline-flex;align-items:center;height:18px;margin-left:12px;padding-left:12px;border-left:1px solid #e5e7eb;color:#6d7381;font-size:14px;font-weight:600;line-height:1}
-.gh-right{display:flex;align-items:center;gap:12px;padding-right:12px}
-.gh-plan{display:inline-flex;align-items:center;height:22px;padding:0 10px;border-radius:100px;background:#e9f2ff;border:1px solid #ccdfff;font-size:12px;font-weight:500;color:#3151c4;line-height:1}
-.gh-dday{font-size:14px;font-weight:500;color:#6d7381;line-height:1}
-.gh-credit{display:inline-flex;align-items:center;gap:6px;font-size:14px;font-weight:500;color:#3b3f4c;line-height:1}
-.gh-sep{width:0;height:14px;border-left:1px solid #dde1e8}
-.gh-user{display:inline-flex;align-items:center;gap:3px;font-size:14px;font-weight:500;color:#3b3f4c;cursor:pointer;border:none;background:none;padding:0;line-height:1}
-.gh-user:hover{color:#365eef}
+/* ══════ 글로벌 헤더 (CLIPO 표준 g-hd) ══════ */
+.g-hd { height: 56px; background: #fff; border-bottom: 1px solid #d9d9d9; display: flex; align-items: center; padding: 0 20px 0 8px; position: fixed; top: 0; left: 0; right: 0; z-index: 200; }
+.gh-menu-btn { width:36px; height:36px; border:none; background:none; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; color:#3b3f4c; margin-right:8px; line-height:1; border-radius:4px; }
+.gh-menu-btn:hover { background:#f6f7f9; }
+.g-hd-r { margin-left: auto; display: flex; align-items: center; gap: 6px; font-size: 14px; color: #3b3f4c; }
+.plan-badge { background: #eef3ff; color: #416bff; font-size: 12px; font-weight: 600; padding: 3px 10px; border-radius: 12px; }
+.hd-div { width: 1px; height: 14px; background: #d9d9d9; margin: 0 4px; }
+.credit-wrap { display: flex; align-items: center; gap: 4px; font-size: 14px; font-weight: 500; color: #3b3f4c; }
+.user-btn { display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 0; border: none; background: none; font-size: 14px; color: #222631; cursor: pointer; line-height: 1; font-weight: 500; }
 
-/* ══════ 서브 네비게이션 ══════ */
-.sub-nav{height:54px;background:#fff;border-bottom:1px solid #dde1e8;display:flex;align-items:flex-end;padding:0 24px;position:fixed;top:56px;left:0;right:0;z-index:205}
-.sub-nav-item{position:relative;display:inline-flex;align-items:center;justify-content:center;height:54px;padding:0 16px;font-size:15px;font-weight:500;color:#6d7381;cursor:pointer;text-decoration:none;line-height:1;background:none;border:none;font-family:inherit}
-.sub-nav-item:hover{color:#222631}
-.sub-nav-item.active{color:#365eef;font-weight:600}
-.sub-nav-item.active::after{content:"";position:absolute;left:12px;right:12px;bottom:-1px;height:2px;background:#365eef;border-radius:2px 2px 0 0}
+/* ══════ 사이드바 (CLIPO 표준 icon-sb) ══════ */
+.icon-sb { width: 56px; background: #fff; border-right: 1px solid #d9d9d9; position: fixed; top: 56px; bottom: 0; left: 0; display: flex; flex-direction: column; padding: 8px 0; z-index: 150; transition: width .2s ease; }
+.icon-sb.expanded { width: 200px; }
+.si { height: 40px; display: flex; align-items: center; border-radius: 8px; color: #6d7381; cursor: pointer; margin: 0 8px 2px; position: relative; padding: 0 4px 0 8px; gap: 10px; white-space: nowrap; flex-shrink: 0; }
+.si:hover { background: #f1f3f5; }
+.si.active { background: #e9f2ff; color: #416bff; }
+.si-icon { width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.si-label { font-size: 13px; font-weight: 500; opacity: 0; transition: opacity .1s; overflow: hidden; }
+.icon-sb.expanded .si-label { opacity: 1; }
+.si-tip { position: absolute; left: 48px; top: 50%; transform: translateY(-50%); background: #222631; color: #fff; font-size: 11px; padding: 3px 8px; border-radius: 4px; white-space: nowrap; display: none; z-index: 300; pointer-events: none; }
+.si:hover .si-tip { display: block; }
+.icon-sb.expanded .si-tip { display: none !important; }
+.nav-bottom { margin-top: auto; width: 100%; }
+.nav-div { height: 1px; background: #f1f3f5; margin: 4px 8px; }
 
-/* ══════ 사이드바 ══════ */
-.sidebar{position:fixed;top:110px;left:0;bottom:0;width:56px;background:#fff;border-right:1px solid #dde1e8;display:flex;flex-direction:column;align-items:center;padding:8px 0;z-index:100;gap:4px}
-.sb-item{width:40px;height:40px;display:inline-flex;align-items:center;justify-content:center;border-radius:6px;color:#6d7381;cursor:pointer;border:none;background:none}
-.sb-item:hover{background:#f6f7f9;color:#3b3f4c}
-.sb-item.active{background:#e9f2ff;color:#365eef}
+/* ══════ 상단 탭 밴드 (CLIPO 표준) ══════ */
+.tab-band{ background:white; border-bottom:1px solid #dde1e8; }
+.tab-band-inner{ max-width:1240px; margin:0 auto; padding:0 32px; display:flex; gap:8px; }
+.sub-tab{ padding:18px 14px; font-size:16px; font-weight:500; color:#3b3f4c; border:none; background:none; cursor:pointer; font-family:inherit; border-bottom:2px solid transparent; margin-bottom:-1px; display:inline-flex; align-items:center; justify-content:center; line-height:1; vertical-align:middle; }
+.sub-tab:hover{ color:#222631; }
+.sub-tab.on{ color:#416bff; border-bottom:2px solid #416bff; font-weight:600; }
 
 /* ══════ 메인 ══════ */
-.main{margin-left:56px;margin-top:110px;padding:24px;display:flex;justify-content:center}
+.main-wrap{ position:relative; padding-top:56px; padding-left:56px; transition:padding-left .2s; min-height:100vh; background:#f6f7f9; }
+body.nav-expanded .main-wrap{ padding-left:200px; }
+.main{padding:24px;display:flex;justify-content:center}
 .container{width:100%;max-width:1248px;display:flex;flex-direction:column;gap:24px}
 
 /* 페이지 헤더 */
@@ -263,9 +270,7 @@ body{background:#f6f7f9;color:#222631;min-height:100vh}
   .gh-user{font-size:13px}
   .sub-nav{top:52px;height:48px;padding:0 12px}
   .sub-nav-item{padding:0 10px;font-size:14px;height:48px}
-  .sidebar{top:100px;width:48px}
-  .sb-item{width:36px;height:36px}
-  .main{margin-left:48px;margin-top:100px;padding:14px 10px}
+  .main{padding:14px 10px}
   .container{gap:14px}
   .page-header{flex-direction:column;align-items:stretch;gap:10px}
   .page-title{font-size:18px}
@@ -282,8 +287,7 @@ body{background:#f6f7f9;color:#222631;min-height:100vh}
   .modal{max-width:calc(100vw - 32px)}
 }
 @media (max-width:420px){
-  .sidebar{display:none}
-  .main{margin-left:0;padding:12px 10px}
+  .main{padding:12px 10px}
   .gh-menu-btn{width:36px;height:36px}
   .page-title{font-size:17px}
 }
@@ -291,43 +295,53 @@ body{background:#f6f7f9;color:#222631;min-height:100vh}
 </head>
 <body>
 
-<!-- 헤더 -->
-<div class="global-header">
-  <div class="gh-left">
-    <button class="gh-menu-btn"><i data-lucide="menu" style="width:24px;height:24px"></i></button>
-    <a class="gh-logo" href="#" aria-label="CLIPO">
-      <svg width="76" height="16" viewBox="0 0 76 16" fill="none"><path d="M11.3613 4.03516H4.09668V11.9629H8.88281L8.88086 11.9648H15.6016V16H4.02539C1.80242 15.9998 0 14.223 0 12.0322V3.96777C0 1.77696 1.80242 0.000177874 4.02539 0H15.4561L11.3613 4.03516ZM22.0703 11.9648H33.5781V16H22.002C19.7788 16 17.9756 14.2231 17.9756 12.0322V0H22.0703V11.9648ZM40.0459 16H35.9521V0H40.0459V16ZM54.5381 0C56.4564 0 58.0138 1.53228 58.0186 3.42285L58.0166 3.4248V8.54297C58.014 10.4333 56.4567 11.9648 54.5361 11.9648H46.5107L42.416 16V0H54.5381ZM71.9746 0C74.0086 0.000134956 75.6887 1.49046 75.958 3.42285H76V12.5771H75.958C75.6887 14.5095 74.011 15.9999 71.9746 16H64.4238C62.3897 16 60.7098 14.5096 60.4404 12.5771C60.4145 12.398 60.3984 12.2184 60.3984 12.0322V3.96777C60.3984 3.78159 60.4145 3.60205 60.4404 3.42285C60.7098 1.49037 62.3873 0 64.4238 0H71.9746ZM64.4922 12.5771H71.9062V3.42285H64.4922V12.5771ZM46.5107 3.42285V8.54004H53.9238V3.42285H46.5107Z" fill="#365EEF"/></svg>
-    </a>
+<!-- ===== Global Header (CLIPO 표준 g-hd) ===== -->
+<header class="g-hd" id="gnb">
+  <button class="gh-menu-btn" onclick="toggleNav()"><i data-lucide="menu" style="width:20px;height:20px"></i></button>
+  <svg width="76" height="16" viewBox="0 0 76 16" fill="none" xmlns="http://www.w3.org/2000/svg" style="cursor:pointer" onclick="location.href='home_v1_260612.html'"><path d="M11.3613 4.03516H4.09668V11.9629H8.88281L8.88086 11.9648H15.6016V16H4.02539C1.80242 15.9998 0 14.223 0 12.0322V3.96777C0 1.77696 1.80242 0.000177874 4.02539 0H15.4561L11.3613 4.03516ZM22.0703 11.9648H33.5781V16H22.002C19.7788 16 17.9756 14.2231 17.9756 12.0322V0H22.0703V11.9648ZM40.0459 16H35.9521V0H40.0459V16ZM54.5381 0C56.4564 0 58.0138 1.53228 58.0186 3.42285L58.0166 3.4248V8.54297C58.014 10.4333 56.4567 11.9648 54.5361 11.9648H46.5107L42.416 16V0H54.5381ZM71.9746 0C74.0086 0.000134956 75.6887 1.49046 75.958 3.42285H76V12.5771H75.958C75.6887 14.5095 74.011 15.9999 71.9746 16H64.4238C62.3897 16 60.7098 14.5096 60.4404 12.5771C60.4145 12.398 60.3984 12.2184 60.3984 12.0322V3.96777C60.3984 3.78159 60.4145 3.60205 60.4404 3.42285C60.7098 1.49037 62.3873 0 64.4238 0H71.9746ZM64.4922 12.5771H71.9062V3.42285H64.4922V12.5771ZM46.5107 3.42285V8.54004H53.9238V3.42285H46.5107Z" fill="#365EEF"/></svg>
+  <div class="g-hd-r">
+    <span class="plan-badge">학교 유료</span>
+    <span style="font-size:14px;color:#3b3f4c">D-180</span>
+    <div class="hd-div"></div>
+    <i data-lucide="sparkles" style="width:18px;height:18px;color:#416bff"></i>
+    <div class="credit-wrap">AI 크레딧 200</div>
+    <div class="hd-div"></div>
+    <button class="user-btn">최대표 선생님(대표교사) <i data-lucide="chevron-down" style="width:16px;height:16px"></i></button>
   </div>
-  <div class="gh-right">
-    <span class="gh-plan">개인 유료</span>
-    <span class="gh-dday">D-30</span>
-    <span class="gh-credit"><i data-lucide="bot" style="width:20px;height:20px"></i>AI 크레딧 900</span>
-    <div class="gh-sep"></div>
-    <button class="gh-user">홍길동 선생님(대표교사)<i data-lucide="chevron-down" style="width:22px;height:22px"></i></button>
-  </div>
-</div>
+</header>
 
-<!-- 서브 내비 -->
-<nav class="sub-nav">
-  <button class="sub-nav-item" onclick="location.href='co_teacher_review_v1_260611.html'">수업 홈</button>
-  <button class="sub-nav-item" onclick="location.href='task_ocr_review_v2_260612.html#design'">수행평가 설계</button>
-  <button class="sub-nav-item" onclick="location.href='task_ocr_review_v2_260612.html'">과제물 관리</button>
-  <button class="sub-nav-item active" onclick="location.href='task_ocr_review_v2_260612.html#scoring'">수행평가 채점</button>
-  <button class="sub-nav-item" onclick="showToast('success','세부능력 및 특기사항 지원은 준비 중입니다.')">세부능력 및 특기사항 지원</button>
+<!-- ===== Sidebar (CLIPO 표준 icon-sb) ===== -->
+<nav class="icon-sb" id="icon-sb">
+  <div class="si" onclick="location.href='home_v1_260612.html'"><div class="si-icon"><i data-lucide="home" style="width:20px;height:20px"></i></div><span class="si-label">홈</span><span class="si-tip">홈</span></div>
+  <div class="si"><div class="si-icon"><i data-lucide="scissors" style="width:20px;height:20px"></i></div><span class="si-label">평가계획</span><span class="si-tip">평가계획</span></div>
+  <div class="si active" onclick="location.href='co_teacher_review_v1_260611.html'"><div class="si-icon"><i data-lucide="layout-grid" style="width:20px;height:20px"></i></div><span class="si-label">수업</span><span class="si-tip">수업</span></div>
+  <div class="si" onclick="location.href='creative_activity_list_v6_260507.html'"><div class="si-icon"><i data-lucide="notebook-pen" style="width:20px;height:20px"></i></div><span class="si-label">창의적 체험활동 <span style="font-size:10px;background:#416bff;color:#fff;padding:1px 5px;border-radius:3px;margin-left:2px">Beta</span></span><span class="si-tip">창의적 체험활동</span></div>
+  <div class="si" onclick="location.href='quick_seteuk_dev_list_v1_260604.html'"><div class="si-icon"><i data-lucide="zap" style="width:20px;height:20px"></i></div><span class="si-label">세특 간편 생성기</span><span class="si-tip">세특 간편 생성기</span></div>
+  <div class="si"><div class="si-icon"><i data-lucide="smile" style="width:20px;height:20px"></i></div><span class="si-label">행동특성 및 종합기록</span><span class="si-tip">행동특성 및 종합기록</span></div>
+  <div class="si"><div class="si-icon"><i data-lucide="bar-chart-2" style="width:20px;height:20px"></i></div><span class="si-label">리포트</span><span class="si-tip">리포트</span></div>
+  <div class="si"><div class="si-icon"><i data-lucide="building-2" style="width:20px;height:20px"></i></div><span class="si-label">학교 설정</span><span class="si-tip">학교 설정</span></div>
+  <div class="nav-bottom">
+    <div class="nav-div"></div>
+    <div class="si"><div class="si-icon"><i data-lucide="file-down" style="width:20px;height:20px"></i></div><span class="si-label">매뉴얼 다운로드</span><span class="si-tip">매뉴얼 다운로드</span></div>
+    <div class="si"><div class="si-icon"><i data-lucide="credit-card" style="width:20px;height:20px"></i></div><span class="si-label">요금제</span><span class="si-tip">요금제</span></div>
+    <div class="si"><div class="si-icon"><i data-lucide="help-circle" style="width:20px;height:20px"></i></div><span class="si-label">고객센터</span><span class="si-tip">고객센터</span></div>
+  </div>
 </nav>
 
-<!-- 사이드바 -->
-<aside class="sidebar">
-  <button class="sb-item" title="홈"><i data-lucide="home" style="width:20px;height:20px"></i></button>
-  <button class="sb-item" title="평가계획"><i data-lucide="scissors" style="width:20px;height:20px"></i></button>
-  <button class="sb-item active" title="수업"><i data-lucide="layout-grid" style="width:20px;height:20px"></i></button>
-  <button class="sb-item" title="창의적 체험활동"><i data-lucide="notebook-pen" style="width:20px;height:20px"></i></button>
-  <button class="sb-item" title="리포트"><i data-lucide="bar-chart-2" style="width:20px;height:20px"></i></button>
-</aside>
+<div class="main-wrap" id="main-wrap">
+  <!-- 상단 탭 밴드 (CLIPO 표준) -->
+  <div class="tab-band">
+    <div class="tab-band-inner">
+      <button class="sub-tab" onclick="location.href='co_teacher_review_v1_260611.html'">수업 홈</button>
+      <button class="sub-tab" onclick="location.href='task_ocr_review_v2_260612.html#design'">수행평가 설계</button>
+      <button class="sub-tab" onclick="location.href='task_ocr_review_v2_260612.html'">과제물 관리</button>
+      <button class="sub-tab on">수행평가 채점</button>
+      <button class="sub-tab" onclick="showToast('success','세부능력 및 특기사항 지원은 준비 중입니다.')">세부능력 및 특기사항 지원</button>
+    </div>
+  </div>
 
-<!-- 메인 -->
-<main class="main">
+  <!-- 메인 -->
+  <main class="main">
   <div class="container">
 
     <!-- 페이지 헤더 -->
@@ -541,6 +555,8 @@ body{background:#f6f7f9;color:#222631;min-height:100vh}
     </div>
   </div>
 </div>
+  </main>
+</div><!-- /main-wrap -->
 
 <!-- 토스트 -->
 <div class="toast" id="toast">
@@ -549,6 +565,9 @@ body{background:#f6f7f9;color:#222631;min-height:100vh}
 </div>
 
 <script>
+// ══════ 좌측 네비 토글 (CLIPO 표준) ══════
+function toggleNav(){ document.getElementById('icon-sb').classList.toggle('expanded'); document.body.classList.toggle('nav-expanded'); }
+
 // ══════ 학생 데이터 ══════
 var STUDENTS = [
   {id:'10101', name:'김피드백', aiStatus:'채점 완료', aiScore:33, finalScore:33, status:'완료',     statusCls:'done',     link:'scoring_elementary_v2_260511.html'},
