@@ -96,8 +96,8 @@ body.nav-expanded .main-wrap{ padding-left:200px; }
 .col-ai-status{width:130px}
 .col-ai-score{width:90px;color:#6d7381}
 .col-final{width:100px;font-weight:600;color:#222631}
-.col-status{width:110px}
-.col-action{width:200px}
+.col-status{width:180px}
+.col-action{width:130px}
 .col-action-group{display:inline-flex;gap:10px;align-items:center;justify-content:center}
 .muted{color:#9ca3af}
 
@@ -106,6 +106,8 @@ body.nav-expanded .main-wrap{ padding-left:200px; }
 .status-badge.done{background:#dcfce7;color:#16a34a}
 .status-badge.progress{background:#fff3eb;color:#c2410c}
 .status-badge.need{background:#fde7e9;color:#b91c1c}
+.status-badge.fail{background:#fde7e9;color:#b91c1c}
+.status-badge.stale{background:#fff3eb;color:#c2410c}
 .status-badge.none{background:#f1f3f5;color:#6d7381}
 
 /* 학생 채점 링크 */
@@ -115,6 +117,10 @@ body.nav-expanded .main-wrap{ padding-left:200px; }
 .btn-detail-sub:hover{color:#3b3f4c}
 .btn-detail.disabled{color:#c2c7d0;cursor:not-allowed;pointer-events:none}
 .btn-detail.disabled:hover{color:#c2c7d0}
+.btn-rescore{display:inline-flex;align-items:center;justify-content:center;gap:4px;height:30px;padding:0 12px;border-radius:8px;background:#eef3ff;border:1px solid #dce6ff;color:#3151c4;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;line-height:1}
+.btn-rescore:hover{background:#e0eaff;border-color:#a3c3ff}
+.btn-rescore-text{display:inline-flex;align-items:center;gap:3px;font-size:13px;font-weight:600;color:#3151c4;background:none;border:none;cursor:pointer;padding:0;line-height:1;font-family:inherit;white-space:nowrap}
+.btn-rescore-text:hover{color:#365eef;text-decoration:underline}
 
 /* ══════ 모달 ══════ */
 .modal-overlay{position:fixed;inset:0;background:rgba(34,38,49,.5);display:none;align-items:center;justify-content:center;z-index:1000;padding:24px}
@@ -333,8 +339,8 @@ body.nav-expanded .main-wrap{ padding-left:200px; }
   <div class="tab-band">
     <div class="tab-band-inner">
       <button class="sub-tab" onclick="location.href='co_teacher_review_v1_260611.html'">수업 홈</button>
-      <button class="sub-tab" onclick="location.href='task_ocr_review_v2_260612.html#design'">수행평가 설계</button>
-      <button class="sub-tab" onclick="location.href='task_ocr_review_v2_260612.html'">과제물 관리</button>
+      <button class="sub-tab" onclick="location.href='task_ocr_inline_v1.html#design'">수행평가 설계</button>
+      <button class="sub-tab" onclick="location.href='task_ocr_inline_v1.html'">과제물 관리</button>
       <button class="sub-tab on">수행평가 채점</button>
       <button class="sub-tab" onclick="showToast('success','세부능력 및 특기사항 지원은 준비 중입니다.')">세부능력 및 특기사항 지원</button>
     </div>
@@ -347,7 +353,7 @@ body.nav-expanded .main-wrap{ padding-left:200px; }
     <!-- 페이지 헤더 -->
     <div class="page-header">
       <div class="ph-left">
-        <button class="btn-back" onclick="location.href='task_ocr_review_v2_260612.html#scoring'">
+        <button class="btn-back" onclick="location.href='task_ocr_inline_v1.html#scoring'">
           <i data-lucide="chevron-left" style="width:18px;height:18px"></i>이전으로
         </button>
         <h1 class="page-title">1학년 1반 채점 현황</h1>
@@ -573,10 +579,10 @@ var STUDENTS = [
   {id:'10101', name:'김피드백', aiStatus:'채점 완료', aiScore:33, finalScore:33, status:'완료',     statusCls:'done',     link:'scoring_elementary_v2_260511.html'},
   {id:'10103', name:'미제출',   aiStatus:'-',         aiScore:'-', finalScore:10, status:'미제출',   statusCls:'none',     link:'scoring_elementary_v2_260511.html'},
   {id:'10104', name:'채점전',   aiStatus:'-',         aiScore:'-', finalScore:'-', status:'미채점',   statusCls:'none',     link:'scoring_elementary_v2_260511.html'},
-  {id:'10105', name:'채점실패', aiStatus:'실패',      aiScore:'-', finalScore:'-', status:'확인 필요', statusCls:'need',     link:'scoring_elementary_v2_260511.html'},
+  {id:'10105', name:'채점실패', aiStatus:'채점 실패', aiScore:'-', finalScore:'-', status:'채점 실패', statusCls:'fail',     scoreFail:true, link:'scoring_elementary_v2_260511.html'},
   {id:'10106', name:'이전채점', aiStatus:'채점 완료', aiScore:33, finalScore:33, status:'완료',     statusCls:'done',     link:'scoring_elementary_v1_260506.html'},
-  {id:'10107', name:'히스토리', aiStatus:'채점 완료', aiScore:33, finalScore:33, status:'완료',     statusCls:'done',     link:'scoring_elementary_v2_260511.html'},
-  {id:'10108', name:'OCR미인식', aiStatus:'-',         aiScore:'-', finalScore:'-', status:'OCR 인식 실패', statusCls:'need', ocrFail:true, link:'scoring_elementary_v2_260511.html'}
+  {id:'10107', name:'OCR수정됨', aiStatus:'채점 완료', aiScore:33, finalScore:33, status:'재채점 필요', statusCls:'stale', stale:true, link:'scoring_elementary_v2_260511.html'},
+  {id:'10108', name:'확인대기', aiStatus:'채점 완료', aiScore:28, finalScore:'-', status:'확인 필요', statusCls:'need', link:'scoring_elementary_v2_260511.html'}
 ];
 
 function renderTable(){
@@ -585,19 +591,27 @@ function renderTable(){
     var aiStatusCls = s.aiStatus === '-' ? 'muted' : '';
     var aiScoreCell = s.aiScore === '-' ? '<span class="muted">-</span>' : '('+s.aiScore+')';
     var finalCell = s.finalScore === '-' ? '<span class="muted">-</span>' : s.finalScore;
+    var aiStatusHtml = s.scoreFail ? '<span style="color:#db3e51;font-weight:600;">'+s.aiStatus+'</span>' : s.aiStatus;
+    var rescoreInline = (s.scoreFail || s.stale)
+      ? '<button class="btn-rescore-text" onclick="rescoreStudent(\''+s.id+'\',\''+s.name+'\')"><i data-lucide="rotate-cw" style="width:13px;height:13px"></i>다시 채점</button>'
+      : '';
     return '<tr>'
       +'<td class="col-id">'+s.id+'</td>'
       +'<td class="col-name" style="text-align:left;padding-left:20px">'+s.name+'</td>'
-      +'<td class="col-ai-status '+aiStatusCls+'">'+s.aiStatus+'</td>'
+      +'<td class="col-ai-status '+aiStatusCls+'">'+aiStatusHtml+'</td>'
       +'<td class="col-ai-score">'+aiScoreCell+'</td>'
       +'<td class="col-final">'+finalCell+'</td>'
-      +'<td class="col-status"><span class="status-badge '+s.statusCls+'">'+s.status+'</span></td>'
+      +'<td class="col-status"><span style="display:inline-flex;align-items:center;gap:8px;justify-content:center;"><span class="status-badge '+s.statusCls+'">'+s.status+'</span>'+rescoreInline+'</span></td>'
       +'<td class="col-action"><div class="col-action-group">'
       +'<button class="btn-detail" onclick="openStudentScoring(\''+s.id+'\',\''+s.name+'\',\''+(s.link||'scoring_elementary_v2_260511.html')+'\')"><i data-lucide="user-round" style="width:14px;height:14px"></i>상세 보기</button>'
       +'</div></td>'
       +'</tr>';
   }).join('');
   lucide.createIcons();
+}
+
+function rescoreStudent(id, name){
+  showToast('loading', name + ' 학생 AI 채점을 다시 실행합니다.');
 }
 
 function openStudentScoring(id, name, link){
@@ -665,7 +679,7 @@ function updateBulkAiLevelLabels(){
 function renderBulkAiStudentTable(){
   var tbody = document.getElementById('bulkAiStudentTable');
   tbody.innerHTML = STUDENTS.map(function(s){
-    var disabled = s.status === '미제출' || s.ocrFail; // 미제출·OCR 인식 실패 → AI 채점 대상 제외 (PRD 2-7)
+    var disabled = s.status === '미제출'; // 미제출 → AI 채점 대상 제외
     var checked = BULK_AI_STATE.selected.has(s.id);
     return '<tr class="' + (disabled ? 'disabled' : '') + '" data-id="' + s.id + '">'
       + '<td><label class="checkbox-row ' + (checked ? 'checked' : '') + (disabled ? ' disabled' : '') + '" onclick="toggleBulkAiStudent(event, \'' + s.id + '\')">'
@@ -697,7 +711,7 @@ function toggleBulkAiStudent(ev, id){
 }
 
 function toggleAllBulkAiStudents(){
-  var selectableIds = STUDENTS.filter(function(s){ return s.status !== '미제출' && !s.ocrFail; }).map(function(s){ return s.id; });
+  var selectableIds = STUDENTS.filter(function(s){ return s.status !== '미제출'; }).map(function(s){ return s.id; });
   var allSelected = selectableIds.length > 0 && selectableIds.every(function(id){ return BULK_AI_STATE.selected.has(id); });
   if(allSelected){
     selectableIds.forEach(function(id){ BULK_AI_STATE.selected.delete(id); });
@@ -711,7 +725,7 @@ function toggleAllBulkAiStudents(){
 function syncBulkAiHeaderCheckbox(){
   var header = document.getElementById('bulkAiHeaderCheckbox');
   if(!header) return;
-  var selectableIds = STUDENTS.filter(function(s){ return s.status !== '미제출' && !s.ocrFail; }).map(function(s){ return s.id; });
+  var selectableIds = STUDENTS.filter(function(s){ return s.status !== '미제출'; }).map(function(s){ return s.id; });
   var allSelected = selectableIds.length > 0 && selectableIds.every(function(id){ return BULK_AI_STATE.selected.has(id); });
   header.classList.toggle('checked', allSelected);
 }
