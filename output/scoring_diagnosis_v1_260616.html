@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="icon" type="image/png" href="clipo_favicon.png">
-  <title>과제물 관리 — OCR 인라인 (CLIPO)</title>
+  <title>수행평가 채점 — AI 채점 진단 (CLIPO)</title>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard-gov.min.css">
   <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
   <style>
@@ -147,14 +147,14 @@
     .rm-radio .ring{ width:22px; height:22px; border-radius:50%; border:1.5px solid #c7cbd3; background:#fff; flex-shrink:0; }
     .rm-radio.selected .ring{ border:7px solid #416bff; }
     .rm-radio .lbl{ font-size:16px; color:#222631; }
-    .rm-tbl-wrap{ border:1px solid #dde1e8; border-radius:8px; overflow:auto; flex:1; min-height:0; }
+    .rm-tbl-wrap{ border:1px solid #dde1e8; border-radius:8px; overflow:auto; max-height:calc(100vh - 320px); }
     .rm-tbl{ width:100%; border-collapse:separate; border-spacing:0; }
-    .rm-tbl th{ background:#f6f7f9; height:42px; font-size:14px; font-weight:600; color:#222631; text-align:center; border-bottom:1px solid #dde1e8; position:sticky; top:0; z-index:1; }
-    .rm-tbl td{ height:46px; font-size:15px; text-align:center; color:#222631; border-bottom:1px solid #eceef2; }
+    .rm-tbl th{ background:#f6f7f9; height:48px; font-size:15px; font-weight:600; color:#222631; text-align:center; border-bottom:1px solid #dde1e8; position:sticky; top:0; z-index:1; }
+    .rm-tbl td{ height:56px; font-size:16px; text-align:center; color:#222631; border-bottom:1px solid #eceef2; }
     .rm-tbl tr:last-child td{ border-bottom:none; }
     .rm-tbl tr.sel td{ background:#f4f8ff; }
     .rm-tbl tr.dis td{ color:#b3b6bd; }
-    .rm-chk{ width:18px; height:18px; accent-color:#416bff; cursor:pointer; vertical-align:middle; }
+    .rm-chk{ width:20px; height:20px; accent-color:#416bff; cursor:pointer; vertical-align:middle; }
     .rm-chk:disabled{ cursor:not-allowed; opacity:.5; }
 
     /* ===== 푸터 (flex 컨테이너 하단으로 밀착) ===== */
@@ -289,6 +289,15 @@
     .pick-sel{ flex:1; height:42px; border:1px solid #d9d9d9; border-radius:8px; padding:0 38px 0 12px; font-size:15px; font-family:inherit; color:#222631; cursor:pointer; appearance:none; -webkit-appearance:none; -moz-appearance:none; background-color:#fff; background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%236d7381' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E"); background-repeat:no-repeat; background-position:right 12px center; background-size:18px; }
     .pick-sel:focus{ outline:none; border-color:#416bff; box-shadow:0 0 0 2px rgba(65,107,255,.12); }
     .pick-hint{ font-size:13px; color:#6d7381; margin-top:8px; line-height:1.5; }
+    .verdict{ display:flex; gap:14px; align-items:flex-start; border-radius:10px; padding:16px 18px; }
+    .verdict.warn{ background:#fff7ed; }
+    .verdict.good{ background:#eefcf4; }
+    .verdict-ico{ width:40px; height:40px; border-radius:50%; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+    .verdict.warn .verdict-ico{ background:#ffedd5; color:#ea580c; }
+    .verdict.good .verdict-ico{ background:#d6f5e5; color:#319d64; }
+    .verdict-ico i{ width:22px; height:22px; }
+    .verdict-tit{ font-size:17px; font-weight:700; color:#222631; }
+    .verdict-desc{ font-size:14px; color:#3b3f4c; line-height:1.6; margin-top:4px; }
     .report-basis{ display:inline-flex; align-items:center; gap:5px; font-size:13px; color:#9aa0ad; margin-top:7px; }
     .report-basis i{ width:13px; height:13px; color:#b0b4bd; }
     .sec-tit{ font-size:14px; font-weight:600; color:#6d7381; margin:0 0 4px; }
@@ -384,7 +393,7 @@
   </div>
   <div class="page-wrap">
     <h1 class="page-h1">1학년 국어 과제물 관리</h1>
-    <p class="page-sub">학생 제출 현황을 실시간으로 확인하고, 필요하면 과제를 직접 올릴 수도 있습니다. 채점을 실행하면 제출물 인식부터 AI 채점까지 한 번에 진행돼요.</p>
+    <p class="page-sub">학생 제출 현황을 실시간으로 확인하고, 필요하면 과제를 직접 올릴 수도 있습니다. 제출된 과제는 AI 채점을 위해 OCR 인식을 진행해 주세요.</p>
 
       <div style="display:flex;flex-direction:column;gap:20px;">
 
@@ -413,6 +422,7 @@
                 <th style="width:240px;">제출 현황</th>
                 <th style="width:70px;text-align:center;">미제출</th>
                 <th style="width:260px;">과제 제출 기간</th>
+                <th style="width:110px;text-align:center;">OCR 상태</th>
                 <th style="width:150px;text-align:center;">상세 보기</th>
               </tr>
             </thead>
@@ -427,6 +437,7 @@
                 </td>
                 <td style="text-align:center;">6</td>
                 <td style="font-size:14px;color:#3b3f4c;">10월 16일 18:55 ~ 10월 17일 23:59</td>
+                <td style="text-align:center;"><span class="badge badge-red">확인 필요</span></td>
                 <td style="text-align:center;">
                   <button onclick="showListForClass(1,'A')" style="background:none;border:none;cursor:pointer;font-family:inherit;font-size:14px;font-weight:600;color:#416bff;display:inline-flex;align-items:center;gap:4px;padding:6px 10px;border-radius:4px;" onmouseover="this.style.background='#e9f2ff'" onmouseout="this.style.background='none'">
                     <i data-lucide="clipboard-list" style="width:14px;height:14px;"></i>과제 제출 현황
@@ -443,6 +454,7 @@
                 </td>
                 <td style="text-align:center;">14</td>
                 <td style="font-size:14px;color:#3b3f4c;">10월 16일 18:55 ~ 10월 17일 23:59</td>
+                <td style="text-align:center;color:#b3b3b3;">—</td>
                 <td style="text-align:center;">
                   <button onclick="showListForClass(2,'A')" style="background:none;border:none;cursor:pointer;font-family:inherit;font-size:14px;font-weight:600;color:#416bff;display:inline-flex;align-items:center;gap:4px;padding:6px 10px;border-radius:4px;" onmouseover="this.style.background='#e9f2ff'" onmouseout="this.style.background='none'">
                     <i data-lucide="clipboard-list" style="width:14px;height:14px;"></i>과제 제출 현황
@@ -459,6 +471,7 @@
                 </td>
                 <td style="text-align:center;">0</td>
                 <td style="font-size:14px;color:#3b3f4c;">10월 16일 18:55 ~ 10월 17일 23:59</td>
+                <td style="text-align:center;"><span class="badge badge-green">완료</span></td>
                 <td style="text-align:center;">
                   <button onclick="showListForClass(3,'A')" style="background:none;border:none;cursor:pointer;font-family:inherit;font-size:14px;font-weight:600;color:#416bff;display:inline-flex;align-items:center;gap:4px;padding:6px 10px;border-radius:4px;" onmouseover="this.style.background='#e9f2ff'" onmouseout="this.style.background='none'">
                     <i data-lucide="clipboard-list" style="width:14px;height:14px;"></i>과제 제출 현황
@@ -494,6 +507,7 @@
                 <th style="width:240px;">제출 현황</th>
                 <th style="width:70px;text-align:center;">미제출</th>
                 <th style="width:260px;">과제 제출 기간</th>
+                <th style="width:110px;text-align:center;">OCR 상태</th>
                 <th style="width:150px;text-align:center;">상세 보기</th>
               </tr>
             </thead>
@@ -508,6 +522,7 @@
                 </td>
                 <td style="text-align:center;">0</td>
                 <td style="font-size:14px;color:#3b3f4c;">10월 16일 18:55 ~ 10월 17일 23:59</td>
+                <td style="text-align:center;"><span class="badge badge-red">확인 필요</span></td>
                 <td style="text-align:center;">
                   <button onclick="showListForClass(1,'B')" style="background:none;border:none;cursor:pointer;font-family:inherit;font-size:14px;font-weight:600;color:#416bff;display:inline-flex;align-items:center;gap:4px;padding:6px 10px;border-radius:4px;" onmouseover="this.style.background='#e9f2ff'" onmouseout="this.style.background='none'">
                     <i data-lucide="clipboard-list" style="width:14px;height:14px;"></i>과제 제출 현황
@@ -524,6 +539,7 @@
                 </td>
                 <td style="text-align:center;">2</td>
                 <td style="font-size:14px;color:#3b3f4c;">10월 16일 18:55 ~ 10월 17일 23:59</td>
+                <td style="text-align:center;"><span class="badge badge-orange">미진행</span></td>
                 <td style="text-align:center;">
                   <button onclick="showListForClass(2,'B')" style="background:none;border:none;cursor:pointer;font-family:inherit;font-size:14px;font-weight:600;color:#416bff;display:inline-flex;align-items:center;gap:4px;padding:6px 10px;border-radius:4px;" onmouseover="this.style.background='#e9f2ff'" onmouseout="this.style.background='none'">
                     <i data-lucide="clipboard-list" style="width:14px;height:14px;"></i>과제 제출 현황
@@ -540,6 +556,7 @@
                 </td>
                 <td style="text-align:center;">0</td>
                 <td style="font-size:14px;color:#3b3f4c;">10월 16일 18:55 ~ 10월 17일 23:59</td>
+                <td style="text-align:center;"><span class="badge badge-green">완료</span></td>
                 <td style="text-align:center;">
                   <button onclick="showListForClass(3,'B')" style="background:none;border:none;cursor:pointer;font-family:inherit;font-size:14px;font-weight:600;color:#416bff;display:inline-flex;align-items:center;gap:4px;padding:6px 10px;border-radius:4px;" onmouseover="this.style.background='#e9f2ff'" onmouseout="this.style.background='none'">
                     <i data-lucide="clipboard-list" style="width:14px;height:14px;"></i>과제 제출 현황
@@ -639,7 +656,7 @@
               <td style="font-weight:500;">1-2반</td>
               <td><div style="display:flex;align-items:center;gap:12px;"><div style="flex:1;height:10px;background:#e9f2ff;border-radius:4px;overflow:hidden;"><div style="width:43%;height:100%;background:#8da9ff;"></div></div><span style="font-size:15px;color:#222631;min-width:45px;text-align:right;">6/14</span></div></td>
               <td>-</td>
-              <td><button class="pill-btn pill-btn-primary" onclick="openRunModal()"><i data-lucide="wand-sparkles" style="width:15px;height:15px;"></i>AI 채점 실행</button></td>
+              <td><button class="pill-btn pill-btn-primary" onclick="openAiRunWithOcrCheck()"><i data-lucide="wand-sparkles" style="width:15px;height:15px;"></i>AI 채점 실행</button></td>
               <td><button class="pill-btn pill-btn-soft" disabled><i data-lucide="bar-chart-3" style="width:15px;height:15px;"></i>결과 확인</button></td>
               <td><button onclick="location.href='class_scoring_detail_v1_260512.html'" style="background:none;border:none;cursor:pointer;font-family:inherit;font-size:14px;font-weight:600;color:#416bff;display:inline-flex;align-items:center;justify-content:center;line-height:1;vertical-align:middle;gap:4px;padding:6px 10px;border-radius:4px;" onmouseover="this.style.background='#e9f2ff'" onmouseout="this.style.background='none'"><i data-lucide="clipboard-list" style="width:14px;height:14px;"></i>학급 채점 현황</button></td>
             </tr>
@@ -647,7 +664,16 @@
               <td style="font-weight:500;">1-3반</td>
               <td><div style="display:flex;align-items:center;gap:12px;"><div style="flex:1;height:10px;background:#e9f2ff;border-radius:4px;overflow:hidden;"><div style="width:0%;height:100%;background:#8da9ff;"></div></div><span style="font-size:15px;color:#222631;min-width:45px;text-align:right;">0/14</span></div></td>
               <td>-</td>
-              <td><button class="pill-btn pill-btn-primary" onclick="openRunModal()"><i data-lucide="wand-sparkles" style="width:15px;height:15px;"></i>AI 채점 실행</button></td>
+              <td><button class="pill-btn pill-btn-primary" onclick="openAiRunWithOcrCheck()"><i data-lucide="wand-sparkles" style="width:15px;height:15px;"></i>AI 채점 실행</button></td>
+              <td><button class="pill-btn pill-btn-soft" disabled><i data-lucide="bar-chart-3" style="width:15px;height:15px;"></i>결과 확인</button></td>
+              <td><button onclick="location.href='class_scoring_detail_v1_260512.html'" style="background:none;border:none;cursor:pointer;font-family:inherit;font-size:14px;font-weight:600;color:#416bff;display:inline-flex;align-items:center;justify-content:center;line-height:1;vertical-align:middle;gap:4px;padding:6px 10px;border-radius:4px;" onmouseover="this.style.background='#e9f2ff'" onmouseout="this.style.background='none'"><i data-lucide="clipboard-list" style="width:14px;height:14px;"></i>학급 채점 현황</button></td>
+            </tr>
+            <!-- 1-4반: OCR 인식 진행 중 → AI 채점 버튼 비활성(툴팁) [HiAI scoring_list_v1 C안 1-4 포팅] -->
+            <tr>
+              <td style="font-weight:500;">1-4반</td>
+              <td><div style="display:flex;align-items:center;gap:12px;"><div style="flex:1;height:10px;background:#e9f2ff;border-radius:4px;overflow:hidden;"><div style="width:0%;height:100%;background:#8da9ff;"></div></div><span style="font-size:15px;color:#222631;min-width:45px;text-align:right;">0/14</span></div></td>
+              <td>-</td>
+              <td><span title="OCR 인식 중이에요. 완료 후 이용할 수 있어요." style="display:inline-flex;"><button class="pill-btn pill-btn-primary" disabled style="pointer-events:none;"><i data-lucide="wand-sparkles" style="width:15px;height:15px;"></i>AI 채점 실행</button></span></td>
               <td><button class="pill-btn pill-btn-soft" disabled><i data-lucide="bar-chart-3" style="width:15px;height:15px;"></i>결과 확인</button></td>
               <td><button onclick="location.href='class_scoring_detail_v1_260512.html'" style="background:none;border:none;cursor:pointer;font-family:inherit;font-size:14px;font-weight:600;color:#416bff;display:inline-flex;align-items:center;justify-content:center;line-height:1;vertical-align:middle;gap:4px;padding:6px 10px;border-radius:4px;" onmouseover="this.style.background='#e9f2ff'" onmouseout="this.style.background='none'"><i data-lucide="clipboard-list" style="width:14px;height:14px;"></i>학급 채점 현황</button></td>
             </tr>
@@ -688,7 +714,7 @@
               <td style="font-weight:500;">1-1반</td>
               <td><div style="display:flex;align-items:center;gap:12px;"><div style="flex:1;height:10px;background:#e9f2ff;border-radius:4px;overflow:hidden;"><div style="width:0%;height:100%;background:#8da9ff;"></div></div><span style="font-size:15px;color:#222631;min-width:45px;text-align:right;">0/14</span></div></td>
               <td>-</td>
-              <td><button class="pill-btn pill-btn-primary" onclick="openRunModal()"><i data-lucide="wand-sparkles" style="width:15px;height:15px;"></i>AI 채점 실행</button></td>
+              <td><button class="pill-btn pill-btn-primary" onclick="openOcrFirstModal()"><i data-lucide="wand-sparkles" style="width:15px;height:15px;"></i>AI 채점 실행</button></td>
               <td><button class="pill-btn pill-btn-soft" disabled><i data-lucide="bar-chart-3" style="width:15px;height:15px;"></i>결과 확인</button></td>
               <td><button onclick="location.href='class_scoring_detail_v1_260512.html'" style="background:none;border:none;cursor:pointer;font-family:inherit;font-size:14px;font-weight:600;color:#416bff;display:inline-flex;align-items:center;justify-content:center;line-height:1;vertical-align:middle;gap:4px;padding:6px 10px;border-radius:4px;" onmouseover="this.style.background='#e9f2ff'" onmouseout="this.style.background='none'"><i data-lucide="clipboard-list" style="width:14px;height:14px;"></i>학급 채점 현황</button></td>
             </tr>
@@ -696,7 +722,7 @@
               <td style="font-weight:500;">1-2반</td>
               <td><div style="display:flex;align-items:center;gap:12px;"><div style="flex:1;height:10px;background:#e9f2ff;border-radius:4px;overflow:hidden;"><div style="width:0%;height:100%;background:#8da9ff;"></div></div><span style="font-size:15px;color:#222631;min-width:45px;text-align:right;">0/14</span></div></td>
               <td>-</td>
-              <td><button class="pill-btn pill-btn-primary" onclick="openRunModal()"><i data-lucide="wand-sparkles" style="width:15px;height:15px;"></i>AI 채점 실행</button></td>
+              <td><button class="pill-btn pill-btn-primary" onclick="openOcrFirstModal()"><i data-lucide="wand-sparkles" style="width:15px;height:15px;"></i>AI 채점 실행</button></td>
               <td><button class="pill-btn pill-btn-soft" disabled><i data-lucide="bar-chart-3" style="width:15px;height:15px;"></i>결과 확인</button></td>
               <td><button onclick="location.href='class_scoring_detail_v1_260512.html'" style="background:none;border:none;cursor:pointer;font-family:inherit;font-size:14px;font-weight:600;color:#416bff;display:inline-flex;align-items:center;justify-content:center;line-height:1;vertical-align:middle;gap:4px;padding:6px 10px;border-radius:4px;" onmouseover="this.style.background='#e9f2ff'" onmouseout="this.style.background='none'"><i data-lucide="clipboard-list" style="width:14px;height:14px;"></i>학급 채점 현황</button></td>
             </tr>
@@ -704,7 +730,7 @@
               <td style="font-weight:500;">1-3반</td>
               <td><div style="display:flex;align-items:center;gap:12px;"><div style="flex:1;height:10px;background:#e9f2ff;border-radius:4px;overflow:hidden;"><div style="width:0%;height:100%;background:#8da9ff;"></div></div><span style="font-size:15px;color:#222631;min-width:45px;text-align:right;">0/14</span></div></td>
               <td>-</td>
-              <td><button class="pill-btn pill-btn-primary" onclick="openRunModal()"><i data-lucide="wand-sparkles" style="width:15px;height:15px;"></i>AI 채점 실행</button></td>
+              <td><button class="pill-btn pill-btn-primary" onclick="openOcrFirstModal()"><i data-lucide="wand-sparkles" style="width:15px;height:15px;"></i>AI 채점 실행</button></td>
               <td><button class="pill-btn pill-btn-soft" disabled><i data-lucide="bar-chart-3" style="width:15px;height:15px;"></i>결과 확인</button></td>
               <td><button onclick="location.href='class_scoring_detail_v1_260512.html'" style="background:none;border:none;cursor:pointer;font-family:inherit;font-size:14px;font-weight:600;color:#416bff;display:inline-flex;align-items:center;justify-content:center;line-height:1;vertical-align:middle;gap:4px;padding:6px 10px;border-radius:4px;" onmouseover="this.style.background='#e9f2ff'" onmouseout="this.style.background='none'"><i data-lucide="clipboard-list" style="width:14px;height:14px;"></i>학급 채점 현황</button></td>
             </tr>
@@ -837,6 +863,11 @@
       <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:8px;gap:16px;">
         <h1 id="list-class-title" class="page-h1" style="margin:0;">1-1반 과제 제출 현황</h1>
         <div style="display:flex;gap:10px;flex-shrink:0;">
+          <span id="btn-ocr-confirm-wrap">
+            <button id="btn-ocr-confirm" class="btn btn-secondary btn-sm" onclick="goToOCR(0)">
+              <i data-lucide="scan-text" style="width:16px;height:16px;"></i>OCR 결과 확인
+            </button>
+          </span>
           <button class="btn btn-primary btn-sm" onclick="showScreen('screen-upload');resetUpload();">
             <i data-lucide="upload" style="width:16px;height:16px;"></i>학급 PDF 업로드
           </button>
@@ -858,6 +889,11 @@
         </div>
       </div>
 
+      <!-- 처리 필요 액션 바 (OCR 관련 — 요약 1줄 + 조건부 버튼 2개) -->
+      <div id="class-action-bar" style="display:none;align-items:center;justify-content:space-between;gap:10px;background:#fff7ed;border:1px solid #fdba74;border-radius:8px;padding:11px 14px;margin-bottom:12px;flex-wrap:wrap;">
+        <span id="cab-summary" style="font-size:14px;color:#3b3f4c;"></span>
+        <div id="cab-actions" style="display:flex;gap:8px;flex-shrink:0;"></div>
+      </div>
       <!-- OCR 진행 애니메이션 호스트 -->
       <div id="list-b-ocr-pending-banner" style="display:none;align-items:center;justify-content:space-between;gap:10px;padding:12px 16px;background:#fff7ed;border:1px solid #f97316;border-radius:8px;margin-bottom:12px;"></div>
 
@@ -870,6 +906,7 @@
             <th style="width:80px;">이름</th>
             <th style="width:200px;">제출 파일</th>
             <th style="width:175px;white-space:nowrap;">최근 제출 일시</th>
+            <th style="width:150px;text-align:center;">OCR 결과</th>
             <th style="width:150px;text-align:center;">과제 제출 관리</th>
           </tr>
         </thead>
@@ -1522,7 +1559,7 @@
 
 <!-- ===== AI 채점 실행 모달 (1/2): 채점 모델·채점 수준·학생 피드백 구성 ===== -->
 <div id="runModal1" class="rm-overlay" onclick="if(event.target===this) closeRmModal('runModal1')">
-  <div class="rm-modal" style="height:620px;">
+  <div class="rm-modal">
     <div class="rm-hd">
       <div class="rm-title">AI 채점 실행 (1/2)</div>
       <button class="rm-close" onclick="closeRmModal('runModal1')"><i data-lucide="x" style="width:20px;height:20px"></i></button>
@@ -1590,7 +1627,7 @@
 
 <!-- ===== AI 채점 실행 모달 (2/2): 학생 선택 ===== -->
 <div id="runModal2" class="rm-overlay" onclick="if(event.target===this) closeRmModal('runModal2')">
-  <div class="rm-modal" style="height:620px;">
+  <div class="rm-modal" style="width:560px;">
     <div class="rm-hd">
       <div class="rm-title">AI 채점 실행 (2/2)</div>
       <button class="rm-close" onclick="closeRmModal('runModal2')"><i data-lucide="x" style="width:20px;height:20px"></i></button>
@@ -1762,6 +1799,38 @@
   </div>
 </div>
 
+<!-- ===== B안: 업로드 후 OCR 진행 여부 모달 ===== -->
+<div id="modal-ocr-ask-b" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.4);z-index:1000;align-items:center;justify-content:center;">
+  <div style="background:white;border-radius:12px;box-shadow:0 4px 12px rgba(0,0,0,0.16);width:480px;max-width:90vw;position:relative;">
+    <div style="padding:24px 24px 16px;">
+      <div style="display:flex;align-items:center;gap:10px;">
+        <div style="width:36px;height:36px;background:#fff7ed;border-radius:4px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+          <i data-lucide="scan-text" style="width:20px;height:20px;color:#f97316;"></i>
+        </div>
+        <h3 style="font-size:18px;font-weight:600;color:#222631;margin:0;">업로드가 완료되었습니다</h3>
+      </div>
+    </div>
+    <div style="padding:0 24px 24px;display:flex;flex-direction:column;gap:16px;">
+      <div style="background:#f6f7f9;border-radius:4px;padding:16px 18px;display:flex;flex-direction:column;gap:10px;">
+        <div style="display:flex;align-items:flex-start;gap:10px;">
+          <i data-lucide="file-text" style="width:18px;height:18px;color:#416bff;flex-shrink:0;margin-top:2px;"></i>
+          <p style="font-size:15px;color:#222631;margin:0;line-height:1.55;">업로드된 과제물의 OCR 인식을 <strong>지금 진행</strong>하면 AI 채점을 바로 시작할 수 있습니다.</p>
+        </div>
+        <div style="display:flex;align-items:flex-start;gap:10px;">
+          <i data-lucide="clock" style="width:18px;height:18px;color:#6d7381;flex-shrink:0;margin-top:2px;"></i>
+          <p style="font-size:15px;color:#6d7381;margin:0;line-height:1.55;"><strong>나중에 하기</strong>를 선택하면 과제물 관리 화면에서 언제든 OCR을 진행할 수 있습니다.</p>
+        </div>
+      </div>
+    </div>
+    <div style="padding:8px 24px 20px;display:flex;justify-content:flex-end;gap:8px;">
+      <button onclick="closeOcrAskB(false)" class="btn btn-outline btn-sm">나중에 하기</button>
+      <button onclick="closeOcrAskB(true)" class="btn btn-primary btn-sm">
+        <i data-lucide="scan-text" style="width:16px;height:16px;"></i>지금 OCR 진행
+      </button>
+    </div>
+  </div>
+</div>
+
 <script>
 // ── 사이드바 토글 ──
 function toggleNav() {
@@ -1899,6 +1968,7 @@ function renderTable() {
       + '<th style="width:80px;">이름</th>'
       + '<th style="width:200px;">제출 파일</th>'
       + '<th style="width:175px;white-space:nowrap;">최근 제출 일시</th>'
+      + '<th style="width:150px;text-align:center;">OCR 결과</th>'
       + '<th style="width:150px;text-align:center;">과제 제출 관리</th>'
       + '</tr>';
   }
@@ -1958,6 +2028,7 @@ function renderTable() {
     html += '<td>' + s.name + '</td>';
     html += '<td>' + fileNameCellA + '</td>';
     html += '<td style="font-size:13px;white-space:nowrap;color:' + (displayDate === '-' ? '#b3b6bd' : '#6d7381') + ';">' + displayDate + '</td>';
+    html += '<td style="text-align:center;">' + ocrCell + '</td>';
     html += '<td style="text-align:center;">' + actionCell + '</td>';
     html += '</tr>';
   });
@@ -2289,7 +2360,8 @@ function pendingBannerHtml(list) {
         + '<span style="font-size:15px;color:#ea580c;font-weight:700;">OCR 미진행 ' + list.length + '명</span>'
         + '<span style="font-size:13px;color:#9a4806;line-height:1.6;">제출됐지만 아직 OCR 인식 전이에요. AI 채점을 시작하려면 OCR을 먼저 진행해 주세요.</span>'
       + '</div>'
-    + '</div>';
+    + '</div>'
+    + '<button onclick="startOcrFromBanner()" style="flex-shrink:0;height:34px;background:#f97316;color:white;border:none;border-radius:8px;padding:0 14px;font-size:14px;font-weight:700;font-family:inherit;cursor:pointer;white-space:nowrap;display:inline-flex;align-items:center;gap:6px;"><i data-lucide="scan-text" style="width:16px;height:16px;"></i>지금 OCR 진행</button>';
 }
 function renderActionBanners(classNum, rawType) {
   var L = getClassActionLists(classNum, rawType);
@@ -2317,8 +2389,9 @@ function renderActionBanners(classNum, rawType) {
   if (L.pending.length) parts.push('OCR 미진행 ' + L.pending.length);
   if (L.review.length) parts.push('확인 필요 ' + L.review.length);
   sumEl.innerHTML = '<i data-lucide="alert-circle" style="width:16px;height:16px;color:#ea580c;vertical-align:-3px;margin-right:5px;"></i>처리 필요 <b style="font-weight:700;color:#222631;">' + total + '건</b> · ' + parts.join(' · ');
-  // OCR 인라인 모델: 'OCR 미진행 → 지금 진행' 버튼 제거됨 (인식은 채점 실행 시 자동). 확인 필요 → 해당 학생 OCR 상세로만 유지
+  // 조건부 버튼 2개: OCR 미진행 → 지금 OCR 진행 / 확인 필요 → 해당 학생 OCR 상세로
   var btns = '';
+  if (L.pending.length) btns += '<button onclick="startOcrFromBanner()" style="height:34px;background:#f97316;color:white;border:none;border-radius:8px;padding:0 14px;font-size:13px;font-weight:700;font-family:inherit;cursor:pointer;white-space:nowrap;display:inline-flex;align-items:center;justify-content:center;line-height:1;gap:6px;"><i data-lucide="scan-text" style="width:15px;height:15px;"></i>지금 OCR 진행</button>';
   if (L.review.length) btns += '<button onclick="goToFirstReview()" style="height:34px;background:white;color:#db3e51;border:1px solid #f2a5ad;border-radius:8px;padding:0 14px;font-size:13px;font-weight:700;font-family:inherit;cursor:pointer;white-space:nowrap;display:inline-flex;align-items:center;justify-content:center;line-height:1;gap:6px;"><i data-lucide="search-check" style="width:15px;height:15px;"></i>확인 필요 학생 보기</button>';
   actEl.innerHTML = btns;
   if (typeof lucide !== 'undefined') lucide.createIcons();
@@ -2375,7 +2448,9 @@ function renderClassStatusBanner(classNum, rawType) {
 
   // 대표 CTA: 대기>0 → OCR 진행 / 아니면 확인필요>0 → OCR 결과 확인 / 그 외 없음
   var cta = '';
-  if (counts.review > 0) {
+  if (counts.waiting > 0) {
+    cta = '<button onclick="startOcrFromBanner()" style="height:36px;background:#f97316;color:white;border:none;border-radius:8px;padding:0 14px;font-size:14px;font-weight:700;font-family:inherit;cursor:pointer;white-space:nowrap;display:inline-flex;align-items:center;justify-content:center;line-height:1;gap:6px;"><i data-lucide="scan-text" style="width:16px;height:16px;"></i>지금 OCR 진행 (' + counts.waiting + '명)</button>';
+  } else if (counts.review > 0) {
     cta = '<button onclick="scrollToFirstStatus(\'review\')" class="btn btn-secondary btn-sm" style="white-space:nowrap;"><i data-lucide="alert-circle" style="width:16px;height:16px;"></i>OCR 결과 확인 (' + counts.review + '명)</button>';
   }
   if (ctaWrap) ctaWrap.innerHTML = cta;
@@ -2428,9 +2503,15 @@ function showListForClass(classNum, evalType) {
     if (rawType === 'C') { stateClass = (classNum === 1) ? 3 : (classNum === 2) ? 1 : 2; }
     else { stateClass = classNum; }
     currentStateClass = stateClass;
+    if (stateClass === 1) enableOcrBtn();
+    else if (stateClass === 2) disableOcrBtn('OCR 인식 후 이용가능합니다.');
+    else disableOcrBtn('과제물 업로드 후 이용가능합니다.');
+  } else {
+    if (classNum === 1) enableOcrBtn();
+    else if (bulkOcrStateA[classNum] === 'done') enableOcrBtn();
+    else if (bulkUploadedClasses[classNum]) disableOcrBtn('OCR 인식 후 이용가능합니다.');
+    else disableOcrBtn('과제물 업로드 후 이용가능합니다.');
   }
-  // OCR 인라인 모델: 인식 결과는 AI 채점 실행 후에만 확인 가능 → 항상 비활성 + 안내 툴팁
-  disableOcrBtn('AI 채점 실행 후 확인할 수 있습니다.');
 
   renderTable();
   showScreen('screen-list');
@@ -3241,6 +3322,7 @@ function renderTableB() {
     + '<th style="width:92px;text-align:center;">제출방식</th>'
     + '<th style="width:200px;">제출 파일</th>'
     + '<th style="width:175px;white-space:nowrap;">최근 제출 일시</th>'
+    + '<th style="width:150px;text-align:center;">OCR 결과</th>'
     + '<th style="width:150px;text-align:center;">과제 제출 관리</th>'
     + '</tr>';
   if (thead) thead.innerHTML = theadRow;
@@ -3277,6 +3359,7 @@ function renderTableB() {
       cols += methodCell;
       cols += fileNameCell;
       cols += dateCell;
+      cols += '<td style="text-align:center;">' + ocrCell + '</td>';
       cols += '<td style="text-align:center;"><button onclick="openStudentUploadModal(\'' + s.id + '\',\'' + s.name + '\')" style="background:none;border:none;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:4px;color:#416bff;font-size:13px;font-weight:600;padding:4px 8px;border-radius:4px;white-space:nowrap;" onmouseover="this.style.background=\'#e9f2ff\'" onmouseout="this.style.background=\'none\'"><i data-lucide="paperclip" style="width:13px;height:13px;flex-shrink:0;"></i>파일 추가/제거</button></td>';
       html += '<tr>' + cols + '</tr>';
     });
@@ -3289,6 +3372,7 @@ function renderTableB() {
         absentCols += '<td style="text-align:center;color:#b3b6bd;">-</td>';
         absentCols += '<td style="color:#b3b6bd;">-</td>';
         absentCols += '<td style="color:#b3b6bd;">-</td>';
+        absentCols += '<td style="text-align:center;color:#b3b6bd;">-</td>';
         absentCols += '<td style="text-align:center;"><button onclick="openStudentUploadModal(\'' + s.id + '\',\'' + s.name + '\')" style="background:none;border:none;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:4px;color:#416bff;font-size:13px;font-weight:600;padding:4px 8px;border-radius:4px;white-space:nowrap;" onmouseover="this.style.background=\'#e9f2ff\'" onmouseout="this.style.background=\'none\'"><i data-lucide="paperclip" style="width:13px;height:13px;flex-shrink:0;"></i>파일 추가/제거</button></td>';
         html += '<tr>' + absentCols + '</tr>';
         return;
@@ -3302,7 +3386,34 @@ function renderTableB() {
       cols += '<td style="text-align:center;">' + renderSubmissionMethodCell(s.submissionMethod) + '</td>';
       cols += '<td>' + renderFileNameCell(s) + '</td>';
       cols += '<td style="font-size:13px;color:#6d7381;white-space:nowrap;">' + s.date + '</td>';
-      cols += '<td style="text-align:center;"><button onclick="openStudentUploadModal(\'' + s.id + '\',\'' + s.name + '\')" style="background:none;border:none;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:4px;color:#416bff;font-size:13px;font-weight:600;padding:4px 8px;border-radius:4px;white-space:nowrap;" onmouseover="this.style.background=\'#e9f2ff\'" onmouseout="this.style.background=\'none\'"><i data-lucide="paperclip" style="width:13px;height:13px;flex-shrink:0;"></i>파일 추가/제거</button></td>';
+      // OCR 컬럼: 타이핑은 OCR 불필요
+      if (isTyping) {
+        cols += '<td style="text-align:center;"><span style="display:inline-flex;align-items:center;gap:4px;color:#b3b6bd;font-weight:600;font-size:13px;"><i data-lucide="minus-circle" style="width:14px;height:14px;"></i>불필요</span></td>';
+      } else if (isB1) {
+        var ocrCell = '-';
+        var ucB1 = (OCR_DATA[s.id] && OCR_DATA[s.id].questions) ? OCR_DATA[s.id].questions.filter(function(q){ return !!q.uncertainty; }).length : 0;
+        if (s.ocrStatus === 'confirmed') ocrCell = ocrResultCell('confirmed', 0, 'goToOCR_B(' + i + ')');
+        else if (s.ocrStatus === 'unconfirmed' && s.needsReview) ocrCell = ocrResultCell('review', ucB1, 'goToOCR_B(' + i + ')');
+        else if (s.ocrStatus === 'unconfirmed') ocrCell = ocrResultCell('unconfirmed', 0, 'goToOCR_B(' + i + ')');
+        else if (s.ocrStatus === 'processing') ocrCell = ocrResultCell('processing');
+        else if (s.ocrStatus === 'failed') ocrCell = ocrResultCell('failed', 0, null, s.id);
+        cols += '<td style="text-align:center;">' + ocrCell + '</td>';
+      } else if (isB2) {
+        var b2OcrCell;
+        if (!isB2OcrStartedFor(s.id)) {
+          b2OcrCell = ocrResultCell('waiting');
+        } else {
+          var st = s.ocrStatusAfter;
+          var ucB2 = (OCR_DATA[s.id] && OCR_DATA[s.id].questions) ? OCR_DATA[s.id].questions.filter(function(q){ return !!q.uncertainty; }).length : 0;
+          if (st === 'confirmed') b2OcrCell = ocrResultCell('confirmed', 0, 'goToOCR_B(' + i + ')');
+          else if (st === 'unconfirmed' && s.needsReview) b2OcrCell = ocrResultCell('review', ucB2, 'goToOCR_B(' + i + ')');
+          else if (st === 'unconfirmed') b2OcrCell = ocrResultCell('unconfirmed', 0, 'goToOCR_B(' + i + ')');
+          else if (st === 'failed') b2OcrCell = ocrResultCell('failed', 0, null, s.id);
+          else b2OcrCell = ocrResultCell('processing');
+        }
+        cols += '<td style="text-align:center;">' + b2OcrCell + '</td>';
+      }
+      cols += '<td style="text-align:center;"><button onclick="openStudentUploadModal(\'' + s.id + '\',\'' + s.name + '\')" style="background:none;border:none;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:4px;color:#416bff;font-size:13px;font-weight:600;padding:4px 8px;border-radius:4px;white-space:nowrap;" onmouseover="this.style.background=\'#e9f2ff\'" onmouseout="this.style.background=\'none\'"><i data-lucide="paperclip" style="width:13px;height:13px;flex-shrink:0;"></i>' + (isTyping ? '타이핑 보기' : '파일 추가/제거') + '</button></td>';
       html += '<tr>' + cols + '</tr>';
     });
   }
@@ -3326,7 +3437,8 @@ function uploadAndGoList() {
   renderTable();
   showScreen('screen-list');
   showToast('과제물이 업로드되었습니다.', 'success');
-  // OCR 인라인 모델: 업로드는 OCR을 유발하지 않음 (인식은 채점 실행 시 자동 처리)
+  // 일괄·개별 모두 동일하게 "업로드 완료 → OCR 진행 여부" 팝업 노출
+  setTimeout(function() { showOcrAskB(); }, 300);
 }
 
 function goScoringList() {
@@ -3491,7 +3603,7 @@ function submitStudentUpload() {
     processing.style.display = 'none';
     document.getElementById('studentUploadModal').style.display = 'none';
     renderTable();
-    showToast('과제물이 업로드되었습니다.', 'success');
+    showOcrAskB();
   }, 1500);
 }
 
@@ -3644,7 +3756,7 @@ var RUN_STUDENTS = [
   { id:'10109', name:'박수란', ai:'-',    t:'미채점',   checked:true },
   { id:'10110', name:'박수란', ai:'-',    t:'미채점',   checked:true },
   { id:'10111', name:'안유림', ai:'absent', t:'미채점', absent:true },
-  { id:'10112', name:'안지영', ai:'-', t:'미채점', checked:true },
+  { id:'10112', name:'안지영', ai:'ocrfail', t:'미채점', ocrfail:true },
   { id:'10113', name:'김도윤', ai:'-',    t:'미채점',   checked:true }
 ];
 function rmTeacherBadge(t) {
@@ -3653,6 +3765,7 @@ function rmTeacherBadge(t) {
   return '<span class="badge" style="background:#fff7ed;color:#ea580c;">미채점</span>';
 }
 function rmAiCell(s) {
+  if (s.ocrfail || s.ai === 'ocrfail') return '<span style="color:#6d7381;">OCR 미인식</span>';
   if (s.ai === 'fail') return '<span style="color:#db3e51;font-weight:600;">채점 실패</span>';
   if (s.ai === 'absent') return '<span style="color:#b3b6bd;">미제출</span>';
   return '<span style="color:#6d7381;">-</span>';
