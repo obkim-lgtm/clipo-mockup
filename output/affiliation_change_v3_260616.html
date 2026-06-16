@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/png" href="clipo_favicon.png">
+  <title>소속 변경 (내 정보 → 재인증) · 데이터 보존 — CLIPO</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard-gov.min.css">
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+  <style>
+    *{ font-family:'Pretendard GOV',-apple-system,sans-serif; box-sizing:border-box; }
+    body{ margin:0; background:#f6f7f9; color:#222631; font-size:16px; min-width:1280px; }
+    a{ text-decoration:none; color:inherit; }
+    button{ font-family:inherit; }
+
+    /* ===== Header ===== */
+    .g-hd { height:56px; background:#fff; border-bottom:1px solid #d9d9d9; display:flex; align-items:center; padding:0 20px 0 8px; position:fixed; top:0; left:0; right:0; z-index:200; }
+    .gh-menu-btn { width:36px; height:36px; border:none; background:none; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; color:#3b3f4c; margin-right:8px; line-height:1; }
+    .gh-logo { display:inline-flex; align-items:center; cursor:pointer; padding:4px; border-radius:4px; }
+    .g-hd-r { margin-left:auto; display:flex; align-items:center; gap:6px; font-size:14px; color:#3b3f4c; }
+    .plan-badge { background:#eef3ff; color:#416bff; font-size:12px; font-weight:600; padding:3px 10px; border-radius:12px; }
+    .hd-div { width:1px; height:14px; background:#d9d9d9; margin:0 4px; }
+    .credit-wrap { display:flex; align-items:center; gap:4px; font-size:14px; font-weight:500; color:#3b3f4c; }
+    .auth-badge { font-size:12px; font-weight:600; padding:3px 9px; border-radius:100px; background:#e8f7ee; color:#179c56; }
+    .user-btn { display:inline-flex; align-items:center; justify-content:center; gap:6px; padding:0; border:none; background:none; font-size:14px; color:#222631; cursor:pointer; line-height:1; font-weight:500; }
+
+    /* ===== Sidebar ===== */
+    .icon-sb { width:56px; background:#fff; border-right:1px solid #d9d9d9; position:fixed; top:56px; bottom:0; left:0; display:flex; flex-direction:column; padding:8px 0; z-index:150; transition:width .2s ease; }
+    .icon-sb.expanded { width:200px; }
+    .si { height:40px; display:flex; align-items:center; border-radius:8px; color:#6d7381; cursor:pointer; margin:0 8px 2px; position:relative; padding:0 4px 0 8px; gap:10px; white-space:nowrap; flex-shrink:0; }
+    .si:hover { background:#f1f3f5; }
+    .si.active { background:#e9f2ff; color:#416bff; }
+    .si-icon { width:24px; height:24px; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+    .si-label { font-size:13px; font-weight:500; opacity:0; transition:opacity .1s; overflow:hidden; }
+    .icon-sb.expanded .si-label { opacity:1; }
+    .si-tip { position:absolute; left:48px; top:50%; transform:translateY(-50%); background:#222631; color:#fff; font-size:11px; padding:3px 8px; border-radius:4px; white-space:nowrap; display:none; z-index:300; pointer-events:none; }
+    .si:hover .si-tip { display:block; }
+    .icon-sb.expanded .si-tip { display:none !important; }
+    .nav-bottom { margin-top:auto; width:100%; }
+    .nav-div { height:1px; background:#f1f3f5; margin:4px 8px; }
+
+    /* ===== Layout ===== */
+    .main-wrap{ padding-top:56px; padding-left:56px; transition:padding-left .2s; min-height:100vh; display:flex; flex-direction:column; }
+    body.nav-expanded .main-wrap{ padding-left:200px; }
+    .page-wrap{ max-width:1320px; width:100%; margin:0 auto; padding:24px 36px 40px; flex:1; }
+
+    .pg-title{ font-size:22px; font-weight:700; margin:0 0 8px; }
+    .pg-sub{ font-size:16px; color:#3b3f4c; margin:0 0 24px; line-height:1.55; }
+
+    /* ===== 내 정보 카드 ===== */
+    .sec-card{ background:#fff; border-radius:14px; padding:18px 24px; box-shadow:0 0 1px #2226314D, 0 2px 8px #0000000F; margin-bottom:14px; }
+    .sec-head{ font-size:19px; font-weight:700; margin:0 0 8px; }
+    .sec-desc{ font-size:14px; color:#6d7381; margin:0 0 14px; line-height:1.6; }
+    .ir{ display:flex; align-items:center; gap:16px; padding:10px 0; border-bottom:1px solid #f1f3f5; }
+    .ir:last-child{ border-bottom:none; }
+    .ir-label{ width:96px; flex-shrink:0; font-size:16px; color:#6d7381; }
+    .ir-value{ flex:1; min-width:0; font-size:16px; color:#222631; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+    .ir-value.ph{ color:#9aa0ad; }
+    .ir-btn{ height:40px; padding:0 14px; border:1px solid #c5d6ff; border-radius:8px; background:#f2f6ff; color:#3151c4; font-size:15px; font-weight:600; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; gap:7px; line-height:1; flex-shrink:0; }
+    .ir-btn:hover{ background:#e9f1ff; }
+    .ir-btn.accent{ border-color:#9fbcff; background:#e9f1ff; }
+    .mail-tgl{ margin-left:auto; }
+    .tgl-track{ width:44px; height:24px; border-radius:100px; background:#d9d9d9; position:relative; transition:background .15s; flex-shrink:0; cursor:pointer; display:inline-block; }
+    .tgl-knob{ position:absolute; top:2px; left:2px; width:20px; height:20px; border-radius:50%; background:#fff; transition:left .15s; box-shadow:0 1px 3px rgba(0,0,0,.2); }
+    .tgl-track.on{ background:#416bff; }
+    .tgl-track.on .tgl-knob{ left:22px; }
+    .withdraw{ font-size:15px; color:#9aa0ad; cursor:pointer; padding:6px 2px; display:inline-block; }
+    .withdraw:hover{ color:#6d7381; text-decoration:underline; }
+
+    /* ===== 교사 인증 화면 ===== */
+    .back-link{ display:inline-flex; align-items:center; gap:4px; font-size:15px; color:#416bff; cursor:pointer; margin-bottom:10px; }
+    .ctx-note{ background:#eef3ff; border-radius:10px; padding:12px 16px; display:flex; align-items:center; gap:10px; font-size:15px; color:#2f4ab3; margin:14px 0 22px; }
+    .ctx-note strong{ color:#222631; font-weight:700; }
+    .auth-card{ background:#fff; border-radius:14px; padding:26px 28px; box-shadow:0 0 1px #2226314D, 0 2px 8px #0000000F; margin-bottom:18px; }
+    .ac-label{ font-size:18px; font-weight:700; margin:0 0 16px; }
+    .ac-label .opt{ font-size:14px; font-weight:500; color:#6d7381; margin-left:4px; }
+    .sel-input{ width:100%; height:50px; border:1px solid #d9d9d9; border-radius:8px; padding:0 16px; font-size:16px; color:#222631; background:#fff; display:flex; align-items:center; cursor:pointer; }
+    .subj-row{ display:flex; gap:12px; align-items:center; }
+    .subj-row .sel-input{ flex:1; }
+    .btn-line{ height:50px; padding:0 18px; border:1px solid #c5d6ff; border-radius:8px; background:#f2f6ff; color:#3151c4; font-size:15px; font-weight:600; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; gap:7px; line-height:1; flex-shrink:0; }
+    .btn-line:hover{ background:#e9f1ff; }
+    .ac-notes{ margin:14px 0 0; padding:0; list-style:none; }
+    .ac-notes li{ font-size:14px; color:#6d7381; line-height:1.7; padding-left:12px; position:relative; }
+    .ac-notes li::before{ content:'-'; position:absolute; left:0; }
+    .auth-tabs{ display:inline-flex; background:#f1f3f5; border-radius:8px; padding:4px; gap:2px; margin-bottom:18px; }
+    .auth-tab{ height:38px; padding:0 16px; border:none; background:none; border-radius:6px; font-size:15px; font-weight:600; color:#6d7381; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; line-height:1; }
+    .auth-tab.on{ background:#fff; color:#416bff; box-shadow:0 1px 2px #0000000f; }
+    .file-row{ display:flex; gap:12px; align-items:center; }
+    .file-ph{ flex:1; height:50px; border:1px solid #d9d9d9; border-radius:8px; padding:0 16px; display:flex; align-items:center; font-size:16px; color:#9aa0ad; }
+    .info-note{ display:flex; gap:8px; align-items:flex-start; margin-top:16px; font-size:14px; color:#6d7381; line-height:1.65; }
+    .info-note i{ color:#9aa0ad; flex-shrink:0; margin-top:2px; }
+    .auth-actions{ display:flex; justify-content:flex-end; margin-top:8px; }
+    .btn-req{ height:50px; padding:0 28px; border-radius:100px; background:#416bff; color:#fff; border:none; font-size:16px; font-weight:600; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; gap:8px; line-height:1; }
+    .btn-req:hover{ background:#365eef; }
+
+    /* ===== 모달 ===== */
+    .modal-ov{ position:fixed; inset:0; background:rgba(20,24,33,.45); z-index:500; display:none; align-items:center; justify-content:center; padding:24px 20px; overflow-y:auto; }
+    .modal-ov.show{ display:flex; }
+    .modal{ background:#fff; border-radius:16px; width:100%; max-width:560px; box-shadow:0 12px 40px #00000033; overflow:hidden; display:flex; flex-direction:column; max-height:calc(100vh - 48px); }
+    .modal.wide{ max-width:640px; }
+    .m-head{ padding:24px 26px 0; display:flex; align-items:flex-start; gap:13px; flex-shrink:0; }
+    .m-ic{ width:42px; height:42px; border-radius:11px; display:inline-flex; align-items:center; justify-content:center; flex-shrink:0; }
+    .m-ic.blue{ background:#e9f2ff; color:#416bff; }
+    .m-ic.orange{ background:#fff1e6; color:#f97316; }
+    .m-title{ font-size:21px; font-weight:700; margin:0 0 5px; line-height:1.4; }
+    .m-sub{ font-size:15px; color:#3b3f4c; margin:0; line-height:1.6; }
+    .m-x{ margin-left:auto; background:none; border:none; cursor:pointer; color:#9aa0ad; width:30px; height:30px; display:inline-flex; align-items:center; justify-content:center; border-radius:6px; flex-shrink:0; }
+    .m-x:hover{ background:#f1f3f5; }
+    .m-body{ padding:18px 26px 4px; overflow-y:auto; }
+    .m-foot{ padding:18px 26px 24px; display:flex; justify-content:space-between; align-items:center; gap:12px; flex-shrink:0; }
+
+    .sch-flow{ display:flex; align-items:center; gap:14px; background:#f6f7f9; border-radius:12px; padding:14px 16px; }
+    .sch-chip{ flex:1; min-width:0; }
+    .sch-chip .lbl{ font-size:13px; color:#6d7381; margin-bottom:4px; }
+    .sch-chip .nm{ font-size:17px; font-weight:600; color:#222631; display:flex; align-items:center; gap:7px; }
+    .sch-arrow{ color:#9aa0ad; flex-shrink:0; }
+    .new-dot{ width:7px; height:7px; border-radius:50%; background:#416bff; flex-shrink:0; }
+
+    .rcard{ display:flex; gap:13px; border:1.5px solid #d9d9d9; border-radius:12px; padding:16px; cursor:pointer; transition:border-color .12s, background .12s; align-items:flex-start; margin-top:12px; }
+    .rcard:hover{ border-color:#b3b3b3; }
+    .rcard.sel{ border-color:#416bff; background:#f7faff; }
+    .rcard .radio{ width:20px; height:20px; border-radius:50%; border:2px solid #c2c7d0; flex-shrink:0; margin-top:1px; display:inline-flex; align-items:center; justify-content:center; }
+    .rcard.sel .radio{ border-color:#416bff; }
+    .rcard.sel .radio::after{ content:''; width:10px; height:10px; border-radius:50%; background:#416bff; }
+    .rcard .rc-tt{ font-size:16px; font-weight:600; margin:0 0 5px; display:flex; align-items:center; gap:8px; }
+    .rcard .rc-ds{ font-size:14px; color:#3b3f4c; margin:0; line-height:1.55; }
+    .mini-badge{ font-size:11px; font-weight:700; padding:2px 8px; border-radius:100px; }
+    .mb-prep{ background:#fff1e6; color:#c2570c; }
+    .mb-rec{ background:#e9f2ff; color:#3151c4; }
+
+    .dp-list{ border:1px solid #e7e9ee; border-radius:12px; overflow:hidden; }
+    .dp{ display:flex; align-items:flex-start; gap:11px; padding:13px 15px; }
+    .dp + .dp{ border-top:1px solid #eef0f3; }
+    .dp .dp-ic{ flex-shrink:0; margin-top:1px; }
+    .dp .dp-tt{ font-size:15px; font-weight:600; color:#222631; }
+    .dp .dp-ds{ font-size:13.5px; color:#6d7381; line-height:1.5; margin:2px 0 0; }
+    .dp .pill{ margin-left:auto; font-size:12px; font-weight:700; padding:3px 9px; border-radius:100px; flex-shrink:0; white-space:nowrap; }
+    .pill-keep{ background:#eafaf1; color:#179c56; }
+    .pill-mask{ background:#eef3ff; color:#3151c4; }
+    .pill-del{ background:#fdecea; color:#dc3b46; }
+
+    .m-seclabel{ font-size:15px; font-weight:700; color:#222631; margin:20px 0 11px; }
+    .keep-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:10px; }
+    .kcard{ border:1.5px solid #d9d9d9; border-radius:12px; padding:14px 10px; cursor:pointer; text-align:center; transition:border-color .12s, background .12s; }
+    .kcard:hover{ border-color:#b3b3b3; }
+    .kcard.sel{ border-color:#416bff; background:#f7faff; }
+    .kcard .kc-tag{ font-size:12px; color:#6d7381; margin-bottom:5px; }
+    .kcard .kc-yr{ font-size:22px; font-weight:700; color:#222631; }
+    .kcard.sel .kc-yr{ color:#416bff; }
+    .kcard .kc-for{ font-size:12px; color:#6d7381; margin-top:5px; line-height:1.4; }
+
+    .nbox{ border-radius:12px; padding:14px 16px; display:flex; gap:11px; align-items:flex-start; margin-top:14px; }
+    .nbox .nb-ic{ flex-shrink:0; margin-top:1px; }
+    .nbox.warn{ background:#fff5ec; color:#9a4806; }
+    .nbox.warn .nb-ic{ color:#f97316; }
+    .nbox.info{ background:#eef3ff; color:#2f4ab3; }
+    .nbox.info .nb-ic{ color:#416bff; }
+    .nbox .nb-tt{ font-size:14.5px; font-weight:700; margin:0 0 4px; }
+    .nbox .nb-ds{ font-size:13.5px; line-height:1.55; margin:0; }
+    .nb-dl{ margin-top:10px; height:36px; padding:0 14px; border-radius:8px; background:#fff; border:1px solid #f0c79a; color:#9a4806; font-size:13.5px; font-weight:600; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; gap:6px; line-height:1; }
+    .nb-dl:hover{ background:#fff9f3; }
+
+    .agree{ display:flex; gap:11px; align-items:flex-start; background:#f6f7f9; border-radius:12px; padding:13px 15px; margin-top:13px; cursor:pointer; }
+    .agree input{ width:18px; height:18px; accent-color:#416bff; flex-shrink:0; margin-top:2px; }
+    .agree .ag-tx{ font-size:13.5px; color:#3b3f4c; line-height:1.6; }
+    .agree-note{ font-size:12.5px; color:#9aa0ad; margin:8px 4px 0; line-height:1.55; }
+    .sum{ border:1px solid #e7e9ee; border-radius:12px; padding:14px 16px; }
+    .sum-row{ display:flex; gap:10px; align-items:flex-start; font-size:14.5px; color:#3b3f4c; line-height:1.5; }
+    .sum-row + .sum-row{ margin-top:10px; }
+    .sum-ic{ width:20px; height:20px; border-radius:50%; display:inline-flex; align-items:center; justify-content:center; flex-shrink:0; margin-top:1px; }
+    .sum-ic.keep{ background:#eafaf1; color:#179c56; }
+    .sum-ic.del{ background:#fdecea; color:#dc3b46; }
+    .sum-tx b{ font-weight:700; color:#222631; }
+    .detail-toggle{ margin-top:12px; background:none; border:none; color:#416bff; font-size:13.5px; font-weight:600; cursor:pointer; display:inline-flex; align-items:center; gap:4px; padding:2px; line-height:1; }
+    #dp-detail.dp-list{ border:none; border-radius:0; overflow:visible; margin-top:12px; padding-top:10px; border-top:1px solid #eef0f3; }
+    #dp-detail .dp{ padding-left:0; padding-right:0; }
+    .guard-note{ margin-top:16px; color:#9aa0ad; font-size:12.5px; line-height:1.55; }
+
+    .btn-pri{ height:46px; padding:0 24px; border-radius:8px; background:#416bff; color:#fff; border:none; font-size:16px; font-weight:600; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; line-height:1; gap:7px; }
+    .btn-pri:hover{ background:#365eef; }
+    .btn-pri:disabled{ background:#c2cef0; cursor:not-allowed; }
+    .btn-gho{ height:46px; padding:0 18px; border-radius:8px; background:#fff; border:1px solid #d9d9d9; color:#3b3f4c; font-size:16px; font-weight:600; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; line-height:1; gap:6px; }
+    .btn-gho:hover{ background:#f6f7f9; }
+    .btn-warn{ height:46px; padding:0 20px; border-radius:8px; background:#f97316; color:#fff; border:none; font-size:16px; font-weight:600; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; line-height:1; gap:6px; }
+    .btn-warn:hover{ background:#e2660d; }
+
+    /* ===== 이전 소속 홈 ===== */
+    .prev-banner{ background:#fff5ec; border:1px solid #f7d4ad; border-radius:12px; padding:14px 18px; display:flex; align-items:center; gap:14px; margin-bottom:20px; }
+    .prev-banner .pb-ic{ color:#f97316; flex-shrink:0; }
+    .prev-banner .pb-tx{ flex:1; min-width:0; font-size:15px; color:#9a4806; line-height:1.5; }
+    .prev-banner .pb-tx strong{ color:#7c2d12; font-weight:700; }
+    .prev-banner .pb-dl{ height:36px; padding:0 14px; border-radius:8px; background:#fff; border:1px solid #f0c79a; color:#9a4806; font-size:14px; font-weight:600; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; gap:6px; line-height:1; flex-shrink:0; }
+    .my-hd{ display:flex; align-items:center; justify-content:space-between; gap:14px; margin-bottom:18px; }
+    .my-title{ font-size:26px; font-weight:700; margin:0; display:flex; align-items:center; gap:10px; }
+    .htgl{ display:inline-flex; align-items:center; gap:8px; cursor:pointer; user-select:none; font-size:15px; color:#3b3f4c; }
+    .sem-title{ font-size:20px; font-weight:700; margin:0 0 14px; }
+    .sem-grid{ display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:18px; }
+    .cc{ background:#fbfbfc; border-radius:12px; padding:20px; min-height:168px; display:flex; flex-direction:column; box-shadow:0 0 1px #2226314D, 0 2px 8px #0000000F; position:relative; }
+    .cc-top{ display:flex; align-items:flex-start; justify-content:space-between; gap:8px; }
+    .cc-name{ font-size:17px; font-weight:600; line-height:1.45; margin:0; color:#3b3f4c; }
+    .cc-lock{ color:#b0b5bf; flex-shrink:0; }
+    .cc-students{ font-size:14px; color:#9aa0ad; margin-top:12px; line-height:1.6; }
+    .cc-students .masked{ background:#eef0f3; color:#8b909b; border-radius:4px; padding:1px 7px; font-weight:600; font-size:13px; }
+    .cc-tags{ display:flex; align-items:center; gap:6px; margin-top:auto; padding-top:16px; flex-wrap:wrap; }
+    .tag-prev{ display:inline-flex; align-items:center; justify-content:center; gap:4px; background:#fff1e6; color:#c2570c; font-size:13px; font-weight:700; border-radius:6px; padding:3px 10px; }
+    .tag-ro{ display:inline-flex; align-items:center; justify-content:center; gap:4px; background:#f1f3f5; color:#6d7381; font-size:13px; font-weight:600; border-radius:6px; padding:3px 10px; }
+    .cc-btnrow{ display:flex; gap:8px; margin-top:14px; }
+    .cc-dis{ flex:1; height:34px; border-radius:6px; background:#f1f3f5; color:#b0b5bf; border:none; font-size:13px; font-weight:600; display:inline-flex; align-items:center; justify-content:center; gap:5px; cursor:not-allowed; line-height:1; }
+
+    .toast{ position:fixed; bottom:28px; left:50%; transform:translateX(-50%) translateY(12px); opacity:0; min-width:320px; max-width:620px; padding:14px 22px 14px 16px; border-radius:6px; display:flex; align-items:center; gap:12px; font-size:15px; font-weight:600; box-shadow:0 0 1px #2226314D, 0 4px 12px #00000026; z-index:9999; transition:opacity .2s, transform .2s; pointer-events:none; background:#319d64; color:#fff; }
+    .toast.show{ opacity:1; transform:translateX(-50%) translateY(0); }
+    .toast.info{ background:#416bff; }
+    .toast.warn{ background:#f97316; }
+
+    .demo-nav{ position:fixed; right:22px; bottom:22px; z-index:9000; background:#222631; border-radius:12px; padding:11px 12px; box-shadow:0 6px 24px #00000033; cursor:move; user-select:none; width:230px; }
+    .demo-nav .dn-tt{ font-size:11px; font-weight:700; color:#9aa0ad; letter-spacing:.03em; margin-bottom:9px; display:flex; align-items:center; gap:6px; }
+    .demo-nav .dn-cap{ font-size:10px; font-weight:700; color:#6b7180; letter-spacing:.04em; margin:9px 2px 6px; }
+    .demo-nav .dn-btn{ width:100%; text-align:left; background:#2e3340; border:1px solid #3b3f4c; color:#dfe2e8; font-size:12.5px; font-weight:600; border-radius:7px; padding:8px 9px; cursor:pointer; margin-bottom:5px; display:flex; align-items:center; gap:8px; line-height:1.3; }
+    .demo-nav .dn-btn:hover{ background:#3a4050; }
+    .demo-nav .dn-btn.active{ background:#416bff; border-color:#416bff; color:#fff; }
+    .demo-nav .dn-num{ width:17px; height:17px; border-radius:5px; background:#11141b; color:#cfd3da; font-size:10px; font-weight:700; display:inline-flex; align-items:center; justify-content:center; flex-shrink:0; }
+    .demo-nav .dn-btn.active .dn-num{ background:#2a4ed1; color:#fff; }
+    .demo-nav .dn-sub{ padding-left:6px; }
+
+    .screen{ display:none; }
+    .screen.show{ display:block; }
+  </style>
+</head>
+<body>
+
+<!-- ===== Header ===== -->
+<header class="g-hd">
+  <button class="gh-menu-btn" onclick="toggleNav()"><i data-lucide="menu" style="width:20px;height:20px"></i></button>
+  <a class="gh-logo" href="home_v1_260612.html" title="홈으로">
+    <svg width="76" height="16" viewBox="0 0 76 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M11.3613 4.03516H4.09668V11.9629H8.88281L8.88086 11.9648H15.6016V16H4.02539C1.80242 15.9998 0 14.223 0 12.0322V3.96777C0 1.77696 1.80242 0.000177874 4.02539 0H15.4561L11.3613 4.03516ZM22.0703 11.9648H33.5781V16H22.002C19.7788 16 17.9756 14.2231 17.9756 12.0322V0H22.0703V11.9648ZM40.0459 16H35.9521V0H40.0459V16ZM54.5381 0C56.4564 0 58.0138 1.53228 58.0186 3.42285L58.0166 3.4248V8.54297C58.014 10.4333 56.4567 11.9648 54.5361 11.9648H46.5107L42.416 16V0H54.5381ZM71.9746 0C74.0086 0.000134956 75.6887 1.49046 75.958 3.42285H76V12.5771H75.958C75.6887 14.5095 74.011 15.9999 71.9746 16H64.4238C62.3897 16 60.7098 14.5096 60.4404 12.5771C60.4145 12.398 60.3984 12.2184 60.3984 12.0322V3.96777C60.3984 3.78159 60.4145 3.60205 60.4404 3.42285C60.7098 1.49037 62.3873 0 64.4238 0H71.9746ZM64.4922 12.5771H71.9062V3.42285H64.4922V12.5771ZM46.5107 3.42285V8.54004H53.9238V3.42285H46.5107Z" fill="#365EEF"/></svg>
+  </a>
+  <div class="g-hd-r">
+    <span class="plan-badge">학교 유료</span>
+    <span style="font-size:14px;color:#3b3f4c">D-180</span>
+    <div class="hd-div"></div>
+    <i data-lucide="sparkles" style="width:18px;height:18px;color:#416bff"></i>
+    <div class="credit-wrap">AI 크레딧 200</div>
+    <div class="hd-div"></div>
+    <span class="auth-badge" id="hd-auth">인증완료</span>
+    <button class="user-btn">최대표 선생님(대표교사) <i data-lucide="chevron-down" style="width:16px;height:16px"></i></button>
+  </div>
+</header>
+
+<!-- ===== Sidebar ===== -->
+<nav class="icon-sb" id="icon-sb">
+  <div class="si" onclick="location.href='home_v1_260612.html'"><div class="si-icon"><i data-lucide="home" style="width:20px;height:20px"></i></div><span class="si-label">홈</span><span class="si-tip">홈</span></div>
+  <div class="si" onclick="notReady('평가계획')"><div class="si-icon"><i data-lucide="scissors" style="width:20px;height:20px"></i></div><span class="si-label">평가계획</span><span class="si-tip">평가계획</span></div>
+  <div class="si" onclick="location.href='co_teacher_review_v1_260611.html'"><div class="si-icon"><i data-lucide="layout-grid" style="width:20px;height:20px"></i></div><span class="si-label">수업</span><span class="si-tip">수업</span></div>
+  <div class="si" onclick="location.href='creative_activity_list_v6_260507.html'"><div class="si-icon"><i data-lucide="notebook-pen" style="width:20px;height:20px"></i></div><span class="si-label">창의적 체험활동 <span style="font-size:10px;background:#416bff;color:#fff;padding:1px 5px;border-radius:3px;margin-left:2px">Beta</span></span><span class="si-tip">창의적 체험활동</span></div>
+  <div class="si" onclick="location.href='quick_seteuk_dev_list_v1_260604.html'"><div class="si-icon"><i data-lucide="zap" style="width:20px;height:20px"></i></div><span class="si-label">세특 간편 생성기</span><span class="si-tip">세특 간편 생성기</span></div>
+  <div class="si" onclick="notReady('행동특성 및 종합기록')"><div class="si-icon"><i data-lucide="smile" style="width:20px;height:20px"></i></div><span class="si-label">행동특성 및 종합기록</span><span class="si-tip">행동특성 및 종합기록</span></div>
+  <div class="si" onclick="notReady('리포트')"><div class="si-icon"><i data-lucide="bar-chart-2" style="width:20px;height:20px"></i></div><span class="si-label">리포트</span><span class="si-tip">리포트</span></div>
+  <div class="si" onclick="notReady('학교 설정')"><div class="si-icon"><i data-lucide="building-2" style="width:20px;height:20px"></i></div><span class="si-label">학교 설정</span><span class="si-tip">학교 설정</span></div>
+  <div class="nav-bottom">
+    <div class="nav-div"></div>
+    <div class="si" onclick="notReady('매뉴얼 다운로드')"><div class="si-icon"><i data-lucide="file-down" style="width:20px;height:20px"></i></div><span class="si-label">매뉴얼 다운로드</span><span class="si-tip">매뉴얼 다운로드</span></div>
+    <div class="si" onclick="notReady('요금제')"><div class="si-icon"><i data-lucide="credit-card" style="width:20px;height:20px"></i></div><span class="si-label">요금제</span><span class="si-tip">요금제</span></div>
+    <div class="si" onclick="notReady('고객센터')"><div class="si-icon"><i data-lucide="help-circle" style="width:20px;height:20px"></i></div><span class="si-label">고객센터</span><span class="si-tip">고객센터</span></div>
+  </div>
+</nav>
+
+<div class="main-wrap">
+<div class="page-wrap">
+
+  <!-- ============ Screen 1 : 내 정보 ============ -->
+  <section class="screen show" id="scrInfo">
+    <h1 class="pg-title">내 정보</h1>
+    <p class="pg-sub">계정 정보와 학교 정보를 수정·변경할 수 있으며, 소속 학교 변경 시 인증과 이용 정보가 변경될 수 있습니다.</p>
+
+    <div class="sec-card">
+      <p class="sec-head">계정 정보</p>
+      <div class="ir"><span class="ir-label">이름</span><span class="ir-value">최대표</span><button class="ir-btn" onclick="notReady('이름 변경')"><i data-lucide="pencil" style="width:15px;height:15px"></i>이름 변경</button></div>
+      <div class="ir"><span class="ir-label">이메일(ID)</span><span class="ir-value">test99@clipo.ai</span></div>
+      <div class="ir"><span class="ir-label">연락처</span><span class="ir-value ph">-</span><button class="ir-btn" onclick="notReady('번호 변경')"><i data-lucide="pencil" style="width:15px;height:15px"></i>번호 변경</button></div>
+    </div>
+
+    <div class="sec-card">
+      <p class="sec-head">학교 정보</p>
+      <div class="ir"><span class="ir-label">학교</span><span class="ir-value">경기도테스트중학교</span><button class="ir-btn accent" onclick="openModal('keep')"><i data-lucide="school" style="width:16px;height:16px"></i>소속 변경</button></div>
+      <div class="ir"><span class="ir-label">교과</span><span class="ir-value">중학교 선택(2015), 과학, 국어, 사회, 역사(2022), 제2외국어(2022)</span><button class="ir-btn" onclick="notReady('교과 선택')"><i data-lucide="pencil" style="width:15px;height:15px"></i>교과 선택</button></div>
+      <div class="ir"><span class="ir-label">권한</span><span class="ir-value">대표교사</span><button class="ir-btn" onclick="notReady('권한 변경')"><i data-lucide="user-cog" style="width:16px;height:16px"></i>권한 변경</button></div>
+      <div class="ir"><span class="ir-label">이전 학교</span><span class="ir-value">경기도테스트중학교 · 비식별화 보존 · 파기까지 2년 11개월</span><button class="ir-btn" onclick="location.href='prev_school_archive_v1_260616.html'"><i data-lucide="archive" style="width:16px;height:16px"></i>이전 학교 자료 보기</button></div>
+    </div>
+
+    <div class="sec-card">
+      <p class="sec-head">메일 수신</p>
+      <p class="sec-desc">과목별 채점 노하우, AI 활용 꿀팁 등 평가 시간을 줄여주는 실전 노하우와 혜택 소식을 보내드려요.</p>
+      <div class="ir"><span class="ir-label">이메일</span><span class="ir-value">test99@clipo.ai</span><span class="htgl mail-tgl"><span class="tgl-track" id="mail-tgl" onclick="this.classList.toggle('on')"><span class="tgl-knob"></span></span></span></div>
+    </div>
+
+    <span class="withdraw" onclick="notReady('회원 탈퇴')">회원 탈퇴</span>
+  </section>
+
+  <!-- ============ Screen 2 : 교사 인증 (재인증) ============ -->
+  <section class="screen" id="scrAuth">
+    <span class="back-link" onclick="showScreen('info')"><i data-lucide="chevron-left" style="width:18px;height:18px"></i>이전으로</span>
+    <h1 class="pg-title">교사 인증 · 새 학교</h1>
+    <p class="pg-sub">선생님 확인을 위해, 이름이 포함된 나이스 캡쳐 화면이나 재직증명서를 업로드해 주세요. 연수에 참여 중인 경우 인증 코드로 대체할 수 있습니다.</p>
+
+    <div class="ctx-note">
+      <i data-lucide="info" style="width:18px;height:18px"></i>
+      <span>소속 변경 진행 중 · <strong>경기도테스트중학교</strong> 인증은 해제됐어요. 새 학교 <strong>경기도테스트고등학교</strong>로 재인증해 주세요. (이전 학교 자료는 비식별화 보존됨)</span>
+    </div>
+
+    <div class="auth-card">
+      <p class="ac-label">학교 선택</p>
+      <div class="sel-input" onclick="toastMsg('학교 검색은 기존 화면이에요. 데모에서는 새 학교가 선택된 상태입니다.', 'info')">경기도테스트고등학교</div>
+    </div>
+
+    <div class="auth-card">
+      <p class="ac-label">담당 교과 선택 <span class="opt">(중복 가능)</span></p>
+      <div class="subj-row">
+        <div class="sel-input">사회, 역사(2022)</div>
+        <button class="btn-line" onclick="toastMsg('교과 선택 모달은 기존 화면이에요.', 'info')"><i data-lucide="pencil" style="width:16px;height:16px"></i>교과 선택</button>
+      </div>
+      <ul class="ac-notes">
+        <li>담당 교과는 여러 개 추가할 수 있으며, 추가한 교과의 수업만 생성할 수 있습니다.</li>
+        <li>교사 인증 이후에도 ‘내 정보’에서 담당 교과를 변경할 수 있습니다.</li>
+      </ul>
+    </div>
+
+    <div class="auth-card">
+      <p class="ac-label">인증 방식</p>
+      <div class="auth-tabs">
+        <button class="auth-tab on" id="tab-file" onclick="authTab('file')">서류 업로드</button>
+        <button class="auth-tab" id="tab-code" onclick="authTab('code')">인증 코드 입력</button>
+      </div>
+      <div class="file-row">
+        <div class="file-ph">파일을 업로드해 주세요.</div>
+        <button class="btn-line" onclick="toastMsg('파일 업로드는 이 목업에서 제공하지 않습니다.', 'info')"><i data-lucide="upload" style="width:16px;height:16px"></i>파일 업로드</button>
+      </div>
+      <div class="info-note">
+        <i data-lucide="info" style="width:16px;height:16px"></i>
+        <span>재직증명서(스캔 또는 사진)나 선생님 본인 정보가 포함된 나이스(NEIS) 캡쳐 화면을 첨부해 주세요.<br>전근 등으로 위의 자료 첨부가 어려운 경우, 학교 변경 내역을 확인할 수 있는 서류를 첨부해 주세요.</span>
+      </div>
+    </div>
+
+    <div class="auth-actions">
+      <button class="btn-req" onclick="submitAuth()"><i data-lucide="check" style="width:18px;height:18px"></i>인증 요청</button>
+    </div>
+  </section>
+
+</div>
+</div>
+
+<!-- ============ Modal : 보존 안내·설정 (소속 변경 시 바로 노출) ============ -->
+<div class="modal-ov" id="m-keep">
+  <div class="modal wide">
+    <div class="m-head">
+      <div class="m-ic blue"><i data-lucide="school" style="width:23px;height:23px"></i></div>
+      <div>
+        <h2 class="m-title">소속을 변경할까요?</h2>
+        <p class="m-sub">이전 학교(경기도테스트중학교) 자료는 <strong>삭제가 아니라 비식별화해서 보존</strong>돼요.</p>
+      </div>
+      <button class="m-x" onclick="closeModal()"><i data-lucide="x" style="width:18px;height:18px"></i></button>
+    </div>
+    <div class="m-body">
+      <div class="sum">
+        <div class="sum-row"><span class="sum-ic keep"><i data-lucide="check" style="width:13px;height:13px"></i></span><div class="sum-tx"><b>남는 것</b> · 채점·세특·행특(비식별화) · 평가 설계(그대로)</div></div>
+        <div class="sum-row"><span class="sum-ic del"><i data-lucide="x" style="width:13px;height:13px"></i></span><div class="sum-tx"><b>사라지는 것</b> · 과제물 원본 파일(학생 제출물) — 변경 후엔 되돌릴 수 없어요. 필요한 자료는 미리 받아두세요</div></div>
+        <button class="detail-toggle" id="detail-btn" onclick="toggleDetail()">자세히 <i data-lucide="chevron-down" style="width:14px;height:14px"></i></button>
+        <div class="dp-list" id="dp-detail" style="display:none;">
+        <div class="dp"><i data-lucide="user" class="dp-ic" style="width:18px;height:18px;color:#3151c4"></i><div><div class="dp-tt">학생 이름·학번</div><p class="dp-ds">이름은 ‘학생 A·B·C’, 학번은 가림. 글 속 이름도 자동 치환돼요.</p></div><span class="pill pill-mask">비식별화</span></div>
+        <div class="dp"><i data-lucide="file-check-2" class="dp-ic" style="width:18px;height:18px;color:#179c56"></i><div><div class="dp-tt">채점·세특·행특</div><p class="dp-ds">비식별화 후 계속 열람 가능. 편집·AI는 잠겨요.</p></div><span class="pill pill-keep">읽기 전용 보존</span></div>
+        <div class="dp"><i data-lucide="library" class="dp-ic" style="width:18px;height:18px;color:#179c56"></i><div><div class="dp-tt">평가 설계 (문항·루브릭)</div><p class="dp-ds">학생 정보가 없어, 학교가 바뀌어도 그대로 남아요.</p></div><span class="pill pill-keep">유지</span></div>
+        <div class="dp"><i data-lucide="file-x-2" class="dp-ic" style="width:18px;height:18px;color:#dc3b46"></i><div><div class="dp-tt">과제물 원본 파일</div><p class="dp-ds">학생 식별정보가 담겨 비식별화가 안 돼, 변경 시 삭제돼요.</p></div><span class="pill pill-del">즉시 삭제</span></div>
+        </div>
+      </div>
+
+      <p class="m-seclabel">보존 기간</p>
+      <div class="keep-grid">
+        <div class="kcard" id="k-1" onclick="pickKeep('1')"><div class="kc-tag">기본</div><div class="kc-yr">1년</div><div class="kc-for">가볍게 쓰시는 경우</div></div>
+        <div class="kcard sel" id="k-3" onclick="pickKeep('3')"><div class="kc-tag">표준</div><div class="kc-yr">3년</div><div class="kc-for">대부분의 선생님</div></div>
+        <div class="kcard" id="k-8" onclick="pickKeep('8')"><div class="kc-tag">직무 보존</div><div class="kc-yr">8년</div><div class="kc-for">작성 근거를 길게 보관</div></div>
+      </div>
+
+      <label class="agree">
+        <input type="checkbox" id="agree-chk" onchange="syncConfirm()">
+        <span class="ag-tx">보존되는 자료의 관리 책임은 본인에게 있으며, 클리포는 비식별화 처리해 보조 보관함에 동의합니다.</span>
+      </label>
+      <p class="agree-note" id="note8" style="display:none;">※ 학교생활기록부 8년 보관은 학교 NEIS의 의무이며, 클리포 보존은 작업 보조용입니다.</p>
+
+      <p class="guard-note">병설 등 두 학교를 함께 쓰는 기능은 준비 중이에요. 지금 변경하면 기존 학교는 ‘이전 소속’으로 전환돼요.</p>
+    </div>
+    <div class="m-foot">
+      <button class="btn-gho" onclick="closeModal()">취소</button>
+      <button class="btn-pri" id="b-confirm" onclick="goReauth()" disabled>확인 후 재인증</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"><span id="toast-msg"></span></div>
+
+<!-- ===== 데모 네비 (드래그) ===== -->
+<div class="demo-nav" id="demoNav">
+  <div class="dn-tt"><i data-lucide="layers" style="width:13px;height:13px"></i>데모 흐름 (드래그 이동)</div>
+  <button class="dn-btn active" id="dn-info" onclick="showScreen('info')"><span class="dn-num">1</span>내 정보 (출발)</button>
+  <div class="dn-cap">[소속 변경] 클릭 시 →</div>
+  <button class="dn-btn dn-sub" id="dn-keep" onclick="showScreen('info');openModal('keep')"><span class="dn-num">2</span>보존 안내·설정</button>
+  <div class="dn-cap">확인 후 →</div>
+  <button class="dn-btn" id="dn-auth" onclick="showScreen('auth')"><span class="dn-num">3</span>교사 인증 (재인증)</button>
+  <div class="dn-cap">인증 승인 후 →</div>
+  <button class="dn-btn" id="dn-prev" onclick="location.href='prev_school_archive_v1_260616.html'"><span class="dn-num">4</span>이전 학교 자료 (아카이브)</button>
+</div>
+
+<script>
+function toggleNav(){ document.getElementById('icon-sb').classList.toggle('expanded'); document.body.classList.toggle('nav-expanded'); }
+function notReady(name){ toastMsg((name || '해당 화면') + ' 은(는) 아직 준비 중입니다.', 'info'); }
+var _toastTimer=null;
+function toastMsg(msg, kind){
+  var t=document.getElementById('toast');
+  document.getElementById('toast-msg').textContent=msg;
+  t.classList.remove('info','warn'); if(kind) t.classList.add(kind);
+  t.classList.add('show'); clearTimeout(_toastTimer);
+  _toastTimer=setTimeout(function(){ t.classList.remove('show'); }, 2900);
+}
+
+function showScreen(s){
+  ['info','auth'].forEach(function(x){ document.getElementById('scr'+x.charAt(0).toUpperCase()+x.slice(1)).classList.toggle('show', x===s); });
+  ['info','auth'].forEach(function(x){ var b=document.getElementById('dn-'+x); if(b) b.classList.toggle('active', x===s); });
+  if(s!=='info') closeModal();
+  window.scrollTo(0,0);
+  lucide.createIcons();
+}
+
+function authTab(t){
+  document.getElementById('tab-file').classList.toggle('on', t==='file');
+  document.getElementById('tab-code').classList.toggle('on', t==='code');
+}
+
+function openModal(id){
+  ['keep'].forEach(function(x){ document.getElementById('m-'+x).classList.toggle('show', x===id); });
+  ['keep'].forEach(function(x){ var b=document.getElementById('dn-'+x); if(b) b.classList.toggle('active', x===id); });
+  lucide.createIcons();
+}
+function closeModal(){
+  ['keep'].forEach(function(x){ document.getElementById('m-'+x).classList.remove('show'); var b=document.getElementById('dn-'+x); if(b) b.classList.remove('active'); });
+}
+document.querySelectorAll('.modal-ov').forEach(function(ov){ ov.addEventListener('click', function(e){ if(e.target===ov) closeModal(); }); });
+
+var keep='3';
+function pickKeep(y){
+  keep=y;
+  ['1','3','8'].forEach(function(x){ document.getElementById('k-'+x).classList.toggle('sel', x===y); });
+  document.getElementById('note8').style.display=(y==='8')?'block':'none';
+  syncConfirm();
+}
+function syncConfirm(){
+  document.getElementById('b-confirm').disabled=!document.getElementById('agree-chk').checked;
+}
+function toggleDetail(){
+  var d=document.getElementById('dp-detail');
+  var open=d.style.display!=='none';
+  d.style.display=open?'none':'block';
+  document.getElementById('detail-btn').innerHTML = open
+    ? '자세히 <i data-lucide="chevron-down" style="width:14px;height:14px"></i>'
+    : '접기 <i data-lucide="chevron-up" style="width:14px;height:14px"></i>';
+  lucide.createIcons();
+}
+function goReauth(){
+  closeModal();
+  showScreen('auth');
+  toastMsg('기존 인증을 해제했어요. 이전 학교 자료는 '+keep+'년 보존 예정 · 새 학교로 재인증해 주세요.', 'info');
+}
+function submitAuth(){
+  document.getElementById('hd-auth').textContent='승인 대기';
+  document.getElementById('hd-auth').style.background='#fff1e6';
+  document.getElementById('hd-auth').style.color='#c2570c';
+  toastMsg('인증 요청이 접수됐어요. 승인되면 경기도테스트고등학교로 전환되고, 이전 학교 자료는 '+keep+'년간 보존됩니다.', 'info');
+}
+
+(function(){
+  var el=document.getElementById('demoNav'); var dragging=false, ox=0, oy=0;
+  el.addEventListener('mousedown', function(e){
+    if(e.target.closest('.dn-btn')) return;
+    dragging=true; ox=e.clientX-el.offsetLeft; oy=e.clientY-el.offsetTop;
+    el.style.right='auto'; el.style.bottom='auto'; e.preventDefault();
+  });
+  document.addEventListener('mousemove', function(e){ if(!dragging) return; el.style.left=(e.clientX-ox)+'px'; el.style.top=(e.clientY-oy)+'px'; });
+  document.addEventListener('mouseup', function(){ dragging=false; });
+})();
+
+lucide.createIcons();
+</script>
+
+</body>
+</html>

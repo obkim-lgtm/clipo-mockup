@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/png" href="clipo_favicon.png">
+  <title>이전 학교 자료 (아카이브) — CLIPO</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard-gov.min.css">
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+  <style>
+    *{ font-family:'Pretendard GOV',-apple-system,sans-serif; box-sizing:border-box; }
+    body{ margin:0; background:#f6f7f9; color:#222631; font-size:16px; min-width:1280px; }
+    a{ text-decoration:none; color:inherit; }
+    button{ font-family:inherit; }
+
+    .g-hd { height:56px; background:#fff; border-bottom:1px solid #d9d9d9; display:flex; align-items:center; padding:0 20px 0 8px; position:fixed; top:0; left:0; right:0; z-index:200; }
+    .gh-menu-btn { width:36px; height:36px; border:none; background:none; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; color:#3b3f4c; margin-right:8px; line-height:1; }
+    .gh-logo { display:inline-flex; align-items:center; cursor:pointer; padding:4px; border-radius:4px; }
+    .g-hd-r { margin-left:auto; display:flex; align-items:center; gap:6px; font-size:14px; color:#3b3f4c; }
+    .plan-badge { background:#eef3ff; color:#416bff; font-size:12px; font-weight:600; padding:3px 10px; border-radius:12px; }
+    .hd-div { width:1px; height:14px; background:#d9d9d9; margin:0 4px; }
+    .credit-wrap { display:flex; align-items:center; gap:4px; font-size:14px; font-weight:500; color:#3b3f4c; }
+    .user-btn { display:inline-flex; align-items:center; justify-content:center; gap:6px; padding:0; border:none; background:none; font-size:14px; color:#222631; cursor:pointer; line-height:1; font-weight:500; }
+
+    .icon-sb { width:56px; background:#fff; border-right:1px solid #d9d9d9; position:fixed; top:56px; bottom:0; left:0; display:flex; flex-direction:column; padding:8px 0; z-index:150; transition:width .2s ease; }
+    .icon-sb.expanded { width:200px; }
+    .si { height:40px; display:flex; align-items:center; border-radius:8px; color:#6d7381; cursor:pointer; margin:0 8px 2px; position:relative; padding:0 4px 0 8px; gap:10px; white-space:nowrap; flex-shrink:0; }
+    .si:hover { background:#f1f3f5; }
+    .si.active { background:#e9f2ff; color:#416bff; }
+    .si-icon { width:24px; height:24px; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+    .si-label { font-size:13px; font-weight:500; opacity:0; transition:opacity .1s; overflow:hidden; }
+    .icon-sb.expanded .si-label { opacity:1; }
+    .si-tip { position:absolute; left:48px; top:50%; transform:translateY(-50%); background:#222631; color:#fff; font-size:11px; padding:3px 8px; border-radius:4px; white-space:nowrap; display:none; z-index:300; pointer-events:none; }
+    .si:hover .si-tip { display:block; }
+    .icon-sb.expanded .si-tip { display:none !important; }
+    .nav-bottom { margin-top:auto; width:100%; }
+    .nav-div { height:1px; background:#f1f3f5; margin:4px 8px; }
+
+    .main-wrap{ padding-top:56px; padding-left:56px; transition:padding-left .2s; min-height:100vh; }
+    body.nav-expanded .main-wrap{ padding-left:200px; }
+    .page-wrap{ max-width:1320px; width:100%; margin:0 auto; padding:22px 36px 48px; }
+
+    .back-link{ display:inline-flex; align-items:center; gap:4px; font-size:15px; color:#416bff; cursor:pointer; margin-bottom:12px; }
+
+    /* 이전 소속 배너 */
+    .prev-banner{ background:#fff5ec; border:1px solid #f7d4ad; border-radius:12px; padding:14px 18px; display:flex; align-items:center; gap:14px; margin-bottom:22px; }
+    .prev-banner .pb-ic{ color:#f97316; flex-shrink:0; }
+    .prev-banner .pb-tx{ flex:1; min-width:0; font-size:15px; color:#9a4806; line-height:1.5; }
+    .prev-banner .pb-tx strong{ color:#7c2d12; font-weight:700; }
+    .prev-banner .pb-dl{ height:36px; padding:0 14px; border-radius:8px; background:#fff; border:1px solid #f0c79a; color:#9a4806; font-size:14px; font-weight:600; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; gap:6px; line-height:1; flex-shrink:0; }
+    .prev-banner .pb-dl:hover{ background:#fff9f3; }
+    .sch-bar{ position:relative; background:#fff5ec; border:1px solid #f7d4ad; border-radius:12px; padding:10px 14px; display:flex; align-items:center; gap:14px; margin-bottom:22px; }
+    .sch-cur{ display:inline-flex; align-items:center; gap:8px; background:#fff; border:1px solid #f0c79a; border-radius:8px; padding:9px 13px; font-size:16px; font-weight:700; color:#7c2d12; cursor:pointer; line-height:1; }
+    .sch-cur:hover{ background:#fff9f3; }
+    .sch-tag{ font-size:12px; font-weight:700; color:#c2570c; background:#ffe8d4; border-radius:100px; padding:2px 8px; }
+    .sch-meta{ font-size:14px; color:#9a4806; }
+    .sch-meta strong{ color:#7c2d12; font-weight:700; }
+    .sch-menu{ position:absolute; top:54px; left:14px; background:#fff; border:1px solid #e7e9ee; border-radius:10px; box-shadow:0 8px 24px #00000022; padding:6px; min-width:300px; z-index:60; display:none; }
+    .sch-menu.open{ display:block; }
+    .sch-opt{ display:flex; align-items:center; gap:9px; width:100%; text-align:left; background:none; border:none; border-radius:8px; padding:10px 12px; cursor:pointer; font-size:15px; font-weight:600; color:#222631; }
+    .sch-opt:hover{ background:#f6f7f9; }
+    .sch-opt.sel{ background:#fff5ec; }
+    .sch-opt .so-exp{ margin-left:auto; font-size:13px; font-weight:500; color:#9aa0ad; }
+
+    .pg-title{ font-size:22px; font-weight:700; margin:0 0 8px; }
+    .pg-sub{ font-size:16px; color:#3b3f4c; margin:0 0 24px; line-height:1.55; }
+
+    /* 탭 바 */
+    .tabbar{ display:flex; gap:2px; border-bottom:1px solid #e3e6ec; margin-bottom:22px; }
+    .tab{ padding:12px 18px; font-size:16px; font-weight:600; color:#6d7381; cursor:pointer; border:none; background:none; border-bottom:2px solid transparent; margin-bottom:-1px; display:inline-flex; align-items:center; gap:7px; line-height:1; }
+    .tab:hover{ color:#3b3f4c; }
+    .tab.on{ color:#416bff; border-bottom-color:#416bff; }
+    .tab .cnt{ font-size:12px; font-weight:700; background:#eef0f3; color:#6d7381; border-radius:100px; padding:1px 7px; }
+    .tab.on .cnt{ background:#e9f2ff; color:#416bff; }
+    .pane{ display:none; }
+    .pane.on{ display:block; }
+
+    .sec-h{ font-size:18px; font-weight:700; margin:6px 0 14px; display:flex; align-items:center; gap:8px; }
+    .sec-desc{ font-size:14px; color:#9aa0ad; font-weight:500; }
+
+    /* 읽기전용 카드 (수업/기록 공통) */
+    .grid{ display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:18px; }
+    .cc{ background:#fbfbfc; border-radius:12px; padding:18px 20px; min-height:158px; display:flex; flex-direction:column; box-shadow:0 0 1px #2226314D, 0 2px 8px #0000000F; position:relative; cursor:pointer; transition:box-shadow .12s; }
+    .cc:hover{ box-shadow:0 0 0 1.5px #ccdfff, 0 4px 12px #0000001A; }
+    .cc-top{ display:flex; align-items:flex-start; justify-content:space-between; gap:8px; }
+    .cc-name{ font-size:17px; font-weight:600; line-height:1.4; margin:0; color:#222631; }
+    .cc-go{ color:#c2c7d0; flex-shrink:0; }
+    .cc:hover .cc-go{ color:#416bff; }
+    .cc-lock{ color:#b0b5bf; flex-shrink:0; }
+    .cc-meta{ font-size:14px; color:#9aa0ad; margin-top:10px; line-height:1.6; }
+    .cc-meta .masked{ background:#eef0f3; color:#8b909b; border-radius:4px; padding:1px 7px; font-weight:600; font-size:13px; }
+    .cc-date{ font-size:13px; color:#b0b5bf; margin-top:8px; }
+    .cc-tags{ display:flex; align-items:center; gap:6px; margin-top:auto; padding-top:14px; flex-wrap:wrap; }
+    .tag{ display:inline-flex; align-items:center; justify-content:center; gap:4px; font-size:13px; font-weight:700; border-radius:6px; padding:3px 10px; }
+    .tag-prev{ background:#fff1e6; color:#c2570c; }
+    .tag-ro{ background:#f1f3f5; color:#6d7381; font-weight:600; }
+    .tag-t-seteuk{ background:#e9f2ff; color:#3151c4; }
+    .tag-t-changche{ background:#eafaf1; color:#1a8f5b; }
+    .tag-t-haengteuk{ background:#f3ebff; color:#6f34db; }
+
+    /* 기록 탭 필터 칩 */
+    .filters{ display:flex; gap:8px; margin-bottom:16px; flex-wrap:wrap; }
+    .fchip{ height:34px; padding:0 14px; border:1px solid #d9d9d9; border-radius:100px; background:#fff; font-size:14px; font-weight:600; color:#6d7381; cursor:pointer; display:inline-flex; align-items:center; gap:6px; line-height:1; }
+    .fchip:hover{ border-color:#b3b3b3; }
+    .fchip.on{ background:#e9f2ff; border-color:#9fbcff; color:#3151c4; }
+
+    /* 세특 테이블 (수업 탭 안) */
+    .pane-note{ font-size:14px; color:#9aa0ad; margin:2px 0 18px; }
+    .arc-sem{ margin-bottom:26px; }
+    .arc-sem-t{ font-size:18px; font-weight:700; margin:0 0 14px; display:flex; align-items:center; gap:10px; }
+    .arc-sem-c{ font-size:14px; font-weight:600; color:#9aa0ad; }
+    .sub-block{ margin-top:30px; }
+    .class-sel{ height:40px; padding:0 12px; border:1px solid #d9d9d9; border-radius:8px; font-family:inherit; font-size:14px; color:#3b3f4c; background:#fff; cursor:pointer; margin-bottom:14px; }
+    .st-wrap{ background:#fff; border:1px solid #e7e9ee; border-radius:12px; overflow:hidden; }
+    .st-row{ display:grid; grid-template-columns:80px 110px 70px 1fr; align-items:flex-start; gap:14px; padding:14px 18px; }
+    .st-row + .st-row{ border-top:1px solid #eef0f3; }
+    .st-head{ background:#f8f9fb; font-size:14px; font-weight:700; color:#6d7381; text-align:center; }
+    .st-head > div:last-child{ text-align:left; }
+    .st-c-center{ text-align:center; font-size:15px; color:#3b3f4c; padding-top:2px; }
+    .st-c-center .masked{ background:#eef0f3; color:#8b909b; border-radius:4px; padding:1px 7px; font-weight:600; font-size:13px; }
+    .st-record{ font-size:15px; color:#3b3f4c; line-height:1.6; background:#fbfbfc; border:1px solid #eef0f3; border-radius:8px; padding:12px 14px; position:relative; }
+    .st-record .ro-foot{ display:flex; align-items:center; justify-content:space-between; margin-top:10px; font-size:13px; color:#9aa0ad; }
+    .st-empty{ font-size:15px; color:#b0b5bf; }
+
+    .toast{ position:fixed; bottom:28px; left:50%; transform:translateX(-50%) translateY(12px); opacity:0; min-width:320px; max-width:560px; padding:14px 22px 14px 16px; border-radius:6px; display:flex; align-items:center; gap:12px; font-size:15px; font-weight:600; box-shadow:0 0 1px #2226314D, 0 4px 12px #00000026; z-index:9999; transition:opacity .2s, transform .2s; pointer-events:none; background:#416bff; color:#fff; }
+    .toast.show{ opacity:1; transform:translateX(-50%) translateY(0); }
+  </style>
+</head>
+<body>
+
+<header class="g-hd">
+  <button class="gh-menu-btn" onclick="toggleNav()"><i data-lucide="menu" style="width:20px;height:20px"></i></button>
+  <a class="gh-logo" href="home_v1_260612.html" title="홈으로">
+    <svg width="76" height="16" viewBox="0 0 76 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M11.3613 4.03516H4.09668V11.9629H8.88281L8.88086 11.9648H15.6016V16H4.02539C1.80242 15.9998 0 14.223 0 12.0322V3.96777C0 1.77696 1.80242 0.000177874 4.02539 0H15.4561L11.3613 4.03516ZM22.0703 11.9648H33.5781V16H22.002C19.7788 16 17.9756 14.2231 17.9756 12.0322V0H22.0703V11.9648ZM40.0459 16H35.9521V0H40.0459V16ZM54.5381 0C56.4564 0 58.0138 1.53228 58.0186 3.42285L58.0166 3.4248V8.54297C58.014 10.4333 56.4567 11.9648 54.5361 11.9648H46.5107L42.416 16V0H54.5381ZM71.9746 0C74.0086 0.000134956 75.6887 1.49046 75.958 3.42285H76V12.5771H75.958C75.6887 14.5095 74.011 15.9999 71.9746 16H64.4238C62.3897 16 60.7098 14.5096 60.4404 12.5771C60.4145 12.398 60.3984 12.2184 60.3984 12.0322V3.96777C60.3984 3.78159 60.4145 3.60205 60.4404 3.42285C60.7098 1.49037 62.3873 0 64.4238 0H71.9746ZM64.4922 12.5771H71.9062V3.42285H64.4922V12.5771ZM46.5107 3.42285V8.54004H53.9238V3.42285H46.5107Z" fill="#365EEF"/></svg>
+  </a>
+  <div class="g-hd-r">
+    <span class="plan-badge">학교 유료</span>
+    <span style="font-size:14px;color:#3b3f4c">D-180</span>
+    <div class="hd-div"></div>
+    <i data-lucide="sparkles" style="width:18px;height:18px;color:#416bff"></i>
+    <div class="credit-wrap">AI 크레딧 200</div>
+    <div class="hd-div"></div>
+    <button class="user-btn">최대표 선생님(대표교사) <i data-lucide="chevron-down" style="width:16px;height:16px"></i></button>
+  </div>
+</header>
+
+<nav class="icon-sb" id="icon-sb">
+  <div class="si" onclick="location.href='home_v1_260612.html'"><div class="si-icon"><i data-lucide="home" style="width:20px;height:20px"></i></div><span class="si-label">홈</span><span class="si-tip">홈</span></div>
+  <div class="si" onclick="notReady('평가계획')"><div class="si-icon"><i data-lucide="scissors" style="width:20px;height:20px"></i></div><span class="si-label">평가계획</span><span class="si-tip">평가계획</span></div>
+  <div class="si" onclick="location.href='co_teacher_review_v1_260611.html'"><div class="si-icon"><i data-lucide="layout-grid" style="width:20px;height:20px"></i></div><span class="si-label">수업</span><span class="si-tip">수업</span></div>
+  <div class="si" onclick="location.href='creative_activity_list_v6_260507.html'"><div class="si-icon"><i data-lucide="notebook-pen" style="width:20px;height:20px"></i></div><span class="si-label">창의적 체험활동 <span style="font-size:10px;background:#416bff;color:#fff;padding:1px 5px;border-radius:3px;margin-left:2px">Beta</span></span><span class="si-tip">창의적 체험활동</span></div>
+  <div class="si" onclick="location.href='quick_seteuk_dev_list_v1_260604.html'"><div class="si-icon"><i data-lucide="zap" style="width:20px;height:20px"></i></div><span class="si-label">세특 간편 생성기</span><span class="si-tip">세특 간편 생성기</span></div>
+  <div class="si" onclick="notReady('행동특성 및 종합기록')"><div class="si-icon"><i data-lucide="smile" style="width:20px;height:20px"></i></div><span class="si-label">행동특성 및 종합기록</span><span class="si-tip">행동특성 및 종합기록</span></div>
+  <div class="si" onclick="notReady('리포트')"><div class="si-icon"><i data-lucide="bar-chart-2" style="width:20px;height:20px"></i></div><span class="si-label">리포트</span><span class="si-tip">리포트</span></div>
+  <div class="si" onclick="notReady('학교 설정')"><div class="si-icon"><i data-lucide="building-2" style="width:20px;height:20px"></i></div><span class="si-label">학교 설정</span><span class="si-tip">학교 설정</span></div>
+  <div class="nav-bottom">
+    <div class="nav-div"></div>
+    <div class="si" onclick="notReady('매뉴얼 다운로드')"><div class="si-icon"><i data-lucide="file-down" style="width:20px;height:20px"></i></div><span class="si-label">매뉴얼 다운로드</span><span class="si-tip">매뉴얼 다운로드</span></div>
+    <div class="si" onclick="notReady('요금제')"><div class="si-icon"><i data-lucide="credit-card" style="width:20px;height:20px"></i></div><span class="si-label">요금제</span><span class="si-tip">요금제</span></div>
+    <div class="si" onclick="notReady('고객센터')"><div class="si-icon"><i data-lucide="help-circle" style="width:20px;height:20px"></i></div><span class="si-label">고객센터</span><span class="si-tip">고객센터</span></div>
+  </div>
+</nav>
+
+<div class="main-wrap">
+<div class="page-wrap">
+
+  <span class="back-link" onclick="location.href='affiliation_change_v3_260616.html'"><i data-lucide="chevron-left" style="width:18px;height:18px"></i>이전으로</span>
+
+  <h1 class="pg-title">이전 학교 자료</h1>
+  <p class="pg-sub">소속을 변경하면서 보존된 이전 학교 자료예요. 읽기 전용으로 열람만 할 수 있어요.</p>
+
+  <div class="sch-bar">
+    <button class="sch-cur" id="sch-cur-btn" onclick="toggleSchoolMenu(event)">
+      <i data-lucide="archive" style="width:18px;height:18px;color:#c2570c"></i>
+      <span id="sch-name">경기도테스트중학교</span>
+      <span class="sch-tag">이전 소속</span>
+      <i data-lucide="chevron-down" style="width:16px;height:16px;color:#9a4806"></i>
+    </button>
+    <div class="sch-meta">읽기 전용 · 학생 정보 비식별화 · 파기까지 <strong id="sch-exp">2년 11개월</strong></div>
+    <div class="sch-menu" id="sch-menu"></div>
+  </div>
+
+  <div class="tabbar">
+    <button class="tab on" id="tab-class" onclick="showTab('class')"><i data-lucide="layout-grid" style="width:17px;height:17px"></i>수업 <span class="cnt" id="cnt-class">5</span></button>
+    <button class="tab" id="tab-rec" onclick="showTab('rec')"><i data-lucide="file-text" style="width:17px;height:17px"></i>기록 <span class="cnt" id="cnt-rec">6</span></button>
+  </div>
+
+  <!-- ===== 수업 탭 (학기별) ===== -->
+  <section class="pane on" id="pane-class">
+    <p class="pane-note">채점·세특은 각 수업 안에 보존돼요</p>
+    <div id="class-list"></div>
+  </section>
+
+  <!-- ===== 기록 탭 (간편세특/창체/행특) ===== -->
+  <section class="pane" id="pane-rec">
+    <div class="filters" id="rec-filters"></div>
+    <div id="rec-list"></div>
+  </section>
+
+</div>
+</div>
+
+<div class="toast" id="toast"><span id="toast-msg"></span></div>
+
+<script>
+function toggleNav(){ document.getElementById('icon-sb').classList.toggle('expanded'); document.body.classList.toggle('nav-expanded'); }
+var _tt=null;
+function toastMsg(m){ var t=document.getElementById('toast'); document.getElementById('toast-msg').textContent=m; t.classList.add('show'); clearTimeout(_tt); _tt=setTimeout(function(){ t.classList.remove('show'); },2600); }
+function notReady(n){ toastMsg((n||'해당 화면')+' 은(는) 아직 준비 중입니다.'); }
+function openRO(name){ toastMsg('‘'+name+'’ 을(를) 읽기 전용으로 열람해요. (학생 정보 비식별화 · 이 목업에서는 상세 화면 생략)'); }
+
+function showTab(t){
+  document.getElementById('pane-class').classList.toggle('on', t==='class');
+  document.getElementById('pane-rec').classList.toggle('on', t==='rec');
+  document.getElementById('tab-class').classList.toggle('on', t==='class');
+  document.getElementById('tab-rec').classList.toggle('on', t==='rec');
+  lucide.createIcons();
+}
+
+/* ===== 이전 학교 데이터 (학교별 · N개 대응) ===== */
+var SCHOOLS=[
+  { name:'경기도테스트중학교', exp:'2년 11개월',
+    classes:[
+      { sem:'2026학년도 1학기', name:'사회', students:31, evals:5 },
+      { sem:'2026학년도 1학기', name:'한국사', students:28, evals:2 },
+      { sem:'2026학년도 1학기', name:'통합사회', students:30, evals:1 },
+      { sem:'2025학년도 2학기', name:'사회', students:29, evals:3 },
+      { sem:'2025학년도 2학기', name:'도덕', students:27, evals:2 }
+    ],
+    records:[
+      { type:'seteuk',    label:'간편세특', cls:'tag-t-seteuk',    title:'2학기 사회 세특 묶음', meta:'학생 28명 · 기록 28건', year:'2026학년도', date:'2026/06/02' },
+      { type:'changche',  label:'창체',     cls:'tag-t-changche',  title:'자율·자치활동 — 학급 자치', meta:'학생 31명 · 기록 31건', year:'2026학년도', date:'2026/05/28' },
+      { type:'haengteuk', label:'행특',     cls:'tag-t-haengteuk', title:'행특 테스트 3', meta:'학생 2명 · 기록 2건', year:'2026학년도', date:'2026/06/05' },
+      { type:'seteuk',    label:'간편세특', cls:'tag-t-seteuk',    title:'동아리 활동 세특', meta:'학생 12명 · 기록 12건', year:'2025학년도', date:'2025/11/20' },
+      { type:'changche',  label:'창체',     cls:'tag-t-changche',  title:'진로활동 — 진로 탐색 주간', meta:'학생 31명 · 기록 31건', year:'2025학년도', date:'2025/10/30' },
+      { type:'haengteuk', label:'행특',     cls:'tag-t-haengteuk', title:'1학년 2반 행동특성', meta:'학생 31명 · 기록 31건', year:'2025학년도', date:'2025/12/27' }
+    ]
+  },
+  { name:'서천남중학교', exp:'11개월',
+    classes:[
+      { sem:'2025학년도 1학기', name:'사회', students:26, evals:3 },
+      { sem:'2024학년도 2학기', name:'역사', students:24, evals:2 }
+    ],
+    records:[
+      { type:'changche',  label:'창체', cls:'tag-t-changche',  title:'봉사활동 — 교내 도우미', meta:'학생 26명 · 기록 26건', year:'2025학년도', date:'2025/06/10' },
+      { type:'haengteuk', label:'행특', cls:'tag-t-haengteuk', title:'2학년 3반 행동특성', meta:'학생 26명 · 기록 26건', year:'2024학년도', date:'2024/12/29' }
+    ]
+  }
+];
+var curIdx=0, curFilter='all';
+function curSchool(){ return SCHOOLS[curIdx]; }
+
+/* 학교 스위처 */
+function renderSchoolMenu(){
+  document.getElementById('sch-menu').innerHTML = SCHOOLS.map(function(s,i){
+    return '<button class="sch-opt'+(i===curIdx?' sel':'')+'" onclick="selectSchool('+i+')"><i data-lucide="archive" style="width:15px;height:15px;color:#c2570c"></i>'+s.name+'<span class="so-exp">파기 '+s.exp+'</span></button>';
+  }).join('');
+  lucide.createIcons();
+}
+function toggleSchoolMenu(e){ if(e) e.stopPropagation(); document.getElementById('sch-menu').classList.toggle('open'); }
+document.addEventListener('click', function(){ document.getElementById('sch-menu').classList.remove('open'); });
+function selectSchool(i){
+  curIdx=i; curFilter='all';
+  var s=curSchool();
+  document.getElementById('sch-name').textContent=s.name;
+  document.getElementById('sch-exp').textContent=s.exp;
+  document.getElementById('sch-menu').classList.remove('open');
+  renderSchoolMenu(); renderClasses(); renderRecords();
+}
+
+/* 수업 카드 */
+function classCard(c){
+  return '<div class="cc" onclick="openRO(\''+c.name+'\')">'
+    +'<div class="cc-top"><h3 class="cc-name">'+c.name+'</h3><i data-lucide="chevron-right" class="cc-go" style="width:18px;height:18px"></i></div>'
+    +'<div class="cc-meta">수행평가 '+c.evals+'개 · 참여 학생 '+c.students+'명</div>'
+    +'<div class="cc-tags"><span class="tag tag-prev"><i data-lucide="archive" style="width:12px;height:12px"></i>이전 소속</span><span class="tag tag-ro"><i data-lucide="eye" style="width:12px;height:12px"></i>읽기 전용</span></div>'
+    +'</div>';
+}
+function renderClasses(){
+  var list=curSchool().classes, order=[], map={};
+  list.forEach(function(c){ if(!map[c.sem]){ map[c.sem]=[]; order.push(c.sem); } map[c.sem].push(c); });
+  document.getElementById('class-list').innerHTML = order.map(function(sem){
+    return '<div class="arc-sem"><div class="arc-sem-t">'+sem+' <span class="arc-sem-c">'+map[sem].length+'개</span></div><div class="grid">'+map[sem].map(classCard).join('')+'</div></div>';
+  }).join('');
+  document.getElementById('cnt-class').textContent=list.length;
+  lucide.createIcons();
+}
+
+/* 기록 탭 */
+function recCard(r){
+  return '<div class="cc" data-type="'+r.type+'" onclick="openRO(\''+r.title+'\')">'
+    +'<div class="cc-top"><h3 class="cc-name">'+r.title+'</h3><i data-lucide="chevron-right" class="cc-go" style="width:18px;height:18px"></i></div>'
+    +'<div class="cc-meta">'+r.meta+'</div>'
+    +'<div class="cc-date">'+r.date+' 생성</div>'
+    +'<div class="cc-tags"><span class="tag '+r.cls+'">'+r.label+'</span><span class="tag tag-prev"><i data-lucide="archive" style="width:12px;height:12px"></i>이전 소속</span><span class="tag tag-ro"><i data-lucide="eye" style="width:12px;height:12px"></i>읽기 전용</span></div>'
+    +'</div>';
+}
+function renderFilters(){
+  var recs=curSchool().records;
+  var types=[['all','전체'],['seteuk','간편세특'],['changche','창체'],['haengteuk','행특']];
+  document.getElementById('rec-filters').innerHTML = types.map(function(t){
+    var cnt = t[0]==='all' ? recs.length : recs.filter(function(r){ return r.type===t[0]; }).length;
+    return '<button class="fchip'+(curFilter===t[0]?' on':'')+'" data-f="'+t[0]+'" onclick="setFilter(\''+t[0]+'\')">'+t[1]+' <span style="opacity:.7">'+cnt+'</span></button>';
+  }).join('');
+}
+function renderRecords(){
+  var recs=curSchool().records;
+  document.getElementById('cnt-rec').textContent=recs.length;
+  var order=[], map={};
+  recs.forEach(function(r){ if(!map[r.year]){ map[r.year]=[]; order.push(r.year); } map[r.year].push(r); });
+  document.getElementById('rec-list').innerHTML = order.map(function(y){
+    return '<div class="arc-sem"><div class="arc-sem-t">'+y+' <span class="arc-sem-c">'+map[y].length+'개</span></div><div class="grid">'+map[y].map(recCard).join('')+'</div></div>';
+  }).join('');
+  renderFilters(); setFilter(curFilter);
+  lucide.createIcons();
+}
+function setFilter(f){
+  curFilter=f;
+  document.querySelectorAll('#rec-filters .fchip').forEach(function(c){ c.classList.toggle('on', c.dataset.f===f); });
+  document.querySelectorAll('#rec-list .arc-sem').forEach(function(group){
+    var any=false;
+    group.querySelectorAll('.cc').forEach(function(card){
+      var show=(f==='all'||card.dataset.type===f);
+      card.style.display=show?'flex':'none';
+      if(show) any=true;
+    });
+    group.style.display=any?'block':'none';
+  });
+}
+
+renderSchoolMenu();
+renderClasses();
+renderRecords();
+
+lucide.createIcons();
+</script>
+
+</body>
+</html>
