@@ -67,7 +67,7 @@
     .back-link i{ color:#416bff; }
     .back-link:hover{ color:#416bff; }
 
-    /* ===== 수행평가 카드 ===== */
+    /* ===== 평가 카드 ===== */
     .ev-card{ background:white; border-radius:12px; padding:24px; box-shadow:0 0 1px #2226314D, 0 2px 8px #0000000F; }
 
     /* ===== 둥근 모서리 테이블 (피그마) ===== */
@@ -82,14 +82,14 @@
     .tbl2 tr:last-child td:first-child{ border-bottom-left-radius:8px; }
     .tbl2 tr:last-child td:last-child{ border-bottom-right-radius:8px; }
 
-    /* ===== 테이블 내 알약형 액션 버튼 (수행평가 채점) ===== */
+    /* ===== 테이블 내 알약형 액션 버튼 (채점) ===== */
     .pill-btn{ height:36px; border-radius:100px; padding:0 16px; font-size:14px; font-weight:600; font-family:inherit; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; gap:6px; line-height:1; vertical-align:middle; border:none; }
     .pill-btn-primary{ background:#416bff; color:white; }
     .pill-btn-mid{ background:#ccdfff; color:#3151c4; }
     .pill-btn-soft{ background:#e9f2ff; color:#3151c4; }
     .pill-btn:disabled{ opacity:.45; cursor:not-allowed; }
 
-    /* ===== 수행평가 설계 목록 ===== */
+    /* ===== 평가 설계 목록 ===== */
     .ds-grid{ display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:20px; }
     .ds-card{ background:white; border:1px solid #dde1e8; border-radius:12px; padding:20px; display:flex; flex-direction:column; justify-content:space-between; gap:18px; min-height:150px; cursor:pointer; transition:border-color .12s; }
     .ds-card:hover{ border-color:#416bff; }
@@ -105,10 +105,6 @@
     .create-menu.open{ display:block; }
     .create-menu button{ width:100%; display:flex; align-items:center; gap:8px; padding:10px 12px; border:none; background:none; border-radius:6px; font-family:inherit; font-size:15px; color:#222631; cursor:pointer; text-align:left; }
     .create-menu button:hover{ background:#f6f7f9; }
-
-    /* ===== 빈 양식 유도 펄스 하이라이트 ===== */
-    @keyframes pulseHi { 0%{ box-shadow:0 0 0 0 rgba(65,107,255,.45); } 70%{ box-shadow:0 0 0 10px rgba(65,107,255,0); } 100%{ box-shadow:0 0 0 0 rgba(65,107,255,0); } }
-    .pulse-hi{ animation:pulseHi 1.2s ease-out 3; }
 
     /* ===== AI 채점 실행 모달 (1/2·2/2) + OCR 경고 ===== */
     .rm-overlay{ display:none; position:fixed; inset:0; background:rgba(0,0,0,.45); z-index:1600; align-items:center; justify-content:center; padding:24px; }
@@ -298,9 +294,10 @@
   <div class="tab-band">
     <div class="tab-band-inner">
       <button class="sub-tab" onclick="location.href='co_teacher_review_v1_260611.html'">수업 홈</button>
-      <button class="sub-tab" onclick="goDesignList()">수행평가 설계</button>
+      <button class="sub-tab" onclick="goDesignList()">평가 설계</button>
+      <button class="sub-tab" onclick="location.href='question_tab_v1_260617.html'">활동지</button>
       <button class="sub-tab on">과제물 관리</button>
-      <button class="sub-tab" onclick="goScoringList()">수행평가 채점</button>
+      <button class="sub-tab" onclick="goScoringList()">채점</button>
       <button class="sub-tab" onclick="notReady('세부능력 및 특기사항 지원')">세부능력 및 특기사항 지원</button>
     </div>
   </div>
@@ -310,23 +307,18 @@
 
       <div style="display:flex;flex-direction:column;gap:20px;">
 
-        <!-- 카드 1: 선생님 업로드 수행평가 -->
+        <!-- 카드 1: 선생님 업로드 평가 -->
         <div class="ev-card">
           <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:16px;gap:16px;">
             <div style="display:flex;flex-direction:column;gap:4px;">
-              <h3 style="font-size:18px;font-weight:600;color:#222631;margin:0;">선생님 업로드 수행평가</h3>
+              <h3 style="font-size:18px;font-weight:600;color:#222631;margin:0;">선생님 업로드 평가</h3>
               <p style="font-size:14px;color:#6d7381;margin:0;">선생님 과제물 업로드 · 마감 완료</p>
             </div>
             <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;">
-              <span id="blank-form-A" style="display:inline-flex;"></span>
               <button class="btn btn-secondary btn-sm" disabled style="opacity:.5;cursor:not-allowed;background:#e9f2ff;">
                 <i data-lucide="qr-code" style="width:14px;height:14px;"></i>과제 제출 QR
               </button>
             </div>
-          </div>
-          <div id="blank-form-hint-A" style="display:none;align-items:center;gap:8px;background:#e9f2ff;border-radius:8px;padding:10px 14px;margin-bottom:14px;">
-            <i data-lucide="sparkles" style="width:16px;height:16px;color:#3151c4;flex-shrink:0;"></i>
-            <span style="font-size:14px;color:#3151c4;">빈 양식(문항지)을 올려두면 지시문과 학생 답안을 분리해 인식해서 AI 채점이 더 정확해져요.</span>
           </div>
           <table class="tbl2">
             <thead>
@@ -395,23 +387,18 @@
           </table>
         </div>
 
-        <!-- 카드 2: 학생 업로드 수행평가 -->
+        <!-- 카드 2: 학생 업로드 평가 -->
         <div class="ev-card">
           <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:16px;gap:16px;">
             <div style="display:flex;flex-direction:column;gap:4px;">
-              <h3 style="font-size:18px;font-weight:600;color:#222631;margin:0;">학생 업로드 수행평가</h3>
+              <h3 style="font-size:18px;font-weight:600;color:#222631;margin:0;">학생 업로드 평가</h3>
               <p style="font-size:14px;color:#6d7381;margin:0;">학생이 직접 제출 · 마감 완료</p>
             </div>
             <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;">
-              <span id="blank-form-B" style="display:inline-flex;"></span>
               <button class="btn btn-secondary btn-sm" onclick="showToast('과제 제출 QR 기능은 준비 중입니다.','info')">
                 <i data-lucide="qr-code" style="width:14px;height:14px;"></i>과제 제출 QR
               </button>
             </div>
-          </div>
-          <div id="blank-form-hint-B" style="display:none;align-items:center;gap:8px;background:#e9f2ff;border-radius:8px;padding:10px 14px;margin-bottom:14px;">
-            <i data-lucide="sparkles" style="width:16px;height:16px;color:#3151c4;flex-shrink:0;"></i>
-            <span style="font-size:14px;color:#3151c4;">빈 양식(문항지)을 올려두면 지시문과 학생 답안을 분리해 인식해서 AI 채점이 더 정확해져요.</span>
           </div>
           <table class="tbl2">
             <thead>
@@ -480,10 +467,10 @@
           </table>
         </div>
 
-        <!-- 카드 3: 과제물 없는 수행평가 -->
+        <!-- 카드 3: 과제물 없는 평가 -->
         <div class="ev-card" style="padding:20px 24px;display:flex;align-items:center;justify-content:space-between;gap:16px;">
           <div style="display:flex;flex-direction:column;gap:4px;">
-            <h3 style="font-size:18px;font-weight:600;color:#222631;margin:0;">과제물 없는 수행평가</h3>
+            <h3 style="font-size:18px;font-weight:600;color:#222631;margin:0;">과제물 없는 평가</h3>
             <p style="font-size:14px;color:#6d7381;margin:0;">과제물 없이 직접 채점 · 마감 완료</p>
           </div>
           <button class="btn btn-primary btn-sm" onclick="goScoringList()">
@@ -491,10 +478,10 @@
           </button>
         </div>
 
-        <!-- 카드 4: [임시] 임시저장 수행평가 -->
+        <!-- 카드 4: [임시] 임시저장 평가 -->
         <div class="ev-card" style="padding:20px 24px;display:flex;align-items:center;justify-content:space-between;gap:16px;">
           <div style="display:flex;flex-direction:column;gap:4px;">
-            <h3 style="font-size:18px;font-weight:600;color:#222631;margin:0;"><span style="color:#db3e51;">[임시]</span> 임시저장 수행평가</h3>
+            <h3 style="font-size:18px;font-weight:600;color:#222631;margin:0;"><span style="color:#db3e51;">[임시]</span> 임시저장 평가</h3>
             <p style="font-size:14px;color:#6d7381;margin:0;">설계 완료 전 · 마감 전</p>
           </div>
           <button class="btn btn-primary btn-sm" onclick="location.href='evaluation_design_v4_260615.html'">
@@ -511,28 +498,29 @@
   </div>
 </div>
 
-<!-- ===== 화면 0-B: 수행평가 채점 목록 ===== -->
+<!-- ===== 화면 0-B: 채점 목록 ===== -->
 <div id="screen-scoring" class="screen">
   <div class="tab-band">
     <div class="tab-band-inner">
       <button class="sub-tab" onclick="location.href='co_teacher_review_v1_260611.html'">수업 홈</button>
-      <button class="sub-tab" onclick="goDesignList()">수행평가 설계</button>
+      <button class="sub-tab" onclick="goDesignList()">평가 설계</button>
+      <button class="sub-tab" onclick="location.href='question_tab_v1_260617.html'">활동지</button>
       <button class="sub-tab" onclick="showScreen('screen-task')">과제물 관리</button>
-      <button class="sub-tab on">수행평가 채점</button>
+      <button class="sub-tab on">채점</button>
       <button class="sub-tab" onclick="notReady('세부능력 및 특기사항 지원')">세부능력 및 특기사항 지원</button>
     </div>
   </div>
   <div class="page-wrap">
-    <h1 class="page-h1">1학년 국어 수행평가 채점</h1>
+    <h1 class="page-h1">1학년 국어 채점</h1>
     <p class="page-sub">AI가 과제 채점과 피드백 작성을 도와드려요. AI 결과는 참고용이며, 선생님이 확인하신 뒤 최종 점수로 반영됩니다.</p>
 
     <div style="display:flex;flex-direction:column;gap:20px;">
 
-      <!-- 카드 1: 선생님 업로드 수행평가 (마감 완료) -->
+      <!-- 카드 1: 선생님 업로드 평가 (마감 완료) -->
       <div class="ev-card">
         <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:16px;gap:16px;">
           <div style="display:flex;flex-direction:column;gap:4px;">
-            <h3 style="font-size:18px;font-weight:600;color:#222631;margin:0;">선생님 업로드 수행평가</h3>
+            <h3 style="font-size:18px;font-weight:600;color:#222631;margin:0;">선생님 업로드 평가</h3>
             <p style="font-size:14px;color:#6d7381;margin:0;">AI 채점 가능 · 마감 완료</p>
           </div>
           <div style="display:flex;gap:10px;flex-shrink:0;">
@@ -589,11 +577,11 @@
         </table>
       </div>
 
-      <!-- 카드 2: 학생 업로드 수행평가 (마감 전) -->
+      <!-- 카드 2: 학생 업로드 평가 (마감 전) -->
       <div class="ev-card">
         <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:16px;gap:16px;">
           <div style="display:flex;flex-direction:column;gap:4px;">
-            <h3 style="font-size:18px;font-weight:600;color:#222631;margin:0;">학생 업로드 수행평가</h3>
+            <h3 style="font-size:18px;font-weight:600;color:#222631;margin:0;">학생 업로드 평가</h3>
             <p style="font-size:14px;color:#6d7381;margin:0;">AI 채점 가능 · 마감 전</p>
           </div>
           <div style="display:flex;gap:10px;flex-shrink:0;">
@@ -641,19 +629,19 @@
         </table>
       </div>
 
-      <!-- 카드 3: 과제물 없는 수행평가 (마감 완료, 직접 채점) — 과제물 관리와 평가명 동기화 -->
+      <!-- 카드 3: 과제물 없는 평가 (마감 완료, 직접 채점) — 과제물 관리와 평가명 동기화 -->
       <div class="ev-card" style="padding:20px 24px;display:flex;align-items:center;justify-content:space-between;gap:16px;">
         <div style="display:flex;flex-direction:column;gap:4px;">
-          <h3 style="font-size:18px;font-weight:600;color:#222631;margin:0;">과제물 없는 수행평가</h3>
+          <h3 style="font-size:18px;font-weight:600;color:#222631;margin:0;">과제물 없는 평가</h3>
           <p style="font-size:14px;color:#6d7381;margin:0;">과제물 없이 직접 채점 · 마감 완료</p>
         </div>
         <button class="btn btn-primary btn-sm" onclick="location.href='class_scoring_detail_v1_260512.html'">학급별 직접 채점<i data-lucide="chevron-right" style="width:14px;height:14px;"></i></button>
       </div>
 
-      <!-- 카드 4: [임시] 임시저장 수행평가 (설계 미완료, 마감 전) — 과제물 관리와 평가명 동기화 -->
+      <!-- 카드 4: [임시] 임시저장 평가 (설계 미완료, 마감 전) — 과제물 관리와 평가명 동기화 -->
       <div class="ev-card" style="padding:20px 24px;display:flex;align-items:center;justify-content:space-between;gap:16px;">
         <div style="display:flex;flex-direction:column;gap:4px;">
-          <h3 style="font-size:18px;font-weight:600;color:#222631;margin:0;"><span style="color:#db3e51;">[임시]</span> 임시저장 수행평가</h3>
+          <h3 style="font-size:18px;font-weight:600;color:#222631;margin:0;"><span style="color:#db3e51;">[임시]</span> 임시저장 평가</h3>
           <p style="font-size:14px;color:#6d7381;margin:0;">설계 완료 전 · 마감 전</p>
         </div>
         <button class="btn btn-primary btn-sm" onclick="location.href='evaluation_design_v4_260615.html'">설계 이어서 완료하기<i data-lucide="chevron-right" style="width:14px;height:14px;"></i></button>
@@ -668,25 +656,26 @@
   </div>
 </div>
 
-<!-- ===== 화면 0-C: 수행평가 설계 목록 ===== -->
+<!-- ===== 화면 0-C: 평가 설계 목록 ===== -->
 <div id="screen-design" class="screen">
   <div class="tab-band">
     <div class="tab-band-inner">
       <button class="sub-tab" onclick="location.href='co_teacher_review_v1_260611.html'">수업 홈</button>
-      <button class="sub-tab on">수행평가 설계</button>
+      <button class="sub-tab on">평가 설계</button>
+      <button class="sub-tab" onclick="location.href='question_tab_v1_260617.html'">활동지</button>
       <button class="sub-tab" onclick="showScreen('screen-task')">과제물 관리</button>
-      <button class="sub-tab" onclick="goScoringList()">수행평가 채점</button>
+      <button class="sub-tab" onclick="goScoringList()">채점</button>
       <button class="sub-tab" onclick="notReady('세부능력 및 특기사항 지원')">세부능력 및 특기사항 지원</button>
     </div>
   </div>
   <div class="page-wrap">
     <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:24px;">
       <div>
-        <h1 class="page-h1">1학년 국어 수행평가 설계</h1>
-        <p class="page-sub" style="margin-bottom:0;">수행평가는 새롭게 설계하거나 만들어 둔 평가계획을 가져올 수 있습니다. 설계 내용에 따라 과제물 관리와 채점이 진행됩니다.</p>
+        <h1 class="page-h1">1학년 국어 평가 설계</h1>
+        <p class="page-sub" style="margin-bottom:0;">평가는 새롭게 설계하거나 만들어 둔 평가계획을 가져올 수 있습니다. 설계 내용에 따라 과제물 관리와 채점이 진행됩니다.</p>
       </div>
       <div style="position:relative;flex-shrink:0;">
-        <button class="btn btn-primary" onclick="toggleCreateMenu(event)"><i data-lucide="plus" style="width:16px;height:16px;"></i>수행평가 만들기</button>
+        <button class="btn btn-primary" onclick="toggleCreateMenu(event)"><i data-lucide="plus" style="width:16px;height:16px;"></i>평가 만들기</button>
         <div id="createMenu" class="create-menu">
           <button onclick="closeCreateMenu();showToast('설계 작성 화면은 이 목업에서 제공하지 않습니다.','info')"><i data-lucide="file-plus-2" style="width:16px;height:16px;"></i>새로 만들기</button>
           <button onclick="closeCreateMenu();showToast('복사해서 만들기는 이 목업에서 제공하지 않습니다.','info')"><i data-lucide="copy" style="width:16px;height:16px;"></i>복사해서 만들기</button>
@@ -697,7 +686,7 @@
 
     <div class="ds-grid">
       <div class="ds-card" onclick="location.href='evaluation_design_v4_260615.html'">
-        <div class="ds-title">선생님 업로드 수행평가</div>
+        <div class="ds-title">선생님 업로드 평가</div>
         <div class="ds-meta">
           <span class="ds-meta-txt">26.06.05 수정됨 · 교내 공개</span>
           <div class="ds-icons">
@@ -708,7 +697,7 @@
         </div>
       </div>
       <div class="ds-card" onclick="location.href='evaluation_design_v4_260615.html'">
-        <div class="ds-title">학생 업로드 수행평가</div>
+        <div class="ds-title">학생 업로드 평가</div>
         <div class="ds-meta">
           <span class="ds-meta-txt">26.06.05 수정됨 · 교내 공개</span>
           <div class="ds-icons">
@@ -719,7 +708,7 @@
         </div>
       </div>
       <div class="ds-card" onclick="location.href='evaluation_design_v4_260615.html'">
-        <div class="ds-title">과제물 없는 수행평가</div>
+        <div class="ds-title">과제물 없는 평가</div>
         <div class="ds-meta">
           <span class="ds-meta-txt">26.06.05 수정됨 · 교내 공개</span>
           <div class="ds-icons">
@@ -730,7 +719,7 @@
         </div>
       </div>
       <div class="ds-card" onclick="location.href='evaluation_design_v4_260615.html'">
-        <div class="ds-title">임시저장 수행평가 — 설계 제목이 길어지면 이렇게 두 줄로 보여지고, 뒤는 잘립니다</div>
+        <div class="ds-title">임시저장 평가 — 설계 제목이 길어지면 이렇게 두 줄로 보여지고, 뒤는 잘립니다</div>
         <div class="ds-meta">
           <span class="ds-meta-txt temp">임시 저장됨</span>
           <div class="ds-icons">
@@ -754,9 +743,10 @@
   <div class="tab-band">
     <div class="tab-band-inner">
       <button class="sub-tab" onclick="location.href='co_teacher_review_v1_260611.html'">수업 홈</button>
-      <button class="sub-tab" onclick="goDesignList()">수행평가 설계</button>
+      <button class="sub-tab" onclick="goDesignList()">평가 설계</button>
+      <button class="sub-tab" onclick="location.href='question_tab_v1_260617.html'">활동지</button>
       <button class="sub-tab on">과제물 관리</button>
-      <button class="sub-tab" onclick="goScoringList()">수행평가 채점</button>
+      <button class="sub-tab" onclick="goScoringList()">채점</button>
       <button class="sub-tab" onclick="notReady('세부능력 및 특기사항 지원')">세부능력 및 특기사항 지원</button>
     </div>
   </div>
@@ -832,9 +822,10 @@
     <div class="tab-band">
       <div class="tab-band-inner">
         <button class="sub-tab" onclick="location.href='co_teacher_review_v1_260611.html'">수업 홈</button>
-        <button class="sub-tab" onclick="goDesignList()">수행평가 설계</button>
+        <button class="sub-tab" onclick="goDesignList()">평가 설계</button>
+        <button class="sub-tab" onclick="location.href='question_tab_v1_260617.html'">활동지</button>
         <button class="sub-tab on">과제물 관리</button>
-        <button class="sub-tab" onclick="goScoringList()">수행평가 채점</button>
+        <button class="sub-tab" onclick="goScoringList()">채점</button>
         <button class="sub-tab" onclick="notReady('세부능력 및 특기사항 지원')">세부능력 및 특기사항 지원</button>
       </div>
     </div>
@@ -1222,20 +1213,14 @@
 </div>
 
 <!-- Toast -->
-<input type="file" id="blank-form-input" accept="application/pdf" style="display:none;" onchange="onBlankFormPicked(event)">
-
 <!-- ===== 설계 최초 저장 직후 안내 팝업 (데모: 새로고침 시 노출) ===== -->
 <div id="designSavedModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:1500;align-items:center;justify-content:center;" onclick="closeDesignSavedModal(false)">
   <div style="background:white;border-radius:12px;width:480px;max-width:90vw;padding:28px;box-shadow:0 0 1px #2226314D, 0 8px 24px #00000026;" onclick="event.stopPropagation()">
     <div style="width:44px;height:44px;border-radius:100px;background:#eefcf4;display:flex;align-items:center;justify-content:center;margin-bottom:14px;">
       <i data-lucide="check" style="width:24px;height:24px;color:#1ab864;"></i>
     </div>
-    <h3 style="font-size:20px;font-weight:600;color:#222631;margin:0 0 8px;">수행평가 설계가 저장되었습니다</h3>
-    <p style="font-size:16px;color:#3b3f4c;margin:0 0 16px;line-height:1.6;">과제물 관리에서 학생 제출 현황을 확인하고, 과제물을 직접 올릴 수 있어요.</p>
-    <div style="display:flex;align-items:flex-start;gap:8px;background:#e9f2ff;border-radius:8px;padding:12px 14px;margin-bottom:24px;">
-      <i data-lucide="sparkles" style="width:16px;height:16px;color:#3151c4;flex-shrink:0;margin-top:2px;"></i>
-      <span style="font-size:14px;color:#3151c4;line-height:1.6;">빈 양식(문항지)을 미리 올려두면 지시문과 학생 답안을 분리해 인식해서 AI 채점이 더 정확해져요.</span>
-    </div>
+    <h3 style="font-size:20px;font-weight:600;color:#222631;margin:0 0 8px;">평가 설계가 저장되었습니다</h3>
+    <p style="font-size:16px;color:#3b3f4c;margin:0 0 24px;line-height:1.6;">과제물 관리에서 학생 제출 현황을 확인하고, 과제물을 직접 올릴 수 있어요.</p>
     <div style="display:flex;justify-content:flex-end;gap:10px;">
       <button class="btn btn-outline" onclick="closeDesignSavedModal(false)">나중에</button>
       <button class="btn btn-primary" onclick="closeDesignSavedModal(true)">과제물 관리로 이동</button>
@@ -3370,35 +3355,7 @@ function submitStudentUpload() {
   }, 1500);
 }
 
-// ── 빈 양식 업로드 (수행평가 단위 1회) ──
-var BLANK_FORMS = {
-  A: '미래사회예측시나리오_빈양식.pdf',  // 선생님 업로드 수행평가: 업로드 완료 상태 예시
-  B: null                                // 학생 업로드 수행평가: 미업로드 상태 예시
-};
-var blankFormTarget = null;
-function pickBlankForm(key) {
-  blankFormTarget = key;
-  document.getElementById('blank-form-input').click();
-}
-function onBlankFormPicked(e) {
-  var f = e.target.files[0];
-  if (!f || !blankFormTarget) return;
-  BLANK_FORMS[blankFormTarget] = f.name;
-  renderBlankForm(blankFormTarget);
-  showToast('빈 양식이 업로드되었습니다. 이 수행평가의 모든 반에 공통 적용돼요.');
-  e.target.value = '';
-}
-// 파일명 글자수 제한: 20자 초과 시 말줄임 (확장자는 보존, 전체 이름은 호버 툴팁)
-var BLANK_FORM_NAME_MAX = 20;
-function truncBlankFormName(name) {
-  if (name.length <= BLANK_FORM_NAME_MAX) return name;
-  var dot = name.lastIndexOf('.');
-  var ext = dot > -1 ? name.substring(dot) : '';
-  var base = dot > -1 ? name.substring(0, dot) : name;
-  var keep = Math.max(1, BLANK_FORM_NAME_MAX - ext.length - 1);
-  return base.substring(0, keep) + '…' + ext;
-}
-// ── 수행평가 설계 목록 ──
+// ── 평가 설계 목록 ──
 var designPopupShown = false;
 function goDesignList() {
   showScreen('screen-design');
@@ -3584,38 +3541,8 @@ function closeDesignSavedModal(goUpload) {
   document.getElementById('designSavedModal').style.display = 'none';
   if (goUpload) {
     showScreen('screen-task');
-    // 미업로드 카드의 빈 양식 버튼으로 시선 유도
-    var target = document.querySelector('#blank-form-B button');
-    if (target) {
-      target.scrollIntoView({ block: 'center', behavior: 'smooth' });
-      target.classList.add('pulse-hi');
-      setTimeout(function(){ target.classList.remove('pulse-hi'); }, 4000);
-    }
   }
 }
-
-function renderBlankForm(key) {
-  var el = document.getElementById('blank-form-' + key);
-  if (!el) return;
-  var name = BLANK_FORMS[key];
-  // 미업로드 상태에서만 카드 상시 안내 노출
-  var hint = document.getElementById('blank-form-hint-' + key);
-  if (hint) hint.style.display = name ? 'none' : 'flex';
-  if (!name) {
-    el.innerHTML = '<button class="btn btn-secondary btn-sm" onclick="pickBlankForm(\'' + key + '\')" title="이 수행평가의 빈 양식(활동지)을 1회 업로드하면 모든 반에 공통 적용됩니다.">'
-      + '<i data-lucide="file-up" style="width:14px;height:14px;"></i>빈 양식 업로드</button>';
-  } else {
-    el.innerHTML = '<span style="display:inline-flex;align-items:center;gap:6px;height:34px;padding:0 4px 0 10px;background:#f6f7f9;border:1px solid #eceef2;border-radius:4px;">'
-      + '<i data-lucide="file-check-2" style="width:14px;height:14px;color:#1ab864;flex-shrink:0;"></i>'
-      + '<span style="font-size:14px;color:#6d7381;flex-shrink:0;">빈 양식</span>'
-      + '<span style="font-size:14px;font-weight:500;color:#3b3f4c;white-space:nowrap;" title="' + name + '">' + truncBlankFormName(name) + '</span>'
-      + '<button onclick="pickBlankForm(\'' + key + '\')" style="background:none;border:none;cursor:pointer;font-family:inherit;font-size:14px;font-weight:600;color:#416bff;display:inline-flex;align-items:center;justify-content:center;line-height:1;vertical-align:middle;padding:6px 8px;border-radius:4px;" onmouseover="this.style.background=\'#e9f2ff\'" onmouseout="this.style.background=\'none\'">변경</button>'
-      + '</span>';
-  }
-  lucide.createIcons();
-}
-renderBlankForm('A');
-renderBlankForm('B');
 
 // 초기화
 renderTable();
