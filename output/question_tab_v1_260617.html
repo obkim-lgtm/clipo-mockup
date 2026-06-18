@@ -363,9 +363,9 @@
     .bq-ans:focus{ border-color:#416bff; box-shadow:0 0 0 3px rgba(65,107,255,.12); }
     /* 인식 결과 팝업 테이블 */
     .rg-tbl{ border:1px solid #e6e8ed; border-radius:10px; overflow:auto; max-height:48vh; }
-    .rg-head{ display:grid; grid-template-columns:150px 1fr 270px 40px; background:#f6f7f9; font-size:13px; font-weight:600; color:#6d7381; position:sticky; top:0; z-index:2; }
+    .rg-head{ display:grid; grid-template-columns:150px 1fr 270px 100px; background:#f6f7f9; font-size:13px; font-weight:600; color:#6d7381; position:sticky; top:0; z-index:2; }
     .rg-head>div{ padding:12px 14px; }
-    .rg-row{ display:grid; grid-template-columns:150px 1fr 270px 40px; border-top:1px solid #eef0f3; align-items:stretch; }
+    .rg-row{ display:grid; grid-template-columns:150px 1fr 270px 100px; border-top:1px solid #eef0f3; align-items:stretch; }
     .rg-row>div{ padding:12px 14px; }
     .rg-big{ background:#f4f8ff; }
     .rg-bigtag{ font-size:13px; font-weight:700; color:#3151c4; background:#eef3ff; border-radius:6px; padding:4px 10px; display:inline-block; }
@@ -376,6 +376,10 @@
     .rg-muted{ font-size:13px; color:#9ea3ad; }
     .rg-guide{ background:#fbfcff; font-size:13px; }
     .rg-del{ display:flex; align-items:center; justify-content:center; color:#c3c8d4; cursor:pointer; }
+    .rg-act{ display:flex; align-items:center; justify-content:center; gap:1px; }
+    .rg-iconbtn{ display:inline-flex; align-items:center; justify-content:center; width:22px; height:24px; color:#9ea3ad; cursor:pointer; border-radius:6px; flex-shrink:0; }
+    .rg-iconbtn:hover{ background:#eef3ff; color:#416bff; }
+    .rg-iconbtn.del:hover{ background:#fdecec; color:#e5484d; }
     .rg-add{ margin-top:12px; font-size:14px; color:#3151c4; border:1px solid #ccdfff; background:#fff; border-radius:8px; padding:9px 16px; cursor:pointer; font-family:inherit; font-weight:600; }
     .rg-c1-inp{ width:100%; height:100%; min-height:38px; border:1px solid #e1e4ea; border-radius:6px; padding:6px 8px; font-size:14px; font-weight:600; color:#3b3f4c; font-family:inherit; background:#fff; outline:none; }
     .rg-c1-inp:hover{ border-color:#b9c0cc; }
@@ -1120,32 +1124,32 @@
           <div class="rg-c1"><input class="rg-bigtag-inp" value="대문항 1"></div>
           <div><textarea class="rg-ta">다음 글을 읽고 물음에 답하시오.</textarea></div>
           <div class="rg-muted">지시문 · 채점 없음</div>
-          <div class="rg-del" onclick="delRecogRow(this)"><i data-lucide="trash-2" style="width:16px;height:16px"></i></div>
+          <div class="rg-act"><span class="rg-iconbtn" onclick="moveRecogRow(this,-1)"><i data-lucide="chevron-up" style="width:15px;height:15px"></i></span><span class="rg-iconbtn" onclick="moveRecogRow(this,1)"><i data-lucide="chevron-down" style="width:15px;height:15px"></i></span><span class="rg-iconbtn del" onclick="delRecogRow(this)"><i data-lucide="trash-2" style="width:15px;height:15px"></i></span></div>
         </div>
         <div class="rg-row">
           <div><input class="rg-c1-inp" value="1-1 · 요약하기"></div>
           <div><textarea class="rg-ta">제시문의 중심 내용을 한 문장으로 요약하시오.</textarea></div>
           <div><div class="rg-guide-ro">중심 내용을 정확히 파악해 한 문장으로 요약해야 합니다.</div></div>
-          <div class="rg-del" onclick="delRecogRow(this)"><i data-lucide="trash-2" style="width:16px;height:16px"></i></div>
+          <div class="rg-act"><span class="rg-iconbtn" onclick="moveRecogRow(this,-1)"><i data-lucide="chevron-up" style="width:15px;height:15px"></i></span><span class="rg-iconbtn" onclick="moveRecogRow(this,1)"><i data-lucide="chevron-down" style="width:15px;height:15px"></i></span><span class="rg-iconbtn del" onclick="delRecogRow(this)"><i data-lucide="trash-2" style="width:15px;height:15px"></i></span></div>
         </div>
         <div class="rg-row">
           <div><input class="rg-c1-inp" value="1-2 · 근거 찾기"></div>
           <div><textarea class="rg-ta">글쓴이가 주장을 뒷받침하기 위해 제시한 근거 두 가지를 찾아 각각 서술하시오.</textarea></div>
           <div><div class="rg-guide-ro">근거 두 가지를 모두 찾아 각각 구체적으로 서술해야 합니다.</div></div>
-          <div class="rg-del" onclick="delRecogRow(this)"><i data-lucide="trash-2" style="width:16px;height:16px"></i></div>
+          <div class="rg-act"><span class="rg-iconbtn" onclick="moveRecogRow(this,-1)"><i data-lucide="chevron-up" style="width:15px;height:15px"></i></span><span class="rg-iconbtn" onclick="moveRecogRow(this,1)"><i data-lucide="chevron-down" style="width:15px;height:15px"></i></span><span class="rg-iconbtn del" onclick="delRecogRow(this)"><i data-lucide="trash-2" style="width:15px;height:15px"></i></span></div>
         </div>
 
         <div class="rg-row rg-big">
           <div class="rg-c1"><input class="rg-bigtag-inp" value="대문항 2"></div>
           <div><textarea class="rg-ta">아래 〈자료 가〉를 읽고 물음에 답하시오.</textarea></div>
           <div class="rg-muted">지시문 · 채점 없음</div>
-          <div class="rg-del" onclick="delRecogRow(this)"><i data-lucide="trash-2" style="width:16px;height:16px"></i></div>
+          <div class="rg-act"><span class="rg-iconbtn" onclick="moveRecogRow(this,-1)"><i data-lucide="chevron-up" style="width:15px;height:15px"></i></span><span class="rg-iconbtn" onclick="moveRecogRow(this,1)"><i data-lucide="chevron-down" style="width:15px;height:15px"></i></span><span class="rg-iconbtn del" onclick="delRecogRow(this)"><i data-lucide="trash-2" style="width:15px;height:15px"></i></span></div>
         </div>
         <div class="rg-row">
           <div><input class="rg-c1-inp" value="2-1 · 주장하는 글쓰기"></div>
           <div><textarea class="rg-ta">〈자료 가〉를 바탕으로 '일회용품 사용 규제'에 대한 자신의 주장을 정하고, 타당한 근거 두 가지를 들어 글을 쓰시오.</textarea></div>
           <div><div class="rg-guide-ro">주장을 분명히 밝히고, 자료에 근거한 타당한 근거 두 가지를 들어 글을 써야 합니다.</div></div>
-          <div class="rg-del" onclick="delRecogRow(this)"><i data-lucide="trash-2" style="width:16px;height:16px"></i></div>
+          <div class="rg-act"><span class="rg-iconbtn" onclick="moveRecogRow(this,-1)"><i data-lucide="chevron-up" style="width:15px;height:15px"></i></span><span class="rg-iconbtn" onclick="moveRecogRow(this,1)"><i data-lucide="chevron-down" style="width:15px;height:15px"></i></span><span class="rg-iconbtn del" onclick="delRecogRow(this)"><i data-lucide="trash-2" style="width:15px;height:15px"></i></span></div>
         </div>
       </div>
       <div class="recog-actions">
@@ -1555,13 +1559,14 @@ function addRecogRow(){
   row.innerHTML='<div><input class="rg-c1-inp" placeholder="예: 2-2 · 근거 들기"></div>'
     +'<div><textarea class="rg-ta" placeholder="문항 내용을 입력하세요."></textarea></div>'
     +'<div></div>'
-    +'<div class="rg-del" onclick="delRecogRow(this)"><i data-lucide="trash-2" style="width:16px;height:16px"></i></div>';
+    +'<div class="rg-act"><span class="rg-iconbtn" onclick="moveRecogRow(this,-1)"><i data-lucide="chevron-up" style="width:15px;height:15px"></i></span><span class="rg-iconbtn" onclick="moveRecogRow(this,1)"><i data-lucide="chevron-down" style="width:15px;height:15px"></i></span><span class="rg-iconbtn del" onclick="delRecogRow(this)"><i data-lucide="trash-2" style="width:15px;height:15px"></i></span></div>';
   tbl.appendChild(row);
   if(window.lucide) lucide.createIcons();
   var inp=row.querySelector('.rg-c1-inp'); if(inp) inp.focus();
   markRecogDirty();
 }
 function delRecogRow(el){ var r=el.closest('.rg-row'); if(r) r.remove(); markRecogDirty(); }
+function moveRecogRow(el, dir){ var row=el.closest('.rg-row'); if(!row) return; if(dir<0){ var prev=row.previousElementSibling; if(prev && prev.classList.contains('rg-row')){ row.parentNode.insertBefore(row, prev); markRecogDirty(); } } else { var next=row.nextElementSibling; if(next && next.classList.contains('rg-row')){ row.parentNode.insertBefore(next, row); markRecogDirty(); } } }
 
 /* ===== 문항 → 부스터 데이터 연결 ===== */
 function esc(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
