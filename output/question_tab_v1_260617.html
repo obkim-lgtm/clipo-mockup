@@ -122,6 +122,12 @@
     .qcard-title{ font-size:16px; font-weight:700; color:#222631; line-height:1.45; margin:0 0 10px; }
     .qcard-badge{ margin-bottom:auto; }
     .qcard-meta{ font-size:13px; color:#6d7381; margin:14px 0 0; }
+    .qcard-tagline{ display:flex; align-items:center; flex-wrap:wrap; gap:8px 12px; margin-bottom:auto; }
+    .qst{ display:inline-flex; align-items:center; gap:4px; font-size:12.5px; font-weight:500; color:#b0b5bf; }
+    .qst.on{ color:#129a5e; }
+    .list-value{ display:flex; align-items:flex-start; gap:10px; background:#f4f8ff; border:1px solid #e0ebff; border-radius:12px; padding:15px 18px; font-size:15px; font-weight:500; color:#3151c4; line-height:1.6; margin:0 0 24px; }
+    .list-value i{ flex-shrink:0; margin-top:2px; }
+    .list-value b{ font-weight:700; }
     .ev-hd{ display:flex; align-items:flex-start; justify-content:space-between; gap:14px; }
     .ev-title{ font-size:18px; font-weight:700; color:#222631; margin:0 0 6px; display:flex; align-items:center; gap:10px; }
     .ev-meta{ font-size:14px; color:#6d7381; line-height:1.55; }
@@ -240,6 +246,29 @@
     .gen-step-label{ font-size:15px; font-weight:600; color:#8c92a0; white-space:nowrap; }
     .gen-step.active .gen-step-label{ color:#416bff; }
     .gen-step-sep{ color:#c3c8d2; margin:0 10px; display:inline-flex; align-items:center; }
+    /* 활동지 등록 방법 선택 (미등록 상세 페이지) */
+    .reg-tag{ display:inline-flex; align-items:center; gap:5px; font-size:13px; font-weight:600; color:#6d7381; background:#f1f3f5; border-radius:6px; padding:5px 11px; margin-bottom:12px; }
+    .reg-list{ display:grid; grid-template-columns:repeat(3,1fr); gap:12px; }
+    .reg-card{ display:flex; flex-direction:column; align-items:flex-start; width:100%; text-align:left; border:1.5px solid #e2e5ea; border-radius:12px; padding:18px; background:#fff; cursor:pointer; font-family:inherit; transition:border-color .12s, background .12s; position:relative; }
+    .reg-card:hover{ border-color:#a3c3ff; background:#f8faff; }
+    .reg-card.on{ border-color:#416bff; background:#f8faff; }
+    .reg-ic{ width:38px; height:38px; border-radius:9px; background:#f1f3f5; color:#6d7381; display:flex; align-items:center; justify-content:center; flex-shrink:0; margin-bottom:12px; }
+    .reg-card.on .reg-ic{ background:#e9f2ff; color:#416bff; }
+    .reg-tx{ display:block; }
+    .reg-t{ display:block; font-size:16px; font-weight:700; color:#222631; }
+    .reg-d{ display:block; font-size:14px; color:#6d7381; margin-top:5px; line-height:1.5; }
+    .reg-beta{ font-size:11px; font-weight:700; color:#416bff; background:#e9f2ff; border-radius:5px; padding:2px 7px; margin-left:6px; }
+    .reg-check{ position:absolute; top:14px; right:14px; color:#416bff; display:none; }
+    .reg-card.on .reg-check{ display:inline-flex; }
+    #reg-panel{ background:#fff; border-radius:14px; padding:28px 30px; box-shadow:0 0 1px #2226314D, 0 2px 8px #0000000F; }
+    .reg-pane-desc{ font-size:16px; color:#565d6b; line-height:1.65; margin:0 0 18px; }
+    .reg-method-label{ font-size:16px; font-weight:700; color:#222631; margin:0 0 12px; }
+    .recog-desc{ font-size:14px; color:#6d7381; line-height:1.6; margin:0 0 14px; }
+    .recog-actions{ display:flex; align-items:center; justify-content:space-between; gap:12px; margin-top:14px; }
+    .reg-ai-box{ display:flex; align-items:flex-start; gap:14px; background:#f4f8ff; border:1px solid #e0ebff; border-radius:12px; padding:18px 20px; }
+    .reg-ai-ic{ width:42px; height:42px; border-radius:10px; background:#e9f2ff; color:#416bff; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+    .reg-ai-t{ font-size:16px; font-weight:700; color:#222631; }
+    .reg-ai-d{ font-size:14px; color:#565d6b; margin-top:4px; line-height:1.55; }
     /* A4 활동지 뷰어 */
     .a4-wrap{ display:flex; justify-content:center; margin:0 0 16px; }
     .a4-sheet{ background:#fff; width:100%; max-width:794px; border:1px solid #e6e8ed; border-radius:6px; box-shadow:0 6px 28px rgba(0,0,0,.09); padding:54px 60px; box-sizing:border-box; }
@@ -597,28 +626,120 @@
     <div class="page-head">
       <div>
         <h1 class="page-h1">1학년 국어 활동지</h1>
-        <p class="page-sub">평가별로 활동지를 준비합니다. 가진 활동지나 모범답안을 올리면 채점이 더 정확해지고, 없으면 AI가 만들어 드려요.</p>
+        <p class="page-sub">등록하지 않아도 AI 채점은 그대로 실행돼요.</p>
       </div>
     </div>
+    <div class="list-value"><i data-lucide="sparkles" style="width:18px;height:18px"></i><span>활동지를 등록하면 AI가 학생 답변과 문항을 더 잘 구분해 채점이 정확해져요. 가진 활동지가 없으면 AI로 만들 수도 있어요.</span></div>
 
     <div class="card-grid">
       <!-- 활동지 미등록 -->
-      <div class="qcard" onclick="openRegModal()">
+      <div class="qcard" onclick="showRegSelect('매체 자료 비판적 읽기')">
         <h3 class="qcard-title">매체 자료 비판적 읽기</h3>
-        <div class="qcard-badge"><span class="badge badge-empty"><i data-lucide="circle-dashed" style="width:12px;height:12px"></i>활동지 미등록</span></div>
+        <div class="qcard-tagline"><span class="badge badge-empty"><i data-lucide="circle-dashed" style="width:12px;height:12px"></i>미등록</span></div>
         <p class="qcard-meta">교내 공개</p>
       </div>
       <!-- 등록완료: 직접 업로드 -->
       <div class="qcard" onclick="openRegistered('upload','2025_1학기_국어_서술형_활동지.pdf','주장하는 글 쓰기',3)">
         <h3 class="qcard-title">주장하는 글 쓰기</h3>
-        <div class="qcard-badge"><span class="badge badge-done"><i data-lucide="check" style="width:12px;height:12px"></i>활동지 등록완료</span></div>
+        <div class="qcard-tagline">
+          <span class="badge badge-done"><i data-lucide="check" style="width:12px;height:12px"></i>등록</span>
+          <span class="qst on"><i data-lucide="check-circle-2" style="width:14px;height:14px"></i>채점요소 연결</span>
+          <span class="qst on"><i data-lucide="check-circle-2" style="width:14px;height:14px"></i>모범답안</span>
+        </div>
         <p class="qcard-meta">교내 공개 · 직접 업로드</p>
       </div>
       <!-- 등록완료: 다른 선생님 활동지 복사 -->
       <div class="qcard" onclick="openRegistered('copy','매체비판_읽기와글쓰기_활동지.pdf','자료 기반 논술하기',0)">
         <h3 class="qcard-title">자료 기반 논술하기</h3>
-        <div class="qcard-badge"><span class="badge badge-done"><i data-lucide="check" style="width:12px;height:12px"></i>활동지 등록완료</span></div>
+        <div class="qcard-tagline">
+          <span class="badge badge-done"><i data-lucide="check" style="width:12px;height:12px"></i>등록</span>
+          <span class="qst on"><i data-lucide="check-circle-2" style="width:14px;height:14px"></i>채점요소 연결</span>
+          <span class="qst"><i data-lucide="circle" style="width:14px;height:14px"></i>모범답안</span>
+        </div>
         <p class="qcard-meta">교내 공개 · 김정현 선생님 활동지 복사</p>
+      </div>
+    </div>
+
+    <footer class="site-footer">
+      <div class="sf-links"><a href="#" onclick="return false;">회사소개</a><a href="#" onclick="return false;">이용약관</a><a href="#" onclick="return false;">개인정보처리방침</a><a href="#" onclick="return false;">고객센터</a></div>
+      <div class="sf-copy">© 2026. Datadriven Inc. All rights reserved.</div>
+    </footer>
+  </div>
+
+  <!-- ============ VIEW: 활동지 등록 방법 선택 (미등록 상세) ============ -->
+  <div class="page-wrap hidden" id="view-reg">
+    <button class="back-link" onclick="showList()"><i data-lucide="chevron-left" style="width:18px;height:18px"></i>목록으로</button>
+    <h1 class="page-h1" id="reg-h1">활동지 등록</h1>
+    <p class="reg-method-label" style="margin-top:18px;">어떤 방법으로 등록할까요?</p>
+    <div class="reg-list">
+      <button class="reg-card on" data-m="upload" onclick="selectReg('upload')">
+        <span class="reg-ic"><i data-lucide="upload" style="width:19px;height:19px"></i></span>
+        <span class="reg-tx"><span class="reg-t">가진 활동지 올리기</span><span class="reg-d">PDF·이미지를 올려 문항을 자동으로 인식해요.</span></span>
+        <i data-lucide="check-circle-2" class="reg-check" style="width:20px;height:20px"></i>
+      </button>
+      <button class="reg-card" data-m="copy" onclick="selectReg('copy')">
+        <span class="reg-ic"><i data-lucide="copy" style="width:19px;height:19px"></i></span>
+        <span class="reg-tx"><span class="reg-t">다른 선생님 활동지 가져오기</span><span class="reg-d">동교과 선생님이 공유한 활동지를 복사해요.</span></span>
+        <i data-lucide="check-circle-2" class="reg-check" style="width:20px;height:20px"></i>
+      </button>
+      <button class="reg-card" data-m="ai" onclick="selectReg('ai')">
+        <span class="reg-ic"><i data-lucide="wand-sparkles" style="width:19px;height:19px"></i></span>
+        <span class="reg-tx"><span class="reg-t">AI로 함께 만들기<span class="reg-beta">Beta</span></span><span class="reg-d">성취기준·채점기준에 맞춰 AI가 초안을 만들어요.</span></span>
+        <i data-lucide="check-circle-2" class="reg-check" style="width:20px;height:20px"></i>
+      </button>
+    </div>
+
+    <div id="reg-panel" style="margin-top:26px;">
+      <!-- 이미 있어요 -->
+      <div id="regp-upload" class="reg-pane">
+        <p class="reg-pane-desc">가진 활동지(PDF·이미지)를 올리면 문항을 자동으로 인식해 등록해요. 인식 결과만 확인하면 끝이에요.</p>
+        <div class="dropzone" id="rup-dz" onclick="rupUpload()">
+          <div class="dz-ic"><i data-lucide="file-up" style="width:22px;height:22px"></i></div>
+          <div class="dz-main">클릭하거나 파일을 끌어다 놓으세요.</div>
+          <div class="dz-sub">PDF, JPG, PNG 가능 · 한글 파일은 PDF로 변환해 올려주세요</div>
+        </div>
+        <div id="rup-done" class="hidden">
+          <div class="file-chip">
+            <i data-lucide="file-text" style="width:16px;height:16px"></i>
+            <span style="flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">2025_1학기_국어_서술형_활동지.pdf</span>
+            <button class="fc-change" onclick="rupUpload()"><i data-lucide="refresh-cw" style="width:13px;height:13px"></i>파일 변경</button>
+            <span class="fc-x" onclick="rupReset()"><i data-lucide="x" style="width:16px;height:16px"></i></span>
+          </div>
+          <div style="display:flex; justify-content:flex-end; margin-top:18px;">
+            <button class="btn btn-primary btn-lg" onclick="rupAnalyze()"><i data-lucide="scan-search" style="width:16px;height:16px"></i>분석 시작</button>
+          </div>
+        </div>
+      </div>
+      <!-- AI로 함께 만들어요 -->
+      <div id="regp-ai" class="reg-pane hidden">
+        <p class="reg-pane-desc">성취기준·채점기준에 맞춰 AI가 활동지 초안을 만들어요. 내용 입력 → 예상 문항 확인 → 활동지 완성, 3단계로 진행돼요.</p>
+        <div style="display:flex; justify-content:flex-end;">
+          <button class="btn btn-primary btn-lg" onclick="openGen('plan')"><i data-lucide="wand-sparkles" style="width:16px;height:16px"></i>AI로 활동지 만들기</button>
+        </div>
+      </div>
+      <!-- 다른 선생님 가져오기 -->
+      <div id="regp-copy" class="reg-pane hidden">
+        <p class="reg-pane-desc">교내 같은 교과 선생님이 공유한 활동지를 복사해 가져와요. 문항·모범답안까지 그대로 함께 복사돼요.</p>
+        <div class="modal-tools" style="padding:0; margin-bottom:14px;">
+          <span class="modal-count">총 8개</span>
+          <div class="modal-search"><input placeholder="평가명 또는 선생님 이름 입력"><i data-lucide="search" style="width:18px;height:18px"></i></div>
+        </div>
+        <table class="cp-tbl">
+          <thead><tr><th style="width:64px;">선택</th><th style="width:120px;">선생님</th><th>평가명</th><th style="width:80px;">문항</th><th style="width:120px;">최근 수정일</th></tr></thead>
+          <tbody>
+            <tr onclick="selectCopyRow(this)"><td><span class="cp-radio"></span></td><td>박서연</td><td>(중) 시 감상문 쓰기</td><td>4개</td><td>26/06/12</td></tr>
+            <tr onclick="selectCopyRow(this)"><td><span class="cp-radio"></span></td><td>박서연</td><td>설명하는 글 요약하기</td><td>3개</td><td>26/06/05</td></tr>
+            <tr onclick="selectCopyRow(this)"><td><span class="cp-radio"></span></td><td>이준호</td><td>주장하는 글쓰기</td><td>5개</td><td>26/05/28</td></tr>
+            <tr onclick="selectCopyRow(this)"><td><span class="cp-radio"></span></td><td>이준호</td><td>소설 속 인물의 심리 서술</td><td>4개</td><td>26/05/20</td></tr>
+            <tr onclick="selectCopyRow(this)"><td><span class="cp-radio"></span></td><td>김민지</td><td>매체 자료 비판적 읽기</td><td>3개</td><td>26/05/14</td></tr>
+            <tr onclick="selectCopyRow(this)"><td><span class="cp-radio"></span></td><td>김민지</td><td>토론 입론문 작성하기</td><td>6개</td><td>26/05/02</td></tr>
+            <tr onclick="selectCopyRow(this)"><td><span class="cp-radio"></span></td><td>최예린</td><td>시조의 운율과 표현 분석</td><td>3개</td><td>26/04/22</td></tr>
+            <tr onclick="selectCopyRow(this)"><td><span class="cp-radio"></span></td><td>최예린</td><td>건의하는 글 쓰기</td><td>4개</td><td>26/04/15</td></tr>
+          </tbody>
+        </table>
+        <div style="display:flex; justify-content:flex-end; margin-top:16px;">
+          <button class="btn btn-primary btn-lg" id="copyConfirm" disabled onclick="doCopy()"><i data-lucide="copy" style="width:16px;height:16px"></i>복사 생성</button>
+        </div>
       </div>
     </div>
 
@@ -986,15 +1107,58 @@
         <div><div class="up-load-t">문항을 인식하고 있어요…</div><div class="up-load-s">분량이 많으면 조금 걸릴 수 있어요</div></div>
       </div>
 
-      <!-- 업로드 후: 확정 문항 요약 (인식 결과는 팝업) -->
-      <div id="up-confirmed" class="confirmed-bar hidden">
-        <i data-lucide="circle-dashed" id="up-conf-ic" style="width:17px;height:17px"></i>
-        <span id="up-conf-text">문항 5개를 인식했어요 · 확인이 필요해요</span>
-        <button class="cb-edit" id="up-conf-btn" onclick="openRecogModal()"><i data-lucide="search" style="width:13px;height:13px"></i>인식 결과 확인</button>
+    </div>
+
+    <!-- 문항 인식 결과 (인라인) -->
+    <div class="sec hidden" id="up-recog-sec">
+      <div class="sec-hd"><span class="sec-title">문항 인식 결과</span></div>
+      <p class="recog-desc">인식된 문항이 맞는지 확인하고, 다른 부분은 직접 고치세요. 지문·이미지·표는 화면에 없어도 AI가 함께 인식해 채점에 활용해요.</p>
+      <div class="rg-tbl" id="rgTbl" oninput="markRecogDirty()">
+        <div class="rg-head"><div>문항/영역</div><div>문항 내용</div><div>학생 답변 가이드</div><div></div></div>
+
+        <div class="rg-row rg-big">
+          <div class="rg-c1"><input class="rg-bigtag-inp" value="대문항 1"></div>
+          <div><textarea class="rg-ta">다음 글을 읽고 물음에 답하시오.</textarea></div>
+          <div class="rg-muted">지시문 · 채점 없음</div>
+          <div class="rg-del" onclick="delRecogRow(this)"><i data-lucide="trash-2" style="width:16px;height:16px"></i></div>
+        </div>
+        <div class="rg-row">
+          <div><input class="rg-c1-inp" value="1-1 · 요약하기"></div>
+          <div><textarea class="rg-ta">제시문의 중심 내용을 한 문장으로 요약하시오.</textarea></div>
+          <div><div class="rg-guide-ro">중심 내용을 정확히 파악해 한 문장으로 요약해야 합니다.</div></div>
+          <div class="rg-del" onclick="delRecogRow(this)"><i data-lucide="trash-2" style="width:16px;height:16px"></i></div>
+        </div>
+        <div class="rg-row">
+          <div><input class="rg-c1-inp" value="1-2 · 근거 찾기"></div>
+          <div><textarea class="rg-ta">글쓴이가 주장을 뒷받침하기 위해 제시한 근거 두 가지를 찾아 각각 서술하시오.</textarea></div>
+          <div><div class="rg-guide-ro">근거 두 가지를 모두 찾아 각각 구체적으로 서술해야 합니다.</div></div>
+          <div class="rg-del" onclick="delRecogRow(this)"><i data-lucide="trash-2" style="width:16px;height:16px"></i></div>
+        </div>
+
+        <div class="rg-row rg-big">
+          <div class="rg-c1"><input class="rg-bigtag-inp" value="대문항 2"></div>
+          <div><textarea class="rg-ta">아래 〈자료 가〉를 읽고 물음에 답하시오.</textarea></div>
+          <div class="rg-muted">지시문 · 채점 없음</div>
+          <div class="rg-del" onclick="delRecogRow(this)"><i data-lucide="trash-2" style="width:16px;height:16px"></i></div>
+        </div>
+        <div class="rg-row">
+          <div><input class="rg-c1-inp" value="2-1 · 주장하는 글쓰기"></div>
+          <div><textarea class="rg-ta">〈자료 가〉를 바탕으로 '일회용품 사용 규제'에 대한 자신의 주장을 정하고, 타당한 근거 두 가지를 들어 글을 쓰시오.</textarea></div>
+          <div><div class="rg-guide-ro">주장을 분명히 밝히고, 자료에 근거한 타당한 근거 두 가지를 들어 글을 써야 합니다.</div></div>
+          <div class="rg-del" onclick="delRecogRow(this)"><i data-lucide="trash-2" style="width:16px;height:16px"></i></div>
+        </div>
+      </div>
+      <div class="recog-actions">
+        <button class="rg-add" onclick="addRecogRow()">+ 문항 추가</button>
+        <button class="btn btn-secondary" id="recogSaveBtn" onclick="saveRecog()"><i data-lucide="check" style="width:15px;height:15px"></i>문항 저장</button>
+      </div>
+      <div class="info-note hidden" id="recogDirty" style="margin-top:12px;">
+        <i data-lucide="info" style="width:16px;height:16px;flex-shrink:0;margin-top:1px"></i>
+        <span>문항을 수정했어요. <b>문항 저장</b>을 누르면 아래 채점요소·모범답안에 반영돼요.</span>
       </div>
     </div>
 
-    <!-- 정확도 부스터 (확정 후 · 선택 · 비순차) -->
+    <!-- 정확도 부스터 (선택 · 비순차) -->
     <div id="up-boosters" class="hidden">
       <div class="bst-intro">
         <span class="bst-intro-t">채점을 더 정확하게 <span class="opt">선택</span></span>
@@ -1057,49 +1221,12 @@
 <div class="ana-ov" id="anaModal">
   <div class="ana-card">
     <div class="ana-ring"></div>
-    <p class="ana-title">활동지를 만들고 있어요…</p>
+    <p class="ana-title" id="anaTitle">활동지를 만들고 있어요…</p>
     <p class="ana-sub">잠시만 기다려 주세요.</p>
   </div>
 </div>
 
 <!-- ===== 복사해서 가져오기 모달 ===== -->
-<div class="modal-ov" id="copyModal" onclick="if(event.target===this) closeCopyModal()">
-  <div class="modal">
-    <div class="modal-hd">
-      <span class="modal-title">복사해서 가져오기</span>
-      <button class="modal-x" onclick="closeCopyModal()"><i data-lucide="x" style="width:20px;height:20px"></i></button>
-    </div>
-    <p class="modal-desc">교내 같은 교과 선생님이 공유한 활동지를 복사해 가져옵니다. 문항과 모범답안까지 함께 복사돼요. (채점기준은 평가 설계에서 따로 가져옵니다)</p>
-    <div class="modal-tools">
-      <span class="modal-count">총 8개</span>
-      <div class="modal-search">
-        <input placeholder="평가명 또는 선생님 이름 입력">
-        <i data-lucide="search" style="width:18px;height:18px"></i>
-      </div>
-    </div>
-    <div class="modal-body">
-      <table class="cp-tbl">
-        <thead>
-          <tr><th style="width:64px;">선택</th><th style="width:120px;">선생님</th><th>평가명</th><th style="width:80px;">문항</th><th style="width:120px;">최근 수정일</th></tr>
-        </thead>
-        <tbody>
-          <tr onclick="selectCopyRow(this)"><td><span class="cp-radio"></span></td><td>박서연</td><td>(중) 시 감상문 쓰기</td><td>4개</td><td>26/06/12</td></tr>
-          <tr onclick="selectCopyRow(this)"><td><span class="cp-radio"></span></td><td>박서연</td><td>설명하는 글 요약하기</td><td>3개</td><td>26/06/05</td></tr>
-          <tr onclick="selectCopyRow(this)"><td><span class="cp-radio"></span></td><td>이준호</td><td>주장하는 글쓰기</td><td>5개</td><td>26/05/28</td></tr>
-          <tr onclick="selectCopyRow(this)"><td><span class="cp-radio"></span></td><td>이준호</td><td>소설 속 인물의 심리 서술</td><td>4개</td><td>26/05/20</td></tr>
-          <tr onclick="selectCopyRow(this)"><td><span class="cp-radio"></span></td><td>김민지</td><td>매체 자료 비판적 읽기</td><td>3개</td><td>26/05/14</td></tr>
-          <tr onclick="selectCopyRow(this)"><td><span class="cp-radio"></span></td><td>김민지</td><td>토론 입론문 작성하기</td><td>6개</td><td>26/05/02</td></tr>
-          <tr onclick="selectCopyRow(this)"><td><span class="cp-radio"></span></td><td>최예린</td><td>시조의 운율과 표현 분석</td><td>3개</td><td>26/04/22</td></tr>
-          <tr onclick="selectCopyRow(this)"><td><span class="cp-radio"></span></td><td>최예린</td><td>건의하는 글 쓰기</td><td>4개</td><td>26/04/15</td></tr>
-        </tbody>
-      </table>
-    </div>
-    <div class="modal-ft">
-      <button class="btn btn-outline btn-lg" onclick="closeCopyModal()">취소</button>
-      <button class="btn btn-primary btn-lg" id="copyConfirm" disabled onclick="doCopy()">복사 생성</button>
-    </div>
-  </div>
-</div>
 
 <!-- ===== 활동지 등록 선택 모달 ===== -->
 <div class="modal-ov" id="regModal" onclick="if(event.target===this) closeRegModal()">
@@ -1130,58 +1257,7 @@
   </div>
 </div>
 
-<!-- ===== 문항 인식 결과 확인 팝업 ===== -->
-<div class="modal-ov" id="recogModal" onclick="if(event.target===this) closeRecogModal()">
-  <div class="modal" style="width:940px; max-width:96vw;">
-    <div class="modal-hd">
-      <span class="modal-title">문항 인식 결과 확인</span>
-      <button class="modal-x" onclick="closeRecogModal()"><i data-lucide="x" style="width:20px;height:20px"></i></button>
-    </div>
-    <p class="modal-desc">인식된 문항이 맞는지 확인하고, 다른 부분은 직접 고치세요. 지문·이미지·표는 화면에 없어도 AI가 함께 인식해 채점에 활용해요.</p>
-    <div class="modal-body" style="padding-top:14px;">
-      <div class="rg-tbl" id="rgTbl">
-        <div class="rg-head"><div>문항/영역</div><div>문항 내용</div><div>학생 답변 가이드</div><div></div></div>
-
-        <div class="rg-row rg-big">
-          <div class="rg-c1"><input class="rg-bigtag-inp" value="대문항 1"></div>
-          <div><textarea class="rg-ta">다음 글을 읽고 물음에 답하시오.</textarea></div>
-          <div class="rg-muted">지시문 · 채점 없음</div>
-          <div class="rg-del" onclick="delRecogRow(this)"><i data-lucide="trash-2" style="width:16px;height:16px"></i></div>
-        </div>
-        <div class="rg-row">
-          <div><input class="rg-c1-inp" value="1-1 · 요약하기"></div>
-          <div><textarea class="rg-ta">제시문의 중심 내용을 한 문장으로 요약하시오.</textarea></div>
-          <div><div class="rg-guide-ro">중심 내용을 정확히 파악해 한 문장으로 요약해야 합니다.</div></div>
-          <div class="rg-del" onclick="delRecogRow(this)"><i data-lucide="trash-2" style="width:16px;height:16px"></i></div>
-        </div>
-        <div class="rg-row">
-          <div><input class="rg-c1-inp" value="1-2 · 근거 찾기"></div>
-          <div><textarea class="rg-ta">글쓴이가 주장을 뒷받침하기 위해 제시한 근거 두 가지를 찾아 각각 서술하시오.</textarea></div>
-          <div><div class="rg-guide-ro">근거 두 가지를 모두 찾아 각각 구체적으로 서술해야 합니다.</div></div>
-          <div class="rg-del" onclick="delRecogRow(this)"><i data-lucide="trash-2" style="width:16px;height:16px"></i></div>
-        </div>
-
-        <div class="rg-row rg-big">
-          <div class="rg-c1"><input class="rg-bigtag-inp" value="대문항 2"></div>
-          <div><textarea class="rg-ta">아래 〈자료 가〉를 읽고 물음에 답하시오.</textarea></div>
-          <div class="rg-muted">지시문 · 채점 없음</div>
-          <div class="rg-del" onclick="delRecogRow(this)"><i data-lucide="trash-2" style="width:16px;height:16px"></i></div>
-        </div>
-        <div class="rg-row">
-          <div><input class="rg-c1-inp" value="2-1 · 주장하는 글쓰기"></div>
-          <div><textarea class="rg-ta">〈자료 가〉를 바탕으로 '일회용품 사용 규제'에 대한 자신의 주장을 정하고, 타당한 근거 두 가지를 들어 글을 쓰시오.</textarea></div>
-          <div><div class="rg-guide-ro">주장을 분명히 밝히고, 자료에 근거한 타당한 근거 두 가지를 들어 글을 써야 합니다.</div></div>
-          <div class="rg-del" onclick="delRecogRow(this)"><i data-lucide="trash-2" style="width:16px;height:16px"></i></div>
-        </div>
-      </div>
-      <button class="rg-add" onclick="addRecogRow()">+ 문항 추가</button>
-    </div>
-    <div class="modal-ft" style="border-top:1px solid #e6e8ed;">
-      <button class="btn btn-outline btn-lg" onclick="closeRecogModal()">취소</button>
-      <button class="btn btn-primary btn-lg" onclick="confirmRecog()"><i data-lucide="check" style="width:16px;height:16px"></i>문항 확정</button>
-    </div>
-  </div>
-</div>
+<!-- 문항 인식 결과 팝업 → view-upload 페이지로 인라인 이동(제거됨) -->
 
 <!-- 답안 엑셀 업로드 팝업 -->
 <div class="modal-ov" id="xlsModal" onclick="if(event.target===this) closeXls()">
@@ -1380,20 +1456,45 @@ function pickScope(el, mode){ pickRadio(el); document.querySelectorAll('#recog-l
 function runGen(){ var a=document.getElementById('anaModal'); a.classList.add('open'); if(window.lucide) lucide.createIcons(); setTimeout(function(){ a.classList.remove('open'); showPlan(); }, 2200); }
 
 /* Views */
-function showView(id){ ['view-list','view-result','view-plan','view-create','view-upload'].forEach(function(v){ var el=document.getElementById(v); if(el) el.classList.toggle('hidden', v!==id); }); window.scrollTo(0,0); if(window.lucide) lucide.createIcons(); }
+function showView(id){ ['view-list','view-reg','view-result','view-plan','view-create','view-upload'].forEach(function(v){ var el=document.getElementById(v); if(el) el.classList.toggle('hidden', v!==id); }); window.scrollTo(0,0); if(window.lucide) lucide.createIcons(); }
+function showRegSelect(evName){ window._regEv=evName||'활동지'; _regPending=true; var h=document.getElementById('reg-h1'); if(h) h.textContent=(evName||'활동지')+' · 활동지'; rupReset(); selectReg('upload'); showView('view-reg'); }
+function rupUpload(){ var dz=document.getElementById('rup-dz'), done=document.getElementById('rup-done'); if(dz) dz.classList.add('hidden'); if(done) done.classList.remove('hidden'); if(window.lucide) lucide.createIcons(); }
+function rupReset(){ var dz=document.getElementById('rup-dz'), done=document.getElementById('rup-done'); if(done) done.classList.add('hidden'); if(dz) dz.classList.remove('hidden'); if(window.lucide) lucide.createIcons(); }
+function rupAnalyze(){
+  var ev=window._regEv||'활동지';
+  _upMode='new'; _gradedCount=0; window._regSource='upload'; window._regFile='2025_1학기_국어_서술형_활동지.pdf';
+  var note=document.getElementById('up-regraded-note'); if(note) note.classList.add('hidden');
+  var fc=document.getElementById('up-fc-change'); if(fc) fc.classList.remove('hidden');
+  document.getElementById('up-file-sec').classList.remove('hidden');
+  document.getElementById('up-dz').classList.add('hidden');
+  document.getElementById('up-loading').classList.add('hidden');
+  document.getElementById('up-chip').classList.remove('hidden');
+  document.getElementById('up-chip-name').textContent='2025_1학기_국어_서술형_활동지.pdf';
+  document.getElementById('up-h1').textContent=ev;
+  document.getElementById('up-sub').textContent='인식한 문항을 확인하고, 채점요소·모범답안을 더하면 채점이 더 정확해져요. (선택)';
+  document.getElementById('up-recog-sec').classList.remove('hidden');
+  document.getElementById('rubricList').innerHTML=''; document.getElementById('answerList').innerHTML='';
+  renderBoosters();
+  document.getElementById('up-boosters').classList.remove('hidden');
+  var sb=document.getElementById('up-submit'); sb.disabled=false; sb.innerHTML='<i data-lucide="check" style="width:16px;height:16px"></i>활동지 등록';
+  var a=document.getElementById('anaModal'), at=document.getElementById('anaTitle'); if(at) at.textContent='문항을 인식하고 있어요…'; a.classList.add('open'); if(window.lucide) lucide.createIcons();
+  setTimeout(function(){ a.classList.remove('open'); if(at) at.textContent='활동지를 만들고 있어요…'; showView('view-upload'); }, 1500);
+}
+function selectReg(m){ window._regSource=m; document.querySelectorAll('#view-reg .reg-card').forEach(function(c){ c.classList.toggle('on', c.getAttribute('data-m')===m); }); ['upload','ai','copy'].forEach(function(x){ var p=document.getElementById('regp-'+x); if(p) p.classList.toggle('hidden', x!==m); }); if(window.lucide) lucide.createIcons(); }
 var _upMode='new';
-function showUpload(){ _upMode='new'; _gradedCount=0; var rn=document.getElementById('up-regraded-note'); if(rn) rn.classList.add('hidden'); var fc=document.getElementById('up-fc-change'); if(fc) fc.classList.remove('hidden'); document.getElementById('up-file-sec').classList.remove('hidden'); document.getElementById('up-chip').classList.add('hidden'); document.getElementById('up-dz').classList.remove('hidden'); document.getElementById('up-loading').classList.add('hidden'); document.getElementById('up-confirmed').classList.add('hidden'); document.getElementById('up-boosters').classList.add('hidden'); document.getElementById('rubricList').innerHTML=''; document.getElementById('answerList').innerHTML=''; document.getElementById('up-chip-name').textContent='2025_1학기_국어_서술형_활동지.pdf'; document.getElementById('up-h1').textContent='활동지 업로드'; document.getElementById('up-sub').textContent='활동지를 올리면 문항을 자동으로 인식해 드려요. 결과만 확인하면 바로 등록할 수 있어요. 채점요소·모범답안을 더하면 채점이 더 정확해집니다. (선택)'; var sb=document.getElementById('up-submit'); sb.disabled=true; sb.innerHTML='<i data-lucide="check" style="width:16px;height:16px"></i>활동지 등록'; closeRecogModal(); showView('view-upload'); }
+var _regPending=false;
+function showUpload(){ _upMode='new'; _gradedCount=0; var rn=document.getElementById('up-regraded-note'); if(rn) rn.classList.add('hidden'); var fc=document.getElementById('up-fc-change'); if(fc) fc.classList.remove('hidden'); document.getElementById('up-file-sec').classList.remove('hidden'); document.getElementById('up-chip').classList.add('hidden'); document.getElementById('up-dz').classList.remove('hidden'); document.getElementById('up-loading').classList.add('hidden'); document.getElementById('up-recog-sec').classList.add('hidden'); document.getElementById('up-boosters').classList.add('hidden'); document.getElementById('rubricList').innerHTML=''; document.getElementById('answerList').innerHTML=''; document.getElementById('up-chip-name').textContent='2025_1학기_국어_서술형_활동지.pdf'; document.getElementById('up-h1').textContent='활동지 업로드'; document.getElementById('up-sub').textContent='활동지를 올리면 문항을 자동으로 인식해 드려요. 결과만 확인하면 바로 등록할 수 있어요. 채점요소·모범답안을 더하면 채점이 더 정확해집니다. (선택)'; var sb=document.getElementById('up-submit'); sb.disabled=true; sb.innerHTML='<i data-lucide="check" style="width:16px;height:16px"></i>활동지 등록'; closeRecogModal(); showView('view-upload'); }
 /* 등록완료 활동지 열기 — 업로드/인식 결과 페이지를 '등록됨' 상태로 재사용 */
 var _gradedCount=0;
 function openRegistered(source, fileName, evName, gradedCount){
-  _upMode='registered'; _gradedCount=gradedCount||0;
+  _upMode='registered'; _gradedCount=gradedCount||0; window._regSource=source; window._regFile=(source==='ai'?'':fileName); window._regEv=evName;
   var fileSec=document.getElementById('up-file-sec'), note=document.getElementById('up-regraded-note'), fc=document.getElementById('up-fc-change');
   document.getElementById('up-h1').textContent=evName||'활동지';
   fileSec.classList.remove('hidden');
   document.getElementById('up-dz').classList.add('hidden');
   document.getElementById('up-loading').classList.add('hidden');
   document.getElementById('up-chip').classList.remove('hidden');
-  document.getElementById('up-confirmed').classList.remove('hidden');
+  document.getElementById('up-recog-sec').classList.remove('hidden');
   setRecogBar(true);
   if(source==='ai'){
     document.getElementById('up-chip-name').textContent=(evName||'활동지')+' · AI 생성';
@@ -1411,7 +1512,7 @@ function openRegistered(source, fileName, evName, gradedCount){
   document.getElementById('answerList').innerHTML='';
   renderBoosters();
   if(source==='copy') prefillRegisteredData();
-  var sb=document.getElementById('up-submit'); sb.disabled=false; sb.innerHTML='<i data-lucide="check" style="width:16px;height:16px"></i>'+(source==='ai'?'활동지 저장':'변경 저장');
+  var sb=document.getElementById('up-submit'); sb.disabled=false; sb.innerHTML='<i data-lucide="check" style="width:16px;height:16px"></i>'+(source==='ai'?'활동지 저장':(_regPending?'활동지 등록':'변경 저장'));
   closeRecogModal(); showView('view-upload');
 }
 /* 복사로 함께 가져온 채점요소 연결 + 모범답안 (시연용) */
@@ -1427,9 +1528,14 @@ function prefillRegisteredData(){
   ];
   document.querySelectorAll('#answerList .bq-ans').forEach(function(ta,i){ if(answers[i]!=null) ta.value=answers[i]; });
 }
-function upDoUpload(){ document.getElementById('up-chip').classList.remove('hidden'); document.getElementById('up-dz').classList.add('hidden'); document.getElementById('up-loading').classList.remove('hidden'); if(window.lucide) lucide.createIcons(); setTimeout(function(){ document.getElementById('up-loading').classList.add('hidden'); document.getElementById('up-confirmed').classList.remove('hidden'); setRecogBar(false); openRecogModal(); }, 1600); }
-function setRecogBar(confirmed){ var bar=document.getElementById('up-confirmed'), tx=document.getElementById('up-conf-text'), bt=document.getElementById('up-conf-btn'), ic=document.getElementById('up-conf-ic'); var n=scoredCount(); if(confirmed){ bar.classList.add('confirmed'); ic.setAttribute('data-lucide','check-circle-2'); tx.textContent='문항 '+n+'개로 확정했어요'; bt.innerHTML='<i data-lucide="pencil" style="width:13px;height:13px"></i>보기·수정'; } else { bar.classList.remove('confirmed'); ic.setAttribute('data-lucide','circle-dashed'); tx.textContent='문항 '+n+'개를 인식했어요 · 확인이 필요해요'; bt.innerHTML='<i data-lucide="search" style="width:13px;height:13px"></i>인식 결과 확인'; } if(window.lucide) lucide.createIcons(); }
-function upRemove(){ document.getElementById('up-chip').classList.add('hidden'); document.getElementById('up-dz').classList.remove('hidden'); document.getElementById('up-loading').classList.add('hidden'); document.getElementById('up-confirmed').classList.add('hidden'); document.getElementById('up-boosters').classList.add('hidden'); document.getElementById('up-submit').disabled=true; document.getElementById('rubricList').innerHTML=''; document.getElementById('answerList').innerHTML=''; var ab=document.getElementById('rubricAiBtn'); if(ab){ ab.disabled=false; ab.innerHTML='<i data-lucide="wand-sparkles" style="width:14px;height:14px"></i>AI로 자동 연결 · 크레딧 1'; } if(window.lucide) lucide.createIcons(); }
+function upDoUpload(){ document.getElementById('up-chip').classList.remove('hidden'); document.getElementById('up-dz').classList.add('hidden'); document.getElementById('up-loading').classList.remove('hidden'); if(window.lucide) lucide.createIcons(); setTimeout(function(){ document.getElementById('up-loading').classList.add('hidden'); revealRecog(); }, 1600); }
+function revealRecog(){ document.getElementById('up-recog-sec').classList.remove('hidden'); renderBoosters(); document.getElementById('up-boosters').classList.remove('hidden'); document.getElementById('up-submit').disabled=false; if(window.lucide) lucide.createIcons(); }
+var _recogDirty=false;
+function markRecogDirty(){ if(_recogDirty) return; _recogDirty=true; var d=document.getElementById('recogDirty'); if(d) d.classList.remove('hidden'); var sb=document.getElementById('up-submit'); if(sb) sb.disabled=true; if(window.lucide) lucide.createIcons(); }
+function clearRecogDirty(){ _recogDirty=false; var d=document.getElementById('recogDirty'); if(d) d.classList.add('hidden'); }
+function saveRecog(){ renderBoosters(); var sb=document.getElementById('up-submit'); if(sb) sb.disabled=false; if(window.lucide) lucide.createIcons(); toastMsg('수정한 문항을 반영했어요.'); }
+function setRecogBar(confirmed){ /* 인식바 제거 — 문항은 인라인 표시 */ }
+function upRemove(){ document.getElementById('up-chip').classList.add('hidden'); document.getElementById('up-dz').classList.remove('hidden'); document.getElementById('up-loading').classList.add('hidden'); document.getElementById('up-recog-sec').classList.add('hidden'); document.getElementById('up-boosters').classList.add('hidden'); document.getElementById('up-submit').disabled=true; document.getElementById('rubricList').innerHTML=''; document.getElementById('answerList').innerHTML=''; var ab=document.getElementById('rubricAiBtn'); if(ab){ ab.disabled=false; ab.innerHTML='<i data-lucide="wand-sparkles" style="width:14px;height:14px"></i>AI로 자동 연결 · 크레딧 1'; } if(window.lucide) lucide.createIcons(); }
 function confirmRemoveFile(){ document.getElementById('delFileModal').classList.add('open'); if(window.lucide) lucide.createIcons(); }
 function closeDelFileModal(){ document.getElementById('delFileModal').classList.remove('open'); }
 function delFileConfirm(){ closeDelFileModal(); upRemove(); toastMsg('활동지 파일을 삭제했어요.'); }
@@ -1440,8 +1546,8 @@ function openFx(btn){ _fxTarget=btn.closest('.bq').querySelector('.bq-ans'); var
 function closeFx(){ document.getElementById('fxModal').classList.remove('open'); }
 function fxIns(t){ var i=document.getElementById('fxInput'); var a=i.selectionStart, b=i.selectionEnd; if(a==null){a=b=i.value.length;} i.value=i.value.slice(0,a)+t+i.value.slice(b); var pos=a+t.length; i.focus(); i.setSelectionRange(pos,pos); }
 function fxInsertToTarget(){ var v=document.getElementById('fxInput').value.trim(); if(v && _fxTarget){ var sep=(_fxTarget.value && !/\s$/.test(_fxTarget.value))?' ':''; _fxTarget.value += sep+'$'+v+'$'; closeFx(); toastMsg('수식을 답안에 넣었어요.'); } else { closeFx(); } }
-function openRecogModal(){ document.getElementById('recogModal').classList.add('open'); if(window.lucide) lucide.createIcons(); }
-function closeRecogModal(){ document.getElementById('recogModal').classList.remove('open'); }
+function openRecogModal(){ var m=document.getElementById('recogModal'); if(m){ m.classList.add('open'); if(window.lucide) lucide.createIcons(); } }
+function closeRecogModal(){ var m=document.getElementById('recogModal'); if(m) m.classList.remove('open'); }
 function addRecogRow(){
   var tbl=document.getElementById('rgTbl');
   var row=document.createElement('div');
@@ -1453,8 +1559,9 @@ function addRecogRow(){
   tbl.appendChild(row);
   if(window.lucide) lucide.createIcons();
   var inp=row.querySelector('.rg-c1-inp'); if(inp) inp.focus();
+  markRecogDirty();
 }
-function delRecogRow(el){ var r=el.closest('.rg-row'); if(r) r.remove(); }
+function delRecogRow(el){ var r=el.closest('.rg-row'); if(r) r.remove(); markRecogDirty(); }
 
 /* ===== 문항 → 부스터 데이터 연결 ===== */
 function esc(s){ return String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
@@ -1515,9 +1622,10 @@ function renderBoosters(){
   var qs=collectQuestions();
   renderRubricList(qs, snap.rubric);
   renderAnswerList(qs, snap.answer);
+  clearRecogDirty();
   if(window.lucide) lucide.createIcons();
 }
-function confirmRecog(){ renderBoosters(); closeRecogModal(); document.getElementById('up-confirmed').classList.remove('hidden'); setRecogBar(true); document.getElementById('up-boosters').classList.remove('hidden'); document.getElementById('up-submit').disabled=false; toastMsg('문항을 확정했어요.'); }
+function confirmRecog(){ revealRecog(); }
 function toggleBst(hd){ hd.parentElement.classList.toggle('open'); if(window.lucide) lucide.createIcons(); }
 function pickBchip(el){ el.classList.toggle('on'); if(!el.classList.contains('on')){ el.classList.remove('ai'); var s=el.querySelector('small'); if(s) s.remove(); } }
 function aiLinkRubrics(btn){
@@ -1538,12 +1646,12 @@ function aiLinkRubrics(btn){
     toastMsg('AI가 문항별 채점요소를 연결했어요. (크레딧 1개 사용)');
   }, 1500);
 }
-function upSubmit(){ if(_upMode==='registered' && _gradedCount>0){ document.getElementById('saveRegModal').classList.add('open'); if(window.lucide) lucide.createIcons(); return; } toastMsg(_upMode==='registered'?'변경 사항을 저장했어요.':'활동지를 등록했어요. 인식 결과로 채점이 정확해져요.'); setTimeout(showList, 800); }
+function upSubmit(){ if(_regPending){ finalizeRegistration(); _regPending=false; toastMsg('활동지를 등록했어요. 인식 결과로 채점이 정확해져요.'); setTimeout(showList, 800); return; } if(_upMode==='registered' && _gradedCount>0){ document.getElementById('saveRegModal').classList.add('open'); if(window.lucide) lucide.createIcons(); return; } toastMsg(_upMode==='registered'?'변경 사항을 저장했어요.':'활동지를 등록했어요. 인식 결과로 채점이 정확해져요.'); setTimeout(showList, 800); }
 function closeSaveReg(){ document.getElementById('saveRegModal').classList.remove('open'); }
 function saveRegOnly(){ closeSaveReg(); toastMsg('변경 사항을 저장했어요. 다시 채점해야 반영돼요.'); setTimeout(showList, 900); }
 function saveRegAndRescore(){ closeSaveReg(); toastMsg('변경 사항을 저장하고 채점 화면으로 이동합니다.'); setTimeout(showList, 1000); }
 function showResult(){ showView('view-result'); }
-function showList(){ showView('view-list'); }
+function showList(){ _regPending=false; showView('view-list'); }
 function showPlan(){ showView('view-plan'); var fromPlan=(window._genMode==='plan'); document.getElementById('plan-rubric-full').classList.toggle('hidden', fromPlan); }
 function finalizePlan(){ var a=document.getElementById('anaModal'); a.classList.add('open'); if(window.lucide) lucide.createIcons(); setTimeout(function(){ a.classList.remove('open'); showResult(); }, 1800); }
 
@@ -1562,17 +1670,28 @@ document.addEventListener('click', function(){ closeNewMenu(); });
 function openCopyModal(){ document.getElementById('copyModal').classList.add('open'); setTimeout(function(){ if(window.lucide) lucide.createIcons(); },20); }
 function closeCopyModal(){ document.getElementById('copyModal').classList.remove('open'); }
 var _copySel=null;
-function selectCopyRow(tr){ document.querySelectorAll('#copyModal .cp-tbl tbody tr').forEach(function(r){r.classList.remove('on');}); tr.classList.add('on'); document.getElementById('copyConfirm').disabled=false; _copySel={ teacher: tr.children[1].textContent.trim(), name: tr.children[2].textContent.trim() }; }
-function addCopiedCard(ev, file, teacher){
-  var grid=document.querySelector('#view-list .card-grid'); if(!grid) return;
-  var card=document.createElement('div'); card.className='qcard';
-  card.setAttribute('onclick', "openRegistered('copy','"+file+"','"+ev+"',0)");
-  card.innerHTML='<h3 class="qcard-title">'+ev+'</h3>'
-    +'<div class="qcard-badge"><span class="badge badge-done"><i data-lucide="check" style="width:12px;height:12px"></i>활동지 등록완료</span></div>'
-    +'<p class="qcard-meta">교내 공개 · '+teacher+' 선생님 활동지 복사</p>';
-  grid.appendChild(card);
+function selectCopyRow(tr){ document.querySelectorAll('.cp-tbl tbody tr').forEach(function(r){r.classList.remove('on');}); tr.classList.add('on'); document.getElementById('copyConfirm').disabled=false; _copySel={ teacher: tr.children[1].textContent.trim(), name: tr.children[2].textContent.trim() }; }
+function buildRegCardInner(ev, rubricOn, answerOn, metaSrc){
+  function qst(on,label){ return '<span class="qst'+(on?' on':'')+'"><i data-lucide="'+(on?'check-circle-2':'circle')+'" style="width:14px;height:14px"></i>'+label+'</span>'; }
+  return '<h3 class="qcard-title">'+ev+'</h3>'
+    +'<div class="qcard-tagline"><span class="badge badge-done"><i data-lucide="check" style="width:12px;height:12px"></i>등록</span>'+qst(rubricOn,'채점요소 연결')+qst(answerOn,'모범답안')+'</div>'
+    +'<p class="qcard-meta">교내 공개 · '+metaSrc+'</p>';
 }
-function doCopy(){ if(!_copySel) return; closeCopyModal(); var ev=_copySel.name, file=ev.replace(/[()\s]/g,'')+'_활동지.pdf'; addCopiedCard(ev, file, _copySel.teacher); toastMsg('‘'+ev+'’ 활동지를 복사해 가져왔어요.'); openRegistered('copy', file, ev, 0); }
+function regOpen(ev,source,file){ return "openRegistered('"+source+"','"+String(file).replace(/'/g,'')+"','"+String(ev).replace(/'/g,'')+"',0)"; }
+function finalizeRegistration(){
+  var ev=window._regEv||'활동지', source=window._regSource||'upload', file=window._regFile||'';
+  var rubricOn=document.querySelectorAll('#rubricList .bchip.on').length>0;
+  var answerOn=Array.prototype.some.call(document.querySelectorAll('#answerList .bq-ans'), function(t){ return t.value.trim()!==''; });
+  var metaSrc=source==='ai'?'AI 생성':(source==='copy'?((window._copyTeacher?window._copyTeacher+' 선생님 ':'')+'활동지 복사'):'직접 업로드');
+  var grid=document.querySelector('#view-list .card-grid'); if(!grid) return;
+  var target=null;
+  grid.querySelectorAll('.qcard').forEach(function(c){ var t=c.querySelector('.qcard-title'); if(t && t.textContent.trim()===ev && c.querySelector('.badge-empty')) target=c; });
+  var inner=buildRegCardInner(ev, rubricOn, answerOn, metaSrc);
+  if(target){ target.setAttribute('onclick', regOpen(ev,source,file)); target.innerHTML=inner; }
+  else { var card=document.createElement('div'); card.className='qcard'; card.setAttribute('onclick', regOpen(ev,source,file)); card.innerHTML=inner; grid.appendChild(card); }
+  if(window.lucide) lucide.createIcons();
+}
+function doCopy(){ if(!_copySel) return; var src=_copySel.name, file=src.replace(/[()\s]/g,'')+'_활동지.pdf', ev=window._regEv||src; window._copyTeacher=_copySel.teacher; toastMsg('‘'+src+'’ 활동지를 복사해 가져왔어요.'); openRegistered('copy', file, ev, 0); }
 function openRegModal(){ document.getElementById('regModal').classList.add('open'); if(window.lucide) lucide.createIcons(); }
 function closeRegModal(){ document.getElementById('regModal').classList.remove('open'); }
 
