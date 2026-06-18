@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>활동지 등록 진입 — 스타일 시안</title>
+<link rel="icon" type="image/png" href="clipo_favicon.png">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard-gov.min.css">
+<style>
+  *{ box-sizing:border-box; margin:0; padding:0; }
+  body{ font-family:'Pretendard GOV',sans-serif; background:#f1f3f5; color:#222631; padding:40px 24px 80px; }
+  .wrap{ max-width:1080px; margin:0 auto; }
+  .page-title{ font-size:26px; font-weight:700; margin:0 0 8px; }
+  .page-lead{ font-size:16px; color:#3b3f4c; line-height:1.65; margin:0 0 6px; }
+  .principle{ background:#fff7ec; border:1px solid #f3e2b8; border-radius:12px; padding:16px 18px; font-size:14px; color:#8a5a12; line-height:1.65; margin:20px 0 40px; }
+  .principle b{ font-weight:700; }
+
+  .case{ margin-bottom:48px; }
+  .case-hd{ display:flex; align-items:center; gap:10px; margin-bottom:6px; }
+  .case-no{ font-size:13px; font-weight:700; color:#fff; background:#3151c4; border-radius:6px; padding:3px 9px; }
+  .case-title{ font-size:19px; font-weight:700; }
+  .rec{ font-size:12px; font-weight:700; color:#129a5e; background:#e4f7ee; border-radius:5px; padding:2px 8px; }
+  .case-why{ font-size:14px; color:#565d6b; line-height:1.6; margin:0 0 18px; }
+  .stage{ background:#e9ebef; border-radius:16px; padding:36px; display:flex; align-items:center; justify-content:center; min-height:240px; position:relative; }
+  .stage.tall{ min-height:300px; }
+
+  /* 공통 카드/아이콘 */
+  .ic{ width:38px; height:38px; border-radius:9px; background:#f1f3f5; color:#6d7381; display:inline-flex; align-items:center; justify-content:center; flex-shrink:0; }
+  .ic.blue{ background:#e9f2ff; color:#416bff; }
+  .beta{ font-size:11px; font-weight:700; color:#416bff; background:#e9f2ff; border-radius:5px; padding:2px 7px; margin-left:6px; vertical-align:middle; }
+
+  /* ===== 시안 A: 리스트 선택 모달 ===== */
+  .mc{ background:#fff; border-radius:16px; width:480px; max-width:100%; box-shadow:0 20px 60px rgba(0,0,0,.18); overflow:hidden; }
+  .mc-hd{ display:flex; align-items:flex-start; justify-content:space-between; padding:24px 26px 0; }
+  .mc-title{ font-size:20px; font-weight:700; }
+  .mc-x{ color:#9ea3ad; cursor:pointer; }
+  .mc-desc{ font-size:15px; color:#6d7381; padding:6px 26px 0; }
+  .opt-list{ padding:18px 18px 20px; display:flex; flex-direction:column; gap:6px; }
+  .opt-row{ display:flex; align-items:center; gap:14px; width:100%; text-align:left; border:none; background:none; font-family:inherit; padding:14px 14px; border-radius:12px; cursor:pointer; transition:background .12s; }
+  .opt-row:hover{ background:#f6f8fb; }
+  .opt-tx{ flex:1; min-width:0; }
+  .opt-t{ display:block; font-size:16px; font-weight:700; color:#222631; }
+  .opt-d{ display:block; font-size:13px; color:#6d7381; margin-top:3px; line-height:1.5; }
+  .opt-arrow{ color:#c3c8d4; flex-shrink:0; }
+  .opt-row:hover .opt-arrow{ color:#416bff; }
+
+  /* ===== 시안 B: 드롭다운 ===== */
+  .b-bar{ width:100%; display:flex; justify-content:flex-end; }
+  .b-wrap{ position:relative; display:inline-block; }
+  .b-btn{ display:inline-flex; align-items:center; gap:7px; background:#416bff; color:#fff; border:none; border-radius:10px; padding:12px 18px; font-size:15px; font-weight:600; font-family:inherit; cursor:pointer; }
+  .b-menu{ position:absolute; top:50px; right:0; width:340px; background:#fff; border-radius:12px; box-shadow:0 0 1px #2226314D,0 12px 30px rgba(0,0,0,.16); padding:8px; }
+  .b-item{ display:flex; align-items:center; gap:12px; width:100%; text-align:left; border:none; background:none; font-family:inherit; padding:12px 12px; border-radius:9px; cursor:pointer; }
+  .b-item:hover{ background:#f6f8fb; }
+  .b-item .ic{ width:34px; height:34px; }
+  .b-it{ font-size:15px; font-weight:700; }
+  .b-id{ font-size:12.5px; color:#6d7381; margin-top:2px; line-height:1.45; }
+
+  /* ===== 시안 C: 페이지 인라인 선택 ===== */
+  .c-page{ background:#fff; border-radius:16px; width:100%; max-width:760px; padding:40px; box-shadow:0 2px 10px rgba(0,0,0,.05); }
+  .c-h1{ font-size:22px; font-weight:700; margin:0 0 6px; }
+  .c-sub{ font-size:15px; color:#6d7381; margin:0 0 26px; }
+  .c-list{ display:flex; flex-direction:column; gap:12px; }
+  .c-card{ display:flex; align-items:center; gap:16px; border:1px solid #e6e8ed; border-radius:12px; padding:20px; cursor:pointer; transition:border-color .12s, box-shadow .12s; }
+  .c-card:hover{ border-color:#a3c3ff; box-shadow:0 4px 14px rgba(65,107,255,.08); }
+  .c-card .ic{ width:44px; height:44px; }
+  .c-ct{ font-size:17px; font-weight:700; }
+  .c-cd{ font-size:14px; color:#6d7381; margin-top:3px; }
+  .c-arrow{ margin-left:auto; color:#c3c8d4; }
+  .c-card:hover .c-arrow{ color:#416bff; }
+  /* 상세 페이지형 */
+  .page-stage{ background:#eef0f3; padding:22px; align-items:stretch; }
+  .detail-page{ background:#fff; border-radius:12px; width:100%; padding:34px 40px; }
+  .dp-back{ background:none; border:none; font-family:inherit; font-size:14px; font-weight:600; color:#3b3f4c; cursor:pointer; padding:0; margin-bottom:14px; display:inline-flex; align-items:center; gap:4px; }
+  .dp-h1{ font-size:22px; font-weight:700; margin:0 0 6px; }
+  .dp-sub{ font-size:15px; color:#6d7381; margin:0 0 24px; }
+  .dp-tag{ display:inline-flex; align-items:center; gap:5px; font-size:13px; font-weight:600; color:#6d7381; background:#f1f3f5; border-radius:6px; padding:5px 11px; margin-bottom:20px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1 class="page-title">활동지 등록 진입 — 스타일 시안</h1>
+  <p class="page-lead">현재 "활동지 등록" 팝업(3개 큰 카드)에 대한 피드백: <b>"상세 페이지로 가는 네비게이션인데, 길을 막는 카드 벽처럼 느껴진다."</b></p>
+  <div class="principle">
+    <b>UI/UX 원칙</b> — 모달(팝업)은 <b>집중이 필요한 짧은 과업·확인</b>에 쓰는 게 일반적이에요. "여러 경로 중 골라 각자 다른 페이지로 이동"하는 건 모달보다 <b>메뉴·리스트·인라인 선택</b>이 더 자연스럽고, 사용자가 "왜 막혔지?"를 안 느껴요. 아래 3가지 방향을 비교해 골라 주세요.
+  </div>
+
+  <!-- 시안 A -->
+  <div class="case">
+    <div class="case-hd"><span class="case-no">시안 A</span><span class="case-title">리스트 선택 모달</span><span class="rec" style="color:#6d7381;background:#f1f3f5;">빠른 대안</span></div>
+    <p class="case-why">팝업은 유지하되 큰 카드 → <b>메뉴형 리스트 행</b>으로. 우측 화살표(→)가 "누르면 해당 화면으로 이동"을 알려줘 "벽" 느낌이 사라져요. 좁고(480px) 가벼워 길막 느낌 ↓. (네이버·토스 등에서 흔한 선택 모달 스타일)</p>
+    <div class="stage tall">
+      <div class="mc">
+        <div class="mc-hd"><span class="mc-title">활동지 등록</span><span class="mc-x"><i data-lucide="x" style="width:20px;height:20px"></i></span></div>
+        <p class="mc-desc">이 평가의 활동지를 어떻게 등록할까요?</p>
+        <div class="opt-list">
+          <button class="opt-row"><span class="ic"><i data-lucide="upload" style="width:19px;height:19px"></i></span><span class="opt-tx"><span class="opt-t">이미 있어요</span><span class="opt-d">가진 활동지를 올려 그대로 등록해요.</span></span><i data-lucide="chevron-right" class="opt-arrow" style="width:20px;height:20px"></i></button>
+          <button class="opt-row"><span class="ic blue"><i data-lucide="wand-sparkles" style="width:19px;height:19px"></i></span><span class="opt-tx"><span class="opt-t">AI로 함께 만들어요<span class="beta">Beta</span></span><span class="opt-d">성취기준·채점기준을 바탕으로 초안을 만들어요.</span></span><i data-lucide="chevron-right" class="opt-arrow" style="width:20px;height:20px"></i></button>
+          <button class="opt-row"><span class="ic"><i data-lucide="copy" style="width:19px;height:19px"></i></span><span class="opt-tx"><span class="opt-t">다른 선생님의 활동지를 가져와요</span><span class="opt-d">동교과 선생님의 활동지를 복사해요.</span></span><i data-lucide="chevron-right" class="opt-arrow" style="width:20px;height:20px"></i></button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 시안 B -->
+  <div class="case">
+    <div class="case-hd"><span class="case-no">시안 B</span><span class="case-title">드롭다운 메뉴 (모달 없음)</span></div>
+    <p class="case-why">목록 화면의 <b>"활동지 등록 ▾" 버튼</b>을 누르면 그 자리에서 3개 메뉴가 펼쳐져요. 화면을 막지 않아 가장 가벼움. 단, 옵션마다 설명이 길거나 동등하게 비중을 주고 싶을 땐 답답할 수 있어요. (평가 설계의 "만들기 ▾" 패턴)</p>
+    <div class="stage">
+      <div class="b-bar">
+        <div class="b-wrap">
+          <button class="b-btn"><i data-lucide="plus" style="width:17px;height:17px"></i>활동지 등록<i data-lucide="chevron-down" style="width:16px;height:16px"></i></button>
+          <div class="b-menu">
+            <button class="b-item"><span class="ic"><i data-lucide="upload" style="width:17px;height:17px"></i></span><div><div class="b-it">이미 있어요</div><div class="b-id">가진 활동지를 올려 그대로 등록해요.</div></div></button>
+            <button class="b-item"><span class="ic blue"><i data-lucide="wand-sparkles" style="width:17px;height:17px"></i></span><div><div class="b-it">AI로 함께 만들어요<span class="beta">Beta</span></div><div class="b-id">성취기준·채점기준을 바탕으로 초안을 만들어요.</div></div></button>
+            <button class="b-item"><span class="ic"><i data-lucide="copy" style="width:17px;height:17px"></i></span><div><div class="b-it">다른 선생님의 활동지를 가져와요</div><div class="b-id">동교과 선생님의 활동지를 복사해요.</div></div></button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 시안 C -->
+  <div class="case">
+    <div class="case-hd"><span class="case-no">시안 C</span><span class="case-title">활동지 상세 화면 안에서 선택 (모달 없음)</span><span class="rec">추천</span></div>
+    <p class="case-why">미등록 활동지를 누르면 <b>팝업이 아니라 '활동지 상세' 화면으로 진입</b>해요. 등록완료면 이 자리에 활동지·문항이 보이고, <b>미등록이면 같은 화면에 '등록 방법 선택'이 들어가요.</b> 모달을 네비게이션으로 안 쓰니 원칙에 부합하고, 등록완료 상세와 같은 틀이라 일관돼요.</p>
+    <div class="stage page-stage tall">
+      <div class="detail-page">
+        <button class="dp-back"><i data-lucide="chevron-left" style="width:18px;height:18px"></i>목록으로</button>
+        <span class="dp-tag"><i data-lucide="circle-dashed" style="width:14px;height:14px"></i>활동지 미등록</span>
+        <h2 class="dp-h1">매체 자료 비판적 읽기 · 활동지</h2>
+        <p class="dp-sub">이 평가의 활동지를 어떻게 등록할까요?</p>
+        <div class="c-list">
+          <div class="c-card"><span class="ic"><i data-lucide="upload" style="width:22px;height:22px"></i></span><div><div class="c-ct">이미 있어요</div><div class="c-cd">가진 활동지를 올려 그대로 등록해요.</div></div><i data-lucide="chevron-right" class="c-arrow" style="width:22px;height:22px"></i></div>
+          <div class="c-card"><span class="ic blue"><i data-lucide="wand-sparkles" style="width:22px;height:22px"></i></span><div><div class="c-ct">AI로 함께 만들어요<span class="beta">Beta</span></div><div class="c-cd">성취기준·채점기준을 바탕으로 초안을 만들어요.</div></div><i data-lucide="chevron-right" class="c-arrow" style="width:22px;height:22px"></i></div>
+          <div class="c-card"><span class="ic"><i data-lucide="copy" style="width:22px;height:22px"></i></span><div><div class="c-ct">다른 선생님의 활동지를 가져와요</div><div class="c-cd">동교과 선생님의 활동지를 복사해요.</div></div><i data-lucide="chevron-right" class="c-arrow" style="width:22px;height:22px"></i></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<script>lucide.createIcons();</script>
+</body>
+</html>
