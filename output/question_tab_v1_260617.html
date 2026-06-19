@@ -799,7 +799,7 @@
         <span style="font-size:13px;color:#9ea3ad;display:inline-flex;align-items:center;gap:4px;"><i data-lucide="sparkles" style="width:13px;height:13px"></i>크레딧 1개 사용</span>
       </div>
       <div class="pa-btns">
-        <button class="btn btn-outline btn-lg" style="border-color:#416bff;color:#416bff;" onclick="openRegistered('ai','','비판적 읽기와 주장하는 글쓰기',0)">활동지 등록</button>
+        <button class="btn btn-outline btn-lg" style="border-color:#416bff;color:#416bff;" onclick="openRegistered('ai','',window._regEv||'비판적 읽기와 주장하는 글쓰기',0)">활동지 등록</button>
         <button class="btn btn-primary btn-lg" onclick="toastMsg('한글(HWP) 다운로드는 이 목업에서 제공하지 않습니다.')"><i data-lucide="download" style="width:16px;height:16px"></i>한글 다운로드</button>
       </div>
     </div>
@@ -1434,6 +1434,10 @@ function openGen(mode){
   showView('view-create');
 }
 function closeGen(){}
+function makeFourStep(){ document.querySelectorAll('.gen-steps').forEach(function(gs){ if(gs.getAttribute('data-4')) return; gs.setAttribute('data-4','1'); gs.querySelectorAll('.gen-step-num').forEach(function(n){ n.textContent=String(parseInt(n.textContent,10)+1); }); var sep=document.createElement('span'); sep.className='gen-step-sep'; sep.innerHTML='<i data-lucide="chevron-right" style="width:18px;height:18px"></i>'; var info=document.createElement('div'); info.className='gen-step clickable'; info.setAttribute('onclick',"location.href='eval_plan_v1_260619.html?make=sheet'"); info.innerHTML='<span class="gen-step-num">1</span><span class="gen-step-label">활동지 정보</span>'; gs.insertBefore(sep, gs.firstChild); gs.insertBefore(info, gs.firstChild); });
+  var _bc=document.querySelector('#view-create .back-link'); if(_bc){ _bc.setAttribute('onclick',"location.href='eval_plan_v1_260619.html?make=sheet'"); _bc.innerHTML='<i data-lucide="chevron-left" style="width:18px;height:18px"></i>이전으로'; }
+  var _br=document.querySelector('#view-result .back-link'); if(_br){ _br.setAttribute('onclick',"showView('view-plan')"); _br.innerHTML='<i data-lucide="chevron-left" style="width:18px;height:18px"></i>이전으로'; }
+  if(window.lucide) lucide.createIcons(); }
 function openRegen(){ var d=document.getElementById('regenDir'); if(d) d.value=''; document.getElementById('regenModal').classList.add('open'); if(window.lucide) lucide.createIcons(); setTimeout(function(){ if(d) d.focus(); },40); }
 function closeRegen(){ document.getElementById('regenModal').classList.remove('open'); }
 function doRegen(){ closeRegen(); runGen(); }
@@ -1714,9 +1718,11 @@ function closeRegModal(){ document.getElementById('regModal').classList.remove('
 lucide.createIcons();
 /* 외부(평가 준비 등)에서 활동지 카드 클릭 → 인식완료 상세 바로 열기 */
 (function(){ try{ var p=new URLSearchParams(location.search); var open=p.get('open'); if(!open) return; var ev=p.get('ev')||'활동지'; window._backTo='eval_plan_v1_260619.html';
+  document.querySelectorAll('.icon-sb .si').forEach(function(s){ var l=s.querySelector('.si-label'); s.classList.toggle('active', !!(l && l.textContent.trim().indexOf('평가 준비')===0)); });
+  var _tbi=document.querySelector('.tab-band-inner'); if(_tbi) _tbi.innerHTML='<button class="sub-tab on" onclick="location.href=\'eval_plan_v1_260619.html\'">나의 자료</button><button class="sub-tab" onclick="location.href=\'eval_plan_v1_260619.html?tab=shared\'">학교 자료실</button>';
   if(open==='detail'){ var src=p.get('src')||'upload'; var file=p.get('file')||(ev.replace(/\s+/g,'_')+'.pdf'); openRegistered(src, file, ev, 0); }
-  else if(open==='upload'){ window._regEv=ev; showUpload(); document.getElementById('up-h1').textContent=ev; var un=document.getElementById('up-name'); if(un) un.value=ev; }
-  else if(open==='ai'){ window._regEv=ev; openGen('plan'); }
+  else if(open==='upload'){ window._regEv=ev; showUpload(); var bs=document.getElementById('up-basic-sec'); if(bs) bs.classList.add('hidden'); document.getElementById('up-h1').textContent=ev; var _bu=document.querySelector('#view-upload .back-link'); if(_bu){ _bu.setAttribute('onclick',"location.href='eval_plan_v1_260619.html?make=sheet'"); _bu.innerHTML='<i data-lucide="chevron-left" style="width:18px;height:18px"></i>이전으로'; } }
+  else if(open==='ai'){ window._regEv=ev; var rub=p.get('rub')||'self'; openGen(rub==='ai'?'standalone':'plan'); makeFourStep(); }
   if(window.lucide) lucide.createIcons();
 }catch(e){} })();
 </script>
