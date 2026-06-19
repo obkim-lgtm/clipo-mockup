@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/png" href="clipo_favicon.png">
+  <title>평가 준비 — CLIPO</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard-gov.min.css">
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+  <style>
+    *{ font-family:'Pretendard GOV',-apple-system,sans-serif; box-sizing:border-box; }
+    body{ margin:0; background:#f6f7f9; color:#222631; font-size:16px; min-width:1280px; }
+    a{ text-decoration:none; color:inherit; }
+    button{ font-family:inherit; }
+    .hidden{ display:none !important; }
+
+    /* ===== Global Header ===== */
+    .g-hd { height:56px; background:#fff; border-bottom:1px solid #d9d9d9; display:flex; align-items:center; padding:0 20px 0 8px; position:fixed; top:0; left:0; right:0; z-index:200; }
+    .gh-menu-btn { width:36px; height:36px; border:none; background:none; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; color:#3b3f4c; margin-right:8px; line-height:1; }
+    .g-hd-r { margin-left:auto; display:flex; align-items:center; gap:6px; font-size:14px; color:#3b3f4c; }
+    .plan-badge { background:#eef3ff; color:#416bff; font-size:12px; font-weight:600; padding:3px 10px; border-radius:12px; }
+    .hd-div { width:1px; height:14px; background:#d9d9d9; margin:0 4px; }
+    .credit-wrap { display:flex; align-items:center; gap:4px; font-size:14px; font-weight:500; color:#3b3f4c; }
+    .user-btn { display:inline-flex; align-items:center; justify-content:center; gap:6px; padding:0; border:none; background:none; font-size:14px; color:#222631; cursor:pointer; line-height:1; font-weight:500; }
+
+    /* ===== Sidebar ===== */
+    .icon-sb { width:56px; background:#fff; border-right:1px solid #d9d9d9; position:fixed; top:56px; bottom:0; left:0; display:flex; flex-direction:column; padding:8px 0; z-index:150; transition:width .2s ease; }
+    .icon-sb.expanded { width:200px; }
+    .si { height:40px; display:flex; align-items:center; border-radius:8px; color:#6d7381; cursor:pointer; margin:0 8px 2px; position:relative; padding:0 4px 0 8px; gap:10px; white-space:nowrap; flex-shrink:0; }
+    .si:hover { background:#f1f3f5; }
+    .si.active { background:#e9f2ff; color:#416bff; }
+    .si-icon { width:24px; height:24px; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+    .si-label { font-size:13px; font-weight:500; opacity:0; transition:opacity .1s; overflow:hidden; }
+    .icon-sb.expanded .si-label { opacity:1; }
+    .si-tip { position:absolute; left:48px; top:50%; transform:translateY(-50%); background:#222631; color:#fff; font-size:11px; padding:3px 8px; border-radius:4px; white-space:nowrap; display:none; z-index:300; pointer-events:none; }
+    .si:hover .si-tip { display:block; }
+    .icon-sb.expanded .si-tip { display:none !important; }
+    .nav-bottom { margin-top:auto; width:100%; }
+    .nav-div { height:1px; background:#f1f3f5; margin:4px 8px; }
+
+    /* ===== Layout ===== */
+    .main-wrap{ padding-top:56px; padding-left:56px; transition:padding-left .2s; min-height:100vh; display:flex; flex-direction:column; }
+    body.nav-expanded .main-wrap{ padding-left:200px; }
+
+    /* ===== Tab band ===== */
+    .tab-band{ background:white; border-bottom:1px solid #dde1e8; }
+    .tab-band-inner{ max-width:1240px; margin:0 auto; padding:0 32px; display:flex; gap:8px; }
+    .sub-tab{ padding:18px 14px; font-size:16px; font-weight:500; color:#3b3f4c; border:none; background:none; cursor:pointer; font-family:inherit; border-bottom:2px solid transparent; margin-bottom:-1px; display:inline-flex; align-items:center; justify-content:center; line-height:1; }
+    .sub-tab:hover{ color:#222631; }
+    .sub-tab.on{ color:#416bff; border-bottom:2px solid #416bff; }
+
+    /* ===== Page ===== */
+    .page-wrap{ max-width:1240px; width:100%; margin:0 auto; padding:28px 32px 0; flex:1; display:flex; flex-direction:column; }
+    .page-head{ display:flex; align-items:flex-start; justify-content:space-between; gap:16px; margin-bottom:24px; }
+    .page-h1{ font-size:22px; font-weight:700; margin:0 0 8px; }
+    .page-sub{ font-size:16px; color:#3b3f4c; margin:0; line-height:1.55; }
+
+    /* ===== buttons ===== */
+    .btn{ height:40px; border-radius:8px; font-size:14px; font-weight:600; font-family:inherit; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; line-height:1; gap:6px; padding:0 14px; border:1px solid transparent; }
+    .btn-primary{ background:#416bff; color:#fff; }
+    .btn-primary:hover{ background:#365eef; }
+
+    /* 만들기 드롭다운 */
+    .create-menu{ position:absolute; top:46px; right:0; background:white; border-radius:8px; box-shadow:0 0 1px #2226314D, 0 8px 24px #00000026; padding:6px; z-index:400; min-width:208px; display:none; }
+    .create-menu.open{ display:block; }
+    .create-menu button{ width:100%; display:flex; align-items:center; gap:8px; padding:10px 12px; border:none; background:none; border-radius:6px; font-family:inherit; font-size:15px; color:#222631; cursor:pointer; text-align:left; }
+    .create-menu button:hover{ background:#f6f7f9; }
+    .create-menu button i{ color:#6d7381; flex-shrink:0; }
+
+    /* ===== 카드 ===== */
+    .card-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:16px; margin-bottom:8px; }
+    .qcard{ background:#fff; border-radius:12px; padding:20px; box-shadow:0 0 1px #2226314D, 0 2px 8px #0000000F; cursor:pointer; transition:box-shadow .12s; min-height:172px; display:flex; flex-direction:column; }
+    .qcard:hover{ box-shadow:0 0 1px #2226314D, 0 6px 18px #0000001f; }
+    .card-chips{ display:flex; align-items:center; gap:6px; margin-bottom:12px; }
+    .type-chip{ display:inline-flex; align-items:center; gap:4px; font-size:12px; font-weight:700; border-radius:6px; padding:3px 9px; line-height:1; }
+    .type-plan{ background:#eef3ff; color:#416bff; }
+    .type-sheet{ background:#e4f7ee; color:#129a5e; }
+    .subj-chip{ font-size:12px; font-weight:600; background:#f1f3f5; color:#6d7381; border-radius:6px; padding:4px 9px; line-height:1; }
+    .qcard-title{ font-size:17px; font-weight:700; color:#222631; line-height:1.45; margin:0 0 8px; }
+    .card-desc{ font-size:14px; color:#6d7381; line-height:1.55; margin:0; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+    .qcard-foot{ display:flex; align-items:center; justify-content:space-between; gap:10px; margin-top:auto; padding-top:16px; }
+    .foot-meta{ font-size:13px; color:#6d7381; }
+    .foot-meta .draft{ color:#f2525f; font-weight:600; }
+    .foot-acts{ display:flex; gap:6px; flex-shrink:0; }
+    .icon-btn{ width:34px; height:34px; border:1px solid #e6e8ed; border-radius:8px; background:#fff; color:#9ea3ad; display:inline-flex; align-items:center; justify-content:center; cursor:pointer; }
+    .icon-btn:hover{ background:#f6f7f9; color:#416bff; }
+    .icon-btn.del:hover{ background:#fdecec; color:#e5484d; }
+
+    /* ===== 학교 자료실 ===== */
+    .filter-row{ display:flex; align-items:flex-end; gap:14px; margin-bottom:22px; }
+    .fgroup{ display:flex; flex-direction:column; gap:6px; }
+    .fgroup.grow{ flex:1; }
+    .fgroup label{ font-size:13px; font-weight:600; color:#6d7381; }
+    .fsel{ height:44px; border:1px solid #d9d9d9; border-radius:10px; padding:0 38px 0 14px; font-size:15px; font-family:inherit; color:#222631; background-color:#fff; min-width:180px; cursor:pointer; appearance:none; -webkit-appearance:none; background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%236d7381' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>"); background-repeat:no-repeat; background-position:right 12px center; }
+    .fgroup.grow .fsel{ width:100%; color:#9ea3ad; }
+    .section-label{ font-size:18px; font-weight:700; color:#222631; margin:28px 0 14px; }
+    .count-note{ font-size:14px; color:#6d7381; margin:0 0 14px; }
+    .ref-grid{ display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:8px; }
+    .ref-card{ background:#fff; border:1px solid #e6e8ed; border-radius:12px; padding:24px; text-align:center; cursor:pointer; }
+    .ref-card:hover{ border-color:#a3c3ff; background:#f8faff; }
+    .ref-title{ font-size:16px; font-weight:700; color:#222631; }
+    .ref-sub{ display:inline-block; margin-top:8px; font-size:12px; font-weight:600; background:#eef3ff; color:#416bff; border-radius:6px; padding:3px 10px; }
+
+    /* ===== 나의 자료 필터 ===== */
+    .mine-filter{ display:flex; align-items:center; gap:12px; margin-bottom:18px; }
+    .seg{ display:inline-flex; background:#f1f3f5; border-radius:10px; padding:3px; gap:2px; }
+    .seg button{ border:none; background:none; padding:8px 16px; border-radius:8px; font-size:14px; font-weight:600; color:#6d7381; cursor:pointer; font-family:inherit; line-height:1; }
+    .seg button.on{ background:#fff; color:#416bff; box-shadow:0 1px 2px rgba(0,0,0,.08); }
+    .fsel.sm{ height:38px; min-width:128px; font-size:14px; background-position:right 10px center; }
+    .sort-sel{ appearance:none; -webkit-appearance:none; border:none; background-color:transparent; font-family:inherit; font-size:14px; font-weight:600; color:#3b3f4c; cursor:pointer; height:38px; padding:0 28px 0 10px; border-radius:8px; background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%236d7381' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>"); background-repeat:no-repeat; background-position:right 8px center; }
+    .sort-sel:hover{ background-color:#f1f3f5; }
+
+    /* ===== footer (콘텐츠 짧아도 하단 고정) ===== */
+    .site-footer{ margin-top:auto; padding:48px 0 28px; text-align:center; }
+    .sf-links{ display:flex; gap:18px; justify-content:center; margin-bottom:8px; }
+    .sf-links a{ font-size:13px; color:#6d7381; }
+    .sf-copy{ font-size:12px; color:#9ea3ad; }
+
+    /* ===== 활동지 만들기 ===== */
+    .back-link{ display:inline-flex; align-items:center; line-height:1; gap:4px; font-size:15px; font-weight:600; color:#222631; background:none; border:none; cursor:pointer; font-family:inherit; padding:0; margin-bottom:14px; }
+    .back-link i{ color:#416bff; }
+    .fld-label{ display:block; font-size:14px; font-weight:600; color:#3b3f4c; margin:0 0 8px; }
+    .fld-input{ width:100%; height:44px; border:1px solid #d9d9d9; border-radius:10px; padding:0 14px; font-size:15px; font-family:inherit; color:#222631; outline:none; }
+    .fld-input:focus{ border-color:#416bff; box-shadow:0 0 0 3px rgba(65,107,255,.12); }
+    .sec{ background:#fff; border-radius:12px; padding:22px 24px; box-shadow:0 0 1px #2226314D, 0 2px 8px #0000000F; margin-bottom:18px; }
+    .sec-hd{ margin-bottom:16px; }
+    .sec-title{ font-size:18px; font-weight:700; color:#222631; }
+    .method-label{ font-size:18px; font-weight:700; color:#222631; margin:26px 0 12px; }
+    .m-cards{ display:grid; grid-template-columns:repeat(2,1fr); gap:12px; margin-bottom:18px; }
+    .m-card{ display:flex; flex-direction:column; align-items:flex-start; text-align:left; border:1.5px solid #e2e5ea; border-radius:12px; padding:18px; background:#fff; cursor:pointer; font-family:inherit; position:relative; }
+    .m-card:hover{ border-color:#a3c3ff; background:#f8faff; }
+    .m-card.on{ border-color:#416bff; background:#f8faff; }
+    .m-ic{ width:38px; height:38px; border-radius:9px; background:#f1f3f5; color:#6d7381; display:flex; align-items:center; justify-content:center; margin-bottom:12px; }
+    .m-card.on .m-ic{ background:#e9f2ff; color:#416bff; }
+    .m-t{ display:block; font-size:16px; font-weight:700; color:#222631; }
+    .m-d{ display:block; font-size:14px; color:#6d7381; margin-top:5px; line-height:1.5; }
+    .m-check{ position:absolute; top:14px; right:14px; color:#416bff; display:none; }
+    .m-card.on .m-check{ display:inline-flex; }
+    .m-beta{ font-size:11px; font-weight:700; color:#416bff; background:#e9f2ff; border-radius:5px; padding:2px 7px; margin-left:6px; }
+    .m-panel{ background:#fff; border-radius:14px; padding:28px 30px; box-shadow:0 0 1px #2226314D, 0 2px 8px #0000000F; }
+    .m-pane-desc{ font-size:16px; color:#565d6b; line-height:1.65; margin:0 0 18px; }
+    .dropzone{ border:1.5px dashed #a3c3ff; border-radius:10px; min-height:120px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:8px; cursor:pointer; color:#6d7381; background:#fbfcff; padding:18px; }
+    .dropzone:hover{ background:#f4f8ff; }
+    .dz-ic{ width:42px; height:42px; border-radius:10px; background:#e9f2ff; color:#416bff; display:flex; align-items:center; justify-content:center; }
+    .radio-line{ display:flex; gap:20px; flex-wrap:wrap; }
+    .rad{ display:inline-flex; align-items:center; gap:8px; font-size:15px; color:#3b3f4c; cursor:pointer; }
+    .rad .ring{ width:18px; height:18px; border-radius:50%; border:1.5px solid #c3c8d4; flex-shrink:0; position:relative; }
+    .rad.on{ color:#222631; font-weight:600; }
+    .rad.on .ring{ border-color:#416bff; }
+    .rad.on .ring::after{ content:''; position:absolute; inset:3px; border-radius:50%; background:#416bff; }
+    .hint-note{ font-size:13px; color:#6d7381; margin:8px 0 0; line-height:1.5; }
+    .hint-note b{ color:#3151c4; }
+    .btn-secondary{ background:#fff; color:#3151c4; border:1px solid #ccdfff; }
+    .btn-secondary:hover{ background:#e9f2ff; }
+    .btn-sm{ height:34px; font-size:13px; padding:0 12px; }
+    .crit-box{ border:1px solid #e6e8ed; border-radius:10px; padding:14px; margin-bottom:10px; }
+    .crit-row{ display:flex; gap:10px; align-items:stretch; }
+    .crit-elem{ flex:0 0 170px; border:1px solid #d9d9d9; border-radius:8px; padding:8px 10px; font-size:14px; font-family:inherit; resize:none; color:#222631; outline:none; }
+    .crit-scores{ flex:1; display:flex; flex-direction:column; gap:6px; }
+    .crit-score-row{ display:flex; gap:8px; }
+    .crit-sc-num{ width:56px; border:1px solid #d9d9d9; border-radius:6px; padding:6px 8px; font-size:14px; text-align:center; font-family:inherit; outline:none; }
+    .crit-sc-desc{ flex:1; min-width:0; border:1px solid #d9d9d9; border-radius:6px; padding:6px 10px; font-size:14px; font-family:inherit; outline:none; }
+    .crit-elem:focus, .crit-sc-num:focus, .crit-sc-desc:focus{ border-color:#416bff; }
+    .prev-block{ margin-bottom:14px; }
+    .prev-label{ font-size:13px; font-weight:700; color:#6d7381; margin-bottom:6px; }
+    .prev-item{ font-size:14px; color:#3b3f4c; line-height:1.5; padding:9px 12px; background:#f6f7f9; border-radius:8px; margin-bottom:6px; display:flex; justify-content:space-between; gap:10px; }
+    .prev-score{ color:#6d7381; font-weight:600; flex-shrink:0; }
+
+    /* ===== 복사 확인 모달 ===== */
+    .btn-outline{ background:#fff; color:#3b3f4c; border:1px solid #d9d9d9; }
+    .btn-outline:hover{ background:#f6f7f9; }
+    .modal-ov{ position:fixed; inset:0; background:rgba(0,0,0,.45); z-index:1700; display:none; align-items:center; justify-content:center; padding:24px; }
+    .modal-ov.open{ display:flex; }
+    .modal{ background:#fff; border-radius:16px; width:440px; max-width:96vw; box-shadow:0 20px 60px rgba(0,0,0,.25); padding:28px; }
+    .modal-title{ font-size:20px; font-weight:700; color:#222631; margin:0 0 12px; }
+    .modal-desc{ font-size:15px; color:#3b3f4c; line-height:1.55; margin:0 0 6px; }
+    .modal-meta{ font-size:14px; color:#6d7381; margin:0 0 22px; }
+    .modal-ft{ display:flex; justify-content:flex-end; gap:10px; }
+
+    /* ===== toast ===== */
+    .toast{ position:fixed; bottom:32px; left:50%; transform:translateX(-50%) translateY(20px); background:#222631; color:#fff; padding:12px 20px; border-radius:10px; font-size:14px; opacity:0; pointer-events:none; transition:opacity .25s, transform .25s; z-index:2000; }
+    .toast.show{ opacity:1; transform:translateX(-50%) translateY(0); }
+  </style>
+</head>
+<body>
+
+<!-- ===== Header ===== -->
+<header class="g-hd">
+  <button class="gh-menu-btn" onclick="toggleNav()"><i data-lucide="menu" style="width:20px;height:20px"></i></button>
+  <svg width="76" height="16" viewBox="0 0 76 16" fill="none" xmlns="http://www.w3.org/2000/svg" style="cursor:pointer" onclick="location.href='home_v1_260612.html'"><path d="M11.3613 4.03516H4.09668V11.9629H8.88281L8.88086 11.9648H15.6016V16H4.02539C1.80242 15.9998 0 14.223 0 12.0322V3.96777C0 1.77696 1.80242 0.000177874 4.02539 0H15.4561L11.3613 4.03516ZM22.0703 11.9648H33.5781V16H22.002C19.7788 16 17.9756 14.2231 17.9756 12.0322V0H22.0703V11.9648ZM40.0459 16H35.9521V0H40.0459V16ZM54.5381 0C56.4564 0 58.0138 1.53228 58.0186 3.42285L58.0166 3.4248V8.54297C58.014 10.4333 56.4567 11.9648 54.5361 11.9648H46.5107L42.416 16V0H54.5381ZM71.9746 0C74.0086 0.000134956 75.6887 1.49046 75.958 3.42285H76V12.5771H75.958C75.6887 14.5095 74.011 15.9999 71.9746 16H64.4238C62.3897 16 60.7098 14.5096 60.4404 12.5771C60.4145 12.398 60.3984 12.2184 60.3984 12.0322V3.96777C60.3984 3.78159 60.4145 3.60205 60.4404 3.42285C60.7098 1.49037 62.3873 0 64.4238 0H71.9746ZM64.4922 12.5771H71.9062V3.42285H64.4922V12.5771ZM46.5107 3.42285V8.54004H53.9238V3.42285H46.5107Z" fill="#365EEF"/></svg>
+  <div class="g-hd-r">
+    <span class="plan-badge">학교 유료</span>
+    <span style="font-size:14px;color:#3b3f4c">D-180</span>
+    <div class="hd-div"></div>
+    <i data-lucide="sparkles" style="width:18px;height:18px;color:#416bff"></i>
+    <div class="credit-wrap">AI 크레딧 <span id="credit-num">200</span></div>
+    <div class="hd-div"></div>
+    <button class="user-btn">최대표 선생님(대표교사) <i data-lucide="chevron-down" style="width:16px;height:16px"></i></button>
+  </div>
+</header>
+
+<!-- ===== Sidebar ===== -->
+<nav class="icon-sb" id="icon-sb">
+  <div class="si" onclick="location.href='home_v1_260612.html'"><div class="si-icon"><i data-lucide="home" style="width:20px;height:20px"></i></div><span class="si-label">홈</span><span class="si-tip">홈</span></div>
+  <div class="si active"><div class="si-icon"><i data-lucide="scissors" style="width:20px;height:20px"></i></div><span class="si-label">평가 준비</span><span class="si-tip">평가 준비</span></div>
+  <div class="si" onclick="location.href='co_teacher_review_v1_260611.html'"><div class="si-icon"><i data-lucide="layout-grid" style="width:20px;height:20px"></i></div><span class="si-label">수업</span><span class="si-tip">수업</span></div>
+  <div class="si" onclick="location.href='creative_activity_list_v6_260507.html'"><div class="si-icon"><i data-lucide="notebook-pen" style="width:20px;height:20px"></i></div><span class="si-label">창의적 체험활동 <span style="font-size:10px;background:#416bff;color:#fff;padding:1px 5px;border-radius:3px;margin-left:2px">Beta</span></span><span class="si-tip">창의적 체험활동</span></div>
+  <div class="si" onclick="location.href='quick_seteuk_dev_list_v1_260604.html'"><div class="si-icon"><i data-lucide="zap" style="width:20px;height:20px"></i></div><span class="si-label">세특 간편 생성기</span><span class="si-tip">세특 간편 생성기</span></div>
+  <div class="si" onclick="notReady('행동특성 및 종합기록')"><div class="si-icon"><i data-lucide="smile" style="width:20px;height:20px"></i></div><span class="si-label">행동특성 및 종합기록</span><span class="si-tip">행동특성 및 종합기록</span></div>
+  <div class="si" onclick="notReady('리포트')"><div class="si-icon"><i data-lucide="bar-chart-2" style="width:20px;height:20px"></i></div><span class="si-label">리포트</span><span class="si-tip">리포트</span></div>
+  <div class="si" onclick="notReady('학교 설정')"><div class="si-icon"><i data-lucide="building-2" style="width:20px;height:20px"></i></div><span class="si-label">학교 설정</span><span class="si-tip">학교 설정</span></div>
+  <div class="nav-bottom">
+    <div class="nav-div"></div>
+    <div class="si" onclick="notReady('매뉴얼 다운로드')"><div class="si-icon"><i data-lucide="file-down" style="width:20px;height:20px"></i></div><span class="si-label">매뉴얼 다운로드</span><span class="si-tip">매뉴얼 다운로드</span></div>
+    <div class="si" onclick="notReady('요금제')"><div class="si-icon"><i data-lucide="credit-card" style="width:20px;height:20px"></i></div><span class="si-label">요금제</span><span class="si-tip">요금제</span></div>
+    <div class="si" onclick="notReady('고객센터')"><div class="si-icon"><i data-lucide="help-circle" style="width:20px;height:20px"></i></div><span class="si-label">고객센터</span><span class="si-tip">고객센터</span></div>
+  </div>
+</nav>
+
+<div class="main-wrap">
+  <div class="tab-band">
+    <div class="tab-band-inner">
+      <button class="sub-tab on" id="tab-mine" onclick="showPTab('mine')">나의 자료</button>
+      <button class="sub-tab" id="tab-shared" onclick="showPTab('shared')">학교 자료실</button>
+    </div>
+  </div>
+
+  <div class="page-wrap">
+
+    <!-- ============ 나의 자료 ============ -->
+    <section id="view-mine">
+      <div class="page-head">
+        <div>
+          <h1 class="page-h1">나의 자료</h1>
+          <p class="page-sub">수업을 만들기 전에 평가계획과 활동지를 미리 준비하고, 학교에 공유할 수 있어요.</p>
+        </div>
+        <div style="position:relative;">
+          <button class="btn btn-primary" onclick="toggleCreate(event)"><i data-lucide="plus" style="width:16px;height:16px"></i>만들기</button>
+          <div class="create-menu" id="createMenu">
+            <button onclick="goCreate('plan')"><i data-lucide="scissors" style="width:16px;height:16px"></i>평가계획 만들기</button>
+            <button onclick="goCreate('sheet')"><i data-lucide="file-text" style="width:16px;height:16px"></i>활동지 만들기</button>
+            <div style="height:1px;background:#eef0f3;margin:6px 6px;"></div>
+            <button onclick="goCopyFromArchive()"><i data-lucide="copy" style="width:16px;height:16px"></i>자료실에서 복사</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="mine-filter">
+        <div class="seg">
+          <button class="on" onclick="filterMine('all',this)">전체</button>
+          <button onclick="filterMine('plan',this)">평가계획</button>
+          <button onclick="filterMine('sheet',this)">활동지</button>
+        </div>
+        <select class="fsel sm" id="subjFilter" onchange="applyMineFilter()"><option value="all">전체 과목</option><option>국어</option><option>사회</option><option>영어</option></select>
+        <select class="sort-sel" id="sortSel" onchange="sortMine()" style="margin-left:auto;"><option value="mod">최근 수정순</option><option value="name">이름순</option></select>
+      </div>
+
+      <div class="card-grid">
+        <!-- 평가계획 -->
+        <div class="qcard" data-type="plan" data-subj="사회" onclick="openCard('plan','미래 예측 시나리오 작성')">
+          <div class="card-chips"><span class="type-chip type-plan"><i data-lucide="scissors" style="width:11px;height:11px"></i>평가계획</span><span class="subj-chip">사회</span></div>
+          <h3 class="qcard-title">미래 예측 시나리오 작성</h3>
+          <p class="card-desc">사회 변동의 의미를 이해하고 현대사회 변동 양상과 문제점을 분석하는 수행평가</p>
+          <div class="qcard-foot"><span class="foot-meta">26.05.28 수정됨 · 교내 공개</span><span class="foot-acts"><button class="icon-btn" title="내보내기" onclick="cardAct(event,'export','미래 예측 시나리오 작성')"><i data-lucide="download" style="width:16px;height:16px"></i></button><button class="icon-btn del" title="삭제" onclick="cardAct(event,'delete','미래 예측 시나리오 작성')"><i data-lucide="trash-2" style="width:16px;height:16px"></i></button></span></div>
+        </div>
+        <!-- 활동지 -->
+        <div class="qcard" data-type="sheet" data-subj="국어" onclick="openCard('sheet','매체 자료 비판적 읽기 활동지')">
+          <div class="card-chips"><span class="type-chip type-sheet"><i data-lucide="file-text" style="width:11px;height:11px"></i>활동지</span><span class="subj-chip">국어</span></div>
+          <h3 class="qcard-title">매체 자료 비판적 읽기 활동지</h3>
+          <p class="card-desc">문항 5개 · 채점요소 연결 완료 · 모범답안 입력됨</p>
+          <div class="qcard-foot"><span class="foot-meta">26.06.17 수정됨 · 교내 공개</span><span class="foot-acts"><button class="icon-btn" title="내보내기" onclick="cardAct(event,'export','매체 자료 비판적 읽기 활동지')"><i data-lucide="download" style="width:16px;height:16px"></i></button><button class="icon-btn del" title="삭제" onclick="cardAct(event,'delete','매체 자료 비판적 읽기 활동지')"><i data-lucide="trash-2" style="width:16px;height:16px"></i></button></span></div>
+        </div>
+        <!-- 평가계획 -->
+        <div class="qcard" data-type="plan" data-subj="영어" onclick="openCard('plan','나의 좌우명 소개')">
+          <div class="card-chips"><span class="type-chip type-plan"><i data-lucide="scissors" style="width:11px;height:11px"></i>평가계획</span><span class="subj-chip">영어</span></div>
+          <h3 class="qcard-title">나의 좌우명 소개</h3>
+          <p class="card-desc">자신의 좌우명을 영어로 소개하고 근거를 설명하는 말하기·쓰기 평가</p>
+          <div class="qcard-foot"><span class="foot-meta">25.04.22 수정됨 · 비공개</span><span class="foot-acts"><button class="icon-btn" title="내보내기" onclick="cardAct(event,'export','나의 좌우명 소개')"><i data-lucide="download" style="width:16px;height:16px"></i></button><button class="icon-btn del" title="삭제" onclick="cardAct(event,'delete','나의 좌우명 소개')"><i data-lucide="trash-2" style="width:16px;height:16px"></i></button></span></div>
+        </div>
+        <!-- 활동지 -->
+        <div class="qcard" data-type="sheet" data-subj="사회" onclick="openCard('sheet','사회 변동 논술 활동지')">
+          <div class="card-chips"><span class="type-chip type-sheet"><i data-lucide="file-text" style="width:11px;height:11px"></i>활동지</span><span class="subj-chip">사회</span></div>
+          <h3 class="qcard-title">사회 변동 논술 활동지</h3>
+          <p class="card-desc">문항 3개 · 채점요소 연결 완료 · 모범답안 미입력</p>
+          <div class="qcard-foot"><span class="foot-meta">26.06.10 수정됨 · 교내 공개</span><span class="foot-acts"><button class="icon-btn" title="내보내기" onclick="cardAct(event,'export','사회 변동 논술 활동지')"><i data-lucide="download" style="width:16px;height:16px"></i></button><button class="icon-btn del" title="삭제" onclick="cardAct(event,'delete','사회 변동 논술 활동지')"><i data-lucide="trash-2" style="width:16px;height:16px"></i></button></span></div>
+        </div>
+        <!-- 평가계획 임시저장 -->
+        <div class="qcard" data-type="plan" data-subj="국어" onclick="openCard('plan','주장하는 글쓰기 평가')">
+          <div class="card-chips"><span class="type-chip type-plan"><i data-lucide="scissors" style="width:11px;height:11px"></i>평가계획</span><span class="subj-chip">국어</span></div>
+          <h3 class="qcard-title">주장하는 글쓰기 평가</h3>
+          <p class="card-desc">자료를 바탕으로 주장과 근거를 갖춘 글을 쓰는 논술형 수행평가</p>
+          <div class="qcard-foot"><span class="foot-meta"><span class="draft">임시 저장됨</span></span><span class="foot-acts"><button class="icon-btn" title="내보내기" onclick="cardAct(event,'export','주장하는 글쓰기 평가')"><i data-lucide="download" style="width:16px;height:16px"></i></button><button class="icon-btn del" title="삭제" onclick="cardAct(event,'delete','주장하는 글쓰기 평가')"><i data-lucide="trash-2" style="width:16px;height:16px"></i></button></span></div>
+        </div>
+        <!-- 활동지 임시저장 -->
+        <div class="qcard" data-type="sheet" data-subj="영어" onclick="openCard('sheet','영어 자기소개 활동지')">
+          <div class="card-chips"><span class="type-chip type-sheet"><i data-lucide="file-text" style="width:11px;height:11px"></i>활동지</span><span class="subj-chip">영어</span></div>
+          <h3 class="qcard-title">영어 자기소개 활동지</h3>
+          <p class="card-desc">문항 2개 · 채점요소 미연결</p>
+          <div class="qcard-foot"><span class="foot-meta"><span class="draft">임시 저장됨</span></span><span class="foot-acts"><button class="icon-btn" title="내보내기" onclick="cardAct(event,'export','영어 자기소개 활동지')"><i data-lucide="download" style="width:16px;height:16px"></i></button><button class="icon-btn del" title="삭제" onclick="cardAct(event,'delete','영어 자기소개 활동지')"><i data-lucide="trash-2" style="width:16px;height:16px"></i></button></span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ 학교 자료실 ============ -->
+    <section id="view-shared" class="hidden">
+      <div class="page-head">
+        <div>
+          <h1 class="page-h1">학교 자료실</h1>
+          <p class="page-sub">우리 학교 선생님들이 공유한 평가계획·활동지를 가져와 쓸 수 있어요.</p>
+        </div>
+      </div>
+
+      <div class="filter-row">
+        <div class="fgroup"><label>교육과정</label><select class="fsel"><option>2015 개정</option><option>2022 개정</option></select></div>
+        <div class="fgroup"><label>과목</label><select class="fsel"><option>전체</option><option>국어</option><option>사회</option><option>영어</option></select></div>
+        <div class="fgroup grow"><label>성취기준</label><select class="fsel" disabled><option>과목 검색 후 선택해 주세요.</option></select></div>
+      </div>
+
+      <p class="section-label">우리 학교 자료</p>
+      <p class="count-note">4개의 공유 자료가 있어요.</p>
+      <div class="card-grid">
+        <div class="qcard" onclick="openCard('shared-plan','미래 예측 시나리오 작성')">
+          <div class="card-chips"><span class="type-chip type-plan"><i data-lucide="scissors" style="width:11px;height:11px"></i>평가계획</span><span class="subj-chip">사회</span></div>
+          <h3 class="qcard-title">미래 예측 시나리오 작성</h3>
+          <p class="card-desc">김정현 선생님 · 사회 변동 양상 분석 수행평가</p>
+          <div class="qcard-foot"><span class="foot-meta">26.05.28 수정됨</span><span class="foot-acts"><button class="icon-btn" title="복사" onclick="openCopyConfirm(event,'미래 예측 시나리오 작성','사회','김정현','plan')"><i data-lucide="copy" style="width:16px;height:16px"></i></button></span></div>
+        </div>
+        <div class="qcard" onclick="openCard('shared-sheet','매체 비판 읽기·글쓰기 활동지')">
+          <div class="card-chips"><span class="type-chip type-sheet"><i data-lucide="file-text" style="width:11px;height:11px"></i>활동지</span><span class="subj-chip">국어</span></div>
+          <h3 class="qcard-title">매체 비판 읽기·글쓰기 활동지</h3>
+          <p class="card-desc">박서연 선생님 · 문항 5개 · 모범답안 포함</p>
+          <div class="qcard-foot"><span class="foot-meta">26.06.12 수정됨</span><span class="foot-acts"><button class="icon-btn" title="복사" onclick="openCopyConfirm(event,'매체 비판 읽기·글쓰기 활동지','국어','박서연','sheet')"><i data-lucide="copy" style="width:16px;height:16px"></i></button></span></div>
+        </div>
+        <div class="qcard" onclick="openCard('shared-plan','나의 좌우명 소개')">
+          <div class="card-chips"><span class="type-chip type-plan"><i data-lucide="scissors" style="width:11px;height:11px"></i>평가계획</span><span class="subj-chip">영어</span></div>
+          <h3 class="qcard-title">나의 좌우명 소개</h3>
+          <p class="card-desc">이박람 선생님 · 영어 말하기·쓰기 평가</p>
+          <div class="qcard-foot"><span class="foot-meta">25.04.22 수정됨</span><span class="foot-acts"><button class="icon-btn" title="복사" onclick="openCopyConfirm(event,'나의 좌우명 소개','영어','이박람','plan')"><i data-lucide="copy" style="width:16px;height:16px"></i></button></span></div>
+        </div>
+        <div class="qcard" onclick="openCard('shared-sheet','한국 사회 변동 탐구 활동지')">
+          <div class="card-chips"><span class="type-chip type-sheet"><i data-lucide="file-text" style="width:11px;height:11px"></i>활동지</span><span class="subj-chip">사회</span></div>
+          <h3 class="qcard-title">한국 사회 변동 탐구 활동지</h3>
+          <p class="card-desc">최대표 선생님 · 문항 4개 · 채점요소 연결 포함</p>
+          <div class="qcard-foot"><span class="foot-meta">26.02.24 수정됨</span><span class="foot-acts"><button class="icon-btn" title="복사" onclick="openCopyConfirm(event,'한국 사회 변동 탐구 활동지','사회','최대표','sheet')"><i data-lucide="copy" style="width:16px;height:16px"></i></button></span></div>
+        </div>
+      </div>
+
+      <p class="section-label">참고 자료</p>
+      <div class="ref-grid">
+        <div class="ref-card" onclick="toastMsg('교육부 학교알리미로 이동해요.')"><div class="ref-title">다른 학교 평가계획 찾아보기</div><div class="ref-sub">교육부 학교알리미</div></div>
+        <div class="ref-card" onclick="toastMsg('교육부 학생평가지원포털로 이동해요.')"><div class="ref-title">평가 도구 예시 찾아보기</div><div class="ref-sub">교육부 학생평가지원포털</div></div>
+      </div>
+    </section>
+
+    <!-- ============ 활동지 만들기 ============ -->
+    <section id="view-sheet-create" class="hidden">
+      <button class="back-link" onclick="showPTab('mine')"><i data-lucide="chevron-left" style="width:18px;height:18px"></i>목록으로</button>
+      <h1 class="page-h1">활동지 만들기</h1>
+      <p class="page-sub" style="margin-bottom:24px;">활동지명과 평가 기준을 정한 뒤, 만드는 방법을 선택하세요.</p>
+
+      <div class="sec">
+        <div class="sec-hd"><span class="sec-title">기본 정보</span></div>
+        <label class="fld-label">활동지명</label>
+        <input class="fld-input" placeholder="활동지명을 입력해 주세요.">
+        <label class="fld-label" style="margin-top:18px;">평가 기준 <span style="font-weight:500;color:#9ea3ad;">(성취기준·채점기준)</span></label>
+        <div class="radio-line" style="margin:8px 0 0;">
+          <span class="rad on" onclick="pickCrit(this,'import')"><span class="ring"></span>기존 평가계획에서 가져오기</span>
+          <span class="rad" onclick="pickCrit(this,'direct')"><span class="ring"></span>직접 입력</span>
+        </div>
+        <div id="crit-import" style="margin-top:14px;">
+          <select class="fsel" style="width:100%;min-width:0;" onchange="showImportPreview(this)"><option value="">평가계획을 선택해 주세요.</option><option>미래 예측 시나리오 작성 · 사회</option><option>주장하는 글쓰기 평가 · 국어</option><option>나의 좌우명 소개 · 영어</option></select>
+          <p class="hint-note" id="import-hint">평가계획을 선택하면 성취기준·채점기준을 가져와 이 활동지에 연결해요.</p>
+          <div id="import-preview" class="hidden" style="margin-top:16px;">
+            <div class="prev-block">
+              <div class="prev-label">성취기준</div>
+              <div class="prev-item">[9사(일사)12-01] 사회 변동의 의미를 이해하고, 현대사회의 변동 양상과 문제점을 분석한다.</div>
+            </div>
+            <div class="prev-block">
+              <div class="prev-label">채점기준</div>
+              <div class="prev-item">화산 지형의 이해 <span class="prev-score">6 / 4점</span></div>
+              <div class="prev-item">근거의 타당성과 표현의 적절성 <span class="prev-score">6 / 3점</span></div>
+            </div>
+            <p class="hint-note">가져온 성취기준·채점기준이에요. 저장 후 평가계획 설계에서 편집할 수 있어요.</p>
+          </div>
+        </div>
+        <div id="crit-direct" class="hidden" style="margin-top:14px;">
+          <label class="fld-label">성취기준</label>
+          <select class="fsel" style="width:100%;min-width:0;"><option>성취기준을 선택해 주세요.</option><option>[9사(일사)12-01] 사회 변동의 의미를 이해하고, 현대사회의 변동 양상과 문제점을 분석한다.</option><option>[9사(일사)12-02] 한국 사회 변동의 최근 경향을 이해하고, 이에 대한 대응 방안을 탐구한다.</option><option>직접 입력</option></select>
+          <label class="fld-label" style="margin-top:16px;">채점기준</label>
+          <div class="radio-line" style="margin:8px 0 0;">
+            <span class="rad on" onclick="pickRub(this,'self')"><span class="ring"></span>직접 입력</span>
+            <span class="rad" onclick="pickRub(this,'ai')"><span class="ring"></span>활동지 만든 뒤 AI가 추천</span>
+          </div>
+          <div id="rub-editor" style="margin-top:12px;">
+            <div class="crit-box">
+              <div class="crit-row">
+                <textarea class="crit-elem" placeholder="채점요소를 입력해 주세요."></textarea>
+                <div class="crit-scores">
+                  <div class="crit-score-row"><input class="crit-sc-num" value="0"><input class="crit-sc-desc" placeholder="세부 기준을 입력해 주세요."></div>
+                  <div class="crit-score-row"><input class="crit-sc-num" value="0"><input class="crit-sc-desc" placeholder="세부 기준을 입력해 주세요."></div>
+                </div>
+              </div>
+            </div>
+            <button class="btn btn-secondary btn-sm" onclick="addCritRow()"><i data-lucide="plus" style="width:14px;height:14px"></i>채점기준 추가</button>
+          </div>
+          <p class="hint-note hidden" id="rub-ai-note">활동지를 만든 뒤 AI가 문항을 분석해 채점기준을 추천해요.</p>
+          <p class="hint-note" style="margin-top:12px;">저장하면 입력한 성취기준·채점기준으로 <b>평가계획도 함께 만들어져</b> 나의 자료에 추가돼요.</p>
+        </div>
+      </div>
+
+      <div class="sec">
+        <div class="sec-hd"><span class="sec-title">어떤 방법으로 만들까요?</span></div>
+      <div class="m-cards">
+        <button class="m-card on" data-m="upload" onclick="pickMethod('upload')">
+          <span class="m-ic"><i data-lucide="upload" style="width:19px;height:19px"></i></span>
+          <span class="m-t">가진 활동지 올리기</span>
+          <span class="m-d">PDF·이미지를 올려 문항을 자동으로 인식해요.</span>
+          <i data-lucide="check-circle-2" class="m-check" style="width:20px;height:20px"></i>
+        </button>
+        <button class="m-card" data-m="ai" onclick="pickMethod('ai')">
+          <span class="m-ic"><i data-lucide="wand-sparkles" style="width:19px;height:19px"></i></span>
+          <span class="m-t">AI로 함께 만들기<span class="m-beta">Beta</span></span>
+          <span class="m-d">성취기준·채점기준에 맞춰 AI가 초안을 만들어요.</span>
+          <i data-lucide="check-circle-2" class="m-check" style="width:20px;height:20px"></i>
+        </button>
+      </div>
+        <div id="mp-upload">
+          <p class="m-pane-desc">가진 활동지(PDF·이미지)를 올리면 문항을 자동으로 인식해 등록해요. 인식 결과만 확인하면 끝이에요.</p>
+          <div class="dropzone" onclick="toastMsg('파일 업로드 → 문항 인식 단계로 이어져요. (다음 단계)')">
+            <div class="dz-ic"><i data-lucide="file-up" style="width:22px;height:22px"></i></div>
+            <div style="font-size:14px;color:#3b3f4c;">클릭하거나 파일을 끌어다 놓으세요.</div>
+            <div style="font-size:12px;color:#9ea3ad;">PDF, JPG, PNG 가능 · 한글 파일은 PDF로 변환해 올려주세요</div>
+          </div>
+        </div>
+        <div id="mp-ai" class="hidden">
+          <p class="m-pane-desc">성취기준·채점기준에 맞춰 AI가 활동지 초안을 만들어요. 내용 입력 → 예상 문항 확인 → 활동지 완성, 3단계로 진행돼요.</p>
+          <div style="display:flex;justify-content:flex-end;"><button class="btn btn-primary" onclick="toastMsg('AI로 활동지 만들기 (다음 단계)')"><i data-lucide="wand-sparkles" style="width:16px;height:16px"></i>AI로 활동지 만들기</button></div>
+        </div>
+      </div>
+    </section>
+
+    <footer class="site-footer">
+      <div class="sf-links"><a href="#" onclick="return false;">회사소개</a><a href="#" onclick="return false;">이용약관</a><a href="#" onclick="return false;">개인정보처리방침</a><a href="#" onclick="return false;">고객센터</a></div>
+      <div class="sf-copy">© 2026. Datadriven Inc. All rights reserved.</div>
+    </footer>
+  </div>
+</div>
+
+<div class="modal-ov" id="copyModal" onclick="if(event.target===this) closeCopyModal()">
+  <div class="modal">
+    <p class="modal-title">자료실에서 복사</p>
+    <p class="modal-desc"><b id="copyName">자료</b> 을(를) 내 자료로 복사할까요?</p>
+    <p class="modal-meta" id="copyMeta"></p>
+    <div class="modal-ft">
+      <button class="btn btn-outline" onclick="closeCopyModal()">취소</button>
+      <button class="btn btn-primary" onclick="doCopyArchive()"><i data-lucide="copy" style="width:15px;height:15px"></i>복사하기</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  function toggleNav(){ document.getElementById('icon-sb').classList.toggle('expanded'); document.body.classList.toggle('nav-expanded'); }
+  var _tt;
+  function toastMsg(m){ var t=document.getElementById('toast'); t.textContent=m; t.classList.add('show'); clearTimeout(_tt); _tt=setTimeout(function(){t.classList.remove('show');},2200); }
+  function notReady(n){ toastMsg(n+' 화면은 준비 중이에요.'); }
+
+  function showPTab(id){
+    document.getElementById('tab-mine').classList.toggle('on', id==='mine');
+    document.getElementById('tab-shared').classList.toggle('on', id==='shared');
+    document.getElementById('view-mine').classList.toggle('hidden', id!=='mine');
+    document.getElementById('view-shared').classList.toggle('hidden', id!=='shared');
+    var sc=document.getElementById('view-sheet-create'); if(sc) sc.classList.add('hidden');
+    closeCreate();
+    window.scrollTo(0,0);
+    if(window.lucide) lucide.createIcons();
+  }
+  function showSheetCreate(){
+    closeCreate();
+    document.getElementById('view-mine').classList.add('hidden');
+    document.getElementById('view-shared').classList.add('hidden');
+    document.getElementById('view-sheet-create').classList.remove('hidden');
+    document.getElementById('tab-mine').classList.remove('on');
+    document.getElementById('tab-shared').classList.remove('on');
+    window.scrollTo(0,0);
+    if(window.lucide) lucide.createIcons();
+  }
+  function pickMethod(m){ document.querySelectorAll('#view-sheet-create .m-card').forEach(function(c){ c.classList.toggle('on', c.getAttribute('data-m')===m); }); ['upload','copy','ai'].forEach(function(x){ var p=document.getElementById('mp-'+x); if(p) p.classList.toggle('hidden', x!==m); }); if(window.lucide) lucide.createIcons(); }
+  function pickCrit(el, mode){ el.parentNode.querySelectorAll('.rad').forEach(function(r){ r.classList.remove('on'); }); el.classList.add('on'); document.getElementById('crit-import').classList.toggle('hidden', mode!=='import'); document.getElementById('crit-direct').classList.toggle('hidden', mode!=='direct'); }
+  function pickRub(el, mode){ el.parentNode.querySelectorAll('.rad').forEach(function(r){ r.classList.remove('on'); }); el.classList.add('on'); var ed=document.getElementById('rub-editor'), note=document.getElementById('rub-ai-note'); if(ed) ed.classList.toggle('hidden', mode!=='self'); if(note) note.classList.toggle('hidden', mode!=='ai'); if(window.lucide) lucide.createIcons(); }
+  function showImportPreview(sel){ var on=sel.value!==''; document.getElementById('import-preview').classList.toggle('hidden', !on); document.getElementById('import-hint').classList.toggle('hidden', on); }
+  function addCritRow(){ var ed=document.getElementById('rub-editor'); var box=document.createElement('div'); box.className='crit-box'; box.innerHTML='<div class="crit-row"><textarea class="crit-elem" placeholder="채점요소를 입력해 주세요."></textarea><div class="crit-scores"><div class="crit-score-row"><input class="crit-sc-num" value="0"><input class="crit-sc-desc" placeholder="세부 기준을 입력해 주세요."></div><div class="crit-score-row"><input class="crit-sc-num" value="0"><input class="crit-sc-desc" placeholder="세부 기준을 입력해 주세요."></div></div></div>'; ed.insertBefore(box, ed.querySelector('button')); }
+
+  function toggleCreate(e){ if(e) e.stopPropagation(); document.getElementById('createMenu').classList.toggle('open'); }
+  function closeCreate(){ var m=document.getElementById('createMenu'); if(m) m.classList.remove('open'); }
+  window.addEventListener('click', closeCreate);
+
+  /* 유입 분기 — 상세는 기존 빌더 재사용 예정(현재 뼈대: 목적지 안내) */
+  function goCreate(type){
+    closeCreate();
+    if(type==='plan') location.href='eval_plan_detail_v1_260619.html';
+    else showSheetCreate();
+  }
+  function goCopyFromArchive(){ closeCreate(); showPTab('shared'); }
+  var _copyCtx=null;
+  function openCopyConfirm(e, name, subj, teacher, type){ if(e) e.stopPropagation(); _copyCtx={name:name,subj:subj,teacher:teacher,type:type}; document.getElementById('copyName').textContent=name; document.getElementById('copyMeta').textContent=subj+' · '+teacher+' 선생님'; document.getElementById('copyModal').classList.add('open'); if(window.lucide) lucide.createIcons(); }
+  function closeCopyModal(){ document.getElementById('copyModal').classList.remove('open'); }
+  function doCopyArchive(){ if(!_copyCtx) return; addMineCard(_copyCtx.type, _copyCtx.subj, _copyCtx.name); closeCopyModal(); toastMsg('‘'+_copyCtx.name+'’을(를) 나의 자료로 복사했어요.'); showPTab('mine'); }
+  function addMineCard(type, subj, name){
+    var grid=document.querySelector('#view-mine .card-grid'); if(!grid) return;
+    var isPlan=type==='plan';
+    var chip = isPlan ? '<span class="type-chip type-plan"><i data-lucide="scissors" style="width:11px;height:11px"></i>평가계획</span>' : '<span class="type-chip type-sheet"><i data-lucide="file-text" style="width:11px;height:11px"></i>활동지</span>';
+    var onc = isPlan ? "location.href='eval_plan_detail_v1_260619.html'" : "location.href='question_tab_v1_260617.html?open=detail&ev='+encodeURIComponent('"+name.replace(/'/g,'')+"')+'&src=copy'";
+    var card=document.createElement('div'); card.className='qcard'; card.setAttribute('data-type',type); card.setAttribute('data-subj',subj); card.setAttribute('onclick',onc);
+    card.innerHTML='<div class="card-chips">'+chip+'<span class="subj-chip">'+subj+'</span></div>'
+      +'<h3 class="qcard-title">'+name+'</h3>'
+      +'<p class="card-desc">자료실에서 복사한 '+(isPlan?'평가계획':'활동지')+'이에요.</p>'
+      +'<div class="qcard-foot"><span class="foot-meta">방금 · 교내 공개</span><span class="foot-acts"><button class="icon-btn" onclick="event.stopPropagation();toastMsg(\'내보내기\')"><i data-lucide="download" style="width:16px;height:16px"></i></button><button class="icon-btn del" onclick="event.stopPropagation();toastMsg(\'삭제\')"><i data-lucide="trash-2" style="width:16px;height:16px"></i></button></span></div>';
+    grid.insertBefore(card, grid.firstChild); if(window.lucide) lucide.createIcons();
+  }
+  function openCard(type, name){
+    if(type==='plan') location.href='eval_plan_detail_v1_260619.html';
+    else if(type==='sheet') location.href='question_tab_v1_260617.html?open=detail&ev='+encodeURIComponent(name)+'&src=upload';
+    else if(type==='shared-plan') toastMsg('‘'+name+'’ 공유 평가계획 보기 (복사 가능)');
+    else location.href='question_tab_v1_260617.html?open=detail&ev='+encodeURIComponent(name)+'&src=copy';
+  }
+  function cardAct(e, act, name){
+    e.stopPropagation();
+    if(act==='export') toastMsg('‘'+name+'’ 내보내기 — 학교 자료실로 공유');
+    else if(act==='import') toastMsg('‘'+name+'’ 가져오기 — 나의 자료로 복사');
+    else toastMsg('‘'+name+'’ 삭제');
+  }
+
+  var _mineType='all';
+  function filterMine(t, btn){ _mineType=t; document.querySelectorAll('.mine-filter .seg button').forEach(function(b){ b.classList.toggle('on', b===btn); }); applyMineFilter(); }
+  function applyMineFilter(){ var subj=document.getElementById('subjFilter').value; document.querySelectorAll('#view-mine .qcard').forEach(function(c){ var okT=(_mineType==='all'||c.getAttribute('data-type')===_mineType); var okS=(subj==='all'||c.getAttribute('data-subj')===subj); c.classList.toggle('hidden', !(okT&&okS)); }); }
+  function modKey(c){ var m=c.querySelector('.foot-meta').textContent.match(/(\d{2})\.(\d{2})\.(\d{2})/); return m?(m[1]+m[2]+m[3]):'999999'; }
+  function sortMine(){ var key=document.getElementById('sortSel').value; var grid=document.querySelector('#view-mine .card-grid'); var cards=Array.prototype.slice.call(grid.querySelectorAll('.qcard')); cards.sort(function(a,b){ if(key==='name'){ return a.querySelector('.qcard-title').textContent.trim().localeCompare(b.querySelector('.qcard-title').textContent.trim(),'ko'); } return modKey(b).localeCompare(modKey(a)); }); cards.forEach(function(c){ grid.appendChild(c); }); }
+
+  lucide.createIcons();
+  sortMine();
+</script>
+</body>
+</html>

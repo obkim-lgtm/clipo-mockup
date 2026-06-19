@@ -598,7 +598,7 @@
 <!-- ===== Sidebar ===== -->
 <nav class="icon-sb" id="icon-sb">
   <div class="si" onclick="location.href='home_v1_260612.html'"><div class="si-icon"><i data-lucide="home" style="width:20px;height:20px"></i></div><span class="si-label">홈</span><span class="si-tip">홈</span></div>
-  <div class="si" onclick="notReady('평가계획')"><div class="si-icon"><i data-lucide="scissors" style="width:20px;height:20px"></i></div><span class="si-label">평가계획</span><span class="si-tip">평가계획</span></div>
+  <div class="si" onclick="location.href='eval_plan_v1_260619.html'"><div class="si-icon"><i data-lucide="scissors" style="width:20px;height:20px"></i></div><span class="si-label">평가 준비</span><span class="si-tip">평가 준비</span></div>
   <div class="si active" onclick="location.href='co_teacher_review_v1_260611.html'"><div class="si-icon"><i data-lucide="layout-grid" style="width:20px;height:20px"></i></div><span class="si-label">수업</span><span class="si-tip">수업</span></div>
   <div class="si" onclick="location.href='creative_activity_list_v6_260507.html'"><div class="si-icon"><i data-lucide="notebook-pen" style="width:20px;height:20px"></i></div><span class="si-label">창의적 체험활동 <span style="font-size:10px;background:#416bff;color:#fff;padding:1px 5px;border-radius:3px;margin-left:2px">Beta</span></span><span class="si-tip">창의적 체험활동</span></div>
   <div class="si" onclick="location.href='quick_seteuk_dev_list_v1_260604.html'"><div class="si-icon"><i data-lucide="zap" style="width:20px;height:20px"></i></div><span class="si-label">세특 간편 생성기</span><span class="si-tip">세특 간편 생성기</span></div>
@@ -1086,6 +1086,17 @@
     <h1 class="page-h1" id="up-h1">활동지 업로드</h1>
     <p class="page-sub" id="up-sub" style="margin-bottom:24px;">활동지를 올리면 문항을 자동으로 인식해 드려요. 결과만 확인하면 바로 등록할 수 있어요. 채점요소·모범답안을 더하면 채점이 더 정확해집니다. (선택)</p>
 
+    <div class="sec" id="up-basic-sec">
+      <div class="sec-hd"><span class="sec-title">기본 정보</span></div>
+      <label style="display:block;font-size:14px;font-weight:600;color:#3b3f4c;margin:0 0 8px;">활동지명</label>
+      <input id="up-name" style="width:100%;height:44px;border:1px solid #d9d9d9;border-radius:10px;padding:0 14px;font-size:15px;font-family:inherit;color:#222631;outline:none;" placeholder="활동지명을 입력해 주세요.">
+      <label style="display:block;font-size:14px;font-weight:600;color:#3b3f4c;margin:18px 0 8px;">공개 여부</label>
+      <div class="radio-line">
+        <span class="rad on" onclick="pickRadio(this)"><span class="ring"></span>교내 공개</span>
+        <span class="rad" onclick="pickRadio(this)"><span class="ring"></span>나만 보기</span>
+      </div>
+    </div>
+
     <div id="up-regraded-note" class="info-note hidden">
       <i data-lucide="info" style="width:16px;height:16px;flex-shrink:0;margin-top:1px"></i>
       <span>이 활동지로 <b id="up-graded-n">3</b>개 학급을 이미 채점했어요. 활동지를 바꾸면 <b>다시 채점해야</b> 변경 내용이 반영돼요. (이전 채점 결과는 그대로 유지)</span>
@@ -1474,7 +1485,7 @@ function rupAnalyze(){
   document.getElementById('up-loading').classList.add('hidden');
   document.getElementById('up-chip').classList.remove('hidden');
   document.getElementById('up-chip-name').textContent='2025_1학기_국어_서술형_활동지.pdf';
-  document.getElementById('up-h1').textContent=ev;
+  document.getElementById('up-h1').textContent=ev; var _un=document.getElementById('up-name'); if(_un) _un.value=ev;
   document.getElementById('up-sub').textContent='인식한 문항을 확인하고, 채점요소·모범답안을 더하면 채점이 더 정확해져요. (선택)';
   document.getElementById('up-recog-sec').classList.remove('hidden');
   document.getElementById('rubricList').innerHTML=''; document.getElementById('answerList').innerHTML='';
@@ -1493,7 +1504,7 @@ var _gradedCount=0;
 function openRegistered(source, fileName, evName, gradedCount){
   _upMode='registered'; _gradedCount=gradedCount||0; window._regSource=source; window._regFile=(source==='ai'?'':fileName); window._regEv=evName;
   var fileSec=document.getElementById('up-file-sec'), note=document.getElementById('up-regraded-note'), fc=document.getElementById('up-fc-change');
-  document.getElementById('up-h1').textContent=evName||'활동지';
+  document.getElementById('up-h1').textContent=evName||'활동지'; var _un2=document.getElementById('up-name'); if(_un2) _un2.value=evName||'';
   fileSec.classList.remove('hidden');
   document.getElementById('up-dz').classList.add('hidden');
   document.getElementById('up-loading').classList.add('hidden');
@@ -1656,7 +1667,7 @@ function closeSaveReg(){ document.getElementById('saveRegModal').classList.remov
 function saveRegOnly(){ closeSaveReg(); toastMsg('변경 사항을 저장했어요. 다시 채점해야 반영돼요.'); setTimeout(showList, 900); }
 function saveRegAndRescore(){ closeSaveReg(); toastMsg('변경 사항을 저장하고 채점 화면으로 이동합니다.'); setTimeout(showList, 1000); }
 function showResult(){ showView('view-result'); }
-function showList(){ _regPending=false; showView('view-list'); }
+function showList(){ if(window._backTo){ location.href=window._backTo; return; } _regPending=false; showView('view-list'); }
 function showPlan(){ showView('view-plan'); var fromPlan=(window._genMode==='plan'); document.getElementById('plan-rubric-full').classList.toggle('hidden', fromPlan); }
 function finalizePlan(){ var a=document.getElementById('anaModal'); a.classList.add('open'); if(window.lucide) lucide.createIcons(); setTimeout(function(){ a.classList.remove('open'); showResult(); }, 1800); }
 
@@ -1701,6 +1712,8 @@ function openRegModal(){ document.getElementById('regModal').classList.add('open
 function closeRegModal(){ document.getElementById('regModal').classList.remove('open'); }
 
 lucide.createIcons();
+/* 외부(평가 준비 등)에서 활동지 카드 클릭 → 인식완료 상세 바로 열기 */
+(function(){ try{ var p=new URLSearchParams(location.search); if(p.get('open')==='detail'){ var ev=p.get('ev')||'활동지'; var src=p.get('src')||'upload'; var file=p.get('file')||(ev.replace(/\s+/g,'_')+'.pdf'); window._backTo='eval_plan_v1_260619.html'; openRegistered(src, file, ev, 0); if(window.lucide) lucide.createIcons(); } }catch(e){} })();
 </script>
 </body>
 </html>
