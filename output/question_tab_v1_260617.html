@@ -1713,7 +1713,12 @@ function closeRegModal(){ document.getElementById('regModal').classList.remove('
 
 lucide.createIcons();
 /* 외부(평가 준비 등)에서 활동지 카드 클릭 → 인식완료 상세 바로 열기 */
-(function(){ try{ var p=new URLSearchParams(location.search); if(p.get('open')==='detail'){ var ev=p.get('ev')||'활동지'; var src=p.get('src')||'upload'; var file=p.get('file')||(ev.replace(/\s+/g,'_')+'.pdf'); window._backTo='eval_plan_v1_260619.html'; openRegistered(src, file, ev, 0); if(window.lucide) lucide.createIcons(); } }catch(e){} })();
+(function(){ try{ var p=new URLSearchParams(location.search); var open=p.get('open'); if(!open) return; var ev=p.get('ev')||'활동지'; window._backTo='eval_plan_v1_260619.html';
+  if(open==='detail'){ var src=p.get('src')||'upload'; var file=p.get('file')||(ev.replace(/\s+/g,'_')+'.pdf'); openRegistered(src, file, ev, 0); }
+  else if(open==='upload'){ window._regEv=ev; showUpload(); document.getElementById('up-h1').textContent=ev; var un=document.getElementById('up-name'); if(un) un.value=ev; }
+  else if(open==='ai'){ window._regEv=ev; openGen('plan'); }
+  if(window.lucide) lucide.createIcons();
+}catch(e){} })();
 </script>
 </body>
 </html>

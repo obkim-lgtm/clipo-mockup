@@ -361,7 +361,7 @@
       <div class="sec">
         <div class="sec-hd"><span class="sec-title">기본 정보</span></div>
         <label class="fld-label">활동지명</label>
-        <input class="fld-input" placeholder="활동지명을 입력해 주세요.">
+        <input class="fld-input" id="sheet-name" placeholder="활동지명을 입력해 주세요.">
         <label class="fld-label" style="margin-top:18px;">평가 기준 <span style="font-weight:500;color:#9ea3ad;">(성취기준·채점기준)</span></label>
         <div class="radio-line" style="margin:8px 0 0;">
           <span class="rad on" onclick="pickCrit(this,'import')"><span class="ring"></span>기존 평가계획에서 가져오기</span>
@@ -425,17 +425,15 @@
         </button>
       </div>
         <div id="mp-upload">
-          <p class="m-pane-desc">가진 활동지(PDF·이미지)를 올리면 문항을 자동으로 인식해 등록해요. 인식 결과만 확인하면 끝이에요.</p>
-          <div class="dropzone" onclick="toastMsg('파일 업로드 → 문항 인식 단계로 이어져요. (다음 단계)')">
-            <div class="dz-ic"><i data-lucide="file-up" style="width:22px;height:22px"></i></div>
-            <div style="font-size:14px;color:#3b3f4c;">클릭하거나 파일을 끌어다 놓으세요.</div>
-            <div style="font-size:12px;color:#9ea3ad;">PDF, JPG, PNG 가능 · 한글 파일은 PDF로 변환해 올려주세요</div>
-          </div>
+          <p class="m-pane-desc" style="margin-bottom:0;">다음 단계에서 가진 활동지(PDF·이미지)를 올리면, 문항을 자동으로 인식해 등록해요. 인식 결과만 확인하면 끝이에요.</p>
         </div>
         <div id="mp-ai" class="hidden">
-          <p class="m-pane-desc">성취기준·채점기준에 맞춰 AI가 활동지 초안을 만들어요. 내용 입력 → 예상 문항 확인 → 활동지 완성, 3단계로 진행돼요.</p>
-          <div style="display:flex;justify-content:flex-end;"><button class="btn btn-primary" onclick="toastMsg('AI로 활동지 만들기 (다음 단계)')"><i data-lucide="wand-sparkles" style="width:16px;height:16px"></i>AI로 활동지 만들기</button></div>
+          <p class="m-pane-desc" style="margin-bottom:0;">성취기준·채점기준에 맞춰 AI가 활동지 초안을 만들어요. 내용 입력 → 예상 문항 확인 → 활동지 완성, 3단계로 진행돼요.</p>
         </div>
+      </div>
+
+      <div style="display:flex; justify-content:flex-end; margin-top:20px;">
+        <button class="btn btn-primary" style="height:44px; padding:0 24px; font-size:15px;" onclick="sheetNext()">다음으로</button>
       </div>
     </section>
 
@@ -487,6 +485,7 @@
     if(window.lucide) lucide.createIcons();
   }
   function pickMethod(m){ document.querySelectorAll('#view-sheet-create .m-card').forEach(function(c){ c.classList.toggle('on', c.getAttribute('data-m')===m); }); ['upload','copy','ai'].forEach(function(x){ var p=document.getElementById('mp-'+x); if(p) p.classList.toggle('hidden', x!==m); }); if(window.lucide) lucide.createIcons(); }
+  function sheetNext(){ var m=document.querySelector('#view-sheet-create .m-card.on'); var method=m?m.getAttribute('data-m'):'upload'; var nm=(document.getElementById('sheet-name')&&document.getElementById('sheet-name').value.trim())||'새 활동지'; location.href='question_tab_v1_260617.html?open='+(method==='ai'?'ai':'upload')+'&ev='+encodeURIComponent(nm); }
   function pickCrit(el, mode){ el.parentNode.querySelectorAll('.rad').forEach(function(r){ r.classList.remove('on'); }); el.classList.add('on'); document.getElementById('crit-import').classList.toggle('hidden', mode!=='import'); document.getElementById('crit-direct').classList.toggle('hidden', mode!=='direct'); }
   function pickRub(el, mode){ el.parentNode.querySelectorAll('.rad').forEach(function(r){ r.classList.remove('on'); }); el.classList.add('on'); var ed=document.getElementById('rub-editor'), note=document.getElementById('rub-ai-note'); if(ed) ed.classList.toggle('hidden', mode!=='self'); if(note) note.classList.toggle('hidden', mode!=='ai'); if(window.lucide) lucide.createIcons(); }
   function showImportPreview(sel){ var on=sel.value!==''; document.getElementById('import-preview').classList.toggle('hidden', !on); document.getElementById('import-hint').classList.toggle('hidden', on); }
