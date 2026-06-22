@@ -503,7 +503,7 @@ lucide.createIcons();
 .ce-btn-outline:hover{background:#f6f7f9}
 .ce-btn-solid{height:44px;background:#365eef;border:none;border-radius:8px;padding:0 22px;font-size:15px;font-weight:600;color:#fff;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;line-height:1}
 .ce-btn-solid:hover{background:#3151c4}
-.ce-demo{position:fixed;right:24px;bottom:24px;z-index:600;background:#222631;border-radius:12px;padding:10px 12px;box-shadow:0 8px 24px #00000033;user-select:none}
+.ce-demo{position:fixed;left:24px;bottom:24px;z-index:600;background:#222631;border-radius:12px;padding:10px 12px;box-shadow:0 8px 24px #00000033;user-select:none}
 .ce-demo .h{font-size:11px;font-weight:700;color:#9aa0ad;letter-spacing:.04em;margin-bottom:7px}
 .ce-demo .r{display:flex;gap:6px}
 .ce-demo button{border:none;border-radius:7px;padding:7px 12px;font-size:13px;font-weight:600;cursor:pointer;background:#3a3f4c;color:#c5c9d2}
@@ -515,8 +515,11 @@ lucide.createIcons();
       <div class="ce-title">수업 수정</div>
       <button class="ce-close" onclick="closeCe()"><i data-lucide="x" style="width:18px;height:18px"></i></button>
     </div>
-    <p class="ce-desc" id="ceDesc"></p>
     <div class="ce-body">
+      <div class="ce-lock" id="ceLockBox" style="display:none">
+        <i data-lucide="lock"></i>
+        <div id="ceLockText"></div>
+      </div>
       <div class="ce-row2">
         <div class="ce-field">
           <label class="ce-label">학기</label>
@@ -527,17 +530,13 @@ lucide.createIcons();
           <select class="ce-select" id="ceGrade"><option value="3" selected>3학년</option><option value="1">1학년</option><option value="2">2학년</option><option value="4">4학년</option><option value="5">5학년</option><option value="6">6학년</option><option value="none">학년 구분 없음</option></select>
         </div>
       </div>
-      <div class="ce-lock" id="ceLock" style="display:none">
-        <i data-lucide="lock"></i>
-        <span>이 수업은 이미 학생이 등록되어 있어 <b>학년 · 반 편성</b>은 바꿀 수 없어요. 바꾸려면 참여 학생을 모두 삭제하거나, 수업을 삭제하고 새로 만들어 주세요.</span>
-      </div>
-      <div class="ce-field locked">
+      <div class="ce-field" id="ceFieldSubject">
         <label class="ce-label">과목명</label>
         <div class="ce-rg">
-          <label class="ce-radio locked"><input type="radio" name="ceCurri" checked><span class="ce-ring"></span><span>2015 개정 교육과정</span></label>
-          <label class="ce-radio locked"><input type="radio" name="ceCurri"><span class="ce-ring"></span><span>2022 개정 교육과정</span></label>
+          <label class="ce-radio ce-curri"><input type="radio" name="ceCurri" checked><span class="ce-ring"></span><span>2015 개정 교육과정</span></label>
+          <label class="ce-radio ce-curri"><input type="radio" name="ceCurri"><span class="ce-ring"></span><span>2022 개정 교육과정</span></label>
         </div>
-        <select class="ce-select" id="ceSubject" disabled style="margin-top:6px"><option>사회</option></select>
+        <select class="ce-select" id="ceSubject" style="margin-top:6px"><option>사회</option></select>
       </div>
       <div class="ce-field">
         <label class="ce-label">수업명</label>
@@ -559,34 +558,54 @@ lucide.createIcons();
   <div class="ce-demo">
     <div class="h">데모 · 등록 학생</div>
     <div class="r">
-      <button id="ceNone" onclick="setCeStu('none')">없음</button>
-      <button id="ceHas" class="on" onclick="setCeStu('has')">있음</button>
+      <button id="ceStuNone" onclick="setCeStu('none')">없음</button>
+      <button id="ceStuHas" class="on" onclick="setCeStu('has')">있음</button>
+    </div>
+    <div class="h" style="margin-top:9px">데모 · 등록 설계</div>
+    <div class="r">
+      <button id="ceDsgNone" onclick="setCeDesign('none')">없음</button>
+      <button id="ceDsgHas" class="on" onclick="setCeDesign('has')">있음</button>
     </div>
   </div>
 </div>
 <script>
-function openCe(state, name, subj){
+function openCe(state, name, subj, dsg){
   document.getElementById('ceOverlay').classList.add('open');
   if(name){ var inp=document.querySelector('#ceOverlay .ce-input'); if(inp) inp.value=name; }
   if(subj){ var ss=document.getElementById('ceSubject'); if(ss) ss.innerHTML='<option>'+subj+'</option>'; }
   setCeStu(state||'has');
+  setCeDesign(dsg||'has');
   lucide.createIcons();
 }
 function closeCe(){ document.getElementById('ceOverlay').classList.remove('open'); }
 function saveCe(){ closeCe(); if(window.toastMsg) toastMsg('수업 정보를 저장했어요.'); }
 function setCeStu(s){
-  document.getElementById('ceNone').classList.toggle('on', s==='none');
-  document.getElementById('ceHas').classList.toggle('on', s==='has');
+  document.getElementById('ceStuNone').classList.toggle('on', s==='none');
+  document.getElementById('ceStuHas').classList.toggle('on', s==='has');
   var locked=(s==='has');
   document.getElementById('ceGrade').disabled=locked;
   document.getElementById('ceFieldGrade').classList.toggle('locked', locked);
   document.getElementById('ceFieldBan').classList.toggle('locked', locked);
   document.querySelectorAll('.ce-ban').forEach(function(r){ r.classList.toggle('locked', locked); });
-  document.getElementById('ceLock').style.display = locked ? 'flex' : 'none';
-  document.getElementById('ceDesc').textContent = locked
-    ? '이미 만들어진 수업은 학기 · 수업명을 수정할 수 있어요.'
-    : '이미 만들어진 수업은 학기 · 수업명 · 학년 · 반 편성을 수정할 수 있어요.';
-  lucide.createIcons();
+  updateLock(); lucide.createIcons();
+}
+function setCeDesign(d){
+  document.getElementById('ceDsgNone').classList.toggle('on', d==='none');
+  document.getElementById('ceDsgHas').classList.toggle('on', d==='has');
+  var locked=(d==='has');
+  document.getElementById('ceFieldSubject').classList.toggle('locked', locked);
+  document.querySelectorAll('.ce-curri').forEach(function(r){ r.classList.toggle('locked', locked); });
+  document.getElementById('ceSubject').disabled=locked;
+  updateLock(); lucide.createIcons();
+}
+function updateLock(){
+  var stu=document.getElementById('ceStuHas').classList.contains('on');
+  var dsg=document.getElementById('ceDsgHas').classList.contains('on');
+  var box=document.getElementById('ceLockBox'); var html='';
+  if(stu) html+='<div>등록된 학생이 있어 <b>학년 · 반 편성</b>은 바꿀 수 없어요. 바꾸려면 참여 학생을 모두 삭제하거나, 수업을 삭제하고 새로 만들어 주세요.</div>';
+  if(dsg) html+='<div'+(stu?' style="margin-top:8px"':'')+'>등록된 평가 설계가 있어 <b>교육과정 · 과목명</b>은 바꿀 수 없어요. 바꾸려면 평가 설계를 모두 삭제하거나, 수업을 새로 만들어 주세요.</div>';
+  if(html){ document.getElementById('ceLockText').innerHTML=html; box.style.display='flex'; }
+  else box.style.display='none';
 }
 document.getElementById('ceOverlay').addEventListener('click', function(e){ if(e.target===this) closeCe(); });
 </script>
