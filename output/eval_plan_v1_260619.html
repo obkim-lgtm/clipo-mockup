@@ -365,7 +365,7 @@
         <label class="fld-label" style="margin-top:18px;">평가 기준 <span style="font-weight:500;color:#9ea3ad;">(성취기준·채점기준)</span></label>
         <div class="radio-line" style="margin:8px 0 0;">
           <span class="rad on" onclick="pickCrit(this,'import')"><span class="ring"></span>평가계획에서 가져오기</span>
-          <span class="rad" onclick="pickCrit(this,'direct')"><span class="ring"></span>직접 정하기</span>
+          <span class="rad" onclick="pickCrit(this,'direct')"><span class="ring"></span>직접 입력하기</span>
         </div>
         <div id="crit-import" style="margin-top:14px;">
           <select class="fsel" style="width:100%;min-width:0;" onchange="showImportPreview(this)"><option value="">평가계획을 선택해 주세요.</option><option>미래 예측 시나리오 작성 · 사회</option><option>주장하는 글쓰기 평가 · 국어</option><option>나의 좌우명 소개 · 영어</option></select>
@@ -384,11 +384,16 @@
           </div>
         </div>
         <div id="crit-direct" class="hidden" style="margin-top:14px;">
-          <label class="fld-label">성취기준</label>
-          <select class="fsel" style="width:100%;min-width:0;"><option>성취기준을 선택해 주세요.</option><option>[9사(일사)12-01] 사회 변동의 의미를 이해하고, 현대사회의 변동 양상과 문제점을 분석한다.</option><option>[9사(일사)12-02] 한국 사회 변동의 최근 경향을 이해하고, 이에 대한 대응 방안을 탐구한다.</option><option>직접 입력</option></select>
-          <label class="fld-label" style="margin-top:16px;">채점기준</label>
-          <p class="hint-note" style="margin-top:0;">채점기준은 활동지를 만든 뒤 <b>AI로 생성(크레딧 1)</b>하거나 직접 입력할 수 있어요.</p>
-          <p class="hint-note" style="margin-top:14px;">활동지를 만들면 입력한 내용으로 <b>평가계획도 함께 만들어져</b> 나의 자료에 추가돼요.</p>
+          <label class="fld-label">성취기준 <span style="font-weight:500;color:#9ea3ad;">(최대 10개)</span></label>
+          <div id="ach-list"></div>
+          <button class="btn btn-outline btn-sm" id="ach-add" type="button" onclick="addAch()" style="margin-top:8px;"><i data-lucide="plus" style="width:15px;height:15px"></i>성취기준 추가</button>
+
+          <label class="fld-label" style="margin-top:18px;">채점기준 <span style="font-weight:500;color:#9ea3ad;">(선택)</span></label>
+          <p class="hint-note" style="margin-top:0;">지금 입력하지 않아도 돼요. 활동지를 만든 뒤 <b>AI로 생성(크레딧 1)</b>하거나 직접 입력할 수 있어요.</p>
+          <div id="rub-wrap" class="hidden" style="margin-top:10px;"></div>
+          <button class="btn btn-outline btn-sm" id="rub-toggle" type="button" onclick="toggleRub()" style="margin-top:10px;"><i data-lucide="plus" style="width:15px;height:15px"></i>채점기준 직접 입력</button>
+
+          <p class="hint-note" style="margin-top:16px;">활동지를 만들면 입력한 내용으로 <b>평가계획도 함께 만들어져</b> 나의 자료에 추가돼요.</p>
         </div>
       </div>
 
@@ -470,9 +475,45 @@
   }
   function pickMethod(m){ document.querySelectorAll('#view-sheet-create .m-card').forEach(function(c){ c.classList.toggle('on', c.getAttribute('data-m')===m); }); ['upload','copy','ai'].forEach(function(x){ var p=document.getElementById('mp-'+x); if(p) p.classList.toggle('hidden', x!==m); }); if(window.lucide) lucide.createIcons(); }
   function sheetNext(){ var m=document.querySelector('#view-sheet-create .m-card.on'); var method=m?m.getAttribute('data-m'):'upload'; var nm=(document.getElementById('sheet-name')&&document.getElementById('sheet-name').value.trim())||'새 활동지'; if(method==='ai'){ location.href='question_tab_v1_260617.html?open=ai&ev='+encodeURIComponent(nm); } else { location.href='question_tab_v1_260617.html?open=upload&ev='+encodeURIComponent(nm); } }
-  function pickCrit(el, mode){ el.parentNode.querySelectorAll('.rad').forEach(function(r){ r.classList.remove('on'); }); el.classList.add('on'); document.getElementById('crit-import').classList.toggle('hidden', mode!=='import'); document.getElementById('crit-direct').classList.toggle('hidden', mode!=='direct'); }
+  function pickCrit(el, mode){ el.parentNode.querySelectorAll('.rad').forEach(function(r){ r.classList.remove('on'); }); el.classList.add('on'); document.getElementById('crit-import').classList.toggle('hidden', mode!=='import'); document.getElementById('crit-direct').classList.toggle('hidden', mode!=='direct'); if(mode==='direct' && !document.getElementById('ach-list').children.length){ addAch(); } }
   function pickRub(el, mode){ el.parentNode.querySelectorAll('.rad').forEach(function(r){ r.classList.remove('on'); }); el.classList.add('on'); var an=document.getElementById('rub-ai-note'), sn=document.getElementById('rub-self-note'); if(an) an.classList.toggle('hidden', mode!=='ai'); if(sn) sn.classList.toggle('hidden', mode!=='self'); }
   function showImportPreview(sel){ var on=sel.value!==''; document.getElementById('import-preview').classList.toggle('hidden', !on); document.getElementById('import-hint').classList.toggle('hidden', on); }
+
+  /* ===== 직접 입력하기: 성취기준(최대 10) ===== */
+  var ACH_OPTS='<option value="">성취기준을 선택해 주세요.</option><option>[9사(일사)12-01] 사회 변동의 의미를 이해하고, 현대사회의 변동 양상과 문제점을 분석한다.</option><option>[9사(일사)12-02] 한국 사회 변동의 최근 경향을 이해하고, 이에 대한 대응 방안을 탐구한다.</option><option>직접 입력</option>';
+  function addAch(){
+    var list=document.getElementById('ach-list'); if(!list) return;
+    if(list.children.length>=10) return;
+    var row=document.createElement('div'); row.className='ach-row';
+    row.style.cssText='display:flex;gap:8px;align-items:center;margin-bottom:8px;';
+    row.innerHTML='<select class="fsel" style="flex:1;min-width:0;">'+ACH_OPTS+'</select>'+
+      '<button class="ach-del" type="button" onclick="delAch(this)" title="삭제" style="flex-shrink:0;width:36px;height:36px;border:1px solid #e2e5ea;border-radius:8px;background:#fff;color:#9ea3ad;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;"><i data-lucide="x" style="width:16px;height:16px"></i></button>';
+    list.appendChild(row);
+    syncAchAdd(); if(window.lucide) lucide.createIcons();
+  }
+  function delAch(btn){ var list=document.getElementById('ach-list'); var row=btn.closest('.ach-row'); if(list.children.length<=1){ row.querySelector('select').selectedIndex=0; return; } row.remove(); syncAchAdd(); }
+  function syncAchAdd(){ var list=document.getElementById('ach-list'); var add=document.getElementById('ach-add'); if(!list||!add) return; var full=list.children.length>=10; add.disabled=full; add.style.opacity=full?'.45':'1'; add.style.cursor=full?'not-allowed':'pointer'; }
+
+  /* ===== 직접 입력하기: 채점기준(선택) ===== */
+  function rubRow(){
+    var d=document.createElement('div'); d.className='crit-box';
+    d.innerHTML='<div class="crit-row">'+
+      '<textarea class="crit-elem" rows="2" placeholder="채점 요소"></textarea>'+
+      '<div class="crit-scores">'+
+        '<div class="crit-score-row"><input class="crit-sc-num" placeholder="배점"><input class="crit-sc-desc" placeholder="채점 기준 설명"></div>'+
+      '</div>'+
+      '<button class="ach-del" type="button" onclick="delRub(this)" title="삭제" style="flex-shrink:0;width:36px;height:36px;border:1px solid #e2e5ea;border-radius:8px;background:#fff;color:#9ea3ad;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;"><i data-lucide="x" style="width:16px;height:16px"></i></button>'+
+      '</div>';
+    return d;
+  }
+  function toggleRub(){
+    var wrap=document.getElementById('rub-wrap'); var tog=document.getElementById('rub-toggle');
+    if(!wrap.children.length){ wrap.appendChild(rubRow()); var add=document.createElement('button'); add.className='btn btn-outline btn-sm'; add.type='button'; add.id='rub-add'; add.style.marginTop='2px'; add.setAttribute('onclick','addRub()'); add.innerHTML='<i data-lucide="plus" style="width:15px;height:15px"></i>채점기준 추가'; wrap.appendChild(add); }
+    wrap.classList.remove('hidden'); tog.classList.add('hidden');
+    if(window.lucide) lucide.createIcons();
+  }
+  function addRub(){ var wrap=document.getElementById('rub-wrap'); var add=document.getElementById('rub-add'); wrap.insertBefore(rubRow(), add); if(window.lucide) lucide.createIcons(); }
+  function delRub(btn){ var wrap=document.getElementById('rub-wrap'); var box=btn.closest('.crit-box'); var rows=wrap.querySelectorAll('.crit-box'); if(rows.length<=1){ wrap.classList.add('hidden'); wrap.innerHTML=''; document.getElementById('rub-toggle').classList.remove('hidden'); return; } box.remove(); }
   function addCritRow(){ var ed=document.getElementById('rub-editor'); var box=document.createElement('div'); box.className='crit-box'; box.innerHTML='<div class="crit-row"><textarea class="crit-elem" placeholder="채점요소를 입력해 주세요."></textarea><div class="crit-scores"><div class="crit-score-row"><input class="crit-sc-num" value="0"><input class="crit-sc-desc" placeholder="세부 기준을 입력해 주세요."></div><div class="crit-score-row"><input class="crit-sc-num" value="0"><input class="crit-sc-desc" placeholder="세부 기준을 입력해 주세요."></div></div></div>'; ed.insertBefore(box, ed.querySelector('button')); }
 
   function toggleCreate(e){ if(e) e.stopPropagation(); document.getElementById('createMenu').classList.toggle('open'); }
