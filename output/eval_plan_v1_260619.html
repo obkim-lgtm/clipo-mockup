@@ -166,6 +166,25 @@
     .prev-item{ font-size:14px; color:#3b3f4c; line-height:1.5; padding:9px 12px; background:#f6f7f9; border-radius:8px; margin-bottom:6px; display:flex; justify-content:space-between; gap:10px; }
     .prev-score{ color:#6d7381; font-weight:600; flex-shrink:0; }
 
+    /* ===== 채점기준 컴포넌트 (설계/평가계획과 동일) ===== */
+    .crit{ border:1px solid #dde1e8; border-radius:10px; padding:18px; margin-bottom:14px; position:relative; }
+    .crit-hd{ display:flex; align-items:center; justify-content:space-between; margin-bottom:12px; }
+    .crit-name{ font-size:15px; font-weight:600; color:#3b3f4c; }
+    .crit-x{ width:28px; height:28px; border:none; background:none; cursor:pointer; color:#9ea3ad; border-radius:6px; display:inline-flex; align-items:center; justify-content:center; }
+    .crit-x:hover{ background:#f6f7f9; color:#db3e51; }
+    .crit-tools{ display:flex; gap:8px; margin-top:12px; }
+    .rub-elem{ flex:0 0 200px; align-self:stretch; height:auto; border:1px solid #d9d9d9; border-radius:8px; padding:14px; font-size:16px; font-family:inherit; color:#222631; outline:none; background:#fff; resize:none; line-height:1.5; }
+    .rub-elem:focus{ border-color:#416bff; box-shadow:0 0 0 3px rgba(65,107,255,.12); }
+    .rub-elem::placeholder{ color:#9ea3ad; }
+    .sc-tbl{ border:1px solid #dde1e8; border-radius:8px; overflow:hidden; }
+    .sc-row{ display:flex; align-items:stretch; border-bottom:1px solid #eceef2; }
+    .sc-tbl .sc-row:last-child{ border-bottom:none; }
+    .sc-score{ width:64px; flex-shrink:0; border-right:1px solid #eceef2; }
+    .sc-score input{ width:100%; height:100%; min-height:48px; border:none; text-align:center; font-size:16px; font-weight:600; color:#222631; outline:none; background:#fff; font-family:inherit; }
+    .sc-desc{ flex:1; position:relative; }
+    .sc-desc input{ width:100%; height:100%; min-height:48px; border:none; padding:0 14px; font-size:15px; color:#222631; outline:none; background:#fff; font-family:inherit; }
+    .sc-desc input:focus{ background:#f4f8ff; }
+
     /* ===== 복사 확인 모달 ===== */
     .btn-outline{ background:#fff; color:#3b3f4c; border:1px solid #d9d9d9; }
     .btn-outline:hover{ background:#f6f7f9; }
@@ -390,7 +409,10 @@
 
           <label class="fld-label" style="margin-top:18px;">채점기준 <span style="font-weight:500;color:#9ea3ad;">(선택)</span></label>
           <p class="hint-note" style="margin-top:0;">지금 입력하지 않아도 돼요. 활동지를 만든 뒤 <b>AI로 생성(크레딧 1)</b>하거나 직접 입력할 수 있어요.</p>
-          <div id="rub-wrap" class="hidden" style="margin-top:10px;"></div>
+          <div id="rub-area" class="hidden" style="margin-top:12px;">
+            <div id="rub-list"></div>
+            <button class="btn btn-secondary btn-sm" type="button" onclick="addRub()" style="margin-top:2px;"><i data-lucide="plus" style="width:14px;height:14px"></i>기준 추가</button>
+          </div>
           <button class="btn btn-outline btn-sm" id="rub-toggle" type="button" onclick="toggleRub()" style="margin-top:10px;"><i data-lucide="plus" style="width:15px;height:15px"></i>채점기준 직접 입력</button>
 
           <p class="hint-note" style="margin-top:16px;">활동지를 만들면 입력한 내용으로 <b>평가계획도 함께 만들어져</b> 나의 자료에 추가돼요.</p>
@@ -494,26 +516,18 @@
   function delAch(btn){ var list=document.getElementById('ach-list'); var row=btn.closest('.ach-row'); if(list.children.length<=1){ row.querySelector('select').selectedIndex=0; return; } row.remove(); syncAchAdd(); }
   function syncAchAdd(){ var list=document.getElementById('ach-list'); var add=document.getElementById('ach-add'); if(!list||!add) return; var full=list.children.length>=10; add.disabled=full; add.style.opacity=full?'.45':'1'; add.style.cursor=full?'not-allowed':'pointer'; }
 
-  /* ===== 직접 입력하기: 채점기준(선택) ===== */
-  function rubRow(){
-    var d=document.createElement('div'); d.className='crit-box';
-    d.innerHTML='<div class="crit-row">'+
-      '<textarea class="crit-elem" rows="2" placeholder="채점 요소"></textarea>'+
-      '<div class="crit-scores">'+
-        '<div class="crit-score-row"><input class="crit-sc-num" placeholder="배점"><input class="crit-sc-desc" placeholder="채점 기준 설명"></div>'+
-      '</div>'+
-      '<button class="ach-del" type="button" onclick="delRub(this)" title="삭제" style="flex-shrink:0;width:36px;height:36px;border:1px solid #e2e5ea;border-radius:8px;background:#fff;color:#9ea3ad;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;"><i data-lucide="x" style="width:16px;height:16px"></i></button>'+
-      '</div>';
-    return d;
+  /* ===== 직접 입력하기: 채점기준(선택) — 설계/평가계획과 동일 컴포넌트 ===== */
+  function rubCardHTML(){
+    return '<div class="crit-hd"><span class="crit-name">채점기준</span><button class="crit-x" onclick="removeRubCard(this)"><i data-lucide="x" style="width:18px;height:18px"></i></button></div>'
+      +'<div style="display:flex;gap:12px;align-items:stretch;"><textarea class="rub-elem" placeholder="채점요소를 입력해 주세요."></textarea><div class="sc-tbl" style="flex:1;"><div class="sc-row"><div class="sc-score"><input value="0"></div><div class="sc-desc"><input placeholder="내용을 입력해 주세요."></div></div></div></div>'
+      +'<div class="crit-tools"><button class="btn btn-secondary btn-sm" type="button" onclick="addScoreRow(this)"><i data-lucide="plus" style="width:14px;height:14px"></i>급간 추가</button><button class="btn btn-outline btn-sm" type="button" onclick="removeScoreRow(this)"><i data-lucide="minus" style="width:14px;height:14px"></i>급간 제거</button></div>';
   }
-  function toggleRub(){
-    var wrap=document.getElementById('rub-wrap'); var tog=document.getElementById('rub-toggle');
-    if(!wrap.children.length){ wrap.appendChild(rubRow()); var add=document.createElement('button'); add.className='btn btn-outline btn-sm'; add.type='button'; add.id='rub-add'; add.style.marginTop='2px'; add.setAttribute('onclick','addRub()'); add.innerHTML='<i data-lucide="plus" style="width:15px;height:15px"></i>채점기준 추가'; wrap.appendChild(add); }
-    wrap.classList.remove('hidden'); tog.classList.add('hidden');
-    if(window.lucide) lucide.createIcons();
-  }
-  function addRub(){ var wrap=document.getElementById('rub-wrap'); var add=document.getElementById('rub-add'); wrap.insertBefore(rubRow(), add); if(window.lucide) lucide.createIcons(); }
-  function delRub(btn){ var wrap=document.getElementById('rub-wrap'); var box=btn.closest('.crit-box'); var rows=wrap.querySelectorAll('.crit-box'); if(rows.length<=1){ wrap.classList.add('hidden'); wrap.innerHTML=''; document.getElementById('rub-toggle').classList.remove('hidden'); return; } box.remove(); }
+  function renumberRub(){ var l=document.getElementById('rub-list'); if(!l) return; l.querySelectorAll('.crit').forEach(function(c,i){ c.querySelector('.crit-name').textContent='채점기준 '+(i+1); }); }
+  function addRub(){ var l=document.getElementById('rub-list'); if(l.querySelectorAll('.crit').length>=15){ toastMsg('채점기준은 최대 15개까지 입력할 수 있어요.'); return; } var d=document.createElement('div'); d.className='crit'; d.innerHTML=rubCardHTML(); l.appendChild(d); renumberRub(); if(window.lucide) lucide.createIcons(); }
+  function removeRubCard(btn){ var l=document.getElementById('rub-list'); btn.closest('.crit').remove(); if(!l.querySelectorAll('.crit').length){ document.getElementById('rub-area').classList.add('hidden'); document.getElementById('rub-toggle').classList.remove('hidden'); } else renumberRub(); }
+  function addScoreRow(btn){ var tbl=btn.closest('.crit').querySelector('.sc-tbl'); var row=document.createElement('div'); row.className='sc-row'; row.innerHTML='<div class="sc-score"><input value="0"></div><div class="sc-desc"><input placeholder="내용을 입력해 주세요."></div>'; tbl.appendChild(row); }
+  function removeScoreRow(btn){ var tbl=btn.closest('.crit').querySelector('.sc-tbl'); if(tbl && tbl.children.length>1) tbl.lastElementChild.remove(); }
+  function toggleRub(){ document.getElementById('rub-area').classList.remove('hidden'); document.getElementById('rub-toggle').classList.add('hidden'); if(!document.getElementById('rub-list').querySelectorAll('.crit').length) addRub(); }
   function addCritRow(){ var ed=document.getElementById('rub-editor'); var box=document.createElement('div'); box.className='crit-box'; box.innerHTML='<div class="crit-row"><textarea class="crit-elem" placeholder="채점요소를 입력해 주세요."></textarea><div class="crit-scores"><div class="crit-score-row"><input class="crit-sc-num" value="0"><input class="crit-sc-desc" placeholder="세부 기준을 입력해 주세요."></div><div class="crit-score-row"><input class="crit-sc-num" value="0"><input class="crit-sc-desc" placeholder="세부 기준을 입력해 주세요."></div></div></div>'; ed.insertBefore(box, ed.querySelector('button')); }
 
   function toggleCreate(e){ if(e) e.stopPropagation(); document.getElementById('createMenu').classList.toggle('open'); }
