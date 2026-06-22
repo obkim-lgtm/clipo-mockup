@@ -118,6 +118,9 @@
     .cc-pop.open{ display:block; }
     .cc-pop button{ width:100%; display:flex; align-items:center; gap:8px; padding:9px 12px; border:none; background:none; border-radius:6px; font-size:14px; color:#222631; cursor:pointer; text-align:left; }
     .cc-pop button:hover{ background:#f6f7f9; }
+    .cc-pop-div{ height:1px; background:#f1f3f5; margin:4px 6px; }
+    .cc-pop button.cc-del{ color:#f2525f; }
+    .cc-pop button.cc-del:hover{ background:#fdeef0; }
 
     /* ===== 우측 레일 ===== */
     .rail-card{ background:#fff; border-radius:12px; padding:20px; box-shadow:0 0 1px #2226314D, 0 2px 8px #0000000F; }
@@ -353,6 +356,8 @@ function cardHTML(c){
         ? '<button onclick="setArchived(\'' + c.id + '\', false)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="5" rx="1"/><path d="M4 8v11a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8"/><path d="m9.5 17 5-5"/><path d="m9.5 12 5 5"/></svg>보관 해제</button>'
         : '<button onclick="setArchived(\'' + c.id + '\', true)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="5" rx="1"/><path d="M4 8v11a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8"/><path d="M10 12h4"/></svg>보관하기</button>')
     + '<button onclick="toastMsg(\'수업 정보 수정은 이 목업에서 제공하지 않습니다.\', true)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg>수업 정보 수정</button>'
+    + (c.shared ? '' : '<div class="cc-pop-div"></div>'
+        + '<button class="cc-del" onclick="location.href=\'class_delete_v1_260622.html\'"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/></svg>수업 삭제</button>')
     + '</div>'
     + '</div>';
 }
