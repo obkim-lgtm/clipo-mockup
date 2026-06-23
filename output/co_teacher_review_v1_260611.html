@@ -71,7 +71,7 @@ button, .btn, a.btn {
 .class-tabs { position:sticky; top:56px; z-index:30; background:#fff; border-bottom:1px solid #dde1e8;
   display:flex; gap:8px; padding:0 28px; margin:-28px -28px 28px; }
 .ct { padding:18px 16px 15px; font-size:16px; font-weight:500; color:#6d7381; border-bottom:3px solid transparent; cursor:pointer; }
-.ct.active { color:#3151c4; font-weight:600; border-bottom-color:#416bff; }
+.ct.active { color:#416bff; border-bottom-color:#416bff; }
 
 /* 수업 배너 */
 .class-banner { background:#416bff; border-radius:12px; color:#fff; padding:28px 32px; display:flex; justify-content:space-between; align-items:center; }
@@ -358,8 +358,12 @@ body.dn-dragging .review-frame, body.dn-dragging .home-frame { pointer-events:no
 <section class="scene" id="sceneClass">
   <div class="content with-fold" id="classContent">
     <div class="class-tabs">
-      <div class="ct active">수업 홈</div><div class="ct">수행평가 설계</div><div class="ct">과제물 관리</div>
-      <div class="ct">수행평가 채점</div><div class="ct">세부능력 및 특기사항 지원</div>
+      <div class="ct active">수업 홈</div>
+      <div class="ct" onclick="location.href='task_ocr_inline_v1.html#design'">평가 설계</div>
+      <div class="ct" onclick="location.href='question_tab_v1_260617.html'">활동지</div>
+      <div class="ct" onclick="location.href='task_ocr_inline_v1.html'">과제물 관리</div>
+      <div class="ct" onclick="location.href='task_ocr_inline_v1.html#scoring'">채점</div>
+      <div class="ct" onclick="showToast('세부능력 및 특기사항 지원은 준비 중이에요')">세부능력 및 특기사항 지원</div>
     </div>
 
     <div class="class-banner">
@@ -450,8 +454,12 @@ body.dn-dragging .review-frame, body.dn-dragging .home-frame { pointer-events:no
 <section class="scene" id="sceneClass2">
   <div class="content with-fold">
     <div class="class-tabs">
-      <div class="ct active">수업 홈</div><div class="ct">수행평가 설계</div><div class="ct">과제물 관리</div>
-      <div class="ct">수행평가 채점</div><div class="ct">세부능력 및 특기사항 지원</div>
+      <div class="ct active">수업 홈</div>
+      <div class="ct" onclick="location.href='task_ocr_inline_v1.html#design'">평가 설계</div>
+      <div class="ct" onclick="location.href='question_tab_v1_260617.html'">활동지</div>
+      <div class="ct" onclick="location.href='task_ocr_inline_v1.html'">과제물 관리</div>
+      <div class="ct" onclick="location.href='task_ocr_inline_v1.html#scoring'">채점</div>
+      <div class="ct" onclick="showToast('세부능력 및 특기사항 지원은 준비 중이에요')">세부능력 및 특기사항 지원</div>
     </div>
 
     <div class="class-banner slim">
@@ -1005,8 +1013,15 @@ function toggleNav() {
   });
 })();
 
-/* iframe 미리 로드 — 진입 시 버벅임 방지 */
-setTimeout(() => { initHomeFrame(); initReviewFrame(); }, 1500);
+/* ───── 수업 홈 단독 모드 (?home=1) — 데모 네비 숨기고 수업홈 1안만 노출 ───── */
+const SOLO_HOME = new URLSearchParams(location.search).get('home') === '1';
+if (SOLO_HOME) {
+  document.getElementById('demoNav').style.display = 'none';
+  document.body.classList.add('solo-home');
+}
+
+/* iframe 미리 로드 — 진입 시 버벅임 방지 (단독 모드에선 불필요) */
+if (!SOLO_HOME) setTimeout(() => { initHomeFrame(); initReviewFrame(); }, 1500);
 
 goStep(1);
 lucide.createIcons();
