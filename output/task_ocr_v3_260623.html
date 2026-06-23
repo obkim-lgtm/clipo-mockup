@@ -1388,10 +1388,6 @@
           </div>
           <button onclick="openQuestionEditModal()" style="display:inline-flex;align-items:center;justify-content:center;line-height:1;gap:5px;height:30px;padding:0 12px;background:white;border:1px solid #b3c6ff;border-radius:6px;color:#416bff;font-family:inherit;font-size:13px;font-weight:700;cursor:pointer;" onmouseover="this.style.background='#e9f2ff'" onmouseout="this.style.background='white'"><i data-lucide="pencil" style="width:13px;height:13px;"></i>문항 수정</button>
         </div>
-        <div style="padding:10px 14px;background:#e9f2ff;border-radius:4px;display:flex;gap:8px;align-items:flex-start;margin-bottom:16px;">
-          <i data-lucide="pencil-line" style="width:14px;height:14px;color:#3151c4;flex-shrink:0;margin-top:2px;"></i>
-          <span style="font-size:14px;color:#3b3f4c;line-height:1.6;flex:1;"><strong>인식된 텍스트가 원본과 맞는지 확인해 주세요.</strong> 확인이 필요한 문항은 아래 AI 메모를 참고해 원본과 대조 후 수정하세요.</span>
-        </div>
       </div>
       <div id="ocr-b-text-panel" style="padding:0 20px 32px;"></div>
       <div id="ocr-b-original-panel" style="display:none;"></div>
@@ -2104,12 +2100,19 @@ function renderTable() {
   var allAbsent = currentListClass !== 1 && !allDone;
   var bulkUp = !!bulkUploadedClasses[currentListClass];
   var ocrPhase = bulkOcrStateA[currentListClass] || null;
-  var surveyMode = (existingUploadMethod === 'survey');
+  var surveyMode = (getClassMethod(currentListClass) === 'survey');
   STUDENTS.forEach(function(s, i) {
-    // 미제출 학급도 일괄 업로드하면 제출로 동적 반영 (1반은 케이스 데모용으로 s.status 유지)
-    var effectiveStatus = allDone ? '제출' : (allAbsent ? (bulkUp ? '제출' : '미제출') : s.status);
-    // 설문 모드에서 응답을 삭제한 학생은 미제출로 되돌림
-    if (surveyMode && deletedSurveyIds[s.id]) effectiveStatus = '미제출';
+    var effectiveStatus;
+    if (allDone) {
+      effectiveStatus = '제출';
+    } else if (surveyMode) {
+      // 설문: 응답한 학생만 제출 (삭제된 학생 제외). 미응답 = 미제출
+      var responded = SURVEY_ROWS.some(function(r){ return r.sid === s.id; }) && !deletedSurveyIds[s.id];
+      effectiveStatus = responded ? '제출' : '미제출';
+    } else {
+      // PDF: 미제출 학급도 일괄 업로드하면 제출로 동적 반영 (1반은 케이스 데모용 s.status 유지)
+      effectiveStatus = allAbsent ? (bulkUp ? '제출' : '미제출') : s.status;
+    }
     var statusBadge = effectiveStatus === '제출'
       ? '<span class="badge badge-green">제출 완료</span>'
       : '<span class="badge badge-red">미제출</span>';
@@ -2156,7 +2159,7 @@ function renderTable() {
     var displayDate = effectiveStatus !== '제출' ? '-' : (allDone ? '04/20 09:10 선생님 업로드' : (bulkUp ? bulkUploadStamp[currentListClass] : (allAbsent ? '-' : s.date)));
     var fileNameCellA = (effectiveStatus !== '제출')
       ? '<span style="color:#b3b6bd;">-</span>'
-      : (existingUploadMethod === 'survey' ? surveyFileCell() : scoredFileCell(s.id + '_미래시나리오.pdf', s.files));
+      : (surveyMode ? surveyFileCell() : scoredFileCell(s.id + '_미래시나리오.pdf', s.files));
     html += '<tr>';
     html += '<td style="text-align:center;">' + statusBadge + '</td>';
     html += '<td style="font-weight:600;">' + s.id + '</td>';
@@ -2467,7 +2470,14 @@ function getClassActionLists(classNum, rawType) {
       });
     }
   } else {
-    if (classNum === 1) {
+    var methodA = getClassMethod(classNum);
+    if (methodA === 'survey') {
+      // 설문 등록 학급: 응답자=제출(OCR 불필요, 액션 없음), 미응답=미제출
+      STUDENTS.forEach(function(s) {
+        var responded = SURVEY_ROWS.some(function(r){ return r.sid === s.id; }) && !deletedSurveyIds[s.id];
+        if (!responded) L.absent.push(nm(s));
+      });
+    } else if (classNum === 1) {
       STUDENTS.forEach(function(s) {
         if (s.status === '미제출') L.absent.push(nm(s));
         else if (s.ocrStatus === 'waiting') L.pending.push(nm(s));
@@ -2797,14 +2807,6 @@ function renderOcrBText(student) {
   if (suspectEl) suspectEl.textContent = uncertainCount + '개';
 
   var html = '';
-  html += '<div style="margin-bottom:24px;padding-bottom:16px;border-bottom:1px solid #dde1e8;">';
-  html += '<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">';
-  html += '<i data-lucide="book-open" style="width:15px;height:15px;color:#416bff;"></i>';
-  html += '<span style="font-size:14px;font-weight:600;color:#3151c4;">독후 활동 보고서</span>';
-  html += '<span style="font-size:13px;color:#6d7381;margin-left:4px;">사라진 스푼 — 샘 킨 지음</span>';
-  html += '</div>';
-  html += '<div style="font-size:14px;color:#6d7381;">학생: ' + student.name + ' (' + student.id + ')</div>';
-  html += '</div>';
 
   data.questions.forEach(function(q, qi) {
     var hasUncertain = q.uncertain || (q.spans && q.spans.some(function(s){ return s.uncertain; }));
@@ -3337,18 +3339,26 @@ function closeUploadMenu() {
 }
 document.addEventListener('click', function(){ closeUploadMenu(); });
 
-// 현재 학급에 등록된 자료 방식 ('pdf' | 'survey' | null). 데모 학급은 이미 PDF 제출 상태.
-var existingUploadMethod = 'pdf';
+// 학급별 등록된 자료 방식 ('pdf' | 'survey'). 이번 세션에 업로드한 학급만 기록.
+var uploadMethodByClass = {};
 var pendingReplaceTarget = null;
 var deletedSurveyIds = {};         // 설문 응답이 삭제된 학생 id → 미제출로 되돌림
 var currentSurveyStudentId = null; // 응답 보기 모달에서 보고 있는 학생
+
+// 해당 학급에 이미 등록된 자료 방식. 없으면 null (자료 없음 = 미제출 학급).
+// 데모: 1반·완료 학급(예 3반)은 기존 PDF 자료 보유로 간주.
+function getClassMethod(cls) {
+  if (uploadMethodByClass[cls]) return uploadMethodByClass[cls];
+  if (cls === 1 || completedClasses[cls]) return 'pdf';
+  return null;
+}
 
 function openUploadPdf() {
   closeUploadMenu();
   showScreen('screen-upload');
   resetUpload(); // PDF 빈 상태 노출
-  // 기존이 '설문'일 때만 교체 경고 (PDF→PDF는 기존 인라인 안내로 충분)
-  document.getElementById('pdf-replace-banner').style.display = (existingUploadMethod === 'survey') ? 'flex' : 'none';
+  // 기존이 '설문'일 때만 교체 경고 (PDF→PDF·자료 없음은 배너 X)
+  document.getElementById('pdf-replace-banner').style.display = (getClassMethod(currentListClass) === 'survey') ? 'flex' : 'none';
   lucide.createIcons();
 }
 function openUploadSurvey() {
@@ -3360,8 +3370,8 @@ function openUploadSurvey() {
   document.getElementById('upload-state-done').style.display = 'none';
   document.getElementById('upload-state-survey').style.display = 'block';
   surveyClear();
-  // 기존이 'PDF'일 때만 교체 경고 (설문→설문은 기존 인라인 안내로 충분)
-  document.getElementById('survey-replace-banner').style.display = (existingUploadMethod === 'pdf') ? 'flex' : 'none';
+  // 기존이 'PDF'일 때만 교체 경고 (설문→설문·자료 없음은 배너 X)
+  document.getElementById('survey-replace-banner').style.display = (getClassMethod(currentListClass) === 'pdf') ? 'flex' : 'none';
   lucide.createIcons();
 }
 
@@ -3510,15 +3520,15 @@ function closeSurveyQa() {
 }
 function escHtml(s) { return String(s).replace(/[&<>]/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;'}[c]; }); }
 function surveySaveAndList() {
-  // 기존이 PDF면 다른 방법 교체 → 확인 모달, 아니면 바로 등록
-  if (existingUploadMethod === 'pdf') { openReplaceConfirm('survey'); return; }
+  // 기존이 PDF면 다른 방법 교체 → 확인 모달, 자료 없음·설문이면 바로 등록
+  if (getClassMethod(currentListClass) === 'pdf') { openReplaceConfirm('survey'); return; }
   doSurveySave();
 }
 function doSurveySave() {
   var n = surveyRows.length;
-  existingUploadMethod = 'survey';
   deletedSurveyIds = {}; // 새로 등록하면 이전 삭제 이력 초기화
   if (currentListClass) {
+    uploadMethodByClass[currentListClass] = 'survey';
     bulkUploadedClasses[currentListClass] = true;
     // 설문은 OCR 유발 안 함 → bulkOcrStateA 설정하지 않음
     var now = new Date();
@@ -3526,6 +3536,7 @@ function doSurveySave() {
     bulkUploadStamp[currentListClass] = pad(now.getMonth()+1) + '/' + pad(now.getDate()) + ' ' + pad(now.getHours()) + ':' + pad(now.getMinutes()) + ' 설문 등록';
   }
   renderTable();
+  renderActionBanners(currentListClass, window.currentRawType || currentEvalType || 'A');
   showScreen('screen-list');
   showToast('과제물이 등록되었습니다.', 'success');
 }
@@ -3575,6 +3586,7 @@ function deleteStudentSurvey() {
   resetSurveyFooter();
   currentSurveyStudentId = null;
   renderTable();
+  renderActionBanners(currentListClass, window.currentRawType || currentEvalType || 'A');
   showToast('설문 응답을 삭제했어요. 해당 학생은 미제출로 표시돼요.', 'success');
 }
 
@@ -3775,12 +3787,12 @@ function renderTableB() {
 var bulkOcrStateA = {};
 var bulkUploadStamp = {};
 function uploadAndGoList() {
-  // 기존이 설문이면 다른 방법 교체 → 확인 모달, 아니면 바로 업로드
-  if (existingUploadMethod === 'survey') { openReplaceConfirm('pdf'); return; }
+  // 기존이 설문이면 다른 방법 교체 → 확인 모달, 자료 없음·PDF면 바로 업로드
+  if (getClassMethod(currentListClass) === 'survey') { openReplaceConfirm('pdf'); return; }
   doUploadPdf();
 }
 function doUploadPdf() {
-  existingUploadMethod = 'pdf';
+  if (currentListClass) uploadMethodByClass[currentListClass] = 'pdf';
   pendingUploadMode = 'bulk';
   pendingUploadStudentId = null;
   if (currentListClass) {
@@ -3791,6 +3803,7 @@ function doUploadPdf() {
     bulkUploadStamp[currentListClass] = pad(now.getMonth()+1) + '/' + pad(now.getDate()) + ' ' + pad(now.getHours()) + ':' + pad(now.getMinutes()) + ' 선생님 업로드';
   }
   renderTable();
+  renderActionBanners(currentListClass, window.currentRawType || currentEvalType || 'A');
   showScreen('screen-list');
   showToast('과제물이 등록되었습니다.', 'success');
   // OCR 인라인 모델: 업로드는 OCR을 유발하지 않음 (인식은 채점 실행 시 자동 처리)
@@ -4031,7 +4044,7 @@ function applyRunModalMode() {
   var colA = document.getElementById('rm2-col-a');
   var colB = document.getElementById('rm2-col-b');
   if (colA) colA.textContent = ocr ? '제출 방식' : 'AI 채점';
-  if (colB) colB.textContent = ocr ? '제출 파일' : '선생님 채점';
+  if (colB) { colB.textContent = ocr ? '' : '선생님 채점'; colB.style.display = ocr ? 'none' : ''; }
   lucide.createIcons();
   renderRunStudents();
 }
@@ -4228,16 +4241,11 @@ function rmAiCell(s) {
   if (s.ai === 'absent') return '<span style="color:#b3b6bd;">미제출</span>';
   return '<span style="color:#6d7381;">-</span>';
 }
-// OCR 먼저 모드 컬럼: 제출 방식 / 제출 파일
+// OCR 먼저 모드 컬럼: 제출 방식 (파일 / 직접 입력 / 미제출)
 function rmMethodCell(s) {
   if (s.absent) return '<span style="color:#b3b6bd;">미제출</span>';
-  if (s.method === 'typing') return '<span style="color:#6d7381;">직접 입력</span>';
+  if (s.method === 'typing') return '<span style="color:#6d7381;">직접 입력 · OCR 불필요</span>';
   return '<span style="color:#222631;">파일</span>';
-}
-function rmFileCell(s) {
-  if (s.absent) return '<span style="color:#b3b6bd;">-</span>';
-  if (s.method === 'typing') return '<span style="color:#b3b6bd;">OCR 불필요</span>';
-  return '<span style="color:#3b3f4c;">' + (s.file || '-') + '</span>';
 }
 function renderRunStudents() {
   var ocr = rmMethod === 'ocr';
@@ -4251,7 +4259,7 @@ function renderRunStudents() {
       + '<td>' + s.id + '</td>'
       + '<td>' + s.name + '</td>'
       + '<td>' + (ocr ? rmMethodCell(s) : rmAiCell(s)) + '</td>'
-      + '<td>' + (ocr ? rmFileCell(s) : rmTeacherBadge(s.t)) + '</td>'
+      + '<td' + (ocr ? ' style="display:none"' : '') + '>' + (ocr ? '' : rmTeacherBadge(s.t)) + '</td>'
       + '</tr>';
   });
   tbody.innerHTML = html;
