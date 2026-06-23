@@ -198,6 +198,10 @@ button, .btn, a.btn {
 body.review-full .topbar, body.review-full .sidebar { display:none; }
 .review-frame { position:fixed; top:0; left:0; width:100%; height:calc(100vh - 66px); border:none; background:#fff; z-index:55; }
 
+/* 클리포 홈(검토자): 정식 리뉴얼 홈을 풀스크린 iframe으로 */
+body.home-full .topbar, body.home-full .sidebar { display:none; }
+.home-frame { position:fixed; top:0; left:0; width:100%; height:100vh; border:none; background:#f6f7f9; z-index:55; }
+
 /* 하단 검토 도크 */
 .review-dock { position:fixed; left:0; right:0; bottom:0; z-index:60; background:#fff;
   border-top:1px solid #dde1e8; box-shadow:0 -8px 24px rgba(0,0,0,.08); }
@@ -302,7 +306,7 @@ input[type="checkbox"] { width:18px; height:18px; accent-color:#416bff; cursor:p
   border-radius:14px; padding:14px 16px; width:252px; box-shadow:0 8px 24px rgba(0,0,0,.3); user-select:none; cursor:move; }
 /* 드래그 중: iframe이 마우스 이벤트를 가로채 멈추는 현상 방지 + 텍스트 선택 방지 */
 body.dn-dragging { user-select:none; cursor:move; }
-body.dn-dragging .review-frame { pointer-events:none; }
+body.dn-dragging .review-frame, body.dn-dragging .home-frame { pointer-events:none; }
 .dn-title { font-size:12px; font-weight:700; letter-spacing:1.5px; color:#b3b6bd; margin-bottom:10px; display:flex; align-items:center; justify-content:space-between; cursor:move; padding:2px 0 6px; }
 .dn-step { display:flex; align-items:center; gap:9px; padding:7px 8px; border-radius:8px; font-size:13.5px; font-weight:500; color:#c7cbd3; cursor:pointer; }
 .dn-step:hover { background:#3b3f4c; }
@@ -573,65 +577,8 @@ body.dn-dragging .review-frame { pointer-events:none; }
 
 <!-- ═════════ Scene 2 : 클리포 홈 (검토자) ═════════ -->
 <section class="scene" id="sceneHome">
-  <div class="content with-expand">
-    <div class="home-grid">
-      <div>
-        <!-- 확인 요청 요약 블록 -->
-        <div class="inbox-card" id="inboxCard">
-          <div class="inbox-head">
-            <span class="inbox-title"><i data-lucide="user-check" style="width:22px;height:22px;color:#365eef"></i> 확인 요청</span>
-            <span class="inbox-count">1</span>
-          </div>
-          <div class="inbox-sub">동료 선생님이 채점 결과 확인을 요청했어요. 공동평가 확인 기록이 함께 저장됩니다.</div>
-          <div class="inbox-item">
-            <div>
-              <div class="ii-main">미래 예측 시나리오 작성 2</div>
-              <div class="ii-meta">
-                <span>3학년 2반 사회 · 최대표 선생님</span><span>·</span><span>06/11 요청</span>
-                <span class="ii-memo"><i data-lucide="message-square" style="width:13px;height:13px"></i> 서술형 부분점수 위주로 봐주세요</span>
-              </div>
-            </div>
-            <button class="btn-solid" onclick="goStep(4)">검토</button>
-          </div>
-        </div>
-
-        <div class="sec-title">내 수업</div>
-        <div class="class-cards">
-          <div class="class-card">
-            <div class="cc-title">3학년 1반 사회</div>
-            <div class="cc-meta">수행평가 3개</div>
-            <div class="cc-tags"><span class="tag tag-class">3학년 1반</span><span class="tag tag-subj">사회</span></div>
-          </div>
-          <div class="class-card">
-            <div class="cc-title">3학년 3반 사회</div>
-            <div class="cc-meta">수행평가 2개</div>
-            <div class="cc-tags"><span class="tag tag-class">3학년 3반</span><span class="tag tag-subj">사회</span></div>
-          </div>
-        </div>
-
-        <div class="sec-title" style="margin-top:34px">공유받은 수업
-          <span style="font-size:14px;font-weight:400;color:#6d7381">동료 선생님이 공동 확인을 위해 공유한 수업이에요.</span>
-        </div>
-        <div class="class-cards">
-          <div class="class-card" onclick="goStep(4)">
-            <span class="cc-noti">1</span>
-            <div class="cc-title">3학년 2반 사회</div>
-            <div class="cc-meta">수행평가 2개 · 확인 요청 1건</div>
-            <div class="cc-tags"><span class="tag tag-class">3학년 2반</span><span class="tag tag-subj">사회</span><span class="tag tag-owner">최대표 선생님</span></div>
-          </div>
-        </div>
-      </div>
-
-      <div>
-        <div class="rail-card">
-          <div class="rail-title">공지사항 <i data-lucide="chevron-right" style="width:18px;height:18px;color:#6d7381"></i></div>
-          <div class="rail-row"><span>자동 채점 대상 과제가 확대됐어요!</span><span class="d">26/06/02</span></div>
-          <div class="rail-row"><span>리포트 기능 업데이트</span><span class="d">26/05/20</span></div>
-          <div class="rail-row"><span>지식샘터 진행</span><span class="d">26/05/02</span></div>
-        </div>
-      </div>
-    </div>
-  </div>
+  <!-- 정식 리뉴얼 홈(home_v1_260612)을 그대로 사용. 확인 요청 스트립·공유받은 수업 카드 내장 -->
+  <iframe class="home-frame" id="homeFrame" title="클리포 홈 (검토자 시점)"></iframe>
 </section>
 
 <!-- ═════════ Scene 3 : 검토 모드 (검토자) ═════════ -->
@@ -786,6 +733,7 @@ function goStep(n) {
   const sb = document.getElementById('sidebar');
   document.querySelectorAll('.si').forEach(el => el.classList.remove('active'));
   document.body.classList.toggle('review-full', n === 4);
+  document.body.classList.toggle('home-full', n === 3);
 
   if (n === 1 || n === 5) {
     document.getElementById('sceneClass').classList.add('active');
@@ -802,8 +750,8 @@ function goStep(n) {
   } else if (n === 3) {
     document.getElementById('sceneHome').classList.add('active');
     setHeader('reviewer');
-    sb.classList.add('expanded');
     document.querySelector('[data-nav="home"]').classList.add('active');
+    initHomeFrame();
   } else if (n === 4) {
     document.getElementById('sceneReview').classList.add('active');
     setHeader('reviewer');
@@ -853,6 +801,33 @@ function renderOwnerState(done) {
   if (st2) st2.innerHTML = badgeFor(state) + (state === 'done' ? chip : '');
   if (row2) row2.innerHTML = badgeFor(state) + (state === 'done' ? chip : '');
   lucide.createIcons();
+}
+
+/* ───── 검토자 홈: 정식 리뉴얼 홈(home_v1_260612)을 iframe으로 재사용 ───── */
+const HOME_SRC = 'home_v1_260612.html';
+function initHomeFrame() {
+  const f = document.getElementById('homeFrame');
+  if (!f.getAttribute('src')) {
+    f.addEventListener('load', onHomeFrameLoad);
+    f.setAttribute('src', HOME_SRC);
+  }
+}
+function onHomeFrameLoad() {
+  const f = document.getElementById('homeFrame');
+  try {
+    const d = f.contentDocument;
+    // 헤더 페르소나를 검토자(김하나)로 — 홈 원본은 최대표 시점이라 그대로 두면 "본인이 본인에게 요청" 모순
+    const btn = d.querySelector('.user-btn');
+    if (btn && btn.childNodes[0]) btn.childNodes[0].nodeValue = '김하나 선생님(일반교사) ';
+    // co_teacher 검토 링크(스트립 [검토] · 공유 카드)는 부모 데모의 검토 모드(4단계)로 가로채기
+    d.addEventListener('click', e => {
+      const el = e.target.closest && e.target.closest('[onclick]');
+      if (el && /co_teacher_review/.test(el.getAttribute('onclick') || '')) {
+        e.preventDefault(); e.stopPropagation();
+        goStep(4);
+      }
+    }, true);
+  } catch (e) { /* 주입 실패해도 홈은 표시 */ }
 }
 
 /* ───── 검토 모드: 기존 채점 화면(grading_individual_v3)을 iframe으로 재사용 ───── */
@@ -1030,8 +1005,8 @@ function toggleNav() {
   });
 })();
 
-/* 검토 모드 iframe 미리 로드 — 4번 진입 시 버벅임 방지 */
-setTimeout(initReviewFrame, 1500);
+/* iframe 미리 로드 — 진입 시 버벅임 방지 */
+setTimeout(() => { initHomeFrame(); initReviewFrame(); }, 1500);
 
 goStep(1);
 lucide.createIcons();
