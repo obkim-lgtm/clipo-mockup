@@ -425,11 +425,11 @@
                 <td style="text-align:center;font-weight:500;">1-1반</td>
                 <td>
                   <div style="display:flex;align-items:center;gap:12px;">
-                    <div style="flex:1;height:10px;background:#e9f2ff;border-radius:4px;overflow:hidden;"><div style="width:57%;height:100%;background:#416bff;"></div></div>
-                    <span style="font-size:15px;color:#222631;min-width:45px;text-align:right;">8/14</span>
+                    <div style="flex:1;height:10px;background:#e9f2ff;border-radius:4px;overflow:hidden;"><div id="cls-fill-1" style="width:57%;height:100%;background:#416bff;transition:width .4s ease;"></div></div>
+                    <span id="cls-count-1" style="font-size:15px;color:#222631;min-width:45px;text-align:right;">8/14</span>
                   </div>
                 </td>
-                <td style="text-align:center;">6</td>
+                <td id="cls-absent-1" style="text-align:center;">6</td>
                 <td style="font-size:14px;color:#3b3f4c;">10월 16일 18:55 ~ 10월 17일 23:59</td>
                 <td style="text-align:center;">
                   <button onclick="showListForClass(1,'A')" style="background:none;border:none;cursor:pointer;font-family:inherit;font-size:14px;font-weight:600;color:#416bff;display:inline-flex;align-items:center;gap:4px;padding:6px 10px;border-radius:4px;" onmouseover="this.style.background='#e9f2ff'" onmouseout="this.style.background='none'">
@@ -441,11 +441,11 @@
                 <td style="text-align:center;font-weight:500;">1-2반</td>
                 <td>
                   <div style="display:flex;align-items:center;gap:12px;">
-                    <div style="flex:1;height:10px;background:#e9f2ff;border-radius:4px;overflow:hidden;"><div style="width:0%;height:100%;background:#416bff;"></div></div>
-                    <span style="font-size:15px;color:#222631;min-width:45px;text-align:right;">0/14</span>
+                    <div style="flex:1;height:10px;background:#e9f2ff;border-radius:4px;overflow:hidden;"><div id="cls-fill-2" style="width:0%;height:100%;background:#416bff;transition:width .4s ease;"></div></div>
+                    <span id="cls-count-2" style="font-size:15px;color:#222631;min-width:45px;text-align:right;">0/14</span>
                   </div>
                 </td>
-                <td style="text-align:center;">14</td>
+                <td id="cls-absent-2" style="text-align:center;">14</td>
                 <td style="font-size:14px;color:#3b3f4c;">10월 16일 18:55 ~ 10월 17일 23:59</td>
                 <td style="text-align:center;">
                   <button onclick="showListForClass(2,'A')" style="background:none;border:none;cursor:pointer;font-family:inherit;font-size:14px;font-weight:600;color:#416bff;display:inline-flex;align-items:center;gap:4px;padding:6px 10px;border-radius:4px;" onmouseover="this.style.background='#e9f2ff'" onmouseout="this.style.background='none'">
@@ -457,11 +457,11 @@
                 <td style="text-align:center;font-weight:500;">1-3반</td>
                 <td>
                   <div style="display:flex;align-items:center;gap:12px;">
-                    <div style="flex:1;height:10px;background:#e9f2ff;border-radius:4px;overflow:hidden;"><div style="width:100%;height:100%;background:#1ab864;"></div></div>
-                    <span style="font-size:15px;color:#222631;min-width:45px;text-align:right;">14/14</span>
+                    <div style="flex:1;height:10px;background:#e9f2ff;border-radius:4px;overflow:hidden;"><div id="cls-fill-3" style="width:100%;height:100%;background:#1ab864;transition:width .4s ease;"></div></div>
+                    <span id="cls-count-3" style="font-size:15px;color:#222631;min-width:45px;text-align:right;">14/14</span>
                   </div>
                 </td>
-                <td style="text-align:center;">0</td>
+                <td id="cls-absent-3" style="text-align:center;">0</td>
                 <td style="font-size:14px;color:#3b3f4c;">10월 16일 18:55 ~ 10월 17일 23:59</td>
                 <td style="text-align:center;">
                   <button onclick="showListForClass(3,'A')" style="background:none;border:none;cursor:pointer;font-family:inherit;font-size:14px;font-weight:600;color:#416bff;display:inline-flex;align-items:center;gap:4px;padding:6px 10px;border-radius:4px;" onmouseover="this.style.background='#e9f2ff'" onmouseout="this.style.background='none'">
@@ -2674,8 +2674,28 @@ function showScreen(id) {
       mainWrap.style.paddingLeft = '';
     }
   }
+  if (id === 'screen-task') updateClassListProgress();
   window.scrollTo(0,0);
   lucide.createIcons();
+}
+
+// 학급 목록 제출 현황 progressbar — 상세(제출 현황)와 동일 로직으로 동적 갱신
+function updateClassListProgress() {
+  [1, 2, 3].forEach(function(c) {
+    var fill = document.getElementById('cls-fill-' + c);
+    var count = document.getElementById('cls-count-' + c);
+    var absentEl = document.getElementById('cls-absent-' + c);
+    if (!fill || !count) return;
+    var total = STUDENTS.length;
+    var absent = getClassActionLists(c, 'A').absent.length;
+    var submitted = total - absent;
+    var pct = total ? Math.round(submitted / total * 100) : 0;
+    var done = (submitted === total && total > 0);
+    fill.style.width = pct + '%';
+    fill.style.background = done ? '#1ab864' : '#416bff';
+    count.textContent = submitted + '/' + total;
+    if (absentEl) absentEl.textContent = absent;
+  });
 }
 
 function goToList() {
@@ -2714,14 +2734,18 @@ function renderOCRView_B() {
     var ddHtml = '';
     students.forEach(function(s, i) {
       var isCurrent = i === currentOcrBStudentIdx;
-      var statusIcon = s.ocrStatus === 'confirmed'
-        ? '<i data-lucide="circle-check" style="width:13px;height:13px;color:#319d64;flex-shrink:0;"></i>'
-        : (s.needsReview
-          ? '<i data-lucide="alert-circle" style="width:13px;height:13px;color:#db3e51;flex-shrink:0;"></i>'
-          : '<i data-lucide="circle" style="width:13px;height:13px;color:#6d7381;flex-shrink:0;"></i>');
+      var noOcr = ocrBStudentNoOcr(s); // 직접입력 등 OCR 안 한 학생
+      var statusIcon = noOcr
+        ? '<i data-lucide="pen-line" style="width:13px;height:13px;color:#6d7381;flex-shrink:0;"></i>'
+        : (s.ocrStatus === 'confirmed'
+          ? '<i data-lucide="circle-check" style="width:13px;height:13px;color:#319d64;flex-shrink:0;"></i>'
+          : (s.needsReview
+            ? '<i data-lucide="alert-circle" style="width:13px;height:13px;color:#db3e51;flex-shrink:0;"></i>'
+            : '<i data-lucide="circle" style="width:13px;height:13px;color:#6d7381;flex-shrink:0;"></i>'));
       ddHtml += '<div onclick="jumpToOcrBStudent(' + i + ')" style="padding:10px 16px;cursor:pointer;display:flex;align-items:center;gap:10px;background:' + (isCurrent ? '#e9f2ff' : 'transparent') + ';font-weight:' + (isCurrent ? '600' : '400') + ';">';
       ddHtml += statusIcon;
-      ddHtml += '<span style="font-size:15px;color:#222631;">' + s.name + '</span>';
+      ddHtml += '<span style="font-size:15px;color:' + (noOcr ? '#6d7381' : '#222631') + ';">' + s.name + '</span>';
+      if (noOcr) ddHtml += '<span style="font-size:12px;color:#6d7381;background:#f1f3f5;border-radius:100px;padding:1px 8px;">직접 입력</span>';
       ddHtml += '<span style="font-size:13px;color:#6d7381;margin-left:auto;">' + s.id + '</span>';
       ddHtml += '</div>';
     });
@@ -2873,18 +2897,31 @@ function setOcrBScore(studentId, criterionIdx, value) {
   renderOcrBRubric(STUDENTS_B1[currentOcrBStudentIdx]);
 }
 
+// OCR 안 한 학생(직접입력 등) — OCR 결과가 없으니 채점 상세(채점 전)로 보냄
+function ocrBStudentNoOcr(s) { return !!s && s.submissionMethod === 'typing'; }
+function ocrBRouteIfNoOcr(idx) {
+  var s = STUDENTS_B1[idx];
+  if (ocrBStudentNoOcr(s)) {
+    // 데모: 채점 상세의 '채점 전(미채점)' 상태로 이동 (좌측 전사↔원본 스위치로 과제물 확인)
+    location.href = 'scoring_elementary_v2_260511.html?id=10104&name=' + encodeURIComponent('채점전');
+    return true;
+  }
+  return false;
+}
 function navStudentB(dir) {
   var newIdx = currentOcrBStudentIdx + dir;
   if (newIdx < 0 || newIdx >= STUDENTS_B1.length) return;
+  if (ocrBRouteIfNoOcr(newIdx)) return;
   currentOcrBStudentIdx = newIdx;
   ocrBActiveTab = 'text';
   renderOCRView_B();
 }
 
 function jumpToOcrBStudent(idx) {
+  document.getElementById('ocrBStudentDropList').style.display = 'none';
+  if (ocrBRouteIfNoOcr(idx)) return;
   currentOcrBStudentIdx = idx;
   ocrBActiveTab = 'text';
-  document.getElementById('ocrBStudentDropList').style.display = 'none';
   renderOCRView_B();
 }
 
