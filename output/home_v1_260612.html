@@ -314,7 +314,7 @@ function toastMsg(msg, info){
 var CLASSES = [
   { id:'c1',  sem:'2026학년도 2학기', name:'사회',     evals:5, subj:'사회', shared:false, archived:false, last:260610 },
   { id:'c5',  sem:'2026학년도 1학기', name:'사회',     evals:2, subj:'사회', shared:false, archived:false, last:260612, link:'co_teacher_review_v1_260611.html' },
-  { id:'c6',  sem:'2026학년도 1학기', name:'미술',     evals:1, subj:'미술', shared:false, archived:false, last:260520 },
+  { id:'c6',  sem:'2026학년도 1학기', name:'미술',     evals:1, subj:'미술', shared:false, archived:false, last:260520, hasData:false },
   { id:'c11', sem:'2026학년도 1학기', name:'한국사',   evals:2, subj:'사회', shared:true,  sharedBy:'최대표 선생님', reviewReq:1, archived:false, last:260611, link:'co_teacher_review_v1_260611.html#step4' },
   { id:'c7',  sem:'2026학년도 1학기', name:'역사',     evals:1, subj:'사회', shared:true,  sharedBy:'김하나 선생님', reviewReq:1, archived:false, last:260610, link:'co_teacher_review_v1_260611.html#step4' },
   { id:'c8',  sem:'2026학년도 1학기', name:'통합사회', evals:1, subj:'사회', shared:true,  sharedBy:'박지원 선생님', archived:false, last:260601 },
@@ -357,7 +357,7 @@ function cardHTML(c){
         : '<button onclick="setArchived(\'' + c.id + '\', true)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="5" rx="1"/><path d="M4 8v11a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8"/><path d="M10 12h4"/></svg>보관하기</button>')
     + '<button onclick="openCe(\'has\', \'' + c.name + '\', \'' + c.subj + '\')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg>수업 정보 수정</button>'
     + (c.shared ? '' : '<div class="cc-pop-div"></div>'
-        + '<button class="cc-del" onclick="location.href=\'class_delete_v2_260624.html\'"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/></svg>수업 삭제</button>')
+        + '<button class="cc-del" onclick="openDelete(\'' + c.id + '\', \'' + c.name + '\')"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/></svg>수업 삭제</button>')
     + '</div>'
     + '</div>';
 }
@@ -608,6 +608,66 @@ function updateLock(){
   else box.style.display='none';
 }
 document.getElementById('ceOverlay').addEventListener('click', function(e){ if(e.target===this) closeCe(); });
+</script>
+
+<!-- ===== 수업 삭제 확인 팝업 (데이터 유무 분기) ===== -->
+<style>
+.cf-bg{position:fixed;inset:0;background:rgba(34,38,49,.45);z-index:700;display:none;align-items:center;justify-content:center}
+.cf-bg.open{display:flex}
+.cf-dlg{background:#fff;border-radius:12px;width:400px;max-width:calc(100vw - 48px);padding:28px 20px;box-shadow:0 0 1px #2226314D,0 8px 16px #0000001A;display:flex;flex-direction:column;align-items:center;gap:20px;text-align:center}
+.cf-ic{width:44px;height:44px;border-radius:100px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.cf-ic.blue{background:#e9f2ff}.cf-ic.blue svg{color:#416bff}
+.cf-ic.red{background:#fee2e2}.cf-ic.red svg{color:#db3e51}
+.cf-txt{display:flex;flex-direction:column;gap:12px;width:100%}
+.cf-t{font-size:18px;font-weight:600;color:#222631;line-height:1.55;margin:0}
+.cf-d{font-size:15px;font-weight:400;color:#6d7381;line-height:1.55;margin:0}
+.cf-btns{display:flex;gap:12px;width:100%}
+.cf-btn{flex:1;height:40px;border-radius:4px;font-size:15px;font-weight:500;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;line-height:1;font-family:inherit;border:1px solid transparent}
+.cf-out-blue{background:#fff;border-color:#416bff;color:#3151c4}.cf-out-blue:hover{background:#f4f8ff}
+.cf-solid-blue{background:#365eef;color:#fff}.cf-solid-blue:hover{background:#3151c4}
+.cf-out-red{background:#fff;border-color:#f2525f;color:#ab303a}.cf-out-red:hover{background:#fff5f5}
+.cf-solid-red{background:#db3e51;color:#fff}.cf-solid-red:hover{background:#c5263a}
+</style>
+<div class="cf-bg" id="cfBlue">
+  <div class="cf-dlg">
+    <div class="cf-ic blue"><i data-lucide="info" style="width:24px;height:24px"></i></div>
+    <div class="cf-txt">
+      <p class="cf-t">이 수업에는 평가 데이터가 있습니다</p>
+      <p class="cf-d">삭제하면 수업 안에 쌓인 모든 평가 데이터가 사라지고, 복구할 수 없습니다. 삭제 범위를 확인한 뒤 진행해 주세요.</p>
+    </div>
+    <div class="cf-btns">
+      <button class="cf-btn cf-out-blue" onclick="closeCf()">취소</button>
+      <button class="cf-btn cf-solid-blue" onclick="location.href='class_delete_v2_260624.html'">확인하러 가기</button>
+    </div>
+  </div>
+</div>
+<div class="cf-bg" id="cfRed">
+  <div class="cf-dlg">
+    <div class="cf-ic red"><i data-lucide="trash-2" style="width:22px;height:22px"></i></div>
+    <div class="cf-txt">
+      <p class="cf-t" id="cfRedTitle">정말 ‘수업명’을 삭제하시겠습니까?</p>
+      <p class="cf-d">삭제한 수업은 복구할 수 없습니다.</p>
+    </div>
+    <div class="cf-btns">
+      <button class="cf-btn cf-out-red" onclick="closeCf()">취소</button>
+      <button class="cf-btn cf-solid-red" onclick="confirmDeleteNoData()">삭제</button>
+    </div>
+  </div>
+</div>
+<script>
+function openDelete(id, name){
+  var c = CLASSES.find(function(x){ return x.id === id; });
+  if (c && c.hasData === false){
+    document.getElementById('cfRedTitle').textContent = '정말 ‘' + name + '’을 삭제하시겠습니까?';
+    document.getElementById('cfRed').classList.add('open');
+  } else {
+    document.getElementById('cfBlue').classList.add('open');
+  }
+  lucide.createIcons();
+}
+function closeCf(){ document.getElementById('cfBlue').classList.remove('open'); document.getElementById('cfRed').classList.remove('open'); }
+function confirmDeleteNoData(){ closeCf(); toastMsg('수업을 삭제했어요.'); }
+document.querySelectorAll('.cf-bg').forEach(function(o){ o.addEventListener('click', function(e){ if(e.target===o) closeCf(); }); });
 </script>
 
 </body>
