@@ -1735,40 +1735,5 @@ lucide.createIcons();
 }catch(e){} })();
 </script>
 
-<!-- 설문 업로드 플로우 데모 네비 (설문 작업본 task_ocr_v3 로 점프) -->
-<div class="demo-nav" id="demoNav">
-  <div class="dn-title"><span>설문 업로드 플로우</span><i data-lucide="grip-horizontal" style="width:16px;height:16px"></i></div>
-  <div class="dn-step" data-step="1"><span class="n">1</span>학급 목록</div>
-  <div class="dn-step" data-step="2"><span class="n">2</span>설문 응답 업로드</div>
-  <div class="dn-step" data-step="3"><span class="n">3</span>제출 현황 (설문)</div>
-  <div class="dn-step" data-step="4"><span class="n">4</span>설문 채점 결과</div>
-</div>
-<script>
-(function(){
-  var nav = document.getElementById('demoNav'); if (!nav) return;
-  nav.querySelectorAll('.dn-step').forEach(function(el){
-    el.addEventListener('mousedown', function(e){
-      e.stopPropagation(); e.preventDefault();
-      var n = +el.dataset.step;
-      if (n === 4) { location.href = 'scoring_survey_v1_260623.html?id=10101&name=' + encodeURIComponent('설문 채점'); }
-      else { location.href = 'task_ocr_v3_260623.html?demo=' + n; }
-    });
-  });
-  var drag = null;
-  nav.addEventListener('mousedown', function(e){
-    var r = nav.getBoundingClientRect();
-    drag = { dx: e.clientX - r.left, dy: e.clientY - r.top };
-    document.body.classList.add('dn-dragging'); e.preventDefault();
-  });
-  document.addEventListener('mousemove', function(e){
-    if (!drag) return;
-    nav.style.left = (e.clientX - drag.dx) + 'px';
-    nav.style.top = (e.clientY - drag.dy) + 'px';
-    nav.style.right = 'auto'; nav.style.bottom = 'auto';
-  });
-  document.addEventListener('mouseup', function(){ if (!drag) return; drag = null; document.body.classList.remove('dn-dragging'); });
-  if (window.lucide) lucide.createIcons();
-})();
-</script>
 </body>
 </html>
