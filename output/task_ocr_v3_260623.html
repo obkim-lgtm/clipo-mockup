@@ -62,8 +62,8 @@
     /* ===== 콘텐츠 영역 (평면 배경, 패널 없음) ===== */
     .page-wrap{ max-width:1240px; margin:0 auto; padding:28px 32px 0; }
     /* 푸터를 뷰포트 하단에 고정: 콘텐츠가 짧아도 페이지 맨 아래 */
-    #screen-task.active, #screen-scoring.active, #screen-list.active, #screen-design.active{ display:flex; flex-direction:column; min-height:calc(100vh - 56px); }
-    #screen-task .page-wrap, #screen-scoring .page-wrap, #screen-list .page-wrap, #screen-design .page-wrap{ flex:1; display:flex; flex-direction:column; width:100%; }
+    #screen-task.active, #screen-scoring.active, #screen-list.active, #screen-design.active, #screen-form.active{ display:flex; flex-direction:column; min-height:calc(100vh - 56px); }
+    #screen-task .page-wrap, #screen-scoring .page-wrap, #screen-list .page-wrap, #screen-design .page-wrap, #screen-form .page-wrap{ flex:1; display:flex; flex-direction:column; width:100%; }
     .page-h1{ font-size:22px; font-weight:700; color:#222631; margin:0 0 8px; }
     .page-sub{ font-size:16px; color:#3b3f4c; margin:0 0 24px; line-height:1.55; }
     .back-link{ display:inline-flex; align-items:center; justify-content:center; line-height:1; vertical-align:middle; gap:4px; font-size:15px; font-weight:600; color:#222631; background:none; border:none; cursor:pointer; font-family:inherit; padding:0; margin-bottom:14px; align-self:flex-start; }
@@ -258,6 +258,56 @@
     /* ===== Screen transitions ===== */
     .screen{ display:none; }
     .screen.active{ display:block; }
+    .hidden{ display:none !important; }
+    /* ===== 답안 양식 등록 (form registration) ===== */
+    .form-chip{ display:inline-flex; align-items:center; gap:4px; font-size:13px; font-weight:600; padding:5px 11px; border-radius:999px; background:#eef0f4; color:#6d7381; line-height:1; }
+    .form-chip.reg{ background:#e8f7ee; color:#0f9d58; }
+    .form-chip.percls{ background:#e9f2ff; color:#3151c4; }
+    #screen-form .info-note{ display:flex; align-items:flex-start; gap:8px; background:#fff7ec; border:1px solid #f3e2b8; border-radius:10px; padding:13px 15px; font-size:15px; color:#b5560a; line-height:1.6; margin-bottom:20px; }
+    .fm-sec{ background:#fff; border-radius:12px; padding:22px 24px; box-shadow:0 0 1px #2226314D, 0 2px 8px #0000000F; margin-bottom:18px; }
+    .fm-sec-hd{ display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:16px; }
+    .fm-sec-title{ font-size:18px; font-weight:700; color:#222631; }
+    .fm-radio-line{ display:flex; gap:24px; }
+    .fm-rad{ display:inline-flex; align-items:center; gap:8px; cursor:pointer; font-size:16px; color:#222631; }
+    .fm-rad .ring{ width:20px; height:20px; border-radius:50%; border:1.5px solid #c7cbd3; background:#fff; flex-shrink:0; box-sizing:border-box; }
+    .fm-rad.on .ring{ border:6.5px solid #416bff; }
+    .fm-rad-sub{ font-size:14px; color:#6d7381; margin:12px 0 0; line-height:1.55; }
+    #screen-form .dropzone{ border:1.5px dashed #a3c3ff; border-radius:10px; min-height:120px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:8px; cursor:pointer; color:#6d7381; background:#fbfcff; padding:18px; text-align:center; }
+    #screen-form .dropzone .dz-ic{ width:42px; height:42px; border-radius:10px; background:#e9f2ff; color:#416bff; display:flex; align-items:center; justify-content:center; }
+    #screen-form .dropzone .dz-main{ font-size:15px; color:#3b3f4c; }
+    #screen-form .dropzone .dz-sub{ font-size:13px; color:#9ea3ad; }
+    #screen-form .file-chip{ display:flex; align-items:center; gap:10px; border:1px solid #d8e6ff; background:#f4f8ff; border-radius:8px; padding:11px 14px; font-size:15px; color:#3151c4; margin-top:10px; }
+    #screen-form .file-chip .fc-x{ cursor:pointer; color:#9ea3ad; display:inline-flex; flex-shrink:0; }
+    #screen-form .file-chip .fc-change{ display:inline-flex; align-items:center; justify-content:center; gap:5px; line-height:1; flex-shrink:0; font-size:13px; font-weight:600; color:#3151c4; background:#fff; border:1px solid #cdddff; border-radius:7px; padding:6px 10px; cursor:pointer; font-family:inherit; }
+    #screen-form .up-loading{ display:flex; align-items:center; gap:14px; background:#f4f8ff; border:1px solid #e0ebff; border-radius:10px; padding:16px 18px; margin-top:12px; }
+    #screen-form .up-spin{ width:32px; height:32px; border-radius:50%; border:4px solid #dbe6ff; border-top-color:#416bff; animation:spin 1s linear infinite; flex-shrink:0; }
+    #screen-form .up-load-t{ font-size:15px; font-weight:700; color:#222631; }
+    #screen-form .up-load-s{ font-size:13px; color:#6d7381; margin-top:2px; }
+    #screen-form .recog-desc{ font-size:14px; color:#6d7381; line-height:1.6; margin:0 0 14px; }
+    .fmrg-tbl{ border:1px solid #e6e8ed; border-radius:10px; overflow:auto; }
+    .fmrg-head{ display:grid; grid-template-columns:170px 1fr 64px; background:#f6f7f9; font-size:13px; font-weight:600; color:#6d7381; position:sticky; top:0; z-index:2; }
+    .fmrg-head>div{ padding:11px 12px; }
+    .fmrg-row{ display:grid; grid-template-columns:170px 1fr 64px; border-top:1px solid #eef0f3; align-items:stretch; }
+    .fmrg-row>div{ padding:10px 12px; display:flex; align-items:center; }
+    .fmrg-big{ background:#f4f8ff; }
+    .fmrg-ta{ width:100%; min-height:46px; border:1px solid #d9d9d9; border-radius:8px; padding:8px 10px; font-size:15px; font-family:inherit; color:#222631; outline:none; resize:vertical; line-height:1.5; }
+    .fmrg-ta:focus{ border-color:#416bff; box-shadow:0 0 0 3px rgba(65,107,255,.12); }
+    .fmrg-big .fmrg-ta{ font-style:italic; color:#6d7381; }
+    .fmrg-c1-inp{ width:100%; min-height:38px; border:1px solid #e1e4ea; border-radius:6px; padding:6px 8px; font-size:14px; font-weight:600; color:#3b3f4c; font-family:inherit; background:#fff; outline:none; }
+    .fmrg-c1-inp:focus{ border-color:#416bff; box-shadow:0 0 0 3px rgba(65,107,255,.12); }
+    .fmrg-tag-inp{ width:100%; min-height:38px; max-width:130px; border:1px solid #cdddff; border-radius:6px; padding:4px 10px; font-size:13px; font-weight:700; color:#3151c4; background:#eef3ff; font-family:inherit; outline:none; }
+    .fmrg-tag-inp:focus{ border-color:#416bff; background:#fff; box-shadow:0 0 0 3px rgba(65,107,255,.12); }
+    .fmrg-act{ justify-content:center; }
+    .fmrg-iconbtn{ display:inline-flex; align-items:center; justify-content:center; width:26px; height:28px; color:#9ea3ad; cursor:pointer; border-radius:6px; flex-shrink:0; }
+    .fmrg-iconbtn.del:hover{ background:#fdecec; color:#e5484d; }
+    .fmrg-add{ margin-top:12px; font-size:14px; color:#3151c4; border:1px solid #ccdfff; background:#fff; border-radius:8px; padding:9px 16px; cursor:pointer; font-family:inherit; font-weight:600; }
+    #screen-form .recog-actions{ display:flex; align-items:center; justify-content:space-between; gap:12px; margin-top:14px; }
+    .cls-row{ display:flex; align-items:center; gap:14px; padding:15px 4px; border-top:1px solid #eef0f3; }
+    .cls-wrap:first-child .cls-row{ border-top:none; }
+    .cls-row .cls-name{ font-size:16px; font-weight:600; color:#222631; width:84px; }
+    .cls-row .cls-state{ flex:1; font-size:14px; color:#9ea3ad; display:inline-flex; align-items:center; gap:6px; }
+    .cls-row .cls-state.has{ color:#0f9d58; font-weight:600; }
+    .cls-expand{ margin:0 2px 8px; padding:16px; border:1px solid #e0ebff; border-radius:10px; background:#fbfcff; }
 
     /* ===== Progress bar (OCR A) ===== */
     .ocr-progress-bg{ background:#dbe5ff; border-radius:4px; height:6px; width:100%; overflow:hidden; }
@@ -343,6 +393,13 @@
     .diag-promo > i{ width:16px; height:16px; color:#3151c4; flex-shrink:0; }
     .diag-promo span{ font-size:14px; color:#3151c4; }
     .diag-promo b{ font-weight:700; }
+    .form-promo{ background:#e9f2ff; border-bottom:1px solid #d4e1ff; }
+    .form-promo .fp-inner{ max-width:1240px; margin:0 auto; padding:12px 32px; display:flex; align-items:center; gap:10px; }
+    .form-promo .fp-inner > i{ width:18px; height:18px; color:#3151c4; flex-shrink:0; }
+    .form-promo .fp-txt{ flex:1; font-size:14px; color:#3151c4; line-height:1.55; }
+    .form-promo .fp-txt b{ font-weight:700; }
+    .form-promo .fp-dismiss{ flex-shrink:0; display:inline-flex; align-items:center; justify-content:center; line-height:1; font-size:13px; font-weight:500; color:#7986a6; background:none; border:none; padding:6px 2px; cursor:pointer; font-family:inherit; }
+    .form-promo .fp-dismiss:hover{ color:#3151c4; text-decoration:underline; text-underline-offset:2px; }
     /* 데모 플로우 점프 네비 (우하단 검은 패널) */
     .demo-nav{ position:fixed; right:24px; bottom:24px; z-index:400; background:#222631; color:#fff; border-radius:14px; padding:14px 16px; width:236px; box-shadow:0 8px 24px rgba(0,0,0,.3); user-select:none; cursor:move; }
     body.dn-dragging{ user-select:none; cursor:move; }
@@ -403,9 +460,16 @@
       <button class="sub-tab" onclick="notReady('세부능력 및 특기사항 지원')">세부능력 및 특기사항 지원</button>
     </div>
   </div>
+  <div class="form-promo" id="form-promo">
+    <div class="fp-inner">
+      <i data-lucide="sparkles"></i>
+      <span class="fp-txt"><b>과제물 양식</b>을 등록해 두면 채점할 때 지시문과 학생 답을 더 정확히 구분해 인식해요. 각 평가의 <b>과제물 양식</b> 버튼에서 빈 문제지를 한 번만 올려두세요.</span>
+      <button class="fp-dismiss" onclick="dismissFormPromo()">다시 보지 않기</button>
+    </div>
+  </div>
   <div class="page-wrap">
     <h1 class="page-h1">1학년 국어 과제물 관리</h1>
-    <p class="page-sub">학생 제출 현황을 실시간으로 확인하고, 필요하면 과제를 직접 올릴 수도 있습니다. 채점을 실행하면 제출물 인식부터 AI 채점까지 한 번에 진행돼요.</p>
+    <p class="page-sub">학생 제출 현황을 실시간으로 확인하고, 필요하면 과제를 직접 올릴 수도 있어요.</p>
 
       <div style="display:flex;flex-direction:column;gap:20px;">
 
@@ -417,6 +481,10 @@
               <p style="font-size:14px;color:#6d7381;margin:0;">선생님 과제물 업로드 · 마감 완료</p>
             </div>
             <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;">
+              <span class="form-chip" id="form-chip-A">미등록</span>
+              <button class="btn btn-secondary btn-sm" onclick="openFormScreen('A')">
+                <i data-lucide="file-text" style="width:14px;height:14px;"></i>과제물 양식
+              </button>
               <button class="btn btn-secondary btn-sm" disabled style="opacity:.5;cursor:not-allowed;background:#e9f2ff;">
                 <i data-lucide="qr-code" style="width:14px;height:14px;"></i>과제 제출 QR
               </button>
@@ -493,6 +561,10 @@
               <p style="font-size:14px;color:#6d7381;margin:0;">학생이 직접 제출 · 마감 완료</p>
             </div>
             <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;">
+              <span class="form-chip" id="form-chip-B">미등록</span>
+              <button class="btn btn-secondary btn-sm" onclick="openFormScreen('B')">
+                <i data-lucide="file-text" style="width:14px;height:14px;"></i>과제물 양식
+              </button>
               <button class="btn btn-secondary btn-sm" onclick="showToast('과제 제출 QR 기능은 준비 중입니다.','info')">
                 <i data-lucide="qr-code" style="width:14px;height:14px;"></i>과제 제출 QR
               </button>
@@ -592,6 +664,81 @@
   </div>
 </div>
 
+<!-- ===== 화면 0-F: 답안 양식 등록 ===== -->
+<div id="screen-form" class="screen">
+  <div class="tab-band">
+    <div class="tab-band-inner">
+      <button class="sub-tab" onclick="location.href='co_teacher_review_v1_260611.html'">수업 홈</button>
+      <button class="sub-tab" onclick="goDesignList()">평가 설계</button>
+      <button class="sub-tab" onclick="location.href='question_tab_v1_260617.html'">활동지</button>
+      <button class="sub-tab on">과제물 관리</button>
+      <button class="sub-tab" onclick="goScoringList()">채점</button>
+      <button class="sub-tab" onclick="notReady('세부능력 및 특기사항 지원')">세부능력 및 특기사항 지원</button>
+    </div>
+  </div>
+  <div class="page-wrap">
+    <button class="back-link" onclick="showScreen('screen-task')"><i data-lucide="chevron-left" style="width:18px;height:18px;"></i>이전으로</button>
+    <h1 class="page-h1" id="form-h1">과제물 양식 등록</h1>
+    <p class="page-sub">학생이 받은 빈 과제물(문제지)을 올려두면, 지시문·문항과 학생이 쓴 답을 더 정확히 구분해 인식해요. 등록하지 않아도 채점은 돼요.</p>
+
+    <!-- 적용 범위 -->
+    <div class="fm-sec">
+      <div class="fm-sec-hd"><span class="fm-sec-title">적용 범위</span></div>
+      <div class="fm-radio-line">
+        <span class="fm-rad on" onclick="setFormScope('common',this)"><span class="ring"></span>모든 반 공통</span>
+        <span class="fm-rad" onclick="setFormScope('perclass',this)"><span class="ring"></span>반별로 다르게</span>
+      </div>
+      <p class="fm-rad-sub" id="fm-scope-sub">모든 반이 같은 문제지를 사용해요. 양식 하나만 등록하면 됩니다.</p>
+    </div>
+
+    <!-- 공통 모드 -->
+    <div id="form-common">
+      <div class="fm-sec">
+        <div class="fm-sec-hd"><span class="fm-sec-title">과제물 양식 파일</span></div>
+        <div class="dropzone" id="fm-dz" onclick="fmUpload()">
+          <div class="dz-ic"><i data-lucide="file-up" style="width:22px;height:22px"></i></div>
+          <div class="dz-main">빈 과제물(문제지)을 끌어다 놓거나 클릭해 올려주세요.</div>
+          <div class="dz-sub">PDF, JPG, PNG 가능 · 여러 장이면 한 PDF로 묶어 올려주세요</div>
+        </div>
+        <div id="fm-chip" class="file-chip hidden">
+          <i data-lucide="file-text" style="width:16px;height:16px"></i><span style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">1학년_국어_서술형_문제지.pdf</span>
+          <button class="fc-change" onclick="fmUpload()"><i data-lucide="refresh-cw" style="width:13px;height:13px"></i>파일 변경</button>
+          <span class="fc-x" onclick="fmRemoveFile()"><i data-lucide="x" style="width:16px;height:16px"></i></span>
+        </div>
+        <div id="fm-loading" class="up-loading hidden">
+          <div class="up-spin"></div>
+          <div><div class="up-load-t">문제지를 인식하고 있어요…</div><div class="up-load-s">지시문과 문항을 자동으로 읽고 있어요</div></div>
+        </div>
+      </div>
+
+      <div class="fm-sec hidden" id="fm-recog-sec">
+        <div class="fm-sec-hd"><span class="fm-sec-title">인식 결과</span></div>
+        <p class="recog-desc">문제지에서 인식한 지시문·문항이에요. 잘못 읽은 곳은 직접 고치세요. 학생 이름·답란은 인식하지 않아요.</p>
+        <div id="fm-recog-host"></div>
+      </div>
+    </div>
+
+    <!-- 반별 모드 -->
+    <div id="form-perclass" class="hidden">
+      <div class="fm-sec">
+        <div class="fm-sec-hd"><span class="fm-sec-title">반별 양식</span></div>
+        <p class="recog-desc">문제 순서나 숫자가 다른 반만 따로 등록하세요. 등록하지 않은 반은 <b>공통 양식</b>을 사용해요.</p>
+        <div id="fm-cls-list"></div>
+      </div>
+    </div>
+
+    <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:4px;">
+      <button class="btn btn-outline" onclick="showScreen('screen-task')">취소</button>
+      <button class="btn btn-primary" id="fm-reg-btn" onclick="fmRegister()">등록</button>
+    </div>
+
+    <footer class="site-footer">
+      <div class="sf-links"><a href="#" onclick="return false;">회사소개</a><a href="#" onclick="return false;">이용약관</a><a href="#" onclick="return false;">개인정보처리방침</a><a href="#" onclick="return false;">고객센터</a></div>
+      <div class="sf-copy">© 2026. Datadriven Inc. All rights reserved.</div>
+    </footer>
+  </div>
+</div>
+
 <!-- ===== 화면 0-B: 채점 목록 ===== -->
 <div id="screen-scoring" class="screen">
   <div class="tab-band">
@@ -602,6 +749,13 @@
       <button class="sub-tab" onclick="showScreen('screen-task')">과제물 관리</button>
       <button class="sub-tab on">채점</button>
       <button class="sub-tab" onclick="notReady('세부능력 및 특기사항 지원')">세부능력 및 특기사항 지원</button>
+    </div>
+  </div>
+  <div class="form-promo" id="diag-promo-bar">
+    <div class="fp-inner">
+      <i data-lucide="sparkles"></i>
+      <span class="fp-txt">채점을 실행하기 전에 <b>AI 채점 진단</b>으로 채점기준이 잘 맞는지 미리 확인해 보세요.</span>
+      <button class="fp-dismiss" onclick="dismissDiagPromo()">다시 보지 않기</button>
     </div>
   </div>
   <div class="page-wrap">
@@ -622,10 +776,6 @@
             <button class="btn btn-secondary btn-sm" onclick="showToast('결과 공개 설정은 이 목업에서 제공하지 않습니다.','info')"><i data-lucide="share-2" style="width:14px;height:14px;"></i>결과 공개</button>
             <button class="btn btn-outline btn-sm" onclick="showToast('마감 취소는 이 목업에서 제공하지 않습니다.','info')"><i data-lucide="undo-2" style="width:14px;height:14px;"></i>마감 취소</button>
           </div>
-        </div>
-        <div class="diag-promo">
-          <i data-lucide="sparkles" style="width:16px;height:16px;color:#3151c4;flex-shrink:0;"></i>
-          <span>채점을 실행하기 전에 <b>AI 채점 진단</b>으로 채점기준이 잘 맞는지 미리 확인해 보세요.</span>
         </div>
         <table class="tbl2">
           <thead>
@@ -679,10 +829,6 @@
             <button class="btn btn-secondary btn-sm" onclick="showToast('결과 공개 설정은 이 목업에서 제공하지 않습니다.','info')"><i data-lucide="share-2" style="width:14px;height:14px;"></i>결과 공개</button>
             <button class="btn btn-primary btn-sm" onclick="showToast('마감 처리는 이 목업에서 제공하지 않습니다.','info')"><i data-lucide="check-square" style="width:14px;height:14px;"></i>마감</button>
           </div>
-        </div>
-        <div class="diag-promo">
-          <i data-lucide="sparkles" style="width:16px;height:16px;color:#3151c4;flex-shrink:0;"></i>
-          <span>채점을 실행하기 전에 <b>AI 채점 진단</b>으로 채점기준이 잘 맞는지 미리 확인해 보세요.</span>
         </div>
         <table class="tbl2">
           <thead>
@@ -2693,6 +2839,181 @@ function showScreen(id) {
   lucide.createIcons();
 }
 
+// ===== 답안 양식 등록 =====
+var FM_CARD = 'A';
+var FM_SCOPE = 'common';
+var fmHasFile = false;
+var FM_CLASSES = [
+  { name: '1-1반', reg: false, qn: 0 },
+  { name: '1-2반', reg: false, qn: 0 },
+  { name: '1-3반', reg: true,  qn: 3 }
+];
+var FM_RECOG = [
+  { big: true, tag: '대문항 1', txt: '다음 글을 읽고 물음에 답하시오.' },
+  { tag: '1번', txt: '윗글의 중심 내용을 한 문장으로 요약하시오.' },
+  { tag: '2번', txt: '글쓴이가 주장을 뒷받침하기 위해 제시한 근거 두 가지를 찾아 각각 서술하시오.' },
+  { big: true, tag: '대문항 2', txt: '아래 〈자료〉를 참고하여 물음에 답하시오.' },
+  { tag: '3번', txt: '〈자료〉를 바탕으로 \'교복 자율화\'에 대한 자신의 주장을 정하고, 근거 두 가지를 들어 글을 쓰시오.' }
+];
+
+function fmRowHTML(r) {
+  var act = '<div class="fmrg-act"><span class="fmrg-iconbtn del" onclick="fmDelRow(this)"><i data-lucide="trash-2" style="width:15px;height:15px"></i></span></div>';
+  if (r.big) {
+    return '<div class="fmrg-row fmrg-big">'
+      + '<div><input class="fmrg-tag-inp" value="' + r.tag + '"></div>'
+      + '<div><textarea class="fmrg-ta">' + r.txt + '</textarea></div>'
+      + act + '</div>';
+  }
+  return '<div class="fmrg-row">'
+    + '<div><input class="fmrg-c1-inp" value="' + r.tag + '"></div>'
+    + '<div><textarea class="fmrg-ta">' + r.txt + '</textarea></div>'
+    + act + '</div>';
+}
+function formRecogTableHTML(key) {
+  return '<div class="fmrg-tbl" id="fmrg-' + key + '">'
+    + '<div class="fmrg-head"><div>문항/영역</div><div>인식된 내용</div><div></div></div>'
+    + FM_RECOG.map(fmRowHTML).join('')
+    + '</div>';
+}
+function fmAddRow(key) {
+  var tbl = document.getElementById('fmrg-' + key);
+  if (!tbl) return;
+  tbl.insertAdjacentHTML('beforeend', fmRowHTML({ tag: '', txt: '' }));
+  lucide.createIcons();
+}
+function fmDelRow(btn) {
+  var row = btn.closest('.fmrg-row');
+  if (row) row.remove();
+}
+
+function openFormScreen(card) {
+  FM_CARD = card;
+  document.getElementById('form-h1').textContent = (card === 'A' ? '선생님 업로드 평가' : '학생 업로드 평가') + ' · 과제물 양식 등록';
+  setFormScope('common', document.querySelector('#screen-form .fm-rad'));
+  fmRemoveFile();
+  renderFmClsList();
+  showScreen('screen-form');
+}
+
+function setFormScope(mode, el) {
+  FM_SCOPE = mode;
+  var line = el.closest('.fm-radio-line');
+  line.querySelectorAll('.fm-rad').forEach(function (r) { r.classList.remove('on'); });
+  el.classList.add('on');
+  var common = document.getElementById('form-common');
+  var per = document.getElementById('form-perclass');
+  var sub = document.getElementById('fm-scope-sub');
+  var regBtn = document.getElementById('fm-reg-btn');
+  if (mode === 'common') {
+    common.classList.remove('hidden'); per.classList.add('hidden');
+    sub.textContent = '모든 반이 같은 문제지를 사용해요. 양식 하나만 등록하면 됩니다.';
+    if (regBtn) regBtn.textContent = '등록';
+  } else {
+    common.classList.add('hidden'); per.classList.remove('hidden');
+    sub.textContent = '문제 순서·숫자가 다른 반만 따로 등록해요. 나머지 반은 공통 양식을 사용해요.';
+    if (regBtn) regBtn.textContent = '완료';
+  }
+}
+
+function fmUpload() {
+  document.getElementById('fm-dz').classList.add('hidden');
+  document.getElementById('fm-chip').classList.remove('hidden');
+  document.getElementById('fm-loading').classList.remove('hidden');
+  document.getElementById('fm-recog-sec').classList.add('hidden');
+  lucide.createIcons();
+  setTimeout(function () {
+    document.getElementById('fm-loading').classList.add('hidden');
+    document.getElementById('fm-recog-host').innerHTML = formRecogTableHTML('common')
+      + '<div class="recog-actions"><button class="fmrg-add" onclick="fmAddRow(\'common\')">+ 문항 추가</button><span style="font-size:13px;color:#9ea3ad;">문항 3개 · 지시문 2개를 인식했어요</span></div>';
+    document.getElementById('fm-recog-sec').classList.remove('hidden');
+    fmHasFile = true;
+    lucide.createIcons();
+  }, 1300);
+}
+function fmRemoveFile() {
+  document.getElementById('fm-dz').classList.remove('hidden');
+  document.getElementById('fm-chip').classList.add('hidden');
+  document.getElementById('fm-loading').classList.add('hidden');
+  document.getElementById('fm-recog-sec').classList.add('hidden');
+  document.getElementById('fm-recog-host').innerHTML = '';
+  fmHasFile = false;
+  lucide.createIcons();
+}
+
+function renderFmClsList() {
+  var host = document.getElementById('fm-cls-list');
+  if (!host) return;
+  host.innerHTML = FM_CLASSES.map(function (c, i) {
+    var state = c.reg
+      ? '<span class="cls-state has"><i data-lucide="pencil" style="width:14px;height:14px"></i>개별 등록 · ' + c.qn + '문항</span>'
+      : '<span class="cls-state">공통 양식 사용</span>';
+    return '<div class="cls-wrap">'
+      + '<div class="cls-row">'
+      + '<span class="cls-name">' + c.name + '</span>'
+      + state
+      + '<button class="btn btn-secondary btn-sm" onclick="fmToggleCls(' + i + ',this)">' + (c.reg ? '수정' : '이 반 따로 등록') + '</button>'
+      + '</div>'
+      + '<div class="cls-expand hidden" id="fm-cls-exp-' + i + '"></div>'
+      + '</div>';
+  }).join('');
+  lucide.createIcons();
+}
+function fmToggleCls(i) {
+  var exp = document.getElementById('fm-cls-exp-' + i);
+  var open = !exp.classList.contains('hidden');
+  document.querySelectorAll('.cls-expand').forEach(function (e) { e.classList.add('hidden'); e.innerHTML = ''; });
+  if (open) return;
+  exp.classList.remove('hidden');
+  exp.innerHTML = '<div class="dropzone" onclick="fmClsUpload(' + i + ')">'
+    + '<div class="dz-ic"><i data-lucide="file-up" style="width:22px;height:22px"></i></div>'
+    + '<div class="dz-main">' + FM_CLASSES[i].name + ' 과제물(문제지)을 올려주세요.</div>'
+    + '<div class="dz-sub">PDF, JPG, PNG 가능</div></div>'
+    + '<div id="fm-cls-body-' + i + '"></div>';
+  lucide.createIcons();
+}
+function fmClsUpload(i) {
+  var body = document.getElementById('fm-cls-body-' + i);
+  body.innerHTML = '<div class="up-loading"><div class="up-spin"></div><div><div class="up-load-t">문제지를 인식하고 있어요…</div><div class="up-load-s">지시문과 문항을 자동으로 읽고 있어요</div></div></div>';
+  lucide.createIcons();
+  setTimeout(function () {
+    body.innerHTML = '<p class="recog-desc" style="margin-top:16px;">인식 결과 — 잘못 읽은 곳은 직접 고치세요.</p>'
+      + formRecogTableHTML('cls' + i)
+      + '<div class="recog-actions"><button class="fmrg-add" onclick="fmAddRow(\'cls' + i + '\')">+ 문항 추가</button>'
+      + '<button class="btn btn-primary btn-sm" onclick="fmClsSave(' + i + ')"><i data-lucide="check" style="width:14px;height:14px"></i>이 반 양식 저장</button></div>';
+    lucide.createIcons();
+  }, 1200);
+}
+function fmClsSave(i) {
+  FM_CLASSES[i].reg = true;
+  FM_CLASSES[i].qn = 3;
+  renderFmClsList();
+  showToast(FM_CLASSES[i].name + ' 양식을 저장했어요.', 'success');
+}
+
+function dismissFormPromo() {
+  var el = document.getElementById('form-promo');
+  if (el) el.classList.add('hidden');
+}
+function setFormChip(card, kind, label) {
+  var chip = document.getElementById('form-chip-' + card);
+  if (!chip) return;
+  chip.className = 'form-chip ' + (kind === 'percls' ? 'percls' : (kind === 'reg' ? 'reg' : ''));
+  chip.textContent = label;
+}
+function fmRegister() {
+  if (FM_SCOPE === 'common') {
+    if (!fmHasFile) { showToast('빈 문제지를 올려주세요.', 'info'); return; }
+    setFormChip(FM_CARD, 'reg', '공통 등록');
+    showToast('과제물 양식을 등록했어요. 채점할 때 이 양식으로 인식해요.', 'success');
+  } else {
+    var n = FM_CLASSES.filter(function (c) { return c.reg; }).length;
+    if (n === 0) { setFormChip(FM_CARD, '', '미등록'); }
+    else setFormChip(FM_CARD, 'percls', '반별 ' + n + '개');
+    showToast('반별 양식을 저장했어요.', 'success');
+  }
+  showScreen('screen-task');
+}
+
 // 학급 목록 제출 현황 progressbar — 상세(제출 현황)와 동일 로직으로 동적 갱신
 function updateClassListProgress() {
   [1, 2, 3].forEach(function(c) {
@@ -4512,7 +4833,8 @@ function startDiag(){
 }
 function closeReport(){ document.getElementById('diagReport').classList.remove('open'); }
 function editRubric(){ location.href='evaluation_design_v4_260615.html'; }
-function setDiagPromo(used){ var l=document.querySelectorAll('.diag-promo'); for(var i=0;i<l.length;i++){ l[i].style.display = used ? 'none' : 'flex'; } }
+function setDiagPromo(used){ var el=document.getElementById('diag-promo-bar'); if(el){ el.classList.toggle('hidden', !!used); } }
+function dismissDiagPromo(){ try{ sessionStorage.setItem('clipo_diag_used','1'); }catch(e){} setDiagPromo(true); }
 function initDiagPromo(){
   var used=false; try{ used=sessionStorage.getItem('clipo_diag_used')==='1'; }catch(e){}
   setDiagPromo(used);

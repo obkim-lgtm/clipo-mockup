@@ -128,6 +128,14 @@
     .list-value{ display:flex; align-items:flex-start; gap:10px; background:#f4f8ff; border:1px solid #e0ebff; border-radius:12px; padding:15px 18px; font-size:15px; font-weight:500; color:#3151c4; line-height:1.6; margin:0 0 24px; }
     .list-value i{ flex-shrink:0; margin-top:2px; }
     .list-value b{ font-weight:700; }
+    .form-promo{ background:#e9f2ff; border-bottom:1px solid #d4e1ff; }
+    .form-promo .fp-inner{ max-width:1240px; margin:0 auto; padding:12px 32px; display:flex; align-items:center; gap:10px; }
+    .form-promo .fp-inner > i{ width:18px; height:18px; color:#3151c4; flex-shrink:0; }
+    .form-promo .fp-txt{ flex:1; font-size:14px; color:#3151c4; line-height:1.55; }
+    .form-promo .fp-txt b{ font-weight:700; }
+    .form-promo .fp-dismiss{ flex-shrink:0; display:inline-flex; align-items:center; justify-content:center; line-height:1; font-size:13px; font-weight:500; color:#7986a6; background:none; border:none; padding:6px 2px; cursor:pointer; font-family:inherit; }
+    .form-promo .fp-dismiss:hover{ color:#3151c4; text-decoration:underline; text-underline-offset:2px; }
+    .form-promo.hidden{ display:none; }
     .ev-hd{ display:flex; align-items:flex-start; justify-content:space-between; gap:14px; }
     .ev-title{ font-size:18px; font-weight:700; color:#222631; margin:0 0 6px; display:flex; align-items:center; gap:10px; }
     .ev-meta{ font-size:14px; color:#6d7381; line-height:1.55; }
@@ -632,6 +640,14 @@
     </div>
   </div>
 
+  <div class="form-promo" id="qt-promo-bar">
+    <div class="fp-inner">
+      <i data-lucide="sparkles"></i>
+      <span class="fp-txt">활동지를 등록하면 AI가 학생 답변과 문항을 더 잘 구분해 채점이 정확해져요. 가진 활동지가 없으면 AI로 만들 수도 있어요.</span>
+      <button class="fp-dismiss" onclick="dismissQtPromo()">다시 보지 않기</button>
+    </div>
+  </div>
+
   <!-- ============ VIEW: 문항 목록 ============ -->
   <div class="page-wrap" id="view-list">
     <div class="page-head">
@@ -640,7 +656,6 @@
         <p class="page-sub">등록하지 않아도 AI 채점은 그대로 실행돼요.</p>
       </div>
     </div>
-    <div class="list-value"><i data-lucide="sparkles" style="width:18px;height:18px"></i><span>활동지를 등록하면 AI가 학생 답변과 문항을 더 잘 구분해 채점이 정확해져요. 가진 활동지가 없으면 AI로 만들 수도 있어요.</span></div>
 
     <div class="card-grid">
       <!-- 활동지 미등록 -->
@@ -1463,7 +1478,11 @@ function pickScope(el, mode){ pickRadio(el); document.querySelectorAll('#recog-l
 function runGen(){ var a=document.getElementById('anaModal'); a.classList.add('open'); if(window.lucide) lucide.createIcons(); setTimeout(function(){ a.classList.remove('open'); showPlan(); }, 2200); }
 
 /* Views */
-function showView(id){ ['view-list','view-reg','view-result','view-plan','view-create','view-upload'].forEach(function(v){ var el=document.getElementById(v); if(el) el.classList.toggle('hidden', v!==id); }); window.scrollTo(0,0); if(window.lucide) lucide.createIcons(); }
+function showView(id){ ['view-list','view-reg','view-result','view-plan','view-create','view-upload'].forEach(function(v){ var el=document.getElementById(v); if(el) el.classList.toggle('hidden', v!==id); }); if(typeof qtPromoSync==='function') qtPromoSync(id); window.scrollTo(0,0); if(window.lucide) lucide.createIcons(); }
+var _qtPromoDismissed=false; try{ _qtPromoDismissed=sessionStorage.getItem('clipo_qt_promo')==='1'; }catch(e){}
+function qtPromoSync(activeId){ var el=document.getElementById('qt-promo-bar'); if(el) el.classList.toggle('hidden', _qtPromoDismissed || activeId!=='view-list'); }
+function dismissQtPromo(){ _qtPromoDismissed=true; try{ sessionStorage.setItem('clipo_qt_promo','1'); }catch(e){} qtPromoSync('view-list'); }
+qtPromoSync('view-list');
 function showRegSelect(evName){ window._regEv=evName||'활동지'; _regPending=true; var h=document.getElementById('reg-h1'); if(h) h.textContent=(evName||'활동지')+' · 활동지'; rupReset(); selectReg('upload'); showView('view-reg'); }
 function rupUpload(){ var dz=document.getElementById('rup-dz'), done=document.getElementById('rup-done'); if(dz) dz.classList.add('hidden'); if(done) done.classList.remove('hidden'); if(window.lucide) lucide.createIcons(); }
 function rupReset(){ var dz=document.getElementById('rup-dz'), done=document.getElementById('rup-done'); if(done) done.classList.add('hidden'); if(dz) dz.classList.remove('hidden'); if(window.lucide) lucide.createIcons(); }
