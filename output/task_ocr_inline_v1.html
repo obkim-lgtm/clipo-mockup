@@ -733,6 +733,13 @@
       <button class="sub-tab" onclick="notReady('세부능력 및 특기사항 지원')">세부능력 및 특기사항 지원</button>
     </div>
   </div>
+  <div class="form-promo" id="diag-promo-bar">
+    <div class="fp-inner">
+      <i data-lucide="sparkles"></i>
+      <span class="fp-txt">채점을 실행하기 전에 <b>AI 채점 진단</b>으로 채점기준이 잘 맞는지 미리 확인해 보세요.</span>
+      <button class="fp-dismiss" onclick="dismissDiagPromo()">다시 보지 않기</button>
+    </div>
+  </div>
   <div class="page-wrap">
     <h1 class="page-h1">1학년 국어 채점</h1>
     <p class="page-sub">AI가 과제 채점과 피드백 작성을 도와드려요. AI 결과는 참고용이며, 선생님이 확인하신 뒤 최종 점수로 반영됩니다.</p>
@@ -751,10 +758,6 @@
             <button class="btn btn-secondary btn-sm" onclick="showToast('결과 공개 설정은 이 목업에서 제공하지 않습니다.','info')"><i data-lucide="share-2" style="width:14px;height:14px;"></i>결과 공개</button>
             <button class="btn btn-outline btn-sm" onclick="showToast('마감 취소는 이 목업에서 제공하지 않습니다.','info')"><i data-lucide="undo-2" style="width:14px;height:14px;"></i>마감 취소</button>
           </div>
-        </div>
-        <div class="diag-promo">
-          <i data-lucide="sparkles" style="width:16px;height:16px;color:#3151c4;flex-shrink:0;"></i>
-          <span>채점을 실행하기 전에 <b>AI 채점 진단</b>으로 채점기준이 잘 맞는지 미리 확인해 보세요.</span>
         </div>
         <table class="tbl2">
           <thead>
@@ -808,10 +811,6 @@
             <button class="btn btn-secondary btn-sm" onclick="showToast('결과 공개 설정은 이 목업에서 제공하지 않습니다.','info')"><i data-lucide="share-2" style="width:14px;height:14px;"></i>결과 공개</button>
             <button class="btn btn-primary btn-sm" onclick="showToast('마감 처리는 이 목업에서 제공하지 않습니다.','info')"><i data-lucide="check-square" style="width:14px;height:14px;"></i>마감</button>
           </div>
-        </div>
-        <div class="diag-promo">
-          <i data-lucide="sparkles" style="width:16px;height:16px;color:#3151c4;flex-shrink:0;"></i>
-          <span>채점을 실행하기 전에 <b>AI 채점 진단</b>으로 채점기준이 잘 맞는지 미리 확인해 보세요.</span>
         </div>
         <table class="tbl2">
           <thead>
@@ -4107,7 +4106,8 @@ function startDiag(){
 }
 function closeReport(){ document.getElementById('diagReport').classList.remove('open'); }
 function editRubric(){ location.href='evaluation_design_v4_260615.html'; }
-function setDiagPromo(used){ var l=document.querySelectorAll('.diag-promo'); for(var i=0;i<l.length;i++){ l[i].style.display = used ? 'none' : 'flex'; } }
+function setDiagPromo(used){ var el=document.getElementById('diag-promo-bar'); if(el){ el.classList.toggle('hidden', !!used); } }
+function dismissDiagPromo(){ try{ sessionStorage.setItem('clipo_diag_used','1'); }catch(e){} setDiagPromo(true); }
 function initDiagPromo(){
   var used=false; try{ used=sessionStorage.getItem('clipo_diag_used')==='1'; }catch(e){}
   setDiagPromo(used);
