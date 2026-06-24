@@ -4366,6 +4366,17 @@ function rmExec() {
   if (n === 0) return;
   closeRmModal('runModal2');
   showToast(n + '명의 AI 채점을 시작합니다. 완료되면 결과 확인에서 볼 수 있어요.', 'success');
+  // 채점 목록 학급 칸 → '채점 중' 스피너 (데모: 잠시 후 재실행 가능)
+  if (ocrCtxCell) {
+    var cell = ocrCtxCell;
+    if (cell.dataset) delete cell.dataset.ocr;
+    cell.innerHTML = '<button class="pill-btn pill-btn-soft" disabled style="opacity:.75;cursor:default;"><i data-lucide="loader-circle" class="spin" style="width:15px;height:15px;"></i>채점 중</button>';
+    lucide.createIcons();
+    setTimeout(function(){
+      cell.innerHTML = '<button class="pill-btn pill-btn-mid" onclick="openRunModal(this)"><i data-lucide="wand-sparkles" style="width:15px;height:15px;"></i>재실행</button>';
+      lucide.createIcons();
+    }, 3500);
+  }
 }
 
 // ── 설계 저장 직후 안내 팝업 ──
