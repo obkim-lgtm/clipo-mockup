@@ -106,6 +106,20 @@
     .create-menu button{ width:100%; display:flex; align-items:center; gap:8px; padding:10px 12px; border:none; background:none; border-radius:6px; font-family:inherit; font-size:15px; color:#222631; cursor:pointer; text-align:left; }
     .create-menu button:hover{ background:#f6f7f9; }
 
+    /* ===== 개인정보 비식별화 안내 ===== */
+    .deid-box{ background:#e9f2ff; border-radius:10px; padding:14px 16px; display:flex; align-items:flex-start; gap:10px; }
+    .deid-ico{ width:36px; height:36px; border-radius:9px; background:#d4e3ff; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+    .deid-ico i{ width:20px; height:20px; color:#416bff; }
+    .deid-body{ flex:1; min-width:0; }
+    .deid-title{ font-size:15px; font-weight:700; color:#1f47b3; line-height:1.4; margin:0 0 3px; }
+    .deid-desc{ font-size:14px; font-weight:500; color:#45517a; line-height:1.6; margin:0; }
+    .deid-dismiss{ font-size:13px; font-weight:600; color:#6d7381; background:none; border:none; cursor:pointer; flex-shrink:0; padding:4px 2px; line-height:1; align-self:flex-start; }
+    .deid-dismiss:hover{ color:#416bff; text-decoration:underline; }
+    .deid-mini{ display:inline-flex; align-items:center; gap:6px; font-size:13px; font-weight:600; color:#6d7381; }
+    .deid-mini i{ width:15px; height:15px; color:#416bff; }
+    .deid-mini .undo{ color:#416bff; cursor:pointer; margin-left:4px; }
+    .deid-mini .undo:hover{ text-decoration:underline; }
+
     /* ===== AI 채점 실행 모달 (1/2·2/2) + OCR 경고 ===== */
     .rm-overlay{ display:none; position:fixed; inset:0; background:rgba(0,0,0,.45); z-index:1600; align-items:center; justify-content:center; padding:24px; }
     .rm-overlay.open{ display:flex; }
@@ -990,9 +1004,21 @@
       <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:8px;gap:16px;">
         <h1 id="list-class-title" class="page-h1" style="margin:0;">1-1반 과제 제출 현황</h1>
         <div style="display:flex;gap:10px;flex-shrink:0;">
-          <button class="btn btn-primary btn-sm" onclick="showScreen('screen-upload');resetUpload();">
-            <i data-lucide="upload" style="width:16px;height:16px;"></i>학급 PDF 업로드
-          </button>
+          <div style="position:relative;">
+            <button class="btn btn-primary btn-sm" onclick="toggleUploadMenu(event)">
+              <i data-lucide="upload" style="width:16px;height:16px;"></i>학급 일괄 업로드<i data-lucide="chevron-down" style="width:15px;height:15px;"></i>
+            </button>
+            <div id="uploadMenu" class="create-menu" style="min-width:248px;">
+              <button onclick="openUploadPdf()">
+                <i data-lucide="file-text" style="width:18px;height:18px;color:#416bff;flex-shrink:0;"></i>
+                <span style="display:flex;flex-direction:column;gap:2px;"><span style="font-size:15px;font-weight:600;color:#222631;line-height:1.3;">PDF 업로드</span><span style="font-size:13px;color:#6d7381;line-height:1.3;">스캔한 손글씨 답안</span></span>
+              </button>
+              <button onclick="openUploadSurvey()">
+                <i data-lucide="clipboard-list" style="width:18px;height:18px;color:#416bff;flex-shrink:0;"></i>
+                <span style="display:flex;flex-direction:column;gap:2px;"><span style="font-size:15px;font-weight:600;color:#222631;line-height:1.3;">설문 응답 업로드</span><span style="font-size:13px;color:#6d7381;line-height:1.3;">구글 설문·엑셀 등에서 받은 응답</span></span>
+              </button>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -1057,6 +1083,25 @@
       <div>
         <h1 class="page-h1">1학년 1반 학급 PDF 일괄 업로드</h1>
         <p class="page-sub">학생의 과제를 스캔해서 한 번에 업로드할 수 있습니다.</p>
+
+        <div id="pdf-replace-banner" style="display:none;align-items:flex-start;gap:10px;background:#fff7ed;border:1px solid #fed7aa;border-radius:8px;padding:12px 14px;margin-bottom:16px;">
+          <i data-lucide="alert-triangle" style="width:18px;height:18px;color:#f97316;flex-shrink:0;margin-top:1px;"></i>
+          <div style="font-size:14px;color:#9a3412;line-height:1.55;">이미 <b>설문 응답 자료</b>가 등록돼 있어요. PDF를 등록하면 <b>기존 설문 자료와 채점 결과가 교체</b>돼요. 한 학급에는 한 종류의 자료만 등록할 수 있어요.</div>
+        </div>
+
+        <!-- 개인정보 비식별화 안내 -->
+        <div class="deid-box" id="deid-bulk" style="margin-bottom:16px;">
+          <div class="deid-ico"><i data-lucide="shield-check"></i></div>
+          <div class="deid-body">
+            <p class="deid-title">학생 개인정보는 안전하게 보호돼요</p>
+            <p class="deid-desc">학번·이름은 <b>자동으로 가려진 채</b> AI 채점돼요. 선생님 화면에는 그대로 보여서 채점에는 지장이 없어요.</p>
+          </div>
+          <button class="deid-dismiss" onclick="dismissDeid()">다시 보지 않기</button>
+        </div>
+        <div id="deidmini-bulk" style="display:none;margin-bottom:16px;">
+          <span class="deid-mini"><i data-lucide="shield-check"></i>개인정보 비식별화 적용 중<span class="undo" onclick="restoreDeid()">자세히</span></span>
+        </div>
+
         <div class="ev-card">
           <div style="background:white;border:1px dashed #b3b3b3;border-radius:12px;padding:40px 24px;min-height:228px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;text-align:center;">
             <i data-lucide="upload-cloud" style="width:48px;height:48px;color:#6d7381;"></i>
@@ -1204,6 +1249,153 @@
           </div>
         </div>
       </div>
+    </div>
+  </div>
+
+  <!-- [상태S] 구글 설문 응답 업로드 -->
+  <div id="upload-state-survey" style="display:none;">
+    <div class="tab-band">
+      <div class="tab-band-inner">
+        <button class="sub-tab" onclick="location.href='co_teacher_review_v1_260611.html'">수업 홈</button>
+        <button class="sub-tab" onclick="goDesignList()">평가 설계</button>
+        <button class="sub-tab" onclick="location.href='question_tab_v1_260617.html'">활동지</button>
+        <button class="sub-tab on">과제물 관리</button>
+        <button class="sub-tab" onclick="goScoringList()">채점</button>
+        <button class="sub-tab" onclick="notReady('세부능력 및 특기사항 지원')">세부능력 및 특기사항 지원</button>
+      </div>
+    </div>
+    <div class="page-wrap">
+      <button class="back-link" onclick="showScreen('screen-list')"><i data-lucide="chevron-left" style="width:18px;height:18px;"></i>이전으로</button>
+      <div>
+        <h1 class="page-h1">설문 응답 업로드</h1>
+        <p class="page-sub">구글 설문·엑셀 등으로 받은 학생 응답을 양식에 맞춰 올리면, 인식(OCR) 없이 바로 채점할 수 있어요.</p>
+
+        <div id="survey-replace-banner" style="display:none;align-items:flex-start;gap:10px;background:#fff7ed;border:1px solid #fed7aa;border-radius:8px;padding:12px 14px;margin-bottom:16px;">
+          <i data-lucide="alert-triangle" style="width:18px;height:18px;color:#f97316;flex-shrink:0;margin-top:1px;"></i>
+          <div style="font-size:14px;color:#9a3412;line-height:1.55;">이미 <b>학급 PDF 자료</b>가 등록돼 있어요. 설문 응답을 등록하면 <b>기존 PDF 자료와 채점 결과가 교체</b>돼요. 한 학급에는 한 종류의 자료만 등록할 수 있어요.</div>
+        </div>
+
+        <!-- 카드 1: 양식 다운로드 후 업로드 -->
+        <div class="ev-card" style="margin-bottom:16px;">
+          <h3 style="font-size:18px;font-weight:600;color:#222631;margin:0 0 4px;">1. 양식 다운로드 후 업로드</h3>
+          <p style="font-size:14px;color:#6d7381;margin:0 0 16px;line-height:1.55;">아래에서 양식을 받아, 설문 응답을 양식에 맞춰 입력한 뒤 업로드해 주세요.</p>
+          <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px;">
+            <button class="btn btn-primary btn-sm" onclick="surveyFilePicked()">
+              <i data-lucide="upload" style="width:16px;height:16px;"></i>파일 업로드
+            </button>
+            <button class="btn btn-outline btn-sm" onclick="surveyDownloadTemplate()">
+              <i data-lucide="download" style="width:16px;height:16px;"></i>설문 응답 양식 다운로드
+            </button>
+          </div>
+          <div id="survey-file-chip" style="display:none;align-items:center;gap:10px;padding:10px 14px;border:1px solid #d9d9d9;border-radius:8px;margin-bottom:16px;max-width:420px;">
+            <div style="width:32px;height:32px;border-radius:6px;background:#eff3ff;color:#416bff;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;"><i data-lucide="file-spreadsheet" style="width:18px;height:18px;"></i></div>
+            <div style="flex:1;min-width:0;">
+              <div style="font-size:14px;font-weight:500;color:#222631;line-height:1.3;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">1-1반_구글설문응답.xlsx</div>
+              <div style="font-size:12px;color:#6d7381;line-height:1.4;margin-top:2px;">28KB · 방금 업로드</div>
+            </div>
+            <button onclick="surveyClear()" title="업로드 취소" style="background:none;border:none;color:#6d7381;cursor:pointer;padding:6px;display:flex;border-radius:4px;"><i data-lucide="x" style="width:16px;height:16px;"></i></button>
+          </div>
+          <div style="background:#f6f7f9;border-radius:8px;padding:14px 18px;font-size:14px;color:#3b3f4c;line-height:1.7;">
+            <div style="color:#222631;margin-bottom:4px;">※ 반드시 위 <b style="color:#416bff;">[설문 응답 양식]</b>을 받아 양식에 맞춰 작성 후 업로드해 주세요. 다른 양식은 사용할 수 없어요.</div>
+            <ul style="padding-left:16px;margin:0;">
+              <li>학번·이름 옆 열부터 <b style="color:#222631;">평가 문항을 한 칸에 하나씩</b> 넣고, 학생 답변은 해당 학생 행에 입력해 주세요.</li>
+              <li>응답은 항목별 1,000자 이내, 파일 용량은 20MB까지 가능해요.</li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- 카드 2: 업로드 내용 확인 -->
+        <div class="ev-card">
+          <h3 style="font-size:18px;font-weight:600;color:#222631;margin:0 0 16px;">2. 업로드 내용 확인</h3>
+          <div id="survey-empty" style="padding:64px 20px;text-align:center;">
+            <div style="width:56px;height:56px;border-radius:50%;background:#f1f3f5;color:#6d7381;display:inline-flex;align-items:center;justify-content:center;margin-bottom:16px;"><i data-lucide="file-text" style="width:28px;height:28px;"></i></div>
+            <div style="font-size:16px;font-weight:600;color:#222631;margin-bottom:4px;">파일을 업로드해 주세요.</div>
+            <div style="font-size:14px;color:#6d7381;">업로드 후 등록할 내용을 확인할 수 있어요.</div>
+          </div>
+          <div id="survey-result" style="display:none;">
+            <div style="font-size:14px;color:#3b3f4c;margin-bottom:12px;">평가 문항 <span style="color:#416bff;font-weight:700;" id="survey-q-total">0</span>개</div>
+            <div style="border:1px solid #e5e7eb;border-radius:8px;overflow:hidden;margin-bottom:24px;">
+              <table style="width:100%;border-collapse:separate;border-spacing:0;font-size:14px;">
+                <thead><tr>
+                  <th style="width:64px;background:#f9fafb;padding:12px 14px;text-align:center;font-weight:600;color:#3b3f4c;font-size:14px;border-bottom:1px solid #e5e7eb;">No.</th>
+                  <th style="background:#f9fafb;padding:12px 14px;text-align:left;font-weight:600;color:#3b3f4c;font-size:14px;border-bottom:1px solid #e5e7eb;">평가 문항</th>
+                </tr></thead>
+                <tbody id="survey-q-rows"></tbody>
+              </table>
+            </div>
+            <div style="font-size:14px;color:#3b3f4c;margin-bottom:12px;">응답 결과 <span style="color:#416bff;font-weight:700;" id="survey-r-total">0</span>명</div>
+            <div style="border:1px solid #e5e7eb;border-radius:8px;overflow:hidden;">
+              <table style="width:100%;border-collapse:separate;border-spacing:0;font-size:14px;">
+                <thead><tr id="survey-r-head"></tr></thead>
+                <tbody id="survey-r-rows"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <div style="display:flex;justify-content:flex-end;gap:10px;margin:16px 0 32px;">
+          <button class="btn btn-outline btn-sm" onclick="showScreen('screen-list')">이전으로</button>
+          <button class="btn btn-primary btn-sm" id="survey-save-btn" disabled onclick="surveySaveAndList()">
+            <i data-lucide="check" style="width:16px;height:16px;"></i>등록 완료
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- 설문 응답 자세히 보기 모달 -->
+<div id="survey-qa-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.4);z-index:600;align-items:center;justify-content:center;padding:24px;">
+  <div style="background:#fff;border-radius:12px;width:600px;max-width:100%;max-height:calc(100vh - 48px);display:flex;flex-direction:column;box-shadow:0 4px 16px rgba(0,0,0,.16);overflow:hidden;">
+    <div style="padding:22px 24px 12px;display:flex;align-items:flex-start;justify-content:space-between;gap:12px;">
+      <div style="font-size:18px;font-weight:700;color:#222631;line-height:1.4;" id="survey-qa-title">설문 응답</div>
+      <button onclick="closeSurveyQa()" style="background:none;border:none;cursor:pointer;color:#6d7381;padding:4px;display:flex;border-radius:4px;flex-shrink:0;"><i data-lucide="x" style="width:18px;height:18px;"></i></button>
+    </div>
+    <div style="padding:8px 24px 20px;overflow-y:auto;flex:1;" id="survey-qa-body"></div>
+    <div style="padding:14px 24px 20px;display:flex;justify-content:flex-end;gap:8px;border-top:1px solid #f1f3f5;">
+      <button onclick="closeSurveyQa()" class="btn btn-primary btn-sm">닫기</button>
+    </div>
+  </div>
+</div>
+
+<!-- 학생 설문 응답 보기/삭제 모달 (제출 현황) -->
+<div id="student-survey-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.4);z-index:610;align-items:center;justify-content:center;padding:24px;">
+  <div style="background:#fff;border-radius:12px;width:600px;max-width:100%;max-height:calc(100vh - 48px);display:flex;flex-direction:column;box-shadow:0 4px 16px rgba(0,0,0,.16);overflow:hidden;">
+    <div style="padding:22px 24px 12px;display:flex;align-items:flex-start;justify-content:space-between;gap:12px;">
+      <div style="font-size:18px;font-weight:700;color:#222631;line-height:1.4;" id="student-survey-title">설문 응답</div>
+      <button onclick="closeStudentSurveyResponse()" style="background:none;border:none;cursor:pointer;color:#6d7381;padding:4px;display:flex;border-radius:4px;flex-shrink:0;"><i data-lucide="x" style="width:18px;height:18px;"></i></button>
+    </div>
+    <div style="padding:8px 24px 20px;overflow-y:auto;flex:1;" id="student-survey-body"></div>
+    <!-- 푸터 [기본] -->
+    <div id="student-survey-foot-default" style="padding:14px 24px 20px;display:flex;align-items:center;justify-content:space-between;gap:8px;border-top:1px solid #f1f3f5;">
+      <button onclick="askDeleteSurvey()" class="btn btn-outline btn-sm" style="color:#f2525f;border-color:#f5b5bc;" onmouseover="this.style.background='#fff3f4'" onmouseout="this.style.background='#eff3ff'"><i data-lucide="trash-2" style="width:15px;height:15px;"></i>응답 삭제</button>
+      <button onclick="closeStudentSurveyResponse()" class="btn btn-primary btn-sm">닫기</button>
+    </div>
+    <!-- 푸터 [삭제 확인] — 같은 모달 안 인라인 전환 -->
+    <div id="student-survey-foot-confirm" style="display:none;padding:14px 24px 20px;align-items:center;justify-content:space-between;gap:12px;border-top:1px solid #f5b5bc;background:#fff3f4;">
+      <span style="font-size:14px;color:#9a1b29;line-height:1.5;display:inline-flex;align-items:center;gap:8px;"><i data-lucide="alert-triangle" style="width:16px;height:16px;color:#f2525f;flex-shrink:0;"></i>이 응답을 삭제하면 되돌릴 수 없어요.</span>
+      <span style="display:inline-flex;gap:8px;flex-shrink:0;">
+        <button onclick="cancelDeleteSurvey()" class="btn btn-outline btn-sm">취소</button>
+        <button onclick="deleteStudentSurvey()" class="btn btn-primary btn-sm" style="background:#f2525f;border-color:#f2525f;" onmouseover="this.style.background='#e0434f';this.style.borderColor='#e0434f'" onmouseout="this.style.background='#f2525f';this.style.borderColor='#f2525f'">삭제</button>
+      </span>
+    </div>
+  </div>
+</div>
+
+<!-- 자료 교체 확인 모달 (다른 방법으로 덮어쓸 때만) -->
+<div id="replace-confirm-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.4);z-index:620;align-items:center;justify-content:center;padding:24px;">
+  <div style="background:#fff;border-radius:12px;width:440px;max-width:100%;box-shadow:0 4px 16px rgba(0,0,0,.16);overflow:hidden;">
+    <div style="padding:24px 24px 8px;display:flex;align-items:flex-start;gap:12px;">
+      <div style="width:40px;height:40px;border-radius:50%;background:#fff3f4;color:#f2525f;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;"><i data-lucide="alert-triangle" style="width:22px;height:22px;"></i></div>
+      <div>
+        <div style="font-size:18px;font-weight:700;color:#222631;line-height:1.4;" id="replace-confirm-title">기존 자료를 교체할까요?</div>
+      </div>
+    </div>
+    <div style="padding:4px 24px 20px 76px;font-size:16px;color:#3b3f4c;line-height:1.6;" id="replace-confirm-body"></div>
+    <div style="padding:14px 24px 20px;display:flex;justify-content:flex-end;gap:8px;border-top:1px solid #f1f3f5;">
+      <button onclick="closeReplaceConfirm()" class="btn btn-outline btn-sm">취소</button>
+      <button onclick="confirmReplace()" class="btn btn-primary btn-sm" style="background:#f2525f;border-color:#f2525f;" onmouseover="this.style.background='#e0434f';this.style.borderColor='#e0434f'" onmouseout="this.style.background='#f2525f';this.style.borderColor='#f2525f'">교체하고 등록</button>
     </div>
   </div>
 </div>
@@ -2056,8 +2248,18 @@ function renderTable() {
   var allAbsent = currentListClass !== 1 && !allDone;
   var bulkUp = !!bulkUploadedClasses[currentListClass];
   var ocrPhase = bulkOcrStateA[currentListClass] || null;
+  var surveyMode = (getClassMethod(currentListClass) === 'survey');
   STUDENTS.forEach(function(s, i) {
-    var effectiveStatus = allDone ? '제출' : (allAbsent ? ((bulkUp && s.status === '제출') ? '제출' : '미제출') : s.status);
+    var effectiveStatus;
+    if (allDone) {
+      effectiveStatus = '제출';
+    } else if (surveyMode) {
+      // 설문: 응답한 학생만 제출 (삭제된 학생 제외). 미응답 = 미제출
+      var responded = SURVEY_ROWS.some(function(r){ return r.sid === s.id; }) && !deletedSurveyIds[s.id];
+      effectiveStatus = responded ? '제출' : '미제출';
+    } else {
+      effectiveStatus = allAbsent ? ((bulkUp && s.status === '제출') ? '제출' : '미제출') : s.status;
+    }
     var statusBadge = effectiveStatus === '제출'
       ? '<span class="badge badge-green">제출 완료</span>'
       : '<span class="badge badge-red">미제출</span>';
@@ -2095,11 +2297,16 @@ function renderTable() {
         }
       }
     }
-    var actionCell = '<button onclick="openStudentUploadModal(\'' + s.id + '\', \'' + s.name + '\')" style="background:none;border:none;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:4px;color:#416bff;font-size:13px;font-weight:600;padding:4px 8px;border-radius:4px;white-space:nowrap;" onmouseover="this.style.background=\'#e9f2ff\'" onmouseout="this.style.background=\'none\'"><i data-lucide="paperclip" style="width:13px;height:13px;flex-shrink:0;"></i>파일 추가/제거</button>';
+    var actionCell;
+    if (surveyMode && effectiveStatus === '제출') {
+      actionCell = '<button onclick="openStudentSurveyResponse(\'' + s.id + '\', \'' + s.name + '\')" style="background:none;border:none;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:4px;color:#416bff;font-size:13px;font-weight:600;padding:4px 8px;border-radius:4px;white-space:nowrap;" onmouseover="this.style.background=\'#e9f2ff\'" onmouseout="this.style.background=\'none\'"><i data-lucide="eye" style="width:13px;height:13px;flex-shrink:0;"></i>응답 보기</button>';
+    } else {
+      actionCell = '<button onclick="openStudentUploadModal(\'' + s.id + '\', \'' + s.name + '\')" style="background:none;border:none;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:4px;color:#416bff;font-size:13px;font-weight:600;padding:4px 8px;border-radius:4px;white-space:nowrap;" onmouseover="this.style.background=\'#e9f2ff\'" onmouseout="this.style.background=\'none\'"><i data-lucide="paperclip" style="width:13px;height:13px;flex-shrink:0;"></i>파일 추가/제거</button>';
+    }
     var displayDate = effectiveStatus !== '제출' ? '-' : (allDone ? '04/20 09:10 선생님 업로드' : (bulkUp ? bulkUploadStamp[currentListClass] : (allAbsent ? '-' : s.date)));
     var fileNameCellA = (effectiveStatus !== '제출')
       ? '<span style="color:#b3b6bd;">-</span>'
-      : scoredFileCell(s.id + '_미래시나리오.pdf', s.files);
+      : (surveyMode ? surveyFileCell() : scoredFileCell(s.id + '_미래시나리오.pdf', s.files));
     html += '<tr>';
     html += '<td style="text-align:center;">' + statusBadge + '</td>';
     html += '<td style="font-weight:600;">' + s.id + '</td>';
@@ -2410,7 +2617,14 @@ function getClassActionLists(classNum, rawType) {
       });
     }
   } else {
-    if (classNum === 1) {
+    var methodA = getClassMethod(classNum);
+    if (methodA === 'survey') {
+      // 설문 등록 학급: 응답자=제출(OCR 불필요, 액션 없음), 미응답=미제출
+      STUDENTS.forEach(function(s) {
+        var responded = SURVEY_ROWS.some(function(r){ return r.sid === s.id; }) && !deletedSurveyIds[s.id];
+        if (!responded) L.absent.push(nm(s));
+      });
+    } else if (classNum === 1) {
       STUDENTS.forEach(function(s) {
         if (s.status === '미제출') L.absent.push(nm(s));
         else if (s.ocrStatus === 'waiting') L.pending.push(nm(s));
@@ -2769,11 +2983,12 @@ function fmRegister() {
 
 // ===== 까망이 목업 화면 선택기 =====
 function mpGo(which){
-  if (which === 'task')         showScreen('screen-task');
-  else if (which === 'list')    showListForClass(1, 'A');
-  else if (which === 'form')    openFormScreen('A');
-  else if (which === 'scoring') goScoringList();
-  else if (which === 'design')  goDesignList();
+  if (typeof closeUploadMenu === 'function') closeUploadMenu();
+  if (which === 'task')              showScreen('screen-task');
+  else if (which === 'form')         openFormScreen('A');
+  else if (which === 'uploadPdf')    { showListForClass(1, 'A'); openUploadPdf(); }
+  else if (which === 'uploadSurvey') { showListForClass(1, 'A'); openUploadSurvey(); }
+  document.querySelectorAll('#mockpick .mp-btn').forEach(function(b){ b.classList.toggle('on', b.dataset.k === which); });
   if (window.lucide) lucide.createIcons();
 }
 function mpToggle(){
@@ -2787,10 +3002,7 @@ function mpSyncActive(){
   var id = active ? active.id : '';
   var key = '';
   if (id === 'screen-task') key = 'task';
-  else if (id === 'screen-list') key = 'list';
   else if (id === 'screen-form') key = 'form';
-  else if (id === 'screen-scoring') key = 'scoring';
-  else if (id === 'screen-design') key = 'design';
   document.querySelectorAll('#mockpick .mp-btn').forEach(function(b){ b.classList.toggle('on', b.dataset.k === key); });
 }
 function mpInitDrag(){
@@ -2806,7 +3018,13 @@ function mpInitDrag(){
   document.addEventListener('mousemove', function(e){ if(!drag) return; el.style.left=(e.clientX-dx)+'px'; el.style.top=(e.clientY-dy)+'px'; });
   document.addEventListener('mouseup', function(){ drag=false; });
 }
-window.addEventListener('load', function(){ mpInitDrag(); mpSyncActive(); });
+window.addEventListener('load', function(){
+  mpInitDrag(); mpSyncActive();
+  var _active = document.querySelector('.screen.active');
+  var _id = _active ? _active.id : '';
+  var _mp = document.getElementById('mockpick');
+  if (_mp) _mp.style.display = (_id === 'screen-task' || _id === 'screen-form') ? '' : 'none';
+});
 function showScreen(id) {
   document.querySelectorAll('.screen').forEach(function(s){ s.classList.remove('active'); });
   document.getElementById(id).classList.add('active');
@@ -2814,6 +3032,9 @@ function showScreen(id) {
   if (id === 'screen-scoring') { history.replaceState(null, '', '#scoring'); }
   if (id === 'screen-scoring' && typeof syncRegradeFlags === 'function') syncRegradeFlags();
   if (typeof mpSyncActive === 'function') mpSyncActive();
+  // 까망이(목업 화면 선택기)는 과제물 관리 목록·양식 등록 화면에서만 노출
+  var mp = document.getElementById('mockpick');
+  if (mp) mp.style.display = (id === 'screen-task' || id === 'screen-form') ? '' : 'none';
   else if (id === 'screen-design') { history.replaceState(null, '', '#design'); }
   else if (location.hash === '#scoring' || location.hash === '#design') { history.replaceState(null, '', location.pathname + location.search); }
   var gnb = document.getElementById('gnb');
@@ -3494,8 +3715,293 @@ function resetUpload() {
   document.getElementById('upload-state-split').style.display = 'none';
   document.getElementById('upload-state-processing').style.display = 'none';
   document.getElementById('upload-state-done').style.display = 'none';
+  var sv = document.getElementById('upload-state-survey'); if (sv) sv.style.display = 'none';
   lucide.createIcons();
 }
+
+// ── 업로드 방법 드롭다운 ──
+function toggleUploadMenu(e) {
+  e.stopPropagation();
+  document.getElementById('uploadMenu').classList.toggle('open');
+}
+function closeUploadMenu() {
+  var m = document.getElementById('uploadMenu'); if (m) m.classList.remove('open');
+}
+document.addEventListener('click', function(){ closeUploadMenu(); });
+
+// 학급별 등록된 자료 방식 ('pdf' | 'survey'). 이번 세션에 업로드한 학급만 기록.
+var uploadMethodByClass = {};
+var pendingReplaceTarget = null;
+var deletedSurveyIds = {};         // 설문 응답이 삭제된 학생 id → 미제출로 되돌림
+var currentSurveyStudentId = null; // 응답 보기 모달에서 보고 있는 학생
+
+// 해당 학급에 이미 등록된 자료 방식. 없으면 null (자료 없음 = 미제출 학급).
+// 데모: 1반·완료 학급(예 3반)은 기존 PDF 자료 보유로 간주.
+function getClassMethod(cls) {
+  if (typeof uploadMethodByClass !== 'undefined' && uploadMethodByClass[cls]) return uploadMethodByClass[cls];
+  if (cls === 1 || completedClasses[cls]) return 'pdf';
+  return null;
+}
+
+function openUploadPdf() {
+  closeUploadMenu();
+  showScreen('screen-upload');
+  resetUpload(); // PDF 빈 상태 노출
+  // 기존이 '설문'일 때만 교체 경고 (PDF→PDF·자료 없음은 배너 X)
+  document.getElementById('pdf-replace-banner').style.display = (getClassMethod(currentListClass) === 'survey') ? 'flex' : 'none';
+  lucide.createIcons();
+}
+function openUploadSurvey() {
+  closeUploadMenu();
+  showScreen('screen-upload');
+  document.getElementById('upload-state-empty').style.display = 'none';
+  document.getElementById('upload-state-split').style.display = 'none';
+  document.getElementById('upload-state-processing').style.display = 'none';
+  document.getElementById('upload-state-done').style.display = 'none';
+  document.getElementById('upload-state-survey').style.display = 'block';
+  surveyClear();
+  // 기존이 'PDF'일 때만 교체 경고 (설문→설문·자료 없음은 배너 X)
+  document.getElementById('survey-replace-banner').style.display = (getClassMethod(currentListClass) === 'pdf') ? 'flex' : 'none';
+  lucide.createIcons();
+}
+
+// ── 다른 방법으로 덮어쓸 때 교체 확인 모달 ──
+function openReplaceConfirm(target) {
+  pendingReplaceTarget = target;
+  var title = document.getElementById('replace-confirm-title');
+  var body = document.getElementById('replace-confirm-body');
+  if (target === 'survey') {
+    title.textContent = '기존 PDF 자료를 교체할까요?';
+    body.innerHTML = '설문 응답을 등록하면 기존 <b>PDF 자료와 인식·채점 결과가 모두 삭제</b>돼요. 되돌릴 수 없어요.';
+  } else {
+    title.textContent = '기존 설문 자료를 교체할까요?';
+    body.innerHTML = 'PDF를 등록하면 기존 <b>설문 응답과 채점 결과가 모두 삭제</b>돼요. 되돌릴 수 없어요.';
+  }
+  document.getElementById('replace-confirm-modal').style.display = 'flex';
+  lucide.createIcons();
+}
+function closeReplaceConfirm() {
+  document.getElementById('replace-confirm-modal').style.display = 'none';
+  pendingReplaceTarget = null;
+}
+function confirmReplace() {
+  var t = pendingReplaceTarget;
+  document.getElementById('replace-confirm-modal').style.display = 'none';
+  pendingReplaceTarget = null;
+  if (t === 'survey') doSurveySave();
+  else doUploadPdf();
+}
+
+// ── 구글 설문 응답 업로드 ──
+var SURVEY_Q = [
+  '제시문을 읽고 글쓴이의 핵심 주장을 한 문장으로 요약하시오.',
+  '글쓴이의 주장에 대한 자신의 입장을 근거를 들어 서술하시오.',
+  '본문에서 사용된 설득 전략 두 가지를 찾아 설명하시오.'
+];
+// 실제 학급 명단(제출 학생) 사용 — 가짜 학생 끼우지 않음
+var SURVEY_ROWS = [
+  { sid:'10101', name:'김서윤', answers:[
+    '글쓴이는 인공지능의 발전이 인간의 일자리를 위협하기보다 새로운 협업의 기회를 만든다고 주장한다.',
+    '나는 글쓴이의 주장에 동의한다. 단순 반복 업무는 자동화되지만, 그만큼 사람은 창의적·감성적 영역에 집중할 수 있기 때문이다. 실제로 디자인·상담 분야에서 AI를 보조 도구로 쓰는 사례가 늘고 있다.',
+    '첫째, 구체적 통계를 제시해 신뢰를 높였다. 둘째, 반대 의견을 먼저 언급한 뒤 반박하는 양보 구문을 사용해 설득력을 강화했다.'
+  ]},
+  { sid:'10102', name:'이준호', answers:[
+    '기술 발전은 위협이 아니라 기회라는 것이 글쓴이의 주장이다.',
+    '어느 정도 동의하지만 모두에게 기회가 되는 것은 아니라고 생각한다. 재교육을 받지 못하는 계층은 오히려 소외될 수 있어 사회적 안전망이 함께 필요하다.',
+    '전문가의 말을 인용한 점과, 일상적인 예시를 들어 독자의 공감을 끌어낸 점이 설득 전략으로 보인다.'
+  ]},
+  { sid:'10103', name:'박지민', answers:[
+    '인공지능은 일자리를 없애기보다 바꾼다는 것이 핵심이다.',
+    '나는 신중한 입장이다. 변화의 속도가 너무 빨라 적응할 시간이 부족한 사람들이 많기 때문에, 기회와 위협이 공존한다고 본다.',
+    '대조를 통해 과거와 현재를 비교한 전략, 그리고 질문을 던져 독자가 스스로 생각하게 만든 전략이 쓰였다.'
+  ]},
+  { sid:'10104', name:'최유진', answers:[
+    '글쓴이는 변화에 대한 두려움보다 준비가 중요하다고 말한다.',
+    '동의한다. 두려워만 하면 아무것도 바뀌지 않으므로, 새로운 기술을 배우려는 태도가 필요하다고 생각한다.',
+    '감정에 호소하는 표현과, 권위 있는 기관의 자료를 근거로 든 점이 설득 전략이다.'
+  ]},
+  { sid:'10105', name:'정현우', answers:[
+    '핵심 주장은 기술과 인간이 공존할 수 있다는 것이다.',
+    '부분적으로 동의한다. 다만 공존을 위해서는 제도적 뒷받침이 전제되어야 한다는 점을 글쓴이가 충분히 다루지 않은 것 같다.',
+    '구체적 사례 제시와, 점층적으로 주장을 강화하는 구성이 설득 전략으로 사용되었다.'
+  ]},
+  { sid:'10109', name:'임도윤', answers:[
+    '글쓴이는 인공지능을 도구로 활용하면 인간의 능력이 확장된다고 주장한다.',
+    '나는 강하게 동의한다. 도구는 쓰는 사람에 따라 가치가 달라지므로, 결국 중요한 것은 기술이 아니라 사람의 판단력이라고 생각한다.',
+    '반복되는 핵심어로 주장을 각인시킨 전략과, 미래의 모습을 그려 보이는 비전 제시 전략이 쓰였다.'
+  ]}
+];
+var surveyRows = [];
+
+function surveyDownloadTemplate() {
+  showToast('설문 응답 양식을 다운로드했어요.', 'success');
+}
+function surveyFilePicked() {
+  document.getElementById('survey-file-chip').style.display = 'flex';
+  surveyRows = SURVEY_ROWS.map(function(r){ return { sid:r.sid, name:r.name, answers:r.answers.slice() }; });
+  renderSurveyResult();
+  lucide.createIcons();
+}
+function surveyClear() {
+  document.getElementById('survey-file-chip').style.display = 'none';
+  document.getElementById('survey-empty').style.display = 'block';
+  document.getElementById('survey-result').style.display = 'none';
+  document.getElementById('survey-save-btn').disabled = true;
+  surveyRows = [];
+  lucide.createIcons();
+}
+function surveyAnsweredCount(a) { return a.filter(function(x){ return x && x.trim(); }).length; }
+function renderSurveyResult() {
+  document.getElementById('survey-empty').style.display = 'none';
+  document.getElementById('survey-result').style.display = 'block';
+  document.getElementById('survey-q-total').textContent = SURVEY_Q.length;
+  document.getElementById('survey-q-rows').innerHTML = SURVEY_Q.map(function(q, i){
+    return '<tr><td style="padding:14px;text-align:center;border-bottom:1px solid #f1f3f5;color:#3b3f4c;font-size:14px;">' + (i+1) + '</td>'
+      + '<td style="padding:14px;text-align:left;border-bottom:1px solid #f1f3f5;color:#3b3f4c;font-size:14px;line-height:1.55;">' + escHtml(q) + '</td></tr>';
+  }).join('');
+
+  var head = '<th style="width:56px;background:#f9fafb;padding:12px 14px;text-align:center;font-weight:600;color:#3b3f4c;font-size:14px;border-bottom:1px solid #e5e7eb;">No.</th>'
+    + '<th style="width:72px;background:#f9fafb;padding:12px 14px;text-align:center;font-weight:600;color:#3b3f4c;font-size:14px;border-bottom:1px solid #e5e7eb;">학번</th>'
+    + '<th style="width:80px;background:#f9fafb;padding:12px 14px;text-align:center;font-weight:600;color:#3b3f4c;font-size:14px;border-bottom:1px solid #e5e7eb;">이름</th>'
+    + '<th style="width:80px;background:#f9fafb;padding:12px 14px;text-align:center;font-weight:600;color:#3b3f4c;font-size:14px;border-bottom:1px solid #e5e7eb;">응답 수</th>';
+  SURVEY_Q.forEach(function(q, i){
+    head += '<th style="background:#f9fafb;padding:12px 14px;text-align:left;font-weight:600;color:#3b3f4c;font-size:14px;border-bottom:1px solid #e5e7eb;">문항 ' + (i+1) + '</th>';
+  });
+  head += '<th style="width:100px;background:#f9fafb;padding:12px 14px;border-bottom:1px solid #e5e7eb;"></th>';
+  document.getElementById('survey-r-head').innerHTML = head;
+
+  document.getElementById('survey-r-rows').innerHTML = surveyRows.map(function(r, idx){
+    var cnt = surveyAnsweredCount(r.answers);
+    var tdC = 'padding:14px;text-align:center;border-bottom:1px solid #f1f3f5;color:#3b3f4c;font-size:14px;vertical-align:middle;';
+    var html = '<td style="' + tdC + '">' + (idx+1) + '</td>'
+      + '<td style="' + tdC + '">' + r.sid + '</td>'
+      + '<td style="' + tdC + '">' + r.name + '</td>'
+      + '<td style="' + tdC + '">' + cnt + '/' + SURVEY_Q.length + '</td>';
+    r.answers.forEach(function(a, i){
+      if (i >= SURVEY_Q.length) return;
+      html += a
+        ? '<td style="padding:12px 14px;text-align:left;border-bottom:1px solid #f1f3f5;color:#3b3f4c;font-size:14px;"><div style="display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;line-height:1.55;max-width:200px;">' + escHtml(a) + '</div></td>'
+        : '<td style="padding:14px;text-align:center;border-bottom:1px solid #f1f3f5;color:#b3b6bd;">-</td>';
+    });
+    html += '<td style="padding:14px;text-align:center;border-bottom:1px solid #f1f3f5;"><button onclick="openSurveyQa(' + idx + ')" style="color:#416bff;font-size:14px;font-weight:600;text-decoration:underline;cursor:pointer;background:none;border:none;font-family:inherit;padding:4px 8px;">자세히 보기</button></td>';
+    return '<tr>' + html + '</tr>';
+  }).join('');
+
+  document.getElementById('survey-r-total').textContent = surveyRows.length;
+  document.getElementById('survey-save-btn').disabled = false;
+  lucide.createIcons();
+}
+function openSurveyQa(idx) {
+  var row = surveyRows[idx];
+  if (!row) return;
+  document.getElementById('survey-qa-title').textContent = '설문 응답 : ' + row.sid + ' ' + row.name;
+  document.getElementById('survey-qa-body').innerHTML = SURVEY_Q.map(function(q, i){
+    var a = row.answers[i] || '';
+    return '<div style="margin-bottom:16px;">'
+      + '<div style="font-size:14px;font-weight:700;margin-bottom:8px;line-height:1.5;"><span style="color:#416bff;margin-right:6px;">Q' + (i+1) + '.</span><span style="color:#222631;">' + escHtml(q) + '</span></div>'
+      + '<div style="font-size:16px;color:#3b3f4c;line-height:1.6;white-space:pre-wrap;word-break:break-word;background:#f6f7f9;padding:12px 14px;border-radius:8px;">' + (a ? escHtml(a) : '응답 없음') + '</div>'
+      + '</div>';
+  }).join('');
+  document.getElementById('survey-qa-modal').style.display = 'flex';
+  lucide.createIcons();
+}
+function closeSurveyQa() {
+  document.getElementById('survey-qa-modal').style.display = 'none';
+}
+function escHtml(s) { return String(s).replace(/[&<>]/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;'}[c]; }); }
+function surveySaveAndList() {
+  // 기존이 PDF면 다른 방법 교체 → 확인 모달, 자료 없음·설문이면 바로 등록
+  if (getClassMethod(currentListClass) === 'pdf') { openReplaceConfirm('survey'); return; }
+  doSurveySave();
+}
+function doSurveySave() {
+  var n = surveyRows.length;
+  deletedSurveyIds = {}; // 새로 등록하면 이전 삭제 이력 초기화
+  if (currentListClass) {
+    uploadMethodByClass[currentListClass] = 'survey';
+    bulkUploadedClasses[currentListClass] = true;
+    // 설문은 OCR 유발 안 함 → bulkOcrStateA 설정하지 않음
+    var now = new Date();
+    var pad = function(num){ return (num < 10 ? '0' : '') + num; };
+    bulkUploadStamp[currentListClass] = pad(now.getMonth()+1) + '/' + pad(now.getDate()) + ' ' + pad(now.getHours()) + ':' + pad(now.getMinutes()) + ' 설문 등록';
+  }
+  renderTable();
+  renderActionBanners(currentListClass, window.currentRawType || currentEvalType || 'A');
+  showScreen('screen-list');
+  showToast('과제물이 등록되었습니다.', 'success');
+}
+
+// ── 제출 현황: 학생 설문 응답 보기/삭제 ──
+function openStudentSurveyResponse(id, name) {
+  currentSurveyStudentId = id;
+  var row = SURVEY_ROWS.find(function(r){ return r.sid === id; });
+  document.getElementById('student-survey-title').textContent = '설문 응답 : ' + id + ' ' + name;
+  var body = document.getElementById('student-survey-body');
+  if (row) {
+    body.innerHTML = SURVEY_Q.map(function(q, i){
+      var a = row.answers[i] || '';
+      return '<div style="margin-bottom:16px;">'
+        + '<div style="font-size:14px;font-weight:700;margin-bottom:8px;line-height:1.5;"><span style="color:#416bff;margin-right:6px;">Q' + (i+1) + '.</span><span style="color:#222631;">' + escHtml(q) + '</span></div>'
+        + '<div style="font-size:16px;color:#3b3f4c;line-height:1.6;white-space:pre-wrap;word-break:break-word;background:#f6f7f9;padding:12px 14px;border-radius:8px;">' + (a ? escHtml(a) : '응답 없음') + '</div>'
+        + '</div>';
+    }).join('');
+  } else {
+    body.innerHTML = '<p style="font-size:16px;color:#6d7381;">등록된 응답이 없습니다.</p>';
+  }
+  resetSurveyFooter();
+  document.getElementById('student-survey-modal').style.display = 'flex';
+  lucide.createIcons();
+}
+function resetSurveyFooter() {
+  document.getElementById('student-survey-foot-default').style.display = 'flex';
+  document.getElementById('student-survey-foot-confirm').style.display = 'none';
+}
+function askDeleteSurvey() {
+  document.getElementById('student-survey-foot-default').style.display = 'none';
+  document.getElementById('student-survey-foot-confirm').style.display = 'flex';
+  lucide.createIcons();
+}
+function cancelDeleteSurvey() {
+  resetSurveyFooter();
+}
+function closeStudentSurveyResponse() {
+  document.getElementById('student-survey-modal').style.display = 'none';
+  resetSurveyFooter();
+  currentSurveyStudentId = null;
+}
+function deleteStudentSurvey() {
+  if (!currentSurveyStudentId) return;
+  deletedSurveyIds[currentSurveyStudentId] = true;
+  document.getElementById('student-survey-modal').style.display = 'none';
+  resetSurveyFooter();
+  currentSurveyStudentId = null;
+  renderTable();
+  renderActionBanners(currentListClass, window.currentRawType || currentEvalType || 'A');
+  showToast('설문 응답을 삭제했어요. 해당 학생은 미제출로 표시돼요.', 'success');
+}
+
+// 설문 제출 자료 셀 — 학생별 파일이 아니라 학급 설문에서 분배된 '응답'
+function surveyFileCell() {
+  return '<span style="display:inline-flex;align-items:center;gap:6px;vertical-align:middle;">'
+    + '<i data-lucide="clipboard-list" style="width:15px;height:15px;color:#416bff;flex-shrink:0;"></i>'
+    + '<span style="font-size:14px;color:#3b3f4c;">설문 응답</span>'
+    + '</span>';
+}
+
+// ── 개인정보 비식별화 안내: 다시 보지 않기 (일괄·개별 공통) ──
+var DEID_KEY = 'clipo_deid_hide';
+function applyDeidState() {
+  var hidden = localStorage.getItem(DEID_KEY) === '1';
+  ['bulk'].forEach(function(k) {
+    var box = document.getElementById('deid-' + k);
+    var mini = document.getElementById('deidmini-' + k);
+    if (box) box.style.display = hidden ? 'none' : 'flex';
+    if (mini) mini.style.display = hidden ? 'block' : 'none';
+  });
+}
+function dismissDeid() { localStorage.setItem(DEID_KEY, '1'); applyDeidState(); }
+function restoreDeid() { localStorage.removeItem(DEID_KEY); applyDeidState(); }
+
 function renderDoneTable() {
   var container = document.getElementById('done-result-tbody');
   if (!container) return;
@@ -3686,6 +4192,12 @@ function renderTableB() {
 var bulkOcrStateA = {};
 var bulkUploadStamp = {};
 function uploadAndGoList() {
+  // 기존이 설문이면 다른 방법 교체 → 확인 모달, 자료 없음·PDF면 바로 업로드
+  if (getClassMethod(currentListClass) === 'survey') { openReplaceConfirm('pdf'); return; }
+  doUploadPdf();
+}
+function doUploadPdf() {
+  if (currentListClass) uploadMethodByClass[currentListClass] = 'pdf';
   pendingUploadMode = 'bulk';
   pendingUploadStudentId = null;
   if (currentListClass) {
@@ -4057,6 +4569,7 @@ function closeDesignSavedModal(goUpload) {
 
 // 초기화
 renderTable();
+applyDeidState();
 lucide.createIcons();
 
 // URL 해시 라우팅
@@ -4184,10 +4697,9 @@ initDiagPromo();
   </div>
   <div id="mp-body" class="mp-body">
     <button class="mp-btn" data-k="task" onclick="mpGo('task')">과제물 관리 목록</button>
-    <button class="mp-btn" data-k="list" onclick="mpGo('list')">학급 제출 상세 <span class="mp-sub">제출·미제출 현황</span></button>
     <button class="mp-btn" data-k="form" onclick="mpGo('form')">과제물 양식 등록 <span class="mp-sub">공통·반별</span></button>
-    <button class="mp-btn" data-k="scoring" onclick="mpGo('scoring')">채점 목록 <span class="mp-sub">AI 채점·재실행</span></button>
-    <button class="mp-btn" data-k="design" onclick="mpGo('design')">평가 설계 목록</button>
+    <button class="mp-btn" data-k="uploadPdf" onclick="mpGo('uploadPdf')">일괄 업로드 (PDF) <span class="mp-sub">개인정보 비식별화 안내</span></button>
+    <button class="mp-btn" data-k="uploadSurvey" onclick="mpGo('uploadSurvey')">설문 응답 업로드 <span class="mp-sub">구글 설문·엑셀</span></button>
   </div>
 </div>
 
