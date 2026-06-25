@@ -35,7 +35,7 @@ body{background:#fff;color:#222631;overflow:hidden;height:100vh}
 .sub-nav-item.active::after{content:"";position:absolute;left:12px;right:12px;bottom:-1px;height:2px;background:#365eef;border-radius:2px 2px 0 0}
 
 /* ══════ 채점 액션바 (64px) — Figma 5674-13287 ══════ */
-.top-bar{height:64px;background:#f7f8f9;display:flex;align-items:stretch;position:fixed;top:0;left:0;right:0;z-index:200;border-bottom:1px solid #dde1e8}
+.top-bar{height:64px;background:#f7f8f9;display:flex;align-items:stretch;position:fixed;top:var(--chrome-top,0px);left:var(--chrome-left,0px);right:0;z-index:200;border-bottom:1px solid #dde1e8;transition:top .2s ease,left .2s ease}
 .btn-back{display:inline-flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;width:64px;height:64px;background:#365eef;color:#fff;font-size:12px;font-weight:600;font-family:inherit;cursor:pointer;flex-shrink:0;border:none;border-radius:0;line-height:1}
 .btn-back:hover{background:#3151c4}
 .tb-bar{flex:1;min-width:0;display:flex;align-items:center;justify-content:space-between;gap:16px;padding:0 20px}
@@ -61,7 +61,7 @@ body{background:#fff;color:#222631;overflow:hidden;height:100vh}
 .icon-btn-circle:hover{background:#d6e6ff;border-color:#365eef}
 
 /* ══════ 메인 영역 ══════ */
-.main-wrap{display:flex;position:fixed;top:64px;left:0;right:0;bottom:0}
+.main-wrap{display:flex;position:fixed;top:calc(var(--chrome-top,0px) + 64px);left:var(--chrome-left,0px);right:0;bottom:0;transition:top .2s ease,left .2s ease}
 
 /* ══════ 뷰어 (좌) ══════ */
 .viewer{flex:1;display:flex;flex-direction:column;min-width:0;position:relative;background:#dde1e8}
@@ -687,11 +687,156 @@ select.field-input{appearance:none;-webkit-appearance:none;background-image:url(
 .formula-insert-btn{ display:none; }
 .section-editing .formula-insert-btn{ display:inline-flex; }
 .section-editing .rubric-suspect-chip{ display:none; }
+
+/* ══════════════════════════════════════════════════
+   보기 설정 (뷰어/패널 커스터마이즈) — 사용자별 자동 저장
+   ══════════════════════════════════════════════════ */
+/* 1) 기본 보기 = 글로벌 크레딧 헤더 + 좌측 NB + 탭밴드(크롬) 표시 / 간결 보기 = 크롬 숨김(딥워크) */
+:root{--chrome-top:0px;--chrome-left:0px}
+body.vs-chrome{--chrome-top:101px;--chrome-left:56px}
+body.vs-chrome.nav-expanded{--chrome-left:200px}
+.g-hd,.icon-sb,.tab-band{display:none}
+body.vs-chrome .g-hd{display:flex}
+body.vs-chrome .icon-sb{display:flex}
+body.vs-chrome .tab-band{display:flex}
+/* 글로벌 헤더 (CLIPO 표준 56px) */
+.g-hd{height:56px;background:#fff;border-bottom:1px solid #d9d9d9;align-items:center;padding:0 20px 0 8px;position:fixed;top:0;left:0;right:0;z-index:300}
+.g-hd-r{margin-left:auto;display:flex;align-items:center;gap:6px;font-size:14px;color:#3b3f4c}
+.plan-badge{background:#eef3ff;color:#416bff;font-size:12px;font-weight:600;padding:3px 10px;border-radius:12px}
+.hd-div{width:1px;height:14px;background:#d9d9d9;margin:0 4px}
+.credit-wrap{display:flex;align-items:center;gap:4px;font-size:14px;font-weight:500;color:#3b3f4c}
+.user-btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:0;border:none;background:none;font-size:14px;color:#222631;cursor:pointer;line-height:1;font-weight:500}
+/* 좌측 NB (CLIPO 표준 icon-sb) */
+.icon-sb{width:56px;background:#fff;border-right:1px solid #d9d9d9;position:fixed;top:56px;bottom:0;left:0;flex-direction:column;padding:8px 0;z-index:250;transition:width .2s ease}
+.icon-sb.expanded{width:200px}
+.si{height:40px;display:flex;align-items:center;border-radius:8px;color:#6d7381;cursor:pointer;margin:0 8px 2px;position:relative;padding:0 4px 0 8px;gap:10px;white-space:nowrap;flex-shrink:0}
+.si:hover{background:#f1f3f5}
+.si.active{background:#e9f2ff;color:#416bff}
+.si-icon{width:24px;height:24px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.si-label{font-size:13px;font-weight:500;opacity:0;transition:opacity .1s;overflow:hidden}
+.icon-sb.expanded .si-label{opacity:1}
+.si-tip{position:absolute;left:48px;top:50%;transform:translateY(-50%);background:#222631;color:#fff;font-size:11px;padding:3px 8px;border-radius:4px;white-space:nowrap;display:none;z-index:400;pointer-events:none}
+.si:hover .si-tip{display:block}
+.icon-sb.expanded .si-tip{display:none!important}
+.nav-bottom{margin-top:auto;width:100%}
+.nav-div{height:1px;background:#f1f3f5;margin:4px 8px}
+/* 탭밴드 (CLIPO 표준) */
+.tab-band{background:#fff;border-bottom:1px solid #dde1e8;position:fixed;top:56px;left:56px;right:0;height:45px;z-index:240;align-items:stretch;transition:left .2s ease}
+body.vs-chrome.nav-expanded .tab-band{left:200px}
+.tab-band-inner{max-width:1240px;margin:0 auto;padding:0 32px;display:flex;gap:8px;width:100%}
+.sub-tab{padding:0 14px;font-size:15px;font-weight:500;color:#3b3f4c;border:none;background:none;cursor:pointer;font-family:inherit;border-bottom:2px solid transparent;margin-bottom:-1px;display:inline-flex;align-items:center;justify-content:center;line-height:1}
+.sub-tab:hover{color:#222631}
+.sub-tab.on{color:#416bff;border-bottom:2px solid #416bff}
+
+/* ══ AI 피드백 카드 헤더 — Figma 매칭 (균일 연파랑 헤더 / 파랑 번호칩 / 제목 우측 연한 도달 알약) ══ */
+#pane-instruction .ec-card-header{background:#e9f2ff}
+.ec-num{display:inline-flex;align-items:center;justify-content:center;height:24px;padding:4px 8px;border-radius:9999px;background:#416bff;color:#fff;font-size:14px;font-weight:700;line-height:1.25;flex-shrink:0}
+#pane-instruction .ec-summary{color:#18181b;font-size:16px}
+/* 도달 수준 배지 — 좌측 진한 솔리드 폐지 → 제목 우측 연한 알약 */
+.ec-level.lv-correct,.ec-level.lv-high,.ec-level.lv-mid,.ec-level.lv-wrong,.ec-level.lv-low{height:24px;padding:4px 10px;font-size:14px;font-weight:700;border-radius:9999px;display:inline-flex;align-items:center;gap:4px;flex-shrink:0}
+.ec-level.lv-correct,.ec-level.lv-high{background:#ccdfff;color:#3151c4}
+.ec-level.lv-mid{background:#a5f3fc;color:#0e7490}
+.ec-level.lv-wrong,.ec-level.lv-low{background:#fed7aa;color:#92310a}
+/* 채점요소별 카드 — Figma 매칭 (연파랑 헤더 / 요소명 좌측 / AI예상 점수 알약 우측) */
+#pane-rubric .ec-card-header{background:#e9f2ff}
+#pane-rubric .ec-summary{color:#18181b;font-size:15px}
+.ec-score-pill{display:inline-flex;align-items:center;justify-content:center;padding:4px 8px;border-radius:9999px;background:#ccdfff;color:#3151c4;font-size:12px;font-weight:700;line-height:1.25;flex-shrink:0;white-space:nowrap}
+/* 2) AI 결과 글자 크기 (기본 16px) — AI 근거·피드백 텍스트만 대상 */
+body.vs-font-sm .eval-card .editable{font-size:15px}
+body.vs-font-lg .eval-card .editable{font-size:18px}
+/* 3) 표시 항목 토글 — AI 생성 결과의 채점 근거 / 피드백 */
+body.vs-hide-ground .eval-card .ec-block--ground{display:none}
+body.vs-hide-feedback .eval-card .ec-block--feedback{display:none}
+
+/* 보기 설정 진입 버튼 — Figma 아이콘 버튼 토큰 (surface/bg-default #e9f2ff, blue/emphasized #a3c3ff, surface/text #3151c4, Radii/sm 4) */
+.tb-gear{width:36px;height:36px;display:inline-flex;align-items:center;justify-content:center;border:1px solid #a3c3ff;border-radius:4px;background:#e9f2ff;cursor:pointer;color:#3151c4;flex-shrink:0}
+.tb-gear:hover{background:#d6e6ff;border-color:#365eef}
+.tb-gear.on{background:#365eef;border-color:#365eef;color:#fff}
+/* 상단바 숨김 시 떠 있는 재진입 버튼 (설정이 갇히지 않게) — 같은 아이콘 버튼 토큰 */
+.vs-float{display:none;position:fixed;top:12px;right:16px;z-index:240;width:36px;height:36px;align-items:center;justify-content:center;border:1px solid #a3c3ff;border-radius:4px;background:#e9f2ff;color:#3151c4;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.14)}
+.vs-float:hover{background:#d6e6ff;border-color:#365eef}
+body.vs-hide-topbar .vs-float{display:inline-flex}
+
+/* 팝오버 (모달 아님 — 라이브 반영) */
+.vs-pop{position:fixed;z-index:1200;width:304px;background:#fff;border:1px solid #dde1e8;border-radius:14px;box-shadow:0 12px 32px rgba(0,0,0,.16);padding:18px;display:none;flex-direction:column;gap:18px}
+.vs-pop.show{display:flex}
+.vs-pop-hd{display:flex;align-items:center;justify-content:space-between}
+.vs-pop-title{font-size:16px;font-weight:700;color:#222631;line-height:1;display:inline-flex;align-items:center;gap:6px}
+.vs-pop-close{width:28px;height:28px;display:inline-flex;align-items:center;justify-content:center;border:none;background:none;cursor:pointer;color:#9aa0ac;border-radius:8px}
+.vs-pop-close:hover{background:#f1f3f5;color:#3b3f4c}
+.vs-pop-note{font-size:13px;color:#9aa0ac;line-height:1.55;border-top:1px solid #f1f3f5;padding-top:14px}
+/* 프리셋 칩 */
+.vs-presets{display:flex;gap:8px}
+.vs-preset{flex:1;height:38px;border:1px solid #dde1e8;border-radius:100px;background:#fff;color:#3b3f4c;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;justify-content:center;gap:5px;line-height:1}
+.vs-preset:hover{border-color:#a3c3ff;color:#365eef;background:#f4f8ff}
+.vs-preset.active{border-color:#365eef;color:#365eef;background:#eef3ff}
+.vs-group{display:flex;flex-direction:column;gap:10px}
+.vs-group-lbl{font-size:14px;font-weight:600;color:#6d7381;line-height:1;letter-spacing:.01em}
+/* 스위치 행 */
+.vs-row{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:24px}
+.vs-row-text{font-size:15px;color:#222631;line-height:1.3}
+.vs-switch{position:relative;width:40px;height:24px;border-radius:100px;background:#dde1e8;border:none;cursor:pointer;flex-shrink:0;transition:background .15s;padding:0}
+.vs-switch::after{content:"";position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:#fff;box-shadow:0 1px 2px rgba(0,0,0,.2);transition:transform .15s}
+.vs-switch.on{background:#365eef}
+.vs-switch.on::after{transform:translateX(16px)}
+/* 세그먼트 (글자 크기) */
+.vs-seg{display:flex;background:#f1f3f5;border-radius:10px;padding:4px;gap:2px}
+.vs-seg-btn{flex:1;height:38px;border:none;border-radius:8px;background:transparent;color:#6d7381;font-weight:600;cursor:pointer;font-family:inherit;line-height:1;transition:all .15s}
+.vs-seg-btn:hover{color:#3b3f4c}
+.vs-seg-btn.active{background:#fff;color:#365eef;box-shadow:0 1px 3px rgba(0,0,0,.1)}
+.vs-seg-btn.s1{font-size:13px}
+.vs-seg-btn.s2{font-size:15px}
+.vs-seg-btn.s3{font-size:17px}
+.vs-divider{height:1px;background:#eaecf0}
 </style>
 </head>
-<body>
+<body class="vs-chrome">
 
-<!-- ══════ 채점 액션바 (글로벌 헤더·서브내비 제거 — 채점 deep work 모드) ══════ -->
+<!-- ══════ 글로벌 크레딧 헤더 (기본 보기 크롬) ══════ -->
+<header class="g-hd" id="gHd">
+  <button class="gh-menu-btn" onclick="toggleNav()"><i data-lucide="menu" style="width:20px;height:20px"></i></button>
+  <svg width="76" height="16" viewBox="0 0 76 16" fill="none" xmlns="http://www.w3.org/2000/svg" style="cursor:pointer" onclick="location.href='home_v1_260612.html'"><path d="M11.3613 4.03516H4.09668V11.9629H8.88281L8.88086 11.9648H15.6016V16H4.02539C1.80242 15.9998 0 14.223 0 12.0322V3.96777C0 1.77696 1.80242 0.000177874 4.02539 0H15.4561L11.3613 4.03516ZM22.0703 11.9648H33.5781V16H22.002C19.7788 16 17.9756 14.2231 17.9756 12.0322V0H22.0703V11.9648ZM40.0459 16H35.9521V0H40.0459V16ZM54.5381 0C56.4564 0 58.0138 1.53228 58.0186 3.42285L58.0166 3.4248V8.54297C58.014 10.4333 56.4567 11.9648 54.5361 11.9648H46.5107L42.416 16V0H54.5381ZM71.9746 0C74.0086 0.000134956 75.6887 1.49046 75.958 3.42285H76V12.5771H75.958C75.6887 14.5095 74.011 15.9999 71.9746 16H64.4238C62.3897 16 60.7098 14.5096 60.4404 12.5771C60.4145 12.398 60.3984 12.2184 60.3984 12.0322V3.96777C60.3984 3.78159 60.4145 3.60205 60.4404 3.42285C60.7098 1.49037 62.3873 0 64.4238 0H71.9746ZM64.4922 12.5771H71.9062V3.42285H64.4922V12.5771ZM46.5107 3.42285V8.54004H53.9238V3.42285H46.5107Z" fill="#365EEF"/></svg>
+  <div class="g-hd-r">
+    <span class="plan-badge">개인 유료</span>
+    <span style="font-size:14px;color:#6d7381">D-215</span>
+    <div class="hd-div"></div>
+    <i data-lucide="bot" style="width:18px;height:18px;color:#416bff"></i>
+    <div class="credit-wrap">AI 크레딧 842</div>
+    <div class="hd-div"></div>
+    <button class="user-btn">김옥빈2 선생님(대표교사) <i data-lucide="chevron-down" style="width:16px;height:16px"></i></button>
+  </div>
+</header>
+
+<!-- ══════ 좌측 NB (기본 보기 크롬) ══════ -->
+<nav class="icon-sb" id="iconSb">
+  <div class="si" onclick="location.href='home_v1_260612.html'"><div class="si-icon"><i data-lucide="home" style="width:20px;height:20px"></i></div><span class="si-label">홈</span><span class="si-tip">홈</span></div>
+  <div class="si" onclick="location.href='eval_plan_v1_260619.html'"><div class="si-icon"><i data-lucide="scissors" style="width:20px;height:20px"></i></div><span class="si-label">평가 준비</span><span class="si-tip">평가 준비</span></div>
+  <div class="si active" onclick="location.href='co_teacher_review_v1_260611.html'"><div class="si-icon"><i data-lucide="layout-grid" style="width:20px;height:20px"></i></div><span class="si-label">수업</span><span class="si-tip">수업</span></div>
+  <div class="si" onclick="location.href='creative_activity_list_v6_260507.html'"><div class="si-icon"><i data-lucide="notebook-pen" style="width:20px;height:20px"></i></div><span class="si-label">창의적 체험활동</span><span class="si-tip">창의적 체험활동</span></div>
+  <div class="si" onclick="location.href='quick_seteuk_dev_list_v1_260604.html'"><div class="si-icon"><i data-lucide="zap" style="width:20px;height:20px"></i></div><span class="si-label">세특 간편 생성기</span><span class="si-tip">세특 간편 생성기</span></div>
+  <div class="si"><div class="si-icon"><i data-lucide="smile" style="width:20px;height:20px"></i></div><span class="si-label">행동특성 및 종합기록</span><span class="si-tip">행동특성 및 종합기록</span></div>
+  <div class="si"><div class="si-icon"><i data-lucide="bar-chart-2" style="width:20px;height:20px"></i></div><span class="si-label">리포트</span><span class="si-tip">리포트</span></div>
+  <div class="si"><div class="si-icon"><i data-lucide="building-2" style="width:20px;height:20px"></i></div><span class="si-label">학교 설정</span><span class="si-tip">학교 설정</span></div>
+  <div class="nav-bottom">
+    <div class="nav-div"></div>
+    <div class="si"><div class="si-icon"><i data-lucide="file-down" style="width:20px;height:20px"></i></div><span class="si-label">매뉴얼 다운로드</span><span class="si-tip">매뉴얼 다운로드</span></div>
+    <div class="si"><div class="si-icon"><i data-lucide="credit-card" style="width:20px;height:20px"></i></div><span class="si-label">요금제</span><span class="si-tip">요금제</span></div>
+    <div class="si"><div class="si-icon"><i data-lucide="help-circle" style="width:20px;height:20px"></i></div><span class="si-label">고객센터</span><span class="si-tip">고객센터</span></div>
+  </div>
+</nav>
+
+<!-- ══════ 탭밴드 (기본 보기 크롬) ══════ -->
+<div class="tab-band" id="tabBand">
+  <div class="tab-band-inner">
+    <button class="sub-tab" onclick="location.href='co_teacher_review_v1_260611.html'">수업 홈</button>
+    <button class="sub-tab" onclick="location.href='task_ocr_v3_260623.html#design'">수행평가 설계</button>
+    <button class="sub-tab" onclick="location.href='task_ocr_v3_260623.html'">과제물 관리</button>
+    <button class="sub-tab on" onclick="location.href='class_scoring_detail_v3_260623.html'">수행평가 채점</button>
+    <button class="sub-tab" onclick="showToast('success','세부능력 및 특기사항 지원은 준비 중입니다.')">세부능력 및 특기사항 지원</button>
+  </div>
+</div>
+
+<!-- ══════ 채점 액션바 (학생 선택·이동·저장 — 항상 표시) ══════ -->
 <div class="top-bar">
   <button class="btn-back" onclick="goBack()">
     <i data-lucide="arrow-left" style="width:20px;height:20px"></i>
@@ -723,6 +868,7 @@ select.field-input{appearance:none;-webkit-appearance:none;background-image:url(
         </button>
       </div>
       <div class="tb-btn-group">
+        <button class="tb-gear" id="vsGearBtn" title="보기 설정" onclick="toggleVsPop(event)"><i data-lucide="settings-2" style="width:18px;height:18px"></i></button>
         <button class="icon-btn-circle" title="AI 채점 결과 일괄 적용" onclick="location.href='class_ai_bulk_confirm_v1_260521.html?from=' + encodeURIComponent(location.pathname + location.search)"><i data-lucide="stamp" style="width:16px;height:16px"></i></button>
         <button class="btn-save" onclick="saveAndNext()">
           저장 후 다음
@@ -731,6 +877,46 @@ select.field-input{appearance:none;-webkit-appearance:none;background-image:url(
       </div>
     </div>
   </div>
+</div>
+
+<!-- 보기 설정 팝오버 (모달 아님 — 토글 즉시 반영, 자동 저장) -->
+<div class="vs-pop" id="vsPop">
+  <div class="vs-pop-hd">
+    <span class="vs-pop-title"><i data-lucide="settings-2" style="width:16px;height:16px"></i>보기 설정</span>
+    <button class="vs-pop-close" onclick="closeVsPop()"><i data-lucide="x" style="width:16px;height:16px"></i></button>
+  </div>
+  <div class="vs-presets">
+    <button class="vs-preset" id="vsPresetDefault" onclick="applyVsPreset('default')">기본</button>
+    <button class="vs-preset" id="vsPresetSimple" onclick="applyVsPreset('simple')"><i data-lucide="minimize-2" style="width:13px;height:13px"></i>간결 보기</button>
+  </div>
+  <div class="vs-divider"></div>
+  <div class="vs-group">
+    <span class="vs-group-lbl">헤더</span>
+    <div class="vs-row">
+      <span class="vs-row-text">크레딧 헤더 바 표시</span>
+      <button class="vs-switch on" id="vsSwChrome" onclick="toggleVsChrome()" aria-label="크레딧 헤더 바 표시"></button>
+    </div>
+  </div>
+  <div class="vs-group">
+    <span class="vs-group-lbl">AI 결과 글자 크기</span>
+    <div class="vs-seg" id="vsSegFont">
+      <button class="vs-seg-btn s1" onclick="setVsFont('sm')">작게</button>
+      <button class="vs-seg-btn s2 active" onclick="setVsFont('md')">기본</button>
+      <button class="vs-seg-btn s3" onclick="setVsFont('lg')">크게</button>
+    </div>
+  </div>
+  <div class="vs-group">
+    <span class="vs-group-lbl">표시 항목</span>
+    <div class="vs-row">
+      <span class="vs-row-text">채점 근거</span>
+      <button class="vs-switch on" id="vsSwGround" onclick="toggleVsGround()" aria-label="채점 근거 표시"></button>
+    </div>
+    <div class="vs-row">
+      <span class="vs-row-text">AI 피드백</span>
+      <button class="vs-switch on" id="vsSwFeedback" onclick="toggleVsFeedback()" aria-label="AI 피드백 표시"></button>
+    </div>
+  </div>
+  <div class="vs-pop-note">이 화면 보기 방식만 바뀌고, 채점 결과는 그대로예요. 설정은 자동 저장돼요.</div>
 </div>
 
 <!-- ══════ 메인 영역 ══════ -->
@@ -1676,16 +1862,17 @@ var ELEMENTS = [
 function escHtml(s){ return String(s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];}); }
 
 // 편집 가능 블록 (피드백·근거 공용). label이 빈 문자열이면 라벨 텍스트 생략(되돌리기만 우측 정렬)
-function editableBlock(label, value){
+function editableBlock(label, value, variant){
   var orig = escHtml(value);
   var labelHtml = label ? '<div class="ec-block-lbl">'+label+'</div>' : '';
-  return '<div class="ec-block">'
+  var vClass = variant ? ' ec-block--'+variant : '';
+  return '<div class="ec-block'+vClass+'">'
     + labelHtml
     +'<div class="ec-block-content editable" contenteditable="true" data-original="'+orig+'">'+orig+'</div>'
     +'</div>';
 }
-function feedbackBlock(value){ return editableBlock('피드백', value); }
-function groundBlock(value){ return editableBlock('채점 근거', value); }
+function feedbackBlock(value){ return editableBlock('피드백', value, 'feedback'); }
+function groundBlock(value){ return editableBlock('채점 근거', value, 'ground'); }
 // 호환용 — 기존 호출처가 있으면 그대로 ground block 반환 (토글 wrapper 제거)
 function groundToggle(text){ return groundBlock(text); }
 
@@ -1744,8 +1931,9 @@ function renderInstructionCards(){
     var ac = levelAccent(it.level);
     return '<div class="eval-card '+ac+'" data-kind="instruction" data-idx="'+i+'">'
       +'<div class="ec-card-header editable-header" onclick="openInstructionEditModal('+i+')">'
+      +'<span class="ec-num">'+escHtml(it.label)+'</span>'
+      +'<span class="ec-summary-wrap"><span class="ec-summary">'+escHtml(it.summary)+'</span><span class="ec-summary-tip">'+escHtml(it.summary)+'</span></span>'
       +(it.level === 'hidden' ? '' : '<span class="ec-level lv-'+it.level+'">'+LEVEL_LABEL[it.level]+'</span>')
-      +'<span class="ec-title-line"><span class="ec-label">'+escHtml(it.label)+'</span><span class="ec-summary-wrap"><span class="ec-summary">'+escHtml(it.summary)+'</span><span class="ec-summary-tip">'+escHtml(it.summary)+'</span></span></span>'
       +'</div>'
       +'<div class="ec-card-body">'
       +groundBlock(it.explanation)
@@ -1777,23 +1965,12 @@ function renderElementCards(){
   var pane = document.getElementById('pane-rubric');
   pane.innerHTML = ELEMENTS.map(function(el,i){
     var ac = 'ac-neutral'; // 채점요소는 단일 중립 컬러 (도달 수준 색상은 문항 단위까지만)
-    var rubricId = i + 1;
-    var teacherScore = scores[rubricId];
-    var scoreHtml;
-    if(teacherScore === undefined){
-      // 선생님 미선택 — AI 예상치임을 prefix로 명시
-      scoreHtml = '<span class="ai-suggest-prefix">AI 예상</span>'+el.score+' / '+el.maxScore+'점';
-    } else if(teacherScore === el.score){
-      // 같음 — 깔끔하게
-      scoreHtml = teacherScore+' / '+el.maxScore+'점';
-    } else {
-      // 다름 — 선생님 메인 + AI 예상 보조
-      scoreHtml = teacherScore+' / '+el.maxScore+'점<span class="ai-suggest-note">(AI 예상 '+el.score+'점)</span>';
-    }
+    // 우측 점수 알약 = AI 예상 점수 / 만점 (실제 클릭 점수 아님 — Figma 5690:30396 주석)
+    var scoreHtml = el.score + ' / ' + el.maxScore;
     return '<div class="eval-card '+ac+'" data-kind="element" data-idx="'+i+'">'
       +'<div class="ec-card-header readonly-header">'
-      +'<span class="ec-level lv-score">'+scoreHtml+'</span>'
       +'<span class="ec-summary-wrap"><span class="ec-summary">'+escHtml(el.name)+'</span><span class="ec-summary-tip">'+escHtml(el.name)+'</span></span>'
+      +'<span class="ec-score-pill">'+scoreHtml+'</span>'
       +'</div>'
       +'<div class="ec-card-body">'
       +groundBlock(el.explanation)
@@ -2428,6 +2605,9 @@ document.addEventListener('DOMContentLoaded', function(){
       tf.removeAttribute('data-snapshot');
     });
   }
+  // 보기 설정 복원 + 적용
+  loadVsState();
+  applyVsState();
 });
 
 // ══════ 뷰어 ══════
@@ -2450,6 +2630,77 @@ function rotateViewer(d){ viewerRotation=(viewerRotation+d+360)%360; document.ge
   document.addEventListener('mousemove',function(e){ if(!dragging)return; var w=Math.max(360,Math.min(800,startW+(startX-e.clientX))); panel.style.width=w+'px'; });
   document.addEventListener('mouseup',function(){ dragging=false; handle.classList.remove('dragging'); });
 })();
+
+// ══════ 보기 설정 (뷰어/패널 커스터마이즈 — 사용자별 자동 저장) ══════
+var VS_KEY = 'clipo_scoring_view_v1';
+var vsState = { chrome:true, font:'md', ground:true, feedback:true };
+// 좌측 NB 펼침 토글 (기본 보기 크롬)
+function toggleNav(){ var sb=document.getElementById('iconSb'); if(sb){ sb.classList.toggle('expanded'); document.body.classList.toggle('nav-expanded'); } }
+
+function loadVsState(){
+  try{ var s = JSON.parse(localStorage.getItem(VS_KEY)); if(s) vsState = Object.assign(vsState, s); }catch(e){}
+}
+function saveVsState(){ try{ localStorage.setItem(VS_KEY, JSON.stringify(vsState)); }catch(e){} }
+
+function applyVsState(){
+  document.body.classList.toggle('vs-chrome', vsState.chrome);
+  document.body.classList.toggle('vs-font-sm', vsState.font==='sm');
+  document.body.classList.toggle('vs-font-lg', vsState.font==='lg');
+  document.body.classList.toggle('vs-hide-ground', !vsState.ground);
+  document.body.classList.toggle('vs-hide-feedback', !vsState.feedback);
+  syncVsUI();
+}
+function syncVsUI(){
+  var sw=function(id,on){ var e=document.getElementById(id); if(e) e.classList.toggle('on', on); };
+  sw('vsSwChrome', vsState.chrome);
+  sw('vsSwGround', vsState.ground);
+  sw('vsSwFeedback', vsState.feedback);
+  var seg=document.getElementById('vsSegFont');
+  if(seg){ var map={sm:0,md:1,lg:2}; Array.prototype.forEach.call(seg.children,function(b,i){ b.classList.toggle('active', i===map[vsState.font]); }); }
+  var isDefault=(vsState.chrome && vsState.ground && vsState.feedback && vsState.font==='md');
+  var isSimple=(!vsState.chrome && vsState.ground && vsState.feedback && vsState.font==='md');
+  var pd=document.getElementById('vsPresetDefault'), ps=document.getElementById('vsPresetSimple');
+  if(pd) pd.classList.toggle('active', isDefault);
+  if(ps) ps.classList.toggle('active', isSimple);
+}
+function toggleVsChrome(){ vsState.chrome=!vsState.chrome; applyVsState(); saveVsState(); }
+function toggleVsGround(){
+  if(vsState.ground && !vsState.feedback){ showToast('error','채점 근거와 피드백 중 하나는 켜 두세요.'); return; }
+  vsState.ground=!vsState.ground; applyVsState(); saveVsState();
+}
+function toggleVsFeedback(){
+  if(vsState.feedback && !vsState.ground){ showToast('error','채점 근거와 피드백 중 하나는 켜 두세요.'); return; }
+  vsState.feedback=!vsState.feedback; applyVsState(); saveVsState();
+}
+function setVsFont(f){ vsState.font=f; applyVsState(); saveVsState(); }
+function applyVsPreset(p){
+  if(p==='default'){ vsState={chrome:true,font:'md',ground:true,feedback:true}; }
+  else if(p==='simple'){ vsState={chrome:false,font:'md',ground:true,feedback:true}; }
+  applyVsState(); saveVsState();
+}
+
+// 팝오버 열고/닫기 + 위치 (상단바 보이면 기어버튼, 숨김이면 floating 버튼에 앵커)
+function toggleVsPop(ev){ if(ev) ev.stopPropagation(); var pop=document.getElementById('vsPop'); if(pop.classList.contains('show')){ closeVsPop(); } else { openVsPop(); } }
+function openVsPop(){
+  var pop=document.getElementById('vsPop');
+  var anchor=document.getElementById('vsGearBtn');
+  pop.classList.add('show');
+  var g=document.getElementById('vsGearBtn'); if(g) g.classList.add('on');
+  var r=anchor.getBoundingClientRect(), w=pop.offsetWidth, h=pop.offsetHeight;
+  var left=Math.max(12, Math.min(r.right-w, window.innerWidth-w-12));
+  var top=r.bottom+8;
+  if(top+h>window.innerHeight-12) top=Math.max(12, r.top-h-8);
+  pop.style.left=left+'px'; pop.style.top=top+'px';
+  lucide.createIcons();
+}
+function closeVsPop(){ document.getElementById('vsPop').classList.remove('show'); var g=document.getElementById('vsGearBtn'); if(g) g.classList.remove('on'); }
+document.addEventListener('click', function(e){
+  var pop=document.getElementById('vsPop');
+  if(!pop || !pop.classList.contains('show')) return;
+  if(pop.contains(e.target) || e.target.closest('#vsGearBtn')) return;
+  closeVsPop();
+});
+document.addEventListener('keydown', function(e){ if(e.key==='Escape') closeVsPop(); });
 
 // ══════ 토스트 ══════
 var toastTimer=null;
