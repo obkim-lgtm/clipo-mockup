@@ -282,6 +282,13 @@
     #mockpick .mp-btn.on{ background:#416bff; color:#fff; border-color:#416bff; }
     #mockpick .mp-sub{ font-size:11px; font-weight:600; color:#8A8FB0; margin-left:8px; }
     #mockpick .mp-btn.on .mp-sub{ color:#D6E2FF; }
+    #mockpick .mp-head-l{ display:inline-flex; align-items:center; gap:6px; }
+    #mockpick .mp-mini{ display:none; }
+    #mockpick.mp-collapsed{ padding:4px; }
+    #mockpick.mp-collapsed .mp-head{ padding:7px 10px; margin:0; }
+    #mockpick.mp-collapsed .mp-body{ display:none; }
+    #mockpick.mp-collapsed .mp-full{ display:none; }
+    #mockpick.mp-collapsed .mp-mini{ display:inline; }
     .form-promo{ background:#e9f2ff; border-bottom:1px solid #d4e1ff; }
     .form-promo .fp-inner{ max-width:1240px; margin:0 auto; padding:12px 32px; display:flex; align-items:center; gap:10px; }
     .form-promo .fp-inner > i{ width:18px; height:18px; color:#3151c4; flex-shrink:0; }
@@ -2855,10 +2862,9 @@ function mpGo(which){
   if (window.lucide) lucide.createIcons();
 }
 function mpToggle(){
-  var b = document.getElementById('mp-body'), c = document.getElementById('mp-caret');
-  var open = b.style.display !== 'none';
-  b.style.display = open ? 'none' : 'flex';
-  if (c) c.style.transform = open ? 'rotate(180deg)' : '';
+  var mp = document.getElementById('mockpick'), c = document.getElementById('mp-caret');
+  var collapsed = mp.classList.toggle('mp-collapsed');
+  if (c) c.style.transform = collapsed ? 'rotate(180deg)' : '';
 }
 function mpSyncActive(){
   var active = document.querySelector('.screen.active');
@@ -4509,7 +4515,7 @@ applyDeidState();
 <!-- ===== 까망이 목업 화면 선택기 (드래그·접기 · 실제 화면 아님) ===== -->
 <div id="mockpick">
   <div class="mp-head" onclick="mpToggle()">
-    <span style="display:inline-flex;align-items:center;gap:6px;"><i data-lucide="layout-grid" style="width:13px;height:13px;"></i>MOCKUP · 화면 보기</span>
+    <span class="mp-head-l"><i data-lucide="layout-grid" style="width:13px;height:13px;"></i><span class="mp-full">MOCKUP · 화면 보기</span><span class="mp-mini">화면</span></span>
     <i id="mp-caret" data-lucide="chevron-down" style="width:14px;height:14px;"></i>
   </div>
   <div id="mp-body" class="mp-body">
