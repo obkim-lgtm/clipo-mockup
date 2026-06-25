@@ -69,6 +69,15 @@
 
     /* ===== 평가 카드 ===== */
     .ev-card{ background:white; border-radius:12px; padding:24px; box-shadow:0 0 1px #2226314D, 0 2px 8px #0000000F; }
+    /* 카드 접기 (평가 단위) */
+    .ev-card-hd{ display:flex; align-items:flex-start; justify-content:space-between; margin-bottom:16px; gap:16px; }
+    .ev-card.collapsed .ev-card-hd{ margin-bottom:0; }
+    .ev-card.collapsed > .tbl2{ display:none; }
+    .ev-card-hd-l{ display:flex; align-items:center; gap:8px; cursor:pointer; min-width:0; }
+    .card-fold-btn{ display:inline-flex; align-items:center; justify-content:center; width:28px; height:28px; flex-shrink:0; border:none; background:none; padding:0; border-radius:6px; cursor:pointer; color:#6d7381; line-height:1; vertical-align:middle; transition:transform .2s ease, background .15s ease; }
+    .card-fold-btn:hover{ background:#f1f3f5; }
+    .card-fold-btn i, .card-fold-btn svg{ width:20px; height:20px; }
+    .ev-card.collapsed .card-fold-btn{ transform:rotate(-90deg); }
 
     /* ===== 둥근 모서리 테이블 (피그마) ===== */
     .tbl2{ width:100%; border-collapse:separate; border-spacing:0; }
@@ -397,10 +406,13 @@
 
         <!-- 카드 1: 선생님 업로드 평가 -->
         <div class="ev-card">
-          <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:16px;gap:16px;">
-            <div style="display:flex;flex-direction:column;gap:4px;">
-              <h3 style="font-size:18px;font-weight:600;color:#222631;margin:0;">선생님 업로드 평가</h3>
-              <p style="font-size:14px;color:#6d7381;margin:0;">선생님 과제물 업로드 · 마감 완료</p>
+          <div class="ev-card-hd">
+            <div class="ev-card-hd-l" onclick="toggleEvCard(this)">
+              <button type="button" class="card-fold-btn" aria-label="카드 접기/펼치기"><i data-lucide="chevron-down"></i></button>
+              <div style="display:flex;flex-direction:column;gap:4px;">
+                <h3 style="font-size:18px;font-weight:600;color:#222631;margin:0;">선생님 업로드 평가</h3>
+                <p style="font-size:14px;color:#6d7381;margin:0;">선생님 과제물 업로드 · 마감 완료</p>
+              </div>
             </div>
             <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;">
               <span class="form-chip" id="form-chip-A">미등록</span>
@@ -481,10 +493,13 @@
 
         <!-- 카드 2: 학생 업로드 평가 -->
         <div class="ev-card">
-          <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:16px;gap:16px;">
-            <div style="display:flex;flex-direction:column;gap:4px;">
-              <h3 style="font-size:18px;font-weight:600;color:#222631;margin:0;">학생 업로드 평가</h3>
-              <p style="font-size:14px;color:#6d7381;margin:0;">학생이 직접 제출 · 마감 완료</p>
+          <div class="ev-card-hd">
+            <div class="ev-card-hd-l" onclick="toggleEvCard(this)">
+              <button type="button" class="card-fold-btn" aria-label="카드 접기/펼치기"><i data-lucide="chevron-down"></i></button>
+              <div style="display:flex;flex-direction:column;gap:4px;">
+                <h3 style="font-size:18px;font-weight:600;color:#222631;margin:0;">학생 업로드 평가</h3>
+                <p style="font-size:14px;color:#6d7381;margin:0;">학생이 직접 제출 · 마감 완료</p>
+              </div>
             </div>
             <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;">
               <span class="form-chip" id="form-chip-B">미등록</span>
@@ -689,10 +704,13 @@
 
       <!-- 카드 1: 선생님 업로드 평가 (마감 완료) -->
       <div class="ev-card">
-        <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:16px;gap:16px;">
-          <div style="display:flex;flex-direction:column;gap:4px;">
-            <h3 style="font-size:18px;font-weight:600;color:#222631;margin:0;">선생님 업로드 평가</h3>
-            <p style="font-size:14px;color:#6d7381;margin:0;">AI 채점 가능 · 마감 완료</p>
+        <div class="ev-card-hd">
+          <div class="ev-card-hd-l" onclick="toggleEvCard(this)">
+            <button type="button" class="card-fold-btn" aria-label="카드 접기/펼치기"><i data-lucide="chevron-down"></i></button>
+            <div style="display:flex;flex-direction:column;gap:4px;">
+              <h3 style="font-size:18px;font-weight:600;color:#222631;margin:0;">선생님 업로드 평가</h3>
+              <p style="font-size:14px;color:#6d7381;margin:0;">AI 채점 가능 · 마감 완료</p>
+            </div>
           </div>
           <div style="display:flex;gap:10px;flex-shrink:0;">
             <button class="btn btn-secondary btn-sm" onclick="showToast('결과 공개 설정은 이 목업에서 제공하지 않습니다.','info')"><i data-lucide="share-2" style="width:14px;height:14px;"></i>결과 공개</button>
@@ -750,10 +768,13 @@
 
       <!-- 카드 2: 학생 업로드 평가 (마감 전) -->
       <div class="ev-card">
-        <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:16px;gap:16px;">
-          <div style="display:flex;flex-direction:column;gap:4px;">
-            <h3 style="font-size:18px;font-weight:600;color:#222631;margin:0;">학생 업로드 평가</h3>
-            <p style="font-size:14px;color:#6d7381;margin:0;">AI 채점 가능 · 마감 전</p>
+        <div class="ev-card-hd">
+          <div class="ev-card-hd-l" onclick="toggleEvCard(this)">
+            <button type="button" class="card-fold-btn" aria-label="카드 접기/펼치기"><i data-lucide="chevron-down"></i></button>
+            <div style="display:flex;flex-direction:column;gap:4px;">
+              <h3 style="font-size:18px;font-weight:600;color:#222631;margin:0;">학생 업로드 평가</h3>
+              <p style="font-size:14px;color:#6d7381;margin:0;">AI 채점 가능 · 마감 전</p>
+            </div>
           </div>
           <div style="display:flex;gap:10px;flex-shrink:0;">
             <button class="btn btn-secondary btn-sm" onclick="showToast('결과 공개 설정은 이 목업에서 제공하지 않습니다.','info')"><i data-lucide="share-2" style="width:14px;height:14px;"></i>결과 공개</button>
@@ -2815,6 +2836,11 @@ function fmRegister() {
   showScreen('screen-task');
 }
 
+// 평가 카드 접기/펼치기
+function toggleEvCard(el){
+  var card = el.closest('.ev-card');
+  if (card) card.classList.toggle('collapsed');
+}
 // ===== 까망이 목업 화면 선택기 =====
 function mpGo(which){
   if (which === 'task')              showScreen('screen-task');
