@@ -82,6 +82,20 @@
     .card-fold-btn i, .card-fold-btn svg{ width:20px; height:20px; }
     .ev-card.collapsed .card-fold-btn{ transform:rotate(-90deg); }
 
+    /* 개인정보 비식별화 안내 */
+    .deid-box{ background:#e9f2ff; border-radius:10px; padding:14px 16px; display:flex; align-items:flex-start; gap:10px; }
+    .deid-ico{ width:36px; height:36px; border-radius:9px; background:#d4e3ff; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+    .deid-ico i{ width:20px; height:20px; color:#416bff; }
+    .deid-body{ flex:1; min-width:0; }
+    .deid-title{ font-size:15px; font-weight:700; color:#1f47b3; line-height:1.4; margin:0 0 3px; }
+    .deid-desc{ font-size:14px; font-weight:500; color:#45517a; line-height:1.6; margin:0; }
+    .deid-dismiss{ font-size:13px; font-weight:600; color:#6d7381; background:none; border:none; cursor:pointer; flex-shrink:0; padding:4px 2px; line-height:1; align-self:flex-start; }
+    .deid-dismiss:hover{ color:#416bff; text-decoration:underline; }
+    .deid-mini{ display:inline-flex; align-items:center; gap:6px; font-size:13px; font-weight:600; color:#6d7381; }
+    .deid-mini i{ width:15px; height:15px; color:#416bff; }
+    .deid-mini .undo{ color:#416bff; cursor:pointer; margin-left:4px; }
+    .deid-mini .undo:hover{ text-decoration:underline; }
+
     /* ===== 둥근 모서리 테이블 (피그마) ===== */
     .tbl2{ width:100%; border-collapse:separate; border-spacing:0; }
     .tbl2 th{ background:#f6f7f9; height:44px; font-size:15px; font-weight:500; color:#3b3f4c; padding:0 12px; text-align:center; border-top:1px solid #dde1e8; border-bottom:1px solid #dde1e8; }
@@ -412,6 +426,16 @@
     .form-promo .fp-dismiss:hover{ color:#3151c4; text-decoration:underline; text-underline-offset:2px; }
     /* 데모 플로우 점프 네비 (우하단 검은 패널) */
     .demo-nav{ position:fixed; right:24px; bottom:24px; z-index:400; background:#222631; color:#fff; border-radius:14px; padding:14px 16px; width:236px; box-shadow:0 8px 24px rgba(0,0,0,.3); user-select:none; cursor:move; }
+    /* 까망이 목업 화면 선택기 */
+    #mockpick{ position:fixed; right:24px; bottom:24px; z-index:3000; background:#1F2233; border-radius:14px; padding:8px; box-shadow:0 10px 30px rgba(0,0,0,.35); width:max-content; max-width:360px; cursor:move; user-select:none; font-family:inherit; }
+    #mockpick .mp-head{ font-size:11px; font-weight:800; color:#8A8FB0; letter-spacing:.04em; display:flex; align-items:center; justify-content:space-between; gap:16px; padding:6px 8px; cursor:pointer; }
+    #mockpick .mp-body{ display:flex; flex-direction:column; gap:6px; margin-top:6px; }
+    #mockpick .mp-cap{ font-size:10px; font-weight:800; color:#6B6F8C; letter-spacing:.05em; padding:7px 8px 2px; }
+    #mockpick .mp-btn{ width:100%; text-align:left; white-space:nowrap; padding:9px 12px; border-radius:9px; border:1px solid #3A3F58; background:#2A2E44; color:#C9CCE0; font-size:13px; font-weight:700; font-family:inherit; cursor:pointer; line-height:1.35; }
+    #mockpick .mp-btn:hover{ background:#33384f; }
+    #mockpick .mp-btn.on{ background:#416bff; color:#fff; border-color:#416bff; }
+    #mockpick .mp-sub{ font-size:11px; font-weight:600; color:#8A8FB0; margin-left:8px; }
+    #mockpick .mp-btn.on .mp-sub{ color:#D6E2FF; }
     body.dn-dragging{ user-select:none; cursor:move; }
     .dn-title{ font-size:12px; font-weight:700; letter-spacing:1.5px; color:#b3b6bd; margin-bottom:10px; display:flex; align-items:center; justify-content:space-between; cursor:move; padding:2px 0 6px; }
     .dn-step{ display:flex; align-items:center; gap:9px; padding:7px 8px; border-radius:8px; font-size:13.5px; font-weight:500; color:#c7cbd3; cursor:pointer; }
@@ -473,7 +497,7 @@
   <div class="form-promo" id="form-promo">
     <div class="fp-inner">
       <i data-lucide="sparkles"></i>
-      <span class="fp-txt"><b>과제물 양식</b>을 등록해 두면 채점할 때 지시문과 학생 답을 더 정확히 구분해 인식해요. 각 평가의 <b>과제물 양식</b> 버튼에서 빈 문제지를 한 번만 올려두세요.</span>
+      <span class="fp-txt"><b>과제물 양식</b> 버튼을 눌러 빈 문제지를 올려보세요. AI가 문제와 학생 답을 더 잘 구분해 <b>채점 정확도가 높아져요</b>.</span>
       <button class="fp-dismiss" onclick="dismissFormPromo()">다시 보지 않기</button>
     </div>
   </div>
@@ -1104,6 +1128,20 @@
           <i data-lucide="alert-triangle" style="width:18px;height:18px;color:#f97316;flex-shrink:0;margin-top:1px;"></i>
           <div style="font-size:14px;color:#9a3412;line-height:1.55;">이미 <b>설문 응답 자료</b>가 등록돼 있어요. PDF를 등록하면 <b>기존 설문 자료와 채점 결과가 교체</b>돼요. 한 학급에는 한 종류의 자료만 등록할 수 있어요.</div>
         </div>
+
+        <!-- 개인정보 비식별화 안내 -->
+        <div class="deid-box" id="deid-bulk" style="margin-bottom:16px;">
+          <div class="deid-ico"><i data-lucide="shield-check"></i></div>
+          <div class="deid-body">
+            <p class="deid-title">학생 개인정보는 안전하게 보호돼요</p>
+            <p class="deid-desc">학번·이름은 <b>자동으로 가려진 채</b> AI 채점돼요. 선생님 화면에는 그대로 보여서 채점에는 지장이 없어요.</p>
+          </div>
+          <button class="deid-dismiss" onclick="dismissDeid()">다시 보지 않기</button>
+        </div>
+        <div id="deidmini-bulk" style="display:none;margin-bottom:16px;">
+          <span class="deid-mini"><i data-lucide="shield-check"></i>개인정보 비식별화 적용 중<span class="undo" onclick="restoreDeid()">자세히</span></span>
+        </div>
+
         <div class="ev-card">
           <div style="background:white;border:1px dashed #b3b3b3;border-radius:12px;padding:40px 24px;min-height:228px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;text-align:center;">
             <i data-lucide="upload-cloud" style="width:48px;height:48px;color:#6d7381;"></i>
@@ -1798,6 +1836,10 @@
     </div>
     <div style="padding:0 24px;display:flex;flex-direction:column;gap:20px;">
       <p style="font-size:16px;font-weight:400;line-height:1.55;color:#222631;margin:0;">가장 먼저 올린 파일 1개만 채점·OCR 대상이 됩니다. 나머지 파일은 참고용으로 함께 보관됩니다.</p>
+      <!-- 개인정보 비식별화 안내 (한 줄) -->
+      <div style="display:inline-flex;align-items:center;gap:7px;font-size:14px;font-weight:500;color:#6d7381;">
+        <i data-lucide="shield-check" style="width:16px;height:16px;color:#416bff;flex-shrink:0;"></i>학번·이름은 가린 채 AI 채점돼요
+      </div>
       <div style="background:#e9f2ff;border:1px solid #ccdfff;border-radius:4px;padding:12px;">
         <ul style="list-style:disc;padding-left:24px;margin:0;font-size:15px;font-weight:400;line-height:1.55;color:#3151c4;">
           <li>여러 파일을 올릴 수 있어요 (채점·OCR은 가장 먼저 올린 파일만)</li>
@@ -4749,8 +4791,23 @@ function closeDesignSavedModal(goUpload) {
   }
 }
 
+// ── 개인정보 비식별화 안내: 다시 보지 않기 (일괄·개별 공통) ──
+var DEID_KEY = 'clipo_deid_hide';
+function applyDeidState() {
+  var hidden = localStorage.getItem(DEID_KEY) === '1';
+  ['bulk'].forEach(function(k) {
+    var box = document.getElementById('deid-' + k);
+    var mini = document.getElementById('deidmini-' + k);
+    if (box) box.style.display = hidden ? 'none' : 'flex';
+    if (mini) mini.style.display = hidden ? 'block' : 'none';
+  });
+}
+function dismissDeid() { localStorage.setItem(DEID_KEY, '1'); applyDeidState(); }
+function restoreDeid() { localStorage.removeItem(DEID_KEY); applyDeidState(); }
+
 // 초기화
 renderTable();
+applyDeidState();
 lucide.createIcons();
 
 // URL 해시 라우팅
@@ -4930,13 +4987,56 @@ function syncDemoNavs(){
   var active = document.querySelector('.screen.active');
   var id = active ? active.id : '';
   var nav = document.getElementById('demoNav');
-  if (nav) nav.style.display = (id === 'screen-task' || id === 'screen-list' || id === 'screen-upload' || id === 'screen-survey-grade') ? '' : 'none';
+  if (nav) nav.style.display = (id === 'screen-list' || id === 'screen-upload' || id === 'screen-survey-grade') ? '' : 'none';
   var navS = document.getElementById('demoNavScoring');
   if (navS) navS.style.display = (id === 'screen-scoring' || id === 'screen-ocr-b') ? '' : 'none';
+  var mp = document.getElementById('mockpick');
+  if (mp) mp.style.display = (id === 'screen-task' || id === 'screen-form' || id === 'screen-design') ? '' : 'none';
+  if (typeof mpSyncActive === 'function') mpSyncActive();
+}
+// ===== 까망이 목업 화면 선택기 =====
+function mpGo(which){
+  if (which === 'task')         showScreen('screen-task');
+  else if (which === 'list')    showListForClass(1, 'A');
+  else if (which === 'form')    openFormScreen('A');
+  else if (which === 'scoring') goScoringList();
+  else if (which === 'design')  goDesignList();
+  if (window.lucide) lucide.createIcons();
+}
+function mpToggle(){
+  var b = document.getElementById('mp-body'), c = document.getElementById('mp-caret');
+  var open = b.style.display !== 'none';
+  b.style.display = open ? 'none' : 'flex';
+  if (c) c.style.transform = open ? 'rotate(180deg)' : '';
+}
+function mpSyncActive(){
+  var active = document.querySelector('.screen.active');
+  var id = active ? active.id : '';
+  var key = '';
+  if (id === 'screen-task') key = 'task';
+  else if (id === 'screen-list') key = 'list';
+  else if (id === 'screen-form') key = 'form';
+  else if (id === 'screen-scoring') key = 'scoring';
+  else if (id === 'screen-design') key = 'design';
+  document.querySelectorAll('#mockpick .mp-btn').forEach(function(b){ b.classList.toggle('on', b.dataset.k === key); });
+}
+function mpInitDrag(){
+  var el = document.getElementById('mockpick'); if (!el) return;
+  var dx=0, dy=0, drag=false;
+  el.addEventListener('mousedown', function(e){
+    if (e.target.closest('button')) return;
+    drag=true; var r=el.getBoundingClientRect();
+    dx=e.clientX-r.left; dy=e.clientY-r.top;
+    el.style.right='auto'; el.style.bottom='auto'; el.style.left=r.left+'px'; el.style.top=r.top+'px';
+    e.preventDefault();
+  });
+  document.addEventListener('mousemove', function(e){ if(!drag) return; el.style.left=(e.clientX-dx)+'px'; el.style.top=(e.clientY-dy)+'px'; });
+  document.addEventListener('mouseup', function(){ drag=false; });
 }
 function setupDemoNav(){
   bindDemoNav(document.getElementById('demoNav'), goDemo);
   bindDemoNav(document.getElementById('demoNavScoring'), goDemoScoring);
+  mpInitDrag();
   syncDemoNavs();
   // 외부(과제물 관리 화면 등)에서 ?demo=N 으로 설문 플로우 특정 단계 바로 진입
   var dm = new URLSearchParams(location.search).get('demo');
@@ -4964,6 +5064,21 @@ window.addEventListener('load', setupDemoNav);
   <div class="dn-step" data-step="3"><span class="n">3</span>OCR 먼저 확인</div>
   <div class="dn-step" data-step="4"><span class="n">4</span>학급 채점 현황</div>
   <div class="dn-step" data-step="5"><span class="n">5</span>학생 채점 상세</div>
+</div>
+
+<!-- ===== 까망이 목업 화면 선택기 (드래그·접기 · 실제 화면 아님) ===== -->
+<div id="mockpick">
+  <div class="mp-head" onclick="mpToggle()">
+    <span style="display:inline-flex;align-items:center;gap:6px;"><i data-lucide="layout-grid" style="width:13px;height:13px;"></i>MOCKUP · 화면 보기</span>
+    <i id="mp-caret" data-lucide="chevron-down" style="width:14px;height:14px;"></i>
+  </div>
+  <div id="mp-body" class="mp-body">
+    <button class="mp-btn" data-k="task" onclick="mpGo('task')">과제물 관리 목록</button>
+    <button class="mp-btn" data-k="list" onclick="mpGo('list')">학급 제출 상세 <span class="mp-sub">제출·미제출 현황</span></button>
+    <button class="mp-btn" data-k="form" onclick="mpGo('form')">과제물 양식 등록 <span class="mp-sub">공통·반별</span></button>
+    <button class="mp-btn" data-k="scoring" onclick="mpGo('scoring')">채점 목록 <span class="mp-sub">AI 채점·재실행</span></button>
+    <button class="mp-btn" data-k="design" onclick="mpGo('design')">평가 설계 목록</button>
+  </div>
 </div>
 
 </body>
