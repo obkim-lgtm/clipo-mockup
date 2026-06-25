@@ -802,6 +802,23 @@ body.vs-hide-topbar .vs-float{display:inline-flex}
 .vs-seg-val{flex:1.1;border:none;border-radius:8px;background:#fff;color:#365eef;font-weight:700;font-size:14px;cursor:pointer;font-family:inherit;line-height:1;box-shadow:0 1px 3px rgba(0,0,0,.1);display:inline-flex;align-items:center;justify-content:center;height:38px}
 .vs-seg-val:hover{color:#3151c4}
 .vs-divider{height:1px;background:#eaecf0}
+/* 레이아웃 액션 행 (좌우 너비 조절 안내) */
+.vs-action-btn{display:flex;align-items:center;gap:8px;width:100%;height:42px;padding:0 12px;border:1px solid #dde1e8;border-radius:10px;background:#fff;color:#222631;font-size:15px;font-weight:600;cursor:pointer;font-family:inherit;line-height:1}
+.vs-action-btn:hover{border-color:#a3c3ff;background:#f4f8ff;color:#365eef}
+.vs-action-btn i{color:#6d7381;flex-shrink:0}
+.vs-action-btn:hover i{color:#365eef}
+.vs-action-sub{margin-left:auto;font-size:13px;font-weight:500;color:#9aa0ac}
+/* 리사이즈 핸들 강조(안내 모드) + 코치마크 */
+.resize-handle.guide{width:14px;background:#dbe7ff;z-index:120;animation:whPulse 1.3s ease-in-out infinite}
+.resize-handle.guide .resize-grip span{background:#365eef}
+@keyframes whPulse{0%,100%{box-shadow:0 0 0 2px #4f7bff}50%{box-shadow:0 0 0 6px rgba(79,123,255,.3)}}
+.width-coach{position:fixed;z-index:1300;background:#222631;color:#fff;border-radius:10px;box-shadow:0 8px 24px rgba(0,0,0,.28);padding:12px 14px;max-width:232px;display:none}
+.width-coach.show{display:block}
+.width-coach .wc-body{display:flex;gap:8px;align-items:flex-start;font-size:13px;font-weight:500;line-height:1.55}
+.width-coach .wc-body i{color:#9ec3ff;flex-shrink:0;margin-top:1px}
+.width-coach .wc-hint{display:block;margin-top:8px;font-size:12px;color:#b3b6bd}
+.width-coach .wc-arrow{position:absolute;right:-5px;top:50%;transform:translateY(-50%) rotate(45deg);width:10px;height:10px;background:#222631}
+.width-coach.flip .wc-arrow{right:auto;left:-5px}
 </style>
 </head>
 <body class="vs-chrome">
@@ -912,6 +929,10 @@ body.vs-hide-topbar .vs-float{display:inline-flex}
     </div>
   </div>
   <div class="vs-group">
+    <span class="vs-group-lbl">레이아웃</span>
+    <button class="vs-action-btn" onclick="startWidthGuide(event)"><i data-lucide="move-horizontal" style="width:16px;height:16px"></i>좌우 너비 조절<span class="vs-action-sub">잡고 드래그</span></button>
+  </div>
+  <div class="vs-group">
     <span class="vs-group-lbl">AI 결과 글자 크기</span>
     <div class="vs-seg" id="vsSegFont">
       <button class="vs-seg-btn s1" id="vsFontDown" onclick="stepFont(-1)">작게</button>
@@ -931,6 +952,13 @@ body.vs-hide-topbar .vs-float{display:inline-flex}
     </div>
   </div>
   <div class="vs-pop-note">이 화면 보기 방식만 바뀌고, 채점 결과는 그대로예요. 설정은 자동 저장돼요.</div>
+</div>
+
+<!-- 좌우 너비 조절 코치마크 -->
+<div class="width-coach" id="widthCoach">
+  <div class="wc-body"><i data-lucide="move-horizontal" style="width:15px;height:15px"></i><span>이 손잡이를 잡고 좌우로 드래그하면 답안·채점 영역 너비가 조절돼요.</span></div>
+  <span class="wc-hint">잡으면 안내가 사라져요</span>
+  <span class="wc-arrow"></span>
 </div>
 
 <!-- ══════ 메인 영역 ══════ -->
@@ -2635,7 +2663,7 @@ function rotateViewer(d){ viewerRotation=(viewerRotation+d+360)%360; document.ge
 (function(){
   var handle=document.getElementById('resizeHandle'), panel=document.querySelector('.grading-panel'), wrap=document.getElementById('mainWrap');
   var dragging=false, startX=0, startW=0;
-  handle.addEventListener('mousedown',function(e){ dragging=true; startX=e.clientX; startW=panel.offsetWidth; handle.classList.add('dragging'); e.preventDefault(); });
+  handle.addEventListener('mousedown',function(e){ endWidthGuide(); dragging=true; startX=e.clientX; startW=panel.offsetWidth; handle.classList.add('dragging'); e.preventDefault(); });
   document.addEventListener('mousemove',function(e){ if(!dragging)return; var w=Math.max(360,Math.min(800,startW+(startX-e.clientX))); panel.style.width=w+'px'; });
   document.addEventListener('mouseup',function(){ dragging=false; handle.classList.remove('dragging'); });
 })();
@@ -2712,13 +2740,42 @@ function openVsPop(){
   lucide.createIcons();
 }
 function closeVsPop(){ document.getElementById('vsPop').classList.remove('show'); var g=document.getElementById('vsGearBtn'); if(g) g.classList.remove('on'); }
+
+// ── 좌우 너비 조절 안내(코치마크) ──
+function startWidthGuide(ev){
+  if(ev) ev.stopPropagation();
+  closeVsPop();
+  var h=document.getElementById('resizeHandle'); if(h) h.classList.add('guide');
+  var c=document.getElementById('widthCoach'); if(c) c.classList.add('show');
+  positionWidthCoach();
+  if(typeof lucide!=='undefined') lucide.createIcons();
+}
+function positionWidthCoach(){
+  var h=document.getElementById('resizeHandle'), c=document.getElementById('widthCoach');
+  if(!h||!c||!c.classList.contains('show')) return;
+  var r=h.getBoundingClientRect(), cw=c.offsetWidth, ch=c.offsetHeight;
+  var leftPos=r.left - cw - 12;
+  if(leftPos < 12){ // 왼쪽 공간 부족 → 핸들 오른쪽에 배치(플립)
+    c.classList.add('flip');
+    c.style.left=Math.min(window.innerWidth-cw-12, r.right + 12)+'px';
+  } else {
+    c.classList.remove('flip');
+    c.style.left=leftPos+'px';
+  }
+  c.style.top=Math.min(window.innerHeight-ch-16, Math.max(72, (r.top+r.bottom)/2 - ch/2))+'px';
+}
+function endWidthGuide(){
+  var h=document.getElementById('resizeHandle'); if(h) h.classList.remove('guide');
+  var c=document.getElementById('widthCoach'); if(c) c.classList.remove('show');
+}
+window.addEventListener('resize', positionWidthCoach);
 document.addEventListener('click', function(e){
   var pop=document.getElementById('vsPop');
   if(!pop || !pop.classList.contains('show')) return;
   if(pop.contains(e.target) || e.target.closest('#vsGearBtn')) return;
   closeVsPop();
 });
-document.addEventListener('keydown', function(e){ if(e.key==='Escape') closeVsPop(); });
+document.addEventListener('keydown', function(e){ if(e.key==='Escape'){ closeVsPop(); endWidthGuide(); } });
 
 // ══════ 토스트 ══════
 var toastTimer=null;
