@@ -651,6 +651,19 @@ select.field-input{appearance:none;-webkit-appearance:none;background-image:url(
 .rai-sec-text{font-size:15px;color:#3b3f4c;line-height:1.65;padding:12px 14px;background:#f6f7f9;border-radius:8px;white-space:pre-wrap}
 .rai-sec-text.editable{background:#fff;border:1px solid #dde1e8;cursor:text}
 .rai-sec-text.editable:focus{outline:none;border-color:#365eef}
+/* 루브릭 AI 피드백 빈 상태 (Figma 5713:32115) — 보라 '피드백 생성' 버튼 + 안내문 인라인 */
+.rubric-empty{display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.rubric-empty-text{font-size:14px;color:#52525b;line-height:1.55}
+.btn-rubric-gen{display:inline-flex;align-items:center;justify-content:center;gap:4px;height:32px;padding:8px 10px;border-radius:9999px;background:#ebdfff;color:#5d26c4;border:none;box-shadow:0 0 0 1px #d5bfff;font-size:13px;font-weight:500;cursor:pointer;font-family:inherit;line-height:1.25}
+.btn-rubric-gen:hover{background:#e3d2ff}
+.btn-rubric-gen i{color:#5d26c4}
+/* 도움말(?) 우측 배치 시 팝오버 우측 정렬(패널 밖으로 안 잘리게) */
+.help-tip--right .help-tip-pop{left:auto;right:0;transform:none}
+.help-tip--right .help-tip-pop::before{left:auto;right:14px}
+/* 루브릭 AI 생성 카드 — 문항별/채점요소별과 동일한 eval-card 스타일(Figma 5690:30717) */
+#rubricAiPane .ec-card-header{background:#e9f2ff}
+#rubricAiPane .ec-summary{color:#18181b;font-size:15px}
+.rai-ground-ro{padding:10px 12px;border-radius:10px;background:#f6f7f9;border:1px solid #eaecf0;font-size:var(--ai-font,16px);color:#3b3f4c;line-height:1.7;white-space:pre-wrap}
 .rai-footer{display:flex;justify-content:flex-end;padding:4px 0 0 0}
 .rai-regen-btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;height:38px;padding:0 16px;border-radius:100px;background:#fff;border:1px solid #ccdfff;color:#3151c4;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;line-height:1}
 .rai-regen-btn:hover{background:#f4f8ff;border-color:#a3c3ff}
@@ -1115,32 +1128,27 @@ body.vs-hide-topbar .vs-float{display:inline-flex}
     <div class="pn-section white-bg" id="rubricAiSection">
       <div class="pn-section-hd">
         <div class="pn-section-hd-left">
-          <i data-lucide="list-checks" style="width:20px;height:20px;color:#0284c7"></i>
-          <span class="pn-section-title">루브릭 기반 AI 피드백</span>
-          <span class="help-tip">
-            <button type="button" class="help-tip-btn" onclick="toggleHelpTip(this,event)" aria-label="루브릭 기반 AI 피드백 설명"><i data-lucide="circle-help" style="width:16px;height:16px"></i></button>
-            <span class="help-tip-pop">
-              <span class="help-tip-pop-title">루브릭 기반 AI 피드백</span>
-              <span class="help-tip-pop-body">
-                <span class="ht-lead">선생님이 매긴 점수와 채점기준만으로 만드는 피드백이에요.</span>
-                과제물을 읽지 않아 내용이 일반적이에요. 과제물이 없는 학생에게 활용하기 좋아요.
-                <ul>
-                  <li><span class="ht-term">AI 작성 근거</span> : 점수에 해당하는 채점기준 내용으로 채워져요. <span class="ht-lock">수정할 수 없어요.</span></li>
-                  <li><span class="ht-term">AI 피드백</span> : 클릭해서 바로 수정할 수 있어요.</li>
-                </ul>
-              </span>
+          <span class="pn-section-title">루브릭 AI 피드백</span>
+        </div>
+        <span class="help-tip help-tip--right">
+          <button type="button" class="help-tip-btn" onclick="toggleHelpTip(this,event)" aria-label="루브릭 AI 피드백 설명"><i data-lucide="circle-help" style="width:16px;height:16px"></i></button>
+          <span class="help-tip-pop">
+            <span class="help-tip-pop-title">루브릭 AI 피드백</span>
+            <span class="help-tip-pop-body">
+              <span class="ht-lead">선생님이 매긴 점수와 채점기준만으로 만드는 피드백이에요.</span>
+              과제물을 읽지 않아 내용이 일반적이에요. 과제물이 없는 학생에게 활용하기 좋아요.
+              <ul>
+                <li><span class="ht-term">기록 근거</span> : 점수에 해당하는 채점기준 내용으로 채워져요. <span class="ht-lock">수정할 수 없어요.</span></li>
+                <li><span class="ht-term">피드백</span> : 클릭해서 바로 수정할 수 있어요.</li>
+              </ul>
             </span>
           </span>
-        </div>
-        <div class="pn-section-hd-right" id="rubricAiActionGroup">
-          <button class="btn-rubric-ai-run" id="btnRubricAiRun" onclick="runRubricAi()">
-            <i data-lucide="wand-sparkles" style="width:14px;height:14px"></i>실행
-          </button>
-        </div>
+        </span>
       </div>
       <div id="rubricAiPane">
-        <div class="rubric-ai-intro">
-          <p>과제물 기반 피드백 외에 <strong>채점기준 기반의 추가 피드백</strong>을 만들 수 있어요.</p>
+        <div class="rubric-empty">
+          <button class="btn-rubric-gen" id="btnRubricAiRun" onclick="runRubricAi()"><i data-lucide="wand-sparkles" style="width:14px;height:14px"></i>피드백 생성</button>
+          <span class="rubric-empty-text">채점기준 기반의 피드백을 만들 수 있어요.</span>
         </div>
       </div>
     </div>
@@ -2316,7 +2324,7 @@ function applyPreviewItemAvailability(){
                            && rubPane.querySelector('.ec-block,.item-block'));
 
   // 루브릭 AI 결과: 별도 섹션의 .rai-card
-  var hasRubricAi = document.querySelectorAll('#rubricAiPane .rai-card').length > 0
+  var hasRubricAi = document.querySelectorAll('#rubricAiPane .eval-card').length > 0
                     || document.querySelectorAll('.rai-card').length > 0;
 
   // 채점요소별 근거는 두 AI 공통(채점기준 텍스트 기반) — 둘 중 하나라도 있으면 활성
@@ -2818,21 +2826,17 @@ var RUBRIC_AI_RESULT = [
 function resetRubricAiSection(){
   var pane = document.getElementById('rubricAiPane');
   if(pane){
-    pane.innerHTML = '<div class="rubric-ai-intro">'
-      + '<p>과제물 기반 피드백 외에 <strong>채점기준 기반의 추가 피드백</strong>을 만들 수 있어요.</p>'
+    pane.innerHTML = '<div class="rubric-empty">'
+      + '<button class="btn-rubric-gen" id="btnRubricAiRun" onclick="runRubricAi()"><i data-lucide="wand-sparkles" style="width:14px;height:14px"></i>피드백 생성</button>'
+      + '<span class="rubric-empty-text">채점기준 기반의 피드백을 만들 수 있어요.</span>'
       + '</div>';
-  }
-  var actionGroup = document.getElementById('rubricAiActionGroup');
-  if(actionGroup){
-    actionGroup.innerHTML = '<button class="btn-rubric-ai-run" id="btnRubricAiRun" onclick="runRubricAi()">'
-      + '<i data-lucide="wand-sparkles" style="width:14px;height:14px"></i>실행'
-      + '</button>';
+    lucide.createIcons();
   }
 }
 
 function getRubricAiMode(){ return 'overwrite'; } // 재생성은 항상 전체 덮어쓰기 (모드 미제공)
 function updateRubricAiWarning(){
-  var isRegen = document.querySelectorAll('#rubricAiPane .rai-card').length > 0;
+  var isRegen = document.querySelectorAll('#rubricAiPane .eval-card').length > 0;
   var hasDirty = document.querySelectorAll('#rubricAiPane .ec-block.dirty').length > 0;
   var warning = document.getElementById('rubricAiWarning');
   // 다시 생성 + 수정한 내용 있으면 항상 경고 표시
@@ -2872,7 +2876,7 @@ function confirmRubricAi(){
   // 이어쓰기 모드: 수정한 피드백 보존
   var preserved = {};
   if(mode === 'append'){
-    document.querySelectorAll('#rubricAiPane .rai-card').forEach(function(card, idx){
+    document.querySelectorAll('#rubricAiPane .eval-card').forEach(function(card, idx){
       var dirtyEditable = card.querySelector('.ec-block.dirty .editable');
       if(dirtyEditable) preserved[idx] = dirtyEditable.innerHTML;
     });
@@ -2881,7 +2885,7 @@ function confirmRubricAi(){
   setTimeout(function(){
     renderRubricAiResult();
     if(mode === 'append'){
-      document.querySelectorAll('#rubricAiPane .rai-card').forEach(function(card, idx){
+      document.querySelectorAll('#rubricAiPane .eval-card').forEach(function(card, idx){
         if(preserved[idx] != null){
           var editable = card.querySelector('.ec-block .editable');
           if(editable){
@@ -2898,33 +2902,22 @@ function confirmRubricAi(){
 
 function renderRubricAiResult(){
   var html = RUBRIC_AI_RESULT.map(function(r){
-    return '<div class="rai-card">'
-      +  '<div class="rai-card-hd">'
-      +    '<span class="rai-tag">'+r.score+' / '+r.max+'</span>'
-      +    '<span class="rai-name">'+r.name+'</span>'
+    return '<div class="eval-card ac-neutral" data-kind="rubric">'
+      +  '<div class="ec-card-header readonly-header">'
+      +    '<span class="ec-summary-wrap"><span class="ec-summary">'+escHtml(r.name)+'</span><span class="ec-summary-tip">'+escHtml(r.name)+'</span></span>'
       +  '</div>'
-      +  '<div class="rai-card-body">'
-      +    '<div class="rai-sec">'
-      +      '<span class="rai-sec-lbl">AI 작성 근거 <span class="rai-sec-lbl-sub">· 채점기준 기반</span></span>'
-      +      '<div class="rai-sec-text">'+r.ground.replace(/\n/g, '<br>')+'</div>'
-      +    '</div>'
-      +    '<div class="rai-sec">'
-      +      '<span class="rai-sec-lbl">AI 피드백</span>'
-      +      editableBlock('', r.feedback)
-      +    '</div>'
+      +  '<div class="ec-card-body">'
+      +    '<div class="ec-block ec-block--ground"><div class="ec-block-lbl">기록 근거</div>'
+      +      '<div class="rai-ground-ro">'+escHtml(r.ground)+'</div></div>'
+      +    editableBlock('피드백', r.feedback, 'feedback')
       +  '</div>'
       +'</div>';
   }).join('');
-  var wrap = '<div class="rai-list">'+html+'</div>';
+  var wrap = '<div class="rai-list">'+html+'</div>'
+    + '<div class="rai-footer"><button class="rai-regen-btn" onclick="runRubricAi()"><i data-lucide="rotate-ccw" style="width:14px;height:14px"></i>다시 생성</button></div>';
   // 루브릭 AI 결과는 별도 섹션(rubricAiPane)에만 렌더 — 분석 AI 섹션과 분리
   var pane = document.getElementById('rubricAiPane');
   if(pane) pane.innerHTML = wrap;
-  var actionGroup = document.getElementById('rubricAiActionGroup');
-  if(actionGroup){
-    actionGroup.innerHTML = '<button class="btn-rubric-ai-regen" onclick="runRubricAi()">'
-      + '<i data-lucide="rotate-ccw" style="width:14px;height:14px"></i>다시 생성'
-      + '</button>';
-  }
   // 인라인 편집 + dirty 표시 + AI 초안으로 되돌리기 핸들러 바인딩
   bindEditableHandlers();
   lucide.createIcons();
