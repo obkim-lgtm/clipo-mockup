@@ -4991,16 +4991,16 @@ function syncDemoNavs(){
   var navS = document.getElementById('demoNavScoring');
   if (navS) navS.style.display = (id === 'screen-scoring' || id === 'screen-ocr-b') ? '' : 'none';
   var mp = document.getElementById('mockpick');
-  if (mp) mp.style.display = (id === 'screen-task' || id === 'screen-form' || id === 'screen-design') ? '' : 'none';
+  if (mp) mp.style.display = (id === 'screen-task' || id === 'screen-form') ? '' : 'none';
   if (typeof mpSyncActive === 'function') mpSyncActive();
 }
 // ===== 까망이 목업 화면 선택기 =====
 function mpGo(which){
-  if (which === 'task')         showScreen('screen-task');
-  else if (which === 'list')    showListForClass(1, 'A');
-  else if (which === 'form')    openFormScreen('A');
-  else if (which === 'scoring') goScoringList();
-  else if (which === 'design')  goDesignList();
+  if (which === 'task')              showScreen('screen-task');
+  else if (which === 'form')         openFormScreen('A');
+  else if (which === 'uploadPdf')    { showListForClass(1, 'A'); openUploadPdf(); }
+  else if (which === 'uploadSurvey') { showListForClass(1, 'A'); openUploadSurvey(); }
+  document.querySelectorAll('#mockpick .mp-btn').forEach(function(b){ b.classList.toggle('on', b.dataset.k === which); });
   if (window.lucide) lucide.createIcons();
 }
 function mpToggle(){
@@ -5014,10 +5014,7 @@ function mpSyncActive(){
   var id = active ? active.id : '';
   var key = '';
   if (id === 'screen-task') key = 'task';
-  else if (id === 'screen-list') key = 'list';
   else if (id === 'screen-form') key = 'form';
-  else if (id === 'screen-scoring') key = 'scoring';
-  else if (id === 'screen-design') key = 'design';
   document.querySelectorAll('#mockpick .mp-btn').forEach(function(b){ b.classList.toggle('on', b.dataset.k === key); });
 }
 function mpInitDrag(){
@@ -5074,10 +5071,9 @@ window.addEventListener('load', setupDemoNav);
   </div>
   <div id="mp-body" class="mp-body">
     <button class="mp-btn" data-k="task" onclick="mpGo('task')">과제물 관리 목록</button>
-    <button class="mp-btn" data-k="list" onclick="mpGo('list')">학급 제출 상세 <span class="mp-sub">제출·미제출 현황</span></button>
     <button class="mp-btn" data-k="form" onclick="mpGo('form')">과제물 양식 등록 <span class="mp-sub">공통·반별</span></button>
-    <button class="mp-btn" data-k="scoring" onclick="mpGo('scoring')">채점 목록 <span class="mp-sub">AI 채점·재실행</span></button>
-    <button class="mp-btn" data-k="design" onclick="mpGo('design')">평가 설계 목록</button>
+    <button class="mp-btn" data-k="uploadPdf" onclick="mpGo('uploadPdf')">일괄 업로드 (PDF) <span class="mp-sub">개인정보 비식별화 안내</span></button>
+    <button class="mp-btn" data-k="uploadSurvey" onclick="mpGo('uploadSurvey')">설문 응답 업로드 <span class="mp-sub">구글 설문·엑셀</span></button>
   </div>
 </div>
 

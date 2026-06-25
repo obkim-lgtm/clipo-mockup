@@ -248,6 +248,17 @@
     .form-chip{ display:inline-flex; align-items:center; gap:4px; font-size:13px; font-weight:600; padding:5px 11px; border-radius:999px; background:#eef0f4; color:#6d7381; line-height:1; }
     .form-chip.reg{ background:#e8f7ee; color:#0f9d58; }
     .form-chip.percls{ background:#e9f2ff; color:#3151c4; }
+    .regrade-flag{ display:inline-flex; align-items:center; gap:4px; margin-top:6px; font-size:12px; font-weight:600; color:#b5560a; background:#fff4e5; border-radius:6px; padding:3px 8px; line-height:1; white-space:nowrap; }
+    /* 까망이 목업 화면 선택기 */
+    #mockpick{ position:fixed; right:24px; bottom:24px; z-index:3000; background:#1F2233; border-radius:14px; padding:8px; box-shadow:0 10px 30px rgba(0,0,0,.35); width:max-content; max-width:360px; cursor:move; user-select:none; font-family:inherit; }
+    #mockpick .mp-head{ font-size:11px; font-weight:800; color:#8A8FB0; letter-spacing:.04em; display:flex; align-items:center; justify-content:space-between; gap:16px; padding:6px 8px; cursor:pointer; }
+    #mockpick .mp-body{ display:flex; flex-direction:column; gap:6px; margin-top:6px; }
+    #mockpick .mp-cap{ font-size:10px; font-weight:800; color:#6B6F8C; letter-spacing:.05em; padding:7px 8px 2px; }
+    #mockpick .mp-btn{ width:100%; text-align:left; white-space:nowrap; padding:9px 12px; border-radius:9px; border:1px solid #3A3F58; background:#2A2E44; color:#C9CCE0; font-size:13px; font-weight:700; font-family:inherit; cursor:pointer; line-height:1.35; }
+    #mockpick .mp-btn:hover{ background:#33384f; }
+    #mockpick .mp-btn.on{ background:#416bff; color:#fff; border-color:#416bff; }
+    #mockpick .mp-sub{ font-size:11px; font-weight:600; color:#8A8FB0; margin-left:8px; }
+    #mockpick .mp-btn.on .mp-sub{ color:#D6E2FF; }
     .form-promo{ background:#e9f2ff; border-bottom:1px solid #d4e1ff; }
     .form-promo .fp-inner{ max-width:1240px; margin:0 auto; padding:12px 32px; display:flex; align-items:center; gap:10px; }
     .form-promo .fp-inner > i{ width:18px; height:18px; color:#3151c4; flex-shrink:0; }
@@ -445,7 +456,7 @@
   <div class="form-promo" id="form-promo">
     <div class="fp-inner">
       <i data-lucide="sparkles"></i>
-      <span class="fp-txt"><b>과제물 양식</b>을 등록해 두면 채점할 때 지시문과 학생 답을 더 정확히 구분해 인식해요. 각 평가의 <b>과제물 양식</b> 버튼에서 빈 문제지를 한 번만 올려두세요.</span>
+      <span class="fp-txt"><b>과제물 양식</b> 버튼을 눌러 빈 문제지를 올려보세요. AI가 문제와 학생 답을 더 잘 구분해 <b>채점 정확도가 높아져요</b>.</span>
       <button class="fp-dismiss" onclick="dismissFormPromo()">다시 보지 않기</button>
     </div>
   </div>
@@ -772,7 +783,7 @@
           </thead>
           <tbody>
             <tr>
-              <td style="font-weight:500;">1-1반</td>
+              <td style="font-weight:500;"><div>1-1반</div><span class="regrade-flag hidden" id="regrade-flag-1"><i data-lucide="refresh-cw" style="width:11px;height:11px;"></i>양식 변경 · 재채점 권장</span></td>
               <td><div style="display:flex;align-items:center;gap:12px;"><div style="flex:1;height:10px;background:#e9f2ff;border-radius:4px;overflow:hidden;"><div style="width:100%;height:100%;background:#8da9ff;"></div></div><span style="font-size:15px;color:#222631;min-width:45px;text-align:right;">14/14</span></div></td>
               <td>42</td>
               <td><button class="pill-btn pill-btn-mid" onclick="openRunModal()"><i data-lucide="wand-sparkles" style="width:15px;height:15px;"></i>재실행</button></td>
@@ -2735,25 +2746,74 @@ function setFormChip(card, kind, label) {
   chip.className = 'form-chip ' + (kind === 'percls' ? 'percls' : (kind === 'reg' ? 'reg' : ''));
   chip.textContent = label;
 }
+var fmRegradeNudge = false;
+function syncRegradeFlags() {
+  var f = document.getElementById('regrade-flag-1');
+  if (f) f.classList.toggle('hidden', !fmRegradeNudge);
+  if (window.lucide) lucide.createIcons();
+}
 function fmRegister() {
   if (FM_SCOPE === 'common') {
     if (!fmHasFile) { showToast('빈 문제지를 올려주세요.', 'info'); return; }
     setFormChip(FM_CARD, 'reg', '공통 등록');
-    showToast('과제물 양식을 등록했어요. 채점할 때 이 양식으로 인식해요.', 'success');
+    fmRegradeNudge = true;
+    showToast('과제물 양식을 등록했어요. 이미 채점한 학급은 채점에서 재채점하면 새 양식이 반영돼요.', 'success');
   } else {
     var n = FM_CLASSES.filter(function (c) { return c.reg; }).length;
     if (n === 0) { setFormChip(FM_CARD, '', '미등록'); }
-    else setFormChip(FM_CARD, 'percls', '반별 ' + n + '개');
+    else { setFormChip(FM_CARD, 'percls', '반별 ' + n + '개'); fmRegradeNudge = true; }
     showToast('반별 양식을 저장했어요.', 'success');
   }
   showScreen('screen-task');
 }
 
+// ===== 까망이 목업 화면 선택기 =====
+function mpGo(which){
+  if (which === 'task')         showScreen('screen-task');
+  else if (which === 'list')    showListForClass(1, 'A');
+  else if (which === 'form')    openFormScreen('A');
+  else if (which === 'scoring') goScoringList();
+  else if (which === 'design')  goDesignList();
+  if (window.lucide) lucide.createIcons();
+}
+function mpToggle(){
+  var b = document.getElementById('mp-body'), c = document.getElementById('mp-caret');
+  var open = b.style.display !== 'none';
+  b.style.display = open ? 'none' : 'flex';
+  if (c) c.style.transform = open ? 'rotate(180deg)' : '';
+}
+function mpSyncActive(){
+  var active = document.querySelector('.screen.active');
+  var id = active ? active.id : '';
+  var key = '';
+  if (id === 'screen-task') key = 'task';
+  else if (id === 'screen-list') key = 'list';
+  else if (id === 'screen-form') key = 'form';
+  else if (id === 'screen-scoring') key = 'scoring';
+  else if (id === 'screen-design') key = 'design';
+  document.querySelectorAll('#mockpick .mp-btn').forEach(function(b){ b.classList.toggle('on', b.dataset.k === key); });
+}
+function mpInitDrag(){
+  var el = document.getElementById('mockpick'); if (!el) return;
+  var dx=0, dy=0, drag=false;
+  el.addEventListener('mousedown', function(e){
+    if (e.target.closest('button')) return;
+    drag=true; var r=el.getBoundingClientRect();
+    dx=e.clientX-r.left; dy=e.clientY-r.top;
+    el.style.right='auto'; el.style.bottom='auto'; el.style.left=r.left+'px'; el.style.top=r.top+'px';
+    e.preventDefault();
+  });
+  document.addEventListener('mousemove', function(e){ if(!drag) return; el.style.left=(e.clientX-dx)+'px'; el.style.top=(e.clientY-dy)+'px'; });
+  document.addEventListener('mouseup', function(){ drag=false; });
+}
+window.addEventListener('load', function(){ mpInitDrag(); mpSyncActive(); });
 function showScreen(id) {
   document.querySelectorAll('.screen').forEach(function(s){ s.classList.remove('active'); });
   document.getElementById(id).classList.add('active');
   // 탭 상태를 해시로 유지 → 다른 페이지에서 뒤로 와도 탭 복원
   if (id === 'screen-scoring') { history.replaceState(null, '', '#scoring'); }
+  if (id === 'screen-scoring' && typeof syncRegradeFlags === 'function') syncRegradeFlags();
+  if (typeof mpSyncActive === 'function') mpSyncActive();
   else if (id === 'screen-design') { history.replaceState(null, '', '#design'); }
   else if (location.hash === '#scoring' || location.hash === '#design') { history.replaceState(null, '', location.pathname + location.search); }
   var gnb = document.getElementById('gnb');
@@ -4115,6 +4175,21 @@ function initDiagPromo(){
 }
 initDiagPromo();
 </script>
+
+<!-- ===== 까망이 목업 화면 선택기 (드래그·접기 · 실제 화면 아님) ===== -->
+<div id="mockpick">
+  <div class="mp-head" onclick="mpToggle()">
+    <span style="display:inline-flex;align-items:center;gap:6px;"><i data-lucide="layout-grid" style="width:13px;height:13px;"></i>MOCKUP · 화면 보기</span>
+    <i id="mp-caret" data-lucide="chevron-down" style="width:14px;height:14px;"></i>
+  </div>
+  <div id="mp-body" class="mp-body">
+    <button class="mp-btn" data-k="task" onclick="mpGo('task')">과제물 관리 목록</button>
+    <button class="mp-btn" data-k="list" onclick="mpGo('list')">학급 제출 상세 <span class="mp-sub">제출·미제출 현황</span></button>
+    <button class="mp-btn" data-k="form" onclick="mpGo('form')">과제물 양식 등록 <span class="mp-sub">공통·반별</span></button>
+    <button class="mp-btn" data-k="scoring" onclick="mpGo('scoring')">채점 목록 <span class="mp-sub">AI 채점·재실행</span></button>
+    <button class="mp-btn" data-k="design" onclick="mpGo('design')">평가 설계 목록</button>
+  </div>
+</div>
 
 </body>
 </html>
