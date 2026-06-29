@@ -537,6 +537,17 @@
     .lu-c-title{ font-size:16px; font-weight:700; color:#222631; }
     .lu-badge{ font-size:12px; font-weight:700; color:#3151c4; background:#e9f2ff; border-radius:100px; padding:3px 9px; white-space:nowrap; }
     .lu-c-desc{ font-size:14px; color:#6d7381; line-height:1.55; margin:0; }
+
+    /* ===== 여러 파일 업로드 케이스 뷰어 (까망이) ===== */
+    #bmCase{ position:fixed; left:24px; bottom:24px; z-index:3000; background:#1F2233; border-radius:14px; padding:8px; box-shadow:0 10px 30px rgba(0,0,0,.35); width:max-content; max-width:280px; user-select:none; font-family:inherit; display:none; }
+    #bmCase .bc-head{ font-size:11px; font-weight:800; color:#8A8FB0; letter-spacing:.04em; display:flex; align-items:center; justify-content:space-between; gap:16px; padding:6px 8px; cursor:move; }
+    #bmCase .bc-body{ display:flex; flex-direction:column; gap:6px; margin-top:6px; }
+    #bmCase.bc-collapsed .bc-body{ display:none; }
+    #bmCase .bc-btn{ width:100%; text-align:left; white-space:nowrap; padding:9px 12px; border-radius:9px; border:1px solid #3A3F58; background:#2A2E44; color:#C9CCE0; font-size:13px; font-weight:700; font-family:inherit; cursor:pointer; line-height:1.3; }
+    #bmCase .bc-btn:hover{ background:#33384f; }
+    #bmCase .bc-btn.on{ background:#416bff; color:#fff; border-color:#416bff; }
+    #bmCase .bc-sub{ display:block; font-size:11px; font-weight:600; color:#8A8FB0; margin-top:2px; }
+    #bmCase .bc-btn.on .bc-sub{ color:#D6E2FF; }
   </style>
 </head>
 <body>
@@ -3075,6 +3086,7 @@ function toggleEvCard(el){
 function showScreen(id) {
   document.querySelectorAll('.screen').forEach(function(s){ s.classList.remove('active'); });
   document.getElementById(id).classList.add('active');
+  var _bc = document.getElementById('bmCase'); if (_bc) _bc.style.display = (id === 'screen-bulkmatch') ? 'block' : 'none';
   // 탭 상태를 해시로 유지 → 다른 페이지에서 뒤로 와도 탭 복원
   if (id === 'screen-scoring') { history.replaceState(null, '', '#scoring'); }
   else if (id === 'screen-design') { history.replaceState(null, '', '#design'); }
@@ -5279,18 +5291,18 @@ window.addEventListener('load', setupDemoNav);
   <div class="lu-modal">
     <button class="lu-x" onclick="closeBulkModal()"><i data-lucide="x" style="width:20px;height:20px;"></i></button>
     <h3 class="lu-title">학급 일괄 업로드</h3>
-    <p class="lu-sub">학번과 이름을 기준으로 학생 과제를 한 번에 등록할 수 있어요. 등록 방법을 선택해 주세요.</p>
+    <p class="lu-sub">지금 가지고 있는 파일 형태에 따라 골라 주세요.</p>
     <button class="lu-card" onclick="luPick('pdf')">
       <div class="lu-ic"><i data-lucide="scan-line"></i></div>
-      <div class="lu-c-main"><div class="lu-c-top"><span class="lu-c-title">학급 스캔 PDF</span></div><p class="lu-c-desc">한 장으로 쭉 스캔한 PDF 1개를 학생별로 나눠 등록</p></div>
+      <div class="lu-c-main"><div class="lu-c-top"><span class="lu-c-title">학급 스캔 PDF</span></div><p class="lu-c-desc">학급 전체를 한 번에 스캔한 PDF 1개 → 학생별로 나눠 등록</p></div>
     </button>
     <button class="lu-card" onclick="luPick('bulk')">
       <div class="lu-ic"><i data-lucide="files"></i></div>
-      <div class="lu-c-main"><div class="lu-c-top"><span class="lu-c-title">여러 파일 일괄</span></div><p class="lu-c-desc">학생별로 나뉜 PDF·이미지를 파일명으로 자동 매칭해 등록</p></div>
+      <div class="lu-c-main"><div class="lu-c-top"><span class="lu-c-title">여러 파일 일괄</span></div><p class="lu-c-desc">학생마다 따로 받은 PDF·이미지(클래스룸 등) → 파일명으로 자동 분류</p></div>
     </button>
     <button class="lu-card" onclick="luPick('survey')">
       <div class="lu-ic"><i data-lucide="clipboard-list"></i></div>
-      <div class="lu-c-main"><div class="lu-c-top"><span class="lu-c-title">설문 응답</span></div><p class="lu-c-desc">구글 설문·엑셀로 받은 응답을 템플릿에 맞춰 등록</p></div>
+      <div class="lu-c-main"><div class="lu-c-top"><span class="lu-c-title">설문 응답</span></div><p class="lu-c-desc">구글 설문·엑셀로 받은 답안 → 양식에 맞춰 등록</p></div>
     </button>
   </div>
 </div>
@@ -5358,15 +5370,9 @@ function bmStartMatch(){
   host.innerHTML = '<div class="bm-proc"><div class="sp"></div><div><div class="t">파일명을 분석해 학생과 매칭하는 중이에요…</div><div class="s">PDF·이미지 8개 파일</div></div></div>';
   lucide.createIcons();
   setTimeout(function(){
-    bmBuildOk();
-    var row = document.getElementById('bm-row-near');
-    row.dataset.resolved = '0';
-    row.className = 'bm-row';
-    var sel = row.querySelector('.bm-pick'); sel.value = ''; sel.className = 'bm-pick unset';
-    row.querySelector('.bm-st').innerHTML = '<span class="bm-chip warn"><i data-lucide="help-circle" style="width:13px;height:13px;"></i>확인 필요</span>';
-    bmRecalc();
     document.getElementById('bm-state-upload').style.display = 'none';
     document.getElementById('bm-state-match').style.display = '';
+    bmShowCase('normal');
     window.scrollTo(0,0);
     lucide.createIcons();
   }, 1200);
@@ -5438,7 +5444,7 @@ function bmRegister(){
 function bmDoRegister(){
   var ids = BM_OK_IDS.slice();
   var row = document.getElementById('bm-row-near');
-  if (row.dataset.resolved === '1') ids.push(row.querySelector('.bm-pick').value);
+  if (row && row.dataset.resolved === '1') ids.push(row.querySelector('.bm-pick').value);
   STUDENTS.forEach(function(s){
     if (ids.indexOf(s.id) >= 0){
       s.status = '제출'; s.date = '06/29 14:02 선생님 업로드'; s.files = s.files || 1;
@@ -5453,6 +5459,100 @@ function bmDoRegister(){
   showScreen('screen-list');
   showToast(ids.length + '명의 과제가 학생별로 등록되었습니다.', 'success');
 }
+</script>
+
+<!-- ===== 여러 파일 업로드 — 케이스 뷰어 ===== -->
+<div id="bmCase">
+  <div class="bc-head" id="bcHead"><span>🐈‍⬛ 케이스 보기</span><span class="bc-caret" onclick="event.stopPropagation();document.getElementById('bmCase').classList.toggle('bc-collapsed')" style="cursor:pointer;">▾</span></div>
+  <div class="bc-body">
+    <button class="bc-btn on" data-c="normal" onclick="bmShowCase('normal')">기본 (정상 매칭)<span class="bc-sub">자동 7 · 미매칭 1 · 미제출 2</span></button>
+    <button class="bc-btn" data-c="dup" onclick="bmShowCase('dup')">동명이인<span class="bc-sub">후보 2명 → 직접 지정</span></button>
+    <button class="bc-btn" data-c="multi" onclick="bmShowCase('multi')">한 학생 파일 여러 개<span class="bc-sub">택1 · 자동 합치기 X</span></button>
+    <button class="bc-btn" data-c="fileerr" onclick="bmShowCase('fileerr')">파일 오류<span class="bc-sub">미지원 형식 → 등록 불가</span></button>
+    <button class="bc-btn" data-c="combo" onclick="bmShowCase('combo')">여러 개 겹침<span class="bc-sub">동명이인+다파일+미매칭+오류 한 번에</span></button>
+    <button class="bc-btn" data-c="replace" onclick="bmShowCase('replace')">교체 경고<span class="bc-sub">다른 자료 이미 있음</span></button>
+  </div>
+</div>
+
+<script>
+// ===== 케이스 뷰어 렌더 =====
+function bmCaseHi(key){ document.querySelectorAll('#bmCase .bc-btn').forEach(function(b){ b.classList.toggle('on', b.dataset.c===key); }); }
+function bmRowNomatch(){
+  return '<div class="bm-row" id="bm-row-near" data-resolved="0"><div class="bm-file"><div class="fic"><i data-lucide="file-text" style="width:18px;height:18px;"></i></div><div style="min-width:0;"><div class="fn">한지웅 - 수행평가.pdf</div></div></div><div class="bm-arrow"><i data-lucide="arrow-right" style="width:18px;height:18px;"></i></div><div><select class="bm-pick unset" onchange="bmResolveNear(this)"><option value="">학생 선택</option><optgroup label="학생"><option value="10106">한지우 · 10106</option><option value="10108">윤하은 · 10108</option></optgroup><option value="__skip__">이 파일은 등록 안 함</option></select></div><div class="bm-st"><span class="bm-chip warn"><i data-lucide="help-circle" style="width:13px;height:13px;"></i>확인 필요</span></div></div>';
+}
+function bmRowNomatchStatic(){
+  return '<div class="bm-row"><div class="bm-file"><div class="fic"><i data-lucide="file-text" style="width:18px;height:18px;"></i></div><div style="min-width:0;"><div class="fn">한지웅 - 수행평가.pdf</div><div class="fm">명단에 없는 이름 · 직접 지정 필요</div></div></div><div class="bm-arrow"><i data-lucide="arrow-right" style="width:18px;height:18px;"></i></div><div><select class="bm-pick unset" onchange="bmCaseRow(this)"><option value="">학생 선택</option><optgroup label="학생"><option value="10106">한지우 · 10106</option><option value="10108">윤하은 · 10108</option></optgroup><option value="__skip__">이 파일은 등록 안 함</option></select></div><div class="bm-st"><span class="bm-chip warn"><i data-lucide="help-circle" style="width:13px;height:13px;"></i>확인 필요</span></div></div>';
+}
+function bmRowDup(){
+  return '<div class="bm-row"><div class="bm-file"><div class="fic"><i data-lucide="users" style="width:18px;height:18px;"></i></div><div style="min-width:0;"><div class="fn">김민준 - 수행평가.pdf</div><div class="fm">같은 이름 2명 · 자동 지정 불가</div></div></div><div class="bm-arrow"><i data-lucide="arrow-right" style="width:18px;height:18px;"></i></div><div><select class="bm-pick unset" onchange="bmCaseRow(this)"><option value="">학생 선택</option><option value="a">김민준 · 3번</option><option value="b">김민준 · 18번</option></select></div><div class="bm-st"><span class="bm-chip warn"><i data-lucide="help-circle" style="width:13px;height:13px;"></i>확인 필요</span></div></div>';
+}
+function bmRowMulti(){
+  return '<div class="bm-row"><div class="bm-file"><div class="fic" style="background:#fff4e5;color:#b5560a;"><i data-lucide="copy" style="width:18px;height:18px;"></i></div><div style="min-width:0;"><div class="fn">김서윤 · 파일 2개</div><div class="fm">한 학생에 파일 2개 · 1개만 등록 가능</div></div></div><div class="bm-arrow"><i data-lucide="arrow-right" style="width:18px;height:18px;"></i></div><div><select class="bm-pick unset" onchange="bmCaseRow(this)"><option value="">등록할 파일 선택</option><option value="1">김서윤 앞면.pdf</option><option value="2">김서윤 뒷면.pdf</option></select></div><div class="bm-st"><span class="bm-chip warn"><i data-lucide="help-circle" style="width:13px;height:13px;"></i>확인 필요</span></div></div>';
+}
+function bmRowError(){
+  return '<div class="bm-row"><div class="bm-file"><div class="fic" style="background:#fdecec;color:#db3e51;"><i data-lucide="file-x" style="width:18px;height:18px;"></i></div><div style="min-width:0;"><div class="fn">활동지.hwp</div><div class="fm" style="color:#db3e51;">지원하지 않는 형식(hwp) · PDF·JPG·PNG만 가능</div></div></div><div class="bm-arrow"><i data-lucide="arrow-right" style="width:18px;height:18px;"></i></div><div style="font-size:14px;color:#9aa0ad;">등록할 수 없어요</div><div class="bm-st"><span class="bm-chip" style="background:#fdecec;color:#db3e51;">등록 불가</span></div></div>';
+}
+function bmCaseRow(sel){
+  var row=sel.closest('.bm-row'); var st=row.querySelector('.bm-st');
+  if(sel.value){ sel.classList.remove('unset'); row.classList.add('done'); st.innerHTML='<span class="bm-chip ok"><i data-lucide="check" style="width:13px;height:13px;"></i>매칭됨</span>'; }
+  else { sel.classList.add('unset'); row.classList.remove('done'); st.innerHTML='<span class="bm-chip warn"><i data-lucide="help-circle" style="width:13px;height:13px;"></i>확인 필요</span>'; }
+  lucide.createIcons();
+}
+function bmBuildOkN(n){
+  document.getElementById('bm-ok-body').innerHTML = BM_OK.slice(0,n).map(function(m){
+    return '<div class="bm-row"><div class="bm-file"><div class="fic"><i data-lucide="file-text" style="width:18px;height:18px;"></i></div><div style="min-width:0;"><div class="fn">'+m.file+'</div></div></div><div class="bm-arrow"><i data-lucide="arrow-right" style="width:18px;height:18px;"></i></div><div class="bm-stu"><span class="nm">'+m.name+'</span> <span class="nn">· '+m.id+'</span></div><div class="bm-st"><span class="bm-chip ok"><i data-lucide="check" style="width:13px;height:13px;"></i>매칭됨</span></div></div>';
+  }).join('');
+}
+function bmNoneStatic(ids){
+  var list=STUDENTS.filter(function(s){ return ids.indexOf(s.id)>=0; });
+  var card=document.getElementById('bm-sec-none'); card.style.display = list.length? '' : 'none';
+  document.querySelector('#bm-sec-none .sb').textContent=list.length+'명 — 파일이 들어오지 않았어요. 나중에 개별로 추가할 수 있어요.';
+  document.getElementById('bm-none-body').innerHTML=list.map(function(s){ return '<div class="bm-none-row"><span class="bm-stu"><span class="nm">'+s.name+'</span> <span class="nn">· '+s.id+'</span></span><span class="bm-chip gray">미제출</span></div>'; }).join('');
+}
+function bmShowCase(key){
+  bmCaseHi(key);
+  if(key==='replace'){
+    document.getElementById('bm-state-match').style.display='none';
+    document.getElementById('bm-state-upload').style.display='';
+    document.getElementById('bm-replace-banner-text').innerHTML='이미 <b>학급 PDF 자료</b>가 등록돼 있어요. 여러 파일을 등록하면 <b>기존 자료와 채점 결과가 교체</b>돼요. 한 학급에는 한 종류의 자료만 등록할 수 있어요.';
+    document.getElementById('bm-replace-banner').style.display='flex';
+    bmResetDz(); window.scrollTo(0,0); lucide.createIcons(); return;
+  }
+  document.getElementById('bm-state-upload').style.display='none';
+  document.getElementById('bm-state-match').style.display='';
+  document.getElementById('bm-replace-banner').style.display='none';
+  document.getElementById('bm-sec-warn').classList.remove('collapsed');
+  var warnBody=document.querySelector('#bm-sec-warn .bm-body');
+  var okSubEl=document.querySelector('#bm-sec-ok .sb');
+  var totalEl=document.querySelector('.bm-sum .bm-stat.total .num');
+  if(key==='normal'){
+    totalEl.textContent='8'; okSubEl.textContent='7명 — 파일명과 학생 이름이 일치해요'; bmBuildOkN(7);
+    warnBody.innerHTML='<div class="bm-strip"><i data-lucide="info"></i><span>명단에서 이름을 찾지 못한 파일이에요. 학생을 직접 지정하거나, 우리 반 자료가 아니면 ‘이 파일은 등록 안 함’을 선택해 주세요.</span></div>'+bmRowNomatch();
+    bmRecalc();
+  } else {
+    var C={
+      dup:{total:8,ok:7,warn:1,strip:'같은 이름의 학생이 둘 이상이에요(동명이인). 시스템이 자동으로 정하지 않으니 어느 학생인지 직접 골라 주세요.',row:bmRowDup()},
+      multi:{total:8,ok:6,warn:1,strip:'한 학생에게 파일이 여러 개 들어왔어요. 자동 합치기는 지원하지 않아요 — 하나만 골라 등록하거나, 합쳐서 다시 올려 주세요.',row:bmRowMulti()},
+      fileerr:{total:8,ok:7,warn:1,strip:'올릴 수 없는 파일이 있어요. PDF·JPG·PNG만 등록할 수 있어요.',row:bmRowError()},
+      combo:{total:10,ok:5,warn:4,strip:'확인이 필요한 파일이에요. 학생을 직접 지정하거나, 등록할 수 없는 파일은 빼 주세요. 비슷하거나 같은 이름은 서로 바뀔 수 있으니 한 번 더 확인해 주세요.',row:bmRowNomatchStatic()+bmRowDup()+bmRowMulti()+bmRowError()}
+    }[key];
+    totalEl.textContent=C.total; document.getElementById('bm-stat-ok').textContent=C.ok; document.getElementById('bm-stat-warn').textContent=String(C.warn);
+    document.getElementById('bm-warn-sub').textContent=C.warn+'건 — 확인해 주세요';
+    okSubEl.textContent=C.ok+'명 — 파일명과 학생 이름이 일치해요'; bmBuildOkN(C.ok);
+    warnBody.innerHTML='<div class="bm-strip"><i data-lucide="info"></i><span>'+C.strip+'</span></div>'+C.row;
+    bmNoneStatic(key==='combo'?['10108']:['10106','10108']);
+    document.getElementById('bm-reg-txt').textContent=C.ok+'명 등록';
+    document.getElementById('bm-note-txt').textContent='확인 필요 '+C.warn+'건을 정리하면 모두 등록할 수 있어요.';
+  }
+  window.scrollTo(0,0); lucide.createIcons();
+}
+(function(){
+  var p=document.getElementById('bmCase'); if(!p) return; var head=document.getElementById('bcHead');
+  var drag=false, ox=0, oy=0;
+  head.addEventListener('mousedown', function(e){ if(e.target.classList.contains('bc-caret')) return; drag=true; var r=p.getBoundingClientRect(); ox=e.clientX-r.left; oy=e.clientY-r.top; e.preventDefault(); });
+  document.addEventListener('mousemove', function(e){ if(!drag) return; p.style.left=(e.clientX-ox)+'px'; p.style.top=(e.clientY-oy)+'px'; p.style.right='auto'; p.style.bottom='auto'; });
+  document.addEventListener('mouseup', function(){ drag=false; });
+})();
 </script>
 
 </body>
