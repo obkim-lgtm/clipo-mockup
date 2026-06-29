@@ -500,6 +500,25 @@
     .bm-action{ display:flex; align-items:center; justify-content:space-between; gap:12px; border-top:1px solid #eceef2; padding:18px 4px 8px; margin-bottom:28px; }
     .bm-note{ font-size:14px; color:#6d7381; display:inline-flex; align-items:center; gap:7px; }
     .bm-note i{ width:16px; height:16px; color:#9aa0ad; }
+
+    /* ===== 학급 일괄 업로드 — 방법 선택 모달 (창체식) ===== */
+    .lu-overlay{ display:none; position:fixed; inset:0; background:rgba(34,38,49,.45); z-index:1600; align-items:center; justify-content:center; padding:20px; }
+    .lu-overlay.open{ display:flex; }
+    .lu-modal{ background:#fff; border-radius:16px; width:100%; max-width:560px; box-shadow:0 12px 40px rgba(0,0,0,.18); position:relative; padding:24px; max-height:calc(100vh - 40px); overflow-y:auto; }
+    .lu-x{ position:absolute; top:18px; right:18px; width:32px; height:32px; border:none; background:none; color:#6d7381; cursor:pointer; border-radius:6px; display:inline-flex; align-items:center; justify-content:center; line-height:1; }
+    .lu-x:hover{ background:#f1f3f5; color:#222631; }
+    .lu-title{ font-size:20px; font-weight:700; color:#222631; line-height:1.3; margin:0; padding-right:36px; }
+    .lu-sub{ font-size:14px; color:#6d7381; margin:8px 0 20px; line-height:1.6; }
+    .lu-card{ display:flex; align-items:flex-start; gap:14px; width:100%; text-align:left; background:#fff; border:1px solid #e6e8ed; border-radius:12px; padding:16px 18px; cursor:pointer; font-family:inherit; transition:border-color .12s, background .12s; }
+    .lu-card + .lu-card{ margin-top:12px; }
+    .lu-card:hover{ border-color:#416bff; background:#fbfcff; }
+    .lu-ic{ width:42px; height:42px; border-radius:10px; background:#eff3ff; color:#416bff; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+    .lu-ic i{ width:22px; height:22px; }
+    .lu-c-main{ flex:1; min-width:0; }
+    .lu-c-top{ display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-bottom:5px; }
+    .lu-c-title{ font-size:16px; font-weight:700; color:#222631; }
+    .lu-badge{ font-size:12px; font-weight:700; color:#3151c4; background:#e9f2ff; border-radius:100px; padding:3px 9px; white-space:nowrap; }
+    .lu-c-desc{ font-size:14px; color:#6d7381; line-height:1.55; margin:0; }
   </style>
 </head>
 <body>
@@ -1100,25 +1119,9 @@
       <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:8px;gap:16px;">
         <h1 id="list-class-title" class="page-h1" style="margin:0;">1-1반 과제 제출 현황</h1>
         <div style="display:flex;gap:10px;flex-shrink:0;">
-          <div style="position:relative;">
-            <button class="btn btn-primary btn-sm" onclick="toggleUploadMenu(event)">
-              <i data-lucide="upload" style="width:16px;height:16px;"></i>학급 일괄 업로드<i data-lucide="chevron-down" style="width:15px;height:15px;"></i>
-            </button>
-            <div id="uploadMenu" class="create-menu" style="min-width:248px;">
-              <button onclick="openUploadPdf()">
-                <i data-lucide="file-text" style="width:18px;height:18px;color:#416bff;flex-shrink:0;"></i>
-                <span style="display:flex;flex-direction:column;gap:2px;"><span style="font-size:15px;font-weight:600;color:#222631;line-height:1.3;">PDF 업로드</span><span style="font-size:13px;color:#6d7381;line-height:1.3;">스캔한 손글씨 답안</span></span>
-              </button>
-              <button onclick="openUploadSurvey()">
-                <i data-lucide="clipboard-list" style="width:18px;height:18px;color:#416bff;flex-shrink:0;"></i>
-                <span style="display:flex;flex-direction:column;gap:2px;"><span style="font-size:15px;font-weight:600;color:#222631;line-height:1.3;">설문 응답 업로드</span><span style="font-size:13px;color:#6d7381;line-height:1.3;">구글 설문·엑셀 등에서 받은 응답</span></span>
-              </button>
-              <button onclick="openUploadBulk()">
-                <i data-lucide="files" style="width:18px;height:18px;color:#416bff;flex-shrink:0;"></i>
-                <span style="display:flex;flex-direction:column;gap:2px;"><span style="font-size:15px;font-weight:600;color:#222631;line-height:1.3;">여러 파일 일괄 업로드</span><span style="font-size:13px;color:#6d7381;line-height:1.3;">학생별로 나뉜 PDF·이미지를 파일명으로 자동 분류</span></span>
-              </button>
-            </div>
-          </div>
+          <button class="btn btn-primary btn-sm" onclick="openBulkModal()">
+            <i data-lucide="upload" style="width:16px;height:16px;"></i>학급 일괄 업로드
+          </button>
         </div>
       </div>
 
@@ -4915,7 +4918,38 @@ initDiagPromo();
   </div>
 </div>
 
+<!-- ===== 학급 일괄 업로드 — 방법 선택 모달 ===== -->
+<div class="lu-overlay" id="luModal" onclick="if(event.target===this)closeBulkModal()">
+  <div class="lu-modal">
+    <button class="lu-x" onclick="closeBulkModal()"><i data-lucide="x" style="width:20px;height:20px;"></i></button>
+    <h3 class="lu-title">학급 일괄 업로드</h3>
+    <p class="lu-sub">학번과 이름을 기준으로 학생 과제를 한 번에 등록할 수 있어요. 등록 방법을 선택해 주세요.</p>
+    <button class="lu-card" onclick="luPick('pdf')">
+      <div class="lu-ic"><i data-lucide="scan-line"></i></div>
+      <div class="lu-c-main"><div class="lu-c-top"><span class="lu-c-title">학급 스캔 PDF</span></div><p class="lu-c-desc">한 장으로 쭉 스캔한 PDF 1개를 학생별로 나눠 등록</p></div>
+    </button>
+    <button class="lu-card" onclick="luPick('bulk')">
+      <div class="lu-ic"><i data-lucide="files"></i></div>
+      <div class="lu-c-main"><div class="lu-c-top"><span class="lu-c-title">여러 파일 일괄</span></div><p class="lu-c-desc">학생별로 나뉜 PDF·이미지를 파일명으로 자동 매칭해 등록</p></div>
+    </button>
+    <button class="lu-card" onclick="luPick('survey')">
+      <div class="lu-ic"><i data-lucide="clipboard-list"></i></div>
+      <div class="lu-c-main"><div class="lu-c-top"><span class="lu-c-title">설문 응답</span></div><p class="lu-c-desc">구글 설문·엑셀로 받은 응답을 템플릿에 맞춰 등록</p></div>
+    </button>
+  </div>
+</div>
+
 <script>
+// ===== 학급 일괄 업로드 방법 선택 모달 =====
+function openBulkModal(){ document.getElementById('luModal').classList.add('open'); lucide.createIcons(); }
+function closeBulkModal(){ document.getElementById('luModal').classList.remove('open'); }
+function luPick(which){
+  closeBulkModal();
+  if (which === 'pdf') openUploadPdf();
+  else if (which === 'bulk') openUploadBulk();
+  else if (which === 'survey') openUploadSurvey();
+}
+
 // ===== 학생별 파일 업로드 (파일명 자동 매칭) =====
 function bmResetDz(){
   document.getElementById('bm-dz-host').innerHTML =
