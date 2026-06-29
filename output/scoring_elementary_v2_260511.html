@@ -203,6 +203,25 @@ body.before-ai-rerun .score-btn.ai-suggest:hover{background:#f4f8ff;border-color
   .help-tip-pop::before{left:auto;right:14px}
 }
 
+/* ══════ 문항 단위 직접 채점 (AI 채점 제외) — 채점 화면 인라인 표시 ══════ */
+/* 상단 회색 안내 배너 */
+.qx-banner{display:flex;align-items:center;gap:8px;margin:0 0 12px;padding:11px 14px;background:#f1f3f5;border:1px solid #e2e5ea;border-radius:10px;font-size:13px;color:#4b5160;line-height:1.5}
+.qx-banner i{color:#6d3bd6}
+.qx-banner strong{font-weight:700;color:#3b3f4c}
+/* 아웃라인 보라 배지 (문항 카드 헤더) */
+.qx-badge{display:inline-flex;align-items:center;gap:4px;height:24px;padding:0 9px;border-radius:100px;background:#fff;border:1px solid #b9a7f0;color:#6d3bd6;font-size:12px;font-weight:700;line-height:1;flex-shrink:0;white-space:nowrap}
+.qx-badge i{width:12px;height:12px}
+/* 회색 안내문 */
+.qx-note{display:flex;align-items:center;gap:6px;font-size:13px;color:#6d7381;line-height:1.5}
+.qx-note i{width:14px;height:14px;flex-shrink:0;color:#9aa0ac}
+/* 인식 결과 접기/펼치기 */
+.qx-reveal{align-self:flex-start;display:inline-flex;align-items:center;gap:5px;height:30px;padding:0 12px;background:#fff;border:1px solid #dde1e8;border-radius:8px;color:#4b5160;font-family:inherit;font-size:13px;font-weight:600;cursor:pointer;line-height:1}
+.qx-reveal:hover{border-color:#b9a7f0;color:#6d3bd6}
+.qx-reveal i{width:14px;height:14px;transition:transform .15s}
+.qx-body-inner{display:flex;flex-direction:column;gap:12px}
+.qx-collapsed .qx-body-inner{display:none}
+.eval-card.qx-card .ec-card-header{background:#f5f3ff}
+
 /* ══════ 문항 카드 (아기자기) ══════ */
 .eval-tab-pane{display:none;flex-direction:column;gap:12px}
 .eval-tab-pane.active{display:flex}
@@ -913,6 +932,12 @@ select.field-input{appearance:none;-webkit-appearance:none;background-image:url(
             </span>
           </span>
         </div>
+      </div>
+
+      <!-- 문항 단위 직접 채점(AI 제외) 안내 배너 — 제외 문항 있을 때만 -->
+      <div class="qx-banner" id="qx-banner" style="display:none;">
+        <i data-lucide="user-pen" style="width:16px;height:16px;flex-shrink:0;"></i>
+        <span><strong id="qx-banner-count">0개 문항</strong>은 선생님이 직접 채점하는 문항으로, AI 채점에서 제외됐어요.</span>
       </div>
 
       <div class="view-toggle full" role="tablist">
@@ -1716,10 +1741,49 @@ function doRevertAllBlocks(kind){
   showToast('success', 'AI 초안으로 되돌렸어요.');
 }
 
+// ===== 문항 단위 직접 채점 (AI 채점 제외) — OCR 화면에서 세션 공유된 상태 읽기 =====
+var OCR_EXCLUDE_KEY = 'clipo_ocr_exclude';
+function getExcludeMap(){ try { return JSON.parse(sessionStorage.getItem(OCR_EXCLUDE_KEY)) || {}; } catch(e){ return {}; } }
+function getStudentExcludes(){ var m = getExcludeMap(); return (m && m[studentId]) ? m[studentId] : {}; }
+function updateQxBanner(){
+  var b = document.getElementById('qx-banner'); if(!b) return;
+  var n = Object.keys(getStudentExcludes()).length;
+  if(n > 0){ document.getElementById('qx-banner-count').textContent = n + '개 문항'; b.style.display = 'flex'; }
+  else { b.style.display = 'none'; }
+  if(window.lucide) lucide.createIcons();
+}
+function toggleQxReveal(i){
+  var card = document.getElementById('inst-card-'+i); if(!card) return;
+  var collapsed = card.classList.toggle('qx-collapsed');
+  var btn = card.querySelector('.qx-reveal');
+  if(btn){
+    var sp = btn.querySelector('span'); if(sp) sp.textContent = collapsed ? '인식 결과 보기' : '인식 결과 접기';
+    var ic = btn.querySelector('i'); if(ic) ic.style.transform = collapsed ? '' : 'rotate(180deg)';
+  }
+}
+
 function renderInstructionCards(){
   var pane = document.getElementById('pane-instruction');
+  var excl = getStudentExcludes();
   var cards = INSTRUCTIONS.map(function(it,i){
     var ac = levelAccent(it.level);
+    if(excl[i]){
+      // 직접 채점(AI 제외) 문항: 보라 배지 + 회색 안내문 + 인식 결과 기본 접기
+      return '<div class="eval-card ac-purple qx-card qx-collapsed" data-kind="instruction" data-idx="'+i+'" id="inst-card-'+i+'">'
+        +'<div class="ec-card-header readonly-header">'
+        +'<span class="qx-badge"><i data-lucide="user-pen"></i>직접 채점 (AI 제외)</span>'
+        +'<span class="ec-title-line"><span class="ec-label">'+escHtml(it.label)+'</span><span class="ec-summary-wrap"><span class="ec-summary">'+escHtml(it.summary)+'</span><span class="ec-summary-tip">'+escHtml(it.summary)+'</span></span></span>'
+        +'</div>'
+        +'<div class="ec-card-body">'
+        +'<div class="qx-note"><i data-lucide="info"></i>선생님 직접 채점 문항으로, AI 채점에서 제외됩니다.</div>'
+        +'<button type="button" class="qx-reveal" onclick="toggleQxReveal('+i+')"><i data-lucide="chevron-down"></i><span>인식 결과 보기</span></button>'
+        +'<div class="qx-body-inner">'
+        +groundBlock(it.explanation)
+        +feedbackBlock(it.feedback)
+        +'</div>'
+        +'</div>'
+        +'</div>';
+    }
     return '<div class="eval-card '+ac+'" data-kind="instruction" data-idx="'+i+'">'
       +'<div class="ec-card-header editable-header" onclick="openInstructionEditModal('+i+')">'
       +(it.level === 'hidden' ? '' : '<span class="ec-level lv-'+it.level+'">'+LEVEL_LABEL[it.level]+'</span>')
@@ -1733,8 +1797,10 @@ function renderInstructionCards(){
   }).join('');
   pane.innerHTML = cards + renderTabActions('instruction');
   bindEditableHandlers();
+  updateQxBanner();
   requestAnimationFrame(applySummaryTips);
   if(document.fonts && document.fonts.ready){ document.fonts.ready.then(applySummaryTips); }
+  if(window.lucide) lucide.createIcons();
 }
 
 // 실제로 말줄임된 제목에만 툴팁 활성화 (잘리지 않은 제목은 툴팁 숨김)

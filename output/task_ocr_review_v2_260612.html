@@ -192,6 +192,13 @@
     .badge-red{ background:#fff3f4; color:#db3e51; }
     .badge-orange{ background:#fff7ed; color:#ea580c; }
     .badge-purple{ background:#e9f2ff; color:#3151c4; }
+    /* ===== 문항 단위 직접 채점 (AI 제외) — OCR 토글 (보라) ===== */
+    .qx-toggle{ display:inline-flex; align-items:center; gap:4px; height:24px; padding:0 9px; background:#fff; border:1px solid #d9d9d9; border-radius:6px; color:#6d7381; font-family:inherit; font-size:11px; font-weight:700; cursor:pointer; flex-shrink:0; line-height:1; white-space:nowrap; }
+    .qx-toggle:hover{ border-color:#b9a7f0; color:#6d3bd6; }
+    .qx-toggle.on{ background:#f3eefe; border-color:#7c4dff; color:#6d3bd6; }
+    .qx-toggle i{ width:12px; height:12px; }
+    .rubric-ocr-section.qx-on{ border-color:#cdbcf5; box-shadow:inset 3px 0 0 #7c4dff; }
+    .rubric-ocr-section.qx-on .rubric-ocr-body{ opacity:.55; }
     .badge-gray{ background:#f6f7f9; color:#6d7381; }
     .badge-blue{ background:#e9f2ff; color:#3151c4; }
 
@@ -2918,6 +2925,10 @@ function mpsGo(which){
   else if (which === 'stuPending')   mpsStudent('10104', '채점전');     // OCR 미진행
   else if (which === 'stuFail')      mpsStudent('10105', '채점실패');   // OCR 인식 실패
   else if (which === 'stuStale')     mpsStudent('10107', 'OCR수정됨');  // 재채점 필요(stale)
+  else if (which === 'stuExclude') {                                    // 문항 직접 채점 (AI 제외) — 데모 상태 주입 후 점프
+    var m = getExcludeMap(); m['10101'] = { '1': true, '3': true }; saveExcludeMap(m);
+    mpsStudent('10101', '김피드백');
+  }
   if (window.lucide) lucide.createIcons();
 }
 function mpsToggle(){
@@ -3196,6 +3207,25 @@ function confirmOCR_B() {
 }
 
 // ── A안 OCR 뷰 ──
+// ===== 문항 단위 직접 채점 (AI 채점 제외) — OCR↔채점 화면 세션 공유 =====
+// 제외 상태 형태: { studentId: { 문항index: true } } · 세션키 clipo_ocr_exclude
+var OCR_EXCLUDE_KEY = 'clipo_ocr_exclude';
+function getExcludeMap(){ try { return JSON.parse(sessionStorage.getItem(OCR_EXCLUDE_KEY)) || {}; } catch(e){ return {}; } }
+function saveExcludeMap(m){ try { sessionStorage.setItem(OCR_EXCLUDE_KEY, JSON.stringify(m)); } catch(e){} }
+function isQExcluded(studentId, qIndex){ var m = getExcludeMap(); return !!(m[studentId] && m[studentId][qIndex]); }
+function toggleQExclude(studentId, qIndex, btn){
+  var m = getExcludeMap();
+  if (!m[studentId]) m[studentId] = {};
+  if (m[studentId][qIndex]) { delete m[studentId][qIndex]; if (!Object.keys(m[studentId]).length) delete m[studentId]; }
+  else { m[studentId][qIndex] = true; }
+  saveExcludeMap(m);
+  var on = isQExcluded(studentId, qIndex);
+  if (btn) btn.classList.toggle('on', on);
+  var sec = document.getElementById('ocr-sec-' + qIndex);
+  if (sec) sec.classList.toggle('qx-on', on);
+  showToast(on ? '이 문항은 선생님이 직접 채점해요. AI 채점에서 제외됩니다.' : '이 문항을 다시 AI 채점 대상으로 되돌렸어요.', 'success');
+}
+
 function renderOCRView() {
   var student = ocrStudents[currentStudentIdx];
   if (!student) return;
@@ -3254,11 +3284,13 @@ function renderOCRText(student) {
         ? '<span class="rubric-suspect-chip"><i data-lucide="alert-circle" style="width:11px;height:11px;"></i>확인 필요</span>'
         : '';
       var bodyText = group.text || (group.spans ? group.spans.map(function(s){ return s.text; }).join(' ') : '');
-      html += '<div class="rubric-ocr-section">';
+      var qExcluded = isQExcluded(student.id, gi);
+      html += '<div class="rubric-ocr-section' + (qExcluded ? ' qx-on' : '') + '" id="ocr-sec-' + gi + '">';
       html += '<div class="rubric-ocr-header">';
       html += '<span class="badge badge-purple" style="font-size:12px;padding:3px 10px;">' + group.label + '</span>';
       html += '<span class="rubric-ocr-desc">' + group.desc + '</span>';
       html += chipHtml;
+      html += '<button type="button" class="qx-toggle' + (qExcluded ? ' on' : '') + '" onclick="toggleQExclude(\'' + student.id + '\',' + gi + ',this)" title="이 문항을 선생님이 직접 채점하고 AI 채점에서 제외해요. (수식·그래프 등)"><i data-lucide="user-pen"></i>직접 채점 (AI 제외)</button>';
       html += '<button class="formula-insert-btn" onmousedown="event.preventDefault()" onclick="openFormulaInput(\'group-ta-' + gi + '\')" title="수식 입력" style="align-items:center;justify-content:center;line-height:1;gap:3px;height:24px;padding:0 8px;background:white;border:1px solid #d9d9d9;border-radius:6px;color:#3b3f4c;font-family:inherit;font-size:11px;font-weight:700;cursor:pointer;flex-shrink:0;"><i data-lucide="sigma" style="width:11px;height:11px;"></i>수식</button>';
       html += '<button onclick="editSection(this,' + gi + ')" title="편집" style="background:none;border:none;cursor:pointer;color:#b3b6bd;padding:2px 4px;flex-shrink:0;display:flex;align-items:center;">';
       html += '<i data-lucide="pencil" style="width:13px;height:13px;"></i></button>';
@@ -4584,6 +4616,7 @@ applyDeidState();
     <button class="mp-btn" data-k="stuPending" onclick="mpsGo('stuPending')">OCR 미진행 <span class="mp-sub">채점 전·직접 채점</span></button>
     <button class="mp-btn" data-k="stuFail" onclick="mpsGo('stuFail')">OCR 인식 실패 <span class="mp-sub">채점실패·직접 채점</span></button>
     <button class="mp-btn" data-k="stuStale" onclick="mpsGo('stuStale')">재채점 필요 <span class="mp-sub">OCR수정됨·stale</span></button>
+    <button class="mp-btn" data-k="stuExclude" onclick="mpsGo('stuExclude')">문항 직접 채점 <span class="mp-sub">AI 제외 문항</span></button>
   </div>
 </div>
 
