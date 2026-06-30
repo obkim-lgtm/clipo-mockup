@@ -5254,6 +5254,13 @@ function goDemo(n){
     renderTable(); renderActionBanners(1, 'A'); showScreen('screen-list');
   }
   else if (n === 4) { location.href = 'scoring_survey_v1_260623.html?id=10101&name=' + encodeURIComponent('설문 채점'); return; }
+  else if (n === 5 || n === 6 || n === 7) {
+    // 설문 업로드 실패 케이스 바로 보기 (양식 불일치 / 매칭 실패 / 제약 초과)
+    currentEvalType = 'A'; currentListClass = 2;
+    openUploadSurvey();
+    surveyFilePicked();
+    surveyShowCase(n === 5 ? 'format' : (n === 6 ? 'match' : 'over'));
+  }
   document.querySelectorAll('#demoNav .dn-step').forEach(function(el){ el.classList.toggle('on', +el.dataset.step === n); });
 }
 // 채점 플로우 데모 점프 (채점 화면에서만 노출)
@@ -5343,7 +5350,7 @@ function setupDemoNav(){
   syncDemoNavs();
   // 외부(과제물 관리 화면 등)에서 ?demo=N 으로 설문 플로우 특정 단계 바로 진입
   var dm = new URLSearchParams(location.search).get('demo');
-  if (dm) { var k = parseInt(dm, 10); if (k >= 1 && k <= 4) goDemo(k); }
+  if (dm) { var k = parseInt(dm, 10); if (k >= 1 && k <= 7) goDemo(k); }
   // 외부(학급 채점 현황·학생 상세)에서 ?sdemo=N 으로 채점 플로우 단계 진입
   var sdm = new URLSearchParams(location.search).get('sdemo');
   if (sdm) { var sk = parseInt(sdm, 10); if (sk >= 1 && sk <= 3) goDemoScoring(sk); }
@@ -5358,6 +5365,11 @@ window.addEventListener('load', setupDemoNav);
   <div class="dn-step" data-step="2"><span class="n">2</span>설문 응답 업로드</div>
   <div class="dn-step" data-step="3"><span class="n">3</span>제출 현황 (설문)</div>
   <div class="dn-step" data-step="4"><span class="n">4</span>설문 채점 결과</div>
+  <div style="height:1px;background:#3b3f4c;margin:8px 0 6px;"></div>
+  <div style="font-size:10.5px;font-weight:700;color:#8d93a0;letter-spacing:1px;padding:0 8px 4px;">실패 케이스</div>
+  <div class="dn-step" data-step="5"><span class="n" style="background:#5a2a2f;color:#ff9aa6;">!</span>양식 불일치</div>
+  <div class="dn-step" data-step="6"><span class="n" style="background:#5a2a2f;color:#ff9aa6;">!</span>학생 매칭 실패</div>
+  <div class="dn-step" data-step="7"><span class="n" style="background:#5a2a2f;color:#ff9aa6;">!</span>제약 초과</div>
 </div>
 
 <div class="demo-nav" id="demoNavScoring" style="display:none">
