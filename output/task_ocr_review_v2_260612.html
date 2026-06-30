@@ -1433,6 +1433,15 @@
           <div style="font-size:14px;color:#9a3412;line-height:1.55;">이미 <b>학급 PDF 자료</b>가 등록돼 있어요. 설문 응답을 등록하면 <b>기존 PDF 자료와 채점 결과가 교체</b>돼요. 한 학급에는 한 종류의 자료만 등록할 수 있어요.</div>
         </div>
 
+        <!-- [데모] 업로드 결과 케이스 — 실패 안내 흐름 확인용 -->
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:16px;padding:10px 14px;background:#f1f3f5;border-radius:8px;">
+          <span style="font-size:12px;font-weight:700;color:#6d7381;letter-spacing:0.3px;">데모 케이스</span>
+          <button class="sc-btn" data-c="normal" style="height:30px;padding:0 12px;border:1px solid #416bff;border-radius:100px;background:#416bff;color:#fff;font-size:13px;font-weight:600;font-family:inherit;cursor:pointer;" onclick="surveyShowCase('normal')">정상 업로드</button>
+          <button class="sc-btn" data-c="format" style="height:30px;padding:0 12px;border:1px solid #d9d9d9;border-radius:100px;background:#fff;color:#3b3f4c;font-size:13px;font-weight:600;font-family:inherit;cursor:pointer;" onclick="surveyShowCase('format')">양식 불일치</button>
+          <button class="sc-btn" data-c="match" style="height:30px;padding:0 12px;border:1px solid #d9d9d9;border-radius:100px;background:#fff;color:#3b3f4c;font-size:13px;font-weight:600;font-family:inherit;cursor:pointer;" onclick="surveyShowCase('match')">학생 매칭 실패</button>
+          <button class="sc-btn" data-c="over" style="height:30px;padding:0 12px;border:1px solid #d9d9d9;border-radius:100px;background:#fff;color:#3b3f4c;font-size:13px;font-weight:600;font-family:inherit;cursor:pointer;" onclick="surveyShowCase('over')">제약 초과</button>
+        </div>
+
         <!-- 카드 1: 양식 다운로드 후 업로드 -->
         <div class="ev-card" style="margin-bottom:16px;">
           <h3 style="font-size:18px;font-weight:600;color:#222631;margin:0 0 4px;">1. 양식 다운로드 후 업로드</h3>
@@ -1466,12 +1475,27 @@
         <!-- 카드 2: 업로드 내용 확인 -->
         <div class="ev-card">
           <h3 style="font-size:18px;font-weight:600;color:#222631;margin:0 0 16px;">2. 업로드 내용 확인</h3>
+          <!-- 양식 불일치 — 등록 거부 -->
+          <div id="survey-reject" style="display:none;">
+            <div style="display:flex;align-items:flex-start;gap:12px;background:#fff3f4;border:1px solid #f5b5bc;border-radius:8px;padding:16px 18px;">
+              <i data-lucide="alert-circle" style="width:20px;height:20px;color:#f2525f;flex-shrink:0;margin-top:1px;"></i>
+              <div>
+                <div style="font-size:16px;font-weight:700;color:#c0394a;margin-bottom:4px;">양식을 읽을 수 없어 등록할 수 없어요.</div>
+                <div style="font-size:14px;color:#9a1b29;line-height:1.6;">양식 <b>맨 윗줄(제목 줄)이 지워졌거나 열 순서가 바뀐</b> 것 같아요. 응답을 복사해 붙이실 때 <b>제목 줄은 그대로 두고</b> 학생 답변만 채워 주세요. 헷갈리면 위에서 <b>양식을 다시 받아</b> 작성해 주세요.</div>
+                <button class="btn btn-outline btn-sm" style="margin-top:12px;" onclick="surveyDownloadTemplate()"><i data-lucide="download" style="width:14px;height:14px;"></i>설문 응답 양식 다시 받기</button>
+              </div>
+            </div>
+          </div>
           <div id="survey-empty" style="padding:64px 20px;text-align:center;">
             <div style="width:56px;height:56px;border-radius:50%;background:#f1f3f5;color:#6d7381;display:inline-flex;align-items:center;justify-content:center;margin-bottom:16px;"><i data-lucide="file-text" style="width:28px;height:28px;"></i></div>
             <div style="font-size:16px;font-weight:600;color:#222631;margin-bottom:4px;">파일을 업로드해 주세요.</div>
             <div style="font-size:14px;color:#6d7381;">업로드 후 등록할 내용을 확인할 수 있어요.</div>
           </div>
           <div id="survey-result" style="display:none;">
+            <div id="survey-warn" style="display:none;align-items:flex-start;gap:10px;background:#fff7ed;border:1px solid #fed7aa;border-radius:8px;padding:12px 14px;margin-bottom:16px;">
+              <i data-lucide="alert-triangle" style="width:18px;height:18px;color:#f97316;flex-shrink:0;margin-top:1px;"></i>
+              <div id="survey-warn-text" style="font-size:14px;color:#9a3412;line-height:1.55;"></div>
+            </div>
             <div style="font-size:14px;color:#3b3f4c;margin-bottom:12px;">평가 문항 <span style="color:#416bff;font-weight:700;" id="survey-q-total">0</span>개</div>
             <div style="border:1px solid #e5e7eb;border-radius:8px;overflow:hidden;margin-bottom:24px;">
               <table style="width:100%;border-collapse:separate;border-spacing:0;font-size:14px;">
@@ -4550,18 +4574,87 @@ var surveyRows = [];
 function surveyDownloadTemplate() {
   showToast('설문 응답 양식을 다운로드했어요.', 'success');
 }
+var surveyCase = 'normal';
+function surveyShowCase(c) {
+  surveyCase = c;
+  document.querySelectorAll('#upload-state-survey .sc-btn').forEach(function(b){
+    var on = b.dataset.c === c;
+    b.style.background = on ? '#416bff' : '#fff';
+    b.style.color = on ? '#fff' : '#3b3f4c';
+    b.style.borderColor = on ? '#416bff' : '#d9d9d9';
+  });
+  if (document.getElementById('survey-file-chip').style.display !== 'none') applySurveyCase();
+}
 function surveyFilePicked() {
   document.getElementById('survey-file-chip').style.display = 'flex';
   surveyRows = SURVEY_ROWS.map(function(r){ return { sid:r.sid, name:r.name, answers:r.answers.slice() }; });
-  renderSurveyResult();
+  applySurveyCase();
   lucide.createIcons();
+}
+function applySurveyCase() {
+  var reject = document.getElementById('survey-reject');
+  var warn = document.getElementById('survey-warn');
+  var saveBtn = document.getElementById('survey-save-btn');
+  document.getElementById('survey-empty').style.display = 'none';
+  if (surveyCase === 'format') {
+    reject.style.display = 'block';
+    document.getElementById('survey-result').style.display = 'none';
+    saveBtn.disabled = true;
+    lucide.createIcons();
+    return;
+  }
+  reject.style.display = 'none';
+  renderSurveyResult();
+  if (surveyCase === 'match') {
+    appendSurveyUnmatchedRows();
+    warn.style.display = 'flex';
+    document.getElementById('survey-warn-text').innerHTML = '명단에서 찾을 수 없는 행이 <b>2건</b> 있어요. 학번·이름을 확인해 직접 지정하거나 해당 행을 제외한 뒤 등록할 수 있어요. (같은 이름은 서로 바뀔 수 있으니 한 번 더 확인해 주세요)';
+    saveBtn.disabled = true;
+  } else if (surveyCase === 'over') {
+    markSurveyOverLimit();
+    warn.style.display = 'flex';
+    document.getElementById('survey-warn-text').innerHTML = '응답 글자수 <b>1,000자</b>를 넘는 항목이 있어요. 넘는 부분은 잘릴 수 있으니 확인 후 등록해 주세요.';
+  } else {
+    warn.style.display = 'none';
+  }
+  lucide.createIcons();
+}
+function appendSurveyUnmatchedRows() {
+  var tbody = document.getElementById('survey-r-rows');
+  if (!tbody) return;
+  var span = SURVEY_Q.length + 2;
+  function row(no, sid, name, msg) {
+    return '<tr style="background:#fff8f8;">'
+      + '<td style="padding:14px;text-align:center;border-bottom:1px solid #f1f3f5;color:#c0394a;font-size:14px;font-weight:600;">' + no + '</td>'
+      + '<td style="padding:14px;text-align:center;border-bottom:1px solid #f1f3f5;color:#c0394a;font-size:14px;font-weight:600;">' + sid + '</td>'
+      + '<td style="padding:14px;text-align:center;border-bottom:1px solid #f1f3f5;color:#c0394a;font-size:14px;font-weight:600;">' + name + '</td>'
+      + '<td colspan="' + span + '" style="padding:12px 14px;border-bottom:1px solid #f1f3f5;">'
+        + '<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">'
+          + '<span style="display:inline-flex;align-items:center;gap:5px;color:#c0394a;font-size:13px;font-weight:600;"><i data-lucide="user-x" style="width:14px;height:14px;"></i>' + msg + '</span>'
+          + '<select style="height:32px;border:1px solid #d9d9d9;border-radius:6px;font-family:inherit;font-size:13px;color:#3b3f4c;padding:0 8px;"><option>학생 직접 지정…</option><option>10106 한지우</option><option>10107 조민재</option><option>10108 윤하은</option></select>'
+          + '<button style="height:32px;padding:0 10px;border:1px solid #d9d9d9;border-radius:6px;background:#fff;color:#6d7381;font-size:13px;font-weight:600;font-family:inherit;cursor:pointer;">행 제외</button>'
+        + '</div></td></tr>';
+  }
+  tbody.innerHTML += row(surveyRows.length + 1, '10188', '홍서윤', '명단에 없는 학번·이름이에요')
+    + row(surveyRows.length + 2, '—', '김서윤', '같은 이름이 둘이라 어느 학생인지 확인이 필요해요');
+  lucide.createIcons();
+}
+function markSurveyOverLimit() {
+  var fr = document.querySelector('#survey-r-rows tr');
+  if (!fr) return;
+  fr.style.background = '#fff8f8';
+  var c = fr.children[3];
+  if (c) c.innerHTML += '<div style="margin-top:4px;"><span style="font-size:11px;color:#c0394a;background:#fff3f4;border-radius:100px;padding:1px 6px;font-weight:600;white-space:nowrap;">1,000자 초과</span></div>';
 }
 function surveyClear() {
   document.getElementById('survey-file-chip').style.display = 'none';
+  document.getElementById('survey-reject').style.display = 'none';
   document.getElementById('survey-empty').style.display = 'block';
   document.getElementById('survey-result').style.display = 'none';
+  document.getElementById('survey-warn').style.display = 'none';
   document.getElementById('survey-save-btn').disabled = true;
   surveyRows = [];
+  surveyShowCase('normal');
   lucide.createIcons();
 }
 function surveyAnsweredCount(a) { return a.filter(function(x){ return x && x.trim(); }).length; }
