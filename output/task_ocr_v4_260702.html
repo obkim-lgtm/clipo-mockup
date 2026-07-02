@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="icon" type="image/png" href="clipo_favicon.png">
-  <title>과제물 관리 — 시안4 OCR 확인 옵션 (CLIPO)</title>
+  <title>채점 — 시안4 답안 확인 옵션 (CLIPO)</title>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard-gov.min.css">
   <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
   <style>
@@ -176,17 +176,13 @@
     .rm-chk{ width:18px; height:18px; accent-color:#416bff; cursor:pointer; vertical-align:middle; }
     .rm-chk:disabled{ cursor:not-allowed; opacity:.5; }
 
-    /* ===== 시안4: OCR 확인·수정 옵션 (실행 모달 2/2) ===== */
-    .rm-ocr-opt{ flex-shrink:0; border:1px solid #dde1e8; border-radius:10px; padding:16px 18px; display:flex; flex-direction:column; gap:8px; transition:background .18s, border-color .18s; }
-    .rm-ocr-opt.on{ border-color:#ccdfff; background:#f6f9ff; }
-    .rm-ocr-opt-top{ display:flex; align-items:center; justify-content:space-between; gap:12px; }
-    .rm-ocr-opt-title{ font-size:16px; font-weight:600; color:#222631; display:inline-flex; align-items:center; gap:8px; }
-    .rm-ocr-opt-desc{ font-size:14px; color:#6d7381; line-height:1.6; }
-    .rm-switch{ position:relative; width:44px; height:24px; border-radius:100px; background:#c7cbd3; cursor:pointer; transition:background .18s; flex-shrink:0; border:none; padding:0; }
-    .rm-switch::after{ content:''; position:absolute; top:2px; left:2px; width:20px; height:20px; border-radius:50%; background:#fff; box-shadow:0 1px 3px rgba(0,0,0,.2); transition:left .18s; }
-    .rm-switch.on{ background:#416bff; }
-    .rm-switch.on::after{ left:22px; }
-    .rm-ocr-scope{ display:flex; align-items:center; gap:18px; padding-top:10px; margin-top:4px; border-top:1px solid #dbe5fb; }
+    /* ===== 시안4: 답안 확인 부가 옵션 (실행 모달 2/2 — 표 아래 한 줄) ===== */
+    .rm-ocr-opt{ flex-shrink:0; display:flex; flex-direction:column; gap:8px; border-radius:8px; padding:10px 12px; margin:0 -12px; transition:background .18s; }
+    .rm-ocr-opt.on{ background:#f6f9ff; }
+    .rm-ocr-line{ display:flex; align-items:center; gap:9px; cursor:pointer; font-size:14px; color:#3b3f4c; line-height:1.45; }
+    .rm-ocr-line strong{ color:#222631; font-weight:600; }
+    .rm-ocr-cost{ margin-left:auto; font-size:13px; color:#6d7381; white-space:nowrap; }
+    .rm-ocr-scope{ display:flex; align-items:center; gap:18px; padding-left:27px; }
     .rm-ocr-scope-lbl{ font-size:14px; font-weight:600; color:#3b3f4c; }
     .rm-ocr-scope-radio{ display:inline-flex; align-items:center; gap:7px; font-size:14px; color:#222631; cursor:pointer; line-height:1; }
     .rm-ocr-scope-radio input{ width:17px; height:17px; accent-color:#416bff; cursor:pointer; margin:0; }
@@ -2206,20 +2202,6 @@
       <button class="rm-close" onclick="closeRmModal('runModal2')"><i data-lucide="x" style="width:20px;height:20px"></i></button>
     </div>
     <div class="rm-body">
-      <!-- OCR 확인·수정 옵션 (설명이 행동 전에 읽히도록 표 앞에 배치) -->
-      <div class="rm-ocr-opt" id="rm-ocr-opt">
-        <div class="rm-ocr-opt-top">
-          <span class="rm-ocr-opt-title"><i data-lucide="scan-text" style="width:18px;height:18px;color:#416bff;"></i>OCR 인식 결과 확인·수정</span>
-          <button class="rm-switch" id="rm-ocr-switch" onclick="rmOcrSwitch()" aria-label="OCR 인식 결과 확인·수정 옵션"></button>
-        </div>
-        <div class="rm-ocr-opt-desc">채점에 사용된 답안 인식(OCR) 결과를 원본과 대조해 확인·수정할 수 있어요. 선택한 학생 1명당 AI 크레딧 1개가 추가 사용됩니다.</div>
-        <!-- 확인 대상 (토글 ON 시에만 펼침 — 직접 선택일 때만 표에 OCR 열 노출) -->
-        <div class="rm-ocr-scope" id="rm-ocr-scope" style="display:none;">
-          <span class="rm-ocr-scope-lbl">확인 대상</span>
-          <label class="rm-ocr-scope-radio"><input type="radio" name="rm-ocr-scope" checked onchange="rmOcrSetMode('all')">채점 학생 전체 <span id="rm-ocr-scope-n">0</span>명</label>
-          <label class="rm-ocr-scope-radio"><input type="radio" name="rm-ocr-scope" onchange="rmOcrSetMode('custom')">직접 선택</label>
-        </div>
-      </div>
       <div class="rm-tbl-wrap">
         <table class="rm-tbl">
           <thead>
@@ -2229,18 +2211,32 @@
               <th>이름</th>
               <th style="width:96px;">AI 채점</th>
               <th style="width:104px;">선생님 채점</th>
-              <th style="width:116px;display:none;" id="rm-th-ocr"><label style="display:inline-flex;align-items:center;justify-content:center;gap:6px;cursor:pointer;line-height:1;"><input type="checkbox" class="rm-chk" id="rm-ocr-all" onchange="rmOcrAll(this)">OCR 확인</label></th>
+              <th style="width:116px;display:none;" id="rm-th-ocr"><label style="display:inline-flex;align-items:center;justify-content:center;gap:6px;cursor:pointer;line-height:1;"><input type="checkbox" class="rm-chk" id="rm-ocr-all" onchange="rmOcrAll(this)">답안 확인</label></th>
             </tr>
           </thead>
           <tbody id="rm-student-tbody"></tbody>
         </table>
+      </div>
+      <!-- 부가 옵션: 채점 결과에서 AI가 읽은 답안 확인 (표 아래 한 줄 — 필수 과업처럼 안 보이게) -->
+      <div class="rm-ocr-opt" id="rm-ocr-opt">
+        <label class="rm-ocr-line">
+          <input type="checkbox" class="rm-chk" id="rm-ocr-chk" onchange="rmOcrSwitch()">
+          <span>채점 결과에서 <strong>AI가 읽은 답안</strong>도 확인·수정하기</span>
+          <span class="rm-ocr-cost">학생 1명당 크레딧 1개</span>
+        </label>
+        <!-- 확인 대상 (체크 시에만 펼침 — 직접 선택일 때만 표에 답안 확인 열 노출) -->
+        <div class="rm-ocr-scope" id="rm-ocr-scope" style="display:none;">
+          <span class="rm-ocr-scope-lbl">확인 대상</span>
+          <label class="rm-ocr-scope-radio"><input type="radio" name="rm-ocr-scope" checked onchange="rmOcrSetMode('all')">채점 학생 전체 <span id="rm-ocr-scope-n">0</span>명</label>
+          <label class="rm-ocr-scope-radio"><input type="radio" name="rm-ocr-scope" onchange="rmOcrSetMode('custom')">직접 선택</label>
+        </div>
       </div>
       <!-- 크레딧 요약 (실시간) -->
       <div class="rm-credit-bar">
         <div class="rm-credit-items">
           <span>AI 채점 <strong id="rm-cr-grade">0</strong>명</span>
           <span class="sep" id="rm-cr-ocr-sep" style="display:none;">·</span>
-          <span id="rm-cr-ocr-item" style="display:none;">OCR 확인 <strong id="rm-cr-ocr">0</strong>명</span>
+          <span id="rm-cr-ocr-item" style="display:none;">답안 확인 <strong id="rm-cr-ocr">0</strong>명</span>
         </div>
         <div class="rm-credit-total"><i data-lucide="bot" style="width:17px;height:17px;color:#416bff;"></i>총 <span class="num" id="rm-cr-total">0</span> 크레딧 사용</div>
       </div>
@@ -3085,8 +3081,8 @@ function showListForClass(classNum, evalType) {
     else { stateClass = classNum; }
     currentStateClass = stateClass;
   }
-  // 시안4: 인식 결과는 채점 실행 시 OCR 확인 옵션을 선택한 학생만 확인 가능 → 비활성 + 안내 툴팁
-  disableOcrBtn('채점 실행 시 OCR 확인 옵션을 선택한 학생만 확인할 수 있습니다.');
+  // 시안4: 인식 결과는 채점 실행 시 답안 확인 옵션을 선택한 학생만 확인 가능 → 비활성 + 안내 툴팁
+  disableOcrBtn('채점 실행 시 답안 확인 옵션을 선택한 학생만 확인할 수 있습니다.');
 
   renderTable();
   showScreen('screen-list');
@@ -3282,8 +3278,8 @@ function toggleEvCard(el){
 }
 // ===== 까망이 목업 화면 선택기 — 시안4 케이스 (채점 실행 3종 + 결과 보기 2종) =====
 function mpResetOcrOption(){
-  // 반복 시연용 리셋: 토글 OFF·전체 모드·학생별 OCR 선택 해제
-  if (typeof rmOcrOn !== 'undefined' && rmOcrOn) rmOcrSwitch();
+  // 반복 시연용 리셋: 체크 OFF·전체 모드·학생별 답안 확인 선택 해제
+  rmOcrSet(false);
   rmOcrMode = 'all';
 }
 function mpGo(which){
@@ -3295,9 +3291,9 @@ function mpGo(which){
     renderRunStudents();
     openRmModal('runModal2');
     if (which === 'runAll') {
-      rmOcrSwitch();
+      rmOcrSet(true);
     } else if (which === 'runCustom') {
-      rmOcrSwitch();
+      rmOcrSet(true);
       var radios = document.getElementsByName('rm-ocr-scope');
       if (radios.length > 1) { radios[0].checked = false; radios[1].checked = true; }
       rmOcrSetMode('custom');
@@ -4910,17 +4906,18 @@ function rmAiCell(s) {
   if (s.ai === 'absent') return '<span style="color:#b3b6bd;">미제출</span>';
   return '<span style="color:#6d7381;">-</span>';
 }
-// ── 시안4: OCR 확인·수정 옵션 (학생당 크레딧 1개 추가) ──
-// 2단 점진적 공개: 토글 ON → 기본 '채점 학생 전체' / '직접 선택' 시에만 표에 OCR 열 노출
-var rmOcrOn = false;       // 옵션 토글 상태 (기본 OFF)
+// ── 시안4: 답안 확인 부가 옵션 (학생당 크레딧 1개 추가) ──
+// 2단 점진적 공개: 체크 ON → 기본 '채점 학생 전체' / '직접 선택' 시에만 표에 답안 확인 열 노출
+var rmOcrOn = false;       // 옵션 체크 상태 (기본 OFF)
 var rmOcrMode = 'all';     // 'all'(채점 학생 전체) | 'custom'(직접 선택)
 function rmOcrColVisible() { return rmOcrOn && rmOcrMode === 'custom'; }
-function rmOcrSwitch() {
-  rmOcrOn = !rmOcrOn;
-  document.getElementById('rm-ocr-switch').classList.toggle('on', rmOcrOn);
-  document.getElementById('rm-ocr-opt').classList.toggle('on', rmOcrOn);
-  document.getElementById('rm-ocr-scope').style.display = rmOcrOn ? 'flex' : 'none';
-  if (rmOcrOn) {
+function rmOcrSet(on) {
+  rmOcrOn = on;
+  var chk = document.getElementById('rm-ocr-chk');
+  if (chk) chk.checked = on;
+  document.getElementById('rm-ocr-opt').classList.toggle('on', on);
+  document.getElementById('rm-ocr-scope').style.display = on ? 'flex' : 'none';
+  if (on) {
     // 켤 때는 항상 '전체'에서 시작 (라디오도 원복)
     rmOcrMode = 'all';
     var radios = document.getElementsByName('rm-ocr-scope');
@@ -4930,6 +4927,10 @@ function rmOcrSwitch() {
   }
   document.getElementById('rm-th-ocr').style.display = rmOcrColVisible() ? '' : 'none';
   renderRunStudents();
+}
+function rmOcrSwitch() {
+  var chk = document.getElementById('rm-ocr-chk');
+  rmOcrSet(chk ? chk.checked : !rmOcrOn);
 }
 function rmOcrSetMode(mode) {
   rmOcrMode = mode;
@@ -5015,7 +5016,7 @@ function rmExec() {
   var m = rmOcrCount(n);
   if (n === 0) return;
   closeRmModal('runModal2');
-  if (m > 0) showToast(n + '명의 AI 채점을 시작합니다. OCR 확인을 선택한 ' + m + '명은 채점 완료 후 인식 결과를 확인·수정할 수 있어요.', 'success');
+  if (m > 0) showToast(n + '명의 AI 채점을 시작합니다. 답안 확인을 선택한 ' + m + '명은 채점 완료 후 AI가 읽은 답안을 확인·수정할 수 있어요.', 'success');
   else showToast(n + '명의 AI 채점을 시작합니다. 완료되면 결과 확인에서 볼 수 있어요.', 'success');
 }
 
@@ -5171,8 +5172,8 @@ initDiagPromo();
     <button class="mp-btn" data-k="runAll" onclick="mpGo('runAll')">옵션 ON — 채점 학생 전체 <span class="mp-sub">크레딧 합산</span></button>
     <button class="mp-btn" data-k="runCustom" onclick="mpGo('runCustom')">옵션 ON — 직접 선택 <span class="mp-sub">학생별 체크 열</span></button>
     <div class="mp-cap">결과 보기 · 학생 채점 상세</div>
-    <button class="mp-btn" data-k="resultOpt" onclick="mpGo('resultOpt')">OCR 확인 선택 학생 <span class="mp-sub">전사·수정 가능</span></button>
-    <button class="mp-btn" data-k="resultLocked" onclick="mpGo('resultLocked')">OCR 확인 미선택 학생 <span class="mp-sub">잠금 → 크레딧 해제</span></button>
+    <button class="mp-btn" data-k="resultOpt" onclick="mpGo('resultOpt')">답안 확인 선택 학생 <span class="mp-sub">전사·수정 가능</span></button>
+    <button class="mp-btn" data-k="resultLocked" onclick="mpGo('resultLocked')">답안 확인 미선택 학생 <span class="mp-sub">잠금 → 크레딧 해제</span></button>
   </div>
 </div>
 
