@@ -313,11 +313,18 @@ input[type="checkbox"] { width:18px; height:18px; accent-color:#416bff; cursor:p
 .toast svg { width:18px; height:18px; color:#93e3b9; }
 
 .demo-nav { position:fixed; right:24px; bottom:24px; z-index:150; background:#222631; color:#fff;
-  border-radius:14px; padding:14px 16px; width:252px; box-shadow:0 8px 24px rgba(0,0,0,.3); user-select:none; cursor:move; }
+  border-radius:14px; padding:8px; width:252px; box-shadow:0 8px 24px rgba(0,0,0,.3); user-select:none; }
 /* 드래그 중: iframe이 마우스 이벤트를 가로채 멈추는 현상 방지 + 텍스트 선택 방지 */
 body.dn-dragging { user-select:none; cursor:move; }
 body.dn-dragging .review-frame, body.dn-dragging .home-frame { pointer-events:none; }
-.dn-title { font-size:12px; font-weight:700; letter-spacing:1.5px; color:#b3b6bd; margin-bottom:10px; display:flex; align-items:center; justify-content:space-between; cursor:move; padding:2px 0 6px; }
+.dn-title { display:flex; align-items:center; justify-content:space-between; cursor:move; padding:5px 6px 8px; }
+.dn-titletext { font-size:12px; font-weight:700; letter-spacing:1.2px; color:#b3b6bd; display:flex; align-items:center; gap:6px; }
+.dn-fold { width:24px; height:24px; border-radius:6px; color:#b3b6bd; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; }
+.dn-fold:hover { background:#3b3f4c; color:#fff; }
+.dn-body { max-height:600px; overflow:hidden; transition:max-height .22s ease; }
+.demo-nav.collapsed .dn-title { padding-bottom:5px; }
+.demo-nav.collapsed .dn-body { max-height:0; }
+.demo-nav.collapsed .dn-fold svg { transform:rotate(180deg); }
 .dn-div { border-top:1px solid #3b3f4c; margin:8px 2px; }
 .dn-cases { font-size:10px; font-weight:700; letter-spacing:1.2px; color:#6d7381; padding:0 8px 5px; }
 .dn-step { display:flex; align-items:center; gap:9px; padding:7px 8px; border-radius:8px; font-size:13.5px; font-weight:500; color:#c7cbd3; cursor:pointer; }
@@ -611,15 +618,20 @@ body.dn-dragging .review-frame, body.dn-dragging .home-frame { pointer-events:no
 
 <!-- ═════════ 데모 내비게이터 ═════════ -->
 <div class="demo-nav" id="demoNav">
-  <div class="dn-title"><span>DEMO FLOW</span><i data-lucide="grip-horizontal" style="width:16px;height:16px"></i></div>
-  <div class="dn-step on" data-step="1"><span class="n">1</span>수업 홈 · 확인 요청<span class="dn-persona owner">소유자</span></div>
-  <div class="dn-step" data-step="2"><span class="n">2</span>홈 · 요청 수신<span class="dn-persona reviewer">검토자</span></div>
-  <div class="dn-step" data-step="3"><span class="n">3</span>검토 모드 · 확인<span class="dn-persona reviewer">검토자</span></div>
-  <div class="dn-step" data-step="4"><span class="n">4</span>확인 완료 · 의견 수신<span class="dn-persona owner">소유자</span></div>
-  <div class="dn-div"></div>
-  <div class="dn-cases">엣지 케이스</div>
-  <div class="dn-step" data-step="5"><span class="n">5</span>확인 2명 누적<span class="dn-persona owner">소유자</span></div>
-  <div class="dn-step" data-step="6"><span class="n">6</span>권한 없음 안내<span class="dn-persona reviewer">검토자</span></div>
+  <div class="dn-title" id="dnHandle">
+    <span class="dn-titletext"><i data-lucide="grip-horizontal" style="width:14px;height:14px"></i> DEMO FLOW</span>
+    <button class="dn-fold" id="dnFold" title="접기/펼치기"><i data-lucide="chevron-down" style="width:16px;height:16px"></i></button>
+  </div>
+  <div class="dn-body" id="dnBody">
+    <div class="dn-step on" data-step="1"><span class="n">1</span>수업 홈 · 확인 요청<span class="dn-persona owner">소유자</span></div>
+    <div class="dn-step" data-step="2"><span class="n">2</span>홈 · 요청 수신<span class="dn-persona reviewer">검토자</span></div>
+    <div class="dn-step" data-step="3"><span class="n">3</span>검토 모드 · 확인<span class="dn-persona reviewer">검토자</span></div>
+    <div class="dn-step" data-step="4"><span class="n">4</span>확인 완료 · 의견 수신<span class="dn-persona owner">소유자</span></div>
+    <div class="dn-div"></div>
+    <div class="dn-cases">엣지 케이스</div>
+    <div class="dn-step" data-step="5"><span class="n">5</span>확인 2명 누적<span class="dn-persona owner">소유자</span></div>
+    <div class="dn-step" data-step="6"><span class="n">6</span>권한 없음 안내<span class="dn-persona reviewer">검토자</span></div>
+  </div>
 </div>
 
 <script>
@@ -871,23 +883,26 @@ function toggleNav() {
   });
 }
 
-/* ───── 데모 내비: 스텝은 mousedown 즉시 전환, 패널 어디든 잡아 드래그 ───── */
+/* ───── 데모 내비: 타이틀 바 드래그 + 접기, 스텝 mousedown 즉시 전환 ───── */
+function toggleDemoNav() { document.getElementById('demoNav').classList.toggle('collapsed'); lucide.createIcons(); }
 (function() {
   const nav = document.getElementById('demoNav');
-  // 스텝 전환 — click(mouseup 대기) 대신 mousedown에서 바로 반응. stopPropagation으로 드래그 시작 차단
+  const handle = document.getElementById('dnHandle');
+  const fold = document.getElementById('dnFold');
+  // 스텝 전환 — mousedown 즉시 반응
   nav.querySelectorAll('.dn-step').forEach(el => {
-    el.addEventListener('mousedown', e => {
-      e.stopPropagation();
-      e.preventDefault();
-      goStep(+el.dataset.step);
-    });
+    el.addEventListener('mousedown', e => { e.stopPropagation(); e.preventDefault(); goStep(+el.dataset.step); });
   });
-  // 드래그 — 스텝을 제외한 패널 전체가 손잡이
+  // 접기 버튼 (드래그 시작 안 되게 mousedown 차단)
+  fold.addEventListener('mousedown', e => { e.stopPropagation(); });
+  fold.addEventListener('click', e => { e.stopPropagation(); toggleDemoNav(); });
+  // 드래그 — 타이틀 바 전용 (접기 버튼 제외)
   let drag = null;
-  nav.addEventListener('mousedown', e => {
+  handle.addEventListener('mousedown', e => {
+    if (e.target.closest('.dn-fold')) return;
     const r = nav.getBoundingClientRect();
     drag = { dx: e.clientX - r.left, dy: e.clientY - r.top };
-    document.body.classList.add('dn-dragging');   // 드래그 중 iframe 클릭 통과 + 텍스트선택 방지
+    document.body.classList.add('dn-dragging');
     e.preventDefault();
   });
   document.addEventListener('mousemove', e => {
