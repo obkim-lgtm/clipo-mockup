@@ -295,6 +295,16 @@ input[type="checkbox"] { width:18px; height:18px; accent-color:#416bff; cursor:p
 .dd-body { font-size:16px; line-height:1.6; margin-top:10px; color:#222631; }
 .dd-meta { font-size:13px; color:#6d7381; margin-top:10px; }
 
+/* 케이스: 권한 없음 안내 */
+.denied-wrap { min-height:calc(100vh - 180px); display:flex; align-items:center; justify-content:center; }
+.denied-card { max-width:460px; text-align:center; background:#fff; border-radius:16px;
+  box-shadow:0 0 1px #2226314D, 0 4px 8px #0000001A; padding:40px 36px; }
+.denied-ic { width:64px; height:64px; border-radius:100px; background:#f1f3f5; color:#6d7381;
+  display:inline-flex; align-items:center; justify-content:center; margin-bottom:18px; }
+.denied-card h2 { font-size:20px; font-weight:600; }
+.denied-card p { font-size:16px; color:#6d7381; line-height:1.6; margin-top:12px; }
+.denied-actions { display:flex; gap:8px; justify-content:center; margin-top:24px; }
+
 /* ───────── toast / demo nav ───────── */
 .toast { position:fixed; bottom:32px; left:50%; transform:translateX(-50%) translateY(20px); opacity:0;
   background:#222631; color:#fff; font-size:15px; font-weight:500; border-radius:100px; padding:13px 24px;
@@ -308,6 +318,8 @@ input[type="checkbox"] { width:18px; height:18px; accent-color:#416bff; cursor:p
 body.dn-dragging { user-select:none; cursor:move; }
 body.dn-dragging .review-frame, body.dn-dragging .home-frame { pointer-events:none; }
 .dn-title { font-size:12px; font-weight:700; letter-spacing:1.5px; color:#b3b6bd; margin-bottom:10px; display:flex; align-items:center; justify-content:space-between; cursor:move; padding:2px 0 6px; }
+.dn-div { border-top:1px solid #3b3f4c; margin:8px 2px; }
+.dn-cases { font-size:10px; font-weight:700; letter-spacing:1.2px; color:#6d7381; padding:0 8px 5px; }
 .dn-step { display:flex; align-items:center; gap:9px; padding:7px 8px; border-radius:8px; font-size:13.5px; font-weight:500; color:#c7cbd3; cursor:pointer; }
 .dn-step:hover { background:#3b3f4c; }
 .dn-step.on { background:#416bff; color:#fff; font-weight:600; }
@@ -578,6 +590,23 @@ body.dn-dragging .review-frame, body.dn-dragging .home-frame { pointer-events:no
   </div>
 </div>
 
+<!-- ═════════ 케이스: 딥링크 권한 없음 (검토자) ═════════ -->
+<section class="scene" id="sceneDenied">
+  <div class="content with-fold">
+    <div class="denied-wrap">
+      <div class="denied-card">
+        <span class="denied-ic"><i data-lucide="lock" style="width:28px;height:28px"></i></span>
+        <h2>이 수업에 접근할 권한이 없어요</h2>
+        <p>공동 확인 검토자로 초대된 선생님만 이 채점 결과를 볼 수 있어요.<br>초대가 취소되었거나, 아직 초대되지 않은 수업일 수 있어요.</p>
+        <div class="denied-actions">
+          <button class="btn-outline" onclick="goStep(2)">내 홈으로</button>
+          <button class="btn-solid" onclick="showToast('수업 소유자에게 확인 요청을 문의해 주세요')">소유자에게 문의</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
 <div class="toast" id="toast"><i data-lucide="circle-check"></i><span id="toastMsg"></span></div>
 
 <!-- ═════════ 데모 내비게이터 ═════════ -->
@@ -587,6 +616,10 @@ body.dn-dragging .review-frame, body.dn-dragging .home-frame { pointer-events:no
   <div class="dn-step" data-step="2"><span class="n">2</span>홈 · 요청 수신<span class="dn-persona reviewer">검토자</span></div>
   <div class="dn-step" data-step="3"><span class="n">3</span>검토 모드 · 확인<span class="dn-persona reviewer">검토자</span></div>
   <div class="dn-step" data-step="4"><span class="n">4</span>확인 완료 · 의견 수신<span class="dn-persona owner">소유자</span></div>
+  <div class="dn-div"></div>
+  <div class="dn-cases">엣지 케이스</div>
+  <div class="dn-step" data-step="5"><span class="n">5</span>확인 2명 누적<span class="dn-persona owner">소유자</span></div>
+  <div class="dn-step" data-step="6"><span class="n">6</span>권한 없음 안내<span class="dn-persona reviewer">검토자</span></div>
 </div>
 
 <script>
@@ -604,12 +637,12 @@ function goStep(n) {
   document.body.classList.toggle('review-full', n === 3);
   document.body.classList.toggle('home-full', n === 2);
 
-  if (n === 1 || n === 4) {
+  if (n === 1 || n === 4 || n === 5) {
     document.getElementById('sceneClass').classList.add('active');
     setHeader('owner');
     sb.classList.remove('expanded');
     document.querySelector('[data-nav="class"]').classList.add('active');
-    renderOwnerState(n === 4);
+    renderOwnerState(n >= 4, n === 5);
   } else if (n === 2) {
     document.getElementById('sceneHome').classList.add('active');
     setHeader('reviewer');
@@ -620,6 +653,11 @@ function goStep(n) {
     setHeader('reviewer');
     sb.classList.remove('expanded');
     initReviewFrame();
+  } else if (n === 6) {
+    document.getElementById('sceneDenied').classList.add('active');
+    setHeader('reviewer');
+    sb.classList.remove('expanded');
+    document.querySelector('[data-nav="home"]').classList.add('active');
   }
   window.scrollTo(0, 0);
   lucide.createIcons();
@@ -629,13 +667,13 @@ function setHeader(p) {
   document.getElementById('hdrCredit').textContent = p === 'owner' ? '200' : '340';
 }
 
-/* ───── 소유자 상태 렌더 (1안 + 2안 동기화) ───── */
+/* ───── 소유자 상태 렌더 ───── */
 function badgeFor(state) {
   if (state === 'done') return '<span class="badge bdg-done"><i data-lucide="circle-check"></i> 확인 완료</span>';
   if (state === 'req') return '<span class="badge bdg-req"><i data-lucide="send"></i> 요청됨</span>';
   return '<span class="badge bdg-wait"><i data-lucide="clock"></i> 확인 대기</span>';
 }
-function renderOwnerState(done) {
+function renderOwnerState(done, multi) {
   const st = document.getElementById('evalA-status');
   const meta = document.getElementById('evalA-meta');
   const act = document.getElementById('evalA-action');
@@ -643,8 +681,11 @@ function renderOwnerState(done) {
   if (done || S.confirmed) {
     state = 'done';
     st.innerHTML = badgeFor('done') +
+      (multi ? ' <span class="badge bdg-req"><i data-lucide="users"></i> 확인 2명</span>' : '') +
       ' <span class="badge bdg-dissent" onclick="openModal(\'modalDissent\')"><i data-lucide="message-square-warning"></i> 의견 1건</span>';
-    meta.textContent = '김하나 선생님 확인 · 06/11 14:35';
+    meta.textContent = multi
+      ? '김하나·박지현 선생님 확인 · 최근 06/11 14:35'
+      : '김하나 선생님 확인 · 06/11 14:35';
     act.innerHTML = '<button class="btn-ghost btn-sm">확인 기록</button>';
   } else if (S.requested) {
     state = 'req';
