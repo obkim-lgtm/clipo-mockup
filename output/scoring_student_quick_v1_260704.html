@@ -643,8 +643,9 @@ body.std #standardView{display:block}
 <div class="kk-nav">
   <a href="kkamangi_hub_260704.html" title="목업 홈"><i data-lucide="layout-grid"></i>목업</a>
   <a href="scoring_run_modal_v3_260704.html">① 실행 옵션</a>
-  <a href="scoring_student_quick_v1_260704.html" class="on" id="kkNav2">② 채점 결과</a>
-  <a href="scoring_student_quick_v1_260704.html?rerun=1" id="kkNav3">③ 재실행 옵션</a>
+  <a href="scoring_student_quick_v1_260704.html" class="on" id="kkNav2">② 빠른 결과</a>
+  <a href="scoring_student_quick_v1_260704.html?rerun=1" id="kkNav3">③ 재실행 팝업</a>
+  <a href="scoring_student_quick_v1_260704.html?mode=std" id="kkNav4">④ 표준 결과</a>
 </div>
 
 <!-- 토스트 -->
@@ -940,11 +941,15 @@ function showToast(type, msg) {
   renderDropdown();
   updateTotal();
   lucide.createIcons();
-  // ?rerun=1 → 재실행 팝업 케이스로 바로 진입
+  // ?rerun=1 → 재실행 팝업 케이스 / ?mode=std → 표준 결과 케이스
   if (urlParams.get('rerun') === '1') {
     document.getElementById('kkNav2').classList.remove('on');
     document.getElementById('kkNav3').classList.add('on');
     openRerunModal();
+  } else if (urlParams.get('mode') === 'std') {
+    document.getElementById('kkNav2').classList.remove('on');
+    document.getElementById('kkNav4').classList.add('on');
+    toggleDemoView();
   }
 })();
 </script>
