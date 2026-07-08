@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/png" href="clipo_favicon.png">
+  <title>소속 변경 (교사 재인증) · 데이터 보존 — CLIPO</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard-gov.min.css">
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+  <style>
+    *{ font-family:'Pretendard GOV',-apple-system,sans-serif; box-sizing:border-box; }
+    body{ margin:0; background:#f6f7f9; color:#222631; font-size:16px; min-width:1280px; }
+    a{ text-decoration:none; color:inherit; }
+    button{ font-family:inherit; }
+
+    /* ===== Header ===== */
+    .g-hd { height:56px; background:#fff; border-bottom:1px solid #d9d9d9; display:flex; align-items:center; padding:0 20px 0 8px; position:fixed; top:0; left:0; right:0; z-index:200; }
+    .gh-menu-btn { width:36px; height:36px; border:none; background:none; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; color:#3b3f4c; margin-right:8px; line-height:1; }
+    .gh-logo { display:inline-flex; align-items:center; cursor:pointer; padding:4px; border-radius:4px; }
+    .g-hd-r { margin-left:auto; display:flex; align-items:center; gap:6px; font-size:14px; color:#3b3f4c; }
+    .plan-badge { background:#eef3ff; color:#416bff; font-size:12px; font-weight:600; padding:3px 10px; border-radius:12px; }
+    .hd-div { width:1px; height:14px; background:#d9d9d9; margin:0 4px; }
+    .credit-wrap { display:flex; align-items:center; gap:4px; font-size:14px; font-weight:500; color:#3b3f4c; }
+    .auth-badge { background:#e8f7ee; color:#179c56; font-size:12px; font-weight:600; padding:3px 9px; border-radius:100px; }
+    .user-btn { display:inline-flex; align-items:center; justify-content:center; gap:6px; padding:0; border:none; background:none; font-size:14px; color:#222631; cursor:pointer; line-height:1; font-weight:500; }
+
+    /* ===== Sidebar ===== */
+    .icon-sb { width:56px; background:#fff; border-right:1px solid #d9d9d9; position:fixed; top:56px; bottom:0; left:0; display:flex; flex-direction:column; padding:8px 0; z-index:150; transition:width .2s ease; }
+    .icon-sb.expanded { width:200px; }
+    .si { height:40px; display:flex; align-items:center; border-radius:8px; color:#6d7381; cursor:pointer; margin:0 8px 2px; position:relative; padding:0 4px 0 8px; gap:10px; white-space:nowrap; flex-shrink:0; }
+    .si:hover { background:#f1f3f5; }
+    .si.active { background:#e9f2ff; color:#416bff; }
+    .si-icon { width:24px; height:24px; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+    .si-label { font-size:13px; font-weight:500; opacity:0; transition:opacity .1s; overflow:hidden; }
+    .icon-sb.expanded .si-label { opacity:1; }
+    .si-tip { position:absolute; left:48px; top:50%; transform:translateY(-50%); background:#222631; color:#fff; font-size:11px; padding:3px 8px; border-radius:4px; white-space:nowrap; display:none; z-index:300; pointer-events:none; }
+    .si:hover .si-tip { display:block; }
+    .icon-sb.expanded .si-tip { display:none !important; }
+    .nav-bottom { margin-top:auto; width:100%; }
+    .nav-div { height:1px; background:#f1f3f5; margin:4px 8px; }
+
+    /* ===== Layout ===== */
+    .main-wrap{ padding-top:56px; padding-left:56px; transition:padding-left .2s; min-height:100vh; display:flex; flex-direction:column; }
+    body.nav-expanded .main-wrap{ padding-left:200px; }
+    .page-wrap{ max-width:1320px; width:100%; margin:0 auto; padding:24px 36px 40px; flex:1; }
+
+    /* ===== 교사 인증 화면 ===== */
+    .back-link{ display:inline-flex; align-items:center; gap:4px; font-size:15px; color:#416bff; cursor:pointer; margin-bottom:10px; }
+    .auth-title{ font-size:26px; font-weight:700; margin:0 0 8px; }
+    .auth-sub{ font-size:15px; color:#3b3f4c; margin:0 0 6px; line-height:1.6; }
+    /* 소속 변경 컨텍스트 안내 (배경+아이콘, 좌측띠 금지) */
+    .ctx-note{ background:#eef3ff; border-radius:10px; padding:12px 16px; display:flex; align-items:center; gap:10px; font-size:15px; color:#2f4ab3; margin:14px 0 22px; }
+    .ctx-note strong{ color:#222631; font-weight:700; }
+
+    .auth-card{ background:#fff; border-radius:14px; padding:26px 28px; box-shadow:0 0 1px #2226314D, 0 2px 8px #0000000F; margin-bottom:18px; }
+    .ac-label{ font-size:18px; font-weight:700; margin:0 0 16px; }
+    .ac-label .opt{ font-size:14px; font-weight:500; color:#6d7381; margin-left:4px; }
+    .sel-input{ width:100%; height:50px; border:1px solid #d9d9d9; border-radius:8px; padding:0 16px; font-size:16px; color:#222631; background:#fff; display:flex; align-items:center; cursor:pointer; }
+    .sel-input.ph{ color:#9aa0ad; }
+    .subj-row{ display:flex; gap:12px; align-items:center; }
+    .subj-row .sel-input{ flex:1; }
+    .btn-line{ height:50px; padding:0 18px; border:1px solid #c5d6ff; border-radius:8px; background:#f2f6ff; color:#3151c4; font-size:15px; font-weight:600; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; gap:7px; line-height:1; flex-shrink:0; }
+    .btn-line:hover{ background:#e9f1ff; }
+    .ac-notes{ margin:14px 0 0; padding:0; list-style:none; }
+    .ac-notes li{ font-size:14px; color:#6d7381; line-height:1.7; padding-left:12px; position:relative; }
+    .ac-notes li::before{ content:'-'; position:absolute; left:0; }
+    /* 인증 방식 탭 */
+    .auth-tabs{ display:inline-flex; background:#f1f3f5; border-radius:8px; padding:4px; gap:2px; margin-bottom:18px; }
+    .auth-tab{ height:38px; padding:0 16px; border:none; background:none; border-radius:6px; font-size:15px; font-weight:600; color:#6d7381; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; line-height:1; }
+    .auth-tab.on{ background:#fff; color:#416bff; box-shadow:0 1px 2px #0000000f; }
+    .file-row{ display:flex; gap:12px; align-items:center; }
+    .file-ph{ flex:1; height:50px; border:1px solid #d9d9d9; border-radius:8px; padding:0 16px; display:flex; align-items:center; font-size:16px; color:#9aa0ad; }
+    .info-note{ display:flex; gap:8px; align-items:flex-start; margin-top:16px; font-size:14px; color:#6d7381; line-height:1.65; }
+    .info-note i{ color:#9aa0ad; flex-shrink:0; margin-top:2px; }
+    .auth-actions{ display:flex; justify-content:flex-end; margin-top:8px; }
+    .btn-req{ height:50px; padding:0 28px; border-radius:100px; background:#416bff; color:#fff; border:none; font-size:16px; font-weight:600; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; gap:8px; line-height:1; vertical-align:middle; }
+    .btn-req:hover{ background:#365eef; }
+
+    /* ===== 모달 공통 ===== */
+    .modal-ov{ position:fixed; inset:0; background:rgba(20,24,33,.45); z-index:500; display:none; align-items:flex-start; justify-content:center; padding:60px 20px; overflow-y:auto; }
+    .modal-ov.show{ display:flex; }
+    .modal{ background:#fff; border-radius:16px; width:100%; max-width:560px; box-shadow:0 12px 40px #00000033; overflow:hidden; }
+    .modal.wide{ max-width:640px; }
+    .m-head{ padding:24px 26px 0; display:flex; align-items:flex-start; gap:13px; }
+    .m-ic{ width:42px; height:42px; border-radius:11px; display:inline-flex; align-items:center; justify-content:center; flex-shrink:0; }
+    .m-ic.blue{ background:#e9f2ff; color:#416bff; }
+    .m-ic.orange{ background:#fff1e6; color:#f97316; }
+    .m-title{ font-size:21px; font-weight:700; margin:0 0 5px; line-height:1.4; }
+    .m-sub{ font-size:15px; color:#3b3f4c; margin:0; line-height:1.6; }
+    .m-x{ margin-left:auto; background:none; border:none; cursor:pointer; color:#9aa0ad; width:30px; height:30px; display:inline-flex; align-items:center; justify-content:center; border-radius:6px; flex-shrink:0; }
+    .m-x:hover{ background:#f1f3f5; }
+    .m-body{ padding:18px 26px 4px; }
+    .m-foot{ padding:18px 26px 24px; display:flex; justify-content:space-between; align-items:center; gap:12px; }
+
+    /* 학교 전환 칩 */
+    .sch-flow{ display:flex; align-items:center; gap:14px; background:#f6f7f9; border-radius:12px; padding:14px 16px; }
+    .sch-chip{ flex:1; min-width:0; }
+    .sch-chip .lbl{ font-size:13px; color:#6d7381; margin-bottom:4px; }
+    .sch-chip .nm{ font-size:17px; font-weight:600; color:#222631; display:flex; align-items:center; gap:7px; }
+    .sch-arrow{ color:#9aa0ad; flex-shrink:0; }
+    .new-dot{ width:7px; height:7px; border-radius:50%; background:#416bff; flex-shrink:0; }
+
+    /* 라디오 카드 */
+    .rcard{ display:flex; gap:13px; border:1.5px solid #d9d9d9; border-radius:12px; padding:16px; cursor:pointer; transition:border-color .12s, background .12s; align-items:flex-start; margin-top:12px; }
+    .rcard:hover{ border-color:#b3b3b3; }
+    .rcard.sel{ border-color:#416bff; background:#f7faff; }
+    .rcard .radio{ width:20px; height:20px; border-radius:50%; border:2px solid #c2c7d0; flex-shrink:0; margin-top:1px; display:inline-flex; align-items:center; justify-content:center; }
+    .rcard.sel .radio{ border-color:#416bff; }
+    .rcard.sel .radio::after{ content:''; width:10px; height:10px; border-radius:50%; background:#416bff; }
+    .rcard .rc-tt{ font-size:16px; font-weight:600; margin:0 0 5px; display:flex; align-items:center; gap:8px; }
+    .rcard .rc-ds{ font-size:14px; color:#3b3f4c; margin:0; line-height:1.55; }
+    .mini-badge{ font-size:11px; font-weight:700; padding:2px 8px; border-radius:100px; }
+    .mb-prep{ background:#fff1e6; color:#c2570c; }
+    .mb-rec{ background:#e9f2ff; color:#3151c4; }
+
+    /* 데이터 처리 리스트 */
+    .dp-list{ border:1px solid #e7e9ee; border-radius:12px; overflow:hidden; }
+    .dp{ display:flex; align-items:flex-start; gap:11px; padding:13px 15px; }
+    .dp + .dp{ border-top:1px solid #eef0f3; }
+    .dp .dp-ic{ flex-shrink:0; margin-top:1px; }
+    .dp .dp-tt{ font-size:15px; font-weight:600; color:#222631; }
+    .dp .dp-ds{ font-size:13.5px; color:#6d7381; line-height:1.5; margin:2px 0 0; }
+    .dp .pill{ margin-left:auto; font-size:12px; font-weight:700; padding:3px 9px; border-radius:100px; flex-shrink:0; white-space:nowrap; }
+    .pill-keep{ background:#eafaf1; color:#179c56; }
+    .pill-mask{ background:#eef3ff; color:#3151c4; }
+    .pill-del{ background:#fdecea; color:#dc3b46; }
+
+    .m-seclabel{ font-size:15px; font-weight:700; color:#222631; margin:20px 0 11px; }
+    .keep-grid{ display:grid; grid-template-columns:repeat(3,1fr); gap:10px; }
+    .kcard{ border:1.5px solid #d9d9d9; border-radius:12px; padding:14px 10px; cursor:pointer; text-align:center; transition:border-color .12s, background .12s; }
+    .kcard:hover{ border-color:#b3b3b3; }
+    .kcard.sel{ border-color:#416bff; background:#f7faff; }
+    .kcard .kc-tag{ font-size:12px; color:#6d7381; margin-bottom:5px; }
+    .kcard .kc-yr{ font-size:22px; font-weight:700; color:#222631; }
+    .kcard.sel .kc-yr{ color:#416bff; }
+    .kcard .kc-for{ font-size:12px; color:#6d7381; margin-top:5px; line-height:1.4; }
+
+    .nbox{ border-radius:12px; padding:14px 16px; display:flex; gap:11px; align-items:flex-start; margin-top:14px; }
+    .nbox .nb-ic{ flex-shrink:0; margin-top:1px; }
+    .nbox.warn{ background:#fff5ec; color:#9a4806; }
+    .nbox.warn .nb-ic{ color:#f97316; }
+    .nbox.info{ background:#eef3ff; color:#2f4ab3; }
+    .nbox.info .nb-ic{ color:#416bff; }
+    .nbox .nb-tt{ font-size:14.5px; font-weight:700; margin:0 0 4px; }
+    .nbox .nb-ds{ font-size:13.5px; line-height:1.55; margin:0; }
+    .nb-dl{ margin-top:10px; height:36px; padding:0 14px; border-radius:8px; background:#fff; border:1px solid #f0c79a; color:#9a4806; font-size:13.5px; font-weight:600; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; gap:6px; line-height:1; }
+    .nb-dl:hover{ background:#fff9f3; }
+
+    .agree{ display:flex; gap:11px; align-items:flex-start; background:#f6f7f9; border-radius:12px; padding:13px 15px; margin-top:13px; cursor:pointer; }
+    .agree input{ width:18px; height:18px; accent-color:#416bff; flex-shrink:0; margin-top:2px; }
+    .agree .ag-tx{ font-size:13.5px; color:#3b3f4c; line-height:1.6; }
+
+    .btn-pri{ height:46px; padding:0 24px; border-radius:8px; background:#416bff; color:#fff; border:none; font-size:16px; font-weight:600; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; line-height:1; gap:7px; }
+    .btn-pri:hover{ background:#365eef; }
+    .btn-pri:disabled{ background:#c2cef0; cursor:not-allowed; }
+    .btn-gho{ height:46px; padding:0 18px; border-radius:8px; background:#fff; border:1px solid #d9d9d9; color:#3b3f4c; font-size:16px; font-weight:600; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; line-height:1; gap:6px; }
+    .btn-gho:hover{ background:#f6f7f9; }
+    .btn-warn{ height:46px; padding:0 20px; border-radius:8px; background:#f97316; color:#fff; border:none; font-size:16px; font-weight:600; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; line-height:1; gap:6px; }
+    .btn-warn:hover{ background:#e2660d; }
+
+    /* ===== 이전 소속 홈 ===== */
+    .prev-banner{ background:#fff5ec; border:1px solid #f7d4ad; border-radius:12px; padding:14px 18px; display:flex; align-items:center; gap:14px; margin-bottom:20px; }
+    .prev-banner .pb-ic{ color:#f97316; flex-shrink:0; }
+    .prev-banner .pb-tx{ flex:1; min-width:0; font-size:15px; color:#9a4806; line-height:1.5; }
+    .prev-banner .pb-tx strong{ color:#7c2d12; font-weight:700; }
+    .prev-banner .pb-dl{ height:36px; padding:0 14px; border-radius:8px; background:#fff; border:1px solid #f0c79a; color:#9a4806; font-size:14px; font-weight:600; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; gap:6px; line-height:1; flex-shrink:0; }
+    .prev-banner .pb-dl:hover{ background:#fff9f3; }
+    .my-hd{ display:flex; align-items:center; justify-content:space-between; gap:14px; margin-bottom:18px; }
+    .my-title{ font-size:26px; font-weight:700; margin:0; display:flex; align-items:center; gap:10px; }
+    .tgl{ display:inline-flex; align-items:center; gap:8px; cursor:pointer; user-select:none; font-size:15px; color:#3b3f4c; }
+    .tgl-track{ width:40px; height:22px; border-radius:100px; background:#d9d9d9; position:relative; transition:background .15s; flex-shrink:0; }
+    .tgl-knob{ position:absolute; top:2px; left:2px; width:18px; height:18px; border-radius:50%; background:#fff; transition:left .15s; box-shadow:0 1px 3px rgba(0,0,0,.2); }
+    .tgl.on .tgl-track{ background:#416bff; }
+    .tgl.on .tgl-knob{ left:20px; }
+    .sem-title{ font-size:20px; font-weight:700; margin:0 0 14px; }
+    .sem-grid{ display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:18px; }
+    .cc{ background:#fbfbfc; border-radius:12px; padding:20px; min-height:168px; display:flex; flex-direction:column; box-shadow:0 0 1px #2226314D, 0 2px 8px #0000000F; position:relative; }
+    .cc-top{ display:flex; align-items:flex-start; justify-content:space-between; gap:8px; }
+    .cc-name{ font-size:17px; font-weight:600; line-height:1.45; margin:0; color:#3b3f4c; }
+    .cc-lock{ color:#b0b5bf; flex-shrink:0; }
+    .cc-students{ font-size:14px; color:#9aa0ad; margin-top:12px; line-height:1.6; }
+    .cc-students .masked{ background:#eef0f3; color:#8b909b; border-radius:4px; padding:1px 7px; font-weight:600; font-size:13px; }
+    .cc-tags{ display:flex; align-items:center; gap:6px; margin-top:auto; padding-top:16px; flex-wrap:wrap; }
+    .tag-prev{ display:inline-flex; align-items:center; justify-content:center; gap:4px; background:#fff1e6; color:#c2570c; font-size:13px; font-weight:700; border-radius:6px; padding:3px 10px; }
+    .tag-ro{ display:inline-flex; align-items:center; justify-content:center; gap:4px; background:#f1f3f5; color:#6d7381; font-size:13px; font-weight:600; border-radius:6px; padding:3px 10px; }
+    .cc-btnrow{ display:flex; gap:8px; margin-top:14px; }
+    .cc-dis{ flex:1; height:34px; border-radius:6px; background:#f1f3f5; color:#b0b5bf; border:none; font-size:13px; font-weight:600; display:inline-flex; align-items:center; justify-content:center; gap:5px; cursor:not-allowed; line-height:1; }
+
+    /* ===== Toast ===== */
+    .toast{ position:fixed; bottom:28px; left:50%; transform:translateX(-50%) translateY(12px); opacity:0; min-width:320px; max-width:600px; padding:14px 22px 14px 16px; border-radius:6px; display:flex; align-items:center; gap:12px; font-size:15px; font-weight:600; box-shadow:0 0 1px #2226314D, 0 4px 12px #00000026; z-index:9999; transition:opacity .2s, transform .2s; pointer-events:none; background:#319d64; color:#fff; }
+    .toast.show{ opacity:1; transform:translateX(-50%) translateY(0); }
+    .toast.info{ background:#416bff; }
+    .toast.warn{ background:#f97316; }
+
+    /* ===== 데모 네비 (드래그) ===== */
+    .demo-nav{ position:fixed; right:22px; bottom:22px; z-index:9000; background:#222631; border-radius:12px; padding:11px 12px; box-shadow:0 6px 24px #00000033; cursor:move; user-select:none; width:228px; }
+    .demo-nav .dn-tt{ font-size:11px; font-weight:700; color:#9aa0ad; letter-spacing:.03em; margin-bottom:9px; display:flex; align-items:center; gap:6px; }
+    .demo-nav .dn-cap{ font-size:10px; font-weight:700; color:#6b7180; letter-spacing:.05em; margin:9px 2px 6px; }
+    .demo-nav .dn-btn{ width:100%; text-align:left; background:#2e3340; border:1px solid #3b3f4c; color:#dfe2e8; font-size:12.5px; font-weight:600; border-radius:7px; padding:8px 9px; cursor:pointer; margin-bottom:5px; display:flex; align-items:center; gap:8px; line-height:1.3; }
+    .demo-nav .dn-btn:hover{ background:#3a4050; }
+    .demo-nav .dn-btn.active{ background:#416bff; border-color:#416bff; color:#fff; }
+    .demo-nav .dn-num{ width:17px; height:17px; border-radius:5px; background:#11141b; color:#cfd3da; font-size:10px; font-weight:700; display:inline-flex; align-items:center; justify-content:center; flex-shrink:0; }
+    .demo-nav .dn-btn.active .dn-num{ background:#2a4ed1; color:#fff; }
+    .demo-nav .dn-sub{ padding-left:6px; }
+
+    .screen{ display:none; }
+    .screen.show{ display:block; }
+  </style>
+</head>
+<body>
+
+<!-- ===== Header ===== -->
+<header class="g-hd">
+  <button class="gh-menu-btn" onclick="toggleNav()"><i data-lucide="menu" style="width:20px;height:20px"></i></button>
+  <a class="gh-logo" href="home_v1_260612.html" title="홈으로">
+    <svg width="76" height="16" viewBox="0 0 76 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M11.3613 4.03516H4.09668V11.9629H8.88281L8.88086 11.9648H15.6016V16H4.02539C1.80242 15.9998 0 14.223 0 12.0322V3.96777C0 1.77696 1.80242 0.000177874 4.02539 0H15.4561L11.3613 4.03516ZM22.0703 11.9648H33.5781V16H22.002C19.7788 16 17.9756 14.2231 17.9756 12.0322V0H22.0703V11.9648ZM40.0459 16H35.9521V0H40.0459V16ZM54.5381 0C56.4564 0 58.0138 1.53228 58.0186 3.42285L58.0166 3.4248V8.54297C58.014 10.4333 56.4567 11.9648 54.5361 11.9648H46.5107L42.416 16V0H54.5381ZM71.9746 0C74.0086 0.000134956 75.6887 1.49046 75.958 3.42285H76V12.5771H75.958C75.6887 14.5095 74.011 15.9999 71.9746 16H64.4238C62.3897 16 60.7098 14.5096 60.4404 12.5771C60.4145 12.398 60.3984 12.2184 60.3984 12.0322V3.96777C60.3984 3.78159 60.4145 3.60205 60.4404 3.42285C60.7098 1.49037 62.3873 0 64.4238 0H71.9746ZM64.4922 12.5771H71.9062V3.42285H64.4922V12.5771ZM46.5107 3.42285V8.54004H53.9238V3.42285H46.5107Z" fill="#365EEF"/></svg>
+  </a>
+  <div class="g-hd-r">
+    <span class="plan-badge">학교 유료</span>
+    <span style="font-size:14px;color:#3b3f4c">D-180</span>
+    <div class="hd-div"></div>
+    <i data-lucide="sparkles" style="width:18px;height:18px;color:#416bff"></i>
+    <div class="credit-wrap">AI 크레딧 200</div>
+    <div class="hd-div"></div>
+    <span class="auth-badge" id="hd-auth">인증완료</span>
+    <button class="user-btn">최대표 선생님(대표교사) <i data-lucide="chevron-down" style="width:16px;height:16px"></i></button>
+  </div>
+</header>
+
+<!-- ===== Sidebar ===== -->
+<nav class="icon-sb" id="icon-sb">
+  <div class="si" onclick="location.href='home_v1_260612.html'"><div class="si-icon"><i data-lucide="home" style="width:20px;height:20px"></i></div><span class="si-label">홈</span><span class="si-tip">홈</span></div>
+  <div class="si" onclick="notReady('평가계획')"><div class="si-icon"><i data-lucide="scissors" style="width:20px;height:20px"></i></div><span class="si-label">평가계획</span><span class="si-tip">평가계획</span></div>
+  <div class="si" onclick="location.href='co_teacher_review_v1_260611.html'"><div class="si-icon"><i data-lucide="layout-grid" style="width:20px;height:20px"></i></div><span class="si-label">수업</span><span class="si-tip">수업</span></div>
+  <div class="si" onclick="location.href='creative_activity_list_v6_260507.html'"><div class="si-icon"><i data-lucide="notebook-pen" style="width:20px;height:20px"></i></div><span class="si-label">창의적 체험활동 <span style="font-size:10px;background:#416bff;color:#fff;padding:1px 5px;border-radius:3px;margin-left:2px">Beta</span></span><span class="si-tip">창의적 체험활동</span></div>
+  <div class="si" onclick="location.href='quick_seteuk_dev_list_v1_260604.html'"><div class="si-icon"><i data-lucide="zap" style="width:20px;height:20px"></i></div><span class="si-label">세특 간편 생성기</span><span class="si-tip">세특 간편 생성기</span></div>
+  <div class="si" onclick="notReady('행동특성 및 종합기록')"><div class="si-icon"><i data-lucide="smile" style="width:20px;height:20px"></i></div><span class="si-label">행동특성 및 종합기록</span><span class="si-tip">행동특성 및 종합기록</span></div>
+  <div class="si" onclick="notReady('리포트')"><div class="si-icon"><i data-lucide="bar-chart-2" style="width:20px;height:20px"></i></div><span class="si-label">리포트</span><span class="si-tip">리포트</span></div>
+  <div class="si active" onclick="showScreen('auth')"><div class="si-icon"><i data-lucide="building-2" style="width:20px;height:20px"></i></div><span class="si-label">학교 설정</span><span class="si-tip">학교 설정</span></div>
+  <div class="nav-bottom">
+    <div class="nav-div"></div>
+    <div class="si" onclick="notReady('매뉴얼 다운로드')"><div class="si-icon"><i data-lucide="file-down" style="width:20px;height:20px"></i></div><span class="si-label">매뉴얼 다운로드</span><span class="si-tip">매뉴얼 다운로드</span></div>
+    <div class="si" onclick="notReady('요금제')"><div class="si-icon"><i data-lucide="credit-card" style="width:20px;height:20px"></i></div><span class="si-label">요금제</span><span class="si-tip">요금제</span></div>
+    <div class="si" onclick="notReady('고객센터')"><div class="si-icon"><i data-lucide="help-circle" style="width:20px;height:20px"></i></div><span class="si-label">고객센터</span><span class="si-tip">고객센터</span></div>
+  </div>
+</nav>
+
+<div class="main-wrap">
+<div class="page-wrap">
+
+  <!-- ============ Screen 1 : 교사 인증 (소속 변경 = 재인증) ============ -->
+  <section class="screen show" id="scrAuth">
+    <span class="back-link" onclick="notReady('이전 화면')"><i data-lucide="chevron-left" style="width:18px;height:18px"></i>이전으로</span>
+    <h1 class="auth-title">교사 인증</h1>
+    <p class="auth-sub">선생님 확인을 위해, 이름이 포함된 나이스 캡쳐 화면이나 재직증명서를 업로드해 주세요. 연수에 참여 중인 경우 인증 코드로 대체할 수 있습니다.</p>
+
+    <div class="ctx-note">
+      <i data-lucide="info" style="width:18px;height:18px"></i>
+      <span>현재 소속 <strong>경기도테스트중학교</strong> (인증 완료) · 다른 학교로 옮기셨다면 아래에서 <strong>새 학교로 재인증</strong>해 주세요.</span>
+    </div>
+
+    <!-- 학교 선택 -->
+    <div class="auth-card">
+      <p class="ac-label">학교 선택</p>
+      <div class="sel-input" onclick="toastMsg('학교 검색은 기존 화면이에요. 데모에서는 새 학교가 선택된 상태로 진행됩니다.', 'info')">경기도테스트고등학교</div>
+    </div>
+
+    <!-- 담당 교과 선택 -->
+    <div class="auth-card">
+      <p class="ac-label">담당 교과 선택 <span class="opt">(중복 가능)</span></p>
+      <div class="subj-row">
+        <div class="sel-input">사회, 역사(2022)</div>
+        <button class="btn-line" onclick="toastMsg('교과 선택 모달은 기존 화면이에요.', 'info')"><i data-lucide="pencil" style="width:16px;height:16px"></i>교과 선택</button>
+      </div>
+      <ul class="ac-notes">
+        <li>담당 교과는 여러 개 추가할 수 있으며, 추가한 교과의 수업만 생성할 수 있습니다.</li>
+        <li>교사 인증 이후에도 ‘내 정보’에서 담당 교과를 변경할 수 있습니다.</li>
+      </ul>
+    </div>
+
+    <!-- 인증 방식 -->
+    <div class="auth-card">
+      <p class="ac-label">인증 방식</p>
+      <div class="auth-tabs">
+        <button class="auth-tab on" id="tab-file" onclick="authTab('file')">서류 업로드</button>
+        <button class="auth-tab" id="tab-code" onclick="authTab('code')">인증 코드 입력</button>
+      </div>
+      <div class="file-row">
+        <div class="file-ph">파일을 업로드해 주세요.</div>
+        <button class="btn-line" onclick="toastMsg('파일 업로드는 이 목업에서 제공하지 않습니다.', 'info')"><i data-lucide="upload" style="width:16px;height:16px"></i>파일 업로드</button>
+      </div>
+      <div class="info-note">
+        <i data-lucide="info" style="width:16px;height:16px"></i>
+        <span>재직증명서(스캔 또는 사진)나 선생님 본인 정보가 포함된 나이스(NEIS) 캡쳐 화면을 첨부해 주세요.<br>전근 등으로 위의 자료 첨부가 어려운 경우, 학교 변경 내역을 확인할 수 있는 서류를 첨부해 주세요.</span>
+      </div>
+    </div>
+
+    <div class="auth-actions">
+      <button class="btn-req" onclick="openModal('branch')"><i data-lucide="check" style="width:18px;height:18px"></i>인증 요청</button>
+    </div>
+  </section>
+
+  <!-- ============ Screen 2 : 이전 소속 홈 (승인 후) ============ -->
+  <section class="screen" id="scrPrev">
+    <div class="prev-banner">
+      <i data-lucide="archive" class="pb-ic" style="width:20px;height:20px"></i>
+      <div class="pb-tx"><strong>경기도테스트중학교 (이전 소속)</strong> · 읽기 전용 · 학생 정보 마스킹 처리됨 · 파기까지 <strong>2년 11개월</strong> 남음</div>
+      <button class="pb-dl" onclick="toastMsg('이전 소속 자료 다운로드(마스킹 PDF/Excel)는 이 목업에서 제공하지 않습니다.', 'info')"><i data-lucide="download" style="width:15px;height:15px"></i>자료 내려받기</button>
+    </div>
+    <div class="my-hd">
+      <h1 class="my-title"><i data-lucide="home" style="width:24px;height:24px;color:#416bff"></i>내 수업 <span style="font-size:15px;font-weight:500;color:#6d7381;">· 현재 소속: 경기도테스트고등학교</span></h1>
+      <span class="tgl on" id="prev-tgl" onclick="togglePrev()">
+        <span class="tgl-track"><span class="tgl-knob"></span></span>
+        이전 학교 수업 보기
+      </span>
+    </div>
+    <div id="prev-body">
+      <h2 class="sem-title">2026학년도 1학기 · 경기도테스트중학교</h2>
+      <div class="sem-grid" id="prev-grid"></div>
+    </div>
+    <div id="prev-empty" style="display:none; padding:60px 0; text-align:center; color:#9aa0ad;">
+      <i data-lucide="eye-off" style="width:34px;height:34px;color:#c2c7d0"></i>
+      <p style="font-size:16px; margin:12px 0 0;">‘이전 학교 수업 보기’를 켜면 보존된 수업을 볼 수 있어요.</p>
+    </div>
+  </section>
+
+</div>
+</div>
+
+<!-- ============ Modal : 분기 (변경/추가) ============ -->
+<div class="modal-ov" id="m-branch">
+  <div class="modal">
+    <div class="m-head">
+      <div class="m-ic blue"><i data-lucide="building-2" style="width:23px;height:23px"></i></div>
+      <div>
+        <h2 class="m-title">이미 소속된 학교가 있어요</h2>
+        <p class="m-sub">새 학교로 인증을 요청하기 전에, 두 학교를 어떻게 쓰실지 선택해 주세요.</p>
+      </div>
+      <button class="m-x" onclick="closeModal()"><i data-lucide="x" style="width:18px;height:18px"></i></button>
+    </div>
+    <div class="m-body">
+      <div class="sch-flow">
+        <div class="sch-chip">
+          <div class="lbl">현재 소속</div>
+          <div class="nm"><i data-lucide="circle-check-big" style="width:16px;height:16px;color:#1ab864"></i>경기도테스트중학교</div>
+        </div>
+        <i data-lucide="arrow-right" class="sch-arrow" style="width:20px;height:20px"></i>
+        <div class="sch-chip">
+          <div class="lbl">새로 인증할 학교</div>
+          <div class="nm"><span class="new-dot"></span>경기도테스트고등학교</div>
+        </div>
+      </div>
+
+      <div class="rcard sel" id="rc-change" onclick="pickBranch('change')">
+        <span class="radio"></span>
+        <div>
+          <p class="rc-tt">학교를 옮겨요 <span class="mini-badge mb-rec">소속 변경</span></p>
+          <p class="rc-ds">경기도테스트중학교를 떠나 고등학교로 이동합니다. 인증이 승인되면 이전 학교의 학생 정보는 가려진 채(마스킹) 보존되고, 선생님이 만든 자료는 유지됩니다.</p>
+        </div>
+      </div>
+      <div class="rcard" id="rc-add" onclick="pickBranch('add')">
+        <span class="radio"></span>
+        <div>
+          <p class="rc-tt">두 학교를 함께 사용해요 <span class="mini-badge mb-prep">준비 중</span></p>
+          <p class="rc-ds">병설 학교에 함께 출강하시는 경우예요. 두 학교 모두 현재 소속으로 유지하며 전환해 사용합니다.</p>
+        </div>
+      </div>
+    </div>
+    <div class="m-foot">
+      <button class="btn-gho" onclick="closeModal()">취소</button>
+      <button class="btn-pri" onclick="goBranch()">다음 <i data-lucide="arrow-right" style="width:17px;height:17px"></i></button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ Modal : 변경 — 보존 설정·동의 ============ -->
+<div class="modal-ov" id="m-keep">
+  <div class="modal wide">
+    <div class="m-head">
+      <div class="m-ic blue"><i data-lucide="archive" style="width:23px;height:23px"></i></div>
+      <div>
+        <h2 class="m-title">이전 학교 데이터, 이렇게 처리돼요</h2>
+        <p class="m-sub">인증이 승인되면 적용됩니다. <strong>선생님이 만든 자료는 보존</strong>되고, 학생 개인정보는 보호를 위해 가려집니다.</p>
+      </div>
+      <button class="m-x" onclick="closeModal()"><i data-lucide="x" style="width:18px;height:18px"></i></button>
+    </div>
+    <div class="m-body">
+      <div class="dp-list">
+        <div class="dp"><i data-lucide="user" class="dp-ic" style="width:18px;height:18px;color:#3151c4"></i><div><div class="dp-tt">학생 이름·학번</div><p class="dp-ds">‘학생 A·B·C…’로, 학번은 전체 가림. 작성하신 글 속 이름도 자동 치환돼요.</p></div><span class="pill pill-mask">마스킹</span></div>
+        <div class="dp"><i data-lucide="file-check-2" class="dp-ic" style="width:18px;height:18px;color:#179c56"></i><div><div class="dp-tt">채점·세특·행특</div><p class="dp-ds">마스킹된 형태로 계속 열람 가능. 편집·AI 실행은 잠깁니다.</p></div><span class="pill pill-keep">읽기 전용 보존</span></div>
+        <div class="dp"><i data-lucide="library" class="dp-ic" style="width:18px;height:18px;color:#179c56"></i><div><div class="dp-tt">평가지·문항·루브릭</div><p class="dp-ds">학생 정보가 없는 자료라, 새 학교의 개인 라이브러리로 그대로 이전.</p></div><span class="pill pill-keep">자동 이전</span></div>
+        <div class="dp"><i data-lucide="file-x-2" class="dp-ic" style="width:18px;height:18px;color:#dc3b46"></i><div><div class="dp-tt">과제물 원본 파일</div><p class="dp-ds">학생 식별정보가 그대로 담겨 마스킹이 어려워, 변경 시 삭제됩니다.</p></div><span class="pill pill-del">즉시 삭제</span></div>
+      </div>
+
+      <p class="m-seclabel">데이터를 얼마나 보존할까요?</p>
+      <div class="keep-grid">
+        <div class="kcard" id="k-1" onclick="pickKeep('1')"><div class="kc-tag">기본</div><div class="kc-yr">1년</div><div class="kc-for">가볍게 쓰시는 경우</div></div>
+        <div class="kcard sel" id="k-3" onclick="pickKeep('3')"><div class="kc-tag">표준</div><div class="kc-yr">3년</div><div class="kc-for">대부분의 선생님</div></div>
+        <div class="kcard" id="k-8" onclick="pickKeep('8')"><div class="kc-tag">직무 보존</div><div class="kc-yr">8년</div><div class="kc-for">작성 근거를 길게 보관</div></div>
+      </div>
+
+      <div id="agree8" style="display:none;">
+        <label class="agree">
+          <input type="checkbox" id="agree8-chk" onchange="syncConfirm()">
+          <span class="ag-tx">이 데이터의 보존·관리 책임은 본인에게 있으며, 클리포는 보조 도구로서 마스킹 처리된 형태로 보관함에 동의합니다. 「학교생활기록 작성 및 관리지침」상 학교의 8년 보관 의무는 학교 NEIS에 적용되며, 클리포의 보존은 본인의 작업 보조를 위한 것입니다.</span>
+        </label>
+      </div>
+
+      <div class="nbox warn">
+        <i data-lucide="alert-triangle" class="nb-ic" style="width:19px;height:19px"></i>
+        <div style="flex:1;">
+          <p class="nb-tt">과제물 원본 파일은 변경 시 삭제됩니다</p>
+          <p class="nb-ds">학생이 직접 제출한 원본 자료예요. 채점 근거로 보관이 필요하다면 변경 전에 먼저 내려받아 주세요.</p>
+          <button class="nb-dl" onclick="toastMsg('과제물 원본 백업(ZIP) 다운로드는 이 목업에서 제공하지 않습니다.', 'info')"><i data-lucide="download" style="width:14px;height:14px"></i>과제물 원본 미리 내려받기</button>
+        </div>
+      </div>
+
+      <div class="nbox info">
+        <i data-lucide="info" class="nb-ic" style="width:19px;height:19px"></i>
+        <div>
+          <p class="nb-tt">전환 시점은 ‘인증 승인 후’예요</p>
+          <p class="nb-ds">지금은 인증 요청만 접수돼요. 승인 전까지는 경기도테스트중학교를 그대로 사용하실 수 있고, 승인되는 순간 이전 소속으로 전환됩니다.</p>
+        </div>
+      </div>
+    </div>
+    <div class="m-foot">
+      <button class="btn-gho" onclick="openModal('branch')"><i data-lucide="arrow-left" style="width:16px;height:16px"></i>이전</button>
+      <button class="btn-pri" id="b-confirm" onclick="submitChange()">동의 후 인증 요청</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ Modal : 추가 — 병설 과도기 ============ -->
+<div class="modal-ov" id="m-add">
+  <div class="modal">
+    <div class="m-head">
+      <div class="m-ic orange"><i data-lucide="clock" style="width:23px;height:23px"></i></div>
+      <div>
+        <h2 class="m-title">두 학교 동시 사용은 준비 중이에요</h2>
+        <p class="m-sub">한 계정으로 두 학교를 전환해 쓰는 기능을 준비하고 있어요. 곧 제공할 예정입니다.</p>
+      </div>
+      <button class="m-x" onclick="closeModal()"><i data-lucide="x" style="width:18px;height:18px"></i></button>
+    </div>
+    <div class="m-body">
+      <div class="nbox warn">
+        <i data-lucide="alert-triangle" class="nb-ic" style="width:19px;height:19px"></i>
+        <div>
+          <p class="nb-tt">지금 새 학교로 인증을 요청하면 ‘소속 변경’으로 처리돼요</p>
+          <p class="nb-ds">승인되면 기존 경기도테스트중학교가 이전 소속으로 전환되고 데이터는 마스킹 보존됩니다. 두 학교를 함께 쓰시려면 동시 사용 기능이 열릴 때까지 기존 학교를 유지하시는 걸 권장드려요.</p>
+        </div>
+      </div>
+    </div>
+    <div class="m-foot">
+      <button class="btn-pri" onclick="keepWaiting()"><i data-lucide="bell" style="width:16px;height:16px"></i>기존 학교 유지·알림 신청</button>
+      <button class="btn-warn" onclick="openModal('keep')">변경으로 진행</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"><span id="toast-msg"></span></div>
+
+<!-- ===== 데모 네비 (드래그) ===== -->
+<div class="demo-nav" id="demoNav">
+  <div class="dn-tt"><i data-lucide="layers" style="width:13px;height:13px"></i>데모 흐름 (드래그 이동)</div>
+  <button class="dn-btn active" id="dn-auth" onclick="showScreen('auth')"><span class="dn-num">1</span>교사 인증 화면 (출발)</button>
+  <div class="dn-cap">[인증 요청] 클릭 시 →</div>
+  <button class="dn-btn dn-sub" id="dn-branch" onclick="showScreen('auth');openModal('branch')"><span class="dn-num">2</span>분기 모달 (변경/추가)</button>
+  <button class="dn-btn dn-sub" id="dn-keep" onclick="showScreen('auth');openModal('keep')"><span class="dn-num">3</span>변경 — 보존·동의</button>
+  <button class="dn-btn dn-sub" id="dn-add" onclick="showScreen('auth');openModal('add')"><span class="dn-num">4</span>추가(병설) 안내</button>
+  <div class="dn-cap">인증 승인 후 →</div>
+  <button class="dn-btn" id="dn-prev" onclick="showScreen('prev')"><span class="dn-num">5</span>이전 소속 수업 보기</button>
+</div>
+
+<script>
+function toggleNav(){ document.getElementById('icon-sb').classList.toggle('expanded'); document.body.classList.toggle('nav-expanded'); }
+function notReady(name){ toastMsg((name || '해당 화면') + ' 은(는) 아직 준비 중입니다.', 'info'); }
+var _toastTimer=null;
+function toastMsg(msg, kind){
+  var t=document.getElementById('toast');
+  document.getElementById('toast-msg').textContent=msg;
+  t.classList.remove('info','warn'); if(kind) t.classList.add(kind);
+  t.classList.add('show'); clearTimeout(_toastTimer);
+  _toastTimer=setTimeout(function(){ t.classList.remove('show'); }, 2800);
+}
+
+// ── 화면 전환 ──
+function showScreen(s){
+  document.getElementById('scrAuth').classList.toggle('show', s==='auth');
+  document.getElementById('scrPrev').classList.toggle('show', s==='prev');
+  document.getElementById('dn-auth').classList.toggle('active', s==='auth');
+  document.getElementById('dn-prev').classList.toggle('active', s==='prev');
+  if(s!=='auth') closeModal();
+  window.scrollTo(0,0);
+  lucide.createIcons();
+}
+
+// ── 인증 방식 탭 ──
+function authTab(t){
+  document.getElementById('tab-file').classList.toggle('on', t==='file');
+  document.getElementById('tab-code').classList.toggle('on', t==='code');
+}
+
+// ── 모달 ──
+function openModal(id){
+  ['branch','keep','add'].forEach(function(x){ document.getElementById('m-'+x).classList.toggle('show', x===id); });
+  ['branch','keep','add'].forEach(function(x){ var b=document.getElementById('dn-'+x); if(b) b.classList.toggle('active', x===id); });
+  lucide.createIcons();
+}
+function closeModal(){
+  ['branch','keep','add'].forEach(function(x){ document.getElementById('m-'+x).classList.remove('show'); document.getElementById('dn-'+x).classList.remove('active'); });
+}
+document.querySelectorAll('.modal-ov').forEach(function(ov){
+  ov.addEventListener('click', function(e){ if(e.target===ov) closeModal(); });
+});
+
+// ── 분기 ──
+var branch='change';
+function pickBranch(b){
+  branch=b;
+  document.getElementById('rc-change').classList.toggle('sel', b==='change');
+  document.getElementById('rc-add').classList.toggle('sel', b==='add');
+}
+function goBranch(){ openModal(branch==='change' ? 'keep' : 'add'); }
+
+// ── 보존 기간 ──
+var keep='3';
+function pickKeep(y){
+  keep=y;
+  ['1','3','8'].forEach(function(x){ document.getElementById('k-'+x).classList.toggle('sel', x===y); });
+  document.getElementById('agree8').style.display=(y==='8')?'block':'none';
+  syncConfirm();
+}
+function syncConfirm(){
+  var btn=document.getElementById('b-confirm');
+  btn.disabled=(keep==='8') ? !document.getElementById('agree8-chk').checked : false;
+}
+function submitChange(){
+  closeModal();
+  document.getElementById('hd-auth').textContent='승인 대기';
+  document.getElementById('hd-auth').style.background='#fff1e6';
+  document.getElementById('hd-auth').style.color='#c2570c';
+  toastMsg('인증 요청이 접수됐어요. 승인되면 경기도테스트고등학교로 전환되고, 이전 학교 자료는 '+keep+'년간 보존됩니다.', 'info');
+}
+function keepWaiting(){
+  closeModal();
+  toastMsg('기존 학교를 유지했어요. 두 학교 동시 사용 기능이 열리면 알림으로 안내드릴게요.', 'info');
+}
+
+// ── 이전 소속 마스킹 카드 ──
+var PREV_CLASSES=[{name:'사회',students:31},{name:'한국사',students:28},{name:'통합사회',students:30}];
+function prevCardHTML(c){
+  return '<div class="cc">'
+    +'<div class="cc-top"><h3 class="cc-name">'+c.name+'</h3><i data-lucide="lock" class="cc-lock" style="width:17px;height:17px"></i></div>'
+    +'<div class="cc-students">학생 <span class="masked">학생 A</span> <span class="masked">학생 B</span> <span class="masked">학생 C</span> 외 '+(c.students-3)+'명</div>'
+    +'<div class="cc-tags"><span class="tag-prev"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="5" rx="1"/><path d="M4 8v11a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8"/><path d="M10 12h4"/></svg>이전 소속</span><span class="tag-ro"><i data-lucide="eye" style="width:12px;height:12px"></i>읽기 전용</span></div>'
+    +'<div class="cc-btnrow"><button class="cc-dis"><i data-lucide="pencil-off" style="width:13px;height:13px"></i>편집 잠김</button><button class="cc-dis"><i data-lucide="sparkles" style="width:13px;height:13px"></i>AI 잠김</button></div>'
+    +'</div>';
+}
+function renderPrev(){ document.getElementById('prev-grid').innerHTML=PREV_CLASSES.map(prevCardHTML).join(''); lucide.createIcons(); }
+var prevOn=true;
+function togglePrev(){
+  prevOn=!prevOn;
+  document.getElementById('prev-tgl').classList.toggle('on', prevOn);
+  document.getElementById('prev-body').style.display=prevOn?'block':'none';
+  document.getElementById('prev-empty').style.display=prevOn?'none':'block';
+}
+
+// ── 데모 네비 드래그 ──
+(function(){
+  var el=document.getElementById('demoNav'); var dragging=false, ox=0, oy=0;
+  el.addEventListener('mousedown', function(e){
+    if(e.target.closest('.dn-btn')) return;
+    dragging=true; ox=e.clientX-el.offsetLeft; oy=e.clientY-el.offsetTop;
+    el.style.right='auto'; el.style.bottom='auto'; e.preventDefault();
+  });
+  document.addEventListener('mousemove', function(e){ if(!dragging) return; el.style.left=(e.clientX-ox)+'px'; el.style.top=(e.clientY-oy)+'px'; });
+  document.addEventListener('mouseup', function(){ dragging=false; });
+})();
+
+renderPrev();
+lucide.createIcons();
+</script>
+
+</body>
+</html>

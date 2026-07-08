@@ -4,9 +4,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="icon" type="image/png" href="clipo_favicon.png">
-  <title>과제물 관리 — OCR 인라인 (CLIPO)</title>
+  <title>과제물 관리 — 과제물 인식 (CLIPO)</title>
   <!-- 라우트 선감지: #scoring 등으로 진입 시 과제물 화면 초기 깜빡임 방지 -->
-  <script>(function(){var h=location.hash,s=location.search;if(h==='#scoring'||h==='#design'||h==='#list'||/[?&]sdemo=/.test(s)){document.documentElement.classList.add('route-nontask');}})();</script>
+  <script>(function(){var h=location.hash,s=location.search;if(h==='#scoring'||h==='#design'||h==='#list'||/[?&]sdemo=/.test(s)||/[?&]nav=(form|uploadPdf|uploadSurvey|run|ocrb|scoring)/.test(s)){document.documentElement.classList.add('route-nontask');}})();</script>
   <style>html.route-nontask #screen-task{display:none!important;}</style>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard-gov.min.css">
   <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
@@ -172,7 +172,7 @@
     .rm-radio .ring{ width:22px; height:22px; border-radius:50%; border:1.5px solid #c7cbd3; background:#fff; flex-shrink:0; }
     .rm-radio.selected .ring{ border:7px solid #416bff; }
     .rm-radio .lbl{ font-size:16px; color:#222631; }
-    /* V3 하이브리드: 채점 방식 세그먼트 (인라인 기본 / OCR 먼저 옵트인) */
+    /* V3 하이브리드: 채점 방식 세그먼트 (인라인 기본 / 인식 먼저 옵트인) */
     .rm-seg{ display:flex; gap:10px; }
     .rm-seg-opt{ flex:1; display:flex; flex-direction:column; align-items:flex-start; gap:3px; padding:14px 16px; border:1.5px solid #e3e6eb; border-radius:10px; background:#fff; cursor:pointer; font-family:inherit; text-align:left; transition:border-color .12s, background .12s; }
     .rm-seg-opt > i{ width:20px; height:20px; color:#6d7381; margin-bottom:2px; }
@@ -207,6 +207,12 @@
     .badge-red{ background:#fff3f4; color:#db3e51; }
     .badge-orange{ background:#fff7ed; color:#ea580c; }
     .badge-purple{ background:#e9f2ff; color:#3151c4; }
+    /* 채점 실행 모달 상태 태그 — 통일 알약 (테두리·아이콘 없음, 시맨틱 색) */
+    .rm-tag{ display:inline-flex; align-items:center; justify-content:center; height:22px; padding:0 10px; border-radius:100px; font-size:12px; font-weight:700; line-height:1; white-space:nowrap; }
+    .rm-tag.green{ background:#eefcf4; color:#319d64; }
+    .rm-tag.orange{ background:#fff7ed; color:#ea580c; }
+    .rm-tag.red{ background:#fef2f2; color:#f2525f; }
+    .rm-tag.gray{ background:#eef0f3; color:#6d7381; }
     .badge-gray{ background:#f6f7f9; color:#6d7381; }
     .badge-blue{ background:#e9f2ff; color:#3151c4; }
 
@@ -245,15 +251,32 @@
     .page-divider::before,.page-divider::after{ content:''; flex:1; height:1px; background:#dde1e8; }
 
     /* ===== OCR Uncertainty Note ===== */
-    .ocr-uncertainty-note{ border-top:1px dashed #fecaca; background:#fff3f4; padding:10px 14px; display:flex; flex-direction:column; gap:4px; border-radius:0 0 4px 4px; }
-    .ocr-uncertainty-label{ font-size:13px; font-weight:600; color:#db3e51; display:flex; align-items:center; gap:4px; }
+    .ocr-uncertainty-note{ border-top:1px dashed #fed7aa; background:#fff7ed; padding:10px 14px; display:flex; flex-direction:column; gap:4px; border-radius:0 0 4px 4px; }
+    .ocr-uncertainty-label{ font-size:13px; font-weight:600; color:#c2410c; display:flex; align-items:center; gap:4px; }
     .ocr-uncertainty-text{ font-size:14px; color:#3b3f4c; line-height:1.65; }
 
     /* ===== Rubric OCR Section ===== */
     .rubric-ocr-section{ border:1px solid #dde1e8; border-radius:4px; margin-bottom:12px; overflow:hidden; }
     .rubric-ocr-header{ display:flex; align-items:center; gap:8px; padding:10px 14px; background:#f6f7f9; border-bottom:1px solid #dde1e8; flex-wrap:wrap; }
     .rubric-ocr-desc{ font-size:14px; color:#6d7381; font-weight:500; flex:1; min-width:0; overflow:hidden; white-space:nowrap; text-overflow:ellipsis; }
-    .rubric-suspect-chip{ display:inline-flex; align-items:center; gap:4px; background:#fff3f4; border:1px solid #fecaca; border-radius:100px; padding:2px 8px; font-size:13px; font-weight:600; color:#db3e51; flex-shrink:0; }
+    .rubric-suspect-chip{ display:inline-flex; align-items:center; gap:4px; background:#fff7ed; border:1px solid #fed7aa; border-radius:100px; padding:2px 8px; font-size:13px; font-weight:600; color:#ea580c; flex-shrink:0; }
+    .rubric-done-chip{ display:inline-flex; align-items:center; gap:4px; background:#eefcf4; border:1px solid #bbe7cd; border-radius:100px; padding:2px 8px; font-size:13px; font-weight:600; color:#319d64; flex-shrink:0; }
+    /* 직접 채점 (AI 제외) 토글 스위치 */
+    .q-exclude-toggle{ display:inline-flex; align-items:center; gap:7px; cursor:pointer; flex-shrink:0; margin-left:auto; }
+    .q-exclude-toggle input{ display:none; }
+    .q-exclude-track{ width:36px; height:20px; border-radius:100px; background:#d9d9d9; position:relative; transition:background .15s; flex-shrink:0; }
+    .q-exclude-thumb{ position:absolute; top:2px; left:2px; width:16px; height:16px; border-radius:100px; background:white; box-shadow:0 1px 2px rgba(0,0,0,.18); transition:left .15s; }
+    .q-exclude-toggle input:checked + .q-exclude-track{ background:#416bff; }
+    .q-exclude-toggle input:checked + .q-exclude-track .q-exclude-thumb{ left:18px; }
+    .q-exclude-label{ font-size:13px; font-weight:600; color:#3b3f4c; white-space:nowrap; }
+    /* 답 영역 박스 (클릭해 인라인 수정) */
+    .ocr-ans-box{ background:#f6f7f9; border-radius:8px; padding:12px 14px; }
+    .ocr-ans-body{ font-size:16px; line-height:1.7; color:#222631; cursor:text; }
+    .ocr-ans-box:focus-within{ background:white; outline:2px solid #416bff; }
+    /* 직접 채점 문항: 콘텐츠 흐리게 + 잠금 */
+    .ocr-section-excluded .ocr-q-summary, .ocr-section-excluded .ocr-ans-body, .ocr-section-excluded .ocr-ans-body span{ color:#b3b6bd; }
+    .ocr-section-excluded .ocr-ans-body{ cursor:default; }
+    .ocr-exclude-note{ display:flex; align-items:center; gap:8px; background:#e9f2ff; border-radius:8px; padding:10px 12px; margin-top:10px; font-size:14px; color:#3b3f4c; line-height:1.5; }
     .rubric-ocr-body{ padding:14px 16px; font-size:16px; line-height:1.85; color:#222631; cursor:text; position:relative; }
     .rubric-ocr-body:hover{ background:#fbfbfc; }
     .section-editing{ border-color:#416bff !important; box-shadow:0 0 0 2px rgba(65,107,255,.12); }
@@ -896,7 +919,8 @@
       <button class="sub-tab" onclick="notReady('세부능력 및 특기사항 지원')">세부능력 및 특기사항 지원</button>
     </div>
   </div>
-  <div class="form-promo" id="diag-promo-bar">
+  <!-- AI 채점 진단 배너 — 다음 배포까지 숨김 (기능 미탑재). 복원 시 style 제거 -->
+  <div class="form-promo" id="diag-promo-bar" style="display:none">
     <div class="fp-inner">
       <i data-lucide="sparkles"></i>
       <span class="fp-txt">채점을 실행하기 전에 <b>AI 채점 진단</b>으로 채점기준이 잘 맞는지 미리 확인해 보세요.</span>
@@ -920,7 +944,7 @@
             </div>
           </div>
           <div style="display:flex;gap:10px;flex-shrink:0;">
-            <button class="btn btn-secondary btn-sm" onclick="openDiag('선생님 업로드 평가')"><i data-lucide="stethoscope" style="width:14px;height:14px;"></i>AI 채점 진단</button>
+            <button class="btn btn-secondary btn-sm" style="display:none" onclick="openDiag('선생님 업로드 평가')"><i data-lucide="stethoscope" style="width:14px;height:14px;"></i>AI 채점 진단</button><!-- AI 채점 진단 버튼 — 다음 배포까지 숨김 -->
             <button class="btn btn-secondary btn-sm" onclick="showToast('결과 공개 설정은 이 목업에서 제공하지 않습니다.','info')"><i data-lucide="share-2" style="width:14px;height:14px;"></i>결과 공개</button>
             <button class="btn btn-outline btn-sm" onclick="showToast('마감 취소는 이 목업에서 제공하지 않습니다.','info')"><i data-lucide="undo-2" style="width:14px;height:14px;"></i>마감 취소</button>
           </div>
@@ -976,7 +1000,7 @@
             </div>
           </div>
           <div style="display:flex;gap:10px;flex-shrink:0;">
-            <button class="btn btn-secondary btn-sm" onclick="openDiag('학생 업로드 평가')"><i data-lucide="stethoscope" style="width:14px;height:14px;"></i>AI 채점 진단</button>
+            <button class="btn btn-secondary btn-sm" style="display:none" onclick="openDiag('학생 업로드 평가')"><i data-lucide="stethoscope" style="width:14px;height:14px;"></i>AI 채점 진단</button><!-- AI 채점 진단 버튼 — 다음 배포까지 숨김 -->
             <button class="btn btn-secondary btn-sm" onclick="showToast('결과 공개 설정은 이 목업에서 제공하지 않습니다.','info')"><i data-lucide="share-2" style="width:14px;height:14px;"></i>결과 공개</button>
             <button class="btn btn-primary btn-sm" onclick="showToast('마감 처리는 이 목업에서 제공하지 않습니다.','info')"><i data-lucide="check-square" style="width:14px;height:14px;"></i>마감</button>
           </div>
@@ -1154,7 +1178,7 @@
         </div>
       </div>
 
-      <p id="list-eval-desc" class="page-sub">과제 제출 현황을 확인하고, 필요하면 과제를 직접 올릴 수도 있습니다. 제출된 과제는 AI 채점을 위해 OCR 인식을 진행해 주세요.</p>
+      <p id="list-eval-desc" class="page-sub">과제 제출 현황을 확인하고, 필요하면 과제를 직접 올릴 수도 있습니다. 제출된 과제는 AI 채점을 위해 과제물 인식을 진행해 주세요.</p>
 
       <!-- 미제출 학생 배너 (제출 추적 — 실시간으로 누가 안 냈는지) -->
       <div id="absent-banner" style="display:none;align-items:flex-start;gap:10px;background:#fff3f4;border:1px solid #f5b5bc;border-radius:8px;padding:12px 14px;margin-bottom:12px;">
@@ -1169,7 +1193,7 @@
         </div>
       </div>
 
-      <!-- OCR 진행 애니메이션 호스트 -->
+      <!-- 과제물 인식 진행 애니메이션 호스트 -->
       <div id="list-b-ocr-pending-banner" style="display:none;align-items:center;justify-content:space-between;gap:10px;padding:12px 16px;background:#fff7ed;border:1px solid #f97316;border-radius:8px;margin-bottom:12px;"></div>
 
       <div class="ev-card">
@@ -1511,7 +1535,7 @@
       <button class="back-link" onclick="showScreen('screen-list')"><i data-lucide="chevron-left" style="width:18px;height:18px;"></i>이전으로</button>
       <div>
         <h1 class="page-h1">설문 응답 업로드</h1>
-        <p class="page-sub">구글 설문·엑셀 등으로 받은 학생 응답을 양식에 맞춰 올리면, 인식(OCR) 없이 바로 채점할 수 있어요.</p>
+        <p class="page-sub">구글 설문·엑셀 등으로 받은 학생 응답을 양식에 맞춰 올리면, 인식 없이 바로 채점할 수 있어요.</p>
 
         <div id="survey-replace-banner" style="display:none;align-items:flex-start;gap:10px;background:#fff7ed;border:1px solid #fed7aa;border-radius:8px;padding:12px 14px;margin-bottom:16px;">
           <i data-lucide="alert-triangle" style="width:18px;height:18px;color:#f97316;flex-shrink:0;margin-top:1px;"></i>
@@ -1691,10 +1715,10 @@
   </div>
 
   <!-- OCR 품질 경고 배너 -->
-  <div id="ocr-review-banner" style="display:none;padding:10px 20px;background:#fff3f4;border-bottom:1px solid #fecaca;align-items:center;gap:10px;">
-    <i data-lucide="alert-circle" style="width:16px;height:16px;color:#db3e51;flex-shrink:0;"></i>
+  <div id="ocr-review-banner" style="display:none;padding:10px 20px;background:#fff7ed;border-bottom:1px solid #fdba74;align-items:center;gap:10px;">
+    <i data-lucide="alert-circle" style="width:16px;height:16px;color:#c2410c;flex-shrink:0;"></i>
     <span style="font-size:14px;color:#3b3f4c;line-height:1.5;font-weight:500;">
-      <strong style="color:#db3e51;">OCR 결과 확인 필요</strong> &mdash; <strong id="suspect-count-badge" style="color:#db3e51;">0개</strong> 문항에서 인식 불확실 구간이 감지되었습니다. 해당 문항 아래 AI 메모를 확인하고 원본과 대조해 주세요.
+      <strong style="color:#c2410c;">인식 결과 확인 필요</strong> &mdash; <strong id="suspect-count-badge" style="color:#c2410c;">0개</strong> 문항에서 인식 불확실 구간이 감지되었습니다. 해당 문항 아래 AI 메모를 확인하고 원본과 대조해 주세요.
     </span>
   </div>
 
@@ -1730,13 +1754,13 @@
         <div id="scan-page-content" style="background:white;box-shadow:0 2px 16px rgba(0,0,0,.35);width:520px;min-height:700px;padding:48px 44px;font-size:16px;line-height:2.0;color:#222631;transform-origin:top center;transition:transform 0.2s;"></div>
       </div>
     </div>
-    <!-- 우측: OCR 결과 -->
+    <!-- 우측: 인식 결과 -->
     <div style="width:44%;min-width:0;overflow-y:auto;background:white;">
       <div style="padding:16px 20px 0;">
         <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:12px;">
           <div style="display:flex;align-items:center;gap:8px;">
             <i data-lucide="scan-text" style="width:16px;height:16px;color:#416bff;"></i>
-            <span style="font-size:16px;font-weight:600;color:#222631;">OCR 인식 결과</span>
+            <span style="font-size:16px;font-weight:600;color:#222631;">과제물 인식 결과</span>
           </div>
           <button onclick="openQuestionEditModal()" style="display:inline-flex;align-items:center;justify-content:center;line-height:1;gap:5px;height:30px;padding:0 12px;background:white;border:1px solid #b3c6ff;border-radius:6px;color:#416bff;font-family:inherit;font-size:13px;font-weight:700;cursor:pointer;" onmouseover="this.style.background='#e9f2ff'" onmouseout="this.style.background='white'"><i data-lucide="pencil" style="width:13px;height:13px;"></i>문항 수정</button>
         </div>
@@ -1746,7 +1770,7 @@
   </div>
 </div>
 
-<!-- ===== 화면 3: B안 OCR 결과 확인 ===== -->
+<!-- ===== 화면 3: B안 인식 결과 확인 ===== -->
 <div id="screen-ocr-b" class="screen">
   <div style="position:sticky;top:0;z-index:50;height:68px;display:flex;align-items:stretch;background:#f6f7f9;border-top:1px solid #dde1e8;border-bottom:1px solid #dde1e8;">
     <button onclick="goBackFromOcrB()" style="width:68px;height:68px;background:#416bff;border:none;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;flex-shrink:0;padding:0;" onmouseover="this.style.background='#365eef'" onmouseout="this.style.background='#416bff'">
@@ -1766,33 +1790,44 @@
         </div>
         <span id="ocr-b-confirm-count" style="font-size:15px;color:#3b3f4c;white-space:nowrap;"></span>
       </div>
-      <div style="display:flex;align-items:center;gap:16px;">
+      <div style="display:flex;align-items:center;gap:12px;">
         <div style="display:flex;align-items:center;gap:0;">
           <button id="ocr-b-btn-prev" onclick="navStudentB(-1)" style="background:none;border:none;font-size:15px;font-weight:600;color:#3b3f4c;cursor:pointer;padding:0 12px;font-family:inherit;">&lt; 이전 학생</button>
           <div style="width:1px;height:20px;background:#dde1e8;"></div>
           <button id="ocr-b-btn-next" onclick="navStudentB(1)" style="background:none;border:none;font-size:15px;font-weight:600;color:#3b3f4c;cursor:pointer;padding:0 12px;font-family:inherit;">다음 학생 &gt;</button>
         </div>
+        <!-- 과업 1: 수정 저장 (blur 자동 저장 + 의도적 저장 버튼) -->
+        <span id="ocr-b-autosave" style="font-size:13px;font-weight:500;color:#808080;display:inline-flex;align-items:center;gap:5px;white-space:nowrap;">수정하면 자동으로 저장돼요</span>
+        <button onclick="saveOcrB()" class="btn" style="flex-shrink:0;background:#f1f3f5;color:#3b3f4c;border:1px solid #d9d9d9;" onmouseover="this.style.background='#e4e7ec'" onmouseout="this.style.background='#f1f3f5'"><i data-lucide="check" style="width:16px;height:16px;"></i>저장</button>
+        <!-- 과업 2: 채점 진행 — 버튼 1개, 누르면 채점 실행 팝업(현재 학생만 기본 선택, 나머지 선택 가능) -->
+        <div id="ocr-run-actions" style="display:none;align-items:center;gap:10px;">
+          <div style="width:1px;height:24px;background:#dde1e8;"></div>
+          <button class="btn btn-primary" onclick="ocrRunFromReview()"><i data-lucide="wand-sparkles" style="width:16px;height:16px;"></i>AI 채점 실행</button>
+        </div>
       </div>
     </div>
   </div>
 
-  <div id="ocr-b-review-banner" style="display:none;padding:10px 24px;background:#fff3f4;border-bottom:1px solid #fecaca;align-items:center;gap:10px;">
-    <i data-lucide="alert-circle" style="width:16px;height:16px;color:#db3e51;flex-shrink:0;"></i>
-    <span style="font-size:14px;color:#3b3f4c;font-weight:500;">
-      <strong style="color:#db3e51;">OCR 결과 확인 필요</strong> &mdash; <strong id="ocr-b-suspect-count" style="color:#db3e51;">0개</strong> 문항에서 인식 불확실 구간이 감지되었습니다. 해당 문항 아래 AI 메모를 확인하고 원본과 대조해 주세요.
+  <div id="ocr-b-review-banner" style="display:none;padding:10px 24px;background:#fef2f2;border-bottom:1px solid #fecaca;align-items:center;gap:10px;">
+    <i id="ocr-b-banner-icon" data-lucide="alert-circle" style="width:16px;height:16px;color:#f2525f;flex-shrink:0;"></i>
+    <span id="ocr-b-banner-msg" style="font-size:14px;color:#3b3f4c;font-weight:500;">
+      <strong style="color:#f2525f;">인식 결과 확인 필요</strong> &mdash; <strong id="ocr-b-suspect-count" style="color:#f2525f;">0개</strong> 문항에서 인식 불확실 구간이 감지되었습니다. 해당 문항 아래 AI 메모를 확인하고 원본과 대조해 주세요.
     </span>
   </div>
 
   <div id="ocr-b-split" style="display:flex;height:calc(100vh - 68px);">
     <div style="width:56%;min-width:0;display:flex;flex-direction:column;border-right:1px solid #dde1e8;background:#5a5a5a;">
-      <div style="background:#222631;display:flex;align-items:center;gap:20px;padding:4px 20px;flex-shrink:0;min-height:44px;">
-        <div style="width:294px;font-size:15px;color:white;line-height:1.4;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">1학년1반과제파일.pdf</div>
-        <div style="display:flex;align-items:center;gap:20px;">
-          <div style="display:flex;align-items:center;gap:12px;">
-            <button onclick="ocrBPageChange(-1)" style="background:#111;border:none;border-radius:4px;width:40px;padding:2px 8px;color:white;font-size:15px;font-family:inherit;line-height:1.4;cursor:pointer;text-align:center;"><span id="ocr-b-page-cur">4</span></button>
-            <span style="font-size:15px;color:white;line-height:1.4;">/</span>
-            <div style="background:transparent;display:flex;align-items:center;justify-content:center;border-radius:4px;width:40px;padding:2px 8px;color:white;font-size:15px;line-height:1.4;text-align:center;"><span id="ocr-b-page-total">120</span></div>
-          </div>
+      <div style="background:#222631;display:flex;align-items:center;justify-content:center;gap:24px;padding:4px 20px;flex-shrink:0;min-height:44px;">
+        <div id="ocr-b-filename" style="font-size:14px;color:white;line-height:1.4;white-space:nowrap;">04/18 09:14</div>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <button onclick="ocrBPageChange(-1)" title="이전 페이지" style="background:none;border:none;cursor:pointer;padding:2px;display:flex;align-items:center;"><i data-lucide="chevron-left" style="width:18px;height:18px;color:white;"></i></button>
+          <div style="background:#111;border-radius:4px;width:40px;padding:2px 8px;color:white;font-size:15px;line-height:1.4;text-align:center;"><span id="ocr-b-page-cur">1</span></div>
+          <span style="font-size:15px;color:white;line-height:1.4;">/</span>
+          <div style="background:transparent;border-radius:4px;width:40px;padding:2px 8px;color:white;font-size:15px;line-height:1.4;text-align:center;"><span id="ocr-b-page-total">2</span></div>
+          <button onclick="ocrBPageChange(1)" title="다음 페이지" style="background:none;border:none;cursor:pointer;padding:2px;display:flex;align-items:center;"><i data-lucide="chevron-right" style="width:18px;height:18px;color:white;"></i></button>
+        </div>
+        <div style="display:flex;align-items:center;gap:12px;">
+          <button onclick="ocrBRotateChange()" title="90° 회전" style="background:none;border:none;cursor:pointer;padding:2px;display:flex;align-items:center;"><i data-lucide="rotate-cw" style="width:17px;height:17px;color:white;"></i></button>
           <div style="display:flex;align-items:center;gap:4px;">
             <button onclick="ocrBZoomChange(-10)" style="background:white;border:none;border-radius:100px;width:20px;height:20px;display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0;">
               <i data-lucide="minus" style="width:14px;height:14px;color:#222631;"></i>
@@ -1805,11 +1840,13 @@
         </div>
       </div>
       <div id="ocr-b-scan-viewport" style="flex:1;overflow:auto;padding:24px;display:flex;flex-direction:column;gap:20px;align-items:center;">
-        <div id="ocr-b-scan-image" style="background:white;box-shadow:0 2px 16px rgba(0,0,0,.35);width:100%;max-width:540px;min-height:720px;padding:40px;color:#222631;font-size:14px;transform-origin:top center;transition:transform .15s;">
-          <p style="text-align:center;font-weight:600;margin:0 0 20px;">독후 활동 보고서 — PDF 미리보기</p>
-          <div style="background:#f6f7f9;height:200px;border-radius:4px;margin-bottom:12px;"></div>
-          <div style="background:#f6f7f9;height:140px;border-radius:4px;margin-bottom:12px;"></div>
-          <div style="background:#f6f7f9;height:180px;border-radius:4px;"></div>
+        <div id="ocr-b-scan-image" style="background:white;box-shadow:0 2px 16px rgba(0,0,0,.35);width:100%;max-width:540px;min-height:720px;overflow:hidden;transform-origin:top center;transition:transform .15s;">
+          <img src="social_eval_p1.png" alt="학생 제출물 스캔" style="width:100%;display:block;" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+          <div style="display:none;flex-direction:column;align-items:center;justify-content:center;gap:10px;min-height:720px;color:#b3b6bd;padding:40px;text-align:center;">
+            <i data-lucide="file-image" style="width:44px;height:44px;"></i>
+            <div style="font-size:15px;font-weight:600;color:#6d7381;">학생 제출물 이미지</div>
+            <div style="font-size:13px;line-height:1.5;">이 위치에 스캔한 제출물이 표시됩니다.</div>
+          </div>
         </div>
       </div>
     </div>
@@ -1818,9 +1855,8 @@
         <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:12px;">
           <div style="display:flex;align-items:center;gap:8px;">
             <i data-lucide="scan-text" style="width:16px;height:16px;color:#416bff;"></i>
-            <span style="font-size:16px;font-weight:600;color:#222631;">OCR 인식 결과</span>
+            <span style="font-size:16px;font-weight:600;color:#222631;">과제물 인식 결과</span>
           </div>
-          <button onclick="openQuestionEditModal()" style="display:inline-flex;align-items:center;justify-content:center;line-height:1;gap:5px;height:30px;padding:0 12px;background:white;border:1px solid #b3c6ff;border-radius:6px;color:#416bff;font-family:inherit;font-size:13px;font-weight:700;cursor:pointer;" onmouseover="this.style.background='#e9f2ff'" onmouseout="this.style.background='white'"><i data-lucide="pencil" style="width:13px;height:13px;"></i>문항 수정</button>
         </div>
       </div>
       <div id="ocr-b-text-panel" style="padding:0 20px 32px;"></div>
@@ -1830,15 +1866,7 @@
     </div>
   </div>
 
-  <!-- V3: OCR 먼저 확인 → 채점 진행 액션바 (채점 실행 흐름으로 진입했을 때만 노출) -->
-  <div id="ocr-run-bar" style="display:none;position:fixed;left:0;right:0;bottom:0;z-index:120;background:#fff;border-top:1px solid #dde1e8;box-shadow:0 -4px 16px rgba(0,0,0,.06);padding:12px 24px;align-items:center;justify-content:space-between;gap:16px;">
-    <button class="btn btn-outline" onclick="ocrBackToScoring()" style="flex-shrink:0;"><i data-lucide="chevron-left" style="width:16px;height:16px;"></i>채점 목록으로</button>
-    <span style="flex:1;min-width:0;font-size:14px;color:#6d7381;line-height:1.4;text-align:center;">인식 결과를 확인했다면 학생을 넘기며 저장하고, 끝나면 채점을 진행하세요.</span>
-    <div style="display:flex;align-items:center;gap:10px;flex-shrink:0;">
-      <button class="btn btn-outline" onclick="saveAndNextOcr()" style="border-color:#416bff;color:#416bff;border-width:1.5px;"><i data-lucide="check" style="width:16px;height:16px;"></i>저장 후 다음</button>
-      <button class="btn btn-primary" onclick="ocrRunProceed()"><i data-lucide="wand-sparkles" style="width:16px;height:16px;"></i>선택 학생 채점 · <span id="ocr-run-count">0</span>명</button>
-    </div>
-  </div>
+  <!-- (하단 고정바 제거 — 채점 액션은 상단 헤더 #ocr-run-actions로 통합, 2026-07-08) -->
 </div>
 
 </div><!-- /main-wrap -->
@@ -1848,11 +1876,23 @@
   <div style="background:white;border-radius:16px;box-shadow:0 8px 24px rgba(0,0,0,0.16);width:600px;max-width:92vw;max-height:86vh;display:flex;flex-direction:column;position:relative;">
     <button onclick="closeQuestionEditModal()" style="position:absolute;top:11px;right:11px;width:36px;height:36px;background:none;border:none;cursor:pointer;border-radius:6px;display:flex;align-items:center;justify-content:center;" onmouseover="this.style.background='#f6f7f9'" onmouseout="this.style.background='none'"><i data-lucide="x" style="width:18px;height:18px;color:#6d7381;"></i></button>
     <div style="padding:24px 24px 8px;"><h3 style="font-size:18px;font-weight:700;color:#222631;margin:0;">문항 수정</h3></div>
-    <div style="padding:0 24px 8px;"><p style="font-size:13px;color:#6d7381;line-height:1.55;margin:0;">수정한 문항은 <strong style="color:#3b3f4c;">이 평가의 모든 학생 OCR 결과</strong>에 동일하게 적용됩니다. 학생별로 따로 수정할 필요가 없습니다.</p></div>
+    <div style="padding:0 24px 8px;"><p style="font-size:13px;color:#6d7381;line-height:1.55;margin:0;">수정한 문항은 <strong style="color:#3b3f4c;">이 평가의 모든 학생 인식 결과</strong>에 동일하게 적용됩니다. 학생별로 따로 수정할 필요가 없습니다.</p></div>
     <div id="qedit-list" style="padding:8px 24px 8px;overflow-y:auto;flex:1;"></div>
     <div style="padding:12px 24px 16px;display:flex;justify-content:flex-end;gap:10px;border-top:1px solid #eceef2;">
       <button onclick="closeQuestionEditModal()" class="btn btn-outline">취소</button>
       <button onclick="saveQuestionEditModal()" class="btn btn-primary">모든 학생에 적용</button>
+    </div>
+  </div>
+</div>
+
+<!-- OCR 인식 결과 되돌리기 확인 모달 (되돌릴 수 없는 동작 → 짧은 확인) -->
+<div id="ocrRevertModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.4);z-index:1200;align-items:center;justify-content:center;" onclick="if(event.target===this)closeOcrRevertModal()">
+  <div style="background:white;border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,0.16);width:400px;max-width:92vw;">
+    <div style="padding:22px 22px 10px;"><h3 style="font-size:17px;font-weight:700;color:#222631;margin:0;">원래 인식 결과로 되돌릴까요?</h3></div>
+    <div style="padding:0 22px 6px;"><p style="font-size:14px;color:#3b3f4c;line-height:1.6;margin:0;">수정한 내용을 지우고 AI가 처음 인식한 결과로 되돌려요. 되돌린 후에는 수정한 내용을 복구할 수 없어요.</p></div>
+    <div style="padding:14px 22px 18px;display:flex;justify-content:flex-end;gap:10px;">
+      <button onclick="closeOcrRevertModal()" class="btn btn-outline btn-sm">취소</button>
+      <button onclick="confirmOcrRevert()" class="btn btn-primary btn-sm">되돌리기</button>
     </div>
   </div>
 </div>
@@ -2054,14 +2094,14 @@
       <p id="student-upload-title" style="font-size:20px;font-weight:600;line-height:1.25;color:#222631;margin:0;">학생 파일 추가/제거</p>
     </div>
     <div style="padding:0 24px;display:flex;flex-direction:column;gap:20px;">
-      <p style="font-size:16px;font-weight:400;line-height:1.55;color:#222631;margin:0;">가장 먼저 올린 파일 1개만 채점·OCR 대상이 됩니다. 나머지 파일은 참고용으로 함께 보관됩니다.</p>
+      <p style="font-size:16px;font-weight:400;line-height:1.55;color:#222631;margin:0;">가장 먼저 올린 파일 1개만 채점·인식 대상이 됩니다. 나머지 파일은 참고용으로 함께 보관됩니다.</p>
       <!-- 개인정보 비식별화 안내 (한 줄) -->
       <div style="display:inline-flex;align-items:center;gap:7px;font-size:14px;font-weight:500;color:#6d7381;">
         <i data-lucide="shield-check" style="width:16px;height:16px;color:#416bff;flex-shrink:0;"></i>학번·이름은 가린 채 AI 채점돼요
       </div>
       <div style="background:#e9f2ff;border:1px solid #ccdfff;border-radius:4px;padding:12px;">
         <ul style="list-style:disc;padding-left:24px;margin:0;font-size:15px;font-weight:400;line-height:1.55;color:#3151c4;">
-          <li>여러 파일을 올릴 수 있어요 (채점·OCR은 가장 먼저 올린 파일만)</li>
+          <li>여러 파일을 올릴 수 있어요 (채점·인식은 가장 먼저 올린 파일만)</li>
           <li>제출 가능한 파일 형식 : PDF, PNG, JPG</li>
         </ul>
       </div>
@@ -2085,18 +2125,18 @@
   </div>
 </div>
 
-<!-- ===== 채점 실행 전 OCR 미확인 경고 모달 ===== -->
+<!-- ===== 채점 실행 전 인식 미확인 경고 모달 ===== -->
 <div id="ocrWarnModal" class="rm-overlay" onclick="if(event.target===this) closeRmModal('ocrWarnModal')">
   <div class="rm-modal">
     <div class="rm-hd">
       <div style="display:flex;align-items:center;gap:10px;padding-right:36px;">
         <i data-lucide="triangle-alert" style="width:22px;height:22px;color:#f97316;flex-shrink:0;"></i>
-        <span class="rm-title">OCR 확인 필요 학생이 있습니다</span>
+        <span class="rm-title">인식 확인 필요 학생이 있습니다</span>
       </div>
       <button class="rm-close" onclick="closeRmModal('ocrWarnModal')"><i data-lucide="x" style="width:20px;height:20px"></i></button>
     </div>
     <div class="rm-body">
-      <p style="font-size:16px;color:#3b3f4c;line-height:1.55;margin:0;">아래 학생의 OCR 결과가 아직 확인되지 않았습니다. 인식 불확실 구간이 있어 채점 정확도에 영향을 줄 수 있습니다.</p>
+      <p style="font-size:16px;color:#3b3f4c;line-height:1.55;margin:0;">아래 학생의 인식 결과가 아직 확인되지 않았습니다. 인식 불확실 구간이 있어 채점 정확도에 영향을 줄 수 있습니다.</p>
       <div style="border:1px solid #fed7aa;border-radius:8px;overflow:hidden;background:#fff7ed;">
         <div style="padding:12px 16px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #fed7aa;">
           <div style="display:flex;align-items:center;gap:8px;">
@@ -2104,7 +2144,7 @@
             <span style="font-size:16px;font-weight:600;color:#222631;">10102 이준호</span>
             <span style="font-size:13px;font-weight:600;background:#ffedd5;color:#ea580c;border-radius:100px;padding:2px 8px;">2개 문항</span>
           </div>
-          <button onclick="closeRmModal('ocrWarnModal');goToOCRById('10102')" style="background:none;border:none;cursor:pointer;font-family:inherit;font-size:14px;font-weight:600;color:#416bff;display:inline-flex;align-items:center;justify-content:center;line-height:1;vertical-align:middle;gap:4px;padding:4px 6px;border-radius:4px;">OCR 결과 확인 <i data-lucide="chevron-right" style="width:13px;height:13px;"></i></button>
+          <button onclick="closeRmModal('ocrWarnModal');goToOCRById('10102')" style="background:none;border:none;cursor:pointer;font-family:inherit;font-size:14px;font-weight:600;color:#416bff;display:inline-flex;align-items:center;justify-content:center;line-height:1;vertical-align:middle;gap:4px;padding:4px 6px;border-radius:4px;">인식 결과 확인 <i data-lucide="chevron-right" style="width:13px;height:13px;"></i></button>
         </div>
         <div style="padding:12px 16px;display:flex;align-items:center;justify-content:space-between;">
           <div style="display:flex;align-items:center;gap:8px;">
@@ -2112,7 +2152,7 @@
             <span style="font-size:16px;font-weight:600;color:#222631;">10103 박지민</span>
             <span style="font-size:13px;font-weight:600;background:#ffedd5;color:#ea580c;border-radius:100px;padding:2px 8px;">2개 문항</span>
           </div>
-          <button onclick="closeRmModal('ocrWarnModal');goToOCRById('10103')" style="background:none;border:none;cursor:pointer;font-family:inherit;font-size:14px;font-weight:600;color:#416bff;display:inline-flex;align-items:center;justify-content:center;line-height:1;vertical-align:middle;gap:4px;padding:4px 6px;border-radius:4px;">OCR 결과 확인 <i data-lucide="chevron-right" style="width:13px;height:13px;"></i></button>
+          <button onclick="closeRmModal('ocrWarnModal');goToOCRById('10103')" style="background:none;border:none;cursor:pointer;font-family:inherit;font-size:14px;font-weight:600;color:#416bff;display:inline-flex;align-items:center;justify-content:center;line-height:1;vertical-align:middle;gap:4px;padding:4px 6px;border-radius:4px;">인식 결과 확인 <i data-lucide="chevron-right" style="width:13px;height:13px;"></i></button>
         </div>
       </div>
     </div>
@@ -2131,7 +2171,7 @@
       <button class="rm-close" onclick="closeRmModal('runModal1')"><i data-lucide="x" style="width:20px;height:20px"></i></button>
     </div>
     <div class="rm-body">
-      <!-- 채점 방식 (V3 하이브리드: 인라인이 기본, OCR 먼저는 조용한 옵트인) -->
+      <!-- 채점 방식 (V3 하이브리드: 인라인이 기본, 인식 먼저는 조용한 옵트인) -->
       <div class="rm-field" id="rmMethodField">
         <span class="rm-label">채점 방식</span>
         <p style="font-size:14px;color:#6d7381;margin:2px 0 8px;line-height:1.5;">바로 채점해도 인식 결과는 채점 후 학생 화면에서 확인·수정할 수 있어요.</p>
@@ -2143,7 +2183,7 @@
           </button>
           <button type="button" class="rm-seg-opt" id="rmMethodOcr" onclick="rmSetMethod('ocr')">
             <i data-lucide="scan-text"></i>
-            <span class="rm-seg-tit">OCR 먼저 확인하고 채점</span>
+            <span class="rm-seg-tit">인식 먼저 확인하고 채점</span>
             <span class="rm-seg-desc">인식 결과를 먼저 점검해 재채점 크레딧 절약</span>
           </button>
         </div>
@@ -2167,7 +2207,7 @@
             <div class="rm-model-div"></div>
             <ul class="rm-model-feats">
               <li>수학, 과학, 정보 과목의 채점 정확도를 개선했어요.</li>
-              <li>손글씨·이미지 답안의 OCR 인식률을 높였어요.</li>
+              <li>손글씨·이미지 답안의 인식률을 높였어요.</li>
               <li>지시문과 학생 답안을 더 정확히 구분해요.</li>
             </ul>
             <div class="rm-model-tip">※ 채점 예시는 아래 버튼을 클릭하시면 확인 가능합니다.</div>
@@ -2221,7 +2261,7 @@
     <div class="rm-body">
       <div id="rm2-ocr-note" style="display:none;gap:8px;align-items:flex-start;background:#e9f2ff;border-radius:6px;padding:12px 14px;margin-bottom:12px;">
         <i data-lucide="scan-text" style="width:16px;height:16px;color:#3151c4;flex-shrink:0;margin-top:2px;"></i>
-        <span style="font-size:14px;color:#3b3f4c;line-height:1.55;">선택한 학생의 과제물을 먼저 <strong>OCR로 인식</strong>합니다. 인식 결과를 확인·수정한 뒤 이어서 채점해요. <span style="color:#6d7381;">직접 입력(타이핑)으로 낸 답안은 인식이 필요 없어요.</span></span>
+        <span style="font-size:14px;color:#3b3f4c;line-height:1.55;">선택한 학생의 과제물을 <strong>먼저 인식</strong>해요. 결과를 확인·수정한 뒤 이어서 채점하면 더 정확하게 채점돼요.<br><span style="display:block;margin-top:6px;color:#3b3f4c;line-height:1.5;">학생 1명당 <strong>AI 크레딧 1개</strong>예요. 인식할 때 차감되고, 인식한 학생은 <strong>채점 시 추가로 차감되지 않아요.</strong></span></span>
       </div>
       <div class="rm-tbl-wrap">
         <table class="rm-tbl">
@@ -2230,7 +2270,7 @@
               <th style="width:64px;"><input type="checkbox" class="rm-chk" id="rm-chk-all" onchange="rmToggleAll(this)"></th>
               <th style="width:100px;">학번</th>
               <th>이름</th>
-              <th style="width:120px;" id="rm2-col-ocr">사전 OCR</th>
+              <th style="width:120px;" id="rm2-col-ocr">과제물 인식</th>
               <th style="width:110px;" id="rm2-col-a">AI 채점</th>
               <th style="width:120px;" id="rm2-col-b">선생님 채점</th>
             </tr>
@@ -2238,9 +2278,8 @@
           <tbody id="rm-student-tbody"></tbody>
         </table>
       </div>
-      <div id="rm2-credit" style="display:none;margin-top:12px;align-items:center;gap:6px;font-size:14px;color:#3b3f4c;">
-        <i data-lucide="bot" style="width:15px;height:15px;color:#416bff;flex-shrink:0;"></i>
-        <span>AI 크레딧 <strong id="rm2-credit-n">0</strong>개 사용<span id="rm2-credit-sub" style="color:#6d7381;"></span></span>
+      <div id="rm2-credit" style="display:none;margin-top:12px;align-items:center;font-size:14px;color:#3b3f4c;">
+        <span>AI 크레딧 <strong id="rm2-credit-n">0</strong>개 차감<span id="rm2-credit-sub" style="color:#6d7381;"></span></span>
       </div>
     </div>
     <div class="rm-ft" style="justify-content:space-between;">
@@ -2250,7 +2289,7 @@
   </div>
 </div>
 
-<!-- ===== 채점 실행 전 OCR 미진행 모달 (안내 → 분석 → 완료) ===== -->
+<!-- ===== 채점 실행 전 인식 미진행 모달 (안내 → 분석 → 완료) ===== -->
 <div id="ocrFirstModal" class="rm-overlay" onclick="if(event.target===this) closeOcrFirstModal()">
   <div class="rm-modal" style="width:520px;">
 
@@ -2263,8 +2302,8 @@
             <i data-lucide="scan-text" style="width:32px;height:32px;color:#416bff;"></i>
           </div>
           <div>
-            <div style="font-size:20px;font-weight:700;color:#222631;margin-bottom:8px;">AI 채점 전 OCR 분석이 필요해요</div>
-            <div style="font-size:16px;color:#3b3f4c;line-height:1.65;">1-1반 학생들의 제출물이 아직 OCR 처리되지 않았습니다.<br>손글씨 인식 결과를 확인하고 채점해야 정확한 결과를 얻을 수 있어요.</div>
+            <div style="font-size:20px;font-weight:700;color:#222631;margin-bottom:8px;">AI 채점 전 과제물 인식이 필요해요</div>
+            <div style="font-size:16px;color:#3b3f4c;line-height:1.65;">1-1반 학생들의 제출물이 아직 인식되지 않았습니다.<br>손글씨 인식 결과를 확인하고 채점해야 정확한 결과를 얻을 수 있어요.</div>
           </div>
         </div>
       </div>
@@ -2272,14 +2311,14 @@
         <div style="background:#e9f2ff;border:1px solid #ccdfff;border-radius:8px;padding:16px 20px;display:flex;gap:14px;align-items:flex-start;">
           <i data-lucide="info" style="width:18px;height:18px;color:#416bff;flex-shrink:0;margin-top:2px;"></i>
           <div style="font-size:15px;color:#3151c4;line-height:1.65;">
-            <strong>OCR 분석을 먼저 진행합니다.</strong><br>
+            <strong>과제물 인식을 먼저 진행합니다.</strong><br>
             분석 완료 후 확인이 필요한 항목을 검토하거나, 별도 확인 없이 바로 AI 채점을 실행할 수 있어요.
           </div>
         </div>
       </div>
       <div style="padding:0 28px 28px;display:flex;justify-content:flex-end;gap:10px;">
         <button class="btn btn-outline" onclick="closeOcrFirstModal()">취소</button>
-        <button class="btn btn-primary" onclick="startOcrAnalysis()"><i data-lucide="scan-text" style="width:16px;height:16px;"></i>OCR 분석 시작하기</button>
+        <button class="btn btn-primary" onclick="startOcrAnalysis()"><i data-lucide="scan-text" style="width:16px;height:16px;"></i>과제물 인식 시작하기</button>
       </div>
     </div>
 
@@ -2290,7 +2329,7 @@
           <i data-lucide="loader-circle" style="width:36px;height:36px;color:#416bff;" class="spin"></i>
         </div>
         <div>
-          <div style="font-size:20px;font-weight:700;color:#222631;margin-bottom:8px;">OCR 분석 중...</div>
+          <div style="font-size:20px;font-weight:700;color:#222631;margin-bottom:8px;">과제물 인식 중...</div>
           <div id="ocrf-prog-text" style="font-size:16px;color:#6d7381;font-weight:500;">14명 중 0명 처리 완료</div>
         </div>
         <div style="width:100%;">
@@ -2303,56 +2342,64 @@
           </div>
         </div>
         <div id="ocrf-current-stu" style="font-size:14px;color:#416bff;font-weight:600;min-height:20px;"></div>
-        <div style="font-size:13px;color:#6d7381;line-height:1.6;text-align:center;">학생당 최대 1분 정도 소요돼요.<br>이 창을 닫아도 인식은 백그라운드에서 계속 진행됩니다.</div>
+        <div style="font-size:13px;color:#6d7381;line-height:1.6;text-align:center;">학생당 인식에 최대 3분까지 소요될 수 있어요.<br>이 창을 닫아도 인식은 백그라운드에서 계속 진행됩니다.</div>
         <button class="btn btn-outline" style="height:40px;" onclick="ocrProgressBackground()">백그라운드로 진행</button>
       </div>
     </div>
 
     <!-- 3단계: 결과 (확인 필요 항목 발견) -->
     <div id="ocrf-stage3" style="display:none;">
-      <div style="padding:28px 28px 0;position:relative;">
+      <div style="padding:28px 28px 4px;position:relative;">
         <button class="rm-close" onclick="closeOcrFirstModal()"><i data-lucide="x" style="width:20px;height:20px"></i></button>
-        <div style="display:flex;flex-direction:column;align-items:center;gap:12px;text-align:center;padding-bottom:20px;">
-          <div style="width:64px;height:64px;border-radius:16px;background:#e9f2ff;display:flex;align-items:center;justify-content:center;">
-            <i data-lucide="circle-check-big" style="width:32px;height:32px;color:#416bff;"></i>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:10px;text-align:center;">
+          <div style="width:56px;height:56px;border-radius:16px;background:#e9f2ff;display:flex;align-items:center;justify-content:center;">
+            <i data-lucide="circle-check-big" style="width:28px;height:28px;color:#416bff;"></i>
           </div>
-          <div>
-            <div style="font-size:20px;font-weight:700;color:#222631;margin-bottom:6px;">OCR 분석 완료</div>
-            <div style="font-size:16px;color:#3b3f4c;">확인이 필요한 항목이 발견됐습니다</div>
+          <div style="font-size:20px;font-weight:700;color:#222631;">과제물 인식 완료</div>
+          <div style="font-size:15px;color:#6d7381;">전체 14명 중 <strong style="color:#3b3f4c;font-weight:600;">11명</strong>은 정상 인식됐어요.</div>
+        </div>
+      </div>
+      <!-- 초점: 확인이 필요한 학생만 부각. 정상 인식은 위 안심 문구로 흡수(색 최소화) -->
+      <div style="padding:18px 28px 4px;">
+        <div style="font-size:14px;font-weight:700;color:#222631;margin-bottom:10px;display:inline-flex;align-items:center;gap:6px;">
+          <i data-lucide="alert-circle" style="width:15px;height:15px;color:#ea580c;"></i>확인이 필요한 학생 3명
+        </div>
+        <div style="display:flex;flex-direction:column;gap:8px;">
+          <!-- 확인 필요 (OCR 불확실) -->
+          <div style="border:1px solid #e5e7eb;border-radius:10px;padding:12px 14px;display:flex;align-items:center;justify-content:space-between;gap:12px;">
+            <div style="display:flex;align-items:center;gap:9px;min-width:0;flex-wrap:wrap;">
+              <span style="font-size:15px;font-weight:600;color:#222631;">이준호</span>
+              <span style="font-size:13px;color:#9aa0ad;">10102</span>
+              <span style="font-size:13px;font-weight:600;color:#f2525f;">확인 필요</span>
+              <span style="font-size:13px;color:#6d7381;">2개 문항</span>
+            </div>
+            <button onclick="enterOcrReviewFromProgress(1)" style="flex-shrink:0;background:none;border:none;cursor:pointer;font-family:inherit;font-size:14px;font-weight:600;color:#416bff;display:inline-flex;align-items:center;gap:4px;padding:4px 6px;border-radius:4px;">인식 결과 확인 <i data-lucide="chevron-right" style="width:13px;height:13px;"></i></button>
           </div>
-          <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center;">
-            <span style="background:#eefcf4;border:1px solid #b8ebcf;color:#319d64;border-radius:100px;padding:4px 14px;font-size:13px;font-weight:600;">12명 정상 인식</span>
-            <span style="background:#fff7ed;border:1px solid #fed7aa;color:#ea580c;border-radius:100px;padding:4px 14px;font-size:13px;font-weight:600;">1명 확인 필요</span>
-            <span style="background:#f1f3f5;border:1px solid #dde1e8;color:#6d7381;border-radius:100px;padding:4px 14px;font-size:13px;font-weight:600;">1명 인식 실패</span>
+          <!-- 정확도 낮음 → 직접 채점 (OCR 상세와 동일 상태) -->
+          <div style="border:1px solid #e5e7eb;border-radius:10px;padding:12px 14px;display:flex;align-items:center;justify-content:space-between;gap:12px;">
+            <div style="display:flex;align-items:center;gap:9px;min-width:0;flex-wrap:wrap;">
+              <span style="font-size:15px;font-weight:600;color:#222631;">최유진</span>
+              <span style="font-size:13px;color:#9aa0ad;">10104</span>
+              <span style="font-size:13px;font-weight:600;color:#f2525f;">정확도 낮음</span>
+              <span style="font-size:13px;color:#6d7381;">직접 채점 권장</span>
+            </div>
+            <button onclick="enterOcrReviewFromProgress(3)" style="flex-shrink:0;background:none;border:none;cursor:pointer;font-family:inherit;font-size:14px;font-weight:600;color:#416bff;display:inline-flex;align-items:center;gap:4px;padding:4px 6px;border-radius:4px;">인식 결과 확인 <i data-lucide="chevron-right" style="width:13px;height:13px;"></i></button>
+          </div>
+          <!-- 인식 실패 → 다시 시도 (채점 제외) -->
+          <div style="border:1px solid #e5e7eb;border-radius:10px;padding:12px 14px;display:flex;align-items:center;justify-content:space-between;gap:12px;">
+            <div style="display:flex;align-items:center;gap:9px;min-width:0;flex-wrap:wrap;">
+              <span style="font-size:15px;font-weight:600;color:#222631;">백시우</span>
+              <span style="font-size:13px;color:#9aa0ad;">10114</span>
+              <span style="font-size:13px;font-weight:600;color:#f2525f;">인식 실패</span>
+              <span style="font-size:13px;color:#6d7381;">채점에서 제외돼요</span>
+            </div>
+            <button onclick="showToast('과제물 인식을 다시 시도합니다.','info')" style="flex-shrink:0;background:none;border:none;cursor:pointer;font-family:inherit;font-size:14px;font-weight:600;color:#416bff;display:inline-flex;align-items:center;gap:4px;padding:4px 6px;border-radius:4px;"><i data-lucide="rotate-cw" style="width:13px;height:13px;"></i>다시 시도</button>
           </div>
         </div>
       </div>
-      <div style="padding:0 28px 20px;">
-        <div style="border:1px solid #fed7aa;border-radius:8px;overflow:hidden;background:#fff7ed;">
-          <div style="padding:12px 16px;display:flex;align-items:center;justify-content:space-between;">
-            <div style="display:flex;align-items:center;gap:8px;">
-              <i data-lucide="triangle-alert" style="width:14px;height:14px;color:#f97316;flex-shrink:0;"></i>
-              <span style="font-size:16px;font-weight:600;color:#222631;">10102 이준호</span>
-              <span style="font-size:13px;font-weight:600;background:#ffedd5;color:#ea580c;border-radius:100px;padding:2px 8px;">2개 문항</span>
-            </div>
-            <button onclick="enterOcrReviewFromProgress(1)" style="background:none;border:none;cursor:pointer;font-family:inherit;font-size:14px;font-weight:600;color:#416bff;display:inline-flex;align-items:center;justify-content:center;line-height:1;vertical-align:middle;gap:4px;padding:4px 6px;border-radius:4px;">OCR 결과 확인 <i data-lucide="chevron-right" style="width:13px;height:13px;"></i></button>
-          </div>
-        </div>
-        <!-- 인식 실패 (재시도) — 확인 필요와 분리. 채점 대상에서는 제외됨(§2-7) -->
-        <div style="border:1px solid #dde1e8;border-radius:8px;overflow:hidden;background:#f6f7f9;margin-top:10px;">
-          <div style="padding:12px 16px;display:flex;align-items:center;justify-content:space-between;">
-            <div style="display:flex;align-items:center;gap:8px;">
-              <i data-lucide="circle-x" style="width:14px;height:14px;color:#6d7381;flex-shrink:0;"></i>
-              <span style="font-size:16px;font-weight:600;color:#222631;">10104 최유진</span>
-              <span style="font-size:13px;font-weight:600;background:#eceef2;color:#6d7381;border-radius:100px;padding:2px 8px;">인식 실패 · 채점 제외</span>
-            </div>
-            <button onclick="showToast('OCR 인식을 다시 시도합니다.','info')" style="background:none;border:none;cursor:pointer;font-family:inherit;font-size:14px;font-weight:600;color:#416bff;display:inline-flex;align-items:center;justify-content:center;line-height:1;vertical-align:middle;gap:4px;padding:4px 6px;border-radius:4px;"><i data-lucide="rotate-cw" style="width:13px;height:13px;"></i>다시 시도</button>
-          </div>
-        </div>
-      </div>
-      <div style="padding:0 28px 28px;display:flex;gap:10px;">
-        <button class="btn btn-secondary" style="flex:1;height:44px;" onclick="ocrProgressBackground()">나중에 확인</button>
-        <button class="btn btn-primary" style="flex:1;height:44px;" onclick="enterOcrReviewFromProgress(0)"><i data-lucide="scan-text" style="width:16px;height:16px;"></i>인식 결과 확인</button>
+      <div style="padding:18px 28px 26px;display:flex;gap:10px;">
+        <button class="btn btn-secondary" style="flex:1;height:44px;display:inline-flex;align-items:center;justify-content:center;line-height:1;" onclick="ocrProgressBackground()">나중에 확인</button>
+        <button class="btn btn-primary" style="flex:1;height:44px;display:inline-flex;align-items:center;justify-content:center;line-height:1;" onclick="enterOcrReviewFromProgress(0)">인식 결과 확인</button>
       </div>
     </div>
 
@@ -2370,7 +2417,7 @@
         <div style="width:36px;height:36px;background:#e9f2ff;border-radius:4px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
           <i data-lucide="scan-text" style="width:20px;height:20px;color:#416bff;"></i>
         </div>
-        <h3 style="font-size:18px;font-weight:600;color:#222631;margin:0;">OCR 인식을 시작합니다</h3>
+        <h3 style="font-size:18px;font-weight:600;color:#222631;margin:0;">과제물 인식을 시작합니다</h3>
       </div>
     </div>
     <div style="padding:0 24px 24px;display:flex;flex-direction:column;gap:16px;">
@@ -2381,7 +2428,7 @@
         </div>
         <div style="display:flex;align-items:flex-start;gap:10px;">
           <i data-lucide="alert-circle" style="width:18px;height:18px;color:#f97316;flex-shrink:0;margin-top:2px;"></i>
-          <p style="font-size:15px;color:#222631;margin:0;line-height:1.55;"><strong>인식 정확도가 낮은 문항</strong>은 AI가 자동으로 감지합니다. <span style="color:#416bff;font-weight:600;">과제물 관리</span>의 <span style="background:#e9f2ff;color:#3151c4;font-weight:600;padding:1px 6px;border-radius:4px;font-size:13px;">OCR 결과 확인</span> 버튼을 눌러 원본과 대조하여 확인·수정해 주세요.</p>
+          <p style="font-size:15px;color:#222631;margin:0;line-height:1.55;"><strong>인식 정확도가 낮은 문항</strong>은 AI가 자동으로 감지합니다. <span style="color:#416bff;font-weight:600;">과제물 관리</span>의 <span style="background:#e9f2ff;color:#3151c4;font-weight:600;padding:1px 6px;border-radius:4px;font-size:13px;">인식 결과 확인</span> 버튼을 눌러 원본과 대조하여 확인·수정해 주세요.</p>
         </div>
       </div>
       <label style="display:flex;align-items:center;gap:8px;cursor:pointer;user-select:none;">
@@ -2468,7 +2515,7 @@ OCR_DATA['10103'] = {
         return {
           num: p,
           blocks: [
-            { type:'text', content:'학생 ' + s.name + '의 OCR 인식 결과입니다. 이 텍스트는 목업 데이터이며, 실제 서비스에서는 해당 학생의 과제물 스캔 이미지에서 추출된 텍스트가 표시됩니다.' },
+            { type:'text', content:'학생 ' + s.name + '의 과제물 인식 결과입니다. 이 텍스트는 목업 데이터이며, 실제 서비스에서는 해당 학생의 과제물 스캔 이미지에서 추출된 텍스트가 표시됩니다.' },
             { type:'image', description:'이미지 영역' },
             { type:'text', content:'추가 답변 내용이 이어집니다. 학생이 작성한 서술형 답안의 나머지 부분이 여기에 표시됩니다.' }
           ]
@@ -2520,7 +2567,7 @@ var currentStudentIdx = 0;
 var currentPageIdx = 0;
 
 // ── 학급 제출 상세 테이블 렌더 ──
-var completedClasses = { 3: true }; // 데모: 채점·OCR 완료된 학급 (목록 '완료'와 상세 일치용)
+var completedClasses = { 3: true }; // 데모: 채점·인식 완료된 학급 (목록 '완료'와 상세 일치용)
 function renderTable() {
   if (currentEvalType === 'B') { renderTableB(); return; }
   // A안(선생님 업로드) thead 복원 — B안이 덮어쓴 경우 대비
@@ -2537,7 +2584,7 @@ function renderTable() {
   }
   var tbody = document.getElementById('student-table-body');
   var html = '';
-  var allDone = !!completedClasses[currentListClass];          // 데모: 채점/OCR 완료 학급 (예: 1-3반)
+  var allDone = !!completedClasses[currentListClass];          // 데모: 채점/인식 완료 학급 (예: 1-3반)
   var allAbsent = currentListClass !== 1 && !allDone;
   var bulkUp = !!bulkUploadedClasses[currentListClass];
   var ocrPhase = bulkOcrStateA[currentListClass] || null;
@@ -2619,17 +2666,17 @@ const STUDENTS_B1 = [
   { id:'10101', name:'김서윤', state:'submitted', date:'04/18 09:12 학생 제출', files:3, ocrStatus:'confirmed',   needsReview:false, submissionMethod:'file',   fileName:'김서윤_비평.pdf' },
   { id:'10102', name:'이준호', state:'submitted', date:'04/18 09:14 학생 제출', files:1, ocrStatus:'unconfirmed', needsReview:true,  submissionMethod:'file',   fileName:'이준호_비평.pdf' },
   { id:'10103', name:'박지민', state:'submitted', date:'04/18 09:18 학생 제출', files:2, ocrStatus:'confirmed',   needsReview:false, submissionMethod:'file',   fileName:'박지민_비평.pdf' },
-  { id:'10104', name:'최유진', state:'submitted', date:'04/18 09:22 학생 제출', files:1, ocrStatus:'confirmed',   needsReview:false, submissionMethod:'file',   fileName:'최유진_비평.pdf' },
+  { id:'10104', name:'최유진', state:'submitted', date:'04/18 09:22 학생 제출', files:1, ocrStatus:'lowAccuracy', needsReview:false, submissionMethod:'file',   fileName:'최유진_비평.pdf' }, // 인식 정확도 낮음: 결과 숨김 + 직접 채점 안내 + AI 채점 제외 (HIAI §2-② 동일 정책)
   { id:'10105', name:'정현우', state:'submitted', date:'04/18 09:35 학생 제출', files:0, ocrStatus:null,           needsReview:false, submissionMethod:'typing', typingSnippet:'책에서 인상 깊었던 점은 원소들이 발견되는 과정에서...' },
   { id:'10106', name:'한지우', state:'submitted', date:'04/18 09:41 학생 제출', files:0, ocrStatus:null,           needsReview:false, submissionMethod:'typing', typingSnippet:'저는 이 책을 통해 과학자들의 헌신과 경쟁이 만든...' },
   { id:'10107', name:'조민재', state:'submitted', date:'04/18 09:52 학생 제출', files:1, ocrStatus:'confirmed',   needsReview:false, submissionMethod:'file',   fileName:'조민재_비평.pdf' },
-  { id:'10108', name:'윤하은', state:'submitted', date:'04/18 10:02 학생 제출', files:1, ocrStatus:'confirmed',   needsReview:false, submissionMethod:'file',   fileName:'윤하은_비평.pdf' },
+  { id:'10108', name:'윤하은', state:'submitted', date:'04/18 10:02 학생 제출', files:1, ocrStatus:'processing',  needsReview:false, submissionMethod:'file',   fileName:'윤하은_비평.pdf' }, // 인식 진행 중 케이스
   { id:'10109', name:'임도윤', state:'submitted', date:'04/18 10:07 학생 제출', files:0, ocrStatus:null,           needsReview:false, submissionMethod:'typing', typingSnippet:'원소 주기율표에 대한 새로운 시각을 얻었으며...' },
-  { id:'10110', name:'신예린', state:'submitted', date:'04/18 10:15 학생 제출', files:1, ocrStatus:'confirmed',   needsReview:false, submissionMethod:'file',   fileName:'신예린_비평.pdf' },
+  { id:'10110', name:'신예린', state:'absent',    date:'-',                  files:0, ocrStatus:null,           needsReview:false, submissionMethod:null,     fileName:null }, // 미제출 — 인식 대상 아님(드롭다운 비활성). RUN_STUDENTS·채점 상세와 정합
   { id:'10111', name:'김도현', state:'submitted', date:'04/18 10:24 학생 제출', files:0, ocrStatus:null,           needsReview:false, submissionMethod:'typing', typingSnippet:'원자번호와 화학적 성질의 관계를 통해 자연의 규칙성을 느낄 수 있었고...' },
   { id:'10112', name:'송하림', state:'submitted', date:'04/18 10:31 학생 제출', files:1, ocrStatus:'confirmed',   needsReview:false, submissionMethod:'file',   fileName:'송하림_비평.pdf' },
   { id:'10113', name:'노유찬', state:'submitted', date:'04/18 10:48 학생 제출', files:0, ocrStatus:null,           needsReview:false, submissionMethod:'typing', typingSnippet:'과학사의 비극적인 일화들이 오늘날 연구 윤리의 중요성을 일깨워 주었다...' },
-  { id:'10114', name:'백시우', state:'submitted', date:'04/18 10:59 학생 제출', files:1, ocrStatus:'confirmed',   needsReview:false, submissionMethod:'file',   fileName:'백시우_비평.pdf' }
+  { id:'10114', name:'백시우', state:'submitted', date:'04/18 10:59 학생 제출', files:1, ocrStatus:'failed',      needsReview:false, submissionMethod:'file',   fileName:'백시우_비평.pdf' } // 인식 실패(시스템 오류) 케이스 — RUN_STUDENTS·채점 상세와 정합
 ];
 const STUDENTS_B2 = [
   { id:'10201', name:'강민준', state:'submitted', date:'04/19 10:33 학생 제출', files:1, ocrStatusAfter:'confirmed',   needsReview:false, submissionMethod:'file',   fileName:'강민준_비평.pdf' },
@@ -2649,6 +2696,13 @@ const STUDENTS_B2 = [
 ];
 
 const OCR_DATA_B = {
+  '10114': { needsReview: false, rubricScores: [null, null, null, null, null], questions: [ // 백시우 — 다시 인식 성공 데모용
+    { label:'문항 1', desc:'이 책의 핵심 내용을 간략히 요약하시오.', spans:[{ text:'주기율표 속 원소들이 발견된 과정과 그 뒤에 숨은 과학자들의 이야기를 담은 책이다.' }]},
+    { label:'문항 2', desc:'책에서 인상 깊었던 과학자 또는 원소의 발견 이야기를 소개하시오.', spans:[{ text:'헬륨이 지구보다 태양에서 먼저 발견되었다는 이야기가 인상 깊었다. 분광 분석으로 태양 빛 속에서 새 원소를 찾아냈다는 점이 놀라웠다.' }]},
+    { label:'문항 3', desc:'책에서 다룬 원소 중 하나를 선택해 우리 삶과의 연관성을 설명하시오.', spans:[{ text:'헬륨은 풍선뿐 아니라 MRI 장비의 초전도 자석 냉각에도 쓰여 의료 분야에 꼭 필요한 원소다.' }]},
+    { label:'문항 4', desc:'과학 발전에서 국가 간 경쟁이 미친 영향을 서술하시오.', spans:[{ text:'새 원소 발견을 둘러싼 국가 간 경쟁은 이름 붙이기 논쟁까지 이어졌지만, 결과적으로 원소 연구를 앞당겼다.' }]},
+    { label:'문항 5', desc:'이 책을 읽고 더 알고 싶어진 점을 쓰시오.', spans:[{ text:'주기율표의 빈칸이 채워진 지금, 과학자들이 다음으로 찾으려는 것은 무엇인지 궁금하다.' }]}
+  ]},
   '10101': { needsReview: false, rubricScores: [4, 3, 4, 3, 3], questions: [
     { label:'문항 1', desc:'이 책의 핵심 내용을 간략히 요약하시오.', spans:[
       { text:'원소 주기율표에 얽힌 과학자들의 이야기를 통해 원소들이 발견된 역사를 흥미롭게 풀어낸 책이다. 갈륨으로 만든 숟가락이 뜨거운 물에 녹아 사라지는 것처럼, 각 원소는 독특한 성질을 가지고 있으며 그 발견 과정에는 경쟁과 헌신의 역사가 담겨 있다.' }
@@ -2656,7 +2710,7 @@ const OCR_DATA_B = {
     { label:'문항 2', desc:'책에서 인상 깊었던 과학자 또는 원소의 발견 이야기를 소개하시오.', spans:[
       { text:'마리 퀴리의 이야기가 특히 인상 깊었다. 그녀는 방사성 원소인 라듐과 폴로늄을 발견했지만 방사선의 위험성을 모른 채 연구에 헌신하다 생을 마감했다. 과학 발전을 위한 그녀의 헌신은 오늘날에도 귀감이 된다.' }
     ]},
-    { label:'문항 3', desc:'책에서 다룬 원소 중 하나를 선택해 우리 삶과의 연관성을 설명하시오.', spans:[
+    { label:'문항 3', desc:'책에서 다룬 원소 중 하나를 선택해 우리 삶과의 연관성을 설명하시오.', sol:'리튬 활용 분야를 표로 정리함: 스마트폰 배터리 / 전기차 배터리 / 에너지 저장 장치(ESS)', spans:[
       { text:'리튬은 현재 우리 생활에서 없어서는 안 될 원소이다. 스마트폰과 전기차 배터리에 사용되며, 에너지 저장 기술의 핵심 소재다. 처음엔 광물로만 여겨졌지만 지금은 미래 에너지의 열쇠가 되었다.' }
     ]},
     { label:'문항 4', desc:'과학 발전에서 국가 간 경쟁이 미친 영향을 서술하시오.', spans:[
@@ -2677,7 +2731,7 @@ const OCR_DATA_B = {
       { text:'특허를 출원하지 않은', uncertain: true, hint:'특허를 출원하지 않은인지 특허를 신청한인지 확인 필요' },
       { text:' 그의 선택도 매우 인상 깊었다.' }
     ]},
-    { label:'문항 3', desc:'책에서 다룬 원소 중 하나를 선택해 우리 삶과의 연관성을 설명하시오.', uncertain: true, spans:[
+    { label:'문항 3', desc:'책에서 다룬 원소 중 하나를 선택해 우리 삶과의 연관성을 설명하시오.', uncertain: true, sol:'표로 정리함: 수은 온도계 → 디지털 온도계로 대체 / 수은 거울 → 알루미늄 거울로 대체', spans:[
       { text:'수은에 관한 내용이 흥미로웠다. 과거에는 수은을 온도계, 거울 등에 널리 사용했지만 현재는 독성이 밝혀져 대부분 대체되었다. 특히 ' },
       { text:'일본 미나마타', uncertain: true, hint:'지명 불명확 — 미나마타인지 확인 필요' },
       { text:' 지역에서 수은 오염으로 인한 집단 발병 사례는 화학 물질 관리의 중요성을 일깨워 준다. 과학 기술의 발전이 ' },
@@ -2830,7 +2884,7 @@ function refreshAbsentBanner() {
 
 // ── 통합 처리 현황 배너 ──
 // 상태 버킷: absent(미제출) / waiting(OCR 대기) / processing(진행 중) / review(확인 필요) / done(완료)
-// 정책: PDF·이미지는 모두 OCR 인식 대상, 텍스트 직접입력만 OCR 불필요(=done 처리)
+// 정책: PDF·이미지는 모두 과제물 인식 대상, 텍스트 직접입력만 OCR 불필요(=done 처리)
 function getClassStatusCounts(classNum, rawType) {
   var c = { absent:0, waiting:0, processing:0, failed:0, review:0, done:0 };
   var type = (rawType === 'C') ? 'B' : (rawType || 'A');
@@ -2882,7 +2936,7 @@ function getClassStatusCounts(classNum, rawType) {
   return c;
 }
 
-// ── 액션 배너 (액션 필요한 것만: 미제출 / OCR 미진행 / 확인 필요. 각 배너에 '누구인지' 이름 표시) ──
+// ── 액션 배너 (액션 필요한 것만: 미제출 / 인식 미진행 / 확인 필요. 각 배너에 '누구인지' 이름 표시) ──
 function getClassActionLists(classNum, rawType) {
   var L = { absent: [], pending: [], review: [] };
   var type = (rawType === 'C') ? 'B' : (rawType || 'A');
@@ -2942,15 +2996,15 @@ function pendingBannerHtml(list) {
   return '<div style="display:flex;align-items:flex-start;gap:10px;flex:1;min-width:0;">'
       + '<i data-lucide="clock" style="width:18px;height:18px;color:#ea580c;flex-shrink:0;margin-top:2px;"></i>'
       + '<div style="display:flex;flex-direction:column;gap:4px;flex:1;min-width:0;">'
-        + '<span style="font-size:15px;color:#ea580c;font-weight:700;">OCR 미진행 ' + list.length + '명</span>'
-        + '<span style="font-size:13px;color:#9a4806;line-height:1.6;">제출됐지만 아직 OCR 인식 전이에요. AI 채점을 시작하려면 OCR을 먼저 진행해 주세요.</span>'
+        + '<span style="font-size:15px;color:#ea580c;font-weight:700;">인식 미진행 ' + list.length + '명</span>'
+        + '<span style="font-size:13px;color:#9a4806;line-height:1.6;">제출됐지만 아직 과제물 인식 전이에요. AI 채점을 시작하려면 OCR을 먼저 진행해 주세요.</span>'
       + '</div>'
     + '</div>';
 }
 function renderActionBanners(classNum, rawType) {
   var L = getClassActionLists(classNum, rawType);
   var pb = document.getElementById('list-b-ocr-pending-banner');
-  if (pb) pb.style.display = 'none'; // OCR 진행 애니메이션 전용 — 평상시 숨김
+  if (pb) pb.style.display = 'none'; // 과제물 인식 진행 애니메이션 전용 — 평상시 숨김
   // 미제출 배너 (별도 — 제출 추적)
   var ab = document.getElementById('absent-banner');
   if (ab) {
@@ -2970,12 +3024,12 @@ function renderActionBanners(classNum, rawType) {
   if (total === 0) { bar.style.display = 'none'; return; }
   bar.style.display = 'flex';
   var parts = [];
-  if (L.pending.length) parts.push('OCR 미진행 ' + L.pending.length);
+  if (L.pending.length) parts.push('인식 미진행 ' + L.pending.length);
   if (L.review.length) parts.push('확인 필요 ' + L.review.length);
   sumEl.innerHTML = '<i data-lucide="alert-circle" style="width:16px;height:16px;color:#ea580c;vertical-align:-3px;margin-right:5px;"></i>처리 필요 <b style="font-weight:700;color:#222631;">' + total + '건</b> · ' + parts.join(' · ');
-  // OCR 인라인 모델: 'OCR 미진행 → 지금 진행' 버튼 제거됨 (인식은 채점 실행 시 자동). 확인 필요 → 해당 학생 OCR 상세로만 유지
+  // 과제물 인식 모델: '인식 미진행 → 지금 진행' 버튼 제거됨 (인식은 채점 실행 시 자동). 확인 필요 → 해당 학생 OCR 상세로만 유지
   var btns = '';
-  if (L.review.length) btns += '<button onclick="goToFirstReview()" style="height:34px;background:white;color:#db3e51;border:1px solid #f2a5ad;border-radius:8px;padding:0 14px;font-size:13px;font-weight:700;font-family:inherit;cursor:pointer;white-space:nowrap;display:inline-flex;align-items:center;justify-content:center;line-height:1;gap:6px;"><i data-lucide="search-check" style="width:15px;height:15px;"></i>확인 필요 학생 보기</button>';
+  if (L.review.length) btns += '<button onclick="goToFirstReview()" style="height:34px;background:white;color:#c2410c;border:1px solid #fdba74;border-radius:8px;padding:0 14px;font-size:13px;font-weight:700;font-family:inherit;cursor:pointer;white-space:nowrap;display:inline-flex;align-items:center;justify-content:center;line-height:1;gap:6px;"><i data-lucide="search-check" style="width:15px;height:15px;"></i>확인 필요 학생 보기</button>';
   actEl.innerHTML = btns;
   if (typeof lucide !== 'undefined') lucide.createIcons();
 }
@@ -3021,18 +3075,18 @@ function renderClassStatusBanner(classNum, rawType) {
         + chip('제출', submitted, '#3b3f4c', '#f1f3f5', '')
       + '</div>'
       + '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">'
-        + groupLabel('OCR')
+        + groupLabel('인식')
         + chip('미진행', counts.waiting, '#ea580c', '#fff7ed', '')
         + chip('진행 중', counts.processing, '#365eef', '#eef3ff', '')
-        + chip('인식 실패', counts.failed, '#6d7381', '#f1f3f5', 'onclick="scrollToFirstStatus(\'failed\')"')
-        + chip('확인 필요', counts.review, '#db3e51', '#fff3f4', 'onclick="scrollToFirstStatus(\'review\')"')
+        + chip('인식 실패', counts.failed, '#f2525f', '#fef2f2', 'onclick="scrollToFirstStatus(\'failed\')"')
+        + chip('확인 필요', counts.review, '#c2410c', '#fff7ed', 'onclick="scrollToFirstStatus(\'review\')"')
         + chip('완료', counts.done, '#319d64', '#eefcf4', '')
       + '</div>';
 
-  // 대표 CTA: 대기>0 → OCR 진행 / 아니면 확인필요>0 → OCR 결과 확인 / 그 외 없음
+  // 대표 CTA: 대기>0 → 과제물 인식 진행 / 아니면 확인필요>0 → 인식 결과 확인 / 그 외 없음
   var cta = '';
   if (counts.review > 0) {
-    cta = '<button onclick="scrollToFirstStatus(\'review\')" class="btn btn-secondary btn-sm" style="white-space:nowrap;"><i data-lucide="alert-circle" style="width:16px;height:16px;"></i>OCR 결과 확인 (' + counts.review + '명)</button>';
+    cta = '<button onclick="scrollToFirstStatus(\'review\')" class="btn btn-secondary btn-sm" style="white-space:nowrap;"><i data-lucide="alert-circle" style="width:16px;height:16px;"></i>인식 결과 확인 (' + counts.review + '명)</button>';
   }
   if (ctaWrap) ctaWrap.innerHTML = cta;
   if (typeof lucide !== 'undefined') lucide.createIcons();
@@ -3067,7 +3121,7 @@ function showListForClass(classNum, evalType) {
                 : (currentEvalType === 'B') ? '창작 문화 비평 (학생 업로드)'
                 : '미래사회 예측 시나리오 (선생님 업로드)';
   var descEl = document.getElementById('list-eval-desc');
-  if (descEl) descEl.textContent = '과제 제출 현황을 확인하고, 필요하면 과제를 직접 올릴 수도 있습니다. 제출된 과제는 AI 채점을 위해 OCR 인식을 진행해 주세요.';
+  if (descEl) descEl.textContent = '과제 제출 현황을 확인하고, 필요하면 과제를 직접 올릴 수도 있습니다. 제출된 과제는 AI 채점을 위해 과제물 인식을 진행해 주세요.';
   var titleEl = document.getElementById('list-class-title');
   if (titleEl) titleEl.textContent = '1-' + classNum + '반 과제 제출 현황';
 
@@ -3076,7 +3130,7 @@ function showListForClass(classNum, evalType) {
   function enableOcrBtn() { if (ocrBtn) { ocrBtn.disabled = false; ocrBtn.style.opacity = '1'; ocrBtn.style.cursor = 'pointer'; ocrBtn.style.pointerEvents = ''; } if (ocrWrap) { ocrWrap.removeAttribute('title'); ocrWrap.style.cursor = ''; } }
   function disableOcrBtn(tip) { if (ocrBtn) { ocrBtn.disabled = true; ocrBtn.style.opacity = '0.4'; ocrBtn.style.cursor = 'not-allowed'; ocrBtn.style.pointerEvents = 'none'; } if (ocrWrap) { ocrWrap.setAttribute('title', tip); ocrWrap.style.cursor = 'not-allowed'; } }
 
-  // 액션 배너 (미제출 / OCR 미진행 / 확인 필요) — 액션 필요한 것만, 누구인지 이름 표시
+  // 액션 배너 (미제출 / 인식 미진행 / 확인 필요) — 액션 필요한 것만, 누구인지 이름 표시
   renderActionBanners(classNum, rawType);
 
   if (currentEvalType === 'B') {
@@ -3085,7 +3139,7 @@ function showListForClass(classNum, evalType) {
     else { stateClass = classNum; }
     currentStateClass = stateClass;
   }
-  // OCR 인라인 모델: 인식 결과는 AI 채점 실행 후에만 확인 가능 → 항상 비활성 + 안내 툴팁
+  // 과제물 인식 모델: 인식 결과는 AI 채점 실행 후에만 확인 가능 → 항상 비활성 + 안내 툴팁
   disableOcrBtn('AI 채점 실행 후 확인할 수 있습니다.');
 
   renderTable();
@@ -3124,7 +3178,7 @@ function showScreen(id) {
   }
   if (id === 'screen-task') updateClassListProgress();
   if (id === 'screen-scoring' && typeof syncRegradeFlags === 'function') syncRegradeFlags();
-  // 데모 네비 노출 동기화 (설문=과제물 화면 / 채점=채점·OCR 화면)
+  // 데모 네비 노출 동기화 (설문=과제물 화면 / 채점=채점·인식 화면)
   if (typeof syncDemoNavs === 'function') syncDemoNavs();
   window.scrollTo(0,0);
   lucide.createIcons();
@@ -3360,43 +3414,75 @@ function renderOCRView_B() {
   var student = students[currentOcrBStudentIdx];
   if (!student) return;
 
-  document.getElementById('ocr-b-student-name').textContent = student.name + ' (' + student.id + ')';
+  document.getElementById('ocr-b-student-name').textContent = student.id + ' ' + student.name;
+  // 뷰어 상단: 파일명 대신 제출 시간 표시
+  var _fn = document.getElementById('ocr-b-filename');
+  if (_fn) _fn.textContent = (student.date || '').replace(/\s*(학생 제출|선생님 업로드|업로드|제출)\s*$/, ''); // 제출 일시만 표시
+  // 학생 전환 시 회전 초기화
+  _ocrBRotate = 0;
+  applyOcrBTransform();
+
+  // 자동 저장 표시 초기화 (학생 전환·재렌더 시 기본 안내로 — 저장 직후엔 markAutoSaved가 다시 덮음)
+  var _asEl = document.getElementById('ocr-b-autosave');
+  if (_asEl) _asEl.textContent = '수정하면 자동으로 저장돼요';
 
   var listEl = document.getElementById('ocr-b-dropdown-list');
   if (listEl) {
     var ddHtml = '';
     students.forEach(function(s, i) {
       var isCurrent = i === currentOcrBStudentIdx;
-      var noOcr = ocrBStudentNoOcr(s); // 직접입력 등 OCR 안 한 학생
-      var statusIcon = noOcr
-        ? '<i data-lucide="pen-line" style="width:13px;height:13px;color:#6d7381;flex-shrink:0;"></i>'
-        : (s.ocrStatus === 'confirmed'
-          ? '<i data-lucide="circle-check" style="width:13px;height:13px;color:#319d64;flex-shrink:0;"></i>'
-          : (s.needsReview
-            ? '<i data-lucide="alert-circle" style="width:13px;height:13px;color:#db3e51;flex-shrink:0;"></i>'
-            : '<i data-lucide="circle" style="width:13px;height:13px;color:#6d7381;flex-shrink:0;"></i>'));
-      ddHtml += '<div onclick="jumpToOcrBStudent(' + i + ')" style="padding:10px 16px;cursor:pointer;display:flex;align-items:center;gap:10px;background:' + (isCurrent ? '#e9f2ff' : 'transparent') + ';font-weight:' + (isCurrent ? '600' : '400') + ';">';
-      ddHtml += statusIcon;
-      ddHtml += '<span style="font-size:15px;color:' + (noOcr ? '#6d7381' : '#222631') + ';">' + s.name + '</span>';
-      if (noOcr) ddHtml += '<span style="font-size:12px;color:#6d7381;background:#f1f3f5;border-radius:100px;padding:1px 8px;">직접 입력</span>';
-      ddHtml += '<span style="font-size:13px;color:#6d7381;margin-left:auto;">' + s.id + '</span>';
+      var dis = ocrBStudentSkip(s); // 직접 입력(인식 불필요)·미제출 → 비활성
+      var titleAttr = ocrBStudentNoOcr(s) ? ' title="직접 입력으로 제출해 인식할 결과가 없어요"'
+                    : (s.state === 'absent' ? ' title="과제물을 제출하지 않아 인식할 결과가 없어요"' : '');
+      ddHtml += '<div ' + (dis ? '' : 'onclick="jumpToOcrBStudent(' + i + ')" ') + titleAttr + ' style="padding:10px 16px;' + (dis ? 'cursor:not-allowed;opacity:.55;' : 'cursor:pointer;') + 'display:flex;align-items:center;gap:10px;background:' + (isCurrent ? '#e9f2ff' : 'transparent') + ';font-weight:' + (isCurrent ? '600' : '400') + ';">';
+      ddHtml += '<span style="font-size:15px;color:' + (dis ? '#6d7381' : '#222631') + ';white-space:nowrap;">' + s.id + ' ' + s.name + '</span>';
+      if (ocrBStudentNoOcr(s)) ddHtml += '<span style="font-size:12px;color:#6d7381;background:#f1f3f5;border-radius:100px;padding:1px 8px;white-space:nowrap;">직접 입력 · 인식 불필요</span>';
+      else if (s.state === 'absent') ddHtml += '<span style="font-size:12px;color:#6d7381;background:#f1f3f5;border-radius:100px;padding:1px 8px;white-space:nowrap;">미제출</span>';
+      else if (s.ocrStatus === 'processing') ddHtml += '<span style="font-size:12px;color:#416bff;background:#e9f2ff;border-radius:100px;padding:1px 8px;white-space:nowrap;">인식 중</span>';
+      else if (s.ocrStatus === 'failed') ddHtml += '<span style="font-size:12px;color:#f2525f;background:#fef2f2;border-radius:100px;padding:1px 8px;white-space:nowrap;">인식 실패</span>';
+      else if (s.ocrStatus === 'lowAccuracy') ddHtml += '<span style="font-size:12px;color:#f2525f;background:#fef2f2;border-radius:100px;padding:1px 8px;white-space:nowrap;">정확도 낮음</span>';
+      else if (s.needsReview) ddHtml += '<span style="font-size:12px;color:#ea580c;background:#fff7ed;border-radius:100px;padding:1px 8px;white-space:nowrap;">확인 필요</span>';
       ddHtml += '</div>';
     });
     listEl.innerHTML = ddHtml;
     lucide.createIcons();
   }
 
-  var confirmedCount = students.filter(function(s){ return s.ocrStatus === 'confirmed'; }).length;
-  document.getElementById('ocr-b-confirm-count').textContent = '확인완료 ' + confirmedCount + ' / ' + students.length;
+  // 확인완료 카운트: 인식 대상(파일 제출) 학생 기준 — 타이핑(인식 불필요)·미제출·인식 실패는 분모에서 제외
+  var gradable = students.filter(function(s){ return s.state !== 'absent' && s.submissionMethod !== 'typing' && s.ocrStatus !== 'failed'; });
+  var confirmedCount = gradable.filter(function(s){ return s.ocrStatus === 'confirmed'; }).length;
+  document.getElementById('ocr-b-confirm-count').textContent = '확인완료 ' + confirmedCount + ' / ' + gradable.length;
 
   var btnPrev = document.getElementById('ocr-b-btn-prev');
   var btnNext = document.getElementById('ocr-b-btn-next');
   if (btnPrev) { btnPrev.disabled = currentOcrBStudentIdx === 0; btnPrev.style.opacity = currentOcrBStudentIdx === 0 ? '0.4' : '1'; }
   if (btnNext) { btnNext.disabled = currentOcrBStudentIdx === students.length - 1; btnNext.style.opacity = currentOcrBStudentIdx === students.length - 1 ? '0.4' : '1'; }
 
+  // 상단 배너 — 상태별 메시지 (이 화면은 빨강 톤 통일)
   var banner = document.getElementById('ocr-b-review-banner');
   var split = document.getElementById('ocr-b-split');
-  if (student.needsReview) {
+  var bMsg = document.getElementById('ocr-b-banner-msg');
+  var bMode = student.ocrStatus === 'failed' ? 'failed'
+            : student.ocrStatus === 'lowAccuracy' ? 'lowacc'
+            : (student.needsReview ? 'review' : null);
+  if (bMode && bMsg) {
+    // 색 위계: 주황 = 확인 권장(채점 가능) / 빨강 = AI 채점 불가·오류
+    var bIcon = document.getElementById('ocr-b-banner-icon');
+    if (bMode === 'review') {
+      banner.style.background = '#fff7ed'; banner.style.borderBottom = '1px solid #fdba74';
+      if (bIcon) bIcon.style.color = '#c2410c';
+      bMsg.innerHTML = '<strong style="color:#c2410c;">인식 결과 확인 필요</strong> &mdash; <strong id="ocr-b-suspect-count" style="color:#c2410c;">0개</strong> 문항에서 인식 불확실 구간이 감지되었습니다. 해당 문항 아래 AI 메모를 확인하고 원본과 대조해 주세요.';
+    } else {
+      banner.style.background = '#fef2f2'; banner.style.borderBottom = '1px solid #fecaca';
+      if (bIcon) bIcon.style.color = '#f2525f';
+      if (bMode === 'failed') {
+        bMsg.innerHTML = '<strong style="color:#f2525f;">과제물 인식 실패</strong> &mdash; 일시적인 오류로 과제물을 인식하지 못했어요. 다시 인식하거나, 과제물 원본을 보고 직접 채점해 주세요.';
+      } else {
+        bMsg.innerHTML = '<strong style="color:#f2525f;">과제물 인식 정확도 낮음</strong> &mdash; 인식 결과를 신뢰하기 어려워 표시하지 않았어요. 직접 채점하거나, 선명한 파일로 다시 올려 주세요.';
+      }
+    }
+  }
+  if (bMode) {
     banner.style.display = 'flex';
     if (split) split.style.height = 'calc(100vh - 68px - 42px)';
   } else {
@@ -3407,28 +3493,47 @@ function renderOCRView_B() {
   var btnConfirm = document.getElementById('ocr-b-btn-confirm');
   if (btnConfirm) {
     btnConfirm.innerHTML = '<i data-lucide="check" style="width:16px;height:16px;"></i>확인완료';
-    if (student.ocrStatus === 'confirmed') {
-      btnConfirm.style.background = '#319d64';
-    } else {
+    if (student.ocrStatus === 'lowAccuracy') { // 정확도 낮음: 확인할 인식 결과 없음 → 비활성 + 안내 (숨기지 않음)
+      btnConfirm.disabled = true; btnConfirm.style.opacity = '0.4'; btnConfirm.style.cursor = 'not-allowed';
+      btnConfirm.title = '인식 정확도가 낮아 확인할 결과가 없어요. 직접 채점해 주세요.';
       btnConfirm.style.background = '';
+    } else {
+      btnConfirm.disabled = false; btnConfirm.style.opacity = ''; btnConfirm.style.cursor = '';
+      btnConfirm.title = '';
+      btnConfirm.style.background = (student.ocrStatus === 'confirmed') ? '#319d64' : '';
     }
   }
 
   switchOcrBTab(ocrBActiveTab);
   renderOcrBRubric(student);
-  // 하단 바 '선택 학생 채점 · N명' 카운트 동기화 (개별 아닌 선택 N명 전체)
-  var rc = document.getElementById('ocr-run-count');
-  if (rc) rc.textContent = (typeof rmSelectedCount === 'function') ? rmSelectedCount() : '';
+  // 하단 채점 바(개별/일괄) 카운트·버튼 상태 동기화
+  if (typeof updateOcrGradeBar === 'function') updateOcrGradeBar();
+  // 까망이 하이라이트: 현재 학생 상태 기준 (정상/정확도 낮음/확인 필요)
+  if (typeof window.mockNavSetCurrent === 'function') window.mockNavSetCurrent(
+    student.ocrStatus === 'processing' ? 'ocrbProgress'
+    : student.ocrStatus === 'failed' ? 'ocrbFail'
+    : student.ocrStatus === 'lowAccuracy' ? 'ocrbLow'
+    : (student.needsReview ? 'ocrbReview' : 'ocrbNormal'));
   lucide.createIcons();
 }
 
 var _ocrBZoom = 100;
+var _ocrBRotate = 0;
+function applyOcrBTransform() {
+  var img = document.getElementById('ocr-b-scan-image');
+  if (!img) return;
+  img.style.transformOrigin = _ocrBRotate ? 'center center' : 'top center';
+  img.style.transform = 'scale(' + (_ocrBZoom / 100) + ') rotate(' + _ocrBRotate + 'deg)';
+}
 function ocrBZoomChange(delta) {
   _ocrBZoom = Math.max(50, Math.min(200, _ocrBZoom + delta));
   var pct = document.getElementById('ocr-b-zoom-pct');
-  var img = document.getElementById('ocr-b-scan-image');
   if (pct) pct.textContent = _ocrBZoom + '%';
-  if (img) img.style.transform = 'scale(' + (_ocrBZoom / 100) + ')';
+  applyOcrBTransform();
+}
+function ocrBRotateChange() {
+  _ocrBRotate = (_ocrBRotate + 90) % 360;
+  applyOcrBTransform();
 }
 function ocrBPageChange(delta) {
   var cur = document.getElementById('ocr-b-page-cur');
@@ -3438,6 +3543,108 @@ function ocrBPageChange(delta) {
   var t = parseInt(tot.textContent, 10) || 1;
   c = Math.max(1, Math.min(t, c + delta));
   cur.textContent = c;
+}
+
+// ── OCR 수정 모드 상태 (HIAI 동일 기획) ──
+// 학생 답변 수정본 저장소 — { studentId: { qi: 수정텍스트 } }. 원본 인식은 OCR_DATA_B spans에 보존되므로 '되돌리기' 가능
+var ocrBEditMap = {};
+// 직접 채점 (AI 제외) — { studentId: { qi: true } }. 켜면 해당 문항은 AI 채점에서 제외
+var ocrBExcludeMap = {};
+try { ocrBExcludeMap = JSON.parse(sessionStorage.getItem('clipo_ocr_exclude')) || {}; } catch(e) { ocrBExcludeMap = {}; }
+// 문항명 (문항 순서 고정 — 헤더 요약 표기용)
+var OCR_B_QNAMES = ['핵심 내용 요약', '인상 깊은 발견 이야기', '원소와 우리 삶', '국가 간 경쟁의 영향', '더 알고 싶은 점'];
+
+// 자동 저장 표시 — blur 저장·토글·되돌리기 시 상단 '자동 저장됨 · 시각'으로 갱신 (토스트는 노이즈라 미사용)
+function markAutoSaved() {
+  var el = document.getElementById('ocr-b-autosave');
+  if (!el) return;
+  var t = '';
+  try { t = new Date().toLocaleTimeString('ko-KR', { hour: 'numeric', minute: '2-digit' }); } catch (e) {}
+  el.innerHTML = '<i data-lucide="check" style="width:14px;height:14px;color:#1ab864;"></i>자동 저장됨' + (t ? ' · ' + t : '');
+  lucide.createIcons();
+}
+
+// 상단 '저장' — 열린 편집 커밋 + 저장 안내 (자동 저장 지원, 명시적 저장 버튼)
+function saveOcrB() {
+  if (_editingSection !== null) {
+    var ta = document.getElementById('group-ta-' + _editingSection);
+    if (ta && ta.style.display !== 'none') saveSection(ta, _editingSection);
+  }
+  markAutoSaved();
+  showToast('저장되었습니다.', 'success');
+}
+
+// 직접 채점 (AI 제외) 토글 — 켜면 해당 문항 잠금 + AI 채점 제외, 확인 필요도 해소로 취급
+function toggleQExclude(studentId, qi) {
+  if (!ocrBExcludeMap[studentId]) ocrBExcludeMap[studentId] = {};
+  if (ocrBExcludeMap[studentId][qi]) delete ocrBExcludeMap[studentId][qi];
+  else ocrBExcludeMap[studentId][qi] = true;
+  try { sessionStorage.setItem('clipo_ocr_exclude', JSON.stringify(ocrBExcludeMap)); } catch(e) {}
+  recomputeOcrBNeedsReview();
+  markAutoSaved();
+}
+
+// 확인 필요 해소 판정 — 불확실 문항이 수정(reviewed)되거나 직접 채점(excluded)되면 해소로 취급.
+// 모두 해소되면 확인완료 처리 + 배너·드롭다운·카운트 일괄 갱신.
+function recomputeOcrBNeedsReview() {
+  var student = STUDENTS_B1[currentOcrBStudentIdx];
+  if (!student) return;
+  var data = OCR_DATA_B[student.id];
+  if (data && data.questions) {
+    var ex = ocrBExcludeMap[student.id] || {};
+    var pending = data.questions.filter(function(q, qi){ return questionHasUncertainty(q) && !q.reviewed && !ex[qi]; }).length;
+    if (pending === 0 && student.needsReview) {
+      student.needsReview = false;
+      student.ocrStatus = 'confirmed';
+      var orig = STUDENTS.find(function(s){ return s.id === student.id; });
+      if (orig) { orig.needsReview = false; orig.ocrStatus = 'confirmed'; }
+      showToast(student.name + ' 학생의 확인 필요 문항이 모두 해소됐어요. 확인완료로 변경됩니다.', 'success');
+    } else if (pending > 0 && !student.needsReview && student.ocrStatus === 'confirmed') {
+      // 되돌리기 등으로 미해소 문항이 다시 생김 → 확인완료였던 학생도 확인 필요로 복귀
+      student.needsReview = true;
+      student.ocrStatus = 'unconfirmed';
+      var orig2 = STUDENTS.find(function(s){ return s.id === student.id; });
+      if (orig2) { orig2.needsReview = true; orig2.ocrStatus = 'unconfirmed'; }
+      showToast(student.name + ' 학생에게 확인 필요 문항이 다시 생겨 확인 필요로 변경됩니다.', 'success');
+    }
+  }
+  renderOCRView_B();
+}
+
+// 문항 카드 접기/펼치기
+function toggleQFold(qi) {
+  var body = document.getElementById('q-fold-' + qi);
+  var icon = document.getElementById('q-fold-icon-' + qi);
+  if (!body) return;
+  var closed = body.style.display === 'none';
+  body.style.display = closed ? '' : 'none';
+  if (icon) icon.style.transform = closed ? '' : 'rotate(180deg)';
+}
+
+// 되돌리기 — 수정본을 지우고 AI 원본 인식으로 (되돌릴 수 없는 동작 → 짧은 확인 모달)
+var _pendingRevert = null;
+function revertOcrB(studentId, qi) {
+  _pendingRevert = { sid: studentId, qi: qi };
+  var m = document.getElementById('ocrRevertModal');
+  if (m) { m.style.display = 'flex'; lucide.createIcons(); }
+}
+function closeOcrRevertModal() {
+  var m = document.getElementById('ocrRevertModal');
+  if (m) m.style.display = 'none';
+  _pendingRevert = null;
+}
+function confirmOcrRevert() {
+  var p = _pendingRevert;
+  closeOcrRevertModal();
+  if (!p) return;
+  if (ocrBEditMap[p.sid]) delete ocrBEditMap[p.sid][p.qi];
+  var d = OCR_DATA_B[p.sid];
+  var solMode = String(p.qi).indexOf('sol') !== -1;
+  var q = d && d.questions ? d.questions[parseInt(p.qi, 10)] : null;
+  // 되돌리기 = 수정 전 상태 복원 — 불확실 원본이 다시 표시되므로 '확인 필요'도 리셋 (풀이는 확인 필요 대상 아님)
+  if (q && !solMode && questionHasUncertainty(q)) q.reviewed = false;
+  recomputeOcrBNeedsReview();
+  markAutoSaved();
 }
 
 function switchOcrBTab(tabName) {
@@ -3454,26 +3661,76 @@ function switchOcrBTab(tabName) {
 function renderOcrBText(student) {
   var panel = document.getElementById('ocr-b-text-panel');
   if (!panel) return;
+  // ── 케이스 1: 인식 진행 중 — 결과 대기 ──
+  if (student.ocrStatus === 'processing') {
+    panel.innerHTML =
+      '<div style="display:flex;flex-direction:column;align-items:center;gap:14px;padding:96px 32px;text-align:center;">'
+      + '<div style="width:56px;height:56px;border-radius:16px;background:#e9f2ff;display:flex;align-items:center;justify-content:center;"><i data-lucide="loader-circle" class="spin" style="width:26px;height:26px;color:#416bff;"></i></div>'
+      + '<div style="font-size:18px;font-weight:700;color:#222631;">과제물 인식 중&hellip;</div>'
+      + '<p style="font-size:15px;color:#3b3f4c;line-height:1.7;margin:0;max-width:420px;">과제물의 텍스트를 인식하고 있어요. 잠시만 기다려 주세요.</p>'
+      + '</div>';
+    lucide.createIcons();
+    return;
+  }
+  // ── 케이스 2: 인식 실패(시스템·네트워크 오류) — 결과 없음 → 다시 인식 유도 ──
+  if (student.ocrStatus === 'failed') {
+    panel.innerHTML =
+      '<div style="display:flex;flex-direction:column;align-items:center;gap:14px;padding:80px 32px;text-align:center;">'
+      + '<div style="width:56px;height:56px;border-radius:16px;background:#fef2f2;display:flex;align-items:center;justify-content:center;"><i data-lucide="circle-alert" style="width:26px;height:26px;color:#f2525f;"></i></div>'
+      + '<div style="font-size:18px;font-weight:700;color:#222631;">과제물을 인식하지 못했어요</div>'
+      + '<p style="font-size:15px;color:#3b3f4c;line-height:1.7;margin:0;max-width:440px;">일시적인 오류로 인식에 실패했어요. 다시 인식해 주세요.<br>계속 실패하면 과제물 원본을 보고 직접 채점해 주세요.</p>'
+      + '<span style="display:inline-flex;align-items:center;gap:5px;font-size:13px;color:#6d7381;"><i data-lucide="info" style="width:13px;height:13px;flex-shrink:0;"></i>이 경우 다시 인식해도 AI 크레딧은 차감되지 않아요.</span>'
+      + '<div style="display:flex;gap:10px;justify-content:center;margin-top:4px;">'
+      + '<button onclick="ocrBReRecognize()" class="btn btn-primary"><i data-lucide="rotate-ccw" style="width:16px;height:16px;"></i>다시 인식</button>'
+      + '<button onclick="navStudentB(1)" class="btn btn-outline">다음 학생<i data-lucide="arrow-right" style="width:16px;height:16px;"></i></button>'
+      + '</div>'
+      + '</div>';
+    lucide.createIcons();
+    return;
+  }
+  // ── 케이스 3: 인식 정확도 낮음(불가) — 인식은 됐으나 확인 필요 문항이 대부분(70%↑) → 결과 비공개 + 직접 채점 안내 ──
+  if (student.ocrStatus === 'lowAccuracy') {
+    var suspectEl0 = document.getElementById('ocr-b-suspect-count');
+    if (suspectEl0) suspectEl0.textContent = '0개';
+    panel.innerHTML =
+      '<div style="display:flex;flex-direction:column;align-items:center;gap:14px;padding:48px 32px;text-align:center;">'
+      + '<div style="width:56px;height:56px;border-radius:16px;background:#fef2f2;display:flex;align-items:center;justify-content:center;"><i data-lucide="file-x" style="width:26px;height:26px;color:#f2525f;"></i></div>'
+      + '<div style="font-size:18px;font-weight:700;color:#222631;">과제물 인식 정확도가 너무 낮아요</div>'
+      + '<p style="font-size:15px;color:#3b3f4c;line-height:1.7;margin:0;max-width:440px;">확인이 필요한 문항이 대부분이라 인식 결과를 표시하지 않았어요.<br>이 학생은 <strong>AI 채점에서 제외</strong>되니, 과제물 원본을 보고 <strong>직접 채점</strong>해 주세요.</p>'
+      + '<div style="background:#f6f7f9;border-radius:8px;padding:14px 18px;max-width:440px;text-align:left;margin-top:4px;">'
+      + '<div style="display:flex;align-items:center;gap:6px;font-size:14px;font-weight:700;color:#222631;margin-bottom:6px;"><i data-lucide="scan-line" style="width:15px;height:15px;color:#416bff;"></i>다시 스캔해서 올리면 인식이 잘될 수 있어요</div>'
+      + '<ul style="margin:0;padding-left:18px;font-size:14px;color:#3b3f4c;line-height:1.8;">'
+      + '<li>고해상도로 선명하게 스캔해 주세요</li>'
+      + '<li>학생 글씨가 잘 보이게 밝은 곳에서 찍어 주세요</li>'
+      + '<li>그림자&middot;접힘&middot;잘림 없이 문서 전체가 나오게 해주세요</li>'
+      + '</ul></div>'
+      + '<div style="display:flex;gap:10px;justify-content:center;margin-top:4px;">'
+      + '<button onclick="ocrBReupload()" class="btn btn-primary"><i data-lucide="upload" style="width:16px;height:16px;"></i>다시 업로드</button>'
+      + '<button onclick="navStudentB(1)" class="btn btn-outline">다음 학생<i data-lucide="arrow-right" style="width:16px;height:16px;"></i></button>'
+      + '</div>'
+      + '</div>';
+    lucide.createIcons();
+    return;
+  }
   var data = OCR_DATA_B[student.id];
   if (!data) {
     panel.innerHTML = '<div style="padding:40px;text-align:center;color:#b3b6bd;"><i data-lucide="alert-circle" style="width:24px;height:24px;margin-bottom:8px;"></i><br>OCR 데이터가 없습니다.</div>';
     return;
   }
-  var uncertainQuestions = data.questions.filter(function(q){
-    return q.uncertain || (q.spans && q.spans.some(function(s){ return s.uncertain; }));
-  });
-  var uncertainCount = uncertainQuestions.length;
+  var exMap = ocrBExcludeMap[student.id] || {};
+  // 미해소(확인 필요) 문항 수 — 수정(reviewed)되거나 직접 채점(excluded)된 문항은 해소로 취급
+  var pendingCount = data.questions.filter(function(q, qi){ return questionHasUncertainty(q) && !q.reviewed && !exMap[qi]; }).length;
   var suspectEl = document.getElementById('ocr-b-suspect-count');
-  if (suspectEl) suspectEl.textContent = uncertainCount + '개';
+  if (suspectEl) suspectEl.textContent = pendingCount + '개';
 
   var html = '';
 
   data.questions.forEach(function(q, qi) {
-    var hasUncertain = q.uncertain || (q.spans && q.spans.some(function(s){ return s.uncertain; }));
+    var hasUncertain = questionHasUncertainty(q);
+    var excluded = !!exMap[qi];
+    var reviewed = !!q.reviewed;
     var bodyText = '';
-    if (q.spans) {
-      q.spans.forEach(function(span){ bodyText += span.text; });
-    }
+    if (q.spans) { q.spans.forEach(function(span){ bodyText += span.text; }); }
     var noticeText = q.uncertainty;
     if (!noticeText && hasUncertain) {
       var hints = (q.spans || []).filter(function(s){ return s.uncertain && s.hint; }).map(function(s){ return s.hint; });
@@ -3483,33 +3740,134 @@ function renderOcrBText(student) {
         noticeText = '이 문항의 답변 일부 글자 판독이 불확실합니다. 원본 이미지와 대조 후 수정해 주세요.';
       }
     }
-    var chipHtml = hasUncertain
-      ? '<span class="rubric-suspect-chip"><i data-lucide="alert-circle" style="width:11px;height:11px;"></i>확인 필요</span>'
-      : '';
-    html += '<div class="rubric-ocr-section">';
-    html += '<div class="rubric-ocr-header">';
-    html += '<span class="badge badge-purple" style="font-size:12px;padding:3px 10px;">' + q.label + '</span>';
-    html += '<span class="rubric-ocr-desc">' + q.desc + '</span>';
-    html += chipHtml;
-    html += '<button class="formula-insert-btn" onmousedown="event.preventDefault()" onclick="openFormulaInput(\'group-ta-' + qi + '\')" title="수식 입력" style="align-items:center;justify-content:center;line-height:1;gap:3px;height:24px;padding:0 8px;background:white;border:1px solid #d9d9d9;border-radius:6px;color:#3b3f4c;font-family:inherit;font-size:11px;font-weight:700;cursor:pointer;flex-shrink:0;"><i data-lucide="sigma" style="width:11px;height:11px;"></i>수식</button>';
-    html += '<button onclick="editSection(this,' + qi + ')" title="편집" style="background:none;border:none;cursor:pointer;color:#b3b6bd;padding:2px 4px;flex-shrink:0;display:flex;align-items:center;">';
-    html += '<i data-lucide="pencil" style="width:13px;height:13px;"></i></button>';
+    var qName = OCR_B_QNAMES[qi] || '';
+
+    html += '<div class="rubric-ocr-section' + (excluded ? ' ocr-section-excluded' : '') + '">';
+
+    // ── 헤더: 접기 + 문항 번호·문항명 + 직접 채점 (AI 제외) 토글 ──
+    // 확인 필요 문항은 접어도 보이게 헤더에 빨간 돋보기 + 번호 빨강 표시
+    var qPending = hasUncertain && !reviewed && !excluded;
+    html += '<div class="rubric-ocr-header" onclick="toggleQFold(' + qi + ')" style="cursor:pointer;flex-wrap:nowrap;">';
+    html += '<span id="q-fold-icon-' + qi + '" style="display:inline-flex;transition:transform .15s;flex-shrink:0;"><i data-lucide="chevron-up" style="width:15px;height:15px;color:#6d7381;"></i></span>';
+    if (qPending) html += '<i data-lucide="search" style="width:15px;height:15px;color:#ea580c;flex-shrink:0;"></i>';
+    html += '<span style="font-size:15px;font-weight:700;color:' + (qPending ? '#ea580c' : '#416bff') + ';white-space:nowrap;flex-shrink:0;">' + q.label + '</span>';
+    html += '<span style="font-size:15px;font-weight:600;color:#3b3f4c;flex:1;min-width:0;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;">' + qName + '</span>';
+    html += '<label class="q-exclude-toggle" onclick="event.stopPropagation()" title="켜면 이 문항은 AI 채점에서 빠지고 선생님이 직접 채점해요.">'
+      + '<input type="checkbox" ' + (excluded ? 'checked' : '') + ' onchange="toggleQExclude(\'' + student.id + '\',' + qi + ')">'
+      + '<span class="q-exclude-track"><span class="q-exclude-thumb"></span></span>'
+      + '<span class="q-exclude-label">직접 채점 (AI 제외)</span>'
+      + '</label>';
     html += '</div>';
-    html += '<div class="rubric-ocr-body" id="group-body-' + qi + '" onclick="editSectionByBody(this,' + qi + ')">';
-    html += '<span style="color:#222631;">' + bodyText + '</span>';
-    html += '</div>';
-    html += '<textarea id="group-ta-' + qi + '" onblur="saveSection(this,' + qi + ')" style="display:none;width:100%;border:none;border-top:1px solid #ccdfff;padding:12px 15px;font-family:inherit;font-size:16px;line-height:1.85;color:#222631;outline:none;resize:none;overflow:hidden;box-sizing:border-box;" rows="4">' + bodyText + '</textarea>';
-    if (hasUncertain && noticeText) {
-      html += '<div class="ocr-uncertainty-note">';
+
+    html += '<div id="q-fold-' + qi + '">';
+    // ── 문항 요약 ──
+    html += '<div class="ocr-q-summary" style="padding:14px 16px 0;font-size:16px;color:#6d7381;line-height:1.6;">' + q.desc + '</div>';
+    html += '<div style="border-top:1px solid #eceef2;margin:14px 16px 0;"></div>';
+
+    // ── 풀이/답 섹션 (클릭해 인라인 수정) — key: 답 = qi, 풀이 = qi+'-sol' ──
+    var ansSection = function(key, title, origText2, chipHtml2) {
+      var edited2 = (ocrBEditMap[student.id] && ocrBEditMap[student.id][key] != null) ? ocrBEditMap[student.id][key] : null;
+      var dirty2 = edited2 != null && edited2.trim() !== origText2.trim();
+      var shown2 = edited2 != null ? edited2 : origText2;
+      var rOn = dirty2 && !excluded;
+      var s = '<div style="display:flex;align-items:center;gap:8px;margin:0 0 8px;">'
+        + '<span style="font-size:14px;font-weight:700;color:#3b3f4c;">' + title + '</span>' + (chipHtml2 || '')
+        + '<span style="margin-left:auto;display:inline-flex;align-items:center;gap:6px;">'
+        + '<button ' + (rOn ? 'onclick="revertOcrB(\'' + student.id + '\',\'' + key + '\')" ' : 'disabled ') + 'title="원래 인식 결과로 되돌리기" style="display:inline-flex;align-items:center;justify-content:center;line-height:1;gap:4px;height:26px;padding:0 9px;background:white;border:1px solid #d9d9d9;border-radius:6px;color:#3b3f4c;font-family:inherit;font-size:12px;font-weight:700;cursor:' + (rOn ? 'pointer' : 'default') + ';' + (rOn ? '' : 'opacity:.45;') + 'flex-shrink:0;"><i data-lucide="rotate-ccw" style="width:12px;height:12px;"></i>되돌리기</button>'
+        + '<button ' + (excluded ? 'disabled ' : 'onmousedown="event.preventDefault()" onclick="openFormulaInput(\'group-ta-' + key + '\')" ') + 'title="수식 입력" style="display:inline-flex;align-items:center;justify-content:center;line-height:1;gap:4px;height:26px;padding:0 9px;background:white;border:1px solid #d9d9d9;border-radius:6px;color:#3b3f4c;font-family:inherit;font-size:12px;font-weight:700;cursor:' + (excluded ? 'default' : 'pointer') + ';' + (excluded ? 'opacity:.45;' : '') + 'flex-shrink:0;"><i data-lucide="sigma" style="width:12px;height:12px;"></i>수식</button>'
+        + '</span></div>';
+      s += '<div class="ocr-ans-box">';
+      s += '<div class="ocr-ans-body" id="group-body-' + key + '"' + (excluded ? '' : ' onclick="editSectionByBody(this,\'' + key + '\')"') + '>'
+        + (shown2 ? '<span>' + shown2.replace(/\n/g, '<br>') + '</span>' : '<span style="color:#b3b6bd;">텍스트 답안 없음</span>')
+        + '</div>';
+      if (!excluded) {
+        s += '<textarea id="group-ta-' + key + '" onblur="saveSection(this,\'' + key + '\')" style="display:none;width:100%;border:none;background:transparent;padding:0;font-family:inherit;font-size:16px;line-height:1.7;color:#222631;outline:none;resize:none;overflow:hidden;box-sizing:border-box;" rows="3">' + shown2 + '</textarea>';
+      }
+      s += '</div>';
+      return s;
+    };
+
+    html += '<div style="padding:12px 16px 16px;">';
+    // 풀이 (그림/도형/표) — 해당 답안이 있는 문항만
+    if (q.sol != null) {
+      html += ansSection(qi + '-sol', '풀이 (그림/도형/표)', q.sol);
+      html += '<div style="height:16px;"></div>';
+    }
+    var chipHtml = '';
+    if (hasUncertain && !excluded) {
+      chipHtml = reviewed
+        ? '<span class="rubric-done-chip"><i data-lucide="circle-check" style="width:11px;height:11px;"></i>확인 완료</span>'
+        : '<span class="rubric-suspect-chip"><i data-lucide="alert-circle" style="width:11px;height:11px;"></i>확인 필요</span>';
+    }
+    html += ansSection(String(qi), '답', bodyText, chipHtml);
+    if (excluded) {
+      html += '<div class="ocr-exclude-note"><i data-lucide="pen-line" style="width:15px;height:15px;color:#416bff;flex-shrink:0;"></i><span>선생님 직접 채점 문항은 AI 채점에서 제외됩니다.</span></div>';
+    }
+    if (hasUncertain && !reviewed && !excluded && noticeText) {
+      html += '<div class="ocr-uncertainty-note" style="border:1px solid #fed7aa;border-radius:8px;margin-top:10px;">';
       html += '<span class="ocr-uncertainty-label"><i data-lucide="alert-circle" style="width:12px;height:12px;"></i>AI 인식 불확실</span>';
       html += '<span class="ocr-uncertainty-text">' + noticeText + '</span>';
       html += '</div>';
     }
-    html += '</div>';
+    html += '</div>'; // 답 섹션
+    html += '</div>'; // 접기 본문
+    html += '</div>'; // 카드
   });
+
+  // 하단: 다시 인식 — 인식 결과가 미덥지 않을 때 이 학생 과제물 전체 재인식
+  html += '<div style="display:flex;align-items:center;margin-top:16px;">'
+    + '<button onclick="ocrBReRecognize()" style="display:inline-flex;align-items:center;justify-content:center;line-height:1;gap:6px;height:40px;padding:0 16px;background:#fff7ed;border:1px solid #fdba74;border-radius:8px;color:#ea580c;font-family:inherit;font-size:15px;font-weight:700;cursor:pointer;">'
+    + '<i data-lucide="rotate-ccw" style="width:16px;height:16px;"></i>다시 인식</button></div>';
 
   panel.innerHTML = html;
   lucide.createIcons();
+}
+
+// 다시 인식 — 현재 학생 과제물 전체 재인식 (데모: 인식 중 → 완료. 실패·정확도 낮음은 성공으로 전환)
+function ocrBReRecognize() {
+  var s = STUDENTS_B1[currentOcrBStudentIdx];
+  if (!s) return;
+  var prev = s.ocrStatus;
+  s.ocrStatus = 'processing';
+  renderOCRView_B();
+  showToast(s.name + ' 학생의 과제물을 다시 인식하고 있어요…', 'info');
+  setTimeout(function(){
+    s.ocrStatus = (prev === 'failed' || prev === 'lowAccuracy') ? 'unconfirmed' : prev;
+    if (STUDENTS_B1[currentOcrBStudentIdx] === s) renderOCRView_B();
+    showToast('다시 인식했어요. 인식 결과를 확인해 주세요.', 'success');
+  }, 2200);
+}
+// 다시 업로드 — 파일 탐색기로 새 파일 선택 → 자동 재인식 → 결과 표시
+function ocrBReupload() {
+  var inp = document.getElementById('ocrb-reupload-input');
+  if (!inp) {
+    inp = document.createElement('input');
+    inp.type = 'file';
+    inp.accept = '.pdf,.png,.jpg,.jpeg';
+    inp.id = 'ocrb-reupload-input';
+    inp.style.display = 'none';
+    document.body.appendChild(inp);
+    inp.addEventListener('change', function(){
+      if (!inp.files || !inp.files.length) return; // 취소 시 아무 것도 안 함
+      var fname = inp.files[0].name;
+      inp.value = '';
+      ocrBReuploadStart(fname);
+    });
+  }
+  inp.click();
+}
+function ocrBReuploadStart(fname) {
+  var s = STUDENTS_B1[currentOcrBStudentIdx];
+  if (!s) return;
+  if (fname) s.fileName = fname;
+  s.ocrStatus = 'processing';
+  renderOCRView_B();
+  showToast('파일을 다시 업로드했어요. 과제물을 자동으로 다시 인식합니다.', 'success');
+  setTimeout(function(){
+    s.ocrStatus = 'unconfirmed';
+    if (STUDENTS_B1[currentOcrBStudentIdx] === s) renderOCRView_B();
+    showToast('다시 인식했어요. 인식 결과를 확인해 주세요.', 'success');
+  }, 2200);
 }
 
 function renderOcrBRubric(student) {
@@ -3533,21 +3891,17 @@ function setOcrBScore(studentId, criterionIdx, value) {
   renderOcrBRubric(STUDENTS_B1[currentOcrBStudentIdx]);
 }
 
-// OCR 안 한 학생(직접입력 등) — OCR 결과가 없으니 채점 상세(채점 전)로 보냄
+// OCR 안 한 학생(직접입력 등) — 인식 결과가 없으니 이 화면에선 비활성(건너뜀)
 function ocrBStudentNoOcr(s) { return !!s && s.submissionMethod === 'typing'; }
-function ocrBRouteIfNoOcr(idx) {
-  var s = STUDENTS_B1[idx];
-  if (ocrBStudentNoOcr(s)) {
-    // 데모: 채점 상세의 '채점 전(미채점)' 상태로 이동 (좌측 전사↔원본 스위치로 과제물 확인)
-    location.href = 'scoring_elementary_v3_260623.html?id=' + s.id + '&name=' + encodeURIComponent(s.name);
-    return true;
-  }
-  return false;
-}
+// 이 화면 비활성 대상 = 직접 입력(인식 불필요) + 미제출(인식 결과 없음)
+function ocrBStudentSkip(s) { return ocrBStudentNoOcr(s) || (!!s && s.state === 'absent'); }
 function navStudentB(dir) {
   var newIdx = currentOcrBStudentIdx + dir;
+  // 직접 입력·미제출 학생은 인식 결과가 없으니 건너뛴다
+  while (newIdx >= 0 && newIdx < STUDENTS_B1.length && ocrBStudentSkip(STUDENTS_B1[newIdx])) {
+    newIdx += dir;
+  }
   if (newIdx < 0 || newIdx >= STUDENTS_B1.length) return;
-  if (ocrBRouteIfNoOcr(newIdx)) return;
   currentOcrBStudentIdx = newIdx;
   ocrBActiveTab = 'text';
   renderOCRView_B();
@@ -3555,7 +3909,7 @@ function navStudentB(dir) {
 
 function jumpToOcrBStudent(idx) {
   document.getElementById('ocrBStudentDropList').style.display = 'none';
-  if (ocrBRouteIfNoOcr(idx)) return;
+  if (ocrBStudentSkip(STUDENTS_B1[idx])) return; // 직접 입력·미제출 학생 = 비활성(인식 결과 없음)
   currentOcrBStudentIdx = idx;
   ocrBActiveTab = 'text';
   renderOCRView_B();
@@ -3571,7 +3925,7 @@ function confirmOCR_B() {
   if (!student) return;
   student.ocrStatus = 'confirmed';
   student.needsReview = false;
-  showToast('OCR 결과를 확인완료 처리했습니다.', 'success');
+  showToast('인식 결과를 확인완료 처리했습니다.', 'success');
   renderOCRView_B();
 }
 
@@ -3889,6 +4243,28 @@ function saveSection(ta, gi) {
     groups = dataA ? (dataA.type === 'rubric' ? dataA.rubricGroups : dataA.questions) : null;
   }
   var g = groups ? groups[gi] : null;
+
+  if (isB) {
+    // B안(인식 결과 확인): 원본 인식은 보존, 수정본은 ocrBEditMap에 저장 → '되돌리기' 가능
+    // key: 답 = qi, 풀이 = qi+'-sol'
+    var solModeB = String(gi).indexOf('sol') !== -1;
+    var gB = groups ? groups[parseInt(gi, 10)] : null;
+    if (!gB || !student) return;
+    var origText = '';
+    if (solModeB) { origText = gB.sol || ''; }
+    else { (gB.spans || []).forEach(function(s){ origText += s.text; }); }
+    if (!ocrBEditMap[student.id]) ocrBEditMap[student.id] = {};
+    var prevShown = (ocrBEditMap[student.id][gi] != null) ? ocrBEditMap[student.id][gi] : origText;
+    var changed = newText.trim() !== prevShown.trim();
+    if (newText.trim() === origText.trim()) delete ocrBEditMap[student.id][gi];
+    else ocrBEditMap[student.id][gi] = newText;
+    // 원본과 비교 — 실제 수정이 있을 때만 확인 완료 처리 (열었다 그냥 닫으면 확인 필요 유지 · 풀이는 확인 필요 대상 아님)
+    if (!solModeB && questionHasUncertainty(gB) && !gB.reviewed && changed) gB.reviewed = true;
+    recomputeOcrBNeedsReview(); // 칩·배너·카운트·드롭다운 일괄 갱신 (내부에서 재렌더)
+    markAutoSaved();
+    return;
+  }
+
   var clearedUncertain = g ? questionHasUncertainty(g) : false;
 
   // 편집 내용 데이터에 반영 + 해당 문항의 불확실 표시 해제
@@ -4381,7 +4757,7 @@ function renderSubmissionMethodCell(method) {
   }
   return '<span style="display:inline-flex;align-items:center;gap:4px;color:#3b3f4c;background:#f1f3f5;border-radius:100px;padding:2px 8px;font-size:13px;font-weight:600;"><i data-lucide="paperclip" style="width:13px;height:13px;"></i>파일</span>';
 }
-// 제출 파일 셀: 첫(=채점 대상) 파일명 + 여러 개면 '외 N개'. 정책 — 가장 먼저 올린 파일만 채점·OCR.
+// 제출 파일 셀: 첫(=채점 대상) 파일명 + 여러 개면 '외 N개'. 정책 — 가장 먼저 올린 파일만 채점·인식.
 function scoredFileCell(name, count) {
   count = count || 1;
   var extra = count > 1 ? '<span style="font-size:13px;color:#6d7381;flex-shrink:0;">외 ' + (count - 1) + '개</span>' : '';
@@ -4398,7 +4774,7 @@ function surveyFileCell() {
     + '</span>';
 }
 
-// OCR 결과 셀 — 전 케이스 통합 (HIAI 동일 Lucide 아이콘). state: waiting/processing/failed/review/unconfirmed/confirmed
+// 인식 결과 셀 — 전 케이스 통합 (HIAI 동일 Lucide 아이콘). state: waiting/processing/failed/review/unconfirmed/confirmed
 function ocrResultCell(state, count, clickFn, id) {
   var clickAttr = clickFn ? ' onclick="' + clickFn + '"' : '';
   var clickCss = clickFn ? 'cursor:pointer;' : '';
@@ -4411,18 +4787,18 @@ function ocrResultCell(state, count, clickFn, id) {
   }
   if (state === 'failed') {
     return '<span style="display:inline-flex;align-items:center;justify-content:center;gap:8px;">'
-      + '<span style="display:inline-flex;align-items:center;gap:4px;color:#6d7381;font-weight:600;font-size:13px;white-space:nowrap;"><i data-lucide="circle-x" style="width:14px;height:14px;flex-shrink:0;"></i>인식 실패</span>'
+      + '<span style="display:inline-flex;align-items:center;gap:4px;color:#f2525f;font-weight:600;font-size:13px;white-space:nowrap;"><i data-lucide="circle-x" style="width:14px;height:14px;flex-shrink:0;"></i>인식 실패</span>'
       + '<button onclick="retryOcr(\'' + id + '\')" style="display:inline-flex;align-items:center;gap:3px;background:none;border:none;cursor:pointer;color:#416bff;font-family:inherit;font-size:12px;font-weight:700;padding:2px 6px;border-radius:4px;white-space:nowrap;" onmouseover="this.style.background=\'#e9f2ff\'" onmouseout="this.style.background=\'none\'"><i data-lucide="rotate-cw" style="width:12px;height:12px;"></i>다시하기</button>'
       + '</span>';
   }
   if (state === 'review') {
-    return '<span' + clickAttr + ' style="display:inline-flex;align-items:center;gap:4px;color:#db3e51;font-weight:600;font-size:13px;' + clickCss + 'white-space:nowrap;"><i data-lucide="triangle-alert" style="width:14px;height:14px;flex-shrink:0;"></i>확인 필요<span style="font-weight:700;font-size:11px;background:#fff3f4;border-radius:100px;padding:1px 6px;margin-left:2px;white-space:nowrap;">' + (count || 0) + '개 문항</span>' + chev + '</span>';
+    return '<span' + clickAttr + ' style="display:inline-flex;align-items:center;gap:4px;color:#c2410c;font-weight:600;font-size:13px;' + clickCss + 'white-space:nowrap;"><i data-lucide="triangle-alert" style="width:14px;height:14px;flex-shrink:0;"></i>확인 필요<span style="font-weight:700;font-size:11px;background:#fff7ed;border-radius:100px;padding:1px 6px;margin-left:2px;white-space:nowrap;">' + (count || 0) + '개 문항</span>' + chev + '</span>';
   }
-  // confirmed · unconfirmed(불확실 없음) → 완료 (HIAI 동일: OCR 결과 '확인' 단계 없음, 불확실할 때만 '확인 필요')
+  // confirmed · unconfirmed(불확실 없음) → 완료 (HIAI 동일: 인식 결과 '확인' 단계 없음, 불확실할 때만 '확인 필요')
   return '<span' + clickAttr + ' style="display:inline-flex;align-items:center;gap:4px;color:#319d64;font-weight:600;font-size:13px;' + clickCss + '"><i data-lucide="circle-check" style="width:14px;height:14px;"></i>완료' + chev + '</span>';
 }
 
-// OCR 인식 실패 → 다시하기 (재시도 → 진행 중 → 미확인)
+// 과제물 인식 실패 → 다시하기 (재시도 → 진행 중 → 미확인)
 function retryOcr(id) {
   var s = STUDENTS.filter(function(x){ return x.id === id; })[0]
         || STUDENTS_B1.filter(function(x){ return x.id === id; })[0]
@@ -4432,7 +4808,7 @@ function retryOcr(id) {
   if ('ocrStatusAfter' in s) s.ocrStatusAfter = 'processing';
   renderTable();
   renderActionBanners(currentListClass, window.currentRawType || currentEvalType || 'A');
-  if (typeof showToast === 'function') showToast('OCR 인식을 다시 시도합니다.', 'info');
+  if (typeof showToast === 'function') showToast('과제물 인식을 다시 시도합니다.', 'info');
   setTimeout(function(){
     s.ocrStatus = 'unconfirmed';
     if ('ocrStatusAfter' in s) s.ocrStatusAfter = 'unconfirmed';
@@ -4519,7 +4895,7 @@ function renderTableB() {
         return;
       }
       var isTyping = (s.submissionMethod === 'typing');
-      // 상태(제출) 컬럼은 제출 완료/미제출 2종만 (PRD 3-3). OCR 진행 상태는 OCR 결과 컬럼이 담당
+      // 상태(제출) 컬럼은 제출 완료/미제출 2종만 (PRD 3-3). 과제물 인식 진행 상태는 인식 결과 컬럼이 담당
       var statusBadge = '<span class="badge badge-green">제출 완료</span>';
       var cols = '<td style="text-align:center;">' + statusBadge + '</td>';
       cols += '<td style="font-weight:600;">' + s.id + '</td>';
@@ -4558,7 +4934,7 @@ function doUploadPdf() {
   renderActionBanners(currentListClass, window.currentRawType || currentEvalType || 'A');
   showScreen('screen-list');
   showToast('과제물이 등록되었습니다.', 'success');
-  // OCR 인라인 모델: 업로드는 OCR을 유발하지 않음 (인식은 채점 실행 시 자동 처리)
+  // 과제물 인식 모델: 업로드는 OCR을 유발하지 않음 (인식은 채점 실행 시 자동 처리)
 }
 
 function goScoringList() {
@@ -4599,7 +4975,7 @@ function closeOcrAskB(startNow) {
     var ocrWrap2 = document.getElementById('btn-ocr-confirm-wrap');
     if (ocrBtn2) { ocrBtn2.disabled = false; ocrBtn2.style.opacity = '1'; ocrBtn2.style.cursor = 'pointer'; ocrBtn2.style.pointerEvents = ''; }
     if (ocrWrap2) { ocrWrap2.removeAttribute('title'); ocrWrap2.style.cursor = ''; }
-    showToast('OCR 인식을 시작합니다. 완료 후 결과를 확인해 주세요.', 'success');
+    showToast('과제물 인식을 시작합니다. 완료 후 결과를 확인해 주세요.', 'success');
     var csbSum0 = document.getElementById('class-action-bar');
     if (csbSum0) csbSum0.style.display = 'none';
     var bannerB2 = document.getElementById('list-b-ocr-pending-banner');
@@ -4611,7 +4987,7 @@ function closeOcrAskB(startNow) {
           '<i data-lucide="loader" style="width:16px;height:16px;color:#365eef;flex-shrink:0;" class="spin"></i>' +
           '<div style="display:flex;flex-direction:column;gap:6px;flex:1;min-width:0;">' +
             '<div style="display:flex;align-items:center;justify-content:space-between;gap:12px;">' +
-              '<span style="font-size:14px;color:#365eef;font-weight:600;">OCR 인식이 진행 중입니다.</span>' +
+              '<span style="font-size:14px;color:#365eef;font-weight:600;">과제물 인식이 진행 중입니다.</span>' +
               '<span id="ocr-progress-pct" style="font-size:13px;color:#365eef;font-weight:600;flex-shrink:0;">0%</span>' +
             '</div>' +
             '<div class="ocr-progress-bg"><div id="ocr-progress-fill" class="ocr-progress-fill"></div></div>' +
@@ -4644,7 +5020,7 @@ function closeOcrAskB(startNow) {
     renderTable();
     lucide.createIcons();
   } else {
-    showToast('OCR 인식을 나중에 진행할 수 있습니다.', 'success');
+    showToast('과제물 인식을 나중에 진행할 수 있습니다.', 'success');
     var bannerB2 = document.getElementById('list-b-ocr-pending-banner');
     if (bannerB2) bannerB2.style.display = 'none';
     renderActionBanners(currentListClass, window.currentRawType || currentEvalType || 'A');
@@ -4754,11 +5130,11 @@ function goToOCRById(id) {
   var i = STUDENTS.findIndex(function(s){ return s.id === id; });
   if (i !== -1) goToOCR(i);
 }
-// OCR 미확인 학생이 있는 상태에서 채점 실행 → 경고 먼저
+// 인식 미확인 학생이 있는 상태에서 채점 실행 → 경고 먼저
 function openAiRunWithOcrCheck() { openRmModal('ocrWarnModal'); }
-function openRunModal(btn) { ocrCtxCell = (btn && btn.closest) ? btn.closest('td') : null; var seg = document.getElementById('rmMethodField'); if (seg) seg.style.display = ''; rmSetMethod('direct'); openRmModal('runModal1'); }
+function openRunModal(btn) { ocrCtxCell = (btn && btn.closest) ? btn.closest('td') : null; _rmFromOcrReview = false; var seg = document.getElementById('rmMethodField'); if (seg) seg.style.display = ''; rmSetMethod('direct'); openRmModal('runModal1'); }
 
-// ── V3 하이브리드: 채점 방식 분기 (바로 채점 기본 / OCR 먼저 확인 옵트인) ──
+// ── V3 하이브리드: 채점 방식 분기 (바로 채점 기본 / 인식 먼저 확인 옵트인) ──
 var rmMethod = 'direct';
 var ocrFromRun = false;
 var ocrCtxCell = null; // OCR-먼저를 실행한 채점 목록 학급 행의 'AI 채점' 칸
@@ -4780,31 +5156,31 @@ function toggleModelDetail() {
   if (t) t.innerHTML = open ? '접기 <i data-lucide="chevron-up"></i>' : '자세히 <i data-lucide="chevron-down"></i>';
   lucide.createIcons();
 }
-// 2/2 모달을 채점 방식에 맞춰 전환: 바로 채점=채점 학생 선택 / OCR 먼저=OCR 인식 학생 선택
+// 2/2 모달을 채점 방식에 맞춰 전환: 바로 채점=채점 학생 선택 / 인식 먼저=과제물 인식 학생 선택
 function applyRunModalMode() {
   var ocr = rmMethod === 'ocr';
   var title = document.getElementById('rm2-title');
-  if (title) title.textContent = ocr ? 'OCR 인식할 학생 선택' : 'AI 채점 실행 (2/2)';
+  if (title) title.textContent = ocr ? '인식할 학생 선택' : 'AI 채점 실행 (2/2)';
   var note = document.getElementById('rm2-ocr-note');
   if (note) note.style.display = ocr ? 'flex' : 'none';
   var btn = document.getElementById('rm-exec-btn');
   if (btn) {
     btn.innerHTML = ocr
-      ? '<i data-lucide="scan-text" style="width:16px;height:16px"></i>선택 학생 OCR 인식 · <span id="rm-exec-count">0</span>'
+      ? '<i data-lucide="scan-text" style="width:16px;height:16px"></i>선택 학생 과제물 인식 · <span id="rm-exec-count">0</span>'
       : '<i data-lucide="wand-sparkles" style="width:16px;height:16px"></i>AI 채점 실행 · <span id="rm-exec-count">0</span>';
   }
   var colA = document.getElementById('rm2-col-a');
   var colB = document.getElementById('rm2-col-b');
   var colOcr = document.getElementById('rm2-col-ocr');
-  if (colA) colA.textContent = ocr ? '제출 방식' : 'AI 채점';
+  if (colA) { colA.textContent = ocr ? '제출 방식' : 'AI 채점'; colA.style.width = ocr ? '200px' : '110px'; }
   if (colB) { colB.textContent = ocr ? '' : '선생님 채점'; colB.style.display = ocr ? 'none' : ''; }
-  if (colOcr) colOcr.style.display = ocr ? 'none' : ''; // 채점 실행(2/2)에서만 사전 OCR 컬럼
+  if (colOcr) colOcr.style.display = ocr ? 'none' : ''; // 채점 실행(2/2)에서만 사전 인식 컬럼
   var credit = document.getElementById('rm2-credit');
   if (credit) credit.style.display = ocr ? 'none' : 'flex'; // 채점 실행(2/2)에서만 크레딧 안내
   lucide.createIcons();
   renderRunStudents();
 }
-// 2/2 기본 CTA: 방식에 따라 채점 실행 또는 OCR 인식 시작
+// 2/2 기본 CTA: 방식에 따라 채점 실행 또는 과제물 인식 시작
 function rmExecPrimary() {
   if (rmMethod === 'ocr') { startOcrForSelected(); }
   else { rmExec(); }
@@ -4812,12 +5188,12 @@ function rmExecPrimary() {
 function rmSelectedCount() {
   return RUN_STUDENTS.filter(function(s){ return !rmIsDisabled(s) && s.checked; }).length;
 }
-// OCR 먼저 경로: 선택 학생 OCR 인식 → 진행률 모달(인식 중) → 완료
+// 인식 먼저 경로: 선택 학생 과제물 인식 → 진행률 모달(인식 중) → 완료
 function startOcrForSelected() {
   if (rmSelectedCount() === 0) return;
   closeRmModal('runModal2');
   var picks = RUN_STUDENTS.filter(function(s){ return !rmIsDisabled(s) && s.checked; });
-  picks.forEach(function(s){ s.ocrPre = true; }); // 사전 OCR → 크레딧 이미 차감(채점 시 추가 0)
+  picks.forEach(function(s){ s.ocrPre = true; }); // 사전 인식 → 크레딧 이미 차감(채점 시 추가 0)
   clearInterval(ocrFirstTimer);
   ocrFirstTotal = picks.length;
   ocrFirstRoster = picks.map(function(s){ return s.id + ' ' + s.name; });
@@ -4828,14 +5204,15 @@ function startOcrForSelected() {
   openRmModal('ocrFirstModal');
   startOcrAnalysis();
 }
-// 진행률/완료 모달 → OCR 결과 확인 화면(run 모드)
+// 진행률/완료 모달 → 인식 결과 확인 화면(run 모드)
 function enterOcrReviewFromProgress(idx) {
   closeOcrFirstModal();
   ocrFromRun = true;
   ocrEntryViaCell = false;
+  if (typeof resetOcrGradeSession === 'function') resetOcrGradeSession();
   setOcrRunBackLabel('학생 선택으로');
   goToOCR_B(idx || 0);
-  var bar = document.getElementById('ocr-run-bar');
+  var bar = document.getElementById('ocr-run-actions');
   if (bar) bar.style.display = 'flex';
   lucide.createIcons();
 }
@@ -4843,36 +5220,41 @@ function setOcrRunBackLabel(text) {
   var el = document.getElementById('ocr-run-back-label');
   if (el) el.textContent = text;
 }
-// 인식 중/완료에서 이탈 → 채점 목록으로, 그 학급 칸을 'OCR 인식 중'으로 (백그라운드 진행)
+// 인식 중/완료에서 이탈 → 채점 목록으로, 그 학급 칸을 '과제물 인식 중'으로 (백그라운드 진행)
 function ocrProgressBackground() {
   closeOcrFirstModal();
   goScoringList();
   if (ocrCtxCell) {
     var cell = ocrCtxCell;
     setCellOcrState(cell, 'running');
-    setTimeout(function(){ setCellOcrState(cell, 'review'); }, 3500); // 데모: 인식 완료 시뮬
+    setTimeout(function(){
+      setCellOcrState(cell, 'review');
+      // 완료 알림 — 조용히 칸만 바뀌면 흐름이 끊김. 복귀 경로를 토스트로 안내
+      showToast('과제물 인식이 끝났어요. 채점 목록의 [인식 확인 필요]를 눌러 결과를 확인해 주세요.', 'success');
+    }, 3500); // 데모: 인식 완료 시뮬
   }
-  showToast('OCR 인식을 백그라운드에서 진행 중이에요. 채점 목록에서 확인할 수 있어요.', 'info');
+  showToast('과제물 인식을 백그라운드에서 진행 중이에요. 완료되면 알려드릴게요.', 'info');
 }
-// 채점 목록 'OCR 확인 필요' 칸 클릭 → OCR 결과 확인 화면(run 모드)으로 재진입
+// 채점 목록 '인식 확인 필요' 칸 클릭 → 인식 결과 확인 화면(run 모드)으로 재진입
 function enterOcrReviewFromCell(btn) {
   ocrCtxCell = btn.closest('td');
   ocrFromRun = true;
   ocrEntryViaCell = true;
+  if (typeof resetOcrGradeSession === 'function') resetOcrGradeSession();
   setOcrRunBackLabel('채점 목록으로');
   goToOCR_B(0);
-  var bar = document.getElementById('ocr-run-bar');
+  var bar = document.getElementById('ocr-run-actions');
   if (bar) bar.style.display = 'flex';
   lucide.createIcons();
 }
-// 채점 목록 학급 칸의 OCR 상태 전환 (인식 중 / 확인 필요 / 정상)
+// 채점 목록 학급 칸의 인식 상태 전환 (인식 중 / 확인 필요 / 정상)
 function setCellOcrState(cell, state) {
   if (!cell) return;
   cell.dataset.ocr = state;
   if (state === 'running') {
-    cell.innerHTML = '<button class="pill-btn pill-btn-soft" onclick="showToast(\'아직 OCR 인식 중이에요. 완료되면 확인할 수 있어요.\',\'info\')"><i data-lucide="loader-circle" class="spin" style="width:15px;height:15px;"></i>OCR 인식 중</button>';
+    cell.innerHTML = '<button class="pill-btn pill-btn-soft" onclick="showToast(\'아직 과제물 인식 중이에요. 완료되면 확인할 수 있어요.\',\'info\')"><i data-lucide="loader-circle" class="spin" style="width:15px;height:15px;"></i>과제물 인식 중</button>';
   } else if (state === 'review') {
-    cell.innerHTML = '<button class="pill-btn" style="background:#fff7ed;color:#ea580c;border:1px solid #fed7aa;" onclick="enterOcrReviewFromCell(this)"><i data-lucide="scan-text" style="width:15px;height:15px;"></i>OCR 확인 필요</button>';
+    cell.innerHTML = '<button class="pill-btn" style="background:#fff7ed;color:#ea580c;border:1px solid #fed7aa;" onclick="enterOcrReviewFromCell(this)"><i data-lucide="scan-text" style="width:15px;height:15px;"></i>인식 확인 필요</button>';
   } else {
     cell.innerHTML = '<button class="pill-btn pill-btn-primary" onclick="openRunModal(this)"><i data-lucide="wand-sparkles" style="width:15px;height:15px;"></i>AI 채점 실행</button>';
     delete cell.dataset.ocr;
@@ -4882,7 +5264,7 @@ function setCellOcrState(cell, state) {
 // OCR 확인 끝 → 같은 학생들로 바로 채점 실행 (학생은 이미 선택됨)
 // 채점 목록으로 (좌측) — 단순 복귀
 function ocrBackToScoring() {
-  var bar = document.getElementById('ocr-run-bar');
+  var bar = document.getElementById('ocr-run-actions');
   if (bar) bar.style.display = 'none';
   ocrFromRun = false;
   if (ocrCtxCell && ocrCtxCell.dataset.ocr === 'review') { /* 미확인 상태 유지 */ }
@@ -4894,12 +5276,83 @@ function saveAndNextOcr() {
   if (currentOcrBStudentIdx < STUDENTS_B1.length - 1) navStudentB(1);
 }
 // 채점 진행하기 → OCR 상세 그 위에 채점 실행 팝업 (채점 목록으로 이동하지 않음)
-// 방식은 OCR 먼저로 이미 정해졌으니 세그먼트 숨김 + 바로 채점 기준
+// 방식은 인식 먼저로 이미 정해졌으니 세그먼트 숨김 + 바로 채점 기준
 function ocrRunProceed() {
   rmSetMethod('direct');
   var seg = document.getElementById('rmMethodField');
   if (seg) seg.style.display = 'none';
   openRmModal('runModal1');
+}
+// 인식 결과 확인 화면 'AI 채점 실행' — 학생 선택 팝업 바로 열기.
+// 현재 보던 학생만 기본 선택, 나머지는 열어둠(체크로 추가). 방식·설정은 앞 단계에서 이미 정해짐.
+var _rmFromOcrReview = false;
+function ocrRunFromReview() {
+  var cur = STUDENTS_B1[currentOcrBStudentIdx];
+  rmSetMethod('direct');
+  RUN_STUDENTS.forEach(function(s){ if (!rmIsDisabled(s)) s.checked = !!(cur && s.id === cur.id); });
+  applyRunModalMode();
+  var title = document.getElementById('rm2-title');
+  if (title) title.textContent = 'AI 채점 실행'; // 단독 진입이라 (2/2) 스텝 표기 제거
+  _rmFromOcrReview = true;
+  openRmModal('runModal2');
+}
+
+// ══════ 인식 확인 후 채점: 개별(이 학생) / 일괄(남은 학생) 둘 다 지원 ══════
+// 채점 대상 = 파일 제출 학생(타이핑=직접입력·인식 불필요, 인식실패=채점 제외)
+var _gradedIdsB = new Set();
+function ocrGradeableList() {
+  return STUDENTS_B1.filter(function(s){ return s.submissionMethod !== 'typing' && s.ocrStatus !== 'failed'; });
+}
+function ocrRemainCount() {
+  return ocrGradeableList().filter(function(s){ return !_gradedIdsB.has(s.id); }).length;
+}
+function resetOcrGradeSession() { _gradedIdsB = new Set(); }
+// 인식 확인 후 채점 진행 바 카운트·버튼 상태 갱신
+function updateOcrGradeBar() {
+  var el = document.getElementById('ocr-remain-count');
+  if (el) el.textContent = ocrRemainCount();
+  var s = STUDENTS_B1[currentOcrBStudentIdx];
+  // 개별 버튼: 타이핑·인식실패·이미 채점 학생은 비활성
+  var thisBtn = document.getElementById('ocr-grade-this');
+  if (thisBtn) {
+    var blocked = !s || s.submissionMethod === 'typing' || s.ocrStatus === 'failed' || _gradedIdsB.has(s.id);
+    thisBtn.disabled = blocked; thisBtn.style.opacity = blocked ? '.5' : '1'; thisBtn.style.cursor = blocked ? 'not-allowed' : 'pointer';
+    thisBtn.title = (s && _gradedIdsB.has(s.id)) ? '이미 채점한 학생이에요' : (s && s.ocrStatus === 'failed') ? '인식 실패 — 다시 인식이 필요해요' : (s && s.submissionMethod === 'typing') ? '직접 입력 학생은 채점 상세에서 채점해요' : '';
+  }
+  // 일괄 버튼: 남은 0이면 비활성
+  var remBtn = document.getElementById('ocr-grade-remaining');
+  if (remBtn) { var none = ocrRemainCount() === 0; remBtn.disabled = none; remBtn.style.opacity = none ? '.5' : '1'; remBtn.style.cursor = none ? 'not-allowed' : 'pointer'; }
+}
+// 개별: 이 학생 채점 → 토스트 + 다음 미채점 학생으로
+function ocrGradeThisStudent() {
+  var s = STUDENTS_B1[currentOcrBStudentIdx];
+  if (!s) return;
+  if (s.ocrStatus === 'failed') { showToast('인식에 실패한 학생은 채점할 수 없어요. 다시 인식해 주세요.','warning'); return; }
+  if (s.submissionMethod === 'typing') { showToast('직접 입력 학생은 채점 상세에서 채점해요.','info'); return; }
+  if (_gradedIdsB.has(s.id)) { showToast('이미 채점한 학생이에요.','info'); return; }
+  _gradedIdsB.add(s.id);
+  if (typeof confirmOCR_B === 'function') confirmOCR_B();
+  showToast(s.name + ' 학생의 AI 채점을 시작했어요.','success');
+  if (ocrRemainCount() === 0) { setTimeout(ocrBackToScoring, 500); return; }
+  gotoNextGradableB();
+  updateOcrGradeBar();
+}
+// 다음 채점 대상(미채점·파일) 학생으로 이동
+function gotoNextGradableB() {
+  var n = STUDENTS_B1.length;
+  for (var k = 1; k <= n; k++) {
+    var i = (currentOcrBStudentIdx + k) % n;
+    var s = STUDENTS_B1[i];
+    if (s.submissionMethod !== 'typing' && s.ocrStatus !== 'failed' && !_gradedIdsB.has(s.id)) { currentOcrBStudentIdx = i; renderOCRView_B(); return; }
+  }
+}
+// 일괄: 남은 학생 한 번에 채점 → 토스트 + 채점 목록으로
+function ocrGradeRemaining() {
+  var n = ocrRemainCount();
+  if (n === 0) return;
+  ocrGradeableList().forEach(function(s){ _gradedIdsB.add(s.id); });
+  showToast('남은 ' + n + '명의 AI 채점을 시작했어요. 완료되면 결과 확인에서 볼 수 있어요.','success');
+  setTimeout(ocrBackToScoring, 500);
 }
 
 // ── OCR 아예 미진행 케이스: 안내 → 분석 진행 → 완료 ──
@@ -4980,41 +5433,45 @@ function rmBack() {
   openRmModal('runModal1');
 }
 
+// 명단 = OCR 상세(STUDENTS_B1)·채점 상세(STUDENT_LIST)와 동일한 김서윤 14명 세트. typing 5명(정현우·한지우·임도윤·김도현·노유찬) 일치.
 var RUN_STUDENTS = [
-  { id:'10101', name:'김가나', ai:'-',    t:'미채점',   checked:true,  method:'file',   file:'10101_미래시나리오.pdf' },
-  { id:'10102', name:'김구라', ai:'-',    t:'미채점',   checked:true,  method:'file',   file:'10102_미래시나리오.pdf' },
-  { id:'10103', name:'김나라', ai:'-',    t:'완료',     checked:false, method:'file',   file:'10103_미래시나리오.pdf' },
-  { id:'10104', name:'김노아', ai:'fail', t:'확인 필요', checked:true,  method:'file',   file:'10104_미래시나리오.pdf' },
-  { id:'10105', name:'김가나', ai:'absent', t:'미채점', absent:true,   method:'file',   file:'-' },
-  { id:'10106', name:'문유나', ai:'absent', t:'완료',   absent:true,   method:'file',   file:'-' },
-  { id:'10107', name:'이수진', ai:'-',    t:'미채점',   checked:true,  method:'typing' },
-  { id:'10108', name:'박지민', ai:'-',    t:'미채점',   checked:true,  method:'file',   file:'10108_미래시나리오.pdf' },
-  { id:'10109', name:'박수란', ai:'-',    t:'미채점',   checked:true,  method:'file',   file:'10109_미래시나리오.pdf' },
-  { id:'10110', name:'박수란', ai:'-',    t:'미채점',   checked:true,  method:'file',   file:'10110_미래시나리오.pdf' },
-  { id:'10111', name:'안유림', ai:'absent', t:'미채점', absent:true,   method:'file',   file:'-' },
-  { id:'10112', name:'안지영', ai:'-',    t:'미채점',   checked:true,  method:'typing' },
-  { id:'10113', name:'김도윤', ai:'-',    t:'미채점',   checked:true,  method:'file',   file:'10113_미래시나리오.pdf' }
+  { id:'10101', name:'김서윤', ai:'-',    t:'미채점',   checked:true,  method:'file',   file:'10101_미래시나리오.pdf' },
+  { id:'10102', name:'이준호', ai:'fail', t:'확인 필요', checked:true,  method:'file',   file:'10102_미래시나리오.pdf' }, // 이전 채점 실패 → 재채점 대상
+  { id:'10103', name:'박지민', ai:'-',    t:'미채점',   checked:false, method:'file',   ocrPre:true, file:'10103_미래시나리오.pdf' }, // 이미 인식 완료(사전 인식됨) — 두 모드 공통. 원하면 다시 인식 가능
+  { id:'10104', name:'최유진', ai:'-',    t:'미채점',   checked:true,  method:'file',   file:'10104_미래시나리오.pdf' },
+  { id:'10105', name:'정현우', ai:'-',    t:'미채점',   checked:true,  method:'typing' },
+  { id:'10106', name:'한지우', ai:'-',    t:'미채점',   checked:true,  method:'typing' },
+  { id:'10107', name:'조민재', ai:'-',    t:'완료',     checked:false, method:'file',   ocrPre:true, file:'10107_미래시나리오.pdf' }, // 채점 완료 = 인식 완료
+  { id:'10108', name:'윤하은', ai:'-',    t:'미채점',   checked:true,  method:'file',   file:'10108_미래시나리오.pdf' },
+  { id:'10109', name:'임도윤', ai:'-',    t:'미채점',   checked:true,  method:'typing' },
+  { id:'10110', name:'신예린', ai:'absent', t:'미채점', absent:true,   method:'file',   file:'-' }, // 미제출 → 채점·인식 대상 제외
+  { id:'10111', name:'김도현', ai:'-',    t:'미채점',   checked:true,  method:'typing' },
+  { id:'10112', name:'송하림', ai:'-',    t:'완료',     checked:false, method:'file',   ocrPre:true, file:'10112_미래시나리오.pdf' }, // 채점 완료 = 인식 완료
+  { id:'10113', name:'노유찬', ai:'-',    t:'미채점',   checked:true,  method:'typing' },
+  { id:'10114', name:'백시우', ai:'-',    t:'미채점',   checked:true,  method:'file',   ocrfail:true, file:'10114_미래시나리오.pdf' } // 인식 실패 — 재인식 대상(기본 체크). 바로 채점은 불가(인식 결과 없음)
 ];
-// 채점 대상 제외 규칙 (모드별): 바로 채점=미제출·OCR미인식 / OCR 먼저=미제출·직접입력(타이핑은 OCR 불필요)
+// 채점 대상 제외 규칙 (모드별): 바로 채점=미제출·OCR미인식 / 인식 먼저=미제출·직접입력(타이핑은 OCR 불필요)
 function rmIsDisabled(s) {
   if (rmMethod === 'ocr') return s.absent || s.method === 'typing';
   return s.absent || s.ocrfail;
 }
 function rmTeacherBadge(t) {
-  if (t === '완료') return '<span class="badge badge-green">완료</span>';
-  if (t === '확인 필요') return '<span class="badge badge-red">확인 필요</span>';
-  return '<span class="badge" style="background:#fff7ed;color:#ea580c;">미채점</span>';
+  if (t === '완료') return '<span class="rm-tag green">완료</span>';
+  if (t === '확인 필요') return '<span class="rm-tag red">확인 필요</span>';
+  return '<span style="color:#6d7381;">미채점</span>'; // 미채점 = 담백 회색 텍스트(바탕 상태)
 }
 function rmAiCell(s) {
-  if (s.ai === 'fail') return '<span style="color:#db3e51;font-weight:600;">채점 실패</span>';
-  if (s.ai === 'absent') return '<span style="color:#b3b6bd;">미제출</span>';
+  if (s.ai === 'fail') return '<span class="rm-tag red">채점 실패</span>';
+  if (s.ai === 'absent') return '<span style="color:#6d7381;">미제출</span>';
   return '<span style="color:#6d7381;">-</span>';
 }
-// OCR 먼저 모드 컬럼: 제출 방식 (파일 / 직접 입력 / 미제출)
+// 인식 먼저 모드 컬럼: 제출 방식 (파일 / 직접 입력 / 미제출)
 function rmMethodCell(s) {
-  if (s.absent) return '<span style="color:#b3b6bd;">미제출</span>';
-  if (s.method === 'typing') return '<span style="color:#6d7381;">직접 입력 · OCR 불필요</span>';
-  return '<span style="color:#222631;">파일</span>';
+  if (s.absent) return '<span style="color:#b3b6bd;white-space:nowrap;">미제출</span>';
+  if (s.method === 'typing') return '<span style="color:#6d7381;white-space:nowrap;">직접 입력 · 인식 불필요</span>';
+  if (s.ocrfail) return '<span style="white-space:nowrap;color:#222631;">파일 <span style="color:#c3c7cf;">·</span> <span class="rm-tag red" style="vertical-align:middle;">인식 실패</span></span>';
+  if (s.ocrPre) return '<span style="white-space:nowrap;color:#222631;">파일 <span style="color:#c3c7cf;">·</span> <span class="rm-tag green" style="vertical-align:middle;">인식 완료</span></span>';
+  return '<span style="color:#222631;white-space:nowrap;">파일</span>';
 }
 function renderRunStudents() {
   var ocr = rmMethod === 'ocr';
@@ -5027,12 +5484,13 @@ function renderRunStudents() {
       + '<td><input type="checkbox" class="rm-chk" ' + (disabled ? 'disabled' : (s.checked ? 'checked' : '')) + ' onchange="rmToggle(' + i + ', this.checked)"></td>'
       + '<td>' + s.id + '</td>'
       + '<td>' + s.name + '</td>'
-      + '<td' + (ocr ? ' style="display:none"' : '') + '>' + (ocr ? '' : (s.ocrPre && !disabled ? '<span style="display:inline-flex;align-items:center;gap:3px;font-size:12px;font-weight:600;color:#319d64;background:#eefcf4;border:1px solid #b8ebcf;border-radius:100px;padding:2px 9px;">인식 완료</span>' : '<span style="color:#b3b6bd;">-</span>')) + '</td>'
+      + '<td' + (ocr ? ' style="display:none"' : '') + '>' + (ocr ? '' : (s.ocrfail ? '<span class="rm-tag red">인식 실패</span>' : (s.ocrPre && !disabled ? '<span class="rm-tag green">인식 완료</span>' : '<span style="color:#b3b6bd;">-</span>'))) + '</td>'
       + '<td>' + (ocr ? rmMethodCell(s) : rmAiCell(s)) + '</td>'
       + '<td' + (ocr ? ' style="display:none"' : '') + '>' + (ocr ? '' : rmTeacherBadge(s.t)) + '</td>'
       + '</tr>';
   });
   tbody.innerHTML = html;
+  if (typeof lucide !== 'undefined') lucide.createIcons();
   rmUpdateCount();
 }
 function rmToggle(i, on) {
@@ -5051,19 +5509,21 @@ function rmUpdateCount() {
   if (all) { all.checked = n === eligible; all.indeterminate = n > 0 && n < eligible; }
   var btn = document.getElementById('rm-exec-btn');
   if (btn) { btn.disabled = n === 0; btn.style.opacity = n === 0 ? '.5' : '1'; btn.style.cursor = n === 0 ? 'not-allowed' : 'pointer'; }
-  // 크레딧: 채점 대상 중 OCR 사전 안 한(ocrPre=false) 학생만 차감 (사전 OCR=인식 때 이미 차감)
+  // 크레딧: 채점 대상 중 OCR 사전 안 한(ocrPre=false) 학생만 차감 (사전 인식=인식 때 이미 차감)
   var scored = RUN_STUDENTS.filter(function(s){ return !rmIsDisabled(s) && s.checked; });
   var pre = scored.filter(function(s){ return s.ocrPre; }).length;
   var cn = document.getElementById('rm2-credit-n');
   if (cn) cn.textContent = scored.length - pre;
   var cs = document.getElementById('rm2-credit-sub');
-  if (cs) cs.textContent = pre > 0 ? ' · OCR 분석을 미리 진행한 ' + pre + '명은 추가 차감 없음' : '';
+  if (cs) cs.textContent = pre > 0 ? ' · 미리 인식한 ' + pre + '명은 추가로 차감되지 않아요' : '';
 }
 function rmExec() {
   var n = RUN_STUDENTS.filter(function(s){ return !rmIsDisabled(s) && s.checked; }).length;
   if (n === 0) return;
   closeRmModal('runModal2');
   showToast(n + '명의 AI 채점을 시작합니다. 완료되면 결과 확인에서 볼 수 있어요.', 'success');
+  // 인식 결과 확인 화면에서 실행한 경우 → 채점 목록으로 복귀
+  if (_rmFromOcrReview) { _rmFromOcrReview = false; ocrBackToScoring(); }
   // 채점 목록 학급 칸 → '채점 중' 스피너 (데모: 잠시 후 재실행 가능)
   if (ocrCtxCell) {
     var cell = ocrCtxCell;
@@ -5137,12 +5597,27 @@ var ocrBFromUrl = null;
   } else if (hash === '#design') {
     showScreen('screen-design');
   }
+  // ── 목업 내비게이터 ?nav= 진입 라우팅 ──
+  var navp = params.get('nav');
+  if (navp === 'task') { showScreen('screen-task'); }
+  else if (navp === 'scoring') { goScoringList(); }
+  else if (navp === 'form') { openFormScreen('A'); }
+  else if (navp === 'uploadPdf') { showListForClass(1, 'A'); openUploadPdf(); }
+  else if (navp === 'uploadSurvey') { showListForClass(1, 'A'); openUploadSurvey(); }
+  else if (navp === 'run') { goScoringList(); var _m = params.get('m'); setTimeout(function(){ var _rb = document.querySelector('#screen-scoring .pill-btn-primary'); if (_rb) _rb.click(); if (_m === 'ocr' && typeof rmSetMethod === 'function') rmSetMethod('ocr'); }, 90); }
+  else if (navp === 'ocrb') {
+    ocrFromRun = true; ocrEntryViaCell = false;
+    if (typeof resetOcrGradeSession === 'function') resetOcrGradeSession();
+    if (typeof setOcrRunBackLabel === 'function') setOcrRunBackLabel('채점 목록으로');
+    var _oc = params.get('case'); goToOCR_B(_oc === 'lowacc' ? 3 : _oc === 'review' ? 1 : _oc === 'progress' ? 7 : _oc === 'fail' ? 13 : 0); // 3=최유진(정확도 낮음) · 1=이준호(확인 필요) · 7=윤하은(인식 중) · 13=백시우(인식 실패) · 0=김서윤(정상)
+    var _bar = document.getElementById('ocr-run-actions'); if (_bar) _bar.style.display = 'flex';
+  }
 })();
 
 function goBackFromOcrB() {
   if (ocrFromRun) {
     ocrFromRun = false;
-    var bar = document.getElementById('ocr-run-bar');
+    var bar = document.getElementById('ocr-run-actions');
     if (bar) bar.style.display = 'none';
     goScoringList();
     // 모달 완료로 진입 → 학생 선택(2/2)으로 복귀 / 채점 목록 칸 클릭으로 진입 → 채점 목록에 머무름
@@ -5263,7 +5738,7 @@ function goDemoScoring(n){
     ocrFromRun = true; ocrEntryViaCell = false;
     if (typeof setOcrRunBackLabel === 'function') setOcrRunBackLabel('채점 목록으로');
     goToOCR_B(0);
-    var bar = document.getElementById('ocr-run-bar'); if (bar) bar.style.display = 'flex';
+    var bar = document.getElementById('ocr-run-actions'); if (bar) bar.style.display = 'flex';
   }
   else if (n === 4) { location.href = 'class_scoring_detail_v3_260623.html'; return; }
   else if (n === 5) { location.href = 'scoring_elementary_v3_260623.html?id=10101&name=' + encodeURIComponent('김서윤'); return; }
@@ -5299,6 +5774,13 @@ function syncDemoNavs(){
   var mp = document.getElementById('mockpick');
   if (mp) mp.style.display = (id === 'screen-task' || id === 'screen-form') ? '' : 'none';
   if (typeof mpSyncActive === 'function') mpSyncActive();
+  // 통합 목업 내비게이터 활성 표시
+  if (typeof window.mockNavSetCurrent === 'function') {
+    var _mn = { 'screen-task':'task','screen-form':'form','screen-list':'uploadPdf','screen-upload':'uploadPdf','screen-survey-grade':'studentDetail','screen-scoring':'run','screen-ocr-b':'ocrbNormal' };
+    var _r = _mn[id] || '';
+    if (id === 'screen-ocr-b') { var _os = STUDENTS_B1[currentOcrBStudentIdx]; _r = (_os && _os.ocrStatus === 'processing') ? 'ocrbProgress' : (_os && _os.ocrStatus === 'failed') ? 'ocrbFail' : (_os && _os.ocrStatus === 'lowAccuracy') ? 'ocrbLow' : ((_os && _os.needsReview) ? 'ocrbReview' : 'ocrbNormal'); }
+    window.mockNavSetCurrent(_r);
+  }
 }
 // ===== 까망이 목업 화면 선택기 =====
 function mpGo(which){
@@ -5368,7 +5850,7 @@ window.addEventListener('load', setupDemoNav);
   <div class="dn-title"><span>채점 플로우</span><i data-lucide="grip-horizontal" style="width:16px;height:16px"></i></div>
   <div class="dn-step on" data-step="1"><span class="n">1</span>채점 목록</div>
   <div class="dn-step" data-step="2"><span class="n">2</span>AI 채점 실행</div>
-  <div class="dn-step" data-step="3"><span class="n">3</span>OCR 먼저 확인</div>
+  <div class="dn-step" data-step="3"><span class="n">3</span>인식 먼저 확인</div>
   <div class="dn-step" data-step="4"><span class="n">4</span>학급 채점 현황</div>
   <div class="dn-step" data-step="5"><span class="n">5</span>학생 채점 상세</div>
 </div>
@@ -5653,6 +6135,132 @@ function bmShowCase(key){
   head.addEventListener('mousedown', function(e){ if(e.target.classList.contains('bc-caret')) return; drag=true; var r=p.getBoundingClientRect(); ox=e.clientX-r.left; oy=e.clientY-r.top; e.preventDefault(); });
   document.addEventListener('mousemove', function(e){ if(!drag) return; p.style.left=(e.clientX-ox)+'px'; p.style.top=(e.clientY-oy)+'px'; p.style.right='auto'; p.style.bottom='auto'; });
   document.addEventListener('mouseup', function(){ drag=false; });
+})();
+</script>
+
+<!-- ===== 목업 내비게이터 (까망이) — 컨텍스트(탭)별 화면만 노출. 4개 파일 공통 삽입 ===== -->
+<script>
+(function(){
+  var CUR = window.MOCK_NAV_CURRENT || '';
+  var enc = encodeURIComponent;
+  var ROUTES = {
+    task:         'task_ocr_v3_260623.html?nav=task',
+    form:         'task_ocr_v3_260623.html?nav=form',
+    uploadPdf:    'task_ocr_v3_260623.html?nav=uploadPdf',
+    uploadSurvey: 'task_ocr_v3_260623.html?nav=uploadSurvey',
+    run:          'task_ocr_v3_260623.html?nav=run',
+    ocrbNormal:   'task_ocr_v3_260623.html?nav=ocrb',
+    ocrbProgress: 'task_ocr_v3_260623.html?nav=ocrb&case=progress',
+    ocrbLow:      'task_ocr_v3_260623.html?nav=ocrb&case=lowacc',
+    ocrbReview:   'task_ocr_v3_260623.html?nav=ocrb&case=review',
+    ocrbFail:     'task_ocr_v3_260623.html?nav=ocrb&case=fail',
+    classDetail:  'class_scoring_detail_v3_260623.html',
+    studentDetail:'scoring_elementary_v3_260623.html?id=10101&name=' + enc('김서윤'),
+    caseTyping:   'scoring_elementary_v3_260623.html?id=10105&name=' + enc('정현우')
+  };
+  var GROUPS = [
+    { t:'과제물 관리', ctx:'task', items:[['task','과제물 관리 목록'],['form','과제물 양식 등록'],['uploadPdf','일괄 업로드 (PDF)'],['uploadSurvey','설문 응답 업로드']] },
+    { t:'채점', ctx:'scoring', items:[['run','채점 실행'],['classDetail','학급 채점 현황']] },
+    { t:'인식 결과 확인', ctx:'scoring', items:[['ocrbNormal','정상'],['ocrbProgress','인식 진행 중'],['ocrbReview','확인 필요'],['ocrbLow','인식 정확도 낮음'],['ocrbFail','인식 실패']] },
+    { t:'학생 채점 상세', ctx:'scoring', items:[['studentDetail','초등'],['caseTyping','직접 입력 학생']] }
+  ];
+  function routeCtx(r){ for(var i=0;i<GROUPS.length;i++){ for(var j=0;j<GROUPS[i].items.length;j++){ if(GROUPS[i].items[j][0]===r) return GROUPS[i].ctx; } } return ''; }
+  var CTX = window.MOCK_NAV_CONTEXT || routeCtx(CUR) || 'task';
+  var CTX_LABEL  = { task:'MOCKUP · 과제물 관리', scoring:'MOCKUP · 채점' };
+  var MINI_LABEL = { task:'목업 · 과제물', scoring:'목업 · 채점' };
+
+  var css = '#mockNav{position:fixed;right:24px;bottom:24px;z-index:5000;width:222px;background:#222736;color:#C9CCE0;border-radius:14px;padding:10px;box-shadow:0 12px 34px rgba(0,0,0,.38);font-family:"Pretendard GOV",sans-serif;}'
+    + '#mockNav .mn-head{display:flex;align-items:center;justify-content:space-between;gap:10px;cursor:move;padding:4px 4px 8px;}'
+    + '#mockNav .mn-hl{display:inline-flex;align-items:center;gap:7px;font-size:11px;font-weight:800;letter-spacing:.06em;color:#8A8FB0;}'
+    + '#mockNav .mn-dot{width:10px;height:10px;border-radius:50%;background:#416bff;box-shadow:0 0 0 3px rgba(65,107,255,.25);flex-shrink:0;}'
+    + '#mockNav .mn-mini{display:none;}'
+    + '#mockNav .mn-caret{background:none;border:none;color:#8A8FB0;cursor:pointer;font-size:12px;padding:2px 4px;line-height:1;transition:transform .15s;}'
+    + '#mockNav .mn-body{display:flex;flex-direction:column;gap:4px;max-height:72vh;overflow:auto;}'
+    + '#mockNav .mn-group{font-size:10px;font-weight:800;letter-spacing:.08em;color:#6b7192;margin:9px 4px 3px;}'
+    + '#mockNav .mn-btn{width:100%;text-align:left;white-space:nowrap;padding:8px 11px;border-radius:9px;border:1px solid #333a52;background:#2A2F44;color:#C9CCE0;font-size:13px;font-weight:700;font-family:inherit;cursor:pointer;line-height:1.3;}'
+    + '#mockNav .mn-btn:hover{background:#333a55;}'
+    + '#mockNav .mn-btn.on{background:#416bff;color:#fff;border-color:#416bff;}'
+    + '#mockNav .mn-reset{margin-top:10px;width:100%;padding:7px;border-radius:9px;border:1px dashed #4a5170;background:transparent;color:#9aa0c0;font-size:12px;font-weight:700;font-family:inherit;cursor:pointer;}'
+    + '#mockNav .mn-reset:hover{background:#2a2f44;color:#c9cce0;}'
+    + '#mockNav.mn-collapsed{width:auto;}'
+    + '#mockNav.mn-collapsed .mn-body{display:none;}'
+    + '#mockNav.mn-collapsed .mn-full{display:none;}'
+    + '#mockNav.mn-collapsed .mn-mini{display:inline;}'
+    + '#mockNav.mn-collapsed .mn-caret{transform:rotate(180deg);}'
+    + '#mockpick,#demoNav,#demoNavScoring{display:none!important;}';
+  var st = document.createElement('style'); st.textContent = css; document.head.appendChild(st);
+
+  var wrap = document.createElement('div'); wrap.id = 'mockNav';
+  wrap.innerHTML =
+      '<div class="mn-head"><span class="mn-hl"><span class="mn-dot"></span><span class="mn-full" id="mnFull"></span><span class="mn-mini" id="mnMini">목업</span></span>'
+    + '<button class="mn-caret" aria-label="접기/펼치기">▾</button></div>'
+    + '<div class="mn-body" id="mnBody"></div>';
+  document.body.appendChild(wrap);
+  var bodyEl = wrap.querySelector('#mnBody');
+  var fullEl = wrap.querySelector('#mnFull');
+  var miniEl = wrap.querySelector('#mnMini');
+
+  function render(){
+    var rows = '';
+    GROUPS.filter(function(g){ return g.ctx === CTX; }).forEach(function(g){
+      rows += '<div class="mn-group">' + g.t + '</div>';
+      g.items.forEach(function(it){ rows += '<button class="mn-btn' + (it[0] === CUR ? ' on' : '') + '" data-r="' + it[0] + '">' + it[1] + '</button>'; });
+    });
+    rows += '<button class="mn-reset">↺ 케이스 리셋</button>';
+    bodyEl.innerHTML = rows;
+    fullEl.textContent = CTX_LABEL[CTX] || 'MOCKUP · 화면 이동';
+    miniEl.textContent = MINI_LABEL[CTX] || '목업';
+    bodyEl.querySelectorAll('.mn-btn').forEach(function(b){
+      b.addEventListener('click', function(e){ e.stopPropagation(); var url = ROUTES[b.dataset.r]; if (url) location.href = url; });
+    });
+    bodyEl.querySelector('.mn-reset').addEventListener('click', function(e){ e.stopPropagation(); location.href = location.pathname; });
+  }
+  render();
+
+  // 위치·접힘 상태 유지 (페이지 이동 간 공유)
+  function saveNavState(){
+    try {
+      localStorage.setItem('clipoMockNavPos', JSON.stringify({ left: wrap.style.left, top: wrap.style.top }));
+      localStorage.setItem('clipoMockNavCollapsed', wrap.classList.contains('mn-collapsed') ? '1' : '0');
+    } catch(e){}
+  }
+  function restoreNavState(){
+    try {
+      var pos = JSON.parse(localStorage.getItem('clipoMockNavPos') || 'null');
+      if (pos && pos.left && pos.top) { wrap.style.left = pos.left; wrap.style.top = pos.top; wrap.style.right = 'auto'; wrap.style.bottom = 'auto'; }
+      if (localStorage.getItem('clipoMockNavCollapsed') === '1') wrap.classList.add('mn-collapsed');
+    } catch(e){}
+  }
+  restoreNavState();
+
+  var caret = wrap.querySelector('.mn-caret'), head = wrap.querySelector('.mn-head');
+  function toggleCollapse(){ wrap.classList.toggle('mn-collapsed'); saveNavState(); }
+  caret.addEventListener('click', function(e){ e.stopPropagation(); toggleCollapse(); });
+
+  // 헤더: 드래그(이동) + 클릭(접기) 구분
+  var drag = null, moved = false, sx = 0, sy = 0;
+  head.addEventListener('mousedown', function(e){
+    if (e.target.closest('.mn-caret')) return; // 캐럿은 자체 클릭 처리
+    var r = wrap.getBoundingClientRect(); drag = { dx: e.clientX - r.left, dy: e.clientY - r.top };
+    sx = e.clientX; sy = e.clientY; moved = false;
+    wrap.style.right = 'auto'; wrap.style.bottom = 'auto'; wrap.style.left = r.left + 'px'; wrap.style.top = r.top + 'px';
+    document.body.style.userSelect = 'none'; e.preventDefault();
+  });
+  document.addEventListener('mousemove', function(e){
+    if (!drag) return;
+    if (Math.abs(e.clientX - sx) > 3 || Math.abs(e.clientY - sy) > 3) moved = true;
+    wrap.style.left = (e.clientX - drag.dx) + 'px'; wrap.style.top = (e.clientY - drag.dy) + 'px';
+  });
+  document.addEventListener('mouseup', function(){
+    if (!drag) return;
+    drag = null; document.body.style.userSelect = '';
+    if (moved) saveNavState();      // 드래그 → 위치 저장
+    else toggleCollapse();          // 이동 없이 클릭 → 접기/펼치기
+  });
+
+  // 허브(task_ocr_v3)에서 화면 전환 시 활성 표시 + 컨텍스트 갱신
+  window.mockNavSetCurrent = function(r){ CUR = r; var c = routeCtx(r); if (c) CTX = c; render(); };
+  if (typeof syncDemoNavs === 'function') syncDemoNavs(); // 허브: 초기 화면 기준 컨텍스트 세팅
 })();
 </script>
 

@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>행특 간편 생성 — 브로슈어 블록</title>
+<link rel="icon" type="image/png" href="clipo_favicon.png">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard-gov.min.css">
+<style>
+  :root{
+    --ink:#2c3540; --ink2:#3b4452; --muted:#6d7381;
+    --pill:#5d8a96; --rhead:#4569a6; --btn:#3f63c8;
+    --border:#d7e0ec; --box:#f4f7fb; --filechip-bd:#cdd8e8;
+    --feat-bg:#eaf1fb; --feat-tx:#3a5da8; --feat-bd:#cfe0f7;
+  }
+  *{box-sizing:border-box;}
+  body{ margin:0; padding:36px; background:#fff; font-family:'Pretendard GOV','Pretendard',sans-serif; color:var(--ink); -webkit-font-smoothing:antialiased; }
+  .wrap{ max-width:900px; margin:0 auto; }
+
+  .head{ display:flex; align-items:center; gap:12px; margin-bottom:18px; }
+  .chip-label{ display:inline-flex; align-items:center; justify-content:center; line-height:1; vertical-align:middle; background:var(--pill); color:#fff; font-weight:700; font-size:15px; padding:7px 14px; border-radius:8px; white-space:nowrap; flex-shrink:0; }
+  .head-desc{ font-size:16px; font-weight:700; color:var(--ink); }
+
+  .cols{ display:grid; grid-template-columns:1fr 30px 1fr; align-items:stretch; gap:0; }
+  .arrow{ display:flex; align-items:center; justify-content:center; color:#9aa6b6; }
+  .arrow svg{ width:24px; height:24px; }
+  .card{ border:1px solid var(--border); border-radius:12px; background:#fff; overflow:hidden; display:flex; flex-direction:column; }
+
+  .card-l{ padding:16px 16px 14px; }
+  .l-title{ display:flex; align-items:center; gap:7px; font-size:15px; font-weight:700; color:var(--ink); margin-bottom:13px; }
+  .l-title svg{ width:17px; height:17px; color:var(--ink2); }
+
+  /* 키워드·일화 타이핑 입력 (창체의 파일 업로드와 대비) */
+  .kw-box{ background:#fff; border:1px solid var(--filechip-bd); border-radius:9px; padding:12px 13px; font-size:14px; color:var(--ink2); line-height:1.6; min-height:74px; }
+
+  /* 분량 선택 */
+  .amount{ margin-top:13px; }
+  .amount-label{ font-size:12.5px; color:var(--muted); font-weight:600; margin-bottom:9px; }
+  .radio-item{ display:flex; align-items:center; gap:9px; font-size:13.5px; color:var(--ink2); margin-bottom:8px; }
+  .radio-item:last-child{ margin-bottom:0; }
+  .radio-dot{ width:16px; height:16px; border-radius:50%; border:1.6px solid #b9c2d2; flex-shrink:0; position:relative; }
+  .radio-item.sel{ color:var(--ink); font-weight:600; }
+  .radio-item.sel .radio-dot{ border-color:var(--btn); }
+  .radio-item.sel .radio-dot::after{ content:''; position:absolute; inset:3px; border-radius:50%; background:var(--btn); }
+
+  .l-foot{ margin-top:15px; display:flex; justify-content:flex-end; }
+  .gen-btn{ display:inline-flex; align-items:center; justify-content:center; gap:6px; line-height:1; vertical-align:middle; background:var(--btn); color:#fff; border:none; border-radius:9px; padding:10px 15px; font-size:14px; font-weight:700; cursor:pointer; font-family:inherit; }
+  .gen-btn svg{ width:15px; height:15px; }
+
+  .card-r{ }
+  .r-head{ background:var(--rhead); color:#fff; font-size:15px; font-weight:700; text-align:center; padding:11px 14px; display:flex; align-items:center; justify-content:center; line-height:1; }
+  .r-body{ padding:16px 16px 12px; font-size:14px; line-height:1.72; color:var(--ink2); }
+  .r-byte{ margin-top:10px; text-align:right; font-size:12px; color:var(--muted); }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="head">
+      <span class="chip-label">행특 간편 생성</span>
+      <span class="head-desc">키워드와 일화만 입력하면, AI가 성장 관점으로 행특 초안을 작성합니다.</span>
+    </div>
+
+    <div class="cols">
+      <!-- 좌 -->
+      <div class="card card-l">
+        <div class="l-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
+          키워드 및 일화 입력
+        </div>
+
+        <div class="kw-box">산만하고 말이 많은 편이나, 교우관계가 원만하고 친구들을 잘 챙김.</div>
+
+        <div class="amount">
+          <div class="amount-label">AI 기록 생성 분량</div>
+          <div class="radio-item"><span class="radio-dot"></span>300~400자 (900~1,200 Byte)</div>
+          <div class="radio-item sel"><span class="radio-dot"></span>400~500자 (1,200~1,500 Byte)</div>
+          <div class="radio-item"><span class="radio-dot"></span>500~600자 (1,500~1,800 Byte)</div>
+        </div>
+
+        <div class="l-foot">
+          <button class="gen-btn">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.5 2.5 11 6l3.5 1.5L11 9l-1.5 3.5L8 9 4.5 7.5 8 6Z"/><path d="m18 14 .8 2.2L21 17l-2.2.8L18 20l-.8-2.2L15 17l2.2-.8Z"/></svg>
+            AI 기록 생성
+          </button>
+        </div>
+      </div>
+
+      <!-- 화살표 -->
+      <div class="arrow">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+      </div>
+
+      <!-- 우 -->
+      <div class="card card-r">
+        <div class="r-head">AI Assistant가 생성한 행특 기록</div>
+        <div class="r-body">
+          활기차고 에너지 넘치는 태도로 학교생활에 적극적으로 참여함. 풍부한 표현력과 말하기 능력을 바탕으로 수업 시간에 자신의 생각과 아이디어를 자주 제시하며, 주변 친구들과의 소통을 자연스럽게 이끎. 호기심이 많고 관심사가 넓어 다양한 활동에 의욕적으로 도전하는 모습이 인상적이며, 새로운 과제에도 망설임 없이 참여하려는 의지가 큼. 또래 관계가 원만하여 여러 친구들과 두루 어울리고, 다정한 말과 행동으로 친구들을 배려하며 신뢰를 형성함. 자신의 의견을 적극적으로 표현하면서도 다른 사람의 말을 경청하려는 태도를 꾸준히 길러가고 있음. 차분히 집중하여 학습에 임한다면 풍부한 잠재력을 바탕으로 학업과 대인관계 모두에서 크게 성장할 것으로 기대됨.
+          <div class="r-byte">447자 / 1,288 Byte</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

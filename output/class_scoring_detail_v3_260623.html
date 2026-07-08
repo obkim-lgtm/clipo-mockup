@@ -96,19 +96,20 @@ body.nav-expanded .main-wrap{ padding-left:200px; }
 .col-ai-status{width:130px}
 .col-ai-score{width:90px;color:#6d7381}
 .col-final{width:100px;font-weight:600;color:#222631}
-.col-status{width:180px}
+.col-status{width:110px}
 .col-action{width:130px}
 .col-action-group{display:inline-flex;gap:10px;align-items:center;justify-content:center}
 .muted{color:#9ca3af}
 
 /* 상태 뱃지 */
 .status-badge{display:inline-flex;align-items:center;justify-content:center;height:24px;padding:0 10px;border-radius:100px;font-size:12px;font-weight:700;line-height:1}
-.status-badge.done{background:#dcfce7;color:#16a34a}
-.status-badge.progress{background:#fff3eb;color:#c2410c}
-.status-badge.need{background:#fde7e9;color:#b91c1c}
-.status-badge.fail{background:#fde7e9;color:#b91c1c}
-.status-badge.stale{background:#fff3eb;color:#c2410c}
-.status-badge.none{background:#f1f3f5;color:#6d7381}
+.status-badge.done{background:#eefcf4;color:#319d64}
+.status-badge.progress{background:#fff7ed;color:#ea580c}
+.status-badge.need{background:#fef2f2;color:#f2525f}
+.status-badge.fail{background:#fef2f2;color:#f2525f}
+.status-badge.stale{background:#fff7ed;color:#ea580c}
+/* 미채점 = 담백 회색 텍스트 (바탕 상태, 알약 아님) */
+.status-badge.none{background:transparent;color:#6d7381;padding:0;height:auto;font-weight:500}
 
 /* 학생 채점 링크 */
 .btn-detail{display:inline-flex;align-items:center;gap:4px;font-size:14px;font-weight:500;color:#3151c4;background:none;border:none;cursor:pointer;padding:0;line-height:1;font-family:inherit}
@@ -419,12 +420,12 @@ body.nav-expanded .main-wrap{ padding-left:200px; }
       <table class="student-table">
         <thead>
           <tr>
+            <th class="col-status">상태</th>
             <th class="col-id">학번</th>
             <th class="col-name" style="text-align:left;padding-left:20px">이름</th>
-            <th class="col-ai-status">AI 채점 결과</th>
+            <th class="col-ai-status">AI 채점</th>
             <th class="col-ai-score">AI 점수</th>
             <th class="col-final">최종 점수</th>
-            <th class="col-status">채점 상태</th>
             <th class="col-action">학생 채점</th>
           </tr>
         </thead>
@@ -491,7 +492,7 @@ body.nav-expanded .main-wrap{ padding-left:200px; }
             <span class="model-desc">수식·그래프·서술형 답안 인식과 채점 정확도를 개선한 AI 모델입니다.</span>
             <ul class="model-feats">
               <li>수학, 과학, 정보 과목의 채점 정확도를 개선했어요.</li>
-              <li>손글씨·이미지 답안의 OCR 인식률을 높였어요.</li>
+              <li>손글씨·이미지 답안의 인식률을 높였어요.</li>
               <li>지시문과 학생 답안을 더 정확히 구분해요.</li>
             </ul>
             <a class="model-link-btn" href="#" target="_blank" rel="noopener" onclick="event.preventDefault();showToast('success','채점 활용 예시 페이지로 이동합니다.')">채점 활용 예시보기 <i data-lucide="external-link" style="width:11px;height:11px"></i></a>
@@ -540,7 +541,7 @@ body.nav-expanded .main-wrap{ padding-left:200px; }
                 <th><label class="checkbox-row" id="bulkAiHeaderCheckbox" onclick="toggleAllBulkAiStudents()"><span class="checkbox-box"><i data-lucide="check" style="width:12px;height:12px"></i></span></label></th>
                 <th>학번</th>
                 <th>이름</th>
-                <th class="col-result">AI 채점 결과</th>
+                <th class="col-result">AI 채점</th>
                 <th class="col-status">선생님 채점 결과</th>
               </tr>
             </thead>
@@ -591,7 +592,7 @@ var STUDENTS = [
   {id:'10111', name:'김도현', aiStatus:'-', aiScore:'-', finalScore:'-', status:'미채점', statusCls:'none', link:'scoring_elementary_v3_260623.html'},
   {id:'10112', name:'송하림', aiStatus:'채점 완료', aiScore:33, finalScore:33, status:'완료', statusCls:'done', link:'scoring_elementary_v3_260623.html'},
   {id:'10113', name:'노유찬', aiStatus:'-', aiScore:'-', finalScore:'-', status:'미채점', statusCls:'none', link:'scoring_elementary_v3_260623.html'},
-  {id:'10114', name:'백시우', aiStatus:'채점 완료', aiScore:33, finalScore:33, status:'완료', statusCls:'done', link:'scoring_elementary_v3_260623.html'}
+  {id:'10114', name:'백시우', aiStatus:'인식 실패', ocrFail:true, aiScore:'-', finalScore:'-', status:'미채점', statusCls:'none', link:'scoring_elementary_v3_260623.html'}
 ];
 
 function renderTable(){
@@ -600,17 +601,17 @@ function renderTable(){
     var aiStatusCls = s.aiStatus === '-' ? 'muted' : '';
     var aiScoreCell = s.aiScore === '-' ? '<span class="muted">-</span>' : '('+s.aiScore+')';
     var finalCell = s.finalScore === '-' ? '<span class="muted">-</span>' : s.finalScore;
-    var aiStatusHtml = s.scoreFail ? '<span style="color:#db3e51;font-weight:600;">'+s.aiStatus+'</span>' : s.aiStatus;
+    var aiStatusHtml = (s.ocrFail || s.scoreFail) ? '<span class="status-badge fail">'+s.aiStatus+'</span>' : s.aiStatus;
     var rescoreInline = (s.scoreFail || s.stale)
       ? '<button class="btn-rescore-text" onclick="rescoreStudent(\''+s.id+'\',\''+s.name+'\')"><i data-lucide="rotate-cw" style="width:13px;height:13px"></i>다시 채점</button>'
       : '';
     return '<tr>'
+      +'<td class="col-status"><span style="display:inline-flex;align-items:center;gap:8px;justify-content:center;"><span class="status-badge '+s.statusCls+'">'+s.status+'</span>'+rescoreInline+'</span></td>'
       +'<td class="col-id">'+s.id+'</td>'
       +'<td class="col-name" style="text-align:left;padding-left:20px">'+s.name+'</td>'
       +'<td class="col-ai-status '+aiStatusCls+'">'+aiStatusHtml+'</td>'
       +'<td class="col-ai-score">'+aiScoreCell+'</td>'
       +'<td class="col-final">'+finalCell+'</td>'
-      +'<td class="col-status"><span style="display:inline-flex;align-items:center;gap:8px;justify-content:center;"><span class="status-badge '+s.statusCls+'">'+s.status+'</span>'+rescoreInline+'</span></td>'
       +'<td class="col-action"><div class="col-action-group">'
       +'<button class="btn-detail" onclick="openStudentScoring(\''+s.id+'\',\''+s.name+'\',\''+(s.link||'scoring_elementary_v3_260623.html')+'\')"><i data-lucide="user-round" style="width:14px;height:14px"></i>상세 보기</button>'
       +'</div></td>'
@@ -688,7 +689,7 @@ function updateBulkAiLevelLabels(){
 function renderBulkAiStudentTable(){
   var tbody = document.getElementById('bulkAiStudentTable');
   tbody.innerHTML = STUDENTS.map(function(s){
-    var disabled = s.status === '미제출'; // 미제출 → AI 채점 대상 제외
+    var disabled = s.status === '미제출' || s.ocrFail; // 미제출·인식 실패 → AI 채점 대상 제외 (직접 채점은 가능)
     var checked = BULK_AI_STATE.selected.has(s.id);
     return '<tr class="' + (disabled ? 'disabled' : '') + '" data-id="' + s.id + '">'
       + '<td><label class="checkbox-row ' + (checked ? 'checked' : '') + (disabled ? ' disabled' : '') + '" onclick="toggleBulkAiStudent(event, \'' + s.id + '\')">'
@@ -837,7 +838,7 @@ body.dn-dragging{ user-select:none; cursor:move; }
   <div class="dn-title"><span>채점 플로우</span><i data-lucide="grip-horizontal" style="width:16px;height:16px"></i></div>
   <div class="dn-step" data-step="1"><span class="n">1</span>채점 목록</div>
   <div class="dn-step" data-step="2"><span class="n">2</span>AI 채점 실행</div>
-  <div class="dn-step" data-step="3"><span class="n">3</span>OCR 먼저 확인</div>
+  <div class="dn-step" data-step="3"><span class="n">3</span>인식 먼저 확인</div>
   <div class="dn-step on" data-step="4"><span class="n">4</span>학급 채점 현황</div>
   <div class="dn-step" data-step="5"><span class="n">5</span>학생 채점 상세</div>
 </div>
@@ -858,6 +859,132 @@ function goDemoScoring(n){
   document.addEventListener('mousemove', function(e){ if(!drag) return; nav.style.left=(e.clientX-drag.dx)+'px'; nav.style.top=(e.clientY-drag.dy)+'px'; nav.style.right='auto'; nav.style.bottom='auto'; });
   document.addEventListener('mouseup', function(){ if(!drag) return; drag=null; document.body.classList.remove('dn-dragging'); });
   if (typeof lucide !== 'undefined') lucide.createIcons();
+})();
+</script>
+<script>window.MOCK_NAV_CURRENT='classDetail';</script>
+<!-- ===== 목업 내비게이터 (까망이) — 컨텍스트(탭)별 화면만 노출. 4개 파일 공통 삽입 ===== -->
+<script>
+(function(){
+  var CUR = window.MOCK_NAV_CURRENT || '';
+  var enc = encodeURIComponent;
+  var ROUTES = {
+    task:         'task_ocr_v3_260623.html?nav=task',
+    form:         'task_ocr_v3_260623.html?nav=form',
+    uploadPdf:    'task_ocr_v3_260623.html?nav=uploadPdf',
+    uploadSurvey: 'task_ocr_v3_260623.html?nav=uploadSurvey',
+    run:          'task_ocr_v3_260623.html?nav=run',
+    ocrbNormal:   'task_ocr_v3_260623.html?nav=ocrb',
+    ocrbProgress: 'task_ocr_v3_260623.html?nav=ocrb&case=progress',
+    ocrbLow:      'task_ocr_v3_260623.html?nav=ocrb&case=lowacc',
+    ocrbReview:   'task_ocr_v3_260623.html?nav=ocrb&case=review',
+    ocrbFail:     'task_ocr_v3_260623.html?nav=ocrb&case=fail',
+    classDetail:  'class_scoring_detail_v3_260623.html',
+    studentDetail:'scoring_elementary_v3_260623.html?id=10101&name=' + enc('김서윤'),
+    caseTyping:   'scoring_elementary_v3_260623.html?id=10105&name=' + enc('정현우')
+  };
+  var GROUPS = [
+    { t:'과제물 관리', ctx:'task', items:[['task','과제물 관리 목록'],['form','과제물 양식 등록'],['uploadPdf','일괄 업로드 (PDF)'],['uploadSurvey','설문 응답 업로드']] },
+    { t:'채점', ctx:'scoring', items:[['run','채점 실행'],['classDetail','학급 채점 현황']] },
+    { t:'인식 결과 확인', ctx:'scoring', items:[['ocrbNormal','정상'],['ocrbProgress','인식 진행 중'],['ocrbReview','확인 필요'],['ocrbLow','인식 정확도 낮음'],['ocrbFail','인식 실패']] },
+    { t:'학생 채점 상세', ctx:'scoring', items:[['studentDetail','초등'],['caseTyping','직접 입력 학생']] }
+  ];
+  function routeCtx(r){ for(var i=0;i<GROUPS.length;i++){ for(var j=0;j<GROUPS[i].items.length;j++){ if(GROUPS[i].items[j][0]===r) return GROUPS[i].ctx; } } return ''; }
+  var CTX = window.MOCK_NAV_CONTEXT || routeCtx(CUR) || 'task';
+  var CTX_LABEL  = { task:'MOCKUP · 과제물 관리', scoring:'MOCKUP · 채점' };
+  var MINI_LABEL = { task:'목업 · 과제물', scoring:'목업 · 채점' };
+
+  var css = '#mockNav{position:fixed;right:24px;bottom:24px;z-index:5000;width:222px;background:#222736;color:#C9CCE0;border-radius:14px;padding:10px;box-shadow:0 12px 34px rgba(0,0,0,.38);font-family:"Pretendard GOV",sans-serif;}'
+    + '#mockNav .mn-head{display:flex;align-items:center;justify-content:space-between;gap:10px;cursor:move;padding:4px 4px 8px;}'
+    + '#mockNav .mn-hl{display:inline-flex;align-items:center;gap:7px;font-size:11px;font-weight:800;letter-spacing:.06em;color:#8A8FB0;}'
+    + '#mockNav .mn-dot{width:10px;height:10px;border-radius:50%;background:#416bff;box-shadow:0 0 0 3px rgba(65,107,255,.25);flex-shrink:0;}'
+    + '#mockNav .mn-mini{display:none;}'
+    + '#mockNav .mn-caret{background:none;border:none;color:#8A8FB0;cursor:pointer;font-size:12px;padding:2px 4px;line-height:1;transition:transform .15s;}'
+    + '#mockNav .mn-body{display:flex;flex-direction:column;gap:4px;max-height:72vh;overflow:auto;}'
+    + '#mockNav .mn-group{font-size:10px;font-weight:800;letter-spacing:.08em;color:#6b7192;margin:9px 4px 3px;}'
+    + '#mockNav .mn-btn{width:100%;text-align:left;white-space:nowrap;padding:8px 11px;border-radius:9px;border:1px solid #333a52;background:#2A2F44;color:#C9CCE0;font-size:13px;font-weight:700;font-family:inherit;cursor:pointer;line-height:1.3;}'
+    + '#mockNav .mn-btn:hover{background:#333a55;}'
+    + '#mockNav .mn-btn.on{background:#416bff;color:#fff;border-color:#416bff;}'
+    + '#mockNav .mn-reset{margin-top:10px;width:100%;padding:7px;border-radius:9px;border:1px dashed #4a5170;background:transparent;color:#9aa0c0;font-size:12px;font-weight:700;font-family:inherit;cursor:pointer;}'
+    + '#mockNav .mn-reset:hover{background:#2a2f44;color:#c9cce0;}'
+    + '#mockNav.mn-collapsed{width:auto;}'
+    + '#mockNav.mn-collapsed .mn-body{display:none;}'
+    + '#mockNav.mn-collapsed .mn-full{display:none;}'
+    + '#mockNav.mn-collapsed .mn-mini{display:inline;}'
+    + '#mockNav.mn-collapsed .mn-caret{transform:rotate(180deg);}'
+    + '#mockpick,#demoNav,#demoNavScoring{display:none!important;}';
+  var st = document.createElement('style'); st.textContent = css; document.head.appendChild(st);
+
+  var wrap = document.createElement('div'); wrap.id = 'mockNav';
+  wrap.innerHTML =
+      '<div class="mn-head"><span class="mn-hl"><span class="mn-dot"></span><span class="mn-full" id="mnFull"></span><span class="mn-mini" id="mnMini">목업</span></span>'
+    + '<button class="mn-caret" aria-label="접기/펼치기">▾</button></div>'
+    + '<div class="mn-body" id="mnBody"></div>';
+  document.body.appendChild(wrap);
+  var bodyEl = wrap.querySelector('#mnBody');
+  var fullEl = wrap.querySelector('#mnFull');
+  var miniEl = wrap.querySelector('#mnMini');
+
+  function render(){
+    var rows = '';
+    GROUPS.filter(function(g){ return g.ctx === CTX; }).forEach(function(g){
+      rows += '<div class="mn-group">' + g.t + '</div>';
+      g.items.forEach(function(it){ rows += '<button class="mn-btn' + (it[0] === CUR ? ' on' : '') + '" data-r="' + it[0] + '">' + it[1] + '</button>'; });
+    });
+    rows += '<button class="mn-reset">↺ 케이스 리셋</button>';
+    bodyEl.innerHTML = rows;
+    fullEl.textContent = CTX_LABEL[CTX] || 'MOCKUP · 화면 이동';
+    miniEl.textContent = MINI_LABEL[CTX] || '목업';
+    bodyEl.querySelectorAll('.mn-btn').forEach(function(b){
+      b.addEventListener('click', function(e){ e.stopPropagation(); var url = ROUTES[b.dataset.r]; if (url) location.href = url; });
+    });
+    bodyEl.querySelector('.mn-reset').addEventListener('click', function(e){ e.stopPropagation(); location.href = location.pathname; });
+  }
+  render();
+
+  // 위치·접힘 상태 유지 (페이지 이동 간 공유)
+  function saveNavState(){
+    try {
+      localStorage.setItem('clipoMockNavPos', JSON.stringify({ left: wrap.style.left, top: wrap.style.top }));
+      localStorage.setItem('clipoMockNavCollapsed', wrap.classList.contains('mn-collapsed') ? '1' : '0');
+    } catch(e){}
+  }
+  function restoreNavState(){
+    try {
+      var pos = JSON.parse(localStorage.getItem('clipoMockNavPos') || 'null');
+      if (pos && pos.left && pos.top) { wrap.style.left = pos.left; wrap.style.top = pos.top; wrap.style.right = 'auto'; wrap.style.bottom = 'auto'; }
+      if (localStorage.getItem('clipoMockNavCollapsed') === '1') wrap.classList.add('mn-collapsed');
+    } catch(e){}
+  }
+  restoreNavState();
+
+  var caret = wrap.querySelector('.mn-caret'), head = wrap.querySelector('.mn-head');
+  function toggleCollapse(){ wrap.classList.toggle('mn-collapsed'); saveNavState(); }
+  caret.addEventListener('click', function(e){ e.stopPropagation(); toggleCollapse(); });
+
+  // 헤더: 드래그(이동) + 클릭(접기) 구분
+  var drag = null, moved = false, sx = 0, sy = 0;
+  head.addEventListener('mousedown', function(e){
+    if (e.target.closest('.mn-caret')) return; // 캐럿은 자체 클릭 처리
+    var r = wrap.getBoundingClientRect(); drag = { dx: e.clientX - r.left, dy: e.clientY - r.top };
+    sx = e.clientX; sy = e.clientY; moved = false;
+    wrap.style.right = 'auto'; wrap.style.bottom = 'auto'; wrap.style.left = r.left + 'px'; wrap.style.top = r.top + 'px';
+    document.body.style.userSelect = 'none'; e.preventDefault();
+  });
+  document.addEventListener('mousemove', function(e){
+    if (!drag) return;
+    if (Math.abs(e.clientX - sx) > 3 || Math.abs(e.clientY - sy) > 3) moved = true;
+    wrap.style.left = (e.clientX - drag.dx) + 'px'; wrap.style.top = (e.clientY - drag.dy) + 'px';
+  });
+  document.addEventListener('mouseup', function(){
+    if (!drag) return;
+    drag = null; document.body.style.userSelect = '';
+    if (moved) saveNavState();      // 드래그 → 위치 저장
+    else toggleCollapse();          // 이동 없이 클릭 → 접기/펼치기
+  });
+
+  // 허브(task_ocr_v3)에서 화면 전환 시 활성 표시 + 컨텍스트 갱신
+  window.mockNavSetCurrent = function(r){ CUR = r; var c = routeCtx(r); if (c) CTX = c; render(); };
+  if (typeof syncDemoNavs === 'function') syncDemoNavs(); // 허브: 초기 화면 기준 컨텍스트 세팅
 })();
 </script>
 </body>

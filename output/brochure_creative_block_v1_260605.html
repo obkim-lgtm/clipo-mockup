@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>창체 기록 초안 생성 — 브로슈어 블록</title>
+<link rel="icon" type="image/png" href="clipo_favicon.png">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard-gov.min.css">
+<style>
+  :root{
+    --ink:#2c3540; --ink2:#3b4452; --muted:#6d7381;
+    --pill:#5d8a96;            /* 칩 라벨 teal-gray */
+    --rhead:#4569a6;           /* 우측 헤더 blue */
+    --btn:#3f63c8;             /* 생성 버튼 blue */
+    --border:#d7e0ec;
+    --box:#f4f7fb;
+    --filechip-bd:#cdd8e8;
+    --feat-bg:#eaf1fb; --feat-tx:#3a5da8; --feat-bd:#cfe0f7;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0; padding:36px; background:#ffffff;
+    font-family:'Pretendard GOV','Pretendard',sans-serif;
+    color:var(--ink); -webkit-font-smoothing:antialiased;
+  }
+  .wrap{ max-width:900px; margin:0 auto; }
+
+  /* 상단 칩 라벨 + 설명 */
+  .head{ display:flex; align-items:center; gap:12px; margin-bottom:18px; }
+  .chip-label{
+    display:inline-flex; align-items:center; justify-content:center;
+    line-height:1; vertical-align:middle;
+    background:var(--pill); color:#fff; font-weight:700; font-size:15px;
+    padding:7px 14px; border-radius:8px; white-space:nowrap; flex-shrink:0;
+  }
+  .head-desc{ font-size:16px; font-weight:700; color:var(--ink); }
+
+  /* 2단 그리드 */
+  .cols{ display:grid; grid-template-columns:1fr 30px 1fr; align-items:stretch; gap:0; }
+  .arrow{ display:flex; align-items:center; justify-content:center; color:#9aa6b6; }
+  .arrow svg{ width:24px; height:24px; }
+
+  .card{ border:1px solid var(--border); border-radius:12px; background:#fff; overflow:hidden; display:flex; flex-direction:column; }
+
+  /* 좌측 */
+  .card-l{ padding:16px 16px 14px; }
+  .l-title{ display:flex; align-items:center; gap:7px; font-size:15px; font-weight:700; color:var(--ink); margin-bottom:13px; }
+  .l-title svg{ width:17px; height:17px; color:var(--ink2); }
+
+  .file-box{ background:var(--box); border:1px solid var(--border); border-radius:9px; padding:12px; }
+  .file-box .bx-label{ font-size:12.5px; color:var(--muted); margin-bottom:9px; font-weight:600; }
+  .file-chip{
+    display:flex; align-items:center; gap:8px;
+    background:#fff; border:1px solid var(--filechip-bd); border-radius:8px;
+    padding:9px 11px; font-size:14px; color:var(--ink2); font-weight:500; margin-bottom:7px;
+  }
+  .file-chip:last-child{ margin-bottom:0; }
+  .file-chip svg{ width:16px; height:16px; flex-shrink:0; }
+  .file-chip .fname{ flex:1; }
+  .file-chip .ok{ color:#1ea463; }
+  .ic-pdf{ color:#e2574c; } .ic-xls{ color:#1ea463; }
+
+  /* AI 분석 추천 — 행특과 차별화되는 핵심 단계 (하이라이트) */
+  .feat-wrap{
+    margin-top:12px; background:var(--feat-bg); border:1px solid var(--feat-bd);
+    border-radius:9px; padding:12px;
+  }
+  .feat-label{ font-size:13px; color:var(--feat-tx); font-weight:700; margin-bottom:9px; display:flex; align-items:center; gap:6px; }
+  .feat-label svg{ width:15px; height:15px; color:var(--feat-tx); }
+  .feat-chips{ display:flex; flex-wrap:wrap; gap:6px; }
+  .feat-chip{
+    display:inline-flex; align-items:center; gap:4px; line-height:1;
+    background:#fff; color:var(--feat-tx); border:1px solid var(--feat-bd);
+    border-radius:999px; padding:6px 11px 6px 8px; font-size:13px; font-weight:600;
+  }
+  .feat-chip svg{ width:13px; height:13px; }
+
+  .l-foot{ margin-top:14px; display:flex; justify-content:flex-end; }
+  .gen-btn{
+    display:inline-flex; align-items:center; justify-content:center; gap:6px;
+    line-height:1; vertical-align:middle;
+    background:var(--btn); color:#fff; border:none; border-radius:9px;
+    padding:10px 15px; font-size:14px; font-weight:700; cursor:pointer;
+    font-family:inherit;
+  }
+  .gen-btn svg{ width:15px; height:15px; }
+
+  /* 우측 */
+  .card-r{ }
+  .r-head{
+    background:var(--rhead); color:#fff; font-size:15px; font-weight:700;
+    text-align:center; padding:11px 14px;
+    display:flex; align-items:center; justify-content:center; line-height:1;
+  }
+  .r-body{ padding:16px 16px 12px; font-size:14px; line-height:1.72; color:var(--ink2); }
+  .r-byte{ margin-top:10px; text-align:right; font-size:12px; color:var(--muted); }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <!-- 상단 라벨 -->
+    <div class="head">
+      <span class="chip-label">창체 기록 초안 생성</span>
+      <span class="head-desc">AI가 활동 자료를 분석해 학생 특성을 추천하고, 기록 초안까지 생성합니다.</span>
+    </div>
+
+    <!-- 2단 -->
+    <div class="cols">
+      <!-- 좌 -->
+      <div class="card card-l">
+        <div class="l-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.44 11.05-9.19 9.19a6 6 0 0 1-8.49-8.49l8.57-8.57A4 4 0 1 1 18 8.84l-8.59 8.57a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg>
+          활동 자료 입력 및 분석
+        </div>
+
+        <div class="file-box">
+          <div class="bx-label">업로드한 자료 2개</div>
+          <div class="file-chip"><svg class="ic-pdf" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v5h5"/></svg><span class="fname">진로 활동지·보고서.pdf</span><svg class="ok" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></div>
+          <div class="file-chip"><svg class="ic-xls" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v5h5"/><path d="M8 13h2m4 0h2M8 17h2m4 0h2"/></svg><span class="fname">자기평가 설문.xlsx</span><svg class="ok" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg></div>
+        </div>
+
+        <div class="feat-wrap">
+          <div class="feat-label">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.5 2.5 11 6l3.5 1.5L11 9l-1.5 3.5L8 9 4.5 7.5 8 6Z"/><path d="m18 14 .8 2.2L21 17l-2.2.8L18 20l-.8-2.2L15 17l2.2-.8Z"/></svg>
+            AI가 자료를 분석해 추천한 특성
+          </div>
+          <div class="feat-chips">
+            <span class="feat-chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>자료 수집·분석</span>
+            <span class="feat-chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>진로 탐색의 적극성</span>
+            <span class="feat-chip"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>협업·소통 태도</span>
+          </div>
+        </div>
+
+        <div class="l-foot">
+          <button class="gen-btn">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.5 2.5 11 6l3.5 1.5L11 9l-1.5 3.5L8 9 4.5 7.5 8 6Z"/><path d="m18 14 .8 2.2L21 17l-2.2.8L18 20l-.8-2.2L15 17l2.2-.8Z"/></svg>
+            AI 기록 생성
+          </button>
+        </div>
+      </div>
+
+      <!-- 화살표 -->
+      <div class="arrow">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+      </div>
+
+      <!-- 우 -->
+      <div class="card card-r">
+        <div class="r-head">AI Assistant가 생성한 진로 활동 기록</div>
+        <div class="r-body">
+          관심 분야인 화장품·바이오 산업의 직무를 탐색하기 위해 화장품 연구원과 품질관리 등 관련 직업의 역할과 필요 역량을 스스로 조사하여 정리함. 탐색 과정에서 화장품 유효 성분과 보습 효과의 관계에 흥미를 느껴 관련 자료를 폭넓게 수집·분석하고, 자신의 진로 가설을 세워 직접 확인해 보는 적극적인 태도를 보임. 진로 포트폴리오 발표에서 조사한 직무 정보와 탐구 경험을 연결하여 자신의 진로 계획을 구체적으로 제시하였으며, 모둠 진로 토의에서 친구들의 고민을 경청하고 정보를 공유하는 협업·소통 태도가 돋보임. 진로 목표 달성에 필요한 학습과 활동을 스스로 설계하는 자기주도성이 우수하며, 자신의 흥미를 학업·진로 목표와 연결지어 주도적으로 탐색하는 모습이 인상적임.
+          <div class="r-byte">412자 / 1,168 Byte</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
