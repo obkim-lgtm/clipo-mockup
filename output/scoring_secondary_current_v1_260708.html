@@ -219,11 +219,15 @@ body.before-ai-rerun .score-btn.ai-suggest:hover{background:#f4f8ff;border-color
 .grab-card.folded .grab-hint{display:none} /* 접힘 중엔 가져오기 힌트 숨김 (펼쳐서 가져오기) */
 .grab-card.folded{cursor:default}
 .grab-card.folded:hover{border-color:#eaecf0;box-shadow:0 2px 8px rgba(54,94,239,.06)}
-/* 채점요소 = 근거/피드백 블록 단위 */
-.grab-block{position:relative;cursor:pointer;border-radius:10px}
-.grab-block:hover .ec-block-content{outline:1.5px solid #416bff;background:#f7faff}
-.grab-block .grab-hint{top:auto;right:8px;bottom:8px}
-.grab-block:hover .grab-hint{opacity:1}
+/* 근거/피드백 블록 — 라벨 = 접기 토글, 본문 = 호버·클릭 가져오기 */
+.blk-toggle{cursor:pointer;user-select:none;display:flex;align-items:center;gap:4px}
+.blk-chev{display:inline-flex;transition:transform .2s}
+.ec-block.folded .blk-chev{transform:rotate(-90deg)}
+.blk-body{overflow:hidden;transition:max-height .25s ease}
+.grab-area{position:relative;cursor:pointer;border-radius:10px}
+.grab-area:hover .ec-block-content{outline:1.5px solid #416bff;background:#f7faff}
+.grab-area .grab-hint{top:auto;right:8px;bottom:8px}
+.grab-area:hover .grab-hint{opacity:1}
 .eval-card{border-radius:14px;padding:0;background:#fff;border:1px solid #eaecf0;box-shadow:0 2px 8px rgba(54,94,239,.06);position:relative}
 
 /* 카드 색상 테마 */
@@ -775,8 +779,7 @@ body.vs-chrome.nav-expanded .tab-band{left:200px}
 .eval-card .editable{font-size:var(--ai-font,16px)}
 /* 3) 표시 항목 토글 — AI 생성 결과의 채점 근거 / 피드백 */
 body.vs-hide-ground .eval-card .ec-block--ground{display:none}
-body.vs-hide-feedback .eval-card .ec-block--feedback{display:none}
-body.vs-hide-feedback .eval-card[data-kind="overall"]{display:none} /* 채점 근거만 보기 = 종합 피드백 카드도 숨김 (피드백 안 줄 사용자) */
+/* (vs-hide-feedback display:none 제거 — '채점 근거만 보기'는 피드백 블록 토글을 애니메이션으로 일괄 접는 방식) */
 
 /* 보기 설정 진입 버튼 — Figma 아이콘 버튼 토큰 (surface/bg-default #e9f2ff, blue/emphasized #a3c3ff, surface/text #3151c4, Radii/sm 4) */
 .tb-gear{width:36px;height:36px;display:inline-flex;align-items:center;justify-content:center;border:1px solid #a3c3ff;border-radius:4px;background:#e9f2ff;cursor:pointer;color:#3151c4;flex-shrink:0}
@@ -1940,25 +1943,7 @@ function applyOverallFold(){
   if(ic) ic.style.transform = f ? 'rotate(180deg)' : '';
   if(card) card.classList.toggle('folded', f); // 접힘 중엔 가져오기 힌트 숨김
 }
-// 채점요소 카드 아코디언 — 요소가 10개까지 늘 수 있어 접기 지원, 접힘 상태 기억(학생 이동에도 유지)
-function elemFoldSet(){ try{ return JSON.parse(localStorage.getItem('clipo_elem_fold')) || {}; }catch(e){ return {}; } }
-function toggleElemFold(i, ev){
-  if(ev) ev.stopPropagation();
-  var s = elemFoldSet();
-  if(s[i]) delete s[i]; else s[i] = 1;
-  try{ localStorage.setItem('clipo_elem_fold', JSON.stringify(s)); }catch(e){}
-  applyElemFold();
-}
-function applyElemFold(){
-  var s = elemFoldSet();
-  ELEMENTS.forEach(function(_, i){
-    var b = document.getElementById('elemCardBody-' + i);
-    var ic = document.getElementById('elemFoldIcon-' + i);
-    var f = !!s[i];
-    if(b) b.style.display = f ? 'none' : '';
-    if(ic) ic.style.transform = f ? 'rotate(180deg)' : '';
-  });
-}
+// (요소 카드 아코디언 제거 — 문항 카드는 고정, 접기는 근거/피드백 블록 단위로 제공. 2026-07-09 팀 피드백)
 // 총평 = 하나의 덩어리 (총평 + 잘한 점 + 보완할 점 단일 블록)
 // 호버 = 가져오기 어포던스, 클릭 = 선생님 직접 피드백으로 복사
 function overallCardHtml(){
@@ -1970,21 +1955,54 @@ function overallCardHtml(){
     +'</div>'
     +'<div id="overallCardBody">'
     +'<div class="ec-card-body">'
-    +'<div class="ec-block grab-block" onclick="copyAiFeedbackToTeacher(\'overall\')">'
+    +'<div class="ec-block">'
+    +'<div class="grab-area" onclick="copyAiFeedbackToTeacher(\'overall\')">'
     +'<div class="ec-block-content editable" style="white-space:pre-line">'+escHtml(txt)+'</div>'
     +'<span class="grab-hint"><i data-lucide="download" style="width:13px;height:13px"></i>클릭해서 가져오기</span>'
     +'</div>'
     +'</div>'
     +'</div>'
+    +'</div>'
     +'</div>';
 }
-// 채점요소 카드의 근거/피드백 블록 — 블록 단위 호버·클릭 가져오기
+// 채점요소 카드의 근거/피드백 블록 — 라벨 앞 셰브런 = 블록 접기, 본문 = 호버·클릭 가져오기
 function grabBlock(label, value, i, kind){
-  return '<div class="ec-block ec-block--'+kind+' grab-block" onclick="copyElementBlock('+i+',\''+kind+'\')">'
-    + '<div class="ec-block-lbl">'+label+'</div>'
+  return '<div class="ec-block ec-block--'+kind+'">'
+    + '<div class="ec-block-lbl blk-toggle" onclick="toggleBlockFold(this,event)" title="접기/펼치기">'
+    + '<span class="blk-chev"><i data-lucide="chevron-down" style="width:14px;height:14px"></i></span>'
+    + label + '</div>'
+    + '<div class="blk-body">'
+    + '<div class="grab-area" onclick="copyElementBlock('+i+',\''+kind+'\')">'
     + '<div class="ec-block-content editable">'+escHtml(value)+'</div>'
     + '<span class="grab-hint"><i data-lucide="download" style="width:13px;height:13px"></i>클릭해서 가져오기</span>'
-    + '</div>';
+    + '</div></div></div>';
+}
+// 블록 접기/펼치기 (max-height 애니메이션)
+function toggleBlockFold(lblEl, ev){
+  if(ev) ev.stopPropagation();
+  var blk = lblEl.closest('.ec-block');
+  if(blk) setBlockFolded(blk, !blk.classList.contains('folded'));
+}
+function setBlockFolded(blk, fold){
+  var body = blk.querySelector('.blk-body');
+  if(!body) return;
+  if(fold === blk.classList.contains('folded')) return; // 이미 같은 상태
+  if(fold){
+    body.style.maxHeight = body.scrollHeight + 'px';
+    requestAnimationFrame(function(){ body.style.maxHeight = '0px'; });
+    blk.classList.add('folded');
+  } else {
+    body.style.maxHeight = body.scrollHeight + 'px';
+    setTimeout(function(){ if(!blk.classList.contains('folded')) body.style.maxHeight = ''; }, 280);
+    blk.classList.remove('folded');
+  }
+}
+// '채점 근거만 보기' 적용 — 요소 카드의 피드백 블록 토글을 일괄 접기/펼치기 (애니메이션으로 인지)
+function applyFeedbackVis(){
+  var hide = !vsState.feedback;
+  document.querySelectorAll('#pane-rubric .eval-card[data-kind="element"] .ec-block--feedback').forEach(function(blk){
+    setBlockFolded(blk, hide);
+  });
 }
 // 개별 블록 가져오기 — kind: 'ground'(채점 근거) / 'feedback'(피드백)
 function copyElementBlock(i, kind){
@@ -2128,23 +2146,20 @@ function renderElementCards(){
     // 우측 점수 알약 = AI 예상 점수 / 만점 (실제 클릭 점수 아님 — Figma 5690:30396 주석)
     var scoreHtml = el.score + ' / ' + el.maxScore;
     return '<div class="eval-card '+ac+'" data-kind="element" data-idx="'+i+'">'
-      +'<div class="ec-card-header" onclick="toggleElemFold('+i+',event)" style="cursor:pointer;" title="접기/펼치기">'
-      +'<span id="elemFoldIcon-'+i+'" style="display:inline-flex;transition:transform .15s;flex-shrink:0;"><i data-lucide="chevron-up" style="width:16px;height:16px;color:#515869;"></i></span>'
+      +'<div class="ec-card-header readonly-header">'
       +'<span class="ec-summary-wrap"><span class="ec-summary">'+escHtml(el.name)+'</span><span class="ec-summary-tip">'+escHtml(el.name)+'</span></span>'
       +'<span class="ec-score-pill">'+scoreHtml+'</span>'
       +'</div>'
-      +'<div id="elemCardBody-'+i+'">'
       +'<div class="ec-card-body">'
       +grabBlock('채점 근거', el.explanation, i, 'ground')
       +grabBlock('피드백', el.feedback, i, 'feedback')
-      +'</div>'
       +'</div>'
       +'</div>';
   }).join('');
   // 하단 액션 없음 — 재생성은 섹션 헤더(총평+요소별 한 번에), 가져오기는 영역 소제목 우측
   applyOverallFold();   // 총평 접힘 상태 복원 (학생 이동에도 유지)
-  applyElemFold();      // 채점요소 카드 접힘 상태 복원
-  syncElemFbBtn();      // 피드백 숨기기 토글 라벨 동기화
+  applyFeedbackVis();   // 채점 근거만 보기 상태 복원 (피드백 블록 접힘)
+  syncElemFbBtn();      // 채점 근거만 보기 토글 상태 동기화
   bindEditableHandlers();
   requestAnimationFrame(applySummaryTips);
   if(document.fonts && document.fonts.ready){ document.fonts.ready.then(applySummaryTips); }
@@ -2809,7 +2824,7 @@ function applyVsState(){
   document.body.classList.toggle('vs-chrome', vsState.chrome);
   document.body.style.setProperty('--ai-font', (vsState.fontPx||16)+'px');
   document.body.classList.toggle('vs-hide-ground', !vsState.ground);
-  document.body.classList.toggle('vs-hide-feedback', !vsState.feedback);
+  if (typeof applyFeedbackVis === 'function') applyFeedbackVis(); // 피드백 = 블록 토글 일괄 접기(애니메이션) 방식
   syncVsUI();
 }
 function syncVsUI(){
