@@ -161,12 +161,21 @@
     .empty-icon { width: 56px; height: 56px; border-radius: 50%; background: #f1f3f5; display:flex; align-items:center; justify-content:center; color: #b3b3b3; margin: 0 auto 16px; }
     .empty-text { font-size: 14px; color: #6d7381; }
 
-    /* ── 목업 시나리오 토글 (개발용) ── */
-    .mockup-toggle { position: fixed; bottom: 24px; right: 24px; background: #222631; color: #fff; border-radius: 24px; padding: 5px; display: inline-flex; align-items: center; gap: 2px; box-shadow: 0 8px 24px rgba(0,0,0,.2); z-index: 550; font-family: inherit; }
-    .mt-label { padding: 4px 12px; color: #b3b6bd; font-size: 11px; font-weight: 700; letter-spacing: .05em; }
-    .mt-btn { padding: 7px 14px; border: none; background: none; color: #b3b6bd; font-size: 13px; font-weight: 500; cursor: pointer; font-family: inherit; border-radius: 18px; line-height: 1; transition: all .15s; }
-    .mt-btn:hover { color: #fff; }
-    .mt-btn.active { background: #416bff; color: #fff; }
+    /* ── 목업 내비게이터 (까망이, 시연용) ── */
+    .mp-nav { position: fixed; bottom: 24px; right: 24px; background: #1f2233; border-radius: 12px; box-shadow: 0 8px 28px rgba(0,0,0,.35); z-index: 550; font-family: inherit; width: max-content; user-select: none; }
+    .mp-head { display: flex; align-items: center; justify-content: space-between; gap: 20px; padding: 11px 14px; cursor: move; }
+    .mp-title { font-size: 12px; font-weight: 700; letter-spacing: .06em; color: #fff; display: inline-flex; align-items: center; gap: 7px; }
+    .mp-title .dotmark { width: 8px; height: 8px; border-radius: 50%; background: #416bff; }
+    .mp-toggle-ic { color: #9599aa; display: inline-flex; cursor: pointer; transition: transform .2s; }
+    .mp-nav.collapsed .mp-toggle-ic { transform: rotate(-90deg); }
+    .mp-body { padding: 0 14px 14px; }
+    .mp-nav.collapsed .mp-body { display: none; }
+    .mp-cap { font-size: 11px; font-weight: 600; color: #757a90; margin: 12px 0 6px; }
+    .mp-cap .mp-sub { color: #565b70; font-weight: 500; margin-left: 4px; }
+    .mp-btns { display: flex; flex-direction: column; gap: 4px; }
+    .mp-btn { text-align: left; padding: 7px 11px; border: none; background: #2a2e44; color: #c5c8d4; font-size: 13px; font-weight: 500; border-radius: 6px; cursor: pointer; font-family: inherit; white-space: nowrap; line-height: 1.2; transition: background .12s, color .12s; }
+    .mp-btn:hover { background: #363b57; color: #fff; }
+    .mp-btn.on { background: #416bff; color: #fff; }
   </style>
 </head>
 <body>
@@ -214,16 +223,31 @@
   </div>
 </nav>
 
-<!-- 목업 시나리오 토글 (개발용) -->
-<div class="mockup-toggle">
-  <span class="mt-label">MOCKUP</span>
-  <button class="mt-btn active" onclick="setScenario('personal',this)">개인 유료</button>
-  <button class="mt-btn" onclick="setScenario('school',this)">학교 유료</button>
-  <button class="mt-btn" onclick="setScenario('both',this)">개인+학교</button>
-  <button class="mt-btn" onclick="setScenario('free',this)">무료체험</button>
-  <button class="mt-btn" onclick="setScenario('expired',this)">만료</button>
-  <button class="mt-btn" onclick="setScenario('preregistered',this)">선등록</button>
-  <button class="mt-btn" onclick="setScenario('coupon',this)">쿠폰</button>
+<!-- 목업 내비게이터 (까망이, 시연용) -->
+<div class="mp-nav" id="mpNav">
+  <div class="mp-head" id="mpHead">
+    <span class="mp-title"><span class="dotmark"></span> MOCKUP</span>
+    <span class="mp-toggle-ic" id="mpToggle"><i data-lucide="chevron-down" style="width:16px;height:16px"></i></span>
+  </div>
+  <div class="mp-body">
+    <div class="mp-cap">이용권 케이스 <span class="mp-sub">이용권 정보·크레딧 구성</span></div>
+    <div class="mp-btns" id="mpCases">
+      <button class="mp-btn on" onclick="setScenario('personal',this)">개인 유료</button>
+      <button class="mp-btn" onclick="setScenario('school',this)">학교 유료</button>
+      <button class="mp-btn" onclick="setScenario('both',this)">개인 + 학교 동시</button>
+      <button class="mp-btn" onclick="setScenario('free',this)">무료체험</button>
+      <button class="mp-btn" onclick="setScenario('expired',this)">이용권 만료</button>
+      <button class="mp-btn" onclick="setScenario('preregistered',this)">선등록 (이용 예정)</button>
+      <button class="mp-btn" onclick="setScenario('coupon',this)">쿠폰 등록</button>
+    </div>
+    <div class="mp-cap">모달 바로가기</div>
+    <div class="mp-btns">
+      <button class="mp-btn" onclick="openModal('bonusModal')">보너스 크레딧 상세</button>
+      <button class="mp-btn" onclick="openModal('rechargeModal')">추가 충전 크레딧 상세</button>
+      <button class="mp-btn" onclick="openModal('sharedModal')">학교 공유 크레딧 상세</button>
+      <button class="mp-btn" onclick="openModal('usageGuideModal')">AI 크레딧 사용 안내</button>
+    </div>
+  </div>
 </div>
 
 <!-- 메인 -->
@@ -520,6 +544,8 @@
   }
 
   function openModal(id) {
+    // 기존 열린 모달 먼저 닫기 (까망이에서 케이스 전환 시 중첩 방지)
+    document.querySelectorAll('.overlay.open').forEach(o => o.classList.remove('open'));
     document.getElementById(id).classList.add('open');
   }
   function closeModal(id) {
@@ -679,8 +705,8 @@
   };
 
   function setScenario(key, btn) {
-    document.querySelectorAll('.mockup-toggle .mt-btn').forEach(b => b.classList.remove('active'));
-    btn.classList.add('active');
+    document.querySelectorAll('#mpCases .mp-btn').forEach(b => b.classList.remove('on'));
+    if (btn) btn.classList.add('on');
     const s = scenarios[key];
 
     // 헤더
@@ -821,6 +847,37 @@
   // 초기 렌더 (기본: 개인 유료 시나리오)
   renderPops(scenarios.personal);
   lucide.createIcons();
+
+  // ── 까망이: 접기/펴기 + 드래그 ──
+  (function(){
+    const nav = document.getElementById('mpNav');
+    const head = document.getElementById('mpHead');
+    const toggle = document.getElementById('mpToggle');
+
+    // 접기/펴기 (토글 아이콘 클릭)
+    toggle.addEventListener('click', (e) => {
+      e.stopPropagation();
+      nav.classList.toggle('collapsed');
+    });
+
+    // 드래그 이동 (헤더 잡고)
+    let dragging = false, sx = 0, sy = 0, ox = 0, oy = 0;
+    head.addEventListener('mousedown', (e) => {
+      if (e.target.closest('#mpToggle')) return;
+      dragging = true;
+      const r = nav.getBoundingClientRect();
+      ox = r.left; oy = r.top; sx = e.clientX; sy = e.clientY;
+      nav.style.right = 'auto'; nav.style.bottom = 'auto';
+      nav.style.left = ox + 'px'; nav.style.top = oy + 'px';
+      e.preventDefault();
+    });
+    window.addEventListener('mousemove', (e) => {
+      if (!dragging) return;
+      nav.style.left = (ox + e.clientX - sx) + 'px';
+      nav.style.top = (oy + e.clientY - sy) + 'px';
+    });
+    window.addEventListener('mouseup', () => { dragging = false; });
+  })();
 </script>
 
 </body>
