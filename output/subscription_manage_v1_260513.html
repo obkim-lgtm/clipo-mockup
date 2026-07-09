@@ -89,6 +89,7 @@
     .sub-row .amount { font-weight: 600; color: #222631; }
     .sub-row .exp { font-size: 13px; color: #6d7381; }
     .row-exp { font-size: 13px; color: #6d7381; margin-left: 8px; font-weight: 400; }
+    .row-badge { font-size: 11px; font-weight: 600; padding: 1px 7px; border-radius: 4px; background: #eef2ff; color: #416bff; margin-left: 6px; line-height: 1.5; }
     .detail-link { font-size: 13px; color: #416bff; cursor: pointer; display:inline-flex; align-items:center; gap:2px; text-decoration: none; }
     .detail-link:hover { text-decoration: underline; }
     .empty-line { color: #b3b3b3; font-size: 14px; }
@@ -186,6 +187,7 @@
   <button class="mt-btn" onclick="setScenario('free',this)">무료체험</button>
   <button class="mt-btn" onclick="setScenario('expired',this)">만료</button>
   <button class="mt-btn" onclick="setScenario('preregistered',this)">선등록</button>
+  <button class="mt-btn" onclick="setScenario('coupon',this)">쿠폰</button>
 </div>
 
 <!-- 메인 -->
@@ -548,6 +550,23 @@
         {name:'보너스 크레딧', amount:'500개', detail:'bonusModal'},
       ],
       meterNote: '이용 예정 이용권은 시작일부터 데일리·보너스 크레딧이 적용됩니다.'
+    },
+    coupon: {
+      hdCredit: 'AI 크레딧 700',
+      hdBadge: { text:'개인 유료', dDay:'D-365' },
+      school: { ic:'<i data-lucide="school" style="width:30px;height:30px"></i>', name:'-', sub:'-', empty:true },
+      personal: { ic:'<i data-lucide="user" style="width:30px;height:30px"></i>', tickets:[{name:'개인 1년 이용권', status:'active', exp:'~27.05.13 · D-365'}], empty:false },
+      dailyTotal: '450개 <span class="gray">/ 450개</span>',
+      dailyRows: [
+        {name:'신학기 프로모션 쿠폰', exp:'~26.06.14', amount:'일 200개'},
+        {name:'개인 1년 이용권', exp:'~27.05.13', amount:'일 250개'}
+      ],
+      meterTotal: '450개',
+      meterRows: [
+        {name:'추가 충전 크레딧', amount:'200개', detail:'rechargeModal'},
+        {name:'웰컴 쿠폰', exp:'~26.06.14', amount:'250개'}
+      ],
+      meterNote: '쿠폰 크레딧은 쿠폰별 발행 기간까지만 사용할 수 있습니다.'
     }
   };
 
@@ -573,7 +592,7 @@
     document.querySelector('.credit-card-total').innerHTML = s.dailyTotal;
     document.getElementById('daily-rows').innerHTML = s.dailyRows.map(r => `
       <div class="sub-row">
-        <span class="left"><span class="dot"></span> ${r.name}${r.exp ? `<span class="row-exp">${r.exp}</span>` : ''}</span>
+        <span class="left"><span class="dot"></span> ${r.name}${r.badge ? `<span class="row-badge">${r.badge}</span>` : ''}${r.exp ? `<span class="row-exp">${r.exp}</span>` : ''}</span>
         <span class="right"><span class="amount">${r.amount}</span></span>
       </div>`).join('');
 
@@ -584,7 +603,7 @@
     } else {
       document.getElementById('meter-rows').innerHTML = s.meterRows.map(r => `
         <div class="sub-row">
-          <span class="left"><span class="dot"></span> ${r.name}${r.exp ? `<span class="row-exp">${r.exp}</span>` : ''}</span>
+          <span class="left"><span class="dot"></span> ${r.name}${r.badge ? `<span class="row-badge">${r.badge}</span>` : ''}${r.exp ? `<span class="row-exp">${r.exp}</span>` : ''}</span>
           <span class="right">
             <span class="amount">${r.amount}</span>
             ${r.detail ? `<a class="detail-link" onclick="openModal('${r.detail}')">상세 <i data-lucide="chevron-right" style="width:12px;height:12px"></i></a>` : ''}
