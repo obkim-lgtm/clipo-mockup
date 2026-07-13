@@ -91,6 +91,13 @@ body.nav-expanded .main-wrap{ padding-left:200px; }
 .student-table tbody td{padding:14px 12px;font-size:14px;color:#3b3f4c;line-height:1.4;text-align:center;border-bottom:1px solid #eaecf0;vertical-align:middle}
 .student-table tbody tr:last-child td{border-bottom:none}
 .student-table tbody tr:hover{background:#fafbff}
+/* 점수 컬럼 정렬 — 아이콘 자리 상시 확보(폭 흔들림 방지) */
+.th-sortable{cursor:pointer;user-select:none;white-space:nowrap}
+.th-sortable:hover{color:#416bff}
+.sort-ic{display:inline-flex;vertical-align:middle;margin-left:4px;color:#b3b6bd}
+.sort-ic svg{width:14px;height:14px}
+.th-sortable.sorted{color:#416bff}
+.th-sortable.sorted .sort-ic{color:#416bff}
 .col-id{width:90px}
 .col-name{width:120px;text-align:left;padding-left:20px;font-weight:600}
 .col-ai-status{width:130px}
@@ -420,11 +427,11 @@ body.nav-expanded .main-wrap{ padding-left:200px; }
         <thead>
           <tr>
             <th class="col-status">상태</th>
-            <th class="col-id">학번</th>
+            <th class="col-id th-sortable" onclick="toggleScoreSort('id')">학번<span class="sort-ic" id="sortIcId"><i data-lucide="chevrons-up-down"></i></span></th>
             <th class="col-name" style="text-align:left;padding-left:20px">이름</th>
             <th class="col-ai-status">AI 채점</th>
-            <th class="col-ai-score">AI 점수</th>
-            <th class="col-final">최종 점수</th>
+            <th class="col-ai-score th-sortable" onclick="toggleScoreSort('aiScore')">AI 점수<span class="sort-ic" id="sortIcAiScore"><i data-lucide="chevrons-up-down"></i></span></th>
+            <th class="col-final th-sortable" onclick="toggleScoreSort('finalScore')">최종 점수<span class="sort-ic" id="sortIcFinalScore"><i data-lucide="chevrons-up-down"></i></span></th>
             <th class="col-action">학생 채점</th>
           </tr>
         </thead>
@@ -594,9 +601,52 @@ var STUDENTS = [
   {id:'10114', name:'백시우', aiStatus:'인식 실패', ocrFail:true, aiScore:'-', finalScore:'-', status:'미채점', statusCls:'none', link:'scoring_elementary_v3_260623.html'}
 ];
 
+// ══════ 컬럼 정렬 (점수: 내림→오름→기본 / 학번: 오름→내림→기본) ══════
+var scoreSort = { key: null, dir: null };
+
+function toggleScoreSort(key){
+  var firstDir = key === 'id' ? 'asc' : 'desc';
+  var secondDir = key === 'id' ? 'desc' : 'asc';
+  if(scoreSort.key !== key){ scoreSort.key = key; scoreSort.dir = firstDir; }
+  else if(scoreSort.dir === firstDir){ scoreSort.dir = secondDir; }
+  else { scoreSort.key = null; scoreSort.dir = null; }
+  renderTable();
+}
+
+function sortedStudents(){
+  var list = STUDENTS.slice();
+  if(!scoreSort.key) return list;
+  var k = scoreSort.key, sign = scoreSort.dir === 'asc' ? 1 : -1;
+  if(k === 'id'){
+    list.sort(function(a, b){ return a.id.localeCompare(b.id) * sign; });
+    return list;
+  }
+  list.sort(function(a, b){
+    var av = a[k], bv = b[k];
+    var aNum = (typeof av === 'number'), bNum = (typeof bv === 'number');
+    if(aNum && bNum) return (av - bv) * sign;
+    if(aNum) return -1;           // 점수 없는 학생('-')은 방향 무관 항상 아래
+    if(bNum) return 1;
+    return a.id.localeCompare(b.id); // 둘 다 '-'면 학번순 유지
+  });
+  return list;
+}
+
+function updateSortHeaderIcons(){
+  [['id','sortIcId'],['aiScore','sortIcAiScore'],['finalScore','sortIcFinalScore']].forEach(function(pair){
+    var el = document.getElementById(pair[1]);
+    if(!el) return;
+    var active = scoreSort.key === pair[0];
+    var icon = active ? (scoreSort.dir === 'asc' ? 'arrow-up' : 'arrow-down') : 'chevrons-up-down';
+    el.innerHTML = '<i data-lucide="' + icon + '"></i>';
+    el.closest('th').classList.toggle('sorted', active);
+  });
+}
+
 function renderTable(){
   var tbody = document.getElementById('studentTbody');
-  tbody.innerHTML = STUDENTS.map(function(s){
+  updateSortHeaderIcons();
+  tbody.innerHTML = sortedStudents().map(function(s){
     var aiStatusCls = s.aiStatus === '-' ? 'muted' : '';
     var aiScoreCell = s.aiScore === '-' ? '<span class="muted">-</span>' : '('+s.aiScore+')';
     var finalCell = s.finalScore === '-' ? '<span class="muted">-</span>' : s.finalScore;

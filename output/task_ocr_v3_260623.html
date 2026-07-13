@@ -4755,7 +4755,7 @@ function renderSubmissionMethodCell(method, charCount) {
   if (method === 'typing') {
     var cnt = charCount ? '<span style="font-size:13px;color:#6d7381;white-space:nowrap;">' + charCount.toLocaleString() + '자</span>' : '';
     return '<span style="display:inline-flex;align-items:center;gap:6px;">'
-      + '<span style="display:inline-flex;align-items:center;gap:4px;color:#3151c4;background:#e9f2ff;border-radius:100px;padding:2px 8px;font-size:13px;font-weight:600;"><i data-lucide="keyboard" style="width:13px;height:13px;"></i>타이핑</span>'
+      + '<span style="display:inline-flex;align-items:center;gap:4px;color:#3151c4;background:#e9f2ff;border-radius:100px;padding:2px 8px;font-size:13px;font-weight:600;"><i data-lucide="keyboard" style="width:13px;height:13px;"></i>직접 입력</span>'
       + cnt + '</span>';
   }
   return '<span style="display:inline-flex;align-items:center;gap:4px;color:#3b3f4c;background:#f1f3f5;border-radius:100px;padding:2px 8px;font-size:13px;font-weight:600;"><i data-lucide="paperclip" style="width:13px;height:13px;"></i>파일</span>';
@@ -4822,7 +4822,7 @@ function retryOcr(id) {
 }
 function renderFileNameCell(s) {
   if (s.submissionMethod === 'typing') {
-    var snip = s.typingSnippet || '타이핑 입력';
+    var snip = s.typingSnippet || '직접 입력';
     return '<span title="' + snip.replace(/"/g,'&quot;') + '" style="color:#6d7381;font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;display:inline-block;max-width:240px;vertical-align:middle;">' + snip + '</span>';
   }
   var name = s.fileName || '-';
@@ -5603,6 +5603,7 @@ var ocrBFromUrl = null;
   // ── 목업 내비게이터 ?nav= 진입 라우팅 ──
   var navp = params.get('nav');
   if (navp === 'task') { showScreen('screen-task'); }
+  else if (navp === 'list') { showListForClass(Number(params.get('c')) || 1, params.get('t') || 'B'); } // 반 상세 바로 진입 — c=반(기본 1), t=평가유형(기본 B: 학생 업로드=직접 입력 혼합)
   else if (navp === 'scoring') { goScoringList(); }
   else if (navp === 'form') { openFormScreen('A'); }
   else if (navp === 'uploadPdf') { showListForClass(1, 'A'); openUploadPdf(); }
