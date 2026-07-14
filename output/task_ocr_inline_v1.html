@@ -1245,7 +1245,7 @@
           <div class="bm-row" id="bm-row-near" data-resolved="0">
             <div class="bm-file"><div class="fic"><i data-lucide="file-text" style="width:18px;height:18px;"></i></div><div style="min-width:0;"><div class="fn">한지웅 - 수행평가.pdf</div></div></div>
             <div class="bm-arrow"><i data-lucide="arrow-right" style="width:18px;height:18px;"></i></div>
-            <div><select class="bm-pick unset" onchange="bmResolveNear(this)"><option value="">학생 선택</option><optgroup label="학생"><option value="10106">한지우 · 10106</option><option value="10108">윤하은 · 10108</option></optgroup><option value="__skip__">이 파일은 등록 안 함</option></select></div>
+            <div><select class="bm-pick unset" onchange="bmResolveNear(this)"><option value="">학생 선택</option><option value="10106">한지우 · 10106</option><option value="10108">윤하은 · 10108</option><option value="__skip__">이 파일은 등록 안 함</option><optgroup label="이미 파일이 지정된 학생"><option disabled>김서윤 · 10101</option><option disabled>이준호 · 10102</option><option disabled>박지민 · 10103</option><option disabled>최유진 · 10104</option><option disabled>정현우 · 10105</option><option disabled>조민재 · 10107</option><option disabled>임도윤 · 10109</option></optgroup></select></div>
             <div class="bm-st"><span class="bm-chip warn"><i data-lucide="help-circle" style="width:13px;height:13px;"></i>확인 필요</span></div>
           </div>
         </div>
@@ -5221,7 +5221,7 @@ function bmDoRegister(){
   <div class="bc-body">
     <button class="bc-btn on" data-c="normal" onclick="bmShowCase('normal')">기본 (정상 매칭)<span class="bc-sub">자동 7 · 매칭 실패 1 · 미제출 2</span></button>
     <button class="bc-btn" data-c="ambig" onclick="bmShowCase('ambig')">매칭 실패 (통합)<span class="bc-sub">동명이인·파일 2개 — 사유 구분 없이 직접 지정</span></button>
-    <button class="bc-btn" data-c="conflict" onclick="bmShowCase('conflict')">같은 학생 중복 지정<span class="bc-sub">한 학생당 1개만 등록 가능</span></button>
+    <button class="bc-btn" data-c="prevent" onclick="bmShowCase('prevent')">중복 지정 방지<span class="bc-sub">이미 지정된 학생은 선택 불가</span></button>
     <button class="bc-btn" data-c="replace" onclick="bmShowCase('replace')">교체 경고<span class="bc-sub">다른 자료 이미 있음</span></button>
   </div>
 </div>
@@ -5230,21 +5230,22 @@ function bmDoRegister(){
 // ===== 케이스 뷰어 렌더 =====
 function bmCaseHi(key){ document.querySelectorAll('#bmCase .bc-btn').forEach(function(b){ b.classList.toggle('on', b.dataset.c===key); }); }
 function bmRowNomatch(){
-  return '<div class="bm-row" id="bm-row-near" data-resolved="0"><div class="bm-file"><div class="fic"><i data-lucide="file-text" style="width:18px;height:18px;"></i></div><div style="min-width:0;"><div class="fn">한지웅 - 수행평가.pdf</div></div></div><div class="bm-arrow"><i data-lucide="arrow-right" style="width:18px;height:18px;"></i></div><div><select class="bm-pick unset" onchange="bmResolveNear(this)"><option value="">학생 선택</option><optgroup label="학생"><option value="10106">한지우 · 10106</option><option value="10108">윤하은 · 10108</option></optgroup><option value="__skip__">이 파일은 등록 안 함</option></select></div><div class="bm-st"><span class="bm-chip warn"><i data-lucide="help-circle" style="width:13px;height:13px;"></i>확인 필요</span></div></div>';
+  return '<div class="bm-row" id="bm-row-near" data-resolved="0"><div class="bm-file"><div class="fic"><i data-lucide="file-text" style="width:18px;height:18px;"></i></div><div style="min-width:0;"><div class="fn">한지웅 - 수행평가.pdf</div></div></div><div class="bm-arrow"><i data-lucide="arrow-right" style="width:18px;height:18px;"></i></div><div><select class="bm-pick unset" onchange="bmResolveNear(this)"><option value="">학생 선택</option><option value="10106">한지우 · 10106</option><option value="10108">윤하은 · 10108</option><option value="__skip__">이 파일은 등록 안 함</option><optgroup label="이미 파일이 지정된 학생"><option disabled>김서윤 · 10101</option><option disabled>이준호 · 10102</option><option disabled>박지민 · 10103</option><option disabled>최유진 · 10104</option><option disabled>정현우 · 10105</option><option disabled>조민재 · 10107</option><option disabled>임도윤 · 10109</option></optgroup></select></div><div class="bm-st"><span class="bm-chip warn"><i data-lucide="help-circle" style="width:13px;height:13px;"></i>확인 필요</span></div></div>';
 }
 // 확인 필요 행 — 사유 구분 없이 단일 패턴(파일 → 학생 직접 지정 + 등록 안 함)
-function bmRowU(file, opts, selv){
+var bmAvailOpts=[];
+function bmRowU(file, selv){
   var isSet = !!selv;
-  var options = '<option value="">학생 선택</option>'
-    + opts.map(function(o){ return '<option value="'+o.v+'"'+(selv===o.v?' selected':'')+'>'+o.t+'</option>'; }).join('')
+  var options = '<option value=""'+(selv?'':' selected')+'>학생 선택</option>'
+    + bmAvailOpts.map(function(o){ return '<option value="'+o.v+'"'+(selv===o.v?' selected':'')+'>'+o.t+'</option>'; }).join('')
     + '<option value="__skip__"'+(selv==='__skip__'?' selected':'')+'>이 파일은 등록 안 함</option>';
   var chip = !isSet ? '<span class="bm-chip warn"><i data-lucide="help-circle" style="width:13px;height:13px;"></i>확인 필요</span>'
     : (selv==='__skip__' ? '<span class="bm-chip gray">등록 안 함</span>'
     : '<span class="bm-chip ok"><i data-lucide="check" style="width:13px;height:13px;"></i>매칭됨</span>');
   return '<div class="bm-row'+(isSet&&selv!=='__skip__'?' done':'')+'">'
-    + '<div class="bm-file"><div class="fic"><i data-lucide="file-text" style="width:18px;height:18px;"></i></div><div style="min-width:0;"><div class="fn">'+file+'</div><div class="fm bm-conf" style="display:none;color:#b45309;"></div></div></div>'
+    + '<div class="bm-file"><div class="fic"><i data-lucide="file-text" style="width:18px;height:18px;"></i></div><div style="min-width:0;"><div class="fn">'+file+'</div></div></div>'
     + '<div class="bm-arrow"><i data-lucide="arrow-right" style="width:18px;height:18px;"></i></div>'
-    + '<div><select class="bm-pick'+(isSet?'':' unset')+'" onchange="bmCaseRow(this)">'+options+'</select></div>'
+    + '<div><select class="bm-pick bm-u'+(isSet?'':' unset')+'" onchange="bmCaseRow(this)">'+options+'</select></div>'
     + '<div class="bm-st">'+chip+'</div></div>';
 }
 function bmCaseRow(sel){
@@ -5252,28 +5253,26 @@ function bmCaseRow(sel){
   if(sel.value==='__skip__'){ sel.classList.remove('unset'); row.classList.remove('done'); st.innerHTML='<span class="bm-chip gray">등록 안 함</span>'; }
   else if(sel.value){ sel.classList.remove('unset'); row.classList.add('done'); st.innerHTML='<span class="bm-chip ok"><i data-lucide="check" style="width:13px;height:13px;"></i>매칭됨</span>'; }
   else { sel.classList.add('unset'); row.classList.remove('done'); st.innerHTML='<span class="bm-chip warn"><i data-lucide="help-circle" style="width:13px;height:13px;"></i>확인 필요</span>'; }
-  bmConflictScan(row.closest('.bm-body'));
-}
-// 같은 학생 중복 지정 검증 — 1인 1자료 룰. 먼저 지정된 파일이 유지되고 나중 지정이 확인 필요로 남음
-function bmConflictScan(body){
-  if(!body) return;
-  var seen={};
-  [].slice.call(body.querySelectorAll('.bm-pick')).forEach(function(p){
-    var row=p.closest('.bm-row'); var conf=row.querySelector('.bm-conf'); var st=row.querySelector('.bm-st');
-    var v=p.value;
-    if(v && v!=='__skip__'){
-      if(seen[v]){
-        row.classList.remove('done');
-        if(conf){ conf.textContent='이미 '+seen[v]+'에게 파일이 지정됨 · 한 학생당 1개만 등록 가능'; conf.style.display=''; }
-        st.innerHTML='<span class="bm-chip warn"><i data-lucide="alert-triangle" style="width:13px;height:13px;"></i>중복 지정</span>';
-      } else {
-        seen[v]=p.options[p.selectedIndex].text;
-        if(conf) conf.style.display='none';
-        if(!row.classList.contains('done')){ row.classList.add('done'); st.innerHTML='<span class="bm-chip ok"><i data-lucide="check" style="width:13px;height:13px;"></i>매칭됨</span>'; }
-      }
-    } else if(conf){ conf.style.display='none'; }
-  });
+  bmSyncPicks(row.closest('.bm-body'));
   lucide.createIcons();
+}
+// 같은 학생 중복 지정 = 원천 차단 — 이미 파일이 지정된 학생(자동 매칭·다른 행 지정 포함)은 비활성 그룹으로 분리(1인 1자료)
+function bmSyncPicks(body){
+  if(!body) return;
+  var picks=[].slice.call(body.querySelectorAll('.bm-pick.bm-u'));
+  var autoTaken=BM_OK.map(function(m){ return '<option disabled>'+m.name+' · '+m.id+'</option>'; }).join('');
+  picks.forEach(function(p){
+    var own=p.value;
+    var others=picks.filter(function(q){ return q!==p; }).map(function(q){ return q.value; }).filter(function(v){ return v && v!=='__skip__'; });
+    var avail='', taken='';
+    bmAvailOpts.forEach(function(o){
+      if(others.indexOf(o.v)>=0) taken+='<option value="'+o.v+'" disabled>'+o.t+'</option>';
+      else avail+='<option value="'+o.v+'"'+(own===o.v?' selected':'')+'>'+o.t+'</option>';
+    });
+    p.innerHTML='<option value=""'+(own===''?' selected':'')+'>학생 선택</option>'+avail
+      +'<option value="__skip__"'+(own==='__skip__'?' selected':'')+'>이 파일은 등록 안 함</option>'
+      +'<optgroup label="이미 파일이 지정된 학생">'+taken+autoTaken+'</optgroup>';
+  });
 }
 function bmBuildOkN(n){
   document.getElementById('bm-ok-body').innerHTML = BM_OK.slice(0,n).map(function(m){
@@ -5309,16 +5308,16 @@ function bmShowCase(key){
   } else {
     // 확인 필요 = 사유 구분 없는 단일 케이스(1:1 매칭 실패). 동명이인·다파일도 시스템이 판정하지 않고 직접 지정으로 통합
     var STRIP='학생과 1:1로 매칭하지 못한 파일이에요. 어느 학생의 파일인지 직접 지정하거나, 우리 반 자료가 아니면 ‘이 파일은 등록 안 함’을 선택해 주세요.';
-    var AMBIG_OPTS=[{v:'a',t:'김민준 · 3번'},{v:'b',t:'김민준 · 18번'}];
+    bmAvailOpts=[{v:'a',t:'김민준 · 3번'},{v:'b',t:'김민준 · 18번'},{v:'10106',t:'한지우 · 10106'},{v:'10108',t:'윤하은 · 10108'}];
     var C={
-      ambig:{total:9,ok:7,warn:2,reg:7,row:bmRowU('김민준 - 수행평가.pdf',AMBIG_OPTS,'')+bmRowU('김민준 - 수행평가_최종.pdf',AMBIG_OPTS,'')},
-      conflict:{total:9,ok:7,warn:1,reg:8,row:bmRowU('김민준 - 수행평가.pdf',AMBIG_OPTS,'a')+bmRowU('김민준 - 수행평가_최종.pdf',AMBIG_OPTS,'a')}
+      ambig:{total:9,ok:7,warn:2,reg:7,row:bmRowU('김민준 - 수행평가.pdf','')+bmRowU('김민준 - 수행평가_최종.pdf','')},
+      prevent:{total:9,ok:7,warn:1,reg:8,row:bmRowU('김민준 - 수행평가.pdf','a')+bmRowU('김민준 - 수행평가_최종.pdf','')}
     }[key];
     totalEl.textContent=C.total; document.getElementById('bm-stat-ok').textContent=C.ok; document.getElementById('bm-stat-warn').textContent=String(C.warn);
     document.getElementById('bm-warn-sub').textContent=C.warn+'건 — 확인해 주세요';
     okSubEl.textContent=C.ok+'명 — 파일명과 학생 이름이 1:1로 일치해요'; bmBuildOkN(C.ok);
     warnBody.innerHTML='<div class="bm-strip"><i data-lucide="info"></i><span>'+STRIP+'</span></div>'+C.row;
-    bmConflictScan(warnBody);
+    bmSyncPicks(warnBody);
     bmNoneStatic(['10106','10108']);
     document.getElementById('bm-reg-txt').textContent=C.reg+'명 등록';
     document.getElementById('bm-note-txt').textContent='확인 필요 '+C.warn+'건을 정리하면 모두 등록할 수 있어요.';
