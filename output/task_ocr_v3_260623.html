@@ -1240,7 +1240,7 @@
     <!-- 상태1: 업로드 -->
     <div id="bm-state-upload">
       <button class="back-link" onclick="showScreen('screen-list')"><i data-lucide="chevron-left" style="width:18px;height:18px;"></i>이전으로</button>
-      <h1 class="page-h1">여러 파일 일괄 업로드</h1>
+      <h1 class="page-h1" id="bm-title">1-1반 여러 파일 일괄 업로드</h1>
       <p class="page-sub">학생별로 나뉜 PDF·이미지 파일을 한 번에 올리면, 파일명을 읽어 학생과 자동 매칭해 드려요.</p>
       <div class="deid-box" style="margin-bottom:16px;">
         <div class="deid-ico"><i data-lucide="shield-check"></i></div>
@@ -1347,7 +1347,7 @@
     <div class="page-wrap">
       <button class="back-link" onclick="showScreen('screen-list')"><i data-lucide="chevron-left" style="width:18px;height:18px;"></i>이전으로</button>
       <div>
-        <h1 class="page-h1">1학년 1반 학급 PDF 일괄 업로드</h1>
+        <h1 class="page-h1" id="pdf-title">1-1반 PDF 분할 업로드</h1>
         <p class="page-sub">학생의 과제를 스캔해서 한 번에 업로드할 수 있습니다.</p>
 
         <div id="pdf-replace-banner" style="display:none;align-items:flex-start;gap:10px;background:#fff7ed;border:1px solid #fed7aa;border-radius:8px;padding:12px 14px;margin-bottom:16px;">
@@ -4405,6 +4405,7 @@ function openUploadPdf() {
   closeUploadMenu();
   showScreen('screen-upload');
   resetUpload(); // PDF 빈 상태 노출
+  var _pt = document.getElementById('pdf-title'); if (_pt) _pt.textContent = '1-' + (currentListClass || 1) + '반 PDF 분할 업로드';
   // 기존이 '설문'일 때만 교체 경고 (PDF→PDF·자료 없음은 배너 X)
   document.getElementById('pdf-replace-banner').style.display = (getClassMethod(currentListClass) === 'survey') ? 'flex' : 'none';
   lucide.createIcons();
@@ -5882,11 +5883,11 @@ window.addEventListener('load', setupDemoNav);
     <h3 class="lu-title">학급 일괄 업로드</h3>
     <button class="lu-card" onclick="luPick('pdf')">
       <div class="lu-ic"><i data-lucide="scan-line"></i></div>
-      <div class="lu-c-main"><div class="lu-c-top"><span class="lu-c-title">학급 스캔 PDF</span></div><p class="lu-c-desc">학급 전체를 한 번에 스캔한 PDF 1개 → 학생별로 나눠 등록</p></div>
+      <div class="lu-c-main"><div class="lu-c-top"><span class="lu-c-title">PDF 분할 업로드</span></div><p class="lu-c-desc">학급 전체를 한 번에 스캔한 PDF 1개 → 학생별로 나눠 등록</p></div>
     </button>
     <button class="lu-card" onclick="luPick('bulk')">
       <div class="lu-ic"><i data-lucide="files"></i></div>
-      <div class="lu-c-main"><div class="lu-c-top"><span class="lu-c-title">여러 파일 일괄</span></div><p class="lu-c-desc">학생마다 나뉜 PDF·이미지 여러 개 → 파일명으로 학생 자동 매칭</p></div>
+      <div class="lu-c-main"><div class="lu-c-top"><span class="lu-c-title">여러 파일 일괄 업로드</span></div><p class="lu-c-desc">학생마다 나뉜 PDF·이미지 여러 개 → 파일명으로 학생 자동 매칭</p></div>
     </button>
     <!-- 설문 응답 카드: 이번 배포 미포함(C-설문 일괄 업로드 별도 건) — 복구 시 luPick('survey') 카드 되살리기. 설문 화면·딥링크(?nav=uploadSurvey)는 유지 -->
   </div>
@@ -5959,6 +5960,7 @@ function openUploadBulk(){
   document.getElementById('bm-state-upload').style.display = '';
   document.getElementById('bm-state-match').style.display = 'none';
   // 교체 안내는 진입 시 초기화 동의 팝업(openBulkInit)이 담당 — 화면 내 배너 없음
+  var _bt = document.getElementById('bm-title'); if (_bt) _bt.textContent = '1-' + (currentListClass || 1) + '반 여러 파일 일괄 업로드';
   bmResetDz();
   showScreen('screen-bulkmatch');
   lucide.createIcons();
@@ -6285,7 +6287,7 @@ function bmShowCase(key){
   };
   var GROUPS = [
     { t:'과제물 관리', ctx:'task', items:[['task','과제물 관리 목록'],['listDetail','학급 과제물 상세']] },
-    { t:'학급 일괄업로드 팝업', ctx:'task', items:[['uploadBulk','여러 파일 일괄']] }, // 설문 응답: 이번 배포 미포함(C-설문 일괄 업로드 별도 건)이라 내비 미노출 — ?nav=uploadSurvey 딥링크·모달 카드 진입은 유지
+    { t:'학급 일괄업로드 팝업', ctx:'task', items:[['uploadBulk','여러 파일 일괄 업로드']] }, // 설문 응답: 이번 배포 미포함(C-설문 일괄 업로드 별도 건)이라 내비 미노출 — ?nav=uploadSurvey 딥링크·모달 카드 진입은 유지
     { t:'채점', ctx:'scoring', items:[['run','채점 실행'],['classDetail','학급 채점 현황']] },
     { t:'인식 결과 확인', ctx:'scoring', items:[['ocrbNormal','정상'],['ocrbProgress','인식 진행 중'],['ocrbReview','확인 필요'],['ocrbLow','인식 정확도 낮음'],['ocrbFail','인식 실패']] },
     { t:'학생 채점 상세', ctx:'scoring', items:[['studentDetail','초등'],['caseSecondaryCur','중고등 (현재 버전)'],['caseSecondaryInline','중고등 (인라인 수정)'],['caseTyping','과제 입력 제출']] }
