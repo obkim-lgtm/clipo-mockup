@@ -5420,9 +5420,12 @@ function bmShowCase(key){
   document.addEventListener('mousemove', function(e){ if(!drag) return; p.style.left=(e.clientX-ox)+'px'; p.style.top=(e.clientY-oy)+'px'; p.style.right='auto'; p.style.bottom='auto'; });
   document.addEventListener('mouseup', function(){ drag=false; });
 })();
-// ===== 딥링크: ?nav=uploadBulk → 학급 일괄 업로드(여러 파일) 화면 바로 진입 =====
+// ===== 딥링크: ?nav=uploadBulk → 업로드 화면 / ?nav=uploadBulkInit → 초기화 동의 팝업 =====
 (function(){
-  if(/[?&]nav=uploadBulk/.test(location.search)){
+  var s = location.search;
+  if(/[?&]nav=uploadBulkInit/.test(s)){
+    window.addEventListener('load', function(){ showListForClass(1, 'A'); openBulkInit(); }); // 초기화 동의 팝업 바로(캡처용)
+  } else if(/[?&]nav=uploadBulk/.test(s)){
     window.addEventListener('load', function(){ // 전체 스크립트 파싱 후 실행 (함수 정의 순서 무관)
       showListForClass(1, 'A');
       bmClearedClasses[1] = true; // 딥링크 진입은 시연용 — 초기화 동의 팝업 생략
