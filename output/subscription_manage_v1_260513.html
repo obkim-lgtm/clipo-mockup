@@ -390,11 +390,7 @@
       <div class="modal-title">종량제 크레딧 내역</div>
       <button class="modal-close" onclick="closeModal('historyModal')"><i data-lucide="x" style="width:22px;height:22px"></i></button>
     </div>
-    <div class="modal-desc">보유한 종량제 크레딧의 지급·구매 내역입니다. 만료일이 가까운 것부터 사용됩니다.</div>
-    <div style="display:flex;gap:6px;margin-bottom:12px">
-      <button class="sort-btn on" id="sortExpiry" onclick="sortHistory('expiry')">만료일순</button>
-      <button class="sort-btn" id="sortType" onclick="sortHistory('type')">유형순</button>
-    </div>
+    <div class="modal-desc">보유한 종량제 크레딧의 지급·구매 내역이에요. <a class="detail-link" onclick="openModal('usageGuideModal')">차감 순서 안내 <i data-lucide="chevron-right" style="width:12px;height:12px"></i></a></div>
     <table class="tbl">
       <thead>
         <tr>
@@ -840,20 +836,16 @@
       </tr>`).join('');
     lucide.createIcons();
   }
-  function sortHistory(mode) {
-    document.getElementById('sortExpiry').classList.toggle('on', mode==='expiry');
-    document.getElementById('sortType').classList.toggle('on', mode==='type');
+  function renderHistoryDefault() {
+    // 고정 정렬: 활성 먼저(만료일 빠른 순) → 만료 아래
     const st = r => r.status === 'active' ? 0 : 1;
-    const rows = [...HISTORY];
-    // 활성 먼저, 만료는 아래로
-    if (mode === 'expiry') rows.sort((a,b) => st(a) - st(b) || a.ekey - b.ekey);
-    else rows.sort((a,b) => st(a) - st(b) || a.order - b.order || a.ekey - b.ekey);
+    const rows = [...HISTORY].sort((a,b) => st(a) - st(b) || a.ekey - b.ekey);
     renderHistory(rows);
   }
 
   // 초기 렌더 (기본: 개인 유료 시나리오)
   renderPops(scenarios.personal);
-  sortHistory('expiry');
+  renderHistoryDefault();
   lucide.createIcons();
 
   // ── 까망이: 접기/펴기 + 드래그 ──
