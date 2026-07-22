@@ -342,12 +342,12 @@
           <div class="credit-card-sub">쓴 만큼 차감 · 남은 크레딧은 유효기간까지 유지돼요</div>
           <div id="meter-rows">
             <div class="sub-row">
-              <span class="left"><span class="dot"></span> 보너스 크레딧</span>
-              <span class="right"><span class="amount">700개</span></span>
-            </div>
-            <div class="sub-row">
               <span class="left"><span class="dot"></span> 온보딩 크레딧<span class="row-exp">~26.06.05</span></span>
               <span class="right"><span class="amount">50개</span></span>
+            </div>
+            <div class="sub-row">
+              <span class="left"><span class="dot"></span> 보너스 크레딧</span>
+              <span class="right"><span class="amount">700개</span></span>
             </div>
             <div class="sub-row">
               <span class="left"><span class="dot"></span> 추가 충전 크레딧</span>
@@ -486,17 +486,17 @@
       dailyRows: [{name:'개인 1년 이용권', exp:'~27.05.13', amount:'일 250개'}],
       meterTotal: '950개',
       meterRows: [
-        {name:'보너스 크레딧', amount:'700개', detail:'bonusModal'},
-        {name:'온보딩 크레딧', exp:'~26.06.05', amount:'50개', detail:'onboardingModal'},
-        {name:'추가 충전 크레딧', amount:'200개', detail:'rechargeModal'},
+        {name:'온보딩 크레딧', exp:'~26.06.05', amount:'50개'},
+        {name:'보너스 크레딧', amount:'700개'},
+        {name:'추가 충전 크레딧', amount:'200개'},
       ],
       popDaily: [{name:'개인 1년 이용권 (~27.05.13 만료)', amount:'일 250개'}],
       popMeter: [
         {name:'온보딩 크레딧 (~26.06.05 만료)', amount:'50개'},
         {name:'보너스 크레딧 (~26.06.17 만료)', amount:'300개'},
+        {name:'보너스 크레딧 (~27.05.13 만료)', amount:'400개'},
         {name:'추가 충전 크레딧 (~27.01.04 만료)', amount:'50개'},
-        {name:'추가 충전 크레딧 (~27.03.11 만료)', amount:'150개'},
-        {name:'보너스 크레딧 (~27.05.13 만료)', amount:'400개'}
+        {name:'추가 충전 크레딧 (~27.03.11 만료)', amount:'150개'}
       ]
     },
     school: {
@@ -510,7 +510,7 @@
       meterRows: [
         {name:'학교 공유 크레딧', exp:'~26.12.31', amount:'50개', detail:'sharedModal'},
       ],
-      meterNote: '학교 유료 이용자는 본인 명의 추가 충전이 불가합니다. 학교 단위 충전은 고객센터로 문의해 주세요.',
+      meterNote: '개인 사용 목적의 추가 충전은 직접 구매할 수 있어요. 학교 전체용 크레딧은 대표교사(학교 단위)가 문의로 구매합니다.',
       popDaily: [{name:'학교 1년 이용권 (~26.12.31 만료)', amount:'일 250개'}],
       popMeter: [
         {name:'학교 공유 크레딧 (~26.12.31 만료)', amount:'50개'}
@@ -639,13 +639,13 @@
       ],
       meterTotal: '1,150개',
       meterRows: [
+        {name:'온보딩 크레딧', amount:'50개'},
         {name:'쿠폰 크레딧', exp:'~26.06.14', amount:'250개'},
-        {name:'보너스 크레딧', exp:'~26.11.20', amount:'300개', detail:'bonusModal'},
-        {name:'온보딩 크레딧', amount:'50개', detail:'onboardingModal'},
-        {name:'학교 공유 크레딧', exp:'~26.12.31', amount:'350개', detail:'sharedModal'},
-        {name:'추가 충전 크레딧', amount:'200개', detail:'rechargeModal'}
+        {name:'보너스 크레딧', exp:'~26.11.20', amount:'300개'},
+        {name:'학교 공유 크레딧', exp:'~26.12.31', amount:'350개'},
+        {name:'추가 충전 크레딧', amount:'200개'}
       ],
-      meterNote: '만료일이 가까운 크레딧부터 자동으로 사용됩니다.',
+      meterNote: '무료로 받은 크레딧부터 정해진 순서대로 자동 사용됩니다.',
       popDaily: [
         {name:'쿠폰 크레딧 (~26.06.14 만료)', amount:'일 200개'},
         {name:'개인 6개월 이용권 (~26.11.20 만료)', amount:'일 250개'},
@@ -719,6 +719,9 @@
       ...((!s.school.empty && s.school.tickets) ? s.school.tickets.map(t => ({...t, ic:'school'})) : []),
       ...((!s.personal.empty && s.personal.tickets) ? s.personal.tickets.map(t => ({...t, ic:'circle-user-round'})) : [])
     ];
+    // 이용 중은 만료일 빠른 순, 이용 예정은 맨 아래(시작일순)
+    const tkDate = t => { const m = (t.exp || '').match(/(\d{2})\.(\d{2})\.(\d{2})/); return m ? +(m[1] + m[2] + m[3]) : 999999; };
+    tickets.sort((a, b) => ((a.status === 'upcoming') - (b.status === 'upcoming')) || tkDate(a) - tkDate(b));
     const isExpired = tickets.length > 0 && tickets.every(t => t.status === 'expired');
     let planHtml = '<div class="pop-title">이용권 정보</div>';
     if (isExpired) {
