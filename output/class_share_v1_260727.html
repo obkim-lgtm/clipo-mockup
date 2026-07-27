@@ -92,15 +92,17 @@ body.nav-expanded .main-wrap { padding-left:200px; }
 .op-count { min-width:24px; height:24px; padding:0 8px; border-radius:100px; background:#416bff; color:#fff;
   font-size:13px; font-weight:700; display:inline-flex; align-items:center; justify-content:center; }
 .op-sub { font-size:14px; color:#6d7381; margin:6px 0 16px; }
-.op-item { display:flex; align-items:flex-start; justify-content:space-between; gap:16px; padding:16px; background:#f4f8ff; border-radius:8px; }
+.op-item { padding:14px 16px 16px; background:#f4f8ff; border-radius:8px; }
 .op-item + .op-item { margin-top:10px; }
+.op-row1 { display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
 .op-loc { display:inline-flex; align-items:center; gap:6px; height:26px; padding:0 10px; border-radius:100px;
   background:#e9f2ff; border:1px solid #ccdfff; color:#3151c4; font-size:13px; font-weight:600; }
 .op-loc svg { width:14px; height:14px; }
-.op-text { font-size:16px; line-height:1.6; margin-top:10px; }
-.op-meta { font-size:14px; color:#6d7381; margin-top:8px; }
+.op-actions { margin-left:auto; display:flex; align-items:center; gap:6px; flex-shrink:0; }
+.op-text { font-size:16px; line-height:1.6; margin-top:8px; }
+.op-meta { font-size:14px; color:#6d7381; }
 .op-empty { font-size:16px; color:#6d7381; padding:18px 0; }
-.op-unread { width:8px; height:8px; border-radius:100px; background:#416bff; flex-shrink:0; margin-top:9px; }
+.op-unread { width:8px; height:8px; border-radius:100px; background:#416bff; flex-shrink:0; }
 .op-item.done { background:#f6f7f9; }
 .op-item.done .op-text { color:#6d7381; }
 
@@ -345,7 +347,7 @@ body.dn-dragging iframe { pointer-events:none; }
     <!-- 소유자: 받은 의견 전체 (수업 홈 하위 페이지) -->
     <div class="page-wrap" id="ownerOpinions" style="display:none">
       <button class="btn-ghost" style="padding-left:0;margin-bottom:6px" onclick="goOwnerTab('home')">
-        <i data-lucide="chevron-left" style="width:18px;height:18px"></i> 수업 홈</button>
+        <i data-lucide="chevron-left" style="width:18px;height:18px"></i> 이전으로</button>
       <div class="op-page-head">
         <div>
           <h1 class="op-page-title">받은 의견</h1>
@@ -952,19 +954,21 @@ function saveOpinion() {
 }
 
 /* ═════════ 소유자 — 받은 의견 ═════════ */
+/* 2줄 구성: 1줄 = 위치·작성자·시간 + 액션 / 2줄 = 의견 본문(길어질 수 있어 전체 폭 사용) */
 function opItemHTML(o, i) {
   return '<div class="op-item' + (o.done ? ' done' : '') + '">' +
-    (!o.read && !o.done ? '<span class="op-unread"></span>' : '') +
-    '<div style="min-width:0;flex:1">' +
+    '<div class="op-row1">' +
+      (!o.read && !o.done ? '<span class="op-unread"></span>' : '') +
       '<span class="op-loc"><i data-lucide="map-pin"></i> ' + o.loc + '</span>' +
-      (o.done ? ' <span class="badge bdg-done" style="vertical-align:top"><i data-lucide="circle-check"></i> 확인함</span>' : '') +
-      '<div class="op-text">' + o.text + '</div>' +
-      '<div class="op-meta">' + o.by + ' · ' + o.at + '</div>' +
+      '<span class="op-meta">' + o.by + ' · ' + o.at + '</span>' +
+      (o.done ? '<span class="badge bdg-done"><i data-lucide="circle-check"></i> 확인함</span>' : '') +
+      '<span class="op-actions">' +
+        '<button class="btn-outline btn-sm" onclick="goLand(' + i + ')">위치로 이동</button>' +
+        (o.done ? '' : '<button class="btn-ghost btn-sm" onclick="markDone(' + i + ')">확인함</button>') +
+      '</span>' +
     '</div>' +
-    '<div style="flex-shrink:0;display:flex;flex-direction:column;gap:6px;align-items:flex-end">' +
-      '<button class="btn-outline btn-sm" onclick="goLand(' + i + ')">위치로 이동</button>' +
-      (o.done ? '' : '<button class="btn-ghost btn-sm" onclick="markDone(' + i + ')">확인함</button>') +
-    '</div></div>';
+    '<div class="op-text">' + o.text + '</div>' +
+  '</div>';
 }
 /* 수업 홈 요약 = 안 읽은 것 위주 최근 3건 + 전체 보기 */
 function renderOpinions() {
