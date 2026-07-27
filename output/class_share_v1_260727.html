@@ -454,6 +454,11 @@ body.dn-dragging iframe { pointer-events:none; }
   <iframe class="home-frame" id="homeFrame" title="클리포 홈 (공동교사 시점)"></iframe>
 </section>
 
+<!-- ═════════ Scene 6 : 클리포 홈 (소유자 · 새 의견 알림) ═════════ -->
+<section class="scene" id="sceneOwnerHome">
+  <iframe class="home-frame" id="ownerHomeFrame" title="클리포 홈 (소유자 시점)"></iframe>
+</section>
+
 <!-- ═════════ Scene 3 : 공유받은 수업 (공동교사) ═════════ -->
 <section class="scene" id="sceneShared">
   <div class="main-wrap">
@@ -588,7 +593,7 @@ body.dn-dragging iframe { pointer-events:none; }
     </div>
     <div style="display:flex;gap:8px;flex-shrink:0">
       <button class="btn-strip" onclick="showToast('의견을 확인 처리했어요')">확인함</button>
-      <button class="btn-strip" onclick="goStep(6)">수업 홈으로</button>
+      <button class="btn-strip" onclick="goStep(7)">수업 홈으로</button>
     </div>
   </div>
   <iframe class="land-frame" id="landFrame" title="의견이 남겨진 화면"></iframe>
@@ -683,12 +688,13 @@ body.dn-dragging iframe { pointer-events:none; }
     <div class="dn-step" data-step="3"><span class="n">3</span>수업 전체 보기<span class="dn-persona co">공동교사</span></div>
     <div class="dn-step" data-step="4"><span class="n">4</span>평가 설계에 의견<span class="dn-persona co">공동교사</span></div>
     <div class="dn-step" data-step="5"><span class="n">5</span>세특에 의견<span class="dn-persona co">공동교사</span></div>
-    <div class="dn-step" data-step="6"><span class="n">6</span>받은 의견 · 위치로 이동<span class="dn-persona owner">소유자</span></div>
-    <div class="dn-step" data-step="7"><span class="n">7</span>받은 의견 전체 페이지<span class="dn-persona owner">소유자</span></div>
+    <div class="dn-step" data-step="6"><span class="n">6</span>홈 알림 · 새 의견<span class="dn-persona owner">소유자</span></div>
+    <div class="dn-step" data-step="7"><span class="n">7</span>받은 의견 · 위치로 이동<span class="dn-persona owner">소유자</span></div>
+    <div class="dn-step" data-step="8"><span class="n">8</span>받은 의견 전체 페이지<span class="dn-persona owner">소유자</span></div>
     <div class="dn-div"></div>
     <div class="dn-cases">엣지 케이스</div>
-    <div class="dn-step" data-step="8"><span class="n">8</span>세특 공유 끔<span class="dn-persona co">공동교사</span></div>
-    <div class="dn-step" data-step="9"><span class="n">9</span>권한 없음<span class="dn-persona co">공동교사</span></div>
+    <div class="dn-step" data-step="9"><span class="n">9</span>세특 공유 끔<span class="dn-persona co">공동교사</span></div>
+    <div class="dn-step" data-step="10"><span class="n">10</span>권한 없음<span class="dn-persona co">공동교사</span></div>
   </div>
 </div>
 
@@ -752,28 +758,33 @@ function goStep(n) {
   document.querySelectorAll('.dn-step').forEach(el => el.classList.toggle('on', +el.dataset.step === n));
   document.querySelectorAll('.scene').forEach(el => el.classList.remove('active'));
   document.querySelectorAll('.si').forEach(el => el.classList.remove('active'));
-  document.body.classList.toggle('home-full', n === 2);
+  document.body.classList.toggle('home-full', n === 2 || n === 6);
 
-  if (n === 1 || n === 6 || n === 7) {
+  if (n === 1 || n === 7 || n === 8) {
     document.getElementById('sceneOwner').classList.add('active');
     setPersona('owner');
     document.querySelector('[data-nav="class"]').classList.add('active');
     renderOpinions();
-    goOwnerTab(n === 7 ? 'op' : 'home');
+    goOwnerTab(n === 8 ? 'op' : 'home');
   } else if (n === 2) {
     document.getElementById('sceneHome').classList.add('active');
     setPersona('co');
     document.querySelector('[data-nav="home"]').classList.add('active');
     initHomeFrame();
-  } else if (n === 3 || n === 4 || n === 5 || n === 8) {
+  } else if (n === 6) {
+    document.getElementById('sceneOwnerHome').classList.add('active');
+    setPersona('owner');
+    document.querySelector('[data-nav="home"]').classList.add('active');
+    initOwnerHomeFrame();
+  } else if (n === 3 || n === 4 || n === 5 || n === 9) {
     document.getElementById('sceneShared').classList.add('active');
     setPersona('co');
     document.querySelector('[data-nav="class"]').classList.add('active');
     if (n === 3) { goTab('home'); closeCompose(); }
     if (n === 4) { goTab('design'); setTimeout(() => openCompose('예: 배점 기준을 조금 더 느슨하게 잡는 게 어떨까요? 필요할 때 후하게 줄 수 있게요.'), 350); }
     if (n === 5) { S.seteukShared = true; syncSwitch(); goTab('seteuk'); selectStudent('10102'); setTimeout(() => openCompose('예: 이 학생은 토의에서 반대 의견을 조율한 장면이 인상적이었어요. 그 부분을 넣으면 좋겠어요.'), 350); }
-    if (n === 8) { S.seteukShared = false; syncSwitch(); goTab('seteuk'); closeCompose(); }
-  } else if (n === 9) {
+    if (n === 9) { S.seteukShared = false; syncSwitch(); goTab('seteuk'); closeCompose(); }
+  } else if (n === 10) {
     document.getElementById('sceneDenied').classList.add('active');
     setPersona('co');
     document.querySelector('[data-nav="home"]').classList.add('active');
@@ -791,19 +802,19 @@ function setPersona(p) {
 let suppressHash = false;
 function setHash() {
   let tab = null;
-  if (S.step === 1 || S.step === 6 || S.step === 7) tab = S.ownerTab;
-  else if ([3, 4, 5, 8].includes(S.step)) tab = S.tab;
+  if (S.step === 1 || S.step === 7 || S.step === 8) tab = S.ownerTab;
+  else if ([3, 4, 5, 9].includes(S.step)) tab = S.tab;
   const h = '#' + S.step + (tab && tab !== 'home' ? '/' + tab : '');
   if (location.hash !== h) { suppressHash = true; location.hash = h; }
 }
 function applyHash() {
   const m = location.hash.match(/^#(\d+)(?:\/(\w+))?/);
-  const n = m ? Math.min(9, Math.max(1, +m[1])) : 1;
+  const n = m ? Math.min(10, Math.max(1, +m[1])) : 1;
   goStep(n);
   const tab = m && m[2];
   if (tab && (TAB_LABEL[tab] || tab === 'op')) {
-    if (n === 1 || n === 6 || n === 7) goOwnerTab(tab);
-    else if ([3, 4, 5, 8].includes(n) && TAB_LABEL[tab]) goTab(tab);
+    if (n === 1 || n === 7 || n === 8) goOwnerTab(tab);
+    else if ([3, 4, 5, 9].includes(n) && TAB_LABEL[tab]) goTab(tab);
   }
 }
 window.addEventListener('hashchange', () => {
@@ -1067,6 +1078,10 @@ function onHomeFrameLoad() {
     const d = f.contentDocument;
     const btn = d.querySelector('.user-btn');
     if (btn && btn.childNodes[0]) btn.childNodes[0].nodeValue = '김하나 선생님(일반교사) ';
+    // v2 문구: 공유 = 공동 확인 전용이 아니라 수업을 함께 보는 것
+    d.querySelectorAll('.sub-div-desc').forEach(el => {
+      if (/공동 확인을 위해/.test(el.textContent)) el.textContent = '동료 선생님이 함께 보도록 공유한 수업이에요';
+    });
     d.addEventListener('click', e => {
       const el = e.target.closest && e.target.closest('[onclick]');
       if (el && /co_teacher_review|class_share/.test(el.getAttribute('onclick') || '')) {
@@ -1074,6 +1089,55 @@ function onHomeFrameLoad() {
         goStep(3);
       }
     }, true);
+  } catch (e) { /* 주입 실패해도 홈은 표시 */ }
+}
+
+/* ═════════ 소유자 홈 (home_v1 재사용 · 새 의견 알림 주입) ═════════ */
+function initOwnerHomeFrame() {
+  const f = document.getElementById('ownerHomeFrame');
+  if (!f.getAttribute('src')) {
+    f.addEventListener('load', onOwnerHomeLoad);
+    f.setAttribute('src', 'home_v1_260612.html');
+  }
+}
+function onOwnerHomeLoad() {
+  const f = document.getElementById('ownerHomeFrame');
+  try {
+    const d = f.contentDocument;
+    const unread = S.opinions.filter(o => !o.read && !o.done).length;
+    // 1층: 상단 스트립 = 새 의견 요약 (v1 '확인 요청 스트립' 자리 재사용 — 소유자에겐 의견 알림)
+    const strip = d.getElementById('rv-banner');
+    if (strip) {
+      strip.innerHTML = '<div class="rv-row">' +
+        '<span class="rv-label"><i data-lucide="message-square-text" style="width:16px;height:16px;"></i>새 의견<span class="rv-cnt">' + unread + '</span></span>' +
+        '<span class="rv-info"><strong>3학년 2반 사회</strong> — 김하나·박지현 선생님이 의견을 남겼어요 · 최근 07/27</span>' +
+        '<button class="rv-go" id="rvGoOpinions">확인</button></div>';
+      strip.style.display = '';
+      strip.querySelector('#rvGoOpinions').addEventListener('click', ev => { ev.stopPropagation(); goStep(7); });
+    }
+    // 2층: 내 수업 카드(사회)에 의견 배지 + 건수 문구
+    d.querySelectorAll('.cc').forEach(card => {
+      const t = card.querySelector('.cc-name');
+      if (!t || t.textContent.trim() !== '사회') return;
+      if (!card.querySelector('.cc-noti')) {
+        const b = d.createElement('span');
+        b.className = 'cc-noti';
+        b.textContent = unread;
+        b.title = '새 의견 ' + unread + '건';
+        card.insertBefore(b, card.firstChild);
+      }
+      const ev = card.querySelector('.cc-evals');
+      if (ev && !/의견/.test(ev.textContent)) ev.textContent = ev.textContent + ' · 새 의견 ' + unread + '건';
+    });
+    // 어디를 눌러도 데모의 수업 홈(7단계)으로
+    d.addEventListener('click', e => {
+      const el = e.target.closest && e.target.closest('[onclick]');
+      if (el && /co_teacher_review|class_share/.test(el.getAttribute('onclick') || '')) {
+        e.preventDefault(); e.stopPropagation();
+        goStep(7);
+      }
+    }, true);
+    if (f.contentWindow.lucide) f.contentWindow.lucide.createIcons();
   } catch (e) { /* 주입 실패해도 홈은 표시 */ }
 }
 
