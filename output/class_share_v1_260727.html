@@ -207,6 +207,10 @@ body.nav-expanded .main-wrap { padding-left:200px; }
 .share-dock.open .sd-expand { max-height:320px; padding-top:18px; border-bottom:1px solid #f1f3f5; }
 .sd-exp-title { font-size:17px; font-weight:600; display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
 .sd-exp-title .sub { font-size:14px; font-weight:400; color:#6d7381; flex-basis:100%; margin-top:4px; }
+.op-target-wrap { display:inline-flex; align-items:center; gap:8px; font-size:14px; font-weight:500; color:#3b3f4c; }
+.op-target { height:34px; border:1px solid #d9d9d9; border-radius:6px; background:#fff; padding:0 10px;
+  font-size:15px; font-family:inherit; color:#222631; cursor:pointer; }
+.op-target:focus { outline:none; border-color:#416bff; box-shadow:0 0 0 3px rgba(65,107,255,.12); }
 .sd-expand textarea { width:100%; min-height:92px; border:1px solid #d9d9d9; border-radius:8px; padding:12px 14px;
   font-size:16px; font-family:inherit; resize:vertical; margin-top:12px; }
 .sd-expand textarea::placeholder { color:#b3b6bd; }
@@ -600,7 +604,11 @@ body.dn-dragging iframe { pointer-events:none; }
       <div class="sd-exp-title">
         <i data-lucide="message-square-plus" style="width:20px;height:20px;color:#416bff"></i> 의견 남기기
         <span class="op-loc" id="opLocChip"><i data-lucide="map-pin"></i> <span id="opLocText">수업 홈</span></span>
-        <span class="sub">지금 보고 있는 화면이 함께 전달돼요. 최대표 선생님만 볼 수 있어요.</span>
+        <span class="op-target-wrap" id="opTargetWrap" style="display:none">
+          <label for="opTarget">대상</label>
+          <select class="op-target" id="opTarget" onchange="onTargetChange()"></select>
+        </span>
+        <span class="sub" id="opComposeSub">지금 보고 있는 화면이 함께 전달돼요. 최대표 선생님만 볼 수 있어요.</span>
       </div>
       <textarea id="opInput" placeholder="함께 논의하고 싶은 내용을 남겨주세요."></textarea>
       <div class="sd-exp-actions">
@@ -746,6 +754,8 @@ const S = {
   ownerTab: 'home',
   seteukShared: true,
   selStudent: null,
+  target: '',            // 의견 대상 학생 (빈 값 = 이 화면 전체)
+  targetTouched: false,  // 사용자가 대상을 직접 골랐는지
   filter: 'all',
   opinions: [
     { loc:'평가 설계 · 관심 분야에 관한 미래 예측 보고서 작성', tab:'design', by:'김하나 선생님', at:'07/27 10:12',
@@ -756,21 +766,23 @@ const S = {
       text:'채점 기준 3번이 2번과 겹쳐 보여요. 하나로 합치는 게 학생 안내에도 편할 것 같아요.' },
     { loc:'활동지', tab:'sheet', by:'박지현 선생님', at:'07/26 15:41', read:true,
       text:'2번 문항 지시문이 "설명하시오"인데 채점 기준은 근거 제시를 요구해요. 문구를 맞추는 게 좋겠어요.' },
-    { loc:'채점 · 10102 이준호', tab:'scoring', by:'박지현 선생님', at:'07/27 10:40',
+    { loc:'과제물 관리 · 관심 분야에 관한 미래 예측 보고서 작성 · 1학년 1반', tab:'task', by:'김하나 선생님', at:'07/27 09:30',
+      text:'제출은 다 됐는데 인식 결과가 흔들린 학생이 몇 명 보여요. 채점 전에 한 번 확인하면 좋겠어요.' },
+    { loc:'과제물 관리 · 관심 분야에 관한 미래 예측 보고서 작성 · 1학년 1반 · 10104 최유진', tab:'task', by:'박지현 선생님', at:'07/27 09:35', read:true,
+      text:'이 학생 파일이 뒤집혀 올라온 것 같아요. 다시 받아야 할 것 같습니다.' },
+    { loc:'채점 · 관심 분야에 관한 미래 예측 보고서 작성 · 1학년 1반 · 10102 이준호', tab:'scoring', by:'박지현 선생님', at:'07/27 10:40',
       text:'"작성 분량 수준" 2점은 우리가 정한 기준상 1점이 맞아 보여요. 확인 부탁드려요.' },
-    { loc:'채점 · 10104 최유진', tab:'scoring', by:'박지현 선생님', at:'07/27 10:44',
-      text:'근거 제시가 충분해 보이는데 감점 사유가 뭔지 궁금해요. 저는 만점 줬을 것 같아요.' },
-    { loc:'채점 · 10101 김서윤', tab:'scoring', by:'김하나 선생님', at:'07/27 09:58', read:true,
+    { loc:'채점 · 관심 분야에 관한 미래 예측 보고서 작성 · 1학년 1반', tab:'scoring', by:'박지현 선생님', at:'07/27 10:44',
+      text:'반 평균이 우리 반보다 4점 정도 높아요. 편차가 커 보이는데 기준을 한 번 맞춰보면 좋겠어요.' },
+    { loc:'채점 · 관심 분야에 관한 미래 예측 보고서 작성 · 1학년 1반 · 10101 김서윤', tab:'scoring', by:'김하나 선생님', at:'07/27 09:58', read:true,
       text:'우리 반 비슷한 수준 답안과 비교했는데 점수 결이 맞아요. 이대로 괜찮아 보여요.' },
-    { loc:'채점 · 10103 박지민', tab:'scoring', by:'김하나 선생님', at:'07/26 17:20', done:true, read:true,
+    { loc:'채점 · 관심 분야에 관한 미래 예측 보고서 작성 · 1학년 1반 · 10103 박지민', tab:'scoring', by:'김하나 선생님', at:'07/26 17:20', done:true, read:true,
       text:'분량은 짧은데 내용 충실도가 높은 사례라, 우리가 정한 분량 기준을 그대로 적용할지 한번 봐주세요.' },
-    { loc:'채점 · 10105 정현우', tab:'scoring', by:'박지현 선생님', at:'07/26 17:35', done:true, read:true,
-      text:'백지에 가까운 답안인데 최소 성취 기준과 연결해서 볼 필요가 있어 보여요.' },
-    { loc:'세특 전반', tab:'seteuk', by:'김하나 선생님', at:'07/27 11:05',
+    { loc:'세부능력 및 특기사항 지원 · 1학년 1반', tab:'seteuk', by:'김하나 선생님', at:'07/27 11:05',
       text:'문장이 대체로 "~함"으로 끝나는데, 반별로 어미를 맞추면 나중에 취합할 때 편할 것 같아요.' },
-    { loc:'세특 · 10102 이준호', tab:'seteuk', by:'김하나 선생님', at:'07/27 11:08',
+    { loc:'세부능력 및 특기사항 지원 · 1학년 1반 · 10102 이준호', tab:'seteuk', by:'김하나 선생님', at:'07/27 11:08',
       text:'토의에서 반대 의견을 조율한 장면이 인상적이었어요. 그 부분을 넣으면 좋겠어요.' },
-    { loc:'세특 · 10104 최유진', tab:'seteuk', by:'박지현 선생님', at:'07/26 14:30', read:true,
+    { loc:'세부능력 및 특기사항 지원 · 1학년 1반 · 10104 최유진', tab:'seteuk', by:'박지현 선생님', at:'07/26 14:30', read:true,
       text:'디지털 격차 주제로 후속 질문을 많이 했어요. 탐구 태도로 살려도 좋을 것 같아요.' }
   ]
 };
@@ -917,6 +929,7 @@ function goTab(tab) {
     if (S.seteukShared) renderStudents();
   }
   S.selStudent = null;
+  S.target = ''; S.targetTouched = false;
   closeCompose();
   updateDock();
   setHash();
@@ -1009,21 +1022,49 @@ function selectStudent(id) {
 }
 
 /* ═════════ 도크 · 의견 ═════════ */
-/* 위치 = 실제로 보고 있는 화면 수준까지만 (목록을 보면서 특정 평가로 찍지 않는다) */
-function currentLoc() {
-  if (S.tab === 'seteuk' && S.selStudent) {
-    const s = STUDENTS.find(x => x.id === S.selStudent);
-    return '세특 · ' + s.id + ' ' + s.name;
-  }
-  if (S.tab === 'seteuk') return '세특 전반';
-  // 평가 설계는 상세(한 평가) 화면이라 위치에 평가명까지 들어간다
-  if (S.tab === 'design') return '평가 설계 · 관심 분야에 관한 미래 예측 보고서 작성';
-  // 채점은 학생 단위 화면 — 임베드에서 지금 보고 있는 학생을 읽는다
+/* 위치 = 화면 경로(자동) + 대상(있으면).
+   화면이 알려주는 데까지만 자동으로 찍고, 학생은 화면에 드러날 때만 자동·아니면 사용자가 선택 */
+const EVAL_NAME = '관심 분야에 관한 미래 예측 보고서 작성';
+const CLASS_NAME = '1학년 1반';
+function screenPath() {
+  if (S.tab === 'design')  return ['평가 설계', EVAL_NAME];
+  if (S.tab === 'task')    return ['과제물 관리', EVAL_NAME, CLASS_NAME];
+  if (S.tab === 'scoring') return ['채점', EVAL_NAME, CLASS_NAME];
+  if (S.tab === 'seteuk')  return ['세부능력 및 특기사항 지원', CLASS_NAME];
+  return ['수업 홈'];
+}
+/* 화면이 스스로 알려주는 학생 (채점 상세 = 지금 보는 학생, 세특 = 선택한 행) */
+function autoTarget() {
   if (S.tab === 'scoring') {
-    const stu = embedStudent();
-    return stu ? '채점 · ' + stu : '채점';
+    const t = embedStudent();
+    const m = t && t.match(/(\d{5})/);
+    return m ? m[1] : '';
   }
-  return TAB_LABEL[S.tab];
+  if (S.tab === 'seteuk') return S.selStudent || '';
+  return '';
+}
+/* 대상을 고를 수 있는 화면인가 (학생이 나열되는 화면) */
+function targetable() { return ['task', 'scoring', 'seteuk'].includes(S.tab); }
+function currentLoc() {
+  const path = screenPath();
+  const id = S.target || '';
+  const s = id && STUDENTS.find(x => x.id === id);
+  if (s) path.push(s.id + ' ' + s.name);
+  return path.join(' · ');
+}
+function onTargetChange() {
+  S.target = document.getElementById('opTarget').value;
+  S.targetTouched = true;   // 사용자가 고른 값은 화면 자동 감지로 덮어쓰지 않는다
+  document.getElementById('opLocText').textContent = currentLoc();
+}
+function fillTargetSelect() {
+  const wrap = document.getElementById('opTargetWrap');
+  if (!targetable()) { wrap.style.display = 'none'; return; }
+  wrap.style.display = '';
+  const sel = document.getElementById('opTarget');
+  sel.innerHTML = '<option value="">이 화면 전체</option>' +
+    STUDENTS.map(s => '<option value="' + s.id + '">' + s.id + ' ' + s.name + '</option>').join('');
+  sel.value = S.target || '';
 }
 function embedStudent() {
   try {
@@ -1034,9 +1075,10 @@ function embedStudent() {
   } catch (e) { return null; }
 }
 function updateDock() {
-  const loc = currentLoc();
-  document.getElementById('dockLoc').textContent = loc;
-  document.getElementById('opLocText').textContent = loc;
+  // 화면이 학생을 알려주면 대상을 자동으로 맞춰준다 (사용자가 바꾼 값은 유지)
+  if (!S.targetTouched) S.target = autoTarget();
+  document.getElementById('dockLoc').textContent = screenPath().join(' · ');
+  document.getElementById('opLocText').textContent = currentLoc();
 }
 function toggleCompose() {
   if (document.getElementById('shareDock').classList.contains('open')) closeCompose();
@@ -1044,6 +1086,11 @@ function toggleCompose() {
 }
 function openCompose(placeholder) {
   updateDock();
+  fillTargetSelect();
+  document.getElementById('opComposeSub').textContent = targetable()
+    ? (autoTarget() ? '지금 보고 있는 학생이 대상으로 잡혔어요. 화면 전체에 대한 의견이면 대상을 바꿔주세요.'
+                    : '학생을 고르면 그 학생에게, 고르지 않으면 이 화면 전체에 남아요.')
+    : '지금 보고 있는 화면이 함께 전달돼요. 최대표 선생님만 볼 수 있어요.';
   const ta = document.getElementById('opInput');
   ta.value = '';
   if (placeholder) ta.setAttribute('placeholder', placeholder);
@@ -1057,6 +1104,7 @@ function saveOpinion() {
   const v = ta.value.trim() || ta.getAttribute('placeholder').replace(/^예: /, '');
   S.opinions.push({ loc: currentLoc(), tab: S.tab, text: v, by:'김하나 선생님', at:'07/27 14:05', mine:true });
   closeCompose();
+  S.targetTouched = false;
   updateDock();
   showToast('의견을 남겼어요 · 최대표 선생님에게 전달돼요');
 }
