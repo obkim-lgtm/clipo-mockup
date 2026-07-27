@@ -769,6 +769,7 @@ const S = {
   ownerTab: 'home',
   seteukShared: true,
   selStudent: null,
+  embed: '',             // 공유 보기에서 지금 열려 있는 화면 (목록/상세 구분)
   target: '',            // 의견 대상 학생 (빈 값 = 이 화면 전체)
   targetTouched: false,  // 사용자가 대상을 직접 골랐는지
   filter: 'all',
@@ -804,13 +805,27 @@ const S = {
 
 const TAB_LABEL = { home:'수업 홈', design:'평가 설계', sheet:'활동지', task:'과제물 관리', scoring:'채점', seteuk:'세부능력 및 특기사항 지원' };
 const TAB_SRC = {
-  design:  'evaluation_design_v4_260615.html',
+  design:  'task_ocr_v3_260623.html#design',
   sheet:   'question_tab_v1_260617.html',
   task:    'task_ocr_v3_260623.html',
   scoring: 'scoring_secondary_v1_260708.html'
 };
 /* 의견 위치 → 소유자가 착지할 화면 */
 const LAND_SRC = Object.assign({}, TAB_SRC, { home:'', seteuk:'' });
+
+/* 데모 안에서 오갈 수 있는 화면 (그 외 파일로는 이탈 금지).
+   같은 탭 안의 목록 ↔ 상세 이동이라 위치 단위도 여기서 갈린다 */
+const DEMO_SCREENS = {
+  'task_ocr_v3_260623.html#design':   { tab:'design',  level:'list' },
+  'evaluation_design_v4_260615.html': { tab:'design',  level:'detail' },
+  'question_tab_v1_260617.html':      { tab:'sheet',   level:'list' },
+  'task_ocr_v3_260623.html':          { tab:'task',    level:'list' },
+  'scoring_secondary_v1_260708.html': { tab:'scoring', level:'detail' }
+};
+function screenKey(href) {
+  const m = String(href).match(/([\w.-]+\.html(?:#\w+)?)/);
+  return m ? m[1] : '';
+}
 
 const STUDENTS = [
   { id:'10101', name:'김서윤', total:113,
@@ -858,7 +873,7 @@ function goStep(n) {
     setPersona('co');
     document.querySelector('[data-nav="class"]').classList.add('active');
     if (n === 3) { goTab('home'); closeCompose(); }
-    if (n === 4) { goTab('design'); setTimeout(() => openCompose('예: 채점 기준에 분량 미달 시 처리를 넣는 게 어떨까요? 백지·짧은 답안 기준을 맞춰두면 좋겠어요.'), 350); }
+    if (n === 4) { goTab('design'); setTimeout(() => { openEmbed('evaluation_design_v4_260615.html'); setTimeout(() => openCompose('예: 채점 기준에 분량 미달 시 처리를 넣는 게 어떨까요? 백지·짧은 답안 기준을 맞춰두면 좋겠어요.'), 500); }, 300); }
     if (n === 5) { goTab('task'); setTimeout(() => openCompose('예: 손글씨 인식이 어긋난 학생이 몇 명 보여요. 채점 전에 한 번 확인하면 좋겠어요.'), 350); }
     if (n === 6) { goTab('scoring'); setTimeout(() => openCompose('예: 이 학생 "작성 분량 수준" 점수는 우리가 정한 기준과 조금 달라 보여요.'), 700); }
     if (n === 7) { S.seteukShared = true; syncSwitch(); goTab('seteuk'); selectStudent('10102'); setTimeout(() => openCompose('예: 이 학생은 토의에서 반대 의견을 조율한 장면이 인상적이었어요. 그 부분을 넣으면 좋겠어요.'), 350); }
@@ -933,10 +948,7 @@ function goTab(tab) {
   const embedWrap = document.getElementById('shEmbedWrap');
   if (TAB_SRC[tab]) {
     embedWrap.style.display = '';
-    const f = document.getElementById('shEmbed');
-    f.style.height = (window.innerHeight - 58 - 59 - 66) + 'px';
-    f.onload = () => stripChrome(f, true);
-    if (f.getAttribute('src') !== TAB_SRC[tab]) f.src = TAB_SRC[tab];
+    openEmbed(TAB_SRC[tab]);
   } else {
     embedWrap.style.display = 'none';
   }
@@ -951,6 +963,16 @@ function goTab(tab) {
   updateDock();
   setHash();
   lucide.createIcons();
+}
+/* 공유 보기 임베드 열기 — 어느 화면을 보고 있는지(S.embed)를 같이 기록해 위치 단위를 갈라준다 */
+function openEmbed(src) {
+  const f = document.getElementById('shEmbed');
+  S.embed = screenKey(src);
+  f.style.height = (window.innerHeight - 58 - 59 - 66) + 'px';
+  f.onload = () => stripChrome(f, true);
+  if (f.getAttribute('src') !== src) f.src = src; else stripChrome(f, true);
+  S.target = ''; S.targetTouched = false;
+  updateDock();
 }
 /* 재사용 화면에서 자체 헤더·NB·탭밴드를 감추고(lock=true면 편집 요소도 잠금),
    내부 링크로 다른 버전 파일에 빠지지 않게 이동을 차단한다 */
@@ -968,7 +990,12 @@ function stripChrome(f, lock) {
     d.addEventListener('click', e => {
       const el = e.target.closest && e.target.closest('[onclick],a[href]');
       const code = el ? (el.getAttribute('onclick') || '') + (el.getAttribute('href') || '') : '';
-      if (/\.html/.test(code)) { e.preventDefault(); e.stopPropagation(); showToast('데모에서는 이 화면 안에서만 볼 수 있어요'); }
+      if (!/\.html/.test(code)) return;
+      e.preventDefault(); e.stopPropagation();
+      // 같은 탭 안의 화면(목록 ↔ 상세)이면 이동시키고, 그 외 파일로는 나가지 않는다
+      const key = screenKey(code), info = DEMO_SCREENS[key];
+      if (lock && info && info.tab === S.tab) { openEmbed(key); return; }
+      showToast('데모에서는 이 수업 화면 안에서만 볼 수 있어요');
     }, true);
     // 학생을 바꾸면 도크의 '지금 보는 화면'도 따라 바뀐다
     const w = f.contentWindow;
@@ -1063,7 +1090,9 @@ function selectStudent(id) {
 const EVAL_NAME = '관심 분야에 관한 미래 예측 보고서 작성';
 const CLASS_NAME = '1학년 1반';
 function screenPath() {
-  if (S.tab === 'design')  return ['평가 설계', EVAL_NAME];
+  const lv = (DEMO_SCREENS[S.embed] || {}).level;
+  // 평가 설계는 목록/카드 상세 2단 — 목록에서는 평가명을 찍지 않는다
+  if (S.tab === 'design')  return lv === 'detail' ? ['평가 설계', EVAL_NAME] : ['평가 설계'];
   if (S.tab === 'task')    return ['과제물 관리', EVAL_NAME, CLASS_NAME];
   if (S.tab === 'scoring') return ['채점', EVAL_NAME, CLASS_NAME];
   if (S.tab === 'seteuk')  return ['세부능력 및 특기사항 지원', CLASS_NAME];
