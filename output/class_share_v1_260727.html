@@ -1,0 +1,954 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CLIPO — 공동교사 · 수업 공유</title>
+<link rel="icon" type="image/png" href="clipo_favicon.png">
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<style>
+@import url('https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard-gov.min.css');
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:'Pretendard GOV', -apple-system, sans-serif; background:#f6f7f9; color:#222631; font-size:16px; }
+
+input:focus, textarea:focus { outline:none; border-color:#416bff !important; box-shadow:0 0 0 3px rgba(65,107,255,.12); }
+
+button, .btn, a.btn { display:inline-flex; align-items:center; justify-content:center; line-height:1; vertical-align:middle;
+  font-family:inherit; cursor:pointer; border:none; background:none; gap:8px; }
+.btn-solid { height:40px; border-radius:4px; padding:10px 16px; background:#365eef; color:#fff; font-size:14px; font-weight:600; }
+.btn-solid:disabled { background:#dde1e8; color:#b3b6bd; cursor:not-allowed; }
+.btn-outline { height:40px; border-radius:4px; padding:10px 16px; background:#fff; border:1px solid #a3c3ff; color:#3151c4; font-size:14px; font-weight:600; }
+.btn-ghost { height:40px; border-radius:4px; padding:10px 16px; background:transparent; color:#3b3f4c; font-size:14px; font-weight:600; }
+.btn-ghost:hover { background:#f1f3f5; }
+.btn-sm { height:32px; padding:6px 12px; font-size:13px; }
+
+/* ───────── header (2026-07-09 신규 상단바) ───────── */
+.g-hd { position:fixed; top:0; left:0; right:0; height:58px; background:#fff; border-bottom:1px solid #dde1e8; z-index:50;
+  display:flex; align-items:center; justify-content:space-between; padding:0 20px 0 9px; }
+.g-hd-l { display:flex; align-items:center; }
+.hd-menu { width:40px; height:40px; border-radius:4px; margin-right:9px; color:#3b3f4c; }
+.hd-menu:hover { background:#f6f7f9; }
+.logo { font-size:21px; font-weight:800; color:#365eef; letter-spacing:1px; }
+.g-hd-r { display:flex; align-items:center; gap:16px; font-size:15px; color:#18181b; }
+.hd-plan { display:flex; align-items:center; gap:8px; }
+.plan-badge { height:20px; display:inline-flex; align-items:center; padding:0 6px; border-radius:6px; background:#e9f2ff;
+  border:1px solid #ccdfff; font-size:12px; font-weight:500; color:#3151c4; }
+.credit-wrap { display:inline-flex; align-items:center; gap:6px; font-size:15px; font-weight:500; }
+.credit-wrap svg { width:20px; height:20px; color:#416bff; }
+.user-btn { height:36px; padding:0 12px; gap:4px; border:1px solid #c7cbd3; border-radius:9999px; font-size:14px; font-weight:500; color:#27272a; background:#fff; }
+
+/* ───────── sidebar ───────── */
+.icon-sb { position:fixed; top:58px; left:0; bottom:0; background:#fff; border-right:1px solid #dde1e8;
+  width:56px; transition:width .2s ease; z-index:40; padding:8px 0; display:flex; flex-direction:column; }
+.icon-sb.expanded { width:200px; }
+.si { display:flex; align-items:center; gap:10px; height:40px; padding:0 4px 0 16px; color:#3b3f4c;
+  font-size:15px; font-weight:500; cursor:pointer; white-space:nowrap; position:relative; border-radius:4px; margin:0 4px; }
+.si:hover { background:#f6f7f9; }
+.si.active { background:#e9f2ff; color:#416bff; }
+.si svg { width:24px; height:24px; flex-shrink:0; }
+.si-label { opacity:0; transition:opacity .1s; }
+.icon-sb.expanded .si-label { opacity:1; }
+.si .beta { font-size:11px; font-weight:600; color:#5d26c4; background:#ebdfff; border-radius:4px; padding:2px 5px; }
+.sb-div { border-top:1px solid #dde1e8; margin:8px 12px; }
+.sb-grow { flex:1; }
+
+/* ───────── layout ───────── */
+.scene { display:none; }
+.scene.active { display:block; }
+.main-wrap { padding-top:58px; padding-left:56px; transition:padding-left .2s; min-height:100vh; }
+body.nav-expanded .main-wrap { padding-left:200px; }
+.page-wrap { max-width:1240px; margin:0 auto; padding:28px 20px 120px; }
+
+/* 탭 밴드 */
+.tab-band { position:sticky; top:58px; z-index:30; background:#fff; border-bottom:1px solid #dde1e8; padding:0 20px; }
+.tab-band-inner { max-width:1240px; margin:0 auto; display:flex; gap:8px; }
+.sub-tab { padding:18px 14px; font-size:16px; font-weight:500; color:#3b3f4c; border-bottom:2px solid transparent;
+  margin-bottom:-1px; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; line-height:1; gap:6px; }
+.sub-tab:hover { color:#222631; }
+.sub-tab.on { color:#416bff; border-bottom-color:#416bff; }
+.sub-tab .lock { width:14px; height:14px; color:#b3b6bd; }
+
+/* 수업 배너 */
+.class-banner { background:#416bff; border-radius:12px; color:#fff; padding:26px 32px; display:flex; justify-content:space-between; align-items:center; gap:16px; flex-wrap:wrap; }
+.cb-meta { font-size:14px; font-weight:500; opacity:.9; margin-bottom:10px; display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+.cb-title { font-size:26px; font-weight:600; display:flex; align-items:center; gap:10px; }
+.cb-right { display:flex; align-items:center; gap:10px; }
+.cb-stat { font-size:15px; font-weight:500; display:inline-flex; align-items:center; gap:6px; margin-right:6px; }
+.btn-banner { height:40px; padding:10px 18px; border-radius:100px; border:1.5px solid rgba(255,255,255,.7); color:#fff; font-size:14px; font-weight:600; background:transparent; }
+.btn-banner:hover { background:rgba(255,255,255,.12); }
+.shared-chip { display:inline-flex; align-items:center; gap:6px; height:26px; padding:0 10px; border-radius:100px;
+  background:rgba(255,255,255,.18); font-size:13px; font-weight:600; }
+.shared-chip svg { width:14px; height:14px; }
+
+.card { background:#fff; border-radius:12px; box-shadow:0 0 1px #2226314D, 0 4px 8px #0000001A; padding:28px; }
+.card-title { font-size:20px; font-weight:600; display:flex; align-items:center; gap:8px; }
+.card-head { display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; gap:12px; flex-wrap:wrap; }
+.grid-2 { display:grid; grid-template-columns:1fr 1.6fr; gap:24px; margin-top:24px; }
+
+/* 받은 의견 (소유자) */
+.op-card { background:#fff; border:1px solid #ccdfff; border-radius:12px; padding:24px 28px; margin-top:24px; }
+.op-head { display:flex; align-items:center; gap:10px; }
+.op-title { font-size:20px; font-weight:600; display:flex; align-items:center; gap:8px; }
+.op-count { min-width:24px; height:24px; padding:0 8px; border-radius:100px; background:#416bff; color:#fff;
+  font-size:13px; font-weight:700; display:inline-flex; align-items:center; justify-content:center; }
+.op-sub { font-size:14px; color:#6d7381; margin:6px 0 16px; }
+.op-item { display:flex; align-items:flex-start; justify-content:space-between; gap:16px; padding:16px; background:#f4f8ff; border-radius:8px; }
+.op-item + .op-item { margin-top:10px; }
+.op-loc { display:inline-flex; align-items:center; gap:6px; height:26px; padding:0 10px; border-radius:100px;
+  background:#e9f2ff; border:1px solid #ccdfff; color:#3151c4; font-size:13px; font-weight:600; }
+.op-loc svg { width:14px; height:14px; }
+.op-text { font-size:16px; line-height:1.6; margin-top:10px; }
+.op-meta { font-size:14px; color:#6d7381; margin-top:8px; }
+.op-empty { font-size:16px; color:#6d7381; padding:18px 0; }
+
+/* 수행평가 목록 */
+.eval-item { padding:24px 0; border-bottom:1px solid #f1f3f5; }
+.eval-item:last-of-type { border-bottom:none; }
+.eval-top { display:flex; justify-content:space-between; align-items:flex-start; gap:12px; }
+.eval-name { font-size:20px; font-weight:600; }
+.eval-date { font-size:14px; color:#6d7381; flex-shrink:0; }
+.eval-desc { font-size:16px; color:#3b3f4c; margin-top:10px; }
+.eval-desc a { color:#365eef; font-weight:500; }
+.steps { display:flex; align-items:center; margin-top:16px; flex-wrap:wrap; }
+.step { height:32px; display:inline-flex; align-items:center; padding:0 14px; border-radius:100px;
+  border:1px solid #ccdfff; color:#3151c4; background:#fff; font-size:13px; font-weight:500; }
+.step.dim { border-color:#dde1e8; color:#b3b6bd; }
+.step-line { width:18px; border-top:1px solid #dde1e8; }
+.review-row { margin-top:16px; padding:14px 16px; background:#f6f7f9; border-radius:8px;
+  display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; }
+.review-left { display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
+.review-label { font-size:14px; font-weight:600; color:#3b3f4c; display:inline-flex; align-items:center; gap:6px; }
+.review-meta { font-size:14px; color:#6d7381; }
+.badge { height:24px; display:inline-flex; align-items:center; gap:5px; padding:0 9px; border-radius:4px; font-size:13px; font-weight:600; }
+.badge svg { width:14px; height:14px; }
+.bdg-wait { background:#fff7ed; color:#ea580c; }
+.bdg-done { background:#eefcf4; color:#27724b; }
+.bdg-none { background:#f1f3f5; color:#6d7381; }
+
+/* 관찰 기록 */
+.kw { display:inline-flex; align-items:center; height:28px; padding:0 10px; border:1px solid #ccdfff; color:#3151c4;
+  border-radius:6px; font-size:13px; font-weight:500; margin:0 6px 8px 0; background:#fff; }
+.obs-input { display:flex; gap:8px; margin-top:16px; }
+.obs-input input { flex:1; height:40px; border:1px solid #d9d9d9; border-radius:4px; padding:0 12px; font-size:16px; font-family:inherit; }
+.obs-input input::placeholder { color:#b3b6bd; }
+
+/* 세특 목록 (공유 보기) */
+.st-row { display:flex; align-items:flex-start; justify-content:space-between; gap:16px; padding:20px 0; border-bottom:1px solid #f1f3f5; cursor:pointer; }
+.st-row:last-child { border-bottom:none; }
+.st-row:hover { background:#fafbfc; }
+.st-row.sel { background:#f4f8ff; }
+.st-name { font-size:16px; font-weight:600; flex-shrink:0; width:110px; }
+.st-body { font-size:16px; line-height:1.7; color:#3b3f4c; flex:1; }
+.st-side { flex-shrink:0; display:flex; align-items:center; gap:8px; }
+.st-hint { font-size:13px; color:#6d7381; }
+
+/* 잠금 안내 */
+.lock-panel { background:#fff; border-radius:12px; box-shadow:0 0 1px #2226314D, 0 4px 8px #0000001A;
+  padding:56px 36px; text-align:center; }
+.lock-ic { width:64px; height:64px; border-radius:100px; background:#f1f3f5; color:#6d7381;
+  display:inline-flex; align-items:center; justify-content:center; margin-bottom:18px; }
+.lock-panel h2 { font-size:20px; font-weight:600; }
+.lock-panel p { font-size:16px; color:#6d7381; line-height:1.6; margin-top:12px; }
+
+/* 안내 박스 (좌측 액센트 띠 금지 — 배경 + 아이콘) */
+.note { background:#f4f8ff; border-radius:8px; padding:12px 14px; font-size:14px; color:#3151c4;
+  display:flex; gap:8px; align-items:flex-start; line-height:1.55; }
+.note svg { width:18px; height:18px; flex-shrink:0; margin-top:1px; }
+
+/* iframe 콘텐츠 (공유 보기 · 다른 탭) */
+.embed { width:100%; border:none; background:#f6f7f9; display:block; }
+
+/* ───────── 공유 도크 ───────── */
+.share-dock { position:fixed; left:0; right:0; bottom:0; z-index:60; background:#fff; border-top:1px solid #dde1e8;
+  box-shadow:0 -8px 24px rgba(0,0,0,.08); display:none; }
+.scene.active .share-dock, body.dock-on .share-dock { display:block; }
+.sd-expand { max-height:0; overflow:hidden; transition:max-height .25s ease; padding:0 28px; }
+.share-dock.open .sd-expand { max-height:320px; padding-top:18px; border-bottom:1px solid #f1f3f5; }
+.sd-exp-title { font-size:17px; font-weight:600; display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+.sd-exp-title .sub { font-size:14px; font-weight:400; color:#6d7381; flex-basis:100%; margin-top:4px; }
+.sd-expand textarea { width:100%; min-height:92px; border:1px solid #d9d9d9; border-radius:8px; padding:12px 14px;
+  font-size:16px; font-family:inherit; resize:vertical; margin-top:12px; }
+.sd-expand textarea::placeholder { color:#b3b6bd; }
+.sd-exp-actions { display:flex; justify-content:flex-end; gap:8px; margin:12px 0 14px; }
+.sd-bar { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:13px 28px; }
+.sd-ctx { display:flex; align-items:center; gap:9px; font-size:15px; color:#3151c4; min-width:0; flex-wrap:wrap; }
+.sd-ctx b { font-weight:700; }
+.sd-ro { font-size:13px; font-weight:600; color:#3151c4; background:#e9f2ff; border:1px solid #ccdfff;
+  border-radius:100px; padding:4px 10px; flex-shrink:0; }
+.sd-right { display:flex; align-items:center; gap:10px; flex-shrink:0; }
+.sd-count { font-size:14px; font-weight:600; color:#3151c4; background:#f4f8ff; border:1px solid #ccdfff; border-radius:100px; padding:6px 14px; }
+
+/* ───────── 착지 (소유자) ───────── */
+.land-strip { position:fixed; top:0; left:0; right:0; z-index:70; background:#222631; color:#fff; padding:12px 20px;
+  display:flex; align-items:center; justify-content:space-between; gap:16px; flex-wrap:wrap; }
+.ls-left { display:flex; align-items:center; gap:12px; min-width:0; flex-wrap:wrap; }
+.ls-loc { display:inline-flex; align-items:center; gap:6px; height:26px; padding:0 10px; border-radius:100px;
+  background:rgba(255,255,255,.16); font-size:13px; font-weight:600; }
+.ls-loc svg { width:14px; height:14px; }
+.ls-text { font-size:15px; }
+.ls-meta { font-size:13px; color:#b3b6bd; }
+.land-frame { position:fixed; top:52px; left:0; width:100%; height:calc(100vh - 52px); border:none; background:#f6f7f9; z-index:55; }
+.land-native { position:fixed; top:52px; left:0; right:0; bottom:0; overflow:auto; background:#f6f7f9; z-index:55; }
+.land-hl { background:#fff7ed; border-radius:8px; padding:2px 4px; }
+.btn-strip { height:34px; padding:8px 14px; border-radius:6px; background:rgba(255,255,255,.16); color:#fff; font-size:14px; font-weight:600; }
+.btn-strip:hover { background:rgba(255,255,255,.26); }
+
+/* ───────── 홈 iframe (공동교사) ───────── */
+body.home-full .g-hd, body.home-full .icon-sb { display:none; }
+.home-frame { position:fixed; top:0; left:0; width:100%; height:100vh; border:none; background:#f6f7f9; z-index:55; }
+
+/* ───────── modal ───────── */
+.overlay { position:fixed; inset:0; background:rgba(0,0,0,.4); z-index:90; display:none; }
+.overlay.open { display:flex; align-items:center; justify-content:center; }
+.modal { width:672px; max-width:94vw; max-height:88vh; overflow:auto; background:#fff; border-radius:12px;
+  box-shadow:0 0 1px #2226314D, 0 8px 16px rgba(0,0,0,.1); }
+.modal-head { padding:24px 24px 16px; display:flex; align-items:center; justify-content:space-between; }
+.modal-head h2 { font-size:20px; font-weight:600; }
+.modal-body { padding:8px 24px 8px; }
+.modal-foot { padding:8px 24px 20px; display:flex; justify-content:flex-end; gap:8px; }
+.fld-label { font-size:14px; font-weight:500; color:#222631; margin:24px 0 10px; display:flex; align-items:center; gap:6px; }
+.fld-label:first-child { margin-top:8px; }
+.fld-label .opt { font-weight:400; color:#6d7381; }
+.search-input { position:relative; }
+.search-input input { width:100%; height:40px; border:1px solid #d9d9d9; border-radius:4px; padding:0 12px 0 38px; font-size:16px; font-family:inherit; }
+.search-input input::placeholder { color:#b3b6bd; }
+.search-input svg { position:absolute; left:12px; top:10px; width:20px; height:20px; color:#b3b6bd; }
+table.t-list { width:100%; border-collapse:collapse; margin-top:4px; }
+.t-list th { height:40px; background:#f6f7f9; font-size:14px; font-weight:500; color:#3b3f4c; text-align:center; }
+.t-list td { height:48px; font-size:15px; border-bottom:1px solid #f1f3f5; text-align:center; }
+.t-list .role { font-size:13px; color:#6d7381; }
+.icon-btn40 { width:40px; height:40px; border-radius:4px; color:#3b3f4c; }
+.icon-btn40:hover { background:#f1f3f5; }
+
+/* 공유 범위 */
+.scope-box { border:1px solid #dde1e8; border-radius:8px; overflow:hidden; }
+.scope-row { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:14px 16px; }
+.scope-row + .scope-row { border-top:1px solid #f1f3f5; }
+.scope-name { font-size:16px; font-weight:500; display:flex; align-items:center; gap:8px; }
+.scope-state { font-size:14px; color:#6d7381; }
+.switch { width:44px; height:24px; border-radius:100px; background:#dde1e8; position:relative; cursor:pointer; flex-shrink:0; transition:background .15s; }
+.switch.on { background:#416bff; }
+.switch .knob { position:absolute; top:3px; left:3px; width:18px; height:18px; border-radius:100px; background:#fff; transition:left .15s; }
+.switch.on .knob { left:23px; }
+
+/* 권한 없음 */
+.denied-wrap { min-height:calc(100vh - 200px); display:flex; align-items:center; justify-content:center; }
+.denied-card { max-width:460px; text-align:center; background:#fff; border-radius:16px;
+  box-shadow:0 0 1px #2226314D, 0 4px 8px #0000001A; padding:40px 36px; }
+.denied-ic { width:64px; height:64px; border-radius:100px; background:#f1f3f5; color:#6d7381;
+  display:inline-flex; align-items:center; justify-content:center; margin-bottom:18px; }
+.denied-card h2 { font-size:20px; font-weight:600; }
+.denied-card p { font-size:16px; color:#6d7381; line-height:1.6; margin-top:12px; }
+.denied-actions { display:flex; gap:8px; justify-content:center; margin-top:24px; }
+
+/* ───────── toast / demo nav ───────── */
+.toast { position:fixed; bottom:96px; left:50%; transform:translateX(-50%) translateY(20px); opacity:0;
+  background:#222631; color:#fff; font-size:15px; font-weight:500; border-radius:100px; padding:13px 24px;
+  display:flex; align-items:center; gap:8px; z-index:200; pointer-events:none; transition:all .25s; }
+.toast.show { opacity:1; transform:translateX(-50%) translateY(0); }
+.toast svg { width:18px; height:18px; color:#93e3b9; }
+
+.demo-nav { position:fixed; right:24px; bottom:100px; z-index:150; background:#222631; color:#fff;
+  border-radius:14px; padding:8px; width:268px; box-shadow:0 8px 24px rgba(0,0,0,.3); user-select:none; }
+body.dn-dragging { user-select:none; cursor:move; }
+body.dn-dragging iframe { pointer-events:none; }
+.dn-title { display:flex; align-items:center; justify-content:space-between; cursor:move; padding:5px 6px 8px; }
+.dn-titletext { font-size:12px; font-weight:700; letter-spacing:1.2px; color:#b3b6bd; display:flex; align-items:center; gap:6px; }
+.dn-fold { width:24px; height:24px; border-radius:6px; color:#b3b6bd; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; }
+.dn-fold:hover { background:#3b3f4c; color:#fff; }
+.dn-body { max-height:640px; overflow:hidden; transition:max-height .22s ease; }
+.demo-nav.collapsed .dn-title { padding-bottom:5px; }
+.demo-nav.collapsed .dn-body { max-height:0; }
+.demo-nav.collapsed .dn-fold svg { transform:rotate(180deg); }
+.dn-div { border-top:1px solid #3b3f4c; margin:8px 2px; }
+.dn-cases { font-size:10px; font-weight:700; letter-spacing:1.2px; color:#6d7381; padding:0 8px 5px; }
+.dn-step { display:flex; align-items:center; gap:9px; padding:7px 8px; border-radius:8px; font-size:13.5px; font-weight:500; color:#c7cbd3; cursor:pointer; }
+.dn-step:hover { background:#3b3f4c; }
+.dn-step.on { background:#416bff; color:#fff; }
+.dn-step .n { width:20px; height:20px; border-radius:100px; background:#3b3f4c; font-size:11.5px; font-weight:700;
+  display:inline-flex; align-items:center; justify-content:center; flex-shrink:0; }
+.dn-step.on .n { background:rgba(255,255,255,.25); }
+.dn-persona { font-size:10.5px; font-weight:700; padding:2px 6px; border-radius:4px; margin-left:auto; flex-shrink:0; }
+.dn-persona.owner { background:#fff7ed; color:#ea580c; }
+.dn-persona.co { background:#eefcf4; color:#27724b; }
+</style>
+</head>
+<body>
+
+<!-- ═════════ Header ═════════ -->
+<header class="g-hd">
+  <div class="g-hd-l">
+    <button class="hd-menu" onclick="toggleNav()"><i data-lucide="panel-left-open" style="width:20px;height:20px"></i></button>
+    <span class="logo">CLIPO</span>
+  </div>
+  <div class="g-hd-r">
+    <span class="hd-plan"><span class="plan-badge">학교 유료</span><span style="font-weight:500">D-180</span></span>
+    <span class="credit-wrap"><i data-lucide="bot"></i> <span id="hdrCredit">200</span> 크레딧</span>
+    <button class="user-btn"><span id="hdrUser">최대표 선생님 (대표교사)</span> <i data-lucide="chevron-down" style="width:16px;height:16px"></i></button>
+  </div>
+</header>
+
+<!-- ═════════ Sidebar ═════════ -->
+<nav class="icon-sb" id="iconSb">
+  <div class="si" data-nav="home"><i data-lucide="home"></i><span class="si-label">홈</span></div>
+  <div class="si" data-nav="plan"><i data-lucide="scissors"></i><span class="si-label">평가계획</span></div>
+  <div class="si" data-nav="class"><i data-lucide="layout-grid"></i><span class="si-label">수업</span></div>
+  <div class="si"><i data-lucide="notebook-pen"></i><span class="si-label">창의적 체험활동 <span class="beta">Beta</span></span></div>
+  <div class="si"><i data-lucide="zap"></i><span class="si-label">세특 간편 생성기</span></div>
+  <div class="si"><i data-lucide="smile"></i><span class="si-label">행동특성 및 종합기록</span></div>
+  <div class="si"><i data-lucide="bar-chart-2"></i><span class="si-label">리포트</span></div>
+  <div class="si"><i data-lucide="building-2"></i><span class="si-label">학교 설정</span></div>
+  <div class="sb-grow"></div>
+  <div class="sb-div"></div>
+  <div class="si"><i data-lucide="file-down"></i><span class="si-label">매뉴얼 다운로드</span></div>
+  <div class="si"><i data-lucide="credit-card"></i><span class="si-label">요금제</span></div>
+  <div class="si"><i data-lucide="help-circle"></i><span class="si-label">고객센터</span></div>
+</nav>
+
+<!-- ═════════ Scene 1 : 수업 홈 (소유자) ═════════ -->
+<section class="scene" id="sceneOwner">
+  <div class="main-wrap">
+    <div class="tab-band">
+      <div class="tab-band-inner">
+        <div class="sub-tab on">수업 홈</div>
+        <div class="sub-tab" onclick="location.href='task_ocr_v3_260623.html#design'">평가 설계</div>
+        <div class="sub-tab" onclick="location.href='question_tab_v1_260617.html'">활동지</div>
+        <div class="sub-tab" onclick="location.href='task_ocr_v3_260623.html'">과제물 관리</div>
+        <div class="sub-tab" onclick="location.href='task_ocr_v3_260623.html#scoring'">채점</div>
+        <div class="sub-tab" onclick="showToast('아직 준비 중인 기능이에요.')">세부능력 및 특기사항 지원</div>
+      </div>
+    </div>
+
+    <div class="page-wrap">
+      <div class="class-banner">
+        <div>
+          <div class="cb-meta">2026학년도 1학기 ｜ 사회</div>
+          <div class="cb-title">3학년 2반 사회 <i data-lucide="pencil" style="width:20px;height:20px;opacity:.85"></i></div>
+        </div>
+        <div class="cb-right">
+          <span class="cb-stat"><i data-lucide="users" style="width:18px;height:18px"></i> 참여 학생 9명</span>
+          <button class="btn-banner">관리</button>
+          <button class="btn-banner" onclick="openModal('modalShare')"><i data-lucide="users-round" style="width:16px;height:16px"></i> 공동교사 <span id="coCount">2명</span></button>
+        </div>
+      </div>
+
+      <!-- 받은 의견 -->
+      <div class="op-card">
+        <div class="op-head">
+          <span class="op-title"><i data-lucide="message-square-text" style="width:20px;height:20px;color:#416bff"></i> 받은 의견</span>
+          <span class="op-count" id="opCount">2</span>
+        </div>
+        <div class="op-sub">공동교사가 남긴 의견이에요. 의견을 누르면 해당 화면으로 바로 이동해요.</div>
+        <div id="opList"></div>
+      </div>
+
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-head">
+            <div class="card-title">관찰 기록</div>
+            <button class="btn-ghost btn-sm">상세 보기</button>
+          </div>
+          <div>
+            <span class="kw">질문 활동</span><span class="kw">활발함</span><span class="kw">뛰어난 집중력</span><span class="kw">적극적</span>
+            <span class="kw">참여</span><span class="kw">소통</span><span class="kw">배려</span><span class="kw">협력</span>
+          </div>
+          <div class="obs-input">
+            <input type="text" placeholder="기억에 남는 학생 모습을 입력해 주세요.">
+            <button class="btn-solid">등록</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-head"><div class="card-title">수행평가 목록</div></div>
+          <div class="eval-item">
+            <div class="eval-top"><span class="eval-name">관심 분야에 관한 미래 예측 보고서 작성</span><span class="eval-date">06/05 등록</span></div>
+            <div class="eval-desc">채점이 완료되었습니다. <a href="#">세부능력 및 특기사항 지원</a>에서 학급별 AI 기록을 생성할 수 있습니다.</div>
+            <div class="steps">
+              <span class="step">수행평가 설계</span><span class="step-line"></span><span class="step">과제물 제출</span><span class="step-line"></span>
+              <span class="step">채점 진행</span><span class="step-line"></span><span class="step">평가 마감</span><span class="step-line"></span><span class="step dim">세특 작성</span>
+            </div>
+            <div class="review-row">
+              <div class="review-left">
+                <span class="review-label"><i data-lucide="user-check" style="width:16px;height:16px"></i> 채점 공동 확인</span>
+                <span id="ownerConfirmBadge"><span class="badge bdg-wait"><i data-lucide="clock"></i> 확인 대기</span></span>
+                <span class="review-meta">3학년 2반 · 채점 완료 9/9명</span>
+              </div>
+              <button class="btn-outline btn-sm" onclick="showToast('채점 탭에서 확인을 요청해요 (v1 플로우)')">확인 요청</button>
+            </div>
+          </div>
+          <div class="eval-item">
+            <div class="eval-top"><span class="eval-name">설득하는 글쓰기</span><span class="eval-date">06/05 등록</span></div>
+            <div class="eval-desc">수행평가 제출이 진행 중입니다. <a href="#">과제물 관리</a>에서 제출 현황을 확인할 수 있습니다.</div>
+            <div class="steps">
+              <span class="step">수행평가 설계</span><span class="step-line"></span><span class="step">과제물 제출</span><span class="step-line"></span>
+              <span class="step dim">채점 진행</span><span class="step-line"></span><span class="step dim">평가 마감</span><span class="step-line"></span><span class="step dim">세특 작성</span>
+            </div>
+            <div class="review-row">
+              <div class="review-left">
+                <span class="review-label"><i data-lucide="user-check" style="width:16px;height:16px"></i> 채점 공동 확인</span>
+                <span class="badge bdg-none">채점 전</span>
+                <span class="review-meta">채점이 끝나면 확인을 요청할 수 있어요.</span>
+              </div>
+              <button class="btn-outline btn-sm" disabled style="opacity:.45;cursor:not-allowed">확인 요청</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═════════ Scene 2 : 클리포 홈 (공동교사) ═════════ -->
+<section class="scene" id="sceneHome">
+  <iframe class="home-frame" id="homeFrame" title="클리포 홈 (공동교사 시점)"></iframe>
+</section>
+
+<!-- ═════════ Scene 3 : 공유받은 수업 (공동교사) ═════════ -->
+<section class="scene" id="sceneShared">
+  <div class="main-wrap">
+    <div class="tab-band">
+      <div class="tab-band-inner" id="sharedTabs">
+        <div class="sub-tab on" data-tab="home">수업 홈</div>
+        <div class="sub-tab" data-tab="design">평가 설계</div>
+        <div class="sub-tab" data-tab="sheet">활동지</div>
+        <div class="sub-tab" data-tab="task">과제물 관리</div>
+        <div class="sub-tab" data-tab="scoring">채점</div>
+        <div class="sub-tab" data-tab="seteuk">세부능력 및 특기사항 지원</div>
+      </div>
+    </div>
+
+    <!-- 탭: 수업 홈 -->
+    <div class="page-wrap" id="shHome">
+      <div class="class-banner">
+        <div>
+          <div class="cb-meta">
+            <span class="shared-chip"><i data-lucide="users-round"></i> 공유받은 수업</span>
+            2026학년도 1학기 ｜ 사회 ｜ 최대표 선생님의 수업
+          </div>
+          <div class="cb-title">3학년 2반 사회</div>
+        </div>
+        <div class="cb-right">
+          <span class="cb-stat"><i data-lucide="users" style="width:18px;height:18px"></i> 참여 학생 9명</span>
+        </div>
+      </div>
+
+      <div class="card" style="margin-top:24px">
+        <div class="card-head"><div class="card-title">수행평가 목록</div></div>
+        <div class="eval-item">
+          <div class="eval-top"><span class="eval-name">관심 분야에 관한 미래 예측 보고서 작성</span><span class="eval-date">06/05 등록</span></div>
+          <div class="eval-desc">채점이 완료되었습니다.</div>
+          <div class="steps">
+            <span class="step">수행평가 설계</span><span class="step-line"></span><span class="step">과제물 제출</span><span class="step-line"></span>
+            <span class="step">채점 진행</span><span class="step-line"></span><span class="step">평가 마감</span><span class="step-line"></span><span class="step dim">세특 작성</span>
+          </div>
+          <div class="review-row">
+            <div class="review-left">
+              <span class="review-label"><i data-lucide="user-check" style="width:16px;height:16px"></i> 채점 공동 확인</span>
+              <span class="badge bdg-wait"><i data-lucide="clock"></i> 확인 요청 받음</span>
+              <span class="review-meta">최대표 선생님 · 06/11 요청</span>
+            </div>
+            <button class="btn-outline btn-sm" onclick="goTab('scoring')">채점 결과 보기</button>
+          </div>
+        </div>
+        <div class="eval-item">
+          <div class="eval-top"><span class="eval-name">설득하는 글쓰기</span><span class="eval-date">06/05 등록</span></div>
+          <div class="eval-desc">수행평가 제출이 진행 중입니다.</div>
+          <div class="steps">
+            <span class="step">수행평가 설계</span><span class="step-line"></span><span class="step">과제물 제출</span><span class="step-line"></span>
+            <span class="step dim">채점 진행</span><span class="step-line"></span><span class="step dim">평가 마감</span><span class="step-line"></span><span class="step dim">세특 작성</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="card" style="margin-top:24px">
+        <div class="card-head"><div class="card-title">관찰 기록</div></div>
+        <div>
+          <span class="kw">질문 활동</span><span class="kw">활발함</span><span class="kw">뛰어난 집중력</span><span class="kw">적극적</span>
+          <span class="kw">참여</span><span class="kw">소통</span><span class="kw">배려</span><span class="kw">협력</span>
+        </div>
+        <div class="note" style="margin-top:16px"><i data-lucide="eye"></i>
+          <span>공유받은 수업이라 보기만 할 수 있어요. 기록 추가·수정은 최대표 선생님만 할 수 있어요.</span></div>
+      </div>
+    </div>
+
+    <!-- 탭: 세특 -->
+    <div class="page-wrap" id="shSeteuk" style="display:none">
+      <div id="seteukShared">
+        <div class="card">
+          <div class="card-head">
+            <div class="card-title">세부능력 및 특기사항 지원</div>
+            <span class="op-loc"><i data-lucide="eye"></i> 보기 전용</span>
+          </div>
+          <div class="note" style="margin-bottom:8px"><i data-lucide="message-square-plus"></i>
+            <span>학생을 선택하면 그 학생 기록에, 선택하지 않으면 세특 전반에 의견을 남길 수 있어요.</span></div>
+          <div id="stList"></div>
+        </div>
+      </div>
+      <div id="seteukLocked" style="display:none">
+        <div class="lock-panel">
+          <span class="lock-ic"><i data-lucide="lock" style="width:28px;height:28px"></i></span>
+          <h2>세부능력 및 특기사항은 공유되지 않았어요</h2>
+          <p>최대표 선생님이 이 수업의 세특 공유를 꺼두었어요.<br>나머지 탭은 그대로 볼 수 있어요.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 탭: 평가 설계 / 활동지 / 과제물 관리 / 채점 (개발 확정 화면 그대로 재사용) -->
+    <div id="shEmbedWrap" style="display:none">
+      <iframe class="embed" id="shEmbed" title="공유받은 수업 화면"></iframe>
+    </div>
+  </div>
+
+  <!-- 공유 도크 -->
+  <div class="share-dock" id="shareDock" style="display:block">
+    <div class="sd-expand">
+      <div class="sd-exp-title">
+        <i data-lucide="message-square-plus" style="width:20px;height:20px;color:#416bff"></i> 의견 남기기
+        <span class="op-loc" id="opLocChip"><i data-lucide="map-pin"></i> <span id="opLocText">수업 홈</span></span>
+        <span class="sub">지금 보고 있는 화면이 함께 전달돼요. 최대표 선생님만 볼 수 있어요.</span>
+      </div>
+      <textarea id="opInput" placeholder="함께 논의하고 싶은 내용을 남겨주세요."></textarea>
+      <div class="sd-exp-actions">
+        <button class="btn-outline" onclick="closeCompose()">취소</button>
+        <button class="btn-solid" onclick="saveOpinion()">등록</button>
+      </div>
+    </div>
+    <div class="sd-bar">
+      <div class="sd-ctx">
+        <i data-lucide="users-round" style="width:20px;height:20px;flex-shrink:0"></i>
+        <span><b>최대표 선생님</b>이 공유한 수업 · 지금 보는 화면 <b id="dockLoc">수업 홈</b></span>
+        <span class="sd-ro">보기 전용 · 수정 불가</span>
+      </div>
+      <div class="sd-right">
+        <button class="btn-ghost" onclick="goStep(2)">나가기</button>
+        <span class="sd-count" id="myOpCount">남긴 의견 0건</span>
+        <button class="btn-solid" onclick="toggleCompose()"><i data-lucide="message-square-plus" style="width:16px;height:16px"></i> 의견 남기기</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═════════ Scene 4 : 의견 위치로 착지 (소유자) ═════════ -->
+<section class="scene" id="sceneLand">
+  <div class="land-strip">
+    <div class="ls-left">
+      <span class="ls-loc"><i data-lucide="map-pin"></i> <span id="landLoc">평가 설계</span></span>
+      <span class="ls-text" id="landText">의견 내용</span>
+      <span class="ls-meta" id="landMeta">김하나 선생님</span>
+    </div>
+    <div style="display:flex;gap:8px;flex-shrink:0">
+      <button class="btn-strip" onclick="showToast('의견을 확인 처리했어요')">확인함</button>
+      <button class="btn-strip" onclick="goStep(6)">수업 홈으로</button>
+    </div>
+  </div>
+  <iframe class="land-frame" id="landFrame" title="의견이 남겨진 화면"></iframe>
+  <div class="land-native" id="landNative" style="display:none">
+    <div class="page-wrap" style="padding-top:24px">
+      <div class="card">
+        <div class="card-head"><div class="card-title" id="landNativeTitle">세부능력 및 특기사항 지원</div></div>
+        <div id="landNativeBody"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═════════ Scene 5 : 권한 없음 (공동교사) ═════════ -->
+<section class="scene" id="sceneDenied">
+  <div class="main-wrap">
+    <div class="page-wrap">
+      <div class="denied-wrap">
+        <div class="denied-card">
+          <span class="denied-ic"><i data-lucide="lock" style="width:28px;height:28px"></i></span>
+          <h2>이 수업에 접근할 권한이 없어요</h2>
+          <p>공동교사로 초대된 선생님만 이 수업을 볼 수 있어요.<br>초대가 취소되었거나, 아직 초대되지 않은 수업일 수 있어요.</p>
+          <div class="denied-actions">
+            <button class="btn-outline" onclick="goStep(2)">내 홈으로</button>
+            <button class="btn-solid" onclick="showToast('수업을 만든 선생님에게 문의해 주세요')">소유자에게 문의</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═════════ 모달: 공동교사 (수업 공유) ═════════ -->
+<div class="overlay" id="modalShare">
+  <div class="modal">
+    <div class="modal-head"><h2>공동교사</h2>
+      <button class="icon-btn40" onclick="closeModal('modalShare')"><i data-lucide="x" style="width:20px;height:20px"></i></button></div>
+    <div class="modal-body">
+      <div class="note"><i data-lucide="info"></i>
+        <span>공동교사는 이 수업의 <b>모든 화면을 보고, 의견을 남길</b> 수 있어요. 평가·과제물·채점·기록을 <b>수정할 수는 없어요.</b></span></div>
+
+      <div class="fld-label" style="margin-top:24px">공동교사 추가</div>
+      <div class="search-input">
+        <i data-lucide="search"></i>
+        <input type="text" placeholder="우리 학교 선생님 이름 또는 이메일로 검색해 주세요.">
+      </div>
+
+      <div class="fld-label" style="margin-top:28px">이 수업의 공동교사 <span class="opt">2명</span></div>
+      <table class="t-list">
+        <thead><tr><th>이름</th><th>아이디(이메일)</th><th>권한</th><th>삭제</th></tr></thead>
+        <tbody>
+          <tr><td>김하나 선생님</td><td>hana@clipo.com</td><td class="role">보기 · 의견</td>
+            <td><button class="btn-ghost btn-sm" style="color:#db3e51">삭제</button></td></tr>
+          <tr><td>박지현 선생님</td><td>jihyun@clipo.com</td><td class="role">보기 · 의견</td>
+            <td><button class="btn-ghost btn-sm" style="color:#db3e51">삭제</button></td></tr>
+        </tbody>
+      </table>
+
+      <div class="fld-label" style="margin-top:28px">공유 범위</div>
+      <div class="scope-box">
+        <div class="scope-row">
+          <span class="scope-name">평가 설계 · 활동지 · 과제물 관리 · 채점</span>
+          <span class="scope-state">항상 공유</span>
+        </div>
+        <div class="scope-row">
+          <span class="scope-name">세부능력 및 특기사항 지원</span>
+          <span style="display:flex;align-items:center;gap:12px">
+            <span class="scope-state" id="seteukState">공유함</span>
+            <span class="switch on" id="seteukSwitch" onclick="toggleSeteukShare()"><span class="knob"></span></span>
+          </span>
+        </div>
+      </div>
+      <p style="font-size:14px;color:#6d7381;margin-top:10px;line-height:1.55">세특 기록이 민감하다면 이 항목만 끌 수 있어요. 나머지 화면은 그대로 공유돼요.</p>
+    </div>
+    <div class="modal-foot">
+      <button class="btn-outline" onclick="closeModal('modalShare')">닫기</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"><i data-lucide="circle-check"></i><span id="toastMsg"></span></div>
+
+<!-- ═════════ 데모 내비게이터 ═════════ -->
+<div class="demo-nav" id="demoNav">
+  <div class="dn-title" id="dnHandle">
+    <span class="dn-titletext"><i data-lucide="grip-horizontal" style="width:14px;height:14px"></i> DEMO FLOW</span>
+    <button class="dn-fold" id="dnFold" title="접기/펼치기"><i data-lucide="chevron-down" style="width:16px;height:16px"></i></button>
+  </div>
+  <div class="dn-body" id="dnBody">
+    <div class="dn-step on" data-step="1"><span class="n">1</span>수업 홈 · 공동교사 초대<span class="dn-persona owner">소유자</span></div>
+    <div class="dn-step" data-step="2"><span class="n">2</span>홈 · 공유받은 수업<span class="dn-persona co">공동교사</span></div>
+    <div class="dn-step" data-step="3"><span class="n">3</span>수업 전체 보기<span class="dn-persona co">공동교사</span></div>
+    <div class="dn-step" data-step="4"><span class="n">4</span>평가 설계에 의견<span class="dn-persona co">공동교사</span></div>
+    <div class="dn-step" data-step="5"><span class="n">5</span>세특에 의견<span class="dn-persona co">공동교사</span></div>
+    <div class="dn-step" data-step="6"><span class="n">6</span>받은 의견 · 위치로 이동<span class="dn-persona owner">소유자</span></div>
+    <div class="dn-div"></div>
+    <div class="dn-cases">엣지 케이스</div>
+    <div class="dn-step" data-step="7"><span class="n">7</span>세특 공유 끔<span class="dn-persona co">공동교사</span></div>
+    <div class="dn-step" data-step="8"><span class="n">8</span>권한 없음<span class="dn-persona co">공동교사</span></div>
+  </div>
+</div>
+
+<script>
+/* ═════════ 상태 ═════════ */
+const S = {
+  step: 1,
+  tab: 'home',
+  seteukShared: true,
+  selStudent: null,
+  opinions: [
+    { loc:'평가 설계 · 관심 분야에 관한 미래 예측 보고서 작성', tab:'design',
+      text:'채점 조건에 "분량 미달 시 처리"가 없어요. 백지·짧은 답안 기준을 협의해서 넣는 게 좋겠어요.',
+      by:'김하나 선생님', at:'07/27 10:12' },
+    { loc:'채점 · 10102 이준호', tab:'scoring',
+      text:'"작성 분량 수준" 2점은 우리가 정한 기준상 1점이 맞아 보여요. 확인 부탁드려요.',
+      by:'박지현 선생님', at:'07/27 10:40' }
+  ]
+};
+
+const TAB_LABEL = { home:'수업 홈', design:'평가 설계', sheet:'활동지', task:'과제물 관리', scoring:'채점', seteuk:'세부능력 및 특기사항 지원' };
+const TAB_SRC = {
+  design:  'task_ocr_v3_260623.html#design',
+  sheet:   'question_tab_v1_260617.html',
+  task:    'task_ocr_v3_260623.html',
+  scoring: 'task_ocr_v3_260623.html#scoring'
+};
+/* 의견 위치 → 소유자가 착지할 화면 */
+const LAND_SRC = Object.assign({}, TAB_SRC, { home:'', seteuk:'' });
+
+const STUDENTS = [
+  { id:'10101', name:'김서윤', text:'미래 예측 보고서에서 자율주행 기술의 사회적 영향을 다루며, 기술 발전이 일자리 구조에 미치는 변화를 통계 자료를 근거로 설명함.' },
+  { id:'10102', name:'이준호', text:'기후 변화 시나리오를 주제로 보고서를 작성하여 에너지 전환 정책의 필요성을 제시하였고, 모둠 토의에서 반대 의견을 경청하는 태도를 보임.' },
+  { id:'10103', name:'박지민', text:'인구 구조 변화를 주제로 자료를 수집하고, 고령화가 지역 경제에 미치는 영향을 그래프로 정리하여 발표함.' },
+  { id:'10104', name:'최유진', text:'디지털 격차를 주제로 선택하여 세대별 정보 접근성 차이를 조사하고, 해결 방안을 구체적 사례와 함께 제안함.' }
+];
+
+/* ═════════ 씬 전환 ═════════ */
+function goStep(n) {
+  S.step = n;
+  document.querySelectorAll('.dn-step').forEach(el => el.classList.toggle('on', +el.dataset.step === n));
+  document.querySelectorAll('.scene').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.si').forEach(el => el.classList.remove('active'));
+  document.body.classList.toggle('home-full', n === 2);
+
+  if (n === 1 || n === 6) {
+    document.getElementById('sceneOwner').classList.add('active');
+    setPersona('owner');
+    document.querySelector('[data-nav="class"]').classList.add('active');
+    renderOpinions();
+  } else if (n === 2) {
+    document.getElementById('sceneHome').classList.add('active');
+    setPersona('co');
+    document.querySelector('[data-nav="home"]').classList.add('active');
+    initHomeFrame();
+  } else if (n === 3 || n === 4 || n === 5 || n === 7) {
+    document.getElementById('sceneShared').classList.add('active');
+    setPersona('co');
+    document.querySelector('[data-nav="class"]').classList.add('active');
+    if (n === 3) { goTab('home'); closeCompose(); }
+    if (n === 4) { goTab('design'); setTimeout(() => openCompose('예: 배점 기준을 조금 더 느슨하게 잡는 게 어떨까요? 필요할 때 후하게 줄 수 있게요.'), 350); }
+    if (n === 5) { S.seteukShared = true; syncSwitch(); goTab('seteuk'); selectStudent('10102'); setTimeout(() => openCompose('예: 이 학생은 토의에서 반대 의견을 조율한 장면이 인상적이었어요. 그 부분을 넣으면 좋겠어요.'), 350); }
+    if (n === 7) { S.seteukShared = false; syncSwitch(); goTab('seteuk'); closeCompose(); }
+  } else if (n === 8) {
+    document.getElementById('sceneDenied').classList.add('active');
+    setPersona('co');
+    document.querySelector('[data-nav="home"]').classList.add('active');
+  }
+  window.scrollTo(0, 0);
+  lucide.createIcons();
+}
+function setPersona(p) {
+  document.getElementById('hdrUser').textContent = p === 'owner' ? '최대표 선생님 (대표교사)' : '김하나 선생님 (일반교사)';
+  document.getElementById('hdrCredit').textContent = p === 'owner' ? '200' : '340';
+}
+
+/* ═════════ 공유 수업 — 탭 ═════════ */
+function goTab(tab) {
+  S.tab = tab;
+  document.querySelectorAll('#sharedTabs .sub-tab').forEach(el => el.classList.toggle('on', el.dataset.tab === tab));
+  document.getElementById('shHome').style.display = tab === 'home' ? '' : 'none';
+  document.getElementById('shSeteuk').style.display = tab === 'seteuk' ? '' : 'none';
+  const embedWrap = document.getElementById('shEmbedWrap');
+  if (TAB_SRC[tab]) {
+    embedWrap.style.display = '';
+    const f = document.getElementById('shEmbed');
+    f.style.height = (window.innerHeight - 58 - 59 - 66) + 'px';
+    f.onload = onEmbedLoad;
+    f.src = TAB_SRC[tab];
+  } else {
+    embedWrap.style.display = 'none';
+  }
+  if (tab === 'seteuk') {
+    document.getElementById('seteukShared').style.display = S.seteukShared ? '' : 'none';
+    document.getElementById('seteukLocked').style.display = S.seteukShared ? 'none' : '';
+    if (S.seteukShared) renderStudents();
+  }
+  S.selStudent = null;
+  closeCompose();
+  updateDock();
+  lucide.createIcons();
+}
+/* 재사용 화면에서 자체 헤더·NB·탭밴드를 감추고, 편집 요소를 잠근다 */
+function onEmbedLoad() {
+  const f = document.getElementById('shEmbed');
+  try {
+    const d = f.contentDocument;
+    const st = d.createElement('style');
+    st.textContent =
+      '.g-hd,.icon-sb,.tab-band,.site-footer{display:none!important}' +
+      '.main-wrap{padding-top:0!important;padding-left:0!important;min-height:0!important}' +
+      'input,textarea,select,[contenteditable]{pointer-events:none!important}' +
+      '.btn-primary,.btn-danger,.btn-save{display:none!important}';
+    d.head.appendChild(st);
+  } catch (e) { /* 주입 실패해도 화면은 표시 */ }
+}
+window.addEventListener('resize', () => {
+  const f = document.getElementById('shEmbed');
+  if (f && f.src) f.style.height = (window.innerHeight - 58 - 59 - 66) + 'px';
+});
+
+/* 세특 목록 */
+function renderStudents() {
+  document.getElementById('stList').innerHTML = STUDENTS.map(s =>
+    '<div class="st-row' + (S.selStudent === s.id ? ' sel' : '') + '" onclick="selectStudent(\'' + s.id + '\')">' +
+      '<span class="st-name">' + s.id + ' ' + s.name + '</span>' +
+      '<span class="st-body">' + s.text + '</span>' +
+      '<span class="st-side">' + (S.selStudent === s.id
+        ? '<span class="op-loc"><i data-lucide="map-pin"></i> 선택됨</span>'
+        : '<span class="st-hint">선택</span>') + '</span>' +
+    '</div>').join('');
+  lucide.createIcons();
+}
+function selectStudent(id) {
+  S.selStudent = (S.selStudent === id) ? null : id;
+  renderStudents();
+  updateDock();
+}
+
+/* ═════════ 도크 · 의견 ═════════ */
+function currentLoc() {
+  let loc = TAB_LABEL[S.tab];
+  if (S.tab === 'seteuk' && S.selStudent) {
+    const s = STUDENTS.find(x => x.id === S.selStudent);
+    loc = '세특 · ' + s.id + ' ' + s.name;
+  } else if (S.tab === 'seteuk') {
+    loc = '세특 전반';
+  } else if (S.tab === 'design' || S.tab === 'task' || S.tab === 'scoring') {
+    loc = TAB_LABEL[S.tab] + ' · 관심 분야에 관한 미래 예측 보고서 작성';
+  }
+  return loc;
+}
+function updateDock() {
+  const loc = currentLoc();
+  document.getElementById('dockLoc').textContent = loc;
+  document.getElementById('opLocText').textContent = loc;
+  const mine = S.opinions.filter(o => o.mine).length;
+  document.getElementById('myOpCount').textContent = '남긴 의견 ' + mine + '건';
+}
+function toggleCompose() {
+  if (document.getElementById('shareDock').classList.contains('open')) closeCompose();
+  else openCompose();
+}
+function openCompose(placeholder) {
+  updateDock();
+  const ta = document.getElementById('opInput');
+  ta.value = '';
+  if (placeholder) ta.setAttribute('placeholder', placeholder);
+  document.getElementById('shareDock').classList.add('open');
+  ta.focus();
+  lucide.createIcons();
+}
+function closeCompose() { document.getElementById('shareDock').classList.remove('open'); }
+function saveOpinion() {
+  const ta = document.getElementById('opInput');
+  const v = ta.value.trim() || ta.getAttribute('placeholder').replace(/^예: /, '');
+  S.opinions.push({ loc: currentLoc(), tab: S.tab, text: v, by:'김하나 선생님', at:'07/27 14:05', mine:true });
+  closeCompose();
+  updateDock();
+  showToast('의견을 남겼어요 · 최대표 선생님에게 전달돼요');
+}
+
+/* ═════════ 소유자 — 받은 의견 ═════════ */
+function renderOpinions() {
+  document.getElementById('opCount').textContent = S.opinions.length;
+  document.getElementById('opList').innerHTML = S.opinions.length ? S.opinions.map((o, i) =>
+    '<div class="op-item">' +
+      '<div style="min-width:0">' +
+        '<span class="op-loc"><i data-lucide="map-pin"></i> ' + o.loc + '</span>' +
+        '<div class="op-text">' + o.text + '</div>' +
+        '<div class="op-meta">' + o.by + ' · ' + o.at + '</div>' +
+      '</div>' +
+      '<button class="btn-outline btn-sm" style="flex-shrink:0" onclick="goLand(' + i + ')">위치로 이동</button>' +
+    '</div>').join('') : '<div class="op-empty">아직 받은 의견이 없어요.</div>';
+  lucide.createIcons();
+}
+function goLand(i) {
+  const o = S.opinions[i];
+  document.getElementById('landLoc').textContent = o.loc;
+  document.getElementById('landText').textContent = '"' + o.text + '"';
+  document.getElementById('landMeta').textContent = o.by + ' · ' + o.at;
+  document.querySelectorAll('.scene').forEach(el => el.classList.remove('active'));
+  document.getElementById('sceneLand').classList.add('active');
+
+  const src = LAND_SRC[o.tab];
+  const frame = document.getElementById('landFrame'), native = document.getElementById('landNative');
+  if (src) {
+    native.style.display = 'none';
+    frame.style.display = '';
+    frame.src = src;
+  } else {
+    // 세특·수업 홈은 소유자 화면을 그대로 열어 의견이 달린 자리를 하이라이트한다
+    frame.style.display = 'none';
+    native.style.display = '';
+    const stuId = (o.loc.match(/(\d{5})/) || [])[1];
+    document.getElementById('landNativeTitle').textContent = TAB_LABEL[o.tab] || '수업 홈';
+    document.getElementById('landNativeBody').innerHTML = o.tab === 'seteuk'
+      ? STUDENTS.map(s => '<div class="st-row' + (s.id === stuId ? ' sel' : '') + '">' +
+          '<span class="st-name">' + s.id + ' ' + s.name + '</span>' +
+          '<span class="st-body' + (s.id === stuId ? ' land-hl' : '') + '">' + s.text + '</span>' +
+          '<span class="st-side">' + (s.id === stuId
+            ? '<span class="op-loc"><i data-lucide="message-square-text"></i> 의견 1건</span>' : '') + '</span></div>').join('')
+      : '<div class="op-empty">이 수업의 수업 홈이에요.</div>';
+  }
+  lucide.createIcons();
+}
+
+/* ═════════ 세특 공유 토글 ═════════ */
+function toggleSeteukShare() {
+  S.seteukShared = !S.seteukShared;
+  syncSwitch();
+  showToast(S.seteukShared ? '세특을 공유해요' : '세특 공유를 껐어요');
+}
+function syncSwitch() {
+  document.getElementById('seteukSwitch').classList.toggle('on', S.seteukShared);
+  document.getElementById('seteukState').textContent = S.seteukShared ? '공유함' : '공유 안 함';
+}
+
+/* ═════════ 공동교사 홈 (home_v1 재사용) ═════════ */
+function initHomeFrame() {
+  const f = document.getElementById('homeFrame');
+  if (!f.getAttribute('src')) {
+    f.addEventListener('load', onHomeFrameLoad);
+    f.setAttribute('src', 'home_v1_260612.html');
+  }
+}
+function onHomeFrameLoad() {
+  const f = document.getElementById('homeFrame');
+  try {
+    const d = f.contentDocument;
+    const btn = d.querySelector('.user-btn');
+    if (btn && btn.childNodes[0]) btn.childNodes[0].nodeValue = '김하나 선생님(일반교사) ';
+    d.addEventListener('click', e => {
+      const el = e.target.closest && e.target.closest('[onclick]');
+      if (el && /co_teacher_review|class_share/.test(el.getAttribute('onclick') || '')) {
+        e.preventDefault(); e.stopPropagation();
+        goStep(3);
+      }
+    }, true);
+  } catch (e) { /* 주입 실패해도 홈은 표시 */ }
+}
+
+/* ═════════ 공통 ═════════ */
+function openModal(id) { document.getElementById(id).classList.add('open'); lucide.createIcons(); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+document.querySelectorAll('.overlay').forEach(o => o.addEventListener('click', e => { if (e.target === o) o.classList.remove('open'); }));
+
+let toastTimer;
+function showToast(msg) {
+  document.getElementById('toastMsg').textContent = msg;
+  const t = document.getElementById('toast');
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 2600);
+  lucide.createIcons();
+}
+function toggleNav() {
+  document.getElementById('iconSb').classList.toggle('expanded');
+  document.body.classList.toggle('nav-expanded');
+}
+document.querySelectorAll('#sharedTabs .sub-tab').forEach(el => el.addEventListener('click', () => goTab(el.dataset.tab)));
+
+/* 데모 내비: 드래그 + 접기 */
+function toggleDemoNav() { document.getElementById('demoNav').classList.toggle('collapsed'); lucide.createIcons(); }
+(function() {
+  const nav = document.getElementById('demoNav'), handle = document.getElementById('dnHandle'), fold = document.getElementById('dnFold');
+  nav.querySelectorAll('.dn-step').forEach(el => {
+    el.addEventListener('mousedown', e => { e.stopPropagation(); e.preventDefault(); goStep(+el.dataset.step); });
+  });
+  fold.addEventListener('mousedown', e => e.stopPropagation());
+  fold.addEventListener('click', e => { e.stopPropagation(); toggleDemoNav(); });
+  let drag = null;
+  handle.addEventListener('mousedown', e => {
+    if (e.target.closest('.dn-fold')) return;
+    const r = nav.getBoundingClientRect();
+    drag = { dx: e.clientX - r.left, dy: e.clientY - r.top };
+    document.body.classList.add('dn-dragging');
+    e.preventDefault();
+  });
+  document.addEventListener('mousemove', e => {
+    if (!drag) return;
+    nav.style.left = (e.clientX - drag.dx) + 'px';
+    nav.style.top = (e.clientY - drag.dy) + 'px';
+    nav.style.right = 'auto'; nav.style.bottom = 'auto';
+  });
+  document.addEventListener('mouseup', () => { if (drag) { drag = null; document.body.classList.remove('dn-dragging'); } });
+})();
+
+setTimeout(initHomeFrame, 1200);
+goStep(1);
+lucide.createIcons();
+</script>
+</body>
+</html>
