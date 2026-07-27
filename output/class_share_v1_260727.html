@@ -684,10 +684,11 @@ body.dn-dragging iframe { pointer-events:none; }
     <div class="dn-step" data-step="4"><span class="n">4</span>평가 설계에 의견<span class="dn-persona co">공동교사</span></div>
     <div class="dn-step" data-step="5"><span class="n">5</span>세특에 의견<span class="dn-persona co">공동교사</span></div>
     <div class="dn-step" data-step="6"><span class="n">6</span>받은 의견 · 위치로 이동<span class="dn-persona owner">소유자</span></div>
+    <div class="dn-step" data-step="7"><span class="n">7</span>받은 의견 전체 페이지<span class="dn-persona owner">소유자</span></div>
     <div class="dn-div"></div>
     <div class="dn-cases">엣지 케이스</div>
-    <div class="dn-step" data-step="7"><span class="n">7</span>세특 공유 끔<span class="dn-persona co">공동교사</span></div>
-    <div class="dn-step" data-step="8"><span class="n">8</span>권한 없음<span class="dn-persona co">공동교사</span></div>
+    <div class="dn-step" data-step="8"><span class="n">8</span>세특 공유 끔<span class="dn-persona co">공동교사</span></div>
+    <div class="dn-step" data-step="9"><span class="n">9</span>권한 없음<span class="dn-persona co">공동교사</span></div>
   </div>
 </div>
 
@@ -753,26 +754,26 @@ function goStep(n) {
   document.querySelectorAll('.si').forEach(el => el.classList.remove('active'));
   document.body.classList.toggle('home-full', n === 2);
 
-  if (n === 1 || n === 6) {
+  if (n === 1 || n === 6 || n === 7) {
     document.getElementById('sceneOwner').classList.add('active');
     setPersona('owner');
     document.querySelector('[data-nav="class"]').classList.add('active');
     renderOpinions();
-    goOwnerTab('home');
+    goOwnerTab(n === 7 ? 'op' : 'home');
   } else if (n === 2) {
     document.getElementById('sceneHome').classList.add('active');
     setPersona('co');
     document.querySelector('[data-nav="home"]').classList.add('active');
     initHomeFrame();
-  } else if (n === 3 || n === 4 || n === 5 || n === 7) {
+  } else if (n === 3 || n === 4 || n === 5 || n === 8) {
     document.getElementById('sceneShared').classList.add('active');
     setPersona('co');
     document.querySelector('[data-nav="class"]').classList.add('active');
     if (n === 3) { goTab('home'); closeCompose(); }
     if (n === 4) { goTab('design'); setTimeout(() => openCompose('예: 배점 기준을 조금 더 느슨하게 잡는 게 어떨까요? 필요할 때 후하게 줄 수 있게요.'), 350); }
     if (n === 5) { S.seteukShared = true; syncSwitch(); goTab('seteuk'); selectStudent('10102'); setTimeout(() => openCompose('예: 이 학생은 토의에서 반대 의견을 조율한 장면이 인상적이었어요. 그 부분을 넣으면 좋겠어요.'), 350); }
-    if (n === 7) { S.seteukShared = false; syncSwitch(); goTab('seteuk'); closeCompose(); }
-  } else if (n === 8) {
+    if (n === 8) { S.seteukShared = false; syncSwitch(); goTab('seteuk'); closeCompose(); }
+  } else if (n === 9) {
     document.getElementById('sceneDenied').classList.add('active');
     setPersona('co');
     document.querySelector('[data-nav="home"]').classList.add('active');
@@ -790,19 +791,19 @@ function setPersona(p) {
 let suppressHash = false;
 function setHash() {
   let tab = null;
-  if (S.step === 1 || S.step === 6) tab = S.ownerTab;
-  else if ([3, 4, 5, 7].includes(S.step)) tab = S.tab;
+  if (S.step === 1 || S.step === 6 || S.step === 7) tab = S.ownerTab;
+  else if ([3, 4, 5, 8].includes(S.step)) tab = S.tab;
   const h = '#' + S.step + (tab && tab !== 'home' ? '/' + tab : '');
   if (location.hash !== h) { suppressHash = true; location.hash = h; }
 }
 function applyHash() {
   const m = location.hash.match(/^#(\d+)(?:\/(\w+))?/);
-  const n = m ? Math.min(8, Math.max(1, +m[1])) : 1;
+  const n = m ? Math.min(9, Math.max(1, +m[1])) : 1;
   goStep(n);
   const tab = m && m[2];
   if (tab && (TAB_LABEL[tab] || tab === 'op')) {
-    if (n === 1 || n === 6) goOwnerTab(tab);
-    else if ([3, 4, 5, 7].includes(n) && TAB_LABEL[tab]) goTab(tab);
+    if (n === 1 || n === 6 || n === 7) goOwnerTab(tab);
+    else if ([3, 4, 5, 8].includes(n) && TAB_LABEL[tab]) goTab(tab);
   }
 }
 window.addEventListener('hashchange', () => {
