@@ -182,6 +182,17 @@ body.nav-expanded .main-wrap { padding-left:200px; }
 .st-basis { font-size:14px; font-weight:600; color:#416bff; display:inline-flex; align-items:center; gap:4px; }
 .st-pick { font-size:13px; color:#6d7381; }
 .st-picked { display:inline-flex; align-items:center; gap:4px; font-size:13px; font-weight:600; color:#3151c4; }
+.st-iconbtn { width:30px; height:30px; border-radius:6px; color:#6d7381; }
+.st-iconbtn:hover { background:#f1f3f5; }
+.st-pager { display:inline-flex; align-items:center; gap:2px; }
+.st-import { flex-direction:column; height:auto; padding:8px 10px; gap:3px; font-size:13px; }
+.st-polish { display:inline-flex; align-items:center; gap:5px; height:32px; padding:0 12px; border-radius:100px;
+  background:#fff; border:1px solid #a3c3ff; color:#3151c4; font-size:13px; font-weight:600; position:relative; }
+.st-polish .new { position:absolute; top:-9px; right:6px; background:#222631; color:#fff; font-size:10px; font-weight:700;
+  border-radius:100px; padding:2px 6px; }
+/* 공유 보기: 화면은 그대로 두고 편집 액션만 비활성 */
+.ro-off { opacity:.45; cursor:not-allowed; }
+.st-dl { width:40px; height:40px; border-radius:4px; background:#1ab864; color:#fff; }
 
 /* 잠금 안내 */
 .lock-panel { background:#fff; border-radius:12px; box-shadow:0 0 1px #2226314D, 0 4px 8px #0000001A;
@@ -397,9 +408,10 @@ body.dn-dragging iframe { pointer-events:none; }
       <div class="st-toolbar">
         <button class="st-select">1학년 1반 <i data-lucide="chevron-down" style="width:18px;height:18px;color:#6d7381"></i></button>
         <div class="st-tools">
-          <button class="btn-outline" onclick="showToast('데모 범위 밖이에요')"><i data-lucide="eye" style="width:16px;height:16px"></i> 점수 보이기</button>
+          <button class="btn-outline" onclick="showToast('점수 표시를 켰어요')"><i data-lucide="eye" style="width:16px;height:16px"></i> 점수 보이기</button>
           <button class="btn-outline" onclick="showToast('데모 범위 밖이에요')"><i data-lucide="send" style="width:16px;height:16px"></i> 전체 AI 기록 가져오기</button>
           <button class="btn-solid" onclick="showToast('데모 범위 밖이에요')"><i data-lucide="check" style="width:16px;height:16px"></i> 저장</button>
+          <button class="st-dl" onclick="showToast('데모 범위 밖이에요')"><i data-lucide="download" style="width:18px;height:18px"></i></button>
         </div>
       </div>
       <div class="st-table" id="stTableOwner"></div>
@@ -571,14 +583,17 @@ body.dn-dragging iframe { pointer-events:none; }
             <h1>사회 세부능력 및 특기사항 지원</h1>
             <p>AI Assistant가 세부능력 및 특기사항 기록 작성을 도와드려요! 단, AI 생성 결과는 항상 선생님의 최종 확인이 필요합니다.</p>
           </div>
-          <span class="op-loc" style="flex-shrink:0"><i data-lucide="eye"></i> 보기 전용</span>
+          <button class="btn-solid ro-off" style="flex-shrink:0" onclick="roBlock()"><i data-lucide="settings" style="width:16px;height:16px"></i> 생성 옵션 설정</button>
         </div>
         <div class="note" style="margin-top:14px"><i data-lucide="message-square-plus"></i>
-          <span>학생을 선택하면 그 학생 기록에, 선택하지 않으면 세특 전반에 의견을 남길 수 있어요.</span></div>
+          <span>학생을 선택하면 그 학생 기록에, 선택하지 않으면 이 학급 세특 전체에 의견을 남길 수 있어요.</span></div>
         <div class="st-toolbar">
           <button class="st-select">1학년 1반 <i data-lucide="chevron-down" style="width:18px;height:18px;color:#6d7381"></i></button>
           <div class="st-tools">
-            <button class="btn-outline" onclick="showToast('보기 전용이라 점수 표시만 바뀌어요')"><i data-lucide="eye" style="width:16px;height:16px"></i> 점수 보이기</button>
+            <button class="btn-outline" onclick="showToast('점수 표시를 켰어요')"><i data-lucide="eye" style="width:16px;height:16px"></i> 점수 보이기</button>
+            <button class="btn-outline ro-off" onclick="roBlock()"><i data-lucide="send" style="width:16px;height:16px"></i> 전체 AI 기록 가져오기</button>
+            <button class="btn-solid ro-off" onclick="roBlock()"><i data-lucide="check" style="width:16px;height:16px"></i> 저장</button>
+            <button class="st-dl ro-off" onclick="roBlock()"><i data-lucide="download" style="width:18px;height:18px"></i></button>
           </div>
         </div>
         <div class="st-table" id="stTableShared"></div>
@@ -817,6 +832,8 @@ function goStep(n) {
   document.querySelectorAll('.scene').forEach(el => el.classList.remove('active'));
   document.querySelectorAll('.si').forEach(el => el.classList.remove('active'));
   document.body.classList.toggle('home-full', n === 2 || n === 8);
+  // 스텝을 옮기면 열려 있던 모달은 항상 닫는다 (1번에서만 다시 열림)
+  document.querySelectorAll('.overlay.open').forEach(el => el.classList.remove('open'));
 
   if (n === 1 || n === 9) {
     document.getElementById('sceneOwner').classList.add('active');
@@ -825,7 +842,7 @@ function goStep(n) {
     renderOpinions();
     goOwnerTab(n === 9 ? 'op' : 'home');
     // 1단계는 공동교사 설정 팝업을 띄운 채로 진입
-    if (n === 1) openModal('modalShare'); else closeModal('modalShare');
+    if (n === 1) openModal('modalShare');
   } else if (n === 2) {
     document.getElementById('sceneHome').classList.add('active');
     setPersona('co');
@@ -974,23 +991,40 @@ window.addEventListener('resize', () => {
 /* 세특 지원 테이블 — 개발 화면(15_setech.png) 구조 그대로.
    공유 보기(readonly)에서는 생성·가져오기·저장 액션만 빠지고 나머지는 동일 */
 function seteukTableHTML(readonly) {
+  // 공유 보기도 화면은 개발 화면 그대로. 편집 액션만 비활성(회색)으로 둔다
+  const off = readonly ? ' ro-off' : '';
+  const act = readonly ? ' onclick="event.stopPropagation();roBlock()"' : ' onclick="event.stopPropagation();showToast(\'데모 범위 밖이에요\')"';
   const head = '<div class="st-thead">' +
     '<div>학번 <i data-lucide="chevrons-up-down" style="width:13px;height:13px"></i></div>' +
     '<div>이름</div>' +
     '<div>총점 <i data-lucide="chevrons-up-down" style="width:13px;height:13px"></i></div>' +
     '<div>AI Assistant가 생성한 기록</div><div></div><div>선생님이 작성한 기록</div><div>기록 근거</div></div>';
   const rows = STUDENTS.map(s => {
-    const sel = readonly && S.selStudent === s.id;
+    const sel = readonly && S.target === s.id;
     const aiBox = '<div class="st-box ai">' +
-      (s.ai ? '<div class="txt">' + s.ai + '</div>' +
-              '<div class="foot"><span class="st-bytes">' + s.ai.length + '자 (' + byteLen(s.ai) + ' Byte)</span>' +
-              (readonly ? '' : '<button class="btn-solid btn-sm"><i data-lucide="wand-sparkles" style="width:14px;height:14px"></i> 다시 생성</button>') + '</div>'
-            : '<div class="txt empty">생성된 기록이 없습니다.</div>' +
-              (readonly ? '' : '<div class="foot" style="justify-content:flex-end"><button class="btn-solid btn-sm"><i data-lucide="wand-sparkles" style="width:14px;height:14px"></i> 기록 생성</button></div>')) +
+      (s.ai
+        ? '<div class="txt">' + s.ai + '</div>' +
+          '<div class="foot"><span class="st-bytes">' + s.ai.length + '자 (' + byteLen(s.ai) + ' Byte)</span>' +
+          '<span style="display:inline-flex;align-items:center;gap:6px">' +
+            '<span class="st-pager">' +
+              '<button class="st-iconbtn' + off + '"' + act + '><i data-lucide="chevron-left" style="width:16px;height:16px"></i></button>' +
+              '<button class="st-iconbtn' + off + '"' + act + '><i data-lucide="chevron-right" style="width:16px;height:16px"></i></button>' +
+            '</span>' +
+            '<button class="st-iconbtn" onclick="event.stopPropagation();showToast(\'기록을 복사했어요\')"><i data-lucide="copy" style="width:16px;height:16px"></i></button>' +
+            '<button class="btn-solid btn-sm' + off + '"' + act + '><i data-lucide="wand-sparkles" style="width:14px;height:14px"></i> 다시 생성</button>' +
+          '</span></div>'
+        : '<div class="txt empty">생성된 기록이 없습니다.</div>' +
+          '<div class="foot" style="justify-content:flex-end">' +
+            '<button class="btn-solid btn-sm' + off + '"' + act + '><i data-lucide="wand-sparkles" style="width:14px;height:14px"></i> 기록 생성</button></div>') +
       '</div>';
     const tBox = '<div class="st-box teacher">' +
-      (s.teacher ? '<div class="txt">' + s.teacher + '</div><div class="foot"><span class="st-bytes">' + s.teacher.length + '자 (' + byteLen(s.teacher) + ' Byte)</span></div>'
-                 : '<div class="txt empty">작성된 기록이 없습니다.</div><div class="foot"><span class="st-bytes">0자 (0 Byte)</span></div>') +
+      (s.teacher
+        ? '<div class="txt">' + s.teacher + '</div>' +
+          '<div class="foot"><span class="st-bytes">' + s.teacher.length + '자 (' + byteLen(s.teacher) + ' Byte)</span>' +
+          '<button class="st-polish' + off + '"' + act + '><span class="new">New</span>' +
+            '<i data-lucide="wand-sparkles" style="width:14px;height:14px"></i> AI 기록 다듬기</button></div>'
+        : '<div class="txt empty">작성된 기록이 없습니다.</div>' +
+          '<div class="foot"><span class="st-bytes">0자 (0 Byte)</span></div>') +
       '</div>';
     return '<div class="st-trow' + (sel ? ' sel' : '') + '"' +
         (readonly ? ' style="cursor:pointer" onclick="selectStudent(\'' + s.id + '\')"' : '') + '>' +
@@ -998,15 +1032,17 @@ function seteukTableHTML(readonly) {
       '<div class="st-nm">' + s.name + '</div>' +
       '<div class="st-total">' + s.total + '</div>' +
       '<div>' + aiBox + '</div>' +
-      '<div>' + (readonly ? '' : '<button class="btn-outline btn-sm" style="flex-direction:column;height:auto;padding:8px 10px;gap:2px"><i data-lucide="send" style="width:14px;height:14px"></i>가져오기</button>') + '</div>' +
+      '<div><button class="btn-outline btn-sm st-import' + off + '"' + act + '>' +
+        '<i data-lucide="send" style="width:14px;height:14px"></i>가져오기</button></div>' +
       '<div>' + tBox + '</div>' +
       '<div style="flex-direction:column;gap:6px">' +
-        '<span class="st-basis">기록 근거 <i data-lucide="chevron-right" style="width:14px;height:14px"></i></span>' +
-        (readonly ? (sel ? '<span class="st-picked"><i data-lucide="map-pin" style="width:13px;height:13px"></i> 선택됨</span>' : '<span class="st-pick">선택</span>') : '') +
+        '<button class="st-basis" onclick="event.stopPropagation();showToast(\'기록 근거는 데모 범위 밖이에요\')">기록 근거 <i data-lucide="chevron-right" style="width:14px;height:14px"></i></button>' +
+        (readonly ? (sel ? '<span class="st-picked"><i data-lucide="map-pin" style="width:13px;height:13px"></i> 의견 대상</span>' : '<span class="st-pick">의견 대상 선택</span>') : '') +
       '</div></div>';
   }).join('');
   return head + rows;
 }
+function roBlock() { showToast('공유받은 수업이라 보기만 할 수 있어요'); }
 function renderStudents() {
   document.getElementById('stTableShared').innerHTML = seteukTableHTML(true);
   lucide.createIcons();
