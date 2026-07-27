@@ -309,17 +309,29 @@ body.dn-dragging iframe { pointer-events:none; }
 <section class="scene" id="sceneOwner">
   <div class="main-wrap">
     <div class="tab-band">
-      <div class="tab-band-inner">
-        <div class="sub-tab on">수업 홈</div>
-        <div class="sub-tab" onclick="location.href='task_ocr_v3_260623.html#design'">평가 설계</div>
-        <div class="sub-tab" onclick="location.href='question_tab_v1_260617.html'">활동지</div>
-        <div class="sub-tab" onclick="location.href='task_ocr_v3_260623.html'">과제물 관리</div>
-        <div class="sub-tab" onclick="location.href='task_ocr_v3_260623.html#scoring'">채점</div>
-        <div class="sub-tab" onclick="showToast('아직 준비 중인 기능이에요.')">세부능력 및 특기사항 지원</div>
+      <div class="tab-band-inner" id="ownerTabs">
+        <div class="sub-tab on" data-tab="home">수업 홈</div>
+        <div class="sub-tab" data-tab="design">평가 설계</div>
+        <div class="sub-tab" data-tab="sheet">활동지</div>
+        <div class="sub-tab" data-tab="task">과제물 관리</div>
+        <div class="sub-tab" data-tab="scoring">채점</div>
+        <div class="sub-tab" data-tab="seteuk">세부능력 및 특기사항 지원</div>
       </div>
     </div>
 
-    <div class="page-wrap">
+    <!-- 소유자: 다른 탭 (개발 확정 화면 재사용) -->
+    <div id="ownerEmbedWrap" style="display:none">
+      <iframe class="embed" id="ownerEmbed" title="수업 화면"></iframe>
+    </div>
+    <!-- 소유자: 세특 탭 -->
+    <div class="page-wrap" id="ownerSeteuk" style="display:none">
+      <div class="card">
+        <div class="card-head"><div class="card-title">세부능력 및 특기사항 지원</div></div>
+        <div id="ownerStList"></div>
+      </div>
+    </div>
+
+    <div class="page-wrap" id="ownerHome">
       <div class="class-banner">
         <div>
           <div class="cb-meta">2026학년도 1학기 ｜ 사회</div>
@@ -646,14 +658,15 @@ body.dn-dragging iframe { pointer-events:none; }
 const S = {
   step: 1,
   tab: 'home',
+  ownerTab: 'home',
   seteukShared: true,
   selStudent: null,
   opinions: [
-    { loc:'평가 설계 · 관심 분야에 관한 미래 예측 보고서 작성', tab:'design',
-      text:'채점 조건에 "분량 미달 시 처리"가 없어요. 백지·짧은 답안 기준을 협의해서 넣는 게 좋겠어요.',
+    { loc:'평가 설계', tab:'design',
+      text:'"미래 예측 보고서" 채점 조건에 분량 미달 시 처리가 없어요. 백지·짧은 답안 기준을 협의해서 넣는 게 좋겠어요.',
       by:'김하나 선생님', at:'07/27 10:12' },
-    { loc:'채점 · 10102 이준호', tab:'scoring',
-      text:'"작성 분량 수준" 2점은 우리가 정한 기준상 1점이 맞아 보여요. 확인 부탁드려요.',
+    { loc:'채점', tab:'scoring',
+      text:'10102 이준호 "작성 분량 수준" 2점은 우리가 정한 기준상 1점이 맞아 보여요. 확인 부탁드려요.',
       by:'박지현 선생님', at:'07/27 10:40' }
   ]
 };
@@ -688,6 +701,7 @@ function goStep(n) {
     setPersona('owner');
     document.querySelector('[data-nav="class"]').classList.add('active');
     renderOpinions();
+    goOwnerTab('home');
   } else if (n === 2) {
     document.getElementById('sceneHome').classList.add('active');
     setPersona('co');
@@ -707,11 +721,62 @@ function goStep(n) {
     document.querySelector('[data-nav="home"]').classList.add('active');
   }
   window.scrollTo(0, 0);
+  setHash();
   lucide.createIcons();
 }
 function setPersona(p) {
   document.getElementById('hdrUser').textContent = p === 'owner' ? '최대표 선생님 (대표교사)' : '김하나 선생님 (일반교사)';
   document.getElementById('hdrCredit').textContent = p === 'owner' ? '200' : '340';
+}
+
+/* ═════════ 해시 라우팅 — 모든 씬·탭이 고유 URL을 가진다 (#단계/탭) ═════════ */
+let suppressHash = false;
+function setHash() {
+  let tab = null;
+  if (S.step === 1 || S.step === 6) tab = S.ownerTab;
+  else if ([3, 4, 5, 7].includes(S.step)) tab = S.tab;
+  const h = '#' + S.step + (tab && tab !== 'home' ? '/' + tab : '');
+  if (location.hash !== h) { suppressHash = true; location.hash = h; }
+}
+function applyHash() {
+  const m = location.hash.match(/^#(\d+)(?:\/(\w+))?/);
+  const n = m ? Math.min(8, Math.max(1, +m[1])) : 1;
+  goStep(n);
+  const tab = m && m[2];
+  if (tab && TAB_LABEL[tab]) {
+    if (n === 1 || n === 6) goOwnerTab(tab);
+    else if ([3, 4, 5, 7].includes(n)) goTab(tab);
+  }
+}
+window.addEventListener('hashchange', () => {
+  if (suppressHash) { suppressHash = false; return; }
+  applyHash();
+});
+
+/* ═════════ 소유자 수업 — 탭 (파일 밖으로 나가지 않고 내부 임베드) ═════════ */
+function goOwnerTab(tab) {
+  S.ownerTab = tab;
+  document.querySelectorAll('#ownerTabs .sub-tab').forEach(el => el.classList.toggle('on', el.dataset.tab === tab));
+  document.getElementById('ownerHome').style.display = tab === 'home' ? '' : 'none';
+  document.getElementById('ownerSeteuk').style.display = tab === 'seteuk' ? '' : 'none';
+  const wrap = document.getElementById('ownerEmbedWrap');
+  if (TAB_SRC[tab]) {
+    wrap.style.display = '';
+    const f = document.getElementById('ownerEmbed');
+    f.style.height = (window.innerHeight - 58 - 59) + 'px';
+    f.onload = () => stripChrome(f, false);
+    if (f.getAttribute('src') !== TAB_SRC[tab]) f.src = TAB_SRC[tab];
+  } else wrap.style.display = 'none';
+  if (tab === 'seteuk') renderOwnerStudents();
+  setHash();
+  lucide.createIcons();
+}
+function renderOwnerStudents() {
+  document.getElementById('ownerStList').innerHTML = STUDENTS.map(s =>
+    '<div class="st-row" style="cursor:default">' +
+      '<span class="st-name">' + s.id + ' ' + s.name + '</span>' +
+      '<span class="st-body">' + s.text + '</span>' +
+    '</div>').join('');
 }
 
 /* ═════════ 공유 수업 — 탭 ═════════ */
@@ -725,8 +790,8 @@ function goTab(tab) {
     embedWrap.style.display = '';
     const f = document.getElementById('shEmbed');
     f.style.height = (window.innerHeight - 58 - 59 - 66) + 'px';
-    f.onload = onEmbedLoad;
-    f.src = TAB_SRC[tab];
+    f.onload = () => stripChrome(f, true);
+    if (f.getAttribute('src') !== TAB_SRC[tab]) f.src = TAB_SRC[tab];
   } else {
     embedWrap.style.display = 'none';
   }
@@ -738,25 +803,33 @@ function goTab(tab) {
   S.selStudent = null;
   closeCompose();
   updateDock();
+  setHash();
   lucide.createIcons();
 }
-/* 재사용 화면에서 자체 헤더·NB·탭밴드를 감추고, 편집 요소를 잠근다 */
-function onEmbedLoad() {
-  const f = document.getElementById('shEmbed');
+/* 재사용 화면에서 자체 헤더·NB·탭밴드를 감추고(lock=true면 편집 요소도 잠금),
+   내부 링크로 다른 버전 파일에 빠지지 않게 이동을 차단한다 */
+function stripChrome(f, lock) {
   try {
     const d = f.contentDocument;
     const st = d.createElement('style');
     st.textContent =
       '.g-hd,.icon-sb,.tab-band,.site-footer{display:none!important}' +
       '.main-wrap{padding-top:0!important;padding-left:0!important;min-height:0!important}' +
-      'input,textarea,select,[contenteditable]{pointer-events:none!important}' +
-      '.btn-primary,.btn-danger,.btn-save{display:none!important}';
+      (lock ? 'input,textarea,select,[contenteditable]{pointer-events:none!important}' +
+              '.btn-primary,.btn-danger,.btn-save{display:none!important}' : '');
     d.head.appendChild(st);
+    d.addEventListener('click', e => {
+      const el = e.target.closest && e.target.closest('[onclick],a[href]');
+      const code = el ? (el.getAttribute('onclick') || '') + (el.getAttribute('href') || '') : '';
+      if (/\.html/.test(code)) { e.preventDefault(); e.stopPropagation(); showToast('데모에서는 이 화면 안에서만 볼 수 있어요'); }
+    }, true);
   } catch (e) { /* 주입 실패해도 화면은 표시 */ }
 }
 window.addEventListener('resize', () => {
   const f = document.getElementById('shEmbed');
   if (f && f.src) f.style.height = (window.innerHeight - 58 - 59 - 66) + 'px';
+  const of = document.getElementById('ownerEmbed');
+  if (of && of.src) of.style.height = (window.innerHeight - 58 - 59) + 'px';
 });
 
 /* 세특 목록 */
@@ -778,17 +851,14 @@ function selectStudent(id) {
 }
 
 /* ═════════ 도크 · 의견 ═════════ */
+/* 위치 = 실제로 보고 있는 화면 수준까지만 (목록을 보면서 특정 평가로 찍지 않는다) */
 function currentLoc() {
-  let loc = TAB_LABEL[S.tab];
   if (S.tab === 'seteuk' && S.selStudent) {
     const s = STUDENTS.find(x => x.id === S.selStudent);
-    loc = '세특 · ' + s.id + ' ' + s.name;
-  } else if (S.tab === 'seteuk') {
-    loc = '세특 전반';
-  } else if (S.tab === 'design' || S.tab === 'task' || S.tab === 'scoring') {
-    loc = TAB_LABEL[S.tab] + ' · 관심 분야에 관한 미래 예측 보고서 작성';
+    return '세특 · ' + s.id + ' ' + s.name;
   }
-  return loc;
+  if (S.tab === 'seteuk') return '세특 전반';
+  return TAB_LABEL[S.tab];
 }
 function updateDock() {
   const loc = currentLoc();
@@ -919,6 +989,7 @@ function toggleNav() {
   document.body.classList.toggle('nav-expanded');
 }
 document.querySelectorAll('#sharedTabs .sub-tab').forEach(el => el.addEventListener('click', () => goTab(el.dataset.tab)));
+document.querySelectorAll('#ownerTabs .sub-tab').forEach(el => el.addEventListener('click', () => goOwnerTab(el.dataset.tab)));
 
 /* 데모 내비: 드래그 + 접기 */
 function toggleDemoNav() { document.getElementById('demoNav').classList.toggle('collapsed'); lucide.createIcons(); }
@@ -947,7 +1018,7 @@ function toggleDemoNav() { document.getElementById('demoNav').classList.toggle('
 })();
 
 setTimeout(initHomeFrame, 1200);
-goStep(1);
+applyHash();
 lucide.createIcons();
 </script>
 </body>
