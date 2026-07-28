@@ -136,6 +136,32 @@
     /* ===== AI 채점 실행 모달 (1/2·2/2) + OCR 경고 ===== */
     .rm-overlay{ display:none; position:fixed; inset:0; background:rgba(0,0,0,.45); z-index:1600; align-items:center; justify-content:center; padding:24px; }
     .rm-overlay.open{ display:flex; }
+    /* ── 잘 채점되는 과제물 안내 (HIAI scoring_guidance 포팅) ── */
+    .guide-strip{ background:#e9f2ff; border:1px solid #ccdfff; border-radius:8px; padding:14px 16px; display:flex; align-items:center; gap:12px; margin-bottom:16px; }
+    .guide-strip-ico{ width:36px; height:36px; border-radius:8px; background:#d7e6ff; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+    .guide-strip-ico i{ width:20px; height:20px; color:#3151c4; }
+    .guide-strip-title{ font-size:15px; font-weight:600; color:#3151c4; line-height:1.4; margin:0 0 3px; }
+    .guide-strip-desc{ font-size:14px; font-weight:400; color:#4a6bb8; line-height:1.5; margin:0; }
+    .guide-strip-btn{ flex-shrink:0; height:36px; padding:0 14px; background:#fff; color:#416bff; border:1px solid #ccdfff; border-radius:6px; font-family:inherit; font-size:14px; font-weight:500; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; line-height:1; vertical-align:middle; gap:6px; }
+    .guide-strip-btn:hover{ border-color:#416bff; }
+    .gcase{ border:1px solid #dde1e8; border-radius:10px; padding:18px; display:flex; align-items:center; gap:20px; }
+    .gcase-txt{ flex:1; min-width:0; }
+    .gcase-title{ font-size:16px; font-weight:600; color:#222631; margin:0 0 6px; line-height:1.4; }
+    .gcase-desc{ font-size:16px; color:#3b3f4c; line-height:1.65; margin:0; }
+    .gcase-desc b{ color:#222631; font-weight:600; }
+    .gcase-figs{ display:flex; gap:10px; flex-shrink:0; }
+    .gfig{ width:128px; display:flex; flex-direction:column; gap:6px; }
+    .gfig-frame{ height:96px; background:#f1f3f5; border-radius:8px; display:flex; align-items:center; justify-content:center; overflow:hidden; position:relative; }
+    .gfig-mark{ position:absolute; top:6px; left:6px; width:20px; height:20px; border-radius:50%; display:flex; align-items:center; justify-content:center; }
+    .gfig-mark i{ width:13px; height:13px; color:#fff; }
+    .gfig-mark.bad{ background:#f2525f; }
+    .gfig-mark.good{ background:#1ab864; }
+    .gfig-cap{ font-size:14px; font-weight:500; text-align:center; line-height:1.35; }
+    .gfig-cap.bad{ color:#f2525f; }
+    .gfig-cap.good{ color:#1ab864; }
+    .gcalm{ background:#f6f7f9; border-radius:8px; padding:12px 16px; display:flex; align-items:flex-start; gap:8px; }
+    .gcalm i{ width:17px; height:17px; color:#6d7381; flex-shrink:0; margin-top:2px; }
+    .gcalm p{ font-size:14px; color:#3b3f4c; line-height:1.6; margin:0; }
     .rm-modal{ background:#fff; border-radius:12px; width:680px; max-width:calc(100vw - 48px); box-shadow:0 20px 60px rgba(0,0,0,.25); max-height:calc(100vh - 48px); display:flex; flex-direction:column; }
     .rm-hd{ position:relative; padding:24px 24px 16px; flex-shrink:0; }
     .rm-title{ font-size:20px; font-weight:600; color:#222631; line-height:1.25; }
@@ -1247,6 +1273,15 @@
           <p class="deid-desc">학번·이름은 <b>자동으로 가려진 채</b> AI 채점돼요. 선생님 화면에는 그대로 보여서 채점에는 지장이 없어요.</p>
         </div>
       </div>
+      <!-- 업로드 전 안내 (영향 필드 앞 · 인라인) -->
+      <div class="guide-strip">
+        <div class="guide-strip-ico"><i data-lucide="scan-text"></i></div>
+        <div style="flex:1;min-width:0;">
+          <p class="guide-strip-title">업로드 전에 확인하면 더 정확하게 채점돼요</p>
+          <p class="guide-strip-desc">페이지 방향 바르게 &nbsp;·&nbsp; 그림·지도 위에 겹친 글씨 주의 &nbsp;·&nbsp; 빨간펜 첨삭 전 원본으로</p>
+        </div>
+        <button class="guide-strip-btn" onclick="openScoringGuide()">자세히 보기 <i data-lucide="chevron-right" style="width:15px;height:15px;"></i></button>
+      </div>
       <div id="bm-dz-host"></div>
     </div>
 
@@ -1355,6 +1390,16 @@
         </div>
         <div id="deidmini-bulk" style="display:none;margin-bottom:16px;">
           <span class="deid-mini"><i data-lucide="shield-check"></i>개인정보 비식별화 적용 중<span class="undo" onclick="restoreDeid()">자세히</span></span>
+        </div>
+
+        <!-- 업로드 전 안내 (영향 필드 앞 · 인라인) -->
+        <div class="guide-strip">
+          <div class="guide-strip-ico"><i data-lucide="scan-text"></i></div>
+          <div style="flex:1;min-width:0;">
+            <p class="guide-strip-title">업로드 전에 확인하면 더 정확하게 채점돼요</p>
+            <p class="guide-strip-desc">페이지 방향 바르게 &nbsp;·&nbsp; 그림·지도 위에 겹친 글씨 주의 &nbsp;·&nbsp; 빨간펜 첨삭 전 원본으로</p>
+          </div>
+          <button class="guide-strip-btn" onclick="openScoringGuide()">자세히 보기 <i data-lucide="chevron-right" style="width:15px;height:15px;"></i></button>
         </div>
 
         <div class="ev-card">
@@ -2093,6 +2138,9 @@
           <li>제출 가능한 파일 형식 : PDF, PNG, JPG</li>
         </ul>
       </div>
+      <button onclick="openScoringGuide()" style="align-self:flex-start;background:none;border:none;padding:0;cursor:pointer;font-family:inherit;font-size:14px;font-weight:500;color:#416bff;display:inline-flex;align-items:center;justify-content:center;line-height:1;vertical-align:middle;gap:5px;">
+        <i data-lucide="scan-text" style="width:15px;height:15px;"></i>잘 채점되는 과제물 안내 보기
+      </button>
       <div style="display:flex;flex-direction:column;gap:12px;">
         <p style="font-size:15px;font-weight:500;line-height:1.4;color:#222631;margin:0;">파일 추가</p>
         <div id="student-upload-list" style="display:flex;flex-direction:column;gap:8px;"></div>
@@ -5853,6 +5901,160 @@ window.addEventListener('load', setupDemoNav);
   <div class="dn-step" data-step="5"><span class="n">5</span>학생 채점 상세</div>
 </div>
 
+<!-- ===== 잘 채점되는 과제물 안내 모달 (QA 케이스 기반) ===== -->
+<div id="scoringGuideModal" class="rm-overlay" onclick="if(event.target===this) closeScoringGuide()">
+  <div class="rm-modal" style="width:720px;">
+    <div class="rm-hd">
+      <div class="rm-title">잘 채점되는 과제물 안내</div>
+      <p style="font-size:15px;color:#6d7381;margin:6px 0 0;line-height:1.55;">아래 세 가지만 확인하면 AI가 학생 답안을 훨씬 정확하게 읽고 채점해요.</p>
+      <button class="rm-close" onclick="closeScoringGuide()"><i data-lucide="x" style="width:20px;height:20px"></i></button>
+    </div>
+    <div class="rm-body" style="gap:12px;">
+
+      <div class="gcase">
+        <div class="gcase-txt">
+          <p class="gcase-title">1. 페이지 방향을 바르게 스캔해 주세요</p>
+          <p class="gcase-desc">옆으로 돌아가거나 기울어진 스캔은 글씨를 잘못 읽어, <b>학생이 쓴 내용과 다르게 채점될 수 있어요.</b> 업로드 전에 페이지가 바로 서 있는지 확인해 주세요.</p>
+        </div>
+        <div class="gcase-figs">
+          <div class="gfig">
+            <div class="gfig-frame">
+              <div class="gfig-mark bad"><i data-lucide="x"></i></div>
+              <svg width="76" height="76" viewBox="0 0 76 76">
+                <g transform="rotate(90 38 38)">
+                  <rect x="14" y="8" width="48" height="60" rx="3" fill="#fff" stroke="#dde1e8"/>
+                  <g stroke="#e9ecf1" stroke-width="1">
+                    <line x1="20" y1="16" x2="56" y2="16"/><line x1="20" y1="24" x2="56" y2="24"/><line x1="20" y1="32" x2="56" y2="32"/><line x1="20" y1="40" x2="56" y2="40"/><line x1="20" y1="48" x2="56" y2="48"/><line x1="20" y1="56" x2="56" y2="56"/>
+                    <line x1="26" y1="12" x2="26" y2="60"/><line x1="32" y1="12" x2="32" y2="60"/><line x1="38" y1="12" x2="38" y2="60"/><line x1="44" y1="12" x2="44" y2="60"/><line x1="50" y1="12" x2="50" y2="60"/>
+                  </g>
+                  <g stroke="#6d7381" stroke-width="1.6" stroke-linecap="round">
+                    <path d="M22 20 q2 -2 4 0"/><path d="M28 20 q2 2 4 0"/><path d="M34 19 l3 2"/><path d="M40 21 q2 -3 4 -1"/>
+                    <path d="M22 28 q3 2 5 0"/><path d="M29 27 l3 3"/><path d="M35 29 q2 -2 4 0"/>
+                  </g>
+                </g>
+              </svg>
+            </div>
+            <span class="gfig-cap bad">돌아간 스캔</span>
+          </div>
+          <div class="gfig">
+            <div class="gfig-frame">
+              <div class="gfig-mark good"><i data-lucide="check"></i></div>
+              <svg width="76" height="76" viewBox="0 0 76 76">
+                <rect x="14" y="8" width="48" height="60" rx="3" fill="#fff" stroke="#dde1e8"/>
+                <g stroke="#e9ecf1" stroke-width="1">
+                  <line x1="20" y1="16" x2="56" y2="16"/><line x1="20" y1="24" x2="56" y2="24"/><line x1="20" y1="32" x2="56" y2="32"/><line x1="20" y1="40" x2="56" y2="40"/><line x1="20" y1="48" x2="56" y2="48"/><line x1="20" y1="56" x2="56" y2="56"/>
+                  <line x1="26" y1="12" x2="26" y2="60"/><line x1="32" y1="12" x2="32" y2="60"/><line x1="38" y1="12" x2="38" y2="60"/><line x1="44" y1="12" x2="44" y2="60"/><line x1="50" y1="12" x2="50" y2="60"/>
+                </g>
+                <g stroke="#6d7381" stroke-width="1.6" stroke-linecap="round">
+                  <path d="M22 20 q2 -2 4 0"/><path d="M28 20 q2 2 4 0"/><path d="M34 19 l3 2"/><path d="M40 21 q2 -3 4 -1"/>
+                  <path d="M22 28 q3 2 5 0"/><path d="M29 27 l3 3"/><path d="M35 29 q2 -2 4 0"/>
+                </g>
+              </svg>
+            </div>
+            <span class="gfig-cap good">바른 방향</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="gcase">
+        <div class="gcase-txt">
+          <p class="gcase-title">2. 그림·지도 위에 겹쳐 쓴 글씨는 인식이 어려워요</p>
+          <p class="gcase-desc">그림 위에 쓴 글씨는 <b>인식 정확도가 낮아질 수 있어요.</b> 글씨는 그림 밖 여백에 쓰도록 안내해 주시고, 이런 과제는 채점 후 <b>[인식 결과]</b>를 꼭 확인해 주세요.</p>
+        </div>
+        <div class="gcase-figs">
+          <div class="gfig">
+            <div class="gfig-frame">
+              <div class="gfig-mark bad"><i data-lucide="x"></i></div>
+              <svg width="76" height="76" viewBox="0 0 76 76">
+                <rect x="10" y="8" width="56" height="60" rx="3" fill="#fff" stroke="#dde1e8"/>
+                <path d="M20 26 q6 -10 14 -6 q10 -4 16 4 q6 8 -2 16 q-4 10 -14 8 q-10 2 -14 -8 q-6 -6 0 -14 z" fill="#dbe5fb" stroke="#b9cbea"/>
+                <g stroke="#3b3f4c" stroke-width="1.6" stroke-linecap="round">
+                  <path d="M26 30 q3 -3 6 0"/><path d="M35 29 l4 3"/><path d="M43 31 q3 -3 6 0"/>
+                  <path d="M28 42 q4 3 7 0"/><path d="M39 41 l4 3"/><path d="M47 43 q3 -2 5 0"/>
+                </g>
+              </svg>
+            </div>
+            <span class="gfig-cap bad">그림 위에 글씨</span>
+          </div>
+          <div class="gfig">
+            <div class="gfig-frame">
+              <div class="gfig-mark good"><i data-lucide="check"></i></div>
+              <svg width="76" height="76" viewBox="0 0 76 76">
+                <rect x="10" y="8" width="56" height="60" rx="3" fill="#fff" stroke="#dde1e8"/>
+                <path d="M16 24 q4 -7 10 -4 q7 -3 11 3 q4 5 -1 11 q-3 7 -10 5 q-7 2 -10 -5 q-4 -4 0 -10 z" fill="#dbe5fb" stroke="#b9cbea"/>
+                <line x1="34" y1="30" x2="46" y2="26" stroke="#b3b3b3" stroke-width="1" stroke-dasharray="2 2"/>
+                <g stroke="#3b3f4c" stroke-width="1.6" stroke-linecap="round">
+                  <path d="M46 24 q3 -3 6 0"/><path d="M55 23 l4 3"/>
+                  <path d="M46 32 q4 3 7 0"/><path d="M56 31 l4 3"/>
+                  <path d="M18 52 q3 -3 6 0"/><path d="M27 51 l4 3"/><path d="M35 53 q3 -3 6 0"/><path d="M44 52 l4 3"/><path d="M52 54 q3 -2 5 0"/>
+                  <path d="M18 60 q4 3 7 0"/><path d="M29 59 l4 3"/><path d="M37 61 q3 -3 6 0"/>
+                </g>
+              </svg>
+            </div>
+            <span class="gfig-cap good">글씨는 여백에</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="gcase">
+        <div class="gcase-txt">
+          <p class="gcase-title">3. 첨삭하기 전 원본으로 올려주세요</p>
+          <p class="gcase-desc">답안에 빨간펜 첨삭이 남아 있으면 <b>고쳐 쓴 내용을 학생 답으로 읽을 수 있어요.</b> 채점 표시나 첨삭을 하기 전의 원본을 업로드해 주세요.</p>
+        </div>
+        <div class="gcase-figs">
+          <div class="gfig">
+            <div class="gfig-frame">
+              <div class="gfig-mark bad"><i data-lucide="x"></i></div>
+              <svg width="76" height="76" viewBox="0 0 76 76">
+                <rect x="14" y="8" width="48" height="60" rx="3" fill="#fff" stroke="#dde1e8"/>
+                <g stroke="#6d7381" stroke-width="1.6" stroke-linecap="round">
+                  <path d="M20 20 h34"/><path d="M20 30 h28"/><path d="M20 40 h34"/><path d="M20 50 h22"/>
+                </g>
+                <g stroke="#f2525f" stroke-width="1.7" stroke-linecap="round" fill="none">
+                  <ellipse cx="42" cy="30" rx="9" ry="5.5"/>
+                  <path d="M46 24 q6 -6 10 -3"/>
+                  <path d="M22 54 q3 3 5 0 q3 -3 5 0 q3 3 5 0"/>
+                  <path d="M50 46 l6 6 M56 46 l-6 6"/>
+                </g>
+              </svg>
+            </div>
+            <span class="gfig-cap bad">첨삭이 남은 답안</span>
+          </div>
+          <div class="gfig">
+            <div class="gfig-frame">
+              <div class="gfig-mark good"><i data-lucide="check"></i></div>
+              <svg width="76" height="76" viewBox="0 0 76 76">
+                <rect x="14" y="8" width="48" height="60" rx="3" fill="#fff" stroke="#dde1e8"/>
+                <g stroke="#6d7381" stroke-width="1.6" stroke-linecap="round">
+                  <path d="M20 20 h34"/><path d="M20 30 h28"/><path d="M20 40 h34"/><path d="M20 50 h22"/>
+                </g>
+              </svg>
+            </div>
+            <span class="gfig-cap good">첨삭 전 원본</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="gcalm">
+        <i data-lucide="info"></i>
+        <p>안내와 다르게 준비돼도 업로드와 채점은 그대로 진행돼요. 인식이 어려웠던 부분은 <b>[인식 결과]</b> 화면에서 언제든 확인하고 수정할 수 있어요.</p>
+      </div>
+    </div>
+    <div class="rm-ft">
+      <button class="btn btn-primary" onclick="closeScoringGuide()">확인</button>
+    </div>
+  </div>
+</div>
+<script>
+function openScoringGuide(){
+  document.getElementById('scoringGuideModal').classList.add('open');
+  if (window.lucide) lucide.createIcons();
+}
+function closeScoringGuide(){
+  document.getElementById('scoringGuideModal').classList.remove('open');
+}
+</script>
+
 <!-- ===== 까망이 목업 화면 선택기 (드래그·접기 · 실제 화면 아님) ===== -->
 <div id="mockpick">
   <div class="mp-head" onclick="mpToggle()">
@@ -5864,6 +6066,7 @@ window.addEventListener('load', setupDemoNav);
     <button class="mp-btn" data-k="form" onclick="mpGo('form')">과제물 양식 등록 <span class="mp-sub">공통·반별</span></button>
     <button class="mp-btn" data-k="uploadPdf" onclick="mpGo('uploadPdf')">일괄 업로드 (PDF) <span class="mp-sub">개인정보 비식별화 안내</span></button>
     <button class="mp-btn" data-k="uploadSurvey" onclick="mpGo('uploadSurvey')">설문 응답 업로드 <span class="mp-sub">구글 설문·엑셀</span></button>
+    <button class="mp-btn" onclick="openScoringGuide()">잘 채점되는 과제물 안내 <span class="mp-sub">QA 케이스 · 모달</span></button>
   </div>
 </div>
 
@@ -6401,5 +6604,60 @@ function bmShowCase(key){
 })();
 </script>
 
+
+<!-- ===== 까망이 공통 보정 (mp-fix-v2) — 화면 밖 이탈 방지 · 접힌 채 드래그 ===== -->
+<script>
+(function(){
+  var el = document.getElementById('mockpick');
+  if (!el) return;
+  var down = false, moved = false, swallow = false, sx = 0, sy = 0;
+
+  // 패널이 항상 화면 안에 남도록 보정 (범위 안이면 아무것도 바꾸지 않음)
+  function clamp(){
+    if (!window.innerWidth || !window.innerHeight) return;   // 렌더 전/숨김 탭 보호
+    var r = el.getBoundingClientRect();
+    if (!r.width || !r.height) return;
+    var maxL = Math.max(8, window.innerWidth  - r.width  - 8);
+    var maxT = Math.max(8, window.innerHeight - r.height - 8);
+    var l = Math.min(Math.max(8, r.left), maxL);
+    var t = Math.min(Math.max(8, r.top),  maxT);
+    if (Math.abs(l - r.left) > 0.5 || Math.abs(t - r.top) > 0.5) {
+      el.style.right = 'auto'; el.style.bottom = 'auto';
+      el.style.left = l + 'px'; el.style.top = t + 'px';
+    }
+  }
+
+  document.addEventListener('mousedown', function(e){
+    if (!el.contains(e.target) || e.target.closest('button')) return;
+    down = true; moved = false; sx = e.clientX; sy = e.clientY;
+  }, true);
+
+  document.addEventListener('mousemove', function(e){
+    if (!down) return;
+    if (Math.abs(e.clientX - sx) > 3 || Math.abs(e.clientY - sy) > 3) moved = true;
+    if (moved) clamp();
+  });
+
+  document.addEventListener('mouseup', function(){
+    if (!down) return;
+    down = false; swallow = moved;
+    if (moved) clamp();
+  });
+
+  // 끌고 난 직후의 click은 펼치기/접기로 취급하지 않는다
+  // (접은 채로 끌면 mouseup 뒤 click이 mpToggle을 호출해 위치가 되돌아가던 문제)
+  document.addEventListener('click', function(e){
+    if (swallow && el.contains(e.target)) { e.stopPropagation(); e.preventDefault(); }
+    swallow = false;
+  }, true);
+
+  // 펼치기/접기로 높이가 바뀐 뒤 화면 밖으로 나가면 되돌린다
+  el.addEventListener('click', function(){
+    requestAnimationFrame(function(){ requestAnimationFrame(clamp); });
+  });
+
+  window.addEventListener('resize', clamp);
+})();
+</script>
 </body>
 </html>
