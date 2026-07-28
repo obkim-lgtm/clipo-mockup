@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/png" href="clipo_favicon.png">
+<title>화면 이탈 집중 로그 — 컨셉 목업 (CLIPO)</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard-gov.min.css">
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<style>
+*{ font-family:'Pretendard GOV',-apple-system,sans-serif; box-sizing:border-box; }
+body{ margin:0; background:#f6f7f9; color:#222631; font-size:16px; min-width:1280px; }
+a{ text-decoration:none; color:inherit; }
+
+/* ===== Global Header (CLIPO 표준) ===== */
+.g-hd { height: 58px; background: #fff; border-bottom: 1px solid #dde1e8; display: flex; align-items: center; padding: 0 20px 0 9px; position: fixed; top: 0; left: 0; right: 0; z-index: 200; }
+.gh-menu-btn { width:40px; height:40px; border:none; background:none; border-radius:4px; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; color:#3b3f4c; margin-right:9px; line-height:1; }
+.gh-menu-btn:hover { background:#f6f7f9; }
+.g-hd-r { margin-left: auto; display: flex; align-items: center; gap: 16px; font-size: 15px; color: #18181b; }
+.hd-plan { display: flex; align-items: center; gap: 8px; }
+.plan-badge { display: inline-flex; align-items: center; height: 20px; background: #e9f2ff; border: 1px solid #ccdfff; color: #3151c4; font-size: 12px; font-weight: 500; padding: 0 6px; border-radius: 6px; line-height: 1; }
+.credit-wrap { display: flex; align-items: center; gap: 8px; font-size: 15px; font-weight: 500; color: #18181b; }
+.user-btn { display: inline-flex; align-items: center; justify-content: center; gap: 4px; height: 36px; padding: 0 12px; border: 1px solid #c7cbd3; border-radius: 9999px; background: none; font-size: 14px; color: #27272a; cursor: pointer; line-height: 1; font-weight: 500; }
+
+/* ===== Sidebar (CLIPO 표준 icon-sb) ===== */
+.icon-sb { width: 56px; background: #fff; border-right: 1px solid #d9d9d9; position: fixed; top: 58px; bottom: 0; left: 0; display: flex; flex-direction: column; padding: 8px 0; z-index: 150; transition: width .2s ease; }
+.icon-sb.expanded { width: 200px; }
+.si { height: 40px; display: flex; align-items: center; border-radius: 8px; color: #6d7381; cursor: pointer; margin: 0 8px 2px; position: relative; padding: 0 4px 0 8px; gap: 10px; white-space: nowrap; flex-shrink: 0; }
+.si:hover { background: #f1f3f5; }
+.si.active { background: #e9f2ff; color: #416bff; }
+.si-icon { width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.si-label { font-size: 13px; font-weight: 500; opacity: 0; transition: opacity .1s; overflow: hidden; }
+.icon-sb.expanded .si-label { opacity: 1; }
+.si-tip { position: absolute; left: 48px; top: 50%; transform: translateY(-50%); background: #222631; color: #fff; font-size: 11px; padding: 3px 8px; border-radius: 4px; white-space: nowrap; display: none; z-index: 300; pointer-events: none; }
+.si:hover .si-tip { display: block; }
+.icon-sb.expanded .si-tip { display: none !important; }
+.nav-bottom { margin-top: auto; width: 100%; }
+.nav-div { height: 1px; background: #f1f3f5; margin: 4px 8px; }
+
+/* ===== Layout ===== */
+.main-wrap{ position:relative; padding-top:58px; padding-left:56px; transition:padding-left .2s; min-height:100vh; background:#f6f7f9; }
+body.nav-expanded .main-wrap{ padding-left:200px; }
+
+/* ===== 상단 탭 밴드 (Figma 295-7609: 직접 제출 화면 탭 구성) ===== */
+.tab-band{ background:white; border-bottom:1px solid #dde1e8; }
+.tab-band-inner{ max-width:1240px; margin:0 auto; padding:0 32px; display:flex; }
+.sub-tab{ padding:16px 20px; font-size:16px; font-weight:500; color:#3b3f4c; border:none; background:none; cursor:pointer; font-family:inherit; border-bottom:3px solid transparent; margin-bottom:-1px; display:inline-flex; align-items:center; justify-content:center; line-height:1; vertical-align:middle; }
+.sub-tab:hover{ color:#222631; }
+.sub-tab.on{ color:#365eef; border-bottom:3px solid #365eef; }
+
+.page-wrap{ max-width:1240px; margin:0 auto; padding:0 32px; width:100%; }
+#scr-teacher-log.active{ display:flex; flex-direction:column; min-height:calc(100vh - 58px); }
+#scr-teacher-log .page-wrap{ flex:1; display:flex; flex-direction:column; }
+
+/* ===== 페이지 헤더 (Figma: Header title_basic) ===== */
+.back-link{ display:inline-flex; align-items:center; justify-content:center; line-height:1; vertical-align:middle; gap:4px; font-size:15px; font-weight:500; color:#18181b; background:none; border:none; cursor:pointer; font-family:inherit; padding:0; align-self:flex-start; }
+.back-link:hover{ color:#365eef; }
+.page-h1{ font-size:20px; font-weight:600; color:#18181b; margin:0; line-height:1.25; }
+.page-sub{ font-size:14px; font-weight:500; color:#18181b; margin:0; line-height:1.55; }
+.pill-primary{ background:#365eef; color:white; height:40px; border-radius:9999px; border:none; padding:0 16px; font-size:15px; font-weight:500; font-family:inherit; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; line-height:1; vertical-align:middle; gap:8px; }
+.pill-primary:hover{ opacity:.9; }
+
+/* ===== 미제출 학생 State_Box (Figma) ===== */
+.state-box-red{ background:#fff3f4; border:1px solid #fc9ba2; border-radius:12px; box-shadow:0 2px 4px rgba(0,0,0,.1), 0 0 1px rgba(34,38,49,.3); padding:20px; display:flex; flex-direction:column; gap:12px; width:100%; }
+.sbr-title-row{ display:flex; align-items:center; gap:12px; }
+.sbr-title{ display:flex; align-items:center; gap:8px; flex:1; min-width:0; font-size:16px; font-weight:600; color:#ab303a; }
+.sbr-title i{ width:16px; height:16px; color:#ab303a; flex-shrink:0; }
+.sbr-recent{ display:flex; align-items:center; gap:12px; font-size:14px; color:#18181b; }
+.sbr-recent button{ background:none; border:none; cursor:pointer; padding:0; display:inline-flex; align-items:center; color:#18181b; }
+.sbr-desc{ padding-left:20px; font-size:15px; color:#18181b; line-height:1.55; }
+
+/* ===== 카드 (Figma: panel) ===== */
+.ev-card{ background:white; border-radius:12px; padding:24px; box-shadow:0 2px 4px rgba(0,0,0,.1), 0 0 1px rgba(34,38,49,.3); display:flex; flex-direction:column; gap:20px; }
+
+/* ===== 테이블 (Figma: Select_student — 컨테이너 보더 + radius 8) ===== */
+.tbl-wrap{ border:1px solid #dde1e8; border-radius:8px; overflow:hidden; width:100%; }
+.tbl2{ width:100%; border-collapse:collapse; }
+.tbl2 th{ background:#f6f7f9; height:44px; font-size:15px; font-weight:500; color:#18181b; padding:4px 12px; text-align:center; border-bottom:1px solid #dde1e8; white-space:nowrap; }
+.tbl2 td{ font-size:16px; padding:8px 12px; text-align:center; color:#18181b; border-bottom:1px solid #dde1e8; height:48px; }
+.tbl2 tr:last-child td{ border-bottom:none; }
+.chk{ width:20px; height:20px; border:1.5px solid #c7cbd3; border-radius:2px; accent-color:#365eef; cursor:pointer; vertical-align:middle; }
+
+/* ===== 상태 뱃지 (Figma: Badge_제출상태_학생 — 사각 6px) ===== */
+.b-submit{ display:inline-flex; align-items:center; justify-content:center; height:24px; padding:0 8px; border-radius:6px; background:#dff8eb; color:#27724b; font-size:14px; font-weight:500; line-height:1; white-space:nowrap; }
+.b-absent{ display:inline-flex; align-items:center; justify-content:center; height:24px; padding:0 8px; border-radius:6px; background:#ffebeb; color:#ab303a; font-size:14px; font-weight:500; line-height:1; white-space:nowrap; }
+
+/* ===== 제출 유형 뱃지 (Figma: 직접 작성 / 파일 첨부 / -) ===== */
+.t-badge{ display:inline-flex; align-items:center; justify-content:center; gap:3px; height:20px; padding:0 7px; border-radius:9999px; font-size:12px; font-weight:500; line-height:1; white-space:nowrap; }
+.t-badge i{ width:11px; height:11px; }
+.t-text{ background:#e8f1ff; color:#3151c4; }
+.t-file{ background:#f1f3f5; color:#27272a; }
+.t-none{ background:#f1f3f5; color:#27272a; }
+.t-detail{ font-size:15px; font-weight:500; color:#52525b; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+
+/* ===== 행 액션 버튼 (Figma: 변경/삭제 · 업로드) ===== */
+.row-btn{ background:transparent; border:none; border-radius:4px; padding:10px 16px; font-size:15px; font-weight:500; color:#18181b; font-family:inherit; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; line-height:1; vertical-align:middle; gap:8px; }
+.row-btn i{ width:20px; height:20px; }
+.row-btn:hover{ background:#f1f3f5; }
+
+/* ===== 이탈 로그 셀 (신규 제안) ===== */
+.leave-cell-btn{ background:none; border:none; cursor:pointer; font-family:inherit; font-size:15px; font-weight:600; color:#ea580c; display:inline-flex; align-items:center; justify-content:center; line-height:1; vertical-align:middle; gap:4px; padding:6px 10px; border-radius:4px; white-space:nowrap; }
+.leave-cell-btn:hover{ background:#fff7ed; }
+.leave-none{ color:#b3b6bd; font-size:15px; }
+
+/* ===== 이탈 상세 (인라인 펼침) ===== */
+.leave-detail td{ background:#fbfbfc; }
+.leave-detail-inner{ padding:6px 24px 14px; text-align:left; }
+.leave-evt{ display:flex; align-items:center; gap:14px; padding:9px 0; border-bottom:1px solid #eceef2; font-size:15px; }
+.leave-evt:last-of-type{ border-bottom:none; }
+.leave-evt-time{ color:#3b3f4c; font-weight:600; width:64px; flex-shrink:0; }
+.leave-evt-type{ display:inline-flex; align-items:center; justify-content:center; gap:5px; height:24px; padding:0 9px; border-radius:100px; background:#fff7ed; color:#ea580c; font-size:13px; font-weight:600; line-height:1; flex-shrink:0; }
+.leave-evt-type.gap{ background:#eef0f3; color:#6d7381; }
+.leave-evt-dur{ color:#222631; font-weight:600; }
+
+/* ===== 안내 박스 (배경+아이콘) ===== */
+.info-box{ background:#e9f2ff; border-radius:10px; padding:14px 16px; display:flex; align-items:flex-start; gap:10px; }
+.info-box i{ width:20px; height:20px; color:#416bff; flex-shrink:0; margin-top:2px; }
+.info-box p{ margin:0; font-size:15px; color:#3b3f4c; line-height:1.65; font-weight:500; }
+
+/* ===== 토글 ===== */
+.toggle{ display:inline-flex; align-items:center; gap:8px; cursor:pointer; user-select:none; }
+.toggle input{ display:none; }
+.toggle-track{ width:36px; height:20px; border-radius:100px; background:#d9d9d9; position:relative; transition:background .15s; flex-shrink:0; }
+.toggle-thumb{ position:absolute; top:2px; left:2px; width:16px; height:16px; border-radius:100px; background:white; box-shadow:0 1px 2px rgba(0,0,0,.18); transition:left .15s; }
+.toggle input:checked + .toggle-track{ background:#416bff; }
+.toggle input:checked + .toggle-track .toggle-thumb{ left:18px; }
+.toggle-label{ font-size:13px; font-weight:600; color:#3b3f4c; }
+
+/* ===== 학생 화면 ===== */
+.stu-hd{ height:58px; background:#fff; border-bottom:1px solid #dde1e8; display:flex; align-items:center; justify-content:center; padding:0 24px; }
+.stu-hd-inner{ width:100%; max-width:800px; display:flex; align-items:center; justify-content:space-between; }
+.stu-wrap{ max-width:800px; margin:0 auto; padding:36px 24px 80px; }
+.stu-card{ background:white; border-radius:12px; padding:32px; box-shadow:0 2px 4px rgba(0,0,0,.1), 0 0 1px rgba(34,38,49,.3); }
+.stu-rule{ display:flex; align-items:flex-start; gap:12px; padding:14px 0; border-bottom:1px solid #eceef2; }
+.stu-rule:last-child{ border-bottom:none; }
+.stu-rule i{ width:22px; height:22px; color:#416bff; flex-shrink:0; margin-top:1px; }
+.stu-rule p{ margin:0; font-size:16px; color:#222631; line-height:1.6; }
+.stu-rule p .sub{ font-size:14px; color:#6d7381; }
+.stu-textarea{ width:100%; min-height:320px; border:1px solid #d9d9d9; border-radius:8px; padding:16px 18px; font-size:16px; font-family:inherit; line-height:1.75; color:#222631; resize:vertical; outline:none; }
+.stu-textarea:focus{ border-color:#416bff; box-shadow:0 0 0 2px rgba(65,107,255,.12); }
+.badge-blue{ display:inline-flex; align-items:center; justify-content:center; border-radius:100px; padding:3px 10px; font-size:13px; font-weight:600; white-space:nowrap; background:#e9f2ff; color:#3151c4; }
+
+/* 이탈 복귀 배너 (학생) */
+#leaveBanner{ display:none; background:#fff7ed; border-radius:10px; padding:15px 18px; align-items:flex-start; gap:12px; margin-bottom:16px; }
+#leaveBanner.show{ display:flex; }
+#leaveBanner i{ width:22px; height:22px; color:#ea580c; flex-shrink:0; margin-top:2px; }
+#leaveBanner .lb-title{ font-size:16px; font-weight:700; color:#c2410c; margin:0 0 3px; line-height:1.5; }
+#leaveBanner .lb-desc{ font-size:15px; font-weight:500; color:#9a5b2e; margin:0; line-height:1.6; }
+
+/* 기록 중 칩 (학생) */
+.rec-chip{ display:inline-flex; align-items:center; gap:6px; height:28px; padding:0 12px; border-radius:100px; background:#eef0f3; color:#3b3f4c; font-size:13px; font-weight:600; line-height:1; }
+.rec-chip i{ width:14px; height:14px; color:#6d7381; }
+
+.btn{ height:40px; border-radius:4px; font-weight:600; font-size:15px; font-family:inherit; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; line-height:1; vertical-align:middle; gap:8px; padding:0 16px; border:none; transition:opacity .15s; }
+.btn-primary{ background:#416bff; color:white; }
+.btn-primary:hover{ background:#365eef; }
+
+/* ===== 푸터 ===== */
+.site-footer{ margin-top:auto; padding:48px 0 40px; display:flex; flex-direction:column; align-items:center; gap:16px; }
+.sf-links{ display:flex; align-items:center; }
+.sf-links a{ font-size:14px; color:#3b3f4c; padding:0 16px; }
+.sf-links a + a{ border-left:1px solid #dde1e8; }
+.sf-copy{ font-size:14px; color:#9aa0ad; }
+
+/* ===== 토스트 ===== */
+.toast{ position:fixed; bottom:28px; left:50%; transform:translateX(-50%) translateY(12px); opacity:0; min-width:320px; max-width:480px; padding:14px 22px 14px 16px; border-radius:4px; display:flex; align-items:center; gap:12px; font-size:15px; font-weight:600; box-shadow:0 0 1px #2226314D, 0 4px 12px #00000026; z-index:9999; transition:opacity .2s ease, transform .2s ease; pointer-events:none; background:#319d64; color:white; }
+.toast.show{ opacity:1; transform:translateX(-50%) translateY(0); }
+
+/* ===== 목업 내비게이터 ===== */
+#mockpick{ position:fixed; left:24px; bottom:24px; z-index:3000; background:#1F2233; border-radius:14px; padding:8px; box-shadow:0 10px 30px rgba(0,0,0,.35); width:max-content; max-width:380px; cursor:move; user-select:none; }
+#mockpick .mp-head{ font-size:11px; font-weight:700; color:#8A8FB0; letter-spacing:.04em; display:flex; align-items:center; justify-content:space-between; gap:16px; padding:6px 8px; cursor:pointer; }
+#mockpick .mp-body{ display:flex; flex-direction:column; gap:6px; margin-top:6px; }
+#mockpick .mp-cap{ font-size:10px; font-weight:700; color:#6B6F8C; letter-spacing:.05em; padding:7px 8px 2px; }
+#mockpick .mp-btn{ width:100%; text-align:left; white-space:nowrap; padding:9px 12px; border-radius:9px; border:1px solid #3A3F58; background:#2A2E44; color:#C9CCE0; font-size:13px; font-weight:600; font-family:inherit; cursor:pointer; line-height:1.35; }
+#mockpick .mp-btn:hover{ background:#33384f; }
+#mockpick .mp-btn.on{ background:#416bff; color:#fff; border-color:#416bff; }
+#mockpick .mp-sub{ font-size:11px; font-weight:500; color:#8A8FB0; margin-left:8px; }
+#mockpick .mp-btn.on .mp-sub{ color:#D6E2FF; }
+#mockpick .mp-note{ font-size:11px; font-weight:500; color:#8A8FB0; line-height:1.55; padding:6px 8px 4px; max-width:330px; white-space:normal; }
+#mockpick .mp-feed{ background:#171927; border-radius:9px; padding:8px 10px; margin-top:2px; max-height:130px; overflow:auto; display:flex; flex-direction:column; gap:4px; }
+#mockpick .mp-feed-item{ font-size:11px; font-weight:500; color:#AEB3D0; line-height:1.5; white-space:normal; }
+#mockpick .mp-feed-item b{ color:#FFB27A; }
+#mockpick .mp-feed-item.mute b{ color:#6B6F8C; }
+
+.screen{ display:none; }
+.screen.active{ display:block; }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════ 씬 1 · 학생 — 제출 시작(사전 고지) ═══════════════ -->
+<div id="scr-student-notice" class="screen">
+  <div class="stu-hd">
+    <div class="stu-hd-inner">
+      <svg width="76" height="16" viewBox="0 0 76 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M11.3613 4.03516H4.09668V11.9629H8.88281L8.88086 11.9648H15.6016V16H4.02539C1.80242 15.9998 0 14.223 0 12.0322V3.96777C0 1.77696 1.80242 0.000177874 4.02539 0H15.4561L11.3613 4.03516ZM22.0703 11.9648H33.5781V16H22.002C19.7788 16 17.9756 14.2231 17.9756 12.0322V0H22.0703V11.9648ZM40.0459 16H35.9521V0H40.0459V16ZM54.5381 0C56.4564 0 58.0138 1.53228 58.0186 3.42285L58.0166 3.4248V8.54297C58.014 10.4333 56.4567 11.9648 54.5361 11.9648H46.5107L42.416 16V0H54.5381ZM71.9746 0C74.0086 0.000134956 75.6887 1.49046 75.958 3.42285H76V12.5771H75.958C75.6887 14.5095 74.011 15.9999 71.9746 16H64.4238C62.3897 16 60.7098 14.5096 60.4404 12.5771C60.4145 12.398 60.3984 12.2184 60.3984 12.0322V3.96777C60.3984 3.78159 60.4145 3.60205 60.4404 3.42285C60.7098 1.49037 62.3873 0 64.4238 0H71.9746ZM64.4922 12.5771H71.9062V3.42285H64.4922V12.5771ZM46.5107 3.42285V8.54004H53.9238V3.42285H46.5107Z" fill="#365EEF"/></svg>
+      <span style="font-size:15px;font-weight:500;color:#3b3f4c;">1학년 1반 김서윤</span>
+    </div>
+  </div>
+
+  <div class="stu-wrap">
+    <div class="stu-card">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+        <span class="badge-blue">국어</span>
+        <span style="font-size:14px;font-weight:500;color:#6d7381;">제출 마감 7월 28일 16:00</span>
+      </div>
+      <h2 style="font-size:24px;font-weight:700;color:#222631;margin:0 0 8px;">주장하는 글 쓰기</h2>
+      <p style="font-size:16px;color:#3b3f4c;line-height:1.6;margin:0 0 24px;">아래 안내를 확인한 뒤 제출을 시작해 주세요.</p>
+
+      <div style="background:#f6f7f9;border-radius:10px;padding:6px 20px;margin-bottom:28px;">
+        <div class="stu-rule">
+          <i data-lucide="pen-line"></i>
+          <p><b>제출이 끝날 때까지 이 화면에서 작성해요.</b><br><span class="sub">작성 중인 내용은 자동으로 저장돼요.</span></p>
+        </div>
+        <div class="stu-rule">
+          <i data-lucide="monitor-x"></i>
+          <p><b>다른 탭·창으로 이동하면 화면을 벗어난 시각과 시간이 기록돼요.</b><br><span class="sub">기록은 선생님께 전달돼요. 방문한 사이트는 수집하지 않아요.</span></p>
+        </div>
+        <div class="stu-rule">
+          <i data-lucide="clipboard-x"></i>
+          <p><b>외부에서 복사한 내용은 붙여넣을 수 없어요.</b></p>
+        </div>
+      </div>
+
+      <div style="display:flex;justify-content:center;">
+        <button class="btn btn-primary" style="height:48px;padding:0 40px;font-size:16px;" onclick="go('student-write')">제출 시작</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ 씬 2 · 학생 — 제출 중(이탈 감지 라이브) ═══════════════ -->
+<div id="scr-student-write" class="screen">
+  <div class="stu-hd">
+    <div class="stu-hd-inner">
+      <svg width="76" height="16" viewBox="0 0 76 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M11.3613 4.03516H4.09668V11.9629H8.88281L8.88086 11.9648H15.6016V16H4.02539C1.80242 15.9998 0 14.223 0 12.0322V3.96777C0 1.77696 1.80242 0.000177874 4.02539 0H15.4561L11.3613 4.03516ZM22.0703 11.9648H33.5781V16H22.002C19.7788 16 17.9756 14.2231 17.9756 12.0322V0H22.0703V11.9648ZM40.0459 16H35.9521V0H40.0459V16ZM54.5381 0C56.4564 0 58.0138 1.53228 58.0186 3.42285L58.0166 3.4248V8.54297C58.014 10.4333 56.4567 11.9648 54.5361 11.9648H46.5107L42.416 16V0H54.5381ZM71.9746 0C74.0086 0.000134956 75.6887 1.49046 75.958 3.42285H76V12.5771H75.958C75.6887 14.5095 74.011 15.9999 71.9746 16H64.4238C62.3897 16 60.7098 14.5096 60.4404 12.5771C60.4145 12.398 60.3984 12.2184 60.3984 12.0322V3.96777C60.3984 3.78159 60.4145 3.60205 60.4404 3.42285C60.7098 1.49037 62.3873 0 64.4238 0H71.9746ZM64.4922 12.5771H71.9062V3.42285H64.4922V12.5771ZM46.5107 3.42285V8.54004H53.9238V3.42285H46.5107Z" fill="#365EEF"/></svg>
+      <span style="font-size:15px;font-weight:500;color:#3b3f4c;">1학년 1반 김서윤</span>
+    </div>
+  </div>
+
+  <div class="stu-wrap" style="padding-top:28px;">
+
+    <!-- 이탈 복귀 배너 (이탈했다 돌아오면 표시) -->
+    <div id="leaveBanner">
+      <i data-lucide="timer"></i>
+      <div>
+        <p class="lb-title" id="lbTitle">제출 화면을 벗어났다가 돌아왔어요 (32초)</p>
+        <p class="lb-desc">벗어난 시각과 시간이 선생님께 기록돼요. 제출이 끝날 때까지 이 화면에 머물러 주세요.</p>
+      </div>
+    </div>
+
+    <div class="stu-card">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:20px;">
+        <h2 style="font-size:20px;font-weight:700;color:#222631;margin:0;">주장하는 글 쓰기</h2>
+        <span class="rec-chip"><i data-lucide="monitor-check"></i>화면 이탈 기록 중</span>
+      </div>
+
+      <div style="background:#f6f7f9;border-radius:8px;padding:16px 20px;margin-bottom:20px;">
+        <p style="margin:0;font-size:16px;color:#222631;line-height:1.7;"><b style="color:#416bff;">문항 1.</b> '청소년의 SNS 사용 시간을 제한해야 한다'는 주장에 대해 자신의 입장을 정하고, 근거를 두 가지 이상 들어 주장하는 글을 쓰시오.</p>
+      </div>
+
+      <textarea class="stu-textarea" placeholder="여기에 답안을 작성하세요.">나는 청소년의 SNS 사용 시간을 제한하는 것에 반대한다. 첫째, 스스로 조절하는 힘은 금지가 아니라 연습에서 나오기 때문이다.</textarea>
+
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-top:20px;">
+        <span style="font-size:14px;font-weight:500;color:#6d7381;">마지막 자동 저장 방금 전</span>
+        <button class="btn btn-primary" onclick="submitAnswer()">제출</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ 씬 3 · 교사 — 과제 제출 현황(직접 제출 · Figma 295-7609 기준 + 화면 이탈 열) ═══════════════ -->
+<div id="scr-teacher-log" class="screen">
+
+  <header class="g-hd">
+    <button class="gh-menu-btn" onclick="toggleNav()"><i data-lucide="panel-left-open" style="width:20px;height:20px"></i></button>
+    <svg width="76" height="16" viewBox="0 0 76 16" fill="none" xmlns="http://www.w3.org/2000/svg" style="cursor:pointer"><path d="M11.3613 4.03516H4.09668V11.9629H8.88281L8.88086 11.9648H15.6016V16H4.02539C1.80242 15.9998 0 14.223 0 12.0322V3.96777C0 1.77696 1.80242 0.000177874 4.02539 0H15.4561L11.3613 4.03516ZM22.0703 11.9648H33.5781V16H22.002C19.7788 16 17.9756 14.2231 17.9756 12.0322V0H22.0703V11.9648ZM40.0459 16H35.9521V0H40.0459V16ZM54.5381 0C56.4564 0 58.0138 1.53228 58.0186 3.42285L58.0166 3.4248V8.54297C58.014 10.4333 56.4567 11.9648 54.5361 11.9648H46.5107L42.416 16V0H54.5381ZM71.9746 0C74.0086 0.000134956 75.6887 1.49046 75.958 3.42285H76V12.5771H75.958C75.6887 14.5095 74.011 15.9999 71.9746 16H64.4238C62.3897 16 60.7098 14.5096 60.4404 12.5771C60.4145 12.398 60.3984 12.2184 60.3984 12.0322V3.96777C60.3984 3.78159 60.4145 3.60205 60.4404 3.42285C60.7098 1.49037 62.3873 0 64.4238 0H71.9746ZM64.4922 12.5771H71.9062V3.42285H64.4922V12.5771ZM46.5107 3.42285V8.54004H53.9238V3.42285H46.5107Z" fill="#365EEF"/></svg>
+    <div class="g-hd-r">
+      <div class="hd-plan">
+        <span class="plan-badge">학교 유료</span>
+        <span style="font-size:15px;font-weight:500;color:#18181b">D-180</span>
+      </div>
+      <div class="credit-wrap"><i data-lucide="bot" style="width:20px;height:20px;color:#416bff"></i><span>200 크레딧</span></div>
+      <button class="user-btn">최대표 선생님(대표교사) <i data-lucide="chevron-down" style="width:16px;height:16px"></i></button>
+    </div>
+  </header>
+
+  <nav class="icon-sb" id="icon-sb">
+    <div class="si"><div class="si-icon"><i data-lucide="home" style="width:20px;height:20px"></i></div><span class="si-label">홈</span><span class="si-tip">홈</span></div>
+    <div class="si"><div class="si-icon"><i data-lucide="scissors" style="width:20px;height:20px"></i></div><span class="si-label">평가 준비</span><span class="si-tip">평가 준비</span></div>
+    <div class="si active"><div class="si-icon"><i data-lucide="layout-grid" style="width:20px;height:20px"></i></div><span class="si-label">수업</span><span class="si-tip">수업</span></div>
+    <div class="si"><div class="si-icon"><i data-lucide="notebook-pen" style="width:20px;height:20px"></i></div><span class="si-label">창의적 체험활동 <span style="font-size:10px;background:#416bff;color:#fff;padding:1px 5px;border-radius:3px;margin-left:2px">Beta</span></span><span class="si-tip">창의적 체험활동</span></div>
+    <div class="si"><div class="si-icon"><i data-lucide="zap" style="width:20px;height:20px"></i></div><span class="si-label">세특 간편 생성기</span><span class="si-tip">세특 간편 생성기</span></div>
+    <div class="si"><div class="si-icon"><i data-lucide="smile" style="width:20px;height:20px"></i></div><span class="si-label">행동특성 및 종합기록</span><span class="si-tip">행동특성 및 종합기록</span></div>
+    <div class="si"><div class="si-icon"><i data-lucide="bar-chart-2" style="width:20px;height:20px"></i></div><span class="si-label">리포트</span><span class="si-tip">리포트</span></div>
+    <div class="si"><div class="si-icon"><i data-lucide="building-2" style="width:20px;height:20px"></i></div><span class="si-label">학교 설정</span><span class="si-tip">학교 설정</span></div>
+    <div class="nav-bottom">
+      <div class="nav-div"></div>
+      <div class="si"><div class="si-icon"><i data-lucide="file-down" style="width:20px;height:20px"></i></div><span class="si-label">매뉴얼 다운로드</span><span class="si-tip">매뉴얼 다운로드</span></div>
+      <div class="si"><div class="si-icon"><i data-lucide="credit-card" style="width:20px;height:20px"></i></div><span class="si-label">요금제</span><span class="si-tip">요금제</span></div>
+      <div class="si"><div class="si-icon"><i data-lucide="help-circle" style="width:20px;height:20px"></i></div><span class="si-label">고객센터</span><span class="si-tip">고객센터</span></div>
+    </div>
+  </nav>
+
+  <div class="main-wrap">
+    <div class="tab-band">
+      <div class="tab-band-inner">
+        <button class="sub-tab">수업 홈</button>
+        <button class="sub-tab">수행평가 설계</button>
+        <button class="sub-tab on">과제물 관리</button>
+        <button class="sub-tab">수행평가 채점</button>
+        <button class="sub-tab">세부능력 및 특기사항 지원</button>
+      </div>
+    </div>
+    <div class="page-wrap">
+
+      <!-- 페이지 헤더 (Figma: Header title_basic) -->
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:16px;padding:20px 0;">
+        <div style="display:flex;flex-direction:column;gap:8px;min-width:0;">
+          <button class="back-link"><i data-lucide="chevron-left" style="width:18px;height:18px;"></i>이전으로</button>
+          <h1 class="page-h1">1학년 1반 과제 제출 현황</h1>
+          <p class="page-sub">주장하는 글 쓰기 과제 제출 현황을 확인하고 파일을 직접 업로드 할 수 있습니다.</p>
+        </div>
+        <button class="pill-primary" onclick="notReady('학급 일괄 업로드')"><i data-lucide="upload" style="width:20px;height:20px;"></i>학급 일괄 업로드</button>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:20px;">
+
+        <!-- 미제출 학생 State_Box (기존 화면 요소) -->
+        <div class="state-box-red">
+          <div class="sbr-title-row">
+            <div class="sbr-title"><i data-lucide="circle-alert"></i>미제출 학생</div>
+            <div class="sbr-recent">
+              <span>07/28 16:30:00 기준</span>
+              <button title="새로고침"><i data-lucide="refresh-cw" style="width:16px;height:16px;"></i></button>
+            </div>
+          </div>
+          <div class="sbr-desc">10106 한지우, 10107 조민재, 10108 윤하은</div>
+        </div>
+
+        <!-- 화면 이탈 기록 안내 (신규 제안: 영향 필드 앞에 설명) -->
+        <div class="info-box">
+          <i data-lucide="info"></i>
+          <p>화면 이탈 기록은 학생이 제출 화면에서 <b>다른 탭·창으로 이동한 시각과 시간</b>이에요. 방문한 사이트는 수집하지 않고, 스마트폰 등 다른 기기 사용은 감지되지 않아요. 자동 판정이나 감점 없이 <b>참고 정보로만</b> 제공돼요.</p>
+        </div>
+
+        <!-- 학생 제출 현황 카드 -->
+        <div class="ev-card">
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:16px;">
+            <h3 style="font-size:18px;font-weight:600;color:#18181b;margin:0;">학생 제출 현황 <span style="font-size:15px;color:#6d7381;font-weight:500;">6/9명 제출</span></h3>
+            <label class="toggle">
+              <input type="checkbox" id="focusToggle" checked onchange="toggleFocusLog(this.checked)">
+              <span class="toggle-track"><span class="toggle-thumb"></span></span>
+              <span class="toggle-label">화면 이탈 기록</span>
+            </label>
+          </div>
+
+          <div class="tbl-wrap">
+            <table class="tbl2">
+              <thead><tr>
+                <th style="width:68px;"><input type="checkbox" class="chk"></th>
+                <th style="width:98px;">학번</th>
+                <th style="width:98px;">이름</th>
+                <th style="width:98px;">상태</th>
+                <th style="min-width:98px;">최근 제출 일시</th>
+                <th>제출 상세</th>
+                <th style="width:150px;">화면 이탈</th>
+                <th style="width:168px;">과제물 관리</th>
+              </tr></thead>
+              <tbody id="teacherTbody"></tbody>
+            </table>
+          </div>
+
+          <p id="toggleOffNote" style="display:none;margin:-6px 0 0;font-size:14px;font-weight:500;color:#6d7381;">이 과제는 화면 이탈 기록이 꺼져 있어요. 다음 제출부터 기록하려면 켜 주세요.</p>
+        </div>
+      </div>
+    </div>
+
+    <footer class="site-footer">
+      <div class="sf-links"><a href="#" onclick="return false;">회사소개</a><a href="#" onclick="return false;">이용약관</a><a href="#" onclick="return false;">개인정보처리방침</a><a href="#" onclick="return false;">고객센터</a></div>
+      <div class="sf-copy">© 2026. Datadriven Inc. All rights reserved.</div>
+    </footer>
+  </div>
+</div>
+
+<!-- 토스트 -->
+<div id="toast" class="toast"><i data-lucide="circle-check-big" style="width:20px;height:20px;color:white;flex-shrink:0;"></i><span id="toastMsg"></span></div>
+
+<!-- 목업 내비게이터 -->
+<div id="mockpick">
+  <div class="mp-head" onclick="mpToggle(event)"><span>목업 내비게이터 · 화면 이탈 집중 로그 (CLIPO)</span><span id="mpArrow">▾</span></div>
+  <div class="mp-body" id="mpBody">
+    <div class="mp-cap">화면 선택</div>
+    <button class="mp-btn" data-scene="student-notice" onclick="go('student-notice')">① 학생 · 제출 시작<span class="mp-sub">사전 고지</span></button>
+    <button class="mp-btn" data-scene="student-write" onclick="go('student-write')">② 학생 · 제출 중<span class="mp-sub">이탈 감지 — 실제 동작</span></button>
+    <button class="mp-btn" data-scene="teacher-log" onclick="go('teacher-log')">③ 교사 · 과제 제출 현황<span class="mp-sub">직접 제출 화면 + 이탈 로그</span></button>
+    <div id="mpDemo" style="display:none;">
+      <div class="mp-cap">라이브 데모</div>
+      <div class="mp-note">②번 화면에서 <b style="color:#C9CCE0;">실제로 다른 탭에 갔다가 돌아와 보세요</b> — 브라우저 이벤트로 감지해 배너와 기록이 남아요. 3초 미만은 기록되지 않아요.</div>
+      <div class="mp-feed" id="mpFeed"><div class="mp-feed-item mute"><b>대기 중</b> — 아직 이탈 기록이 없어요.</div></div>
+      <div class="mp-note" id="mpTotal">김서윤 누적: 0회 · 0초 → ③ 교사 화면에 반영됨</div>
+    </div>
+    <div class="mp-note">※ ③ 교사 화면은 피그마 직접 제출 시안(295-7609) 기준. "화면 이탈" 열과 안내·토글만 신규 제안이에요. 학생 화면(①·②)은 컨셉 시안.</div>
+  </div>
+</div>
+
+<script>
+/* ───────── 상태 ───────── */
+let currentScene = 'student-notice';
+let liveLog = [];            // 김서윤 라이브 이탈 기록 {time,type,dur}
+let leaveStart = null, leaveType = null;
+
+/* ───────── 씬 전환 (해시 라우팅) ───────── */
+function go(scene){
+  currentScene = scene;
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById('scr-'+scene).classList.add('active');
+  document.querySelectorAll('#mockpick .mp-btn[data-scene]').forEach(b=>b.classList.toggle('on', b.dataset.scene===scene));
+  document.getElementById('mpDemo').style.display = (scene==='student-write') ? 'block' : 'none';
+  if(location.hash !== '#'+scene) history.replaceState(null,'','#'+scene);
+  if(scene==='teacher-log') renderTeacher();
+  window.scrollTo(0,0);
+  lucide.createIcons();
+}
+window.addEventListener('hashchange', ()=>{ const h=location.hash.slice(1); if(h && document.getElementById('scr-'+h)) go(h); });
+
+/* ───────── 이탈 감지 (실제 브라우저 이벤트) ───────── */
+function onLeave(type){
+  if(currentScene!=='student-write' || leaveStart) return;
+  leaveStart = Date.now(); leaveType = type;
+}
+function onReturn(){
+  if(!leaveStart) return;
+  const dur = Math.round((Date.now()-leaveStart)/1000);
+  const t = new Date(leaveStart);
+  const hh = String(t.getHours()).padStart(2,'0'), mm = String(t.getMinutes()).padStart(2,'0'), ss = String(t.getSeconds()).padStart(2,'0');
+  if(dur >= 3){
+    liveLog.push({ time: hh+':'+mm+':'+ss, type: leaveType, dur: dur });
+    showBanner(dur);
+    feed('<b>'+leaveType+'</b> · '+dur+'초 — 기록됨 ('+hh+':'+mm+':'+ss+')');
+  } else {
+    feed('<b class="mute">'+leaveType+'</b> · '+dur+'초 — 3초 미만이라 기록 안 함', true);
+  }
+  leaveStart = null; leaveType = null;
+  updateTotal();
+}
+document.addEventListener('visibilitychange', ()=>{ document.hidden ? onLeave('탭 전환') : onReturn(); });
+window.addEventListener('blur',  ()=>{ if(!document.hidden) onLeave('다른 창 이동'); });
+window.addEventListener('focus', ()=>{ if(!document.hidden) onReturn(); });
+
+function showBanner(dur){
+  const b = document.getElementById('leaveBanner');
+  document.getElementById('lbTitle').textContent = '제출 화면을 벗어났다가 돌아왔어요 ('+fmtDur(dur)+')';
+  b.classList.add('show');
+  lucide.createIcons();
+}
+function feed(html, mute){
+  const f = document.getElementById('mpFeed');
+  const waiting = f.querySelector('.mute');
+  if(waiting && waiting.textContent.includes('대기 중')) f.innerHTML='';
+  const d = document.createElement('div');
+  d.className = 'mp-feed-item'+(mute?' mute':'');
+  d.innerHTML = html;
+  f.prepend(d);
+}
+function updateTotal(){
+  const total = liveLog.reduce((a,e)=>a+e.dur,0);
+  document.getElementById('mpTotal').textContent = '김서윤 누적: '+liveLog.length+'회 · '+fmtDur(total)+' → ③ 교사 화면에 반영됨';
+}
+function fmtDur(s){ return s>=60 ? Math.floor(s/60)+'분'+(s%60? ' '+s%60+'초':'') : s+'초'; }
+
+function submitAnswer(){
+  const t = document.getElementById('toast');
+  document.getElementById('toastMsg').textContent = '제출되었습니다. ③ 교사 화면에서 기록을 확인해 보세요.';
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), 2500);
+}
+function notReady(name){
+  const t = document.getElementById('toast');
+  document.getElementById('toastMsg').textContent = name+'은(는) 이 목업에 포함되지 않았어요.';
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), 2000);
+}
+
+/* ───────── 교사 화면 데이터 (Figma 직접 제출 구조: 제출 유형 = 직접 작성/파일 첨부) ───────── */
+const teacherRows = [
+  { id:'10101', name:'김서윤', status:'live', date:'07/28 15:02 학생 제출', type:'text', detail:'812자' },
+  { id:'10102', name:'이준호', status:'제출', date:'07/28 14:48 학생 제출', type:'text', detail:'542자',
+    events:[ {time:'14:12:05', type:'탭 전환', dur:32}, {time:'14:19:41', type:'다른 창 이동', dur:15} ] },
+  { id:'10103', name:'박지민', status:'제출', date:'07/28 14:55 학생 제출', type:'text', detail:'388자',
+    events:[ {time:'14:03:12', type:'탭 전환', dur:74}, {time:'14:10:26', type:'탭 전환', dur:41}, {time:'14:18:03', type:'다른 창 이동', dur:12}, {time:'14:24:40', type:'탭 전환', dur:58}, {time:'14:31:17', type:'탭 전환', dur:38}, {time:'14:40:02', type:'다른 창 이동', dur:29} ] },
+  { id:'10104', name:'최유진', status:'제출', date:'07/28 14:51 학생 제출', type:'file', detail:'10104_최유진.pdf',
+    events:[ {time:'14:08:30', type:'탭 전환', dur:28}, {time:'14:20:11', type:'gap', dur:171} ] },
+  { id:'10105', name:'정현우', status:'제출', date:'07/28 14:44 학생 제출', type:'text', detail:'634자', events:[] },
+  { id:'10109', name:'임도윤', status:'제출', date:'07/28 16:10 선생님 제출', type:'file', detail:'10109_임도윤.pdf 외 1', teacherUpload:true },
+  { id:'10106', name:'한지우', status:'미제출' },
+  { id:'10107', name:'조민재', status:'미제출' },
+  { id:'10108', name:'윤하은', status:'미제출' }
+];
+let focusLogOn = true;
+let openRow = null;
+
+function renderTeacher(){
+  const tb = document.getElementById('teacherTbody');
+  tb.innerHTML = '';
+  teacherRows.forEach(r=>{
+    const events = (r.status==='live') ? liveLog.map(e=>({time:e.time, type:e.type, dur:e.dur})) : (r.events||[]);
+    const isSubmit = r.status!=='미제출';
+    const realEvents = events.filter(e=>e.type!=='gap');
+    const total = realEvents.reduce((a,e)=>a+e.dur,0);
+    const hasGap = events.some(e=>e.type==='gap');
+
+    /* 제출 상세 셀 (Figma: 유형 뱃지 + 글자 수/파일명) */
+    let detailCell;
+    if(!isSubmit){ detailCell = '<span class="t-badge t-none">-</span>'; }
+    else if(r.type==='text'){ detailCell = '<div style="display:inline-flex;align-items:center;gap:8px;"><span class="t-badge t-text"><i data-lucide="type"></i>직접 작성</span><span class="t-detail">'+r.detail+'</span></div>'; }
+    else { detailCell = '<div style="display:inline-flex;align-items:center;gap:8px;"><span class="t-badge t-file"><i data-lucide="paperclip"></i>파일 첨부</span><span class="t-detail" title="'+r.detail+'">'+r.detail+'</span></div>'; }
+
+    /* 화면 이탈 셀 (신규 제안) */
+    let leaveCell;
+    if(!focusLogOn || !isSubmit || r.teacherUpload){ leaveCell = '<span class="leave-none">-</span>'; }
+    else if(realEvents.length===0 && !hasGap){ leaveCell = '<span class="leave-none">없음</span>'; }
+    else {
+      const label = realEvents.length + '회 · ' + fmtDur(total) + (hasGap? ' <span style="font-size:13px;color:#6d7381;font-weight:500;">(공백)</span>':'');
+      leaveCell = '<button class="leave-cell-btn" onclick="toggleDetail(\''+r.id+'\')">'+label+' <i data-lucide="chevron-down" style="width:16px;height:16px;"></i></button>';
+    }
+
+    /* 과제물 관리 셀 (Figma: 변경/삭제 · 업로드) */
+    const manageCell = isSubmit
+      ? '<button class="row-btn" onclick="notReady(\'변경/삭제\')"><i data-lucide="rotate-ccw"></i>변경/삭제</button>'
+      : '<button class="row-btn" onclick="notReady(\'업로드\')"><i data-lucide="upload"></i>업로드</button>';
+
+    const tr = document.createElement('tr');
+    tr.innerHTML = '<td><input type="checkbox" class="chk"></td>'
+      + '<td>'+r.id+'</td><td>'+r.name+'</td>'
+      + '<td>'+(isSubmit?'<span class="b-submit">제출 완료</span>':'<span class="b-absent">미제출</span>')+'</td>'
+      + '<td>'+(isSubmit? r.date : '-')+'</td>'
+      + '<td>'+detailCell+'</td>'
+      + '<td>'+leaveCell+'</td>'
+      + '<td>'+manageCell+'</td>';
+    tb.appendChild(tr);
+
+    if(focusLogOn && openRow===r.id && (realEvents.length>0 || hasGap)){
+      const dtr = document.createElement('tr');
+      dtr.className = 'leave-detail';
+      let evHtml = events.map(e=>{
+        if(e.type==='gap') return '<div class="leave-evt"><span class="leave-evt-time">'+e.time.slice(0,5)+'</span><span class="leave-evt-type gap"><i data-lucide="wifi-off" style="width:13px;height:13px;"></i>기록 공백</span><span class="leave-evt-dur">'+fmtDur(e.dur)+'</span><span style="font-size:13px;color:#6d7381;">네트워크 연결이 끊겨 기록하지 못한 구간이에요.</span></div>';
+        return '<div class="leave-evt"><span class="leave-evt-time">'+e.time.slice(0,5)+'</span><span class="leave-evt-type"><i data-lucide="external-link" style="width:13px;height:13px;"></i>'+e.type+'</span><span class="leave-evt-dur">'+fmtDur(e.dur)+'</span></div>';
+      }).join('');
+      dtr.innerHTML = '<td colspan="8"><div class="leave-detail-inner">'
+        + '<p style="margin:0 0 6px;font-size:14px;font-weight:600;color:#3b3f4c;">'+r.name+' · 화면 이탈 기록</p>'
+        + evHtml
+        + '<p style="margin:10px 0 0;font-size:13px;font-weight:500;color:#9aa0ad;">3초 미만 이탈은 기록되지 않아요.</p>'
+        + '</div></td>';
+      tb.appendChild(dtr);
+    }
+  });
+  lucide.createIcons();
+}
+function toggleDetail(id){ openRow = (openRow===id) ? null : id; renderTeacher(); }
+function toggleFocusLog(on){
+  focusLogOn = on; openRow = null;
+  document.getElementById('toggleOffNote').style.display = on ? 'none' : 'block';
+  renderTeacher();
+}
+function toggleNav(){
+  document.getElementById('icon-sb').classList.toggle('expanded');
+  document.body.classList.toggle('nav-expanded');
+}
+
+/* ───────── 내비게이터 접기 + 드래그 ───────── */
+function mpToggle(e){
+  const b = document.getElementById('mpBody');
+  const hidden = b.style.display==='none';
+  b.style.display = hidden ? 'flex' : 'none';
+  document.getElementById('mpArrow').textContent = hidden ? '▾' : '▸';
+}
+(function(){
+  const el = document.getElementById('mockpick');
+  let sx, sy, ox, oy, dragging=false;
+  el.addEventListener('mousedown', e=>{
+    if(e.target.closest('button')) return;
+    dragging=true; sx=e.clientX; sy=e.clientY;
+    const r=el.getBoundingClientRect(); ox=r.left; oy=r.top;
+    e.preventDefault();
+  });
+  document.addEventListener('mousemove', e=>{
+    if(!dragging) return;
+    el.style.left=(ox+e.clientX-sx)+'px'; el.style.top=(oy+e.clientY-sy)+'px';
+    el.style.bottom='auto'; el.style.right='auto';
+  });
+  document.addEventListener('mouseup', ()=>{ dragging=false; });
+})();
+
+/* ───────── 초기화 ───────── */
+const initHash = location.hash.slice(1);
+go(initHash && document.getElementById('scr-'+initHash) ? initHash : 'student-notice');
+</script>
+</body>
+</html>
