@@ -3144,7 +3144,9 @@ function toggleEvCard(el){
 function showScreen(id) {
   document.querySelectorAll('.screen').forEach(function(s){ s.classList.remove('active'); });
   document.getElementById(id).classList.add('active');
+  // 한 화면에 목업 도구는 1개만 — 케이스 뷰어가 뜨는 화면에서는 목업 내비게이터를 숨김
   var _bc = document.getElementById('bmCase'); if (_bc) _bc.style.display = (id === 'screen-bulkmatch') ? 'block' : 'none';
+  var _mn = document.getElementById('mockNav'); if (_mn) _mn.style.display = (id === 'screen-bulkmatch') ? 'none' : '';
   // 탭 상태를 해시로 유지 → 다른 페이지에서 뒤로 와도 탭 복원
   if (id === 'screen-scoring') { history.replaceState(null, '', '#scoring'); }
   else if (id === 'screen-design') { history.replaceState(null, '', '#design'); }
