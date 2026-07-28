@@ -448,14 +448,6 @@
     .bm-sum .main{ flex:1; min-width:0; }
     .bm-sum .tt{ font-size:17px; font-weight:700; color:#222631; }
     .bm-sum .ds{ font-size:14px; color:#6d7381; margin-top:3px; }
-    .bm-stats{ display:flex; align-items:center; gap:18px; flex-shrink:0; }
-    .bm-stat{ text-align:center; }
-    .bm-stat .num{ font-size:24px; font-weight:800; line-height:1.1; }
-    .bm-stat .lbl{ font-size:12px; color:#6d7381; margin-top:3px; }
-    .bm-stat.ok .num{ color:#319d64; }
-    .bm-stat.warn .num{ color:#ea580c; }
-    .bm-stat.total .num{ color:#222631; }
-    .bm-vd{ width:1px; height:34px; background:#e6e9ef; }
     .bm-sec{ background:white; border-radius:12px; box-shadow:0 0 1px #2226314D, 0 2px 8px #0000000F; margin-bottom:18px; overflow:hidden; }
     .bm-sec-hd{ display:flex; align-items:center; gap:9px; padding:16px 22px; border-bottom:1px solid #eef0f3; cursor:pointer; }
     .bm-sec-hd .ic{ width:20px; height:20px; flex-shrink:0; }
@@ -495,12 +487,17 @@
     .bm-x{ font-size:13px; font-weight:600; color:#9aa0ad; background:none; border:none; cursor:pointer; font-family:inherit; padding:4px 6px; }
     .bm-x:hover{ color:#db3e51; }
     .bm-undo{ font-size:13px; font-weight:600; color:#3151c4; background:none; border:none; cursor:pointer; font-family:inherit; padding:4px 6px; }
-    .bm-unmatch{ margin-left:6px; width:24px; height:24px; border:none; background:none; color:#9aa0ad; cursor:pointer; border-radius:6px; display:inline-flex; align-items:center; justify-content:center; line-height:1; vertical-align:middle; flex-shrink:0; }
-    .bm-unmatch:hover{ background:#fdecec; color:#db3e51; }
+    /* 자동 매칭 행 — 호버 시에만 노출되는 '매칭 수정'(오매칭 정정). 시안 413:14931 */
+    .bm-editmatch{ margin-left:8px; height:26px; padding:0 8px; border:none; background:none; color:#6d7381; font-family:inherit; font-size:13px; font-weight:600; cursor:pointer; border-radius:6px; display:inline-flex; align-items:center; justify-content:center; gap:4px; line-height:1; vertical-align:middle; flex-shrink:0; opacity:0; transition:opacity .12s; }
+    .bm-row:hover .bm-editmatch{ opacity:1; }
+    .bm-editmatch:hover{ background:#eff3ff; color:#416bff; }
+    .bm-thead{ display:grid; grid-template-columns:1fr 32px 300px 124px; align-items:center; gap:14px; padding:11px 22px; background:#f6f7f9; border-bottom:1px solid #eef0f3; font-size:13px; font-weight:600; color:#6d7381; }
+    .bm-thead .c-st{ text-align:right; }
+    .bm-thead2{ display:flex; align-items:center; justify-content:space-between; padding:11px 22px; background:#f6f7f9; border-bottom:1px solid #eef0f3; font-size:13px; font-weight:600; color:#6d7381; }
     .bm-sec-hd.static{ cursor:default; }
     .bm-none-row{ display:flex; align-items:center; justify-content:space-between; gap:10px; padding:13px 22px; border-bottom:1px solid #f1f3f5; }
     .bm-none-row:last-child{ border-bottom:none; }
-    .bm-action{ display:flex; align-items:center; justify-content:space-between; gap:12px; border-top:1px solid #eceef2; padding:18px 4px 8px; margin-bottom:28px; }
+    .bm-action{ display:flex; align-items:center; justify-content:flex-end; gap:12px; border-top:1px solid #eceef2; padding:18px 4px 8px; margin-bottom:28px; }
     .bm-note{ font-size:14px; color:#6d7381; display:inline-flex; align-items:center; gap:7px; }
     .bm-note i{ width:16px; height:16px; color:#9aa0ad; }
 
@@ -1212,22 +1209,15 @@
 
     <!-- 상태2: 매칭 확인 -->
     <div id="bm-state-match" style="display:none;">
-      <button class="back-link" onclick="bmBackToUpload()"><i data-lucide="chevron-left" style="width:18px;height:18px;"></i>이전으로</button>
-      <h1 class="page-h1">파일 매칭 확인</h1>
-      <p class="page-sub">파일명으로 학생을 자동 매칭했어요. 확인이 필요한 파일은 직접 학생과 매칭한 뒤 등록해 주세요.</p>
+      <button class="back-link" onclick="bmAskLeave()"><i data-lucide="chevron-left" style="width:18px;height:18px;"></i>이전으로</button>
+      <h1 class="page-h1" id="bm-title-match">1-1반 여러 파일 일괄 업로드</h1>
+      <p class="page-sub">학생별로 나뉜 PDF·이미지 파일을 한 번에 올리면, 파일명을 읽어 학생과 자동 매칭해 드려요.</p>
 
       <div class="bm-sum">
         <div class="ic"><i data-lucide="folder-check" style="width:24px;height:24px;"></i></div>
         <div class="main">
-          <div class="tt">1학년 1반 · 1학기 수행평가</div>
-          <div class="ds">PDF·이미지 파일 8개 업로드됨</div>
-        </div>
-        <div class="bm-stats">
-          <div class="bm-stat total"><div class="num">8</div><div class="lbl">총 파일</div></div>
-          <div class="bm-vd"></div>
-          <div class="bm-stat ok"><div class="num" id="bm-stat-ok">7</div><div class="lbl">매칭 완료</div></div>
-          <div class="bm-vd"></div>
-          <div class="bm-stat warn"><div class="num" id="bm-stat-warn">1</div><div class="lbl">확인 필요</div></div>
+          <div class="tt">1학년 1반 · 국어 수행평가</div>
+          <div class="ds" id="bm-sum-count">총 8개 파일 업로드됨</div>
         </div>
       </div>
 
@@ -1236,7 +1226,7 @@
         <div class="bm-sec-hd warn" onclick="bmToggleSec('bm-sec-warn')">
           <i data-lucide="alert-triangle" class="ic"></i>
           <span class="tt">확인 필요</span>
-          <span class="sb" id="bm-warn-sub">1건 — 학생을 지정해 주세요</span>
+          <span class="sb" id="bm-warn-sub">1개</span>
           <span class="bm-fold"><i data-lucide="chevron-down" style="width:18px;height:18px;"></i></span>
         </div>
         <div class="bm-body">
@@ -1244,7 +1234,7 @@
           <div class="bm-row" id="bm-row-near" data-resolved="0">
             <div class="bm-file"><div class="fic"><i data-lucide="file-text" style="width:18px;height:18px;"></i></div><div style="min-width:0;"><div class="fn">한지웅 - 수행평가.pdf</div></div></div>
             <div class="bm-arrow"><i data-lucide="arrow-right" style="width:18px;height:18px;"></i></div>
-            <div><select class="bm-pick unset" onchange="bmResolveNear(this)"><option value="">학생 선택</option><option value="10106">한지우 · 10106</option><option value="10108">윤하은 · 10108</option><option value="__skip__">이 파일은 등록 안 함</option></select></div>
+            <div><select class="bm-pick unset" onchange="bmResolveNear(this)"><option value="">학생 선택</option><option value="10106">10106 한지우</option><option value="10108">10108 윤하은</option><option value="__skip__">이 파일은 등록 안 함</option></select></div>
             <div class="bm-st"><span class="bm-chip warn"><i data-lucide="help-circle" style="width:13px;height:13px;"></i>확인 필요</span></div>
           </div>
         </div>
@@ -1255,7 +1245,7 @@
         <div class="bm-sec-hd ok" onclick="bmToggleSec('bm-sec-ok')">
           <i data-lucide="check-circle-2" class="ic"></i>
           <span class="tt">자동 매칭됨</span>
-          <span class="sb"><b>7명</b> · 파일명과 이름이 일치해요</span>
+          <span class="sb">7개</span>
           <span class="bm-fold"><i data-lucide="chevron-down" style="width:18px;height:18px;"></i></span>
         </div>
         <div class="bm-body" id="bm-ok-body"></div>
@@ -1272,11 +1262,9 @@
       </div>
 
       <div class="bm-action">
-        <span class="bm-note"><i data-lucide="info"></i><span id="bm-note-txt">확인 필요 1건을 모두 처리해야 등록할 수 있어요.</span><button id="bm-skip-all" onclick="bmSkipAllPending()" style="margin-left:10px;height:32px;padding:0 12px;border:1px solid #d9d9d9;background:#fff;border-radius:6px;font-family:inherit;font-size:13px;font-weight:600;color:#3b3f4c;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;line-height:1;vertical-align:middle;">남은 파일 모두 등록 안 함</button></span>
-        <div style="display:flex;gap:10px;">
-          <button class="btn btn-outline" onclick="showScreen('screen-list')">취소</button>
-          <button class="btn btn-primary" onclick="bmRegister()"><i data-lucide="check" style="width:18px;height:18px;"></i><span id="bm-reg-txt">7명 등록</span></button>
-        </div>
+        <span class="bm-note" style="margin-left:auto;"><span id="bm-note-txt">확인이 필요한 1건의 파일을 학생과 매칭해 주세요.</span></span>
+        <button class="btn btn-outline" onclick="bmAskReupload()"><i data-lucide="rotate-ccw" style="width:16px;height:16px;"></i>파일 초기화</button>
+        <button class="btn btn-primary" onclick="bmRegister()"><i data-lucide="check" style="width:18px;height:18px;"></i><span id="bm-reg-txt">7건 등록</span></button>
       </div>
     </div>
 
@@ -5121,6 +5109,7 @@ function openUploadBulk(){
   // 교체 경고: 이미 다른 종류 자료가 등록된 학급이면 안내 (설문·PDF와 같은 룰)
   // 교체 안내는 진입 시 초기화 동의 팝업(openBulkInit)이 담당 — 화면 내 배너 없음
   var _bt = document.getElementById('bm-title'); if (_bt) _bt.textContent = '1-' + (currentListClass || 1) + '반 여러 파일 일괄 업로드';
+  var _btm = document.getElementById('bm-title-match'); if (_btm) _btm.textContent = '1-' + (currentListClass || 1) + '반 여러 파일 일괄 업로드';
   bmResetDz();
   showScreen('screen-bulkmatch');
   lucide.createIcons();
@@ -5165,7 +5154,7 @@ function bmBuildOk(){
     return '<div class="bm-row">'
       + '<div class="bm-file"><div class="fic"><i data-lucide="file-text" style="width:18px;height:18px;"></i></div><div style="min-width:0;"><div class="fn">' + m.file + '</div></div></div>'
       + '<div class="bm-arrow"><i data-lucide="arrow-right" style="width:18px;height:18px;"></i></div>'
-      + '<div class="bm-stu"><span class="nm">' + m.name + '</span> <span class="nn">· ' + m.id + '</span></div>'
+      + '<div class="bm-stu"><span class="nn">' + m.id + '</span> <span class="nm">' + m.name + '</span></div>'
       + '<div class="bm-st"><span class="bm-chip ok"><i data-lucide="check" style="width:13px;height:13px;"></i>매칭됨</span></div>'
       + '</div>';
   }).join('');
@@ -5179,7 +5168,7 @@ function bmResolveNear(sel){
   var st = row.querySelector('.bm-st');
   if (sel.value === '__skip__'){
     row.dataset.resolved = 'excluded'; row.classList.add('skip'); row.classList.remove('done'); sel.classList.remove('unset');
-    st.innerHTML = '<span class="bm-chip gray">등록 안 함</span>';
+    st.innerHTML = '<span class="bm-chip gray"><i data-lucide="minus-circle" style="width:13px;height:13px;"></i>미등록</span>';
   } else if (sel.value){
     row.dataset.resolved = '1'; row.classList.add('done'); row.classList.remove('skip'); sel.classList.remove('unset');
     st.innerHTML = '<span class="bm-chip ok"><i data-lucide="check" style="width:13px;height:13px;"></i>매칭됨</span>';
@@ -5196,10 +5185,9 @@ function bmRecalc(){
   if (row.dataset.resolved === '1') reg++;
   else if (row.dataset.resolved === 'excluded') {}
   else pending++;
-  document.getElementById('bm-stat-ok').textContent = reg;
-  document.getElementById('bm-stat-warn').textContent = pending;
-  document.getElementById('bm-warn-sub').innerHTML = pending > 0 ? '<b>'+pending+'건</b> · 학생을 지정해 주세요' : '모두 정리됐어요';
-  document.getElementById('bm-reg-txt').textContent = reg + '명 등록';
+  bmSetTxt('bm-stat-ok', reg); bmSetTxt('bm-stat-warn', pending);
+  document.getElementById('bm-warn-sub').innerHTML = pending+'개';
+  document.getElementById('bm-reg-txt').textContent = reg + '건 등록';
   bmUpdateGate(pending, reg);
   // 미제출 학생 카드 (실제 명단에서 매칭 안 된 학생)
   var matched = BM_OK_IDS.slice();
@@ -5208,24 +5196,58 @@ function bmRecalc(){
   var noneCard = document.getElementById('bm-sec-none');
   if (fileless.length){
     noneCard.style.display = '';
-    document.getElementById('bm-none-sub').innerHTML = '<b>'+fileless.length+'명</b> · 매칭된 파일이 없어요';
-    document.getElementById('bm-none-body').innerHTML = fileless.map(function(s){
-      return '<div class="bm-none-row"><span class="bm-stu"><span class="nm">' + s.name + '</span> <span class="nn">· ' + s.id + '</span></span><span class="bm-chip gray">미제출</span></div>';
+    document.getElementById('bm-none-sub').innerHTML = fileless.length+'명';
+    document.getElementById('bm-none-body').innerHTML = '<div class="bm-thead2"><div>학생 정보</div><div>상태</div></div>' + fileless.map(function(s){
+      return '<div class="bm-none-row"><span class="bm-stu"><span class="nn">' + s.id + '</span> <span class="nm">' + s.name + '</span></span><span class="bm-chip gray"><i data-lucide="minus-circle" style="width:13px;height:13px;"></i>미등록</span></div>';
     }).join('');
   } else {
     noneCard.style.display = 'none';
   }
 }
 
-// 저장 룰(2026-07-27 제콥·줄리 안): 등록 = 확인 필요 0건 AND 매칭 완료 1건 이상. 미충족 시 버튼 비활성 + 사유 안내
-function bmRegister(){ bmDoRegister(); }
-// 남은 확인 필요를 한 번에 '등록 안 함' 처리 — 0건 만들기를 쉽게(파일이 학생 수보다 많은 경우 대응)
-function bmSkipAllPending(){
-  var picks = [].slice.call(document.querySelectorAll('#bm-sec-warn .bm-pick.bm-u')).filter(function(p){ return p.value===''; });
-  if(!picks.length) return;
-  picks.forEach(function(p){ p.value='__skip__'; });
-  bmCaseRow(picks[picks.length-1]); // 마지막 1회만 동기화(내부에서 bmSyncPicks 호출)
-  showToast(picks.length + '건을 등록 안 함으로 처리했어요.', 'success');
+// 저장 룰(줄리 시안 402:8917): 확인 필요가 남아도 등록 가능 — 제외 확인 팝업 후 매칭 완료분만 등록. 매칭 완료 0건이면 버튼 비활성
+function bmRegister(){
+  var pending = parseInt((document.getElementById('bm-stat-warn')||{}).textContent || '0', 10) || 0;
+  var reg = parseInt((document.getElementById('bm-stat-ok')||{}).textContent || '0', 10) || 0;
+  if (pending > 0) { showToast('확인 필요 ' + pending + '건을 먼저 처리해 주세요.', 'error'); return; }
+  if (reg === 0) { showToast('학생과 매칭된 파일이 없어요.', 'error'); return; }
+  bmDoRegister();
+}
+// 매칭 내용은 등록 전까지 저장되지 않음 — 파일 다시 올리기·화면 이탈 시 확인받고 진행
+var bmLeaveKind = null;
+function bmAskReupload(){ bmOpenLeave('reupload'); }
+function bmAskLeave(){ bmOpenLeave('leave'); }
+function bmOpenLeave(kind){
+  bmLeaveKind = kind;
+  var isRe = (kind === 'reupload');
+  var el = document.getElementById('bm-leave-confirm');
+  if(!el){
+    el = document.createElement('div');
+    el.id = 'bm-leave-confirm';
+    el.style.cssText = 'display:none;position:fixed;inset:0;background:rgba(0,0,0,0.4);z-index:1650;align-items:center;justify-content:center;padding:24px;';
+    document.body.appendChild(el);
+  }
+  el.innerHTML = '<div style="background:#fff;border-radius:12px;width:416px;max-width:100%;box-shadow:0 0 1px #2226314D, 0 8px 16px #0000001A;padding:28px 20px;display:flex;flex-direction:column;gap:20px;align-items:center;">'
+    + '<div style="width:44px;height:44px;border-radius:100px;background:#eff3ff;color:#416bff;display:flex;align-items:center;justify-content:center;flex-shrink:0;"><i data-lucide="' + (isRe ? 'rotate-ccw' : 'alert-circle') + '" style="width:22px;height:22px;"></i></div>'
+    + '<div style="display:flex;flex-direction:column;gap:12px;text-align:center;width:100%;">'
+    + '<div style="font-size:18px;font-weight:600;color:#18181b;line-height:1.55;">' + (isRe ? '파일을 초기화하고<br>다시 업로드할까요?' : '일괄 업로드를 중단하고<br>다른 화면으로 이동할까요?') + '</div>'
+    + '<div style="font-size:15px;color:#6d7381;line-height:1.55;">' + (isRe
+        ? '지금까지 올린 파일과 매칭 내용이 모두 지워집니다.'
+        : '작업 중이던 내용은 저장되지 않습니다.') + '</div>'
+    + '</div>'
+    + '<div style="display:flex;gap:12px;width:100%;">'
+    + '<button onclick="bmCloseLeave()" style="flex:1;height:40px;border-radius:4px;border:1px solid #d9d9d9;background:#fff;color:#3b3f4c;font-size:15px;font-weight:500;font-family:inherit;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;line-height:1;vertical-align:middle;">아니오</button>'
+    + '<button onclick="bmConfirmLeave()" style="flex:1;height:40px;border-radius:4px;border:none;background:#416bff;color:#fff;font-size:15px;font-weight:500;font-family:inherit;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;line-height:1;vertical-align:middle;">' + (isRe ? '네, 초기화합니다' : '네, 이동합니다') + '</button>'
+    + '</div></div>';
+  el.style.display = 'flex';
+  lucide.createIcons();
+}
+function bmCloseLeave(){ var el=document.getElementById('bm-leave-confirm'); if(el) el.style.display='none'; bmLeaveKind=null; }
+function bmConfirmLeave(){
+  var kind = bmLeaveKind;
+  bmCloseLeave();
+  if(kind === 'reupload') bmBackToUpload();
+  else showScreen('screen-list');
 }
 function bmDoRegister(){
   // 현재 자동 매칭(X 해제 반영) + 직접 지정 셀렉트 값 수집
@@ -5249,7 +5271,7 @@ function bmDoRegister(){
   bmClearedClasses[currentListClass] = false; // 등록 완료 — 다음 진입부터 다시 초기화 동의 필요
   renderTable();
   showScreen('screen-list');
-  showToast(ids.length + '명의 과제가 학생별로 등록되었습니다.', 'success');
+  showToast('과제물이 등록되었습니다.', 'success');
 }
 </script>
 
@@ -5268,7 +5290,7 @@ function bmDoRegister(){
 // ===== 케이스 뷰어 렌더 =====
 function bmCaseHi(key){ document.querySelectorAll('#bmCase .bc-btn').forEach(function(b){ b.classList.toggle('on', b.dataset.c===key); }); }
 function bmRowNomatch(){
-  return '<div class="bm-row" id="bm-row-near" data-resolved="0"><div class="bm-file"><div class="fic"><i data-lucide="file-text" style="width:18px;height:18px;"></i></div><div style="min-width:0;"><div class="fn">한지웅 - 수행평가.pdf</div></div></div><div class="bm-arrow"><i data-lucide="arrow-right" style="width:18px;height:18px;"></i></div><div><select class="bm-pick unset" onchange="bmResolveNear(this)"><option value="">학생 선택</option><option value="10106">한지우 · 10106</option><option value="10108">윤하은 · 10108</option><option value="__skip__">이 파일은 등록 안 함</option></select></div><div class="bm-st"><span class="bm-chip warn"><i data-lucide="help-circle" style="width:13px;height:13px;"></i>확인 필요</span></div></div>';
+  return '<div class="bm-row" id="bm-row-near" data-resolved="0"><div class="bm-file"><div class="fic"><i data-lucide="file-text" style="width:18px;height:18px;"></i></div><div style="min-width:0;"><div class="fn">한지웅 - 수행평가.pdf</div></div></div><div class="bm-arrow"><i data-lucide="arrow-right" style="width:18px;height:18px;"></i></div><div><select class="bm-pick unset" onchange="bmResolveNear(this)"><option value="">학생 선택</option><option value="10106">10106 한지우</option><option value="10108">10108 윤하은</option><option value="__skip__">이 파일은 등록 안 함</option></select></div><div class="bm-st"><span class="bm-chip warn"><i data-lucide="help-circle" style="width:13px;height:13px;"></i>확인 필요</span></div></div>';
 }
 // 확인 필요 행 — 사유 구분 없이 단일 패턴(파일 → 학생 직접 지정 + 등록 안 함)
 var bmAvailOpts=[];
@@ -5278,7 +5300,7 @@ function bmRowU(file, selv){
     + bmAvailOpts.map(function(o){ return '<option value="'+o.v+'"'+(selv===o.v?' selected':'')+'>'+o.t+'</option>'; }).join('')
     + '<option value="__skip__"'+(selv==='__skip__'?' selected':'')+'>이 파일은 등록 안 함</option>';
   var chip = !isSet ? '<span class="bm-chip warn"><i data-lucide="help-circle" style="width:13px;height:13px;"></i>확인 필요</span>'
-    : (selv==='__skip__' ? '<span class="bm-chip gray">등록 안 함</span>'
+    : (selv==='__skip__' ? '<span class="bm-chip gray"><i data-lucide="minus-circle" style="width:13px;height:13px;"></i>미등록</span>'
     : '<span class="bm-chip ok"><i data-lucide="check" style="width:13px;height:13px;"></i>매칭됨</span>');
   return '<div class="bm-row'+(isSet&&selv!=='__skip__'?' done':'')+'">'
     + '<div class="bm-file"><div class="fic"><i data-lucide="file-text" style="width:18px;height:18px;"></i></div><div style="min-width:0;"><div class="fn">'+file+'</div></div></div>'
@@ -5288,7 +5310,7 @@ function bmRowU(file, selv){
 }
 function bmCaseRow(sel){
   var row=sel.closest('.bm-row'); var st=row.querySelector('.bm-st');
-  if(sel.value==='__skip__'){ sel.classList.remove('unset'); row.classList.remove('done'); st.innerHTML='<span class="bm-chip gray">등록 안 함</span>'; }
+  if(sel.value==='__skip__'){ sel.classList.remove('unset'); row.classList.remove('done'); st.innerHTML='<span class="bm-chip gray"><i data-lucide="minus-circle" style="width:13px;height:13px;"></i>미등록</span>'; }
   else if(sel.value){ sel.classList.remove('unset'); row.classList.add('done'); st.innerHTML='<span class="bm-chip ok"><i data-lucide="check" style="width:13px;height:13px;"></i>매칭됨</span>'; }
   else { sel.classList.add('unset'); row.classList.remove('done'); st.innerHTML='<span class="bm-chip warn"><i data-lucide="help-circle" style="width:13px;height:13px;"></i>확인 필요</span>'; }
   bmSyncPicks(row.closest('.bm-body'));
@@ -5316,34 +5338,29 @@ function bmSyncPicks(body){
     else if(p.value!=='__skip__'){ resolved++; picked.push(p.value); }
   });
   var reg=BM_OK.length+resolved;
-  document.getElementById('bm-stat-ok').textContent=reg;
-  document.getElementById('bm-stat-warn').textContent=pending;
-  document.getElementById('bm-warn-sub').innerHTML=pending>0? '<b>'+pending+'건</b> · 학생을 지정해 주세요':'모두 정리됐어요';
-  document.getElementById('bm-reg-txt').textContent=reg+'명 등록';
+  bmSetTxt('bm-stat-ok', reg); bmSetTxt('bm-stat-warn', pending);
+  document.getElementById('bm-warn-sub').innerHTML=pending+'개';
+  document.getElementById('bm-reg-txt').textContent=reg+'건 등록';
   bmUpdateGate(pending, reg);
   bmNoneStatic(bmNoneBase.filter(function(id){ return picked.indexOf(id)<0; }));
 }
 // 등록 게이트 — 확인 필요 0건 AND 매칭 완료 1건 이상일 때만 등록 가능(사유 안내·일괄 처리 버튼 동반)
+function bmSetTxt(id, v){ var e=document.getElementById(id); if(e) e.textContent=v; }
 function bmUpdateGate(pending, reg){
   var btn=document.querySelector('.bm-action .btn-primary');
   var note=document.getElementById('bm-note-txt');
-  var skipBtn=document.getElementById('bm-skip-all');
-  var blocked = pending>0 || reg===0;
-  if(btn){
-    btn.disabled=blocked;
-    btn.style.opacity=blocked?'0.45':'';
-    btn.style.cursor=blocked?'not-allowed':'';
-  }
+  // 등록 버튼은 항상 활성 — 미충족 시 클릭하면 토스트로 사유 안내(bmRegister)
+  var strip=document.querySelector('#bm-sec-warn .bm-strip');
+  if(strip) strip.style.display = pending>0 ? 'flex' : 'none'; // 확인 필요 0건이면 안내바 숨김(시안)
   if(note){
-    note.textContent = pending>0 ? '확인 필요 '+pending+'건을 모두 처리해야 등록할 수 있어요.'
-      : (reg===0 ? '등록할 파일이 없어요. 학생과 매칭된 파일이 1개 이상 필요해요.'
-      : '모든 파일이 정리됐어요. 바로 등록할 수 있어요.');
+    note.textContent = pending>0 ? '확인이 필요한 '+pending+'건의 파일을 학생과 매칭해 주세요.'
+      : (reg===0 ? '학생과 매칭된 파일이 없어요.'
+      : '모든 파일이 학생과 매칭되었습니다.');
   }
-  if(skipBtn) skipBtn.style.display = pending>0 ? 'inline-flex' : 'none';
 }
 function bmBuildOkN(n){
-  document.getElementById('bm-ok-body').innerHTML = BM_OK.slice(0,n).map(function(m){
-    return '<div class="bm-row"><div class="bm-file"><div class="fic"><i data-lucide="file-text" style="width:18px;height:18px;"></i></div><div style="min-width:0;"><div class="fn">'+m.file+'</div></div></div><div class="bm-arrow"><i data-lucide="arrow-right" style="width:18px;height:18px;"></i></div><div class="bm-stu"><span class="nm">'+m.name+'</span> <span class="nn">· '+m.id+'</span></div><div class="bm-st"><span class="bm-chip ok"><i data-lucide="check" style="width:13px;height:13px;"></i>매칭됨</span><button class="bm-unmatch" onclick="bmUnmatch(\''+m.id+'\')" title="매칭 해제 — 파일을 확인 필요로 되돌려요"><i data-lucide="x" style="width:14px;height:14px;"></i></button></div></div>';
+  document.getElementById('bm-ok-body').innerHTML = (n>0 ? '<div class="bm-thead"><div>파일명</div><div></div><div>학생 정보</div><div class="c-st">상태</div></div>' : '') + BM_OK.slice(0,n).map(function(m){
+    return '<div class="bm-row"><div class="bm-file"><div class="fic"><i data-lucide="file-text" style="width:18px;height:18px;"></i></div><div style="min-width:0;"><div class="fn">'+m.file+'</div></div><button class="bm-editmatch" onclick="bmUnmatch(\''+m.id+'\')" title="잘못 매칭됐다면 직접 고칠 수 있어요"><i data-lucide="rotate-ccw" style="width:13px;height:13px;"></i>매칭 수정</button></div><div class="bm-arrow"><i data-lucide="arrow-right" style="width:18px;height:18px;"></i></div><div class="bm-stu"><span class="nn">'+m.id+'</span> <span class="nm">'+m.name+'</span></div><div class="bm-st"><span class="bm-chip ok"><i data-lucide="check" style="width:13px;height:13px;"></i>매칭됨</span></div></div>';
   }).join('');
 }
 // 자동 매칭 해제(X) — 오매칭 정정: 파일은 확인 필요로, 학생은 미제출·선택지로 복귀
@@ -5351,21 +5368,22 @@ function bmUnmatch(id){
   var idx=-1; BM_OK.forEach(function(m,j){ if(m.id===id) idx=j; });
   if(idx<0) return;
   var m = BM_OK.splice(idx,1)[0];
-  if(!bmAvailOpts.some(function(o){ return o.v===m.id; })) bmAvailOpts.push({v:m.id, t:m.name+' · '+m.id});
+  if(!bmAvailOpts.some(function(o){ return o.v===m.id; })) bmAvailOpts.push({v:m.id, t:m.id+' '+m.name});
   if(bmNoneBase.indexOf(m.id)<0) bmNoneBase.push(m.id);
   bmBuildOkN(BM_OK.length);
-  document.querySelector('#bm-sec-ok .sb').innerHTML='<b>'+BM_OK.length+'명</b> · 파일명과 이름이 일치해요';
+  document.querySelector('#bm-sec-ok .sb').innerHTML=BM_OK.length+'개';
   var warnBody=document.querySelector('#bm-sec-warn .bm-body');
   document.getElementById('bm-sec-warn').classList.remove('collapsed');
   warnBody.insertAdjacentHTML('beforeend', bmRowU(m.file,''));
   bmSyncPicks(warnBody);
   lucide.createIcons();
+  showToast('확인 필요로 옮겼어요. 다시 지정해 주세요.', 'success'); // 매칭 수정 = 되돌리기 쉬운 동작이라 팝업 없이 토스트만
 }
 function bmNoneStatic(ids){
   var list=STUDENTS.filter(function(s){ return ids.indexOf(s.id)>=0; });
   var card=document.getElementById('bm-sec-none'); card.style.display = list.length? '' : 'none';
-  document.querySelector('#bm-sec-none .sb').innerHTML='<b>'+list.length+'명</b> · 매칭된 파일이 없어요';
-  document.getElementById('bm-none-body').innerHTML=list.map(function(s){ return '<div class="bm-none-row"><span class="bm-stu"><span class="nm">'+s.name+'</span> <span class="nn">· '+s.id+'</span></span><span class="bm-chip gray">미제출</span></div>'; }).join('');
+  document.querySelector('#bm-sec-none .sb').innerHTML=list.length+'명';
+  document.getElementById('bm-none-body').innerHTML='<div class="bm-thead2"><div>학생 정보</div><div>상태</div></div>'+list.map(function(s){ return '<div class="bm-none-row"><span class="bm-stu"><span class="nn">'+s.id+'</span> <span class="nm">'+s.name+'</span></span><span class="bm-chip gray"><i data-lucide="minus-circle" style="width:13px;height:13px;"></i>미등록</span></div>'; }).join('');
 }
 function bmShowCase(key){
   bmCaseHi(key);
@@ -5381,24 +5399,24 @@ function bmShowCase(key){
   document.getElementById('bm-sec-warn').classList.remove('collapsed');
   var warnBody=document.querySelector('#bm-sec-warn .bm-body');
   var okSubEl=document.querySelector('#bm-sec-ok .sb');
-  var totalEl=document.querySelector('.bm-sum .bm-stat.total .num');
+  var totalEl=document.getElementById('bm-sum-count'); // 상단 요약 "총 N개 파일 업로드됨" (3분할 통계는 시안대로 제거)
   if(key==='normal'){
-    totalEl.textContent='8'; okSubEl.innerHTML='<b>7명</b> · 파일명과 이름이 일치해요'; bmBuildOkN(7);
-    bmAvailOpts=[{v:'10106',t:'한지우 · 10106'},{v:'10108',t:'윤하은 · 10108'}];
-    warnBody.innerHTML='<div class="bm-strip"><i data-lucide="info"></i><span>학생과 1:1로 매칭하지 못한 파일이에요. 어느 학생의 파일인지 직접 지정하거나, 우리 반 자료가 아니면 ‘이 파일은 등록 안 함’을 선택해 주세요.</span></div>'+bmRowU('한지웅 - 수행평가.pdf','');
+    if(totalEl) totalEl.textContent='총 8개 파일 업로드됨'; okSubEl.innerHTML='7개'; bmBuildOkN(7);
+    bmAvailOpts=[{v:'10106',t:'10106 한지우'},{v:'10108',t:'10108 윤하은'}];
+    warnBody.innerHTML='<div class="bm-strip"><i data-lucide="info"></i><span>학생과 1:1로 매칭하지 못한 파일이에요. 어느 학생의 파일인지 직접 지정하거나, 우리 반 자료가 아니면 ‘이 파일은 등록 안 함’을 선택해 주세요.</span></div><div class="bm-thead"><div>파일명</div><div></div><div>학생 정보</div><div class="c-st">상태</div></div>'+bmRowU('한지웅 - 수행평가.pdf','');
     bmSyncPicks(warnBody);
   } else {
     // 확인 필요 = 사유 구분 없는 단일 케이스(1:1 매칭 실패). 동명이인·다파일도 시스템이 판정하지 않고 직접 지정으로 통합
     var STRIP='학생과 1:1로 매칭하지 못한 파일이에요. 어느 학생의 파일인지 직접 지정하거나, 우리 반 자료가 아니면 ‘이 파일은 등록 안 함’을 선택해 주세요.';
-    bmAvailOpts=[{v:'a',t:'김민준 · 3번'},{v:'b',t:'김민준 · 18번'},{v:'10106',t:'한지우 · 10106'},{v:'10108',t:'윤하은 · 10108'}];
+    bmAvailOpts=[{v:'a',t:'10103 김민준'},{v:'b',t:'10118 김민준'},{v:'10106',t:'10106 한지우'},{v:'10108',t:'10108 윤하은'}];
     var C={
       ambig:{total:9,ok:7,warn:2,reg:7,row:bmRowU('김민준 - 수행평가.pdf','')+bmRowU('김민준 - 수행평가_최종.pdf','')},
       prevent:{total:9,ok:7,warn:1,reg:8,row:bmRowU('김민준 - 수행평가.pdf','a')+bmRowU('김민준 - 수행평가_최종.pdf','')}
     }[key];
-    totalEl.textContent=C.total; document.getElementById('bm-stat-ok').textContent=C.ok; document.getElementById('bm-stat-warn').textContent=String(C.warn);
-    document.getElementById('bm-warn-sub').innerHTML='<b>'+C.warn+'건</b> · 학생을 지정해 주세요';
-    okSubEl.innerHTML='<b>'+C.ok+'명</b> · 파일명과 이름이 일치해요'; bmBuildOkN(C.ok);
-    warnBody.innerHTML='<div class="bm-strip"><i data-lucide="info"></i><span>'+STRIP+'</span></div>'+C.row;
+    if(totalEl) totalEl.textContent='총 '+C.total+'개 파일 업로드됨'; bmSetTxt('bm-stat-ok', C.ok); bmSetTxt('bm-stat-warn', String(C.warn));
+    document.getElementById('bm-warn-sub').innerHTML=C.warn+'개';
+    okSubEl.innerHTML=C.ok+'개'; bmBuildOkN(C.ok);
+    warnBody.innerHTML='<div class="bm-strip"><i data-lucide="info"></i><span>'+STRIP+'</span></div><div class="bm-thead"><div>파일명</div><div></div><div>학생 정보</div><div class="c-st">상태</div></div>'+C.row;
     bmSyncPicks(warnBody); // 카운트·등록 인원·미제출 카드까지 일괄 동기화
   }
   window.scrollTo(0,0); lucide.createIcons();
