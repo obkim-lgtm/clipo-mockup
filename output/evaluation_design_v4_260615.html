@@ -102,6 +102,13 @@
     .rub-elem{ flex:0 0 200px; align-self:stretch; height:auto; border:1px solid #d9d9d9; border-radius:8px; padding:14px; font-size:16px; font-family:inherit; color:#222631; outline:none; background:#fff; resize:none; line-height:1.5; }
     .rub-elem:focus{ border-color:#416bff; box-shadow:0 0 0 3px rgba(65,107,255,.12); }
     .rub-elem::placeholder{ color:#9ea3ad; }
+    .rub-elem.warn{ border-color:#f97316; background:#fffbf8; }
+    /* 채점요소가 길어질 때 인라인 안내 (QA: 제목에 기준·배점·예시가 뭉치면 채점 실패) */
+    .rub-warn{ display:none; align-items:flex-start; gap:8px; background:#fff7ed; border-radius:8px; padding:12px 14px; margin-top:12px; }
+    .rub-warn.show{ display:flex; }
+    .rub-warn i{ width:17px; height:17px; color:#f97316; flex-shrink:0; margin-top:2px; }
+    .rub-warn p{ font-size:15px; color:#3b3f4c; line-height:1.6; margin:0; }
+    .rub-warn b{ color:#9a3412; font-weight:600; }
     .sc-tbl{ border:1px solid #dde1e8; border-radius:8px; overflow:hidden; }
     .sc-tbl .sc-row:last-child{ border-bottom:none; }
     .sc-score{ width:64px; flex-shrink:0; border-right:1px solid #eceef2; }
@@ -426,7 +433,7 @@
         <span class="sec-title">채점기준 <span class="help" title="구체적일수록 AI 채점 정확도가 향상됩니다"><i data-lucide="help-circle" style="width:16px;height:16px"></i></span></span>
         <span class="sec-count"><span id="rub-count">3</span>개 / 15개</span>
       </div>
-      <p class="sec-desc">채점기준은 최대 15개까지 입력 가능합니다. 채점기준이 구체적일수록 AI 채점 정확도가 향상됩니다.</p>
+      <p class="sec-desc">채점기준은 최대 15개까지 입력 가능합니다. 채점요소는 <b style="font-weight:600;color:#3b3f4c;">한 문장으로 간결하게</b> 쓰고, 배점별 판단은 오른쪽 급간 칸에 나눠 적어주세요. 감점하고 싶은 내용은 채점기준에 적어야 AI가 채점에 반영합니다.</p>
 
       <div class="ai-promo">
         <p class="ai-promo-title">채점기준을 AI로 빠르게 만들어보세요!</p>
@@ -706,8 +713,8 @@
   </div>
 </div>
 
-<!-- 데모 토글 (목업 전용): AI 생성 결과 케이스 선택 -->
-<div class="demo-toggle" id="rubDemoToggle">
+<!-- 데모 토글 (목업 전용): AI 생성 결과 케이스 선택 — 드로워 열릴 때만 노출 -->
+<div class="demo-toggle" id="rubDemoToggle" style="display:none;">
   <span>생성 데모</span>
   <div class="seg">
     <button class="on" onclick="setRubDemo('success', this)">성공</button>
@@ -824,11 +831,21 @@ function saveDesign(){
 }
 
 // ── 채점기준 AI 생성 드로워 ──
-function openRubAi(){ document.getElementById('rubAiDrawer').classList.add('open'); lucide.createIcons(); }
+// 데모 토글(목업 전용)은 드로워가 열려 있을 때만 노출한다
+function syncRubDemoToggle(){
+  var open = document.getElementById('rubAiDrawer').classList.contains('open');
+  document.getElementById('rubDemoToggle').style.display = open ? 'flex' : 'none';
+}
+function openRubAi(){
+  document.getElementById('rubAiDrawer').classList.add('open');
+  syncRubDemoToggle();
+  lucide.createIcons();
+}
 function closeRubAi(){
   // 생성 중에는 바로 닫지 않고 중지 확인 팝오버로 안내 (닫기 = 생성 중단)
   if(rubLoading){ document.getElementById('stopPop').classList.add('show'); return; }
   document.getElementById('rubAiDrawer').classList.remove('open');
+  syncRubDemoToggle();
 }
 function pickMode(mode){
   document.querySelectorAll('.mode-card').forEach(function(c){ c.classList.toggle('on', c.getAttribute('data-mode')===mode); });
@@ -1018,6 +1035,7 @@ function applyRubResult(){
   });
   renumber('rub-list','채점기준','rub-count');
   document.getElementById('rubAiDrawer').classList.remove('open');
+  syncRubDemoToggle();
   rubRestart();
   lucide.createIcons();
   toastMsg('선택한 채점기준 '+picked.length+'개를 추가했어요. 확인 후 자유롭게 수정해 주세요.');
@@ -1032,6 +1050,29 @@ function setRubDemo(v, btn){
 renumber('ach-list','성취기준','ach-count');
 renumber('rub-list','채점기준','rub-count');
 lucide.createIcons();
+
+// ── 채점요소가 길어지면 인라인 안내 (QA: 한 칸에 기준·배점·예시가 뭉치면 채점 실패) ──
+var RUB_ELEM_LIMIT = 80;
+function checkRubElem(ta){
+  var crit = ta.closest('.crit');
+  if(!crit) return;
+  var long = ta.value.length >= RUB_ELEM_LIMIT;
+  ta.classList.toggle('warn', long);
+  var warn = crit.querySelector('.rub-warn');
+  if(!warn){
+    warn = document.createElement('div');
+    warn.className = 'rub-warn';
+    warn.innerHTML = '<i data-lucide="triangle-alert"></i><p><b>채점요소가 너무 길어요.</b> 여러 판단과 배점이 한 칸에 있으면 채점에 실패할 수 있어요. 채점요소는 한 문장으로 쓰고, 배점별 판단은 오른쪽 급간 칸에 나눠 적어주세요.</p>';
+    var tools = crit.querySelector('.crit-tools');
+    if(tools) crit.insertBefore(warn, tools); else crit.appendChild(warn);
+    lucide.createIcons();
+  }
+  warn.classList.toggle('show', long);
+}
+document.getElementById('rub-list').addEventListener('input', function(e){
+  if(e.target.classList.contains('rub-elem')) checkRubElem(e.target);
+});
+document.querySelectorAll('#rub-list .rub-elem').forEach(checkRubElem);
 
 // 데모 토글 드래그 이동
 (function(){

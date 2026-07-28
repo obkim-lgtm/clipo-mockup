@@ -25,6 +25,42 @@
 - **즉각 피드백 + 강요 금지**: 결과는 토스트로, 행동 유도는 이점 먼저(압박 톤 X).
 - **적용 예**: 활동지 — 인식 결과 팝업 제거→페이지 인라인, 등록 방법도 카드 선택→인라인 패널. 시안: `output/register_modal_styles_v1_260618.html`(A 리스트모달 / B 드롭다운 / **C 인라인 채택**).
 
+## 화면마다 고유 URL (해시 라우팅) — 필수
+
+> 실제 서비스처럼 **화면·탭·스텝이 바뀌면 URL도 바뀌어야** 한다. 한 파일에 여러 화면이 들어가는 목업 구조 특성상 URL이 전부 같아지기 쉬운데, 그러면 리뷰어가 특정 화면을 링크로 공유할 수 없고 새로고침하면 첫 화면으로 튄다. (2026-07-28 올립 지적)
+
+**규칙 — 새 목업/새 화면을 그릴 때 처음부터 넣는다:**
+1. **모든 씬·탭·스텝·주요 모달에 고유 해시**를 부여한다. 예 `#task` `#design` `#scoring` `#list` `#upload-pdf` `#form`. 상세 화면은 대상 id까지: `#ocr-b=10102`, `#student=10103`.
+2. **양방향**이어야 한다 — 화면을 바꾸면 URL을 쓰고(write), 그 URL로 들어오면 그 화면이 복원돼야(read) 한다. 한쪽만 있으면 안 된다.
+3. **`hashchange` 리스너 필수.** 이미 열린 탭에 링크를 붙여넣어도 이동해야 한다.
+4. 되쓰기 방지 가드(`_suppressHash`)를 둔다 — 해시로 라우팅하는 동안 화면 전환 코드가 주소창 값을 덮어쓰지 않게.
+5. 화면 전환은 `history.replaceState`로 쓴다(뒤로가기 히스토리를 목업 전환으로 오염시키지 않음). 진짜 뒤로가기가 필요한 흐름만 `pushState`.
+6. 기존 `?nav=`·`?id=` 같은 쿼리 진입점은 **호환 유지**하되, 새로 만드는 진입점은 해시로 통일한다.
+
+**표준 구현 (복제해서 시작)**
+```js
+var SCREEN_HASH = { 'screen-task':'#task', 'screen-design':'#design', /* … */ };
+var _suppressHash = false;
+function setHash(h){ if(_suppressHash || location.hash===h) return;
+  history.replaceState(null,'',location.pathname+location.search+h); }
+
+function showScreen(id){ /* …화면 전환… */ if(SCREEN_HASH[id]) setHash(SCREEN_HASH[id]); }
+
+function routeFromHash(){
+  var h=location.hash; _suppressHash=true;
+  try {
+    if(h==='#design') goDesignList();
+    else if(h==='#scoring') goScoringList();
+    /* … */
+  } finally { _suppressHash=false; }
+}
+if(location.hash) routeFromHash();
+window.addEventListener('hashchange', routeFromHash);
+```
+
+**권위 소스**: `output/task_ocr_v3_260623.html`(9화면 전체 해시 + hashchange), `output/class_share_v1_260727.html`(스텝+탭 복합 해시 `#3/tab`).
+**미적용 잔여**(발견 시 같은 패턴으로 보강): `question_tab_v1_260617`(6뷰, `?open=`만) · `scoring_elementary_v3_260623` 계열(탭·위저드 전부 무URL) · `co_teacher_review_v1_260611`(6스텝) · `class_scoring_detail_v3_260623`(5스텝).
+
 ## 변경 영향 범위 체크 (필수 워크플로)
 
 ### 1. 변경 전 — 영향 범위 grep 전수 검사

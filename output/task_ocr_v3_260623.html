@@ -6,7 +6,7 @@
   <link rel="icon" type="image/png" href="clipo_favicon.png">
   <title>과제물 관리 — 과제물 인식 (CLIPO)</title>
   <!-- 라우트 선감지: #scoring 등으로 진입 시 과제물 화면 초기 깜빡임 방지 -->
-  <script>(function(){var h=location.hash,s=location.search;if(h==='#scoring'||h==='#design'||h==='#list'||/[?&]sdemo=/.test(s)||/[?&]nav=(form|uploadPdf|uploadBulk|uploadSurvey|run|ocrb|scoring)/.test(s)){document.documentElement.classList.add('route-nontask');}})();</script>
+  <script>(function(){var h=location.hash,s=location.search;if((h&&h!=='#task')||/[?&]sdemo=/.test(s)||/[?&]nav=(form|uploadPdf|uploadBulk|uploadSurvey|run|ocrb|scoring)/.test(s)){document.documentElement.classList.add('route-nontask');}})();</script>
   <style>html.route-nontask #screen-task{display:none!important;}</style>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard-gov.min.css">
   <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
@@ -3189,16 +3189,35 @@ function toggleEvCard(el){
   if (card) card.classList.toggle('collapsed');
 }
 
+// ── 화면 ↔ URL 해시 매핑 (실제 서비스처럼 화면마다 고유 URL) ──
+// 학생 상세(#ocr / #ocr-b)는 학생 id가 붙으므로 각 뷰 렌더에서 setOcrHash()가 갱신한다.
+var SCREEN_HASH = {
+  'screen-task':      '#task',
+  'screen-design':    '#design',
+  'screen-scoring':   '#scoring',
+  'screen-list':      '#list',
+  'screen-form':      '#form',
+  'screen-upload':    '#upload-pdf',
+  'screen-bulkmatch': '#upload-bulk',
+  'screen-ocr':       '#ocr',
+  'screen-ocr-b':     '#ocr-b'
+};
+var _suppressHash = false;   // 해시로 들어온 라우팅 중에는 되쓰기 방지
+function setHash(h) {
+  if (_suppressHash) return;
+  if (location.hash === h) return;
+  history.replaceState(null, '', location.pathname + location.search + h);
+}
+
 function showScreen(id) {
   document.querySelectorAll('.screen').forEach(function(s){ s.classList.remove('active'); });
   document.getElementById(id).classList.add('active');
   // 한 화면에 목업 도구는 1개만 — 케이스 뷰어가 뜨는 화면에서는 목업 내비게이터를 숨김
   var _bc = document.getElementById('bmCase'); if (_bc) _bc.style.display = (id === 'screen-bulkmatch') ? 'block' : 'none';
   var _mn = document.getElementById('mockNav'); if (_mn) _mn.style.display = (id === 'screen-bulkmatch') ? 'none' : '';
-  // 탭 상태를 해시로 유지 → 다른 페이지에서 뒤로 와도 탭 복원
-  if (id === 'screen-scoring') { history.replaceState(null, '', '#scoring'); }
-  else if (id === 'screen-design') { history.replaceState(null, '', '#design'); }
-  else if (location.hash === '#scoring' || location.hash === '#design') { history.replaceState(null, '', location.pathname + location.search); }
+  // 화면마다 고유 URL 유지 → 링크 공유·새로고침·뒤로가기에서 같은 화면 복원
+  if (id === 'screen-ocr' || id === 'screen-ocr-b') { setOcrHash(id); }
+  else if (SCREEN_HASH[id]) { setHash(SCREEN_HASH[id]); }
   var gnb = document.getElementById('gnb');
   var sidebar = document.getElementById('icon-sb');
   var mainWrap = document.getElementById('main-wrap');
@@ -3423,6 +3442,17 @@ function updateClassListProgress() {
   });
 }
 
+// 학생 상세 화면의 해시는 현재 학생 id까지 포함한다 (#ocr=10102)
+function setOcrHash(id) {
+  if (id === 'screen-ocr') {
+    var s = ocrStudents[currentStudentIdx];
+    setHash(s ? '#ocr=' + s.id : '#ocr');
+  } else {
+    var b = STUDENTS_B1[currentOcrBStudentIdx];
+    setHash(b ? '#ocr-b=' + b.id : '#ocr-b');
+  }
+}
+
 function goToList() {
   renderTable();
   showScreen('screen-list');
@@ -3451,6 +3481,8 @@ function renderOCRView_B() {
   var students = STUDENTS_B1;
   var student = students[currentOcrBStudentIdx];
   if (!student) return;
+  // 학생 이동 시에도 URL이 따라가게 (이 화면이 떠 있을 때만)
+  if (document.getElementById('screen-ocr-b').classList.contains('active')) setOcrHash('screen-ocr-b');
 
   document.getElementById('ocr-b-student-name').textContent = student.id + ' ' + student.name;
   // 뷰어 상단: 파일명 대신 제출 시간 표시
@@ -3971,6 +4003,8 @@ function confirmOCR_B() {
 function renderOCRView() {
   var student = ocrStudents[currentStudentIdx];
   if (!student) return;
+  // 학생 이동 시에도 URL이 따라가게 (이 화면이 떠 있을 때만)
+  if (document.getElementById('screen-ocr').classList.contains('active')) setOcrHash('screen-ocr');
   var reviewBanner = document.getElementById('ocr-review-banner');
   var ocrSplit = document.getElementById('ocr-split');
   if (student.needsReview) {
@@ -5613,33 +5647,48 @@ lucide.createIcons();
 
 // URL 해시 라우팅
 var ocrBFromUrl = null;
+
+// ── 해시 → 화면 라우팅 (최초 진입 + 주소창 해시 변경 모두 처리) ──
+function routeFromHash() {
+  var hash = window.location.hash;
+  _suppressHash = true;
+  try {
+    if (hash.startsWith('#ocr-b')) {
+      var sidB = hash.indexOf('=') > -1 ? hash.split('=')[1] : '';
+      var idxB = STUDENTS_B1.findIndex(function(s){ return s.id === sidB; });
+      goToOCR_B(idxB !== -1 ? idxB : 0);
+    } else if (hash.startsWith('#ocr')) {
+      var sid = hash.indexOf('=') > -1 ? hash.split('=')[1] : '';
+      var student = STUDENTS.find(function(s){ return s.id === sid; });
+      if (student && student.status !== '미제출' && student.ocrStatus !== 'processing') {
+        var idx = ocrStudents.findIndex(function(s){ return s.id === sid; });
+        currentStudentIdx = (idx !== -1) ? idx : 0;
+        currentPageIdx = 0;
+        renderOCRView();
+        showScreen('screen-ocr');
+      }
+    }
+    else if (hash === '#list')         { showListForClass(1, 'B'); }
+    else if (hash === '#scoring')      { goScoringList(); }
+    else if (hash === '#design')       { goDesignList(); }
+    else if (hash === '#form')         { openFormScreen('A'); }
+    else if (hash === '#upload-pdf')   { showListForClass(1, 'A'); openUploadPdf(); }
+    // openUploadBulk은 뒤쪽 script 블록에 정의 → 아직 없으면 문서 파싱 완료 후 실행
+    else if (hash === '#upload-bulk')  { showListForClass(1, 'A'); if (typeof openUploadBulk === 'function') openUploadBulk(); else window.addEventListener('load', function(){ openUploadBulk(); }); }
+    else if (hash === '#task' || hash === '' ) { showScreen('screen-task'); }
+  } finally {
+    _suppressHash = false;
+  }
+}
+
 (function() {
   var params = new URLSearchParams(location.search);
   var from = params.get('from');
   if (from) ocrBFromUrl = from;
-  var hash = window.location.hash;
-  if (hash.startsWith('#ocr-b=')) {
-    var sid = hash.replace('#ocr-b=', '');
-    var idx = STUDENTS_B1.findIndex(function(s){ return s.id === sid; });
-    goToOCR_B(idx !== -1 ? idx : 0);
-  } else if (hash.startsWith('#ocr=')) {
-    var sid = hash.replace('#ocr=', '');
-    var student = STUDENTS.find(function(s){ return s.id === sid; });
-    if (student && student.status !== '미제출' && student.ocrStatus !== 'processing') {
-      var idx = ocrStudents.findIndex(function(s){ return s.id === sid; });
-      currentStudentIdx = (idx !== -1) ? idx : 0;
-      currentPageIdx = 0;
-      renderOCRView();
-      showScreen('screen-ocr');
-    }
-  } else if (hash === '#list') {
-    showScreen('screen-list');
-  } else if (hash === '#scoring') {
-    showScreen('screen-scoring');
-  } else if (hash === '#design') {
-    showScreen('screen-design');
-  }
-  // ── 목업 내비게이터 ?nav= 진입 라우팅 ──
+  if (location.hash) routeFromHash();
+  // 주소창에 해시를 바꿔 넣거나 뒤로/앞으로 이동해도 해당 화면으로
+  window.addEventListener('hashchange', routeFromHash);
+  // ── 목업 내비게이터 ?nav= 진입 라우팅 (구 링크 호환) ──
   var navp = params.get('nav');
   if (navp === 'task') { showScreen('screen-task'); }
   else if (navp === 'list') { showListForClass(Number(params.get('c')) || 1, params.get('t') || 'B'); } // 반 상세 바로 진입 — c=반(기본 1), t=평가유형(기본 B: 학생 업로드=직접 입력 혼합)
