@@ -322,6 +322,12 @@
     .way.on .way-box{ background:#416bff; border-color:#416bff; }
     .way.on .way-box::after{ content:''; width:6px; height:11px; border:solid #fff; border-width:0 2px 2px 0; transform:rotate(45deg) translate(-1px,-1px); }
     .way-tt{ font-size:16px; font-weight:600; color:#222631; margin:0 0 4px; line-height:1.4; }
+    /* 제출이 들어온 뒤 — 방식은 잠그고 세부 설정만 연다 */
+    .way-lock{ display:none; align-items:center; justify-content:center; gap:4px; height:22px; padding:0 8px; margin-left:6px; border-radius:6px; background:#f1f3f5; color:#6d7381; font-size:12px; font-weight:600; line-height:1; vertical-align:middle; }
+    .way-lock i, .way-lock svg{ width:12px; height:12px; }
+    .way.locked .way-lock{ display:inline-flex; }
+    .way.locked .way-hd{ cursor:default; }
+    .way.locked .way-box{ opacity:.55; }
     .way-dc{ font-size:15px; color:#6d7381; margin:0; line-height:1.55; }
     .way-body{ display:none; padding:14px 20px 20px 52px; flex-direction:column; gap:18px; }
     .way.on .way-body{ display:flex; }
@@ -660,12 +666,18 @@
         <p class="sub-block-title">2. 제출 방식</p>
         <p class="sec-desc" style="margin:-4px 0 14px;">두 가지를 모두 선택하면 학생이 원하는 방식을 골라 제출합니다.</p>
 
+        <!-- 잠금 안내는 영향 필드 앞 -->
+        <div class="alert-info warn" id="waysLockNote" style="display:none;margin:0 0 16px;">
+          <i data-lucide="lock" style="width:18px;height:18px"></i>
+          <div class="ai-txt"><b>이미 제출한 학생이 <span id="waysLockCnt">3</span>명 있어 제출 방식은 바꿀 수 없어요.</b><br>방식을 끄면 이미 받은 답안이 갈 곳이 없어집니다. 글자 수·파일 수·작성 환경은 바꿀 수 있고, <b>바꾼 설정은 이후 제출부터 적용</b>돼요.</div>
+        </div>
+
         <!-- 방식 A · 클리포에서 직접 작성 -->
         <div class="way" id="way-write">
           <div class="way-hd" onclick="toggleWay('write')">
             <span class="way-box"></span>
             <div>
-              <p class="way-tt">클리포에서 직접 작성</p>
+              <p class="way-tt">클리포에서 직접 작성 <span class="way-lock"><i data-lucide="lock" style="width:12px;height:12px"></i>바꿀 수 없음</span></p>
               <p class="way-dc">학생이 클리포 화면에서 문항을 보고 답을 작성합니다.</p>
             </div>
           </div>
@@ -708,7 +720,7 @@
           <div class="way-hd" onclick="toggleWay('file')">
             <span class="way-box"></span>
             <div>
-              <p class="way-tt">파일 제출</p>
+              <p class="way-tt">파일 제출 <span class="way-lock"><i data-lucide="lock" style="width:12px;height:12px"></i>바꿀 수 없음</span></p>
               <p class="way-dc">학생이 작성한 파일을 올려 제출합니다.</p>
             </div>
           </div>
@@ -1545,6 +1557,7 @@ function setSubmitted(n){
   }
   renderQuestions();
   updateSummary();
+  applyWayLock();
 }
 
 /* 목록 카드 → 그 과제의 상태로 설계 상세 열기 */
@@ -1578,10 +1591,24 @@ window.addEventListener('hashchange', function(){
 
 /* ── 제출 방식 토글 ── */
 function toggleWay(k){
+  if(SUBMITTED > 0){
+    toastMsg('이미 제출한 학생이 있어 제출 방식은 바꿀 수 없어요.');
+    return;
+  }
   document.getElementById('way-'+k).classList.toggle('on');
   var none = !document.getElementById('way-write').classList.contains('on')
           && !document.getElementById('way-file').classList.contains('on');
   document.getElementById('way-none').style.display = none ? '' : 'none';
+}
+
+/* 제출이 들어오면 방식만 잠근다 (세부 설정은 계속 조절 가능) */
+function applyWayLock(){
+  var locked = SUBMITTED > 0;
+  document.getElementById('waysLockNote').style.display = locked ? 'flex' : 'none';
+  document.getElementById('waysLockCnt').textContent = SUBMITTED;
+  document.getElementById('way-write').classList.toggle('locked', locked);
+  document.getElementById('way-file').classList.toggle('locked', locked);
+  lucide.createIcons();
 }
 
 /* ── 문항 렌더 ── */
