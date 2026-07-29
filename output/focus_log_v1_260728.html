@@ -91,6 +91,7 @@ body.nav-expanded .main-wrap{ padding-left:200px; }
 .t-text{ background:#e8f1ff; color:#3151c4; }
 .t-file{ background:#f1f3f5; color:#27272a; }
 .t-none{ background:#f1f3f5; color:#27272a; }
+.t-draft{ background:#fff7ed; color:#c2410c; }
 .t-detail{ font-size:15px; font-weight:500; color:#52525b; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 /* 직접 작성 답안 열기 (신규 제안) */
 .t-open{ background:none; border:none; cursor:pointer; font-family:inherit; font-size:15px; font-weight:500; color:#3151c4; display:inline-flex; align-items:center; justify-content:center; line-height:1; vertical-align:middle; gap:5px; padding:6px 8px; border-radius:4px; white-space:nowrap; }
@@ -394,7 +395,7 @@ const teacherRows = [
     events:[ {time:'14:08:30', type:'탭 전환', dur:28}, {time:'14:20:11', type:'gap', dur:171} ] },
   { id:'10105', name:'정현우', status:'제출', date:'07/28 14:44 학생 제출', type:'text', detail:'634자', events:[] },
   { id:'10109', name:'임도윤', status:'제출', date:'07/28 16:10 선생님 제출', type:'file', detail:'10109_임도윤.pdf 외 1', teacherUpload:true },
-  { id:'10106', name:'한지우', status:'미제출' },
+  { id:'10106', name:'한지우', status:'미제출', draft:'812자', draftAt:'07/28 15:52 저장' },
   { id:'10107', name:'조민재', status:'미제출' },
   { id:'10108', name:'윤하은', status:'미제출' }
 ];
@@ -413,7 +414,12 @@ function renderTeacher(){
 
     /* 제출 상세 셀 (Figma: 유형 뱃지 + 글자 수/파일명) */
     let detailCell;
-    if(!isSubmit){ detailCell = '<span class="t-badge t-none">-</span>'; }
+    if(!isSubmit){
+      /* 제출은 안 했지만 쓰던 내용이 남아 있는 경우 — 상태는 미제출 그대로 두고 사실만 알린다 */
+      detailCell = r.draft
+        ? '<div style="display:inline-flex;align-items:center;gap:8px;min-width:0;"><span class="t-badge t-draft"><i data-lucide="pencil-line"></i>작성 중</span><button class="t-open" title="쓰던 내용 보기" onclick="location.href=\'student_submit_v1_260729.html#closed\'">'+r.draft+'<i data-lucide="external-link" style="width:13px;height:13px"></i></button></div>'
+        : '<span class="t-badge t-none">-</span>';
+    }
     else if(r.type==='text'){ detailCell = '<div style="display:inline-flex;align-items:center;gap:8px;"><span class="t-badge t-text"><i data-lucide="type"></i>직접 작성</span><button class="t-open" onclick="location.href=\'student_submit_v1_260729.html#pdf\'">'+r.detail+'<i data-lucide="external-link" style="width:13px;height:13px"></i></button></div>'; }
     else { detailCell = '<div style="display:inline-flex;align-items:center;gap:8px;min-width:0;"><span class="t-badge t-file"><i data-lucide="paperclip"></i>파일 첨부</span><button class="t-open" title="'+r.detail+' 내려받기" onclick="downloadOne(\''+r.name+'\')">'+r.detail+'<i data-lucide="download" style="width:13px;height:13px"></i></button></div>'; }
 

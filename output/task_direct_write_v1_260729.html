@@ -682,6 +682,16 @@
             </div>
 
             <div>
+              <p class="way-sub">문항당 최대 글자 수</p>
+              <div class="hstep" data-step="500" data-min="500" data-max="5000" data-unit="자">
+                <button onclick="hstep(this,-1)">−</button>
+                <span class="hstep-val" style="min-width:84px;">2,000자</span>
+                <button onclick="hstep(this,1)">+</button>
+              </div>
+              <p class="sec-desc" style="margin:8px 0 0;">학생이 문항 하나에 쓸 수 있는 글자 수예요. 500자 단위로 조절합니다.</p>
+            </div>
+
+            <div>
               <p class="way-sub">작성 환경</p>
               <span class="sw on" onclick="toggleSw(this)"><span class="sw-track"><span class="sw-knob"></span></span>복사 및 붙여넣기 금지</span>
               <span class="sw on" onclick="toggleSw(this)" style="margin-top:10px;"><span class="sw-track"><span class="sw-knob"></span></span>다른 탭·창 이동 기록</span>
@@ -1162,9 +1172,15 @@ function pickUpload(el){
 function toggleCbx(el){ el.classList.toggle('on'); }
 function toggleSw(el){ el.classList.toggle('on'); }
 function hstep(btn, dir){
-  var el=document.getElementById('max-file');
-  var v=Math.max(1, (parseInt(el.textContent,10)||1)+dir);
-  el.textContent=v+'개';
+  var wrap = btn.closest('.hstep');
+  var el   = wrap.querySelector('.hstep-val');
+  var step = parseInt(wrap.getAttribute('data-step'), 10) || 1;
+  var min  = parseInt(wrap.getAttribute('data-min'),  10) || 1;
+  var max  = parseInt(wrap.getAttribute('data-max'),  10) || 99;
+  var unit = wrap.getAttribute('data-unit') || '개';
+  var cur  = parseInt(el.textContent.replace(/[^0-9]/g, ''), 10) || min;
+  var v    = Math.min(max, Math.max(min, cur + dir * step));
+  el.textContent = v.toLocaleString() + unit;
 }
 function pickPeriod(el){
   document.querySelectorAll('#student-submit-sec .rad[data-period]').forEach(function(r){r.classList.remove('on');});

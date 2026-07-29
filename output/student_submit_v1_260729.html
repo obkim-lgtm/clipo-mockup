@@ -446,6 +446,39 @@ body.pdf-mode .sf-copy{ color:#8b8f9c; }
   </div>
 </div>
 
+<!-- ═══════════════ ⑤-2 제출 못 한 채 마감 (임시 저장만 있음) ═══════════════ -->
+<div id="scr-closed" class="screen">
+  <div class="page-wrap">
+    <button class="back-link" onclick="location.href='student_home_v1_260729.html'"><i data-lucide="chevron-left" style="width:18px;height:18px"></i>이전으로</button>
+    <h1 class="page-h1">과제 제출 및 확인</h1>
+    <p class="page-sub">과제 내용을 확인하고 직접 제출해 보세요.</p>
+
+    <div class="card">
+      <div class="task-top">
+        <span class="badge-subject">사회</span>
+        <span class="due">제출 마감 7월 29일(수) 16:00 · <b>마감됨</b></span>
+      </div>
+      <h2 class="task-name">사회 변동과 현대사회의 문제 분석</h2>
+
+      <div class="info warn" style="margin-top:18px;">
+        <i data-lucide="clock-alert"></i>
+        <p><b>제출하지 못한 채 마감됐어요.</b><br>쓰던 내용은 그대로 남아 있어요. 아래에서 확인할 수 있고, 선생님께도 작성 중이었다는 것이 보여요. 제출이 필요하면 선생님께 문의해 주세요.</p>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3 class="card-title">쓰던 내용</h3>
+      <p style="font-size:15px;color:#6d7381;margin:-8px 0 18px;line-height:1.6;">마지막으로 저장된 시각 7월 29일(수) 15:52</p>
+      <div id="draftList"></div>
+    </div>
+
+    <footer class="site-footer">
+      <div class="sf-links"><a href="#" onclick="return false;">회사소개</a><a href="#" onclick="return false;">이용약관</a><a href="#" onclick="return false;">개인정보처리방침</a><a href="#" onclick="return false;">고객센터</a></div>
+      <div class="sf-copy">© 2026. Datadriven Inc. All rights reserved.</div>
+    </footer>
+  </div>
+</div>
+
 <!-- ═══════════════ ⑥ 제출 완료 ═══════════════ -->
 <div id="scr-done" class="screen">
   <div class="page-wrap">
@@ -536,6 +569,7 @@ body.pdf-mode .sf-copy{ color:#8b8f9c; }
     <button class="mp-btn" data-scene="both" onclick="go('both')">직접 작성 + 파일 제출<span class="mp-sub">둘 다 허용</span></button>
     <button class="mp-btn" data-scene="fileonly" onclick="go('fileonly')">파일 제출만<span class="mp-sub">작성 칸 없음</span></button>
     <button class="mp-btn" data-scene="preparing" onclick="go('preparing')">문항 미작성<span class="mp-sub">선생님이 준비 중</span></button>
+    <button class="mp-btn" data-scene="closed" onclick="go('closed')">제출 못 한 채 마감<span class="mp-sub">쓰던 내용은 남음</span></button>
 
     <div class="mp-cap">교사가 보는 것</div>
     <button class="mp-btn" onclick="location.href='focus_log_v1_260728.html#teacher-log'">과제물 관리<span class="mp-sub">제출 현황 · 다른 화면 이동</span></button>
@@ -558,6 +592,7 @@ var ANSWERS = [
   '저출산·고령화로 인해 생기는 문제 중 하나는 일할 사람이 줄어드는 것이다. 일하는 사람이 줄면 세금을 내는 사람도 줄어드는데, 돌봐야 할 노인은 늘어난다. 그래서 국가가 걷는 돈은 줄고 써야 하는 돈은 늘어나 부담이 한쪽으로 몰린다.',
   ''
 ];
+var Q_MAX_CHARS = 2000;   // 설계에서 정한 문항당 최대 글자 수 (기본 2,000자)
 var currentScene = 'notice';
 var leaveStart = null, leaveType = null;
 
@@ -572,6 +607,7 @@ function go(scene){
   if(scene === 'write')  renderQuestions('qList', true);
   if(scene === 'both')   renderQuestions('qListBoth', false);
   if(scene === 'done')   renderAnswers();
+  if(scene === 'closed') renderAnswers('draftList');
   if(scene === 'pdf')    renderPdf();
   window.scrollTo(0,0);
   lucide.createIcons();
@@ -603,7 +639,7 @@ function renderQuestions(targetId, withProgress){
       +   '</div>'
       +   '<textarea class="ed-ta" placeholder="여기에 답을 쓰세요." oninput="onAnswer(' + i + ', this)" onpaste="blockPaste(event)"></textarea>'
       + '</div>'
-      + '<div class="q-foot"><span class="q-count"><b class="cnt">0</b>자</span><span class="q-empty-mark"><i data-lucide="circle-alert" style="width:14px;height:14px"></i>아직 안 썼어요</span></div>';
+      + '<div class="q-foot"><span class="q-count"><b class="cnt">0</b> / ' + Q_MAX_CHARS.toLocaleString() + '자</span><span class="q-empty-mark"><i data-lucide="circle-alert" style="width:14px;height:14px"></i>아직 안 썼어요</span></div>';
     d.querySelector('.q-text').textContent = q;
     var ta = d.querySelector('textarea');
     ta.value = ANSWERS[i] || '';
@@ -615,9 +651,15 @@ function renderQuestions(targetId, withProgress){
 }
 
 function onAnswer(i, ta){
+  if(ta.value.length > Q_MAX_CHARS){
+    ta.value = ta.value.slice(0, Q_MAX_CHARS);
+    toastMsg('문항 하나에 ' + Q_MAX_CHARS.toLocaleString() + '자까지 쓸 수 있어요.', true);
+  }
   ANSWERS[i] = ta.value;
   var block = ta.closest('.q-block');
-  block.querySelector('.cnt').textContent = ta.value.length;
+  var cnt = block.querySelector('.cnt');
+  cnt.textContent = ta.value.length.toLocaleString();
+  cnt.style.color = ta.value.length >= Q_MAX_CHARS ? '#ab303a' : '';
   block.classList.remove('miss');
   updateProgress();
 }
@@ -660,8 +702,8 @@ function submitTask(){
 }
 
 /* ───────── 제출한 답안 ───────── */
-function renderAnswers(){
-  var box = document.getElementById('ansList');
+function renderAnswers(targetId){
+  var box = document.getElementById(targetId || 'ansList');
   box.innerHTML = '';
   QUESTIONS.forEach(function(q, i){
     var d = document.createElement('div');
