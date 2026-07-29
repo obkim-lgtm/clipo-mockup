@@ -490,6 +490,7 @@ function renderQ(){
 
 function pickDoc(doc){
   docNow = doc;
+  if(location.hash !== '#' + doc) history.replaceState(null, '', '#' + doc);
   document.querySelectorAll('.doc-tab').forEach(function(t){ t.classList.toggle('on', t.getAttribute('data-doc') === doc); });
   document.querySelectorAll('#mockpick .mp-btn[data-doc]').forEach(function(b){ b.classList.toggle('on', b.getAttribute('data-doc') === doc); });
   document.getElementById('toolWrite').style.display = doc === 'write' ? 'flex' : 'none';
@@ -602,6 +603,22 @@ function mpToggle(){
 /* ───────── 초기화 ───────── */
 renderQ();
 renderCrit();
+
+var _DOCS = ['write', 'file', 'deleted'];
+window.addEventListener('hashchange', function(){
+  var h = location.hash.slice(1);
+  if(_DOCS.indexOf(h) > -1) pickDoc(h);
+  if(h === 'resubmitted') setResub(true);
+});
+var _h = location.hash.slice(1);
+if(_h === 'resubmitted'){
+  pickDoc('write');
+  setResub(true);
+  history.replaceState(null, '', '#resubmitted');
+} else {
+  pickDoc(_DOCS.indexOf(_h) > -1 ? _h : 'write');
+}
+
 lucide.createIcons();
 </script>
 </body>
