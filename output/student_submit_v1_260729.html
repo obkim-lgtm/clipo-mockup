@@ -1,0 +1,691 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/png" href="clipo_favicon.png">
+<title>학생 과제 제출 — 문항형 (CLIPO)</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard-gov.min.css">
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<style>
+*{ font-family:'Pretendard GOV',-apple-system,sans-serif; box-sizing:border-box; }
+body{ margin:0; background:#f6f7f9; color:#222631; font-size:16px; min-width:1180px; }
+a{ text-decoration:none; color:inherit; }
+
+/* ===== 학생 헤더 (Figma 63-9606) ===== */
+.g-hd{ height:58px; background:#fff; border-bottom:1px solid #dde1e8; display:flex; align-items:center; padding:0 20px 0 9px; position:fixed; top:0; left:0; right:0; z-index:200; }
+.gh-menu-btn{ width:40px; height:40px; border:none; background:none; border-radius:4px; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; color:#3b3f4c; margin-right:9px; line-height:1; }
+.gh-menu-btn:hover{ background:#f6f7f9; }
+.g-hd-r{ margin-left:auto; display:flex; align-items:center; gap:6px; font-size:15px; color:#3151c4; font-weight:500; }
+
+/* ===== 학생 좌측 NB (홈 / 과제 / 리포트) ===== */
+.icon-sb{ width:56px; background:#fff; border-right:1px solid #d9d9d9; position:fixed; top:58px; bottom:0; left:0; display:flex; flex-direction:column; padding:8px 0; z-index:150; transition:width .2s ease; }
+.icon-sb.expanded{ width:200px; }
+.si{ height:40px; display:flex; align-items:center; border-radius:8px; color:#6d7381; cursor:pointer; margin:0 8px 2px; position:relative; padding:0 4px 0 8px; gap:10px; white-space:nowrap; flex-shrink:0; }
+.si:hover{ background:#f1f3f5; }
+.si.active{ background:#e9f2ff; color:#416bff; }
+.si-icon{ width:24px; height:24px; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+.si-label{ font-size:13px; font-weight:500; opacity:0; transition:opacity .1s; overflow:hidden; }
+.icon-sb.expanded .si-label{ opacity:1; }
+.si-tip{ position:absolute; left:48px; top:50%; transform:translateY(-50%); background:#222631; color:#fff; font-size:11px; padding:3px 8px; border-radius:4px; white-space:nowrap; display:none; z-index:300; pointer-events:none; }
+.si:hover .si-tip{ display:block; }
+.icon-sb.expanded .si-tip{ display:none !important; }
+
+.main-wrap{ position:relative; padding-top:58px; padding-left:56px; transition:padding-left .2s; min-height:100vh; }
+body.nav-expanded .main-wrap{ padding-left:200px; }
+.page-wrap{ max-width:1240px; margin:0 auto; padding:24px 32px 0; width:100%; display:flex; flex-direction:column; min-height:calc(100vh - 58px); }
+
+/* ===== 페이지 헤더 ===== */
+.back-link{ display:inline-flex; align-items:center; justify-content:center; line-height:1; vertical-align:middle; gap:4px; font-size:15px; font-weight:500; color:#3151c4; background:none; border:none; cursor:pointer; font-family:inherit; padding:0; align-self:flex-start; margin-bottom:10px; }
+.back-link:hover{ color:#365eef; }
+.page-h1{ font-size:26px; font-weight:600; color:#18181b; margin:0 0 6px; line-height:1.3; }
+.page-sub{ font-size:16px; color:#3b3f4c; margin:0 0 24px; line-height:1.55; }
+
+/* ===== 카드 ===== */
+.card{ background:#fff; border-radius:12px; padding:28px 32px; box-shadow:0 2px 4px rgba(0,0,0,.06), 0 0 1px rgba(34,38,49,.3); }
+.card + .card{ margin-top:20px; }
+.card-title{ font-size:20px; font-weight:600; color:#18181b; margin:0 0 16px; }
+
+/* ===== 과제 머리말 ===== */
+.task-top{ display:flex; align-items:center; gap:10px; margin-bottom:10px; flex-wrap:wrap; }
+.badge-subject{ display:inline-flex; align-items:center; justify-content:center; border-radius:100px; padding:4px 12px; font-size:14px; font-weight:600; background:#e9f2ff; color:#3151c4; line-height:1; }
+.due{ font-size:15px; font-weight:500; color:#6d7381; }
+.due b{ color:#ab303a; font-weight:600; }
+.task-name{ font-size:24px; font-weight:700; color:#222631; margin:0 0 10px; line-height:1.35; }
+.task-guide{ background:#f6f7f9; border-radius:10px; padding:16px 18px; font-size:16px; color:#3b3f4c; line-height:1.7; }
+.task-guide .gl{ font-size:14px; font-weight:600; color:#6d7381; display:block; margin-bottom:6px; }
+.guide-file{ display:inline-flex; align-items:center; gap:6px; margin-top:10px; font-size:15px; font-weight:500; color:#3151c4; background:#fff; border:1px solid #ccdfff; border-radius:8px; padding:8px 12px; cursor:pointer; font-family:inherit; line-height:1; }
+.guide-file:hover{ background:#e9f2ff; }
+
+/* ===== 상태 칩 줄 ===== */
+.chip-row{ display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-bottom:20px; }
+.chip{ display:inline-flex; align-items:center; gap:6px; height:30px; padding:0 12px; border-radius:100px; background:#f1f3f5; color:#3b3f4c; font-size:14px; font-weight:500; line-height:1; white-space:nowrap; }
+.chip i{ width:15px; height:15px; color:#6d7381; }
+.chip.warn{ background:#fff3f4; color:#ab303a; }
+.chip.warn i{ color:#ab303a; }
+
+/* ===== 시작 전 안내 규칙 ===== */
+.rules{ background:#f6f7f9; border-radius:10px; padding:6px 20px; margin:24px 0 28px; }
+.rule{ display:flex; align-items:flex-start; gap:12px; padding:16px 0; border-bottom:1px solid #eceef2; }
+.rule:last-child{ border-bottom:none; }
+.rule i{ width:22px; height:22px; color:#416bff; flex-shrink:0; margin-top:1px; }
+.rule p{ margin:0; font-size:16px; color:#222631; line-height:1.6; }
+.rule p b{ font-weight:600; }
+.rule p .sub{ display:block; font-size:15px; color:#6d7381; margin-top:3px; }
+
+/* ===== 문항 ===== */
+.q-block{ border:1px solid #dde1e8; border-radius:12px; padding:22px 24px; }
+.q-block + .q-block{ margin-top:16px; }
+.q-hd{ display:flex; align-items:flex-start; gap:12px; margin-bottom:16px; }
+.q-no{ display:inline-flex; align-items:center; justify-content:center; height:28px; padding:0 12px; border-radius:100px; background:#e9f2ff; color:#3151c4; font-size:15px; font-weight:600; line-height:1; flex-shrink:0; }
+.q-text{ font-size:17px; color:#222631; line-height:1.7; margin:0; flex:1; font-weight:500; }
+.editor{ border:1px solid #d9d9d9; border-radius:8px; overflow:hidden; }
+.editor:focus-within{ border-color:#416bff; box-shadow:0 0 0 2px rgba(65,107,255,.12); }
+.ed-tool{ display:flex; align-items:center; gap:2px; padding:6px 8px; border-bottom:1px solid #eceef2; background:#fbfbfc; flex-wrap:wrap; }
+.ed-btn{ width:30px; height:30px; border:none; background:none; border-radius:5px; color:#6d7381; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; line-height:1; }
+.ed-btn:hover{ background:#eceef2; color:#222631; }
+.ed-div{ width:1px; height:18px; background:#e4e6eb; margin:0 5px; }
+.ed-ta{ width:100%; min-height:150px; border:none; padding:16px 18px; font-size:16px; font-family:inherit; line-height:1.75; color:#222631; resize:vertical; outline:none; display:block; }
+.ed-ta::placeholder{ color:#9aa0ad; }
+.q-foot{ display:flex; align-items:center; justify-content:space-between; margin-top:10px; }
+.q-count{ font-size:14px; color:#6d7381; }
+.q-count b{ color:#3b3f4c; font-weight:600; }
+.q-empty-mark{ font-size:14px; font-weight:600; color:#ab303a; display:none; align-items:center; gap:4px; }
+.q-block.miss{ border-color:#fc9ba2; }
+.q-block.miss .q-empty-mark{ display:inline-flex; }
+
+/* ===== 파일 제출 영역 ===== */
+.dropzone{ display:flex; flex-direction:column; align-items:center; justify-content:center; gap:8px; border:1.5px dashed #c9d2e0; border-radius:10px; padding:30px 22px; color:#6d7381; font-size:15px; cursor:pointer; background:#fbfbfc; }
+.dropzone:hover{ border-color:#a3c3ff; background:#f4f8ff; color:#3151c4; }
+.dz-ic{ width:44px; height:44px; border-radius:50%; background:#e9f2ff; color:#416bff; display:flex; align-items:center; justify-content:center; }
+.dz-main{ font-size:16px; font-weight:600; color:#3b3f4c; }
+.dz-sub{ font-size:14px; color:#9aa0ad; }
+.file-row{ display:flex; align-items:center; gap:12px; border:1px solid #dde1e8; border-radius:10px; padding:14px 16px; margin-top:12px; }
+.file-row i.fi{ width:22px; height:22px; color:#416bff; flex-shrink:0; }
+.file-nm{ font-size:16px; color:#222631; font-weight:500; flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.file-sz{ font-size:14px; color:#6d7381; flex-shrink:0; }
+.file-x{ width:34px; height:34px; border:none; background:none; border-radius:6px; color:#6d7381; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; line-height:1; flex-shrink:0; }
+.file-x:hover{ background:#fff3f4; color:#ab303a; }
+
+/* ===== 안내 박스 ===== */
+.info{ background:#e9f2ff; border-radius:10px; padding:16px 18px; display:flex; align-items:flex-start; gap:10px; }
+.info i{ width:20px; height:20px; color:#416bff; flex-shrink:0; margin-top:2px; }
+.info p{ margin:0; font-size:15px; color:#3b3f4c; line-height:1.65; }
+.info.warn{ background:#fff7ed; }
+.info.warn i{ color:#ea580c; }
+.info.warn p{ color:#9a5b2e; }
+
+/* 이동 복귀 배너 */
+#leaveBanner{ display:none; background:#fff7ed; border-radius:10px; padding:16px 18px; align-items:flex-start; gap:12px; margin-bottom:20px; }
+#leaveBanner.show{ display:flex; }
+#leaveBanner i{ width:22px; height:22px; color:#ea580c; flex-shrink:0; margin-top:2px; }
+#leaveBanner .lb-t{ font-size:16px; font-weight:700; color:#c2410c; margin:0 0 3px; line-height:1.5; }
+#leaveBanner .lb-d{ font-size:15px; font-weight:500; color:#9a5b2e; margin:0; line-height:1.6; }
+
+/* ===== 하단 액션 ===== */
+.actions{ display:flex; align-items:center; justify-content:flex-end; gap:12px; margin-top:24px; }
+.act-note{ margin-right:auto; font-size:15px; color:#6d7381; }
+.act-note b{ color:#222631; font-weight:600; }
+.btn{ height:44px; border-radius:9999px; font-weight:600; font-size:16px; font-family:inherit; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; line-height:1; vertical-align:middle; gap:8px; padding:0 22px; border:none; transition:opacity .15s; }
+.btn-primary{ background:#416bff; color:#fff; }
+.btn-primary:hover{ background:#365eef; }
+.btn-primary:disabled{ background:#a9c1ff; cursor:not-allowed; }
+.btn-outline{ background:#fff; color:#3151c4; border:1px solid #ccdfff; }
+.btn-outline:hover{ background:#e9f2ff; }
+.btn-lg{ height:52px; font-size:17px; padding:0 40px; }
+.btn-sm{ height:38px; font-size:15px; padding:0 16px; }
+
+/* ===== 제출 완료 ===== */
+.done-wrap{ text-align:center; padding:20px 0 8px; }
+.done-ic{ width:64px; height:64px; border-radius:50%; background:#dff8eb; color:#27724b; display:inline-flex; align-items:center; justify-content:center; margin-bottom:18px; }
+.done-t{ font-size:24px; font-weight:700; color:#222631; margin:0 0 8px; }
+.done-d{ font-size:16px; color:#3b3f4c; margin:0; line-height:1.65; }
+.done-box{ background:#f6f7f9; border-radius:10px; padding:18px 20px; margin-top:24px; text-align:left; }
+.done-row{ display:flex; align-items:flex-start; gap:14px; padding:9px 0; font-size:16px; }
+.done-row + .done-row{ border-top:1px solid #eceef2; }
+.done-lb{ width:110px; flex-shrink:0; color:#6d7381; font-weight:500; font-size:15px; }
+.done-vl{ color:#222631; flex:1; }
+
+/* 제출한 답안 접기 */
+.ans-view{ border:1px solid #dde1e8; border-radius:10px; padding:18px 20px; }
+.ans-view + .ans-view{ margin-top:12px; }
+.ans-q{ font-size:16px; font-weight:600; color:#222631; margin:0 0 10px; line-height:1.6; }
+.ans-q .n{ color:#3151c4; }
+.ans-a{ font-size:16px; color:#3b3f4c; line-height:1.8; margin:0; white-space:pre-wrap; }
+
+/* ===== 준비 중 ===== */
+.empty-state{ text-align:center; padding:56px 20px; }
+.empty-ic{ width:64px; height:64px; border-radius:50%; background:#f1f3f5; color:#9aa0ad; display:inline-flex; align-items:center; justify-content:center; margin-bottom:18px; }
+.empty-t{ font-size:20px; font-weight:600; color:#222631; margin:0 0 8px; }
+.empty-d{ font-size:16px; color:#6d7381; margin:0; line-height:1.65; }
+
+/* ===== PDF 미리보기 (교사 다운로드 결과) ===== */
+.pdf-bar{ background:#2a2e3a; color:#e7e9ee; padding:14px 20px; border-radius:10px 10px 0 0; display:flex; align-items:center; gap:12px; font-size:15px; font-weight:500; }
+.pdf-bar i{ width:18px; height:18px; }
+.pdf-bar .pb-r{ margin-left:auto; display:flex; gap:8px; }
+.pdf-bar button{ height:34px; padding:0 14px; border-radius:6px; border:1px solid #4a4f60; background:#3a3f52; color:#e7e9ee; font-size:14px; font-weight:500; font-family:inherit; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; gap:6px; line-height:1; }
+.pdf-bar button:hover{ background:#474d63; }
+.paper{ background:#fff; padding:56px 60px; box-shadow:0 2px 10px rgba(0,0,0,.1); border-radius:0 0 10px 10px; }
+.pp-hd{ border-bottom:2px solid #222631; padding-bottom:18px; margin-bottom:24px; }
+.pp-school{ font-size:14px; color:#6d7381; margin:0 0 8px; }
+.pp-title{ font-size:24px; font-weight:700; color:#222631; margin:0 0 14px; line-height:1.35; }
+.pp-meta{ display:flex; flex-wrap:wrap; gap:8px 28px; font-size:15px; color:#3b3f4c; }
+.pp-meta span b{ color:#6d7381; font-weight:500; margin-right:8px; }
+.pp-q{ margin-bottom:28px; }
+.pp-q-t{ font-size:16px; font-weight:700; color:#222631; margin:0 0 10px; line-height:1.6; }
+.pp-q-a{ font-size:16px; color:#222631; line-height:1.9; margin:0; white-space:pre-wrap; padding-left:2px; }
+.pp-ft{ border-top:1px solid #dde1e8; margin-top:36px; padding-top:14px; font-size:13px; color:#9aa0ad; display:flex; justify-content:space-between; }
+
+.screen{ display:none; }
+.screen.active{ display:block; }
+
+/* ===== 토스트 ===== */
+.toast{ position:fixed; bottom:28px; left:50%; transform:translateX(-50%) translateY(12px); opacity:0; min-width:300px; max-width:520px; padding:15px 22px; border-radius:8px; display:flex; align-items:center; gap:12px; font-size:15px; font-weight:600; box-shadow:0 0 1px #2226314D, 0 4px 12px #00000026; z-index:9999; transition:opacity .2s ease, transform .2s ease; pointer-events:none; background:#319d64; color:#fff; }
+.toast.show{ opacity:1; transform:translateX(-50%) translateY(0); }
+.toast.err{ background:#c8404c; }
+
+/* ===== 푸터 ===== */
+.site-footer{ margin-top:auto; padding:48px 0 40px; display:flex; flex-direction:column; align-items:center; gap:16px; }
+.sf-links{ display:flex; align-items:center; }
+.sf-links a{ font-size:14px; color:#3b3f4c; padding:0 16px; }
+.sf-links a + a{ border-left:1px solid #dde1e8; }
+.sf-copy{ font-size:14px; color:#9aa0ad; }
+</style>
+</head>
+<body>
+
+<!-- ===== 헤더 ===== -->
+<header class="g-hd">
+  <button class="gh-menu-btn" onclick="toggleNav()"><i data-lucide="menu" style="width:20px;height:20px"></i></button>
+  <svg width="76" height="16" viewBox="0 0 76 16" fill="none" xmlns="http://www.w3.org/2000/svg" style="cursor:pointer"><path d="M11.3613 4.03516H4.09668V11.9629H8.88281L8.88086 11.9648H15.6016V16H4.02539C1.80242 15.9998 0 14.223 0 12.0322V3.96777C0 1.77696 1.80242 0.000177874 4.02539 0H15.4561L11.3613 4.03516ZM22.0703 11.9648H33.5781V16H22.002C19.7788 16 17.9756 14.2231 17.9756 12.0322V0H22.0703V11.9648ZM40.0459 16H35.9521V0H40.0459V16ZM54.5381 0C56.4564 0 58.0138 1.53228 58.0186 3.42285L58.0166 3.4248V8.54297C58.014 10.4333 56.4567 11.9648 54.5361 11.9648H46.5107L42.416 16V0H54.5381ZM71.9746 0C74.0086 0.000134956 75.6887 1.49046 75.958 3.42285H76V12.5771H75.958C75.6887 14.5095 74.011 15.9999 71.9746 16H64.4238C62.3897 16 60.7098 14.5096 60.4404 12.5771C60.4145 12.398 60.3984 12.2184 60.3984 12.0322V3.96777C60.3984 3.78159 60.4145 3.60205 60.4404 3.42285C60.7098 1.49037 62.3873 0 64.4238 0H71.9746ZM64.4922 12.5771H71.9062V3.42285H64.4922V12.5771ZM46.5107 3.42285V8.54004H53.9238V3.42285H46.5107Z" fill="#365EEF"/></svg>
+  <div class="g-hd-r">김서윤 학생 <i data-lucide="chevron-down" style="width:16px;height:16px"></i></div>
+</header>
+
+<!-- ===== 좌측 NB ===== -->
+<nav class="icon-sb" id="icon-sb">
+  <div class="si" onclick="location.href='student_home_v1_260729.html'"><div class="si-icon"><i data-lucide="home" style="width:20px;height:20px"></i></div><span class="si-label">홈</span><span class="si-tip">홈</span></div>
+  <div class="si active"><div class="si-icon"><i data-lucide="file-pen-line" style="width:20px;height:20px"></i></div><span class="si-label">과제</span><span class="si-tip">과제</span></div>
+  <div class="si" onclick="notReady('리포트')"><div class="si-icon"><i data-lucide="bar-chart-2" style="width:20px;height:20px"></i></div><span class="si-label">리포트</span><span class="si-tip">리포트</span></div>
+</nav>
+
+<div class="main-wrap">
+
+<!-- ═══════════════ ① 시작 전 안내 ═══════════════ -->
+<div id="scr-notice" class="screen">
+  <div class="page-wrap">
+    <button class="back-link" onclick="location.href='student_home_v1_260729.html'"><i data-lucide="chevron-left" style="width:18px;height:18px"></i>이전으로</button>
+    <h1 class="page-h1">과제 제출 및 확인</h1>
+    <p class="page-sub">과제 내용을 확인하고 직접 제출해 보세요.</p>
+
+    <div class="card">
+      <div class="task-top">
+        <span class="badge-subject">사회</span>
+        <span class="due">제출 마감 7월 30일(목) 16:00 · <b>내일 마감</b></span>
+      </div>
+      <h2 class="task-name">사회 변동과 현대사회의 문제 분석</h2>
+
+      <div class="task-guide">
+        <span class="gl">과제 안내</span>
+        수업 시간에 다룬 사회 변동 사례를 참고해 작성하세요. 문항마다 200자 이상 쓰는 것을 권장합니다. 참고 자료는 아래 파일에서 확인할 수 있어요.
+        <div><button class="guide-file" onclick="notReady('첨부 파일 열기')"><i data-lucide="paperclip" style="width:15px;height:15px"></i>사회 변동 참고자료.pdf</button></div>
+      </div>
+
+      <div class="rules">
+        <div class="rule">
+          <i data-lucide="list-checks"></i>
+          <p><b>문항 3개에 답을 작성해요.</b><span class="sub">작성 중인 내용은 자동으로 저장돼요.</span></p>
+        </div>
+        <div class="rule">
+          <i data-lucide="clipboard-x"></i>
+          <p><b>외부에서 복사한 내용은 붙여넣을 수 없어요.</b></p>
+        </div>
+        <div class="rule">
+          <i data-lucide="monitor-x"></i>
+          <p><b>다른 탭·창으로 이동하면 그 시각과 머문 시간이 기록돼요.</b><span class="sub">기록은 선생님께 전달돼요. 방문한 사이트는 수집하지 않아요.</span></p>
+        </div>
+      </div>
+
+      <div style="display:flex;justify-content:center;">
+        <button class="btn btn-primary btn-lg" onclick="go('write')">제출 시작</button>
+      </div>
+    </div>
+
+    <footer class="site-footer">
+      <div class="sf-links"><a href="#" onclick="return false;">회사소개</a><a href="#" onclick="return false;">이용약관</a><a href="#" onclick="return false;">개인정보처리방침</a><a href="#" onclick="return false;">고객센터</a></div>
+      <div class="sf-copy">© 2026. Datadriven Inc. All rights reserved.</div>
+    </footer>
+  </div>
+</div>
+
+<!-- ═══════════════ ② 작성 (직접 작성만) ═══════════════ -->
+<div id="scr-write" class="screen">
+  <div class="page-wrap">
+    <button class="back-link" onclick="location.href='student_home_v1_260729.html'"><i data-lucide="chevron-left" style="width:18px;height:18px"></i>이전으로</button>
+    <h1 class="page-h1">과제 제출 및 확인</h1>
+    <p class="page-sub">과제 내용을 확인하고 직접 제출해 보세요.</p>
+
+    <div id="leaveBanner">
+      <i data-lucide="timer"></i>
+      <div>
+        <p class="lb-t" id="lbTitle">다른 화면에 다녀왔어요 (32초)</p>
+        <p class="lb-d">이동한 시각과 머문 시간이 선생님께 기록돼요. 제출이 끝날 때까지 이 화면에 머물러 주세요.</p>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="task-top">
+        <span class="badge-subject">사회</span>
+        <span class="due">제출 마감 7월 30일(목) 16:00 · <b>내일 마감</b></span>
+      </div>
+      <h2 class="task-name">사회 변동과 현대사회의 문제 분석</h2>
+
+      <div class="task-guide" style="margin-bottom:20px;">
+        <span class="gl">과제 안내</span>
+        수업 시간에 다룬 사회 변동 사례를 참고해 작성하세요. 문항마다 200자 이상 쓰는 것을 권장합니다.
+        <div><button class="guide-file" onclick="notReady('첨부 파일 열기')"><i data-lucide="paperclip" style="width:15px;height:15px"></i>사회 변동 참고자료.pdf</button></div>
+      </div>
+
+      <div class="chip-row">
+        <span class="chip warn"><i data-lucide="clipboard-x"></i>복사 및 붙여넣기 불가</span>
+        <span class="chip"><i data-lucide="monitor-check"></i>다른 화면 이동 기록 중</span>
+        <span class="chip"><i data-lucide="save"></i>임시 저장 : <span id="savedAt">방금 전</span></span>
+      </div>
+
+      <div id="qList"></div>
+
+      <div class="actions">
+        <span class="act-note" id="progressNote"></span>
+        <button class="btn btn-outline" onclick="tempSave()"><i data-lucide="pencil-line" style="width:16px;height:16px"></i>임시 저장</button>
+        <button class="btn btn-primary" onclick="submitTask()"><i data-lucide="circle-check-big" style="width:16px;height:16px"></i>과제 제출</button>
+      </div>
+    </div>
+
+    <footer class="site-footer">
+      <div class="sf-links"><a href="#" onclick="return false;">회사소개</a><a href="#" onclick="return false;">이용약관</a><a href="#" onclick="return false;">개인정보처리방침</a><a href="#" onclick="return false;">고객센터</a></div>
+      <div class="sf-copy">© 2026. Datadriven Inc. All rights reserved.</div>
+    </footer>
+  </div>
+</div>
+
+<!-- ═══════════════ ③ 작성 + 파일 제출 (둘 다 허용) ═══════════════ -->
+<div id="scr-both" class="screen">
+  <div class="page-wrap">
+    <button class="back-link" onclick="location.href='student_home_v1_260729.html'"><i data-lucide="chevron-left" style="width:18px;height:18px"></i>이전으로</button>
+    <h1 class="page-h1">과제 제출 및 확인</h1>
+    <p class="page-sub">과제 내용을 확인하고 직접 제출해 보세요.</p>
+
+    <div class="card">
+      <div class="task-top">
+        <span class="badge-subject">사회</span>
+        <span class="due">제출 마감 7월 30일(목) 16:00 · <b>내일 마감</b></span>
+      </div>
+      <h2 class="task-name">사회 변동과 현대사회의 문제 분석</h2>
+
+      <div class="info" style="margin-top:18px;">
+        <i data-lucide="info"></i>
+        <p><b>직접 작성하거나 파일로 내거나, 편한 방법을 고르면 돼요.</b> 둘 다 내면 마지막에 낸 것으로 제출돼요.</p>
+      </div>
+
+      <div class="chip-row" style="margin-top:20px;">
+        <span class="chip warn"><i data-lucide="clipboard-x"></i>복사 및 붙여넣기 불가</span>
+        <span class="chip"><i data-lucide="monitor-check"></i>다른 화면 이동 기록 중</span>
+        <span class="chip"><i data-lucide="save"></i>임시 저장 : 방금 전</span>
+      </div>
+
+      <h3 class="card-title" style="font-size:18px;">직접 작성</h3>
+      <div id="qListBoth"></div>
+
+      <h3 class="card-title" style="font-size:18px;margin-top:28px;">파일로 제출</h3>
+      <div class="dropzone" onclick="notReady('파일 업로드')">
+        <div class="dz-ic"><i data-lucide="file-up" style="width:22px;height:22px"></i></div>
+        <div class="dz-main">클릭하거나 파일을 여기에 놓으세요</div>
+        <div class="dz-sub">PDF, JPG, PNG · 최대 2개</div>
+      </div>
+      <div class="file-row">
+        <i data-lucide="file-text" class="fi"></i>
+        <span class="file-nm">사회_과제_10101_김서윤.pdf</span>
+        <span class="file-sz">1.2MB</span>
+        <button class="file-x" onclick="notReady('파일 삭제')"><i data-lucide="x" style="width:18px;height:18px"></i></button>
+      </div>
+
+      <div class="actions">
+        <span class="act-note">아직 제출하지 않았어요.</span>
+        <button class="btn btn-outline" onclick="tempSave()"><i data-lucide="pencil-line" style="width:16px;height:16px"></i>임시 저장</button>
+        <button class="btn btn-primary" onclick="go('done')"><i data-lucide="circle-check-big" style="width:16px;height:16px"></i>과제 제출</button>
+      </div>
+    </div>
+
+    <footer class="site-footer">
+      <div class="sf-links"><a href="#" onclick="return false;">회사소개</a><a href="#" onclick="return false;">이용약관</a><a href="#" onclick="return false;">개인정보처리방침</a><a href="#" onclick="return false;">고객센터</a></div>
+      <div class="sf-copy">© 2026. Datadriven Inc. All rights reserved.</div>
+    </footer>
+  </div>
+</div>
+
+<!-- ═══════════════ ④ 파일 제출만 허용 ═══════════════ -->
+<div id="scr-fileonly" class="screen">
+  <div class="page-wrap">
+    <button class="back-link" onclick="location.href='student_home_v1_260729.html'"><i data-lucide="chevron-left" style="width:18px;height:18px"></i>이전으로</button>
+    <h1 class="page-h1">과제 제출 및 확인</h1>
+    <p class="page-sub">과제 내용을 확인하고 직접 제출해 보세요.</p>
+
+    <div class="card">
+      <div class="task-top">
+        <span class="badge-subject">사회</span>
+        <span class="due">제출 마감 7월 30일(목) 16:00 · <b>내일 마감</b></span>
+      </div>
+      <h2 class="task-name">사회 수행평가 보고서</h2>
+
+      <div class="task-guide" style="margin-bottom:22px;">
+        <span class="gl">과제 안내</span>
+        수업 시간에 나눠 준 활동지를 작성한 뒤, 사진을 찍거나 PDF로 만들어 올려 주세요.
+      </div>
+
+      <div class="dropzone" onclick="notReady('파일 업로드')">
+        <div class="dz-ic"><i data-lucide="file-up" style="width:22px;height:22px"></i></div>
+        <div class="dz-main">클릭하거나 파일을 여기에 놓으세요</div>
+        <div class="dz-sub">PDF, JPG, PNG · 최대 2개</div>
+      </div>
+
+      <div class="actions">
+        <span class="act-note">아직 제출하지 않았어요.</span>
+        <button class="btn btn-primary" disabled><i data-lucide="circle-check-big" style="width:16px;height:16px"></i>과제 제출</button>
+      </div>
+    </div>
+
+    <footer class="site-footer">
+      <div class="sf-links"><a href="#" onclick="return false;">회사소개</a><a href="#" onclick="return false;">이용약관</a><a href="#" onclick="return false;">개인정보처리방침</a><a href="#" onclick="return false;">고객센터</a></div>
+      <div class="sf-copy">© 2026. Datadriven Inc. All rights reserved.</div>
+    </footer>
+  </div>
+</div>
+
+<!-- ═══════════════ ⑤ 준비 중 (문항 미작성) ═══════════════ -->
+<div id="scr-preparing" class="screen">
+  <div class="page-wrap">
+    <button class="back-link" onclick="location.href='student_home_v1_260729.html'"><i data-lucide="chevron-left" style="width:18px;height:18px"></i>이전으로</button>
+    <h1 class="page-h1">과제 제출 및 확인</h1>
+    <p class="page-sub">과제 내용을 확인하고 직접 제출해 보세요.</p>
+
+    <div class="card">
+      <div class="task-top">
+        <span class="badge-subject">사회</span>
+        <span class="due">제출 마감 7월 30일(목) 16:00</span>
+      </div>
+      <h2 class="task-name">1학기 사회 논술형 평가</h2>
+
+      <div class="empty-state">
+        <div class="empty-ic"><i data-lucide="clock" style="width:28px;height:28px"></i></div>
+        <p class="empty-t">선생님이 문항을 준비하고 있어요</p>
+        <p class="empty-d">문항이 올라오면 여기에서 답을 쓸 수 있어요.<br>준비되면 알려 드릴게요.</p>
+      </div>
+    </div>
+
+    <footer class="site-footer">
+      <div class="sf-links"><a href="#" onclick="return false;">회사소개</a><a href="#" onclick="return false;">이용약관</a><a href="#" onclick="return false;">개인정보처리방침</a><a href="#" onclick="return false;">고객센터</a></div>
+      <div class="sf-copy">© 2026. Datadriven Inc. All rights reserved.</div>
+    </footer>
+  </div>
+</div>
+
+<!-- ═══════════════ ⑥ 제출 완료 ═══════════════ -->
+<div id="scr-done" class="screen">
+  <div class="page-wrap">
+    <button class="back-link" onclick="location.href='student_home_v1_260729.html'"><i data-lucide="chevron-left" style="width:18px;height:18px"></i>이전으로</button>
+    <h1 class="page-h1">과제 제출 및 확인</h1>
+    <p class="page-sub">과제 내용을 확인하고 직접 제출해 보세요.</p>
+
+    <div class="card">
+      <div class="done-wrap">
+        <div class="done-ic"><i data-lucide="check" style="width:32px;height:32px"></i></div>
+        <p class="done-t">제출했어요</p>
+        <p class="done-d">마감 전까지는 다시 제출할 수 있어요. 다시 제출하면 마지막에 낸 답안으로 바뀌어요.</p>
+
+        <div class="done-box">
+          <div class="done-row"><span class="done-lb">과제</span><span class="done-vl">사회 변동과 현대사회의 문제 분석</span></div>
+          <div class="done-row"><span class="done-lb">제출 시각</span><span class="done-vl">7월 29일(수) 15:24</span></div>
+          <div class="done-row"><span class="done-lb">제출 방법</span><span class="done-vl">직접 작성 · 문항 3개</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3 class="card-title">제출한 답안</h3>
+      <div id="ansList"></div>
+      <div class="actions">
+        <button class="btn btn-outline" onclick="go('write')"><i data-lucide="pencil-line" style="width:16px;height:16px"></i>다시 제출</button>
+        <button class="btn btn-primary" onclick="location.href='student_home_v1_260729.html'">과제 목록으로</button>
+      </div>
+    </div>
+
+    <footer class="site-footer">
+      <div class="sf-links"><a href="#" onclick="return false;">회사소개</a><a href="#" onclick="return false;">이용약관</a><a href="#" onclick="return false;">개인정보처리방침</a><a href="#" onclick="return false;">고객센터</a></div>
+      <div class="sf-copy">© 2026. Datadriven Inc. All rights reserved.</div>
+    </footer>
+  </div>
+</div>
+
+<!-- ═══════════════ ⑦ 교사가 받는 PDF ═══════════════ -->
+<div id="scr-pdf" class="screen">
+  <div class="page-wrap" style="max-width:940px;">
+    <h1 class="page-h1" style="margin-top:8px;">답안 PDF</h1>
+    <p class="page-sub">교사가 과제물 관리에서 학생 답안을 내려받으면 이 형태로 저장됩니다. 지금은 txt로만 받을 수 있어 이 화면이 신규 제안입니다.</p>
+
+    <div class="pdf-bar">
+      <i data-lucide="file-text"></i>
+      <span>10101_김서윤_사회 변동과 현대사회의 문제 분석.pdf</span>
+      <div class="pb-r">
+        <button onclick="notReady('인쇄')"><i data-lucide="printer" style="width:15px;height:15px"></i>인쇄</button>
+        <button onclick="notReady('저장')"><i data-lucide="download" style="width:15px;height:15px"></i>저장</button>
+      </div>
+    </div>
+
+    <div class="paper">
+      <div class="pp-hd">
+        <p class="pp-school">한국중학교 · 1학년 1반 · 사회</p>
+        <h2 class="pp-title">사회 변동과 현대사회의 문제 분석</h2>
+        <div class="pp-meta">
+          <span><b>학번</b>10101</span>
+          <span><b>이름</b>김서윤</span>
+          <span><b>제출 시각</b>2026. 7. 29. (수) 15:24</span>
+        </div>
+      </div>
+      <div id="pdfBody"></div>
+      <div class="pp-ft">
+        <span>CLIPO</span>
+        <span>1 / 1</span>
+      </div>
+    </div>
+
+    <footer class="site-footer">
+      <div class="sf-copy">© 2026. Datadriven Inc. All rights reserved.</div>
+    </footer>
+  </div>
+</div>
+
+</div>
+
+<div id="toast" class="toast"><i data-lucide="circle-check-big" style="width:20px;height:20px;flex-shrink:0;"></i><span id="toastMsg"></span></div>
+
+<script>
+/* ───────── 데이터 ───────── */
+var QUESTIONS = [
+  '현대사회의 변동 양상 중 한 가지를 골라, 그 변동이 나타나게 된 원인을 서술하시오.',
+  '1번에서 고른 변동으로 인해 나타난 사회 문제를 한 가지 들고, 그 문제가 사회에 미치는 영향을 서술하시오.',
+  '2번에서 든 사회 문제의 해결 방안을 제시하고, 그 방안이 효과적이라고 생각하는 이유를 쓰시오.'
+];
+var ANSWERS = [
+  '내가 고른 변동은 저출산·고령화이다. 이 변동이 나타난 원인은 크게 두 가지라고 생각한다. 첫째, 청년 세대가 안정된 일자리를 얻기까지 걸리는 시간이 길어지면서 결혼과 출산 시기가 함께 늦어졌다. 둘째, 자녀를 기르는 데 드는 비용이 빠르게 늘어나 부담이 커졌다.',
+  '저출산·고령화로 인해 생기는 문제 중 하나는 일할 사람이 줄어드는 것이다. 일하는 사람이 줄면 세금을 내는 사람도 줄어드는데, 돌봐야 할 노인은 늘어난다. 그래서 국가가 걷는 돈은 줄고 써야 하는 돈은 늘어나 부담이 한쪽으로 몰린다.',
+  ''
+];
+var currentScene = 'notice';
+var leaveStart = null, leaveType = null;
+
+/* ───────── 씬 전환 (해시 라우팅) ───────── */
+function go(scene){
+  currentScene = scene;
+  document.querySelectorAll('.screen').forEach(function(s){ s.classList.remove('active'); });
+  document.getElementById('scr-'+scene).classList.add('active');
+  if(location.hash !== '#'+scene) history.replaceState(null, '', '#'+scene);
+  if(scene === 'write')  renderQuestions('qList', true);
+  if(scene === 'both')   renderQuestions('qListBoth', false);
+  if(scene === 'done')   renderAnswers();
+  if(scene === 'pdf')    renderPdf();
+  window.scrollTo(0,0);
+  lucide.createIcons();
+}
+window.addEventListener('hashchange', function(){
+  var h = location.hash.slice(1);
+  if(h && document.getElementById('scr-'+h)) go(h);
+});
+
+/* ───────── 문항 렌더 ───────── */
+function renderQuestions(targetId, withProgress){
+  var box = document.getElementById(targetId);
+  box.innerHTML = '';
+  QUESTIONS.forEach(function(q, i){
+    var d = document.createElement('div');
+    d.className = 'q-block';
+    d.innerHTML =
+      '<div class="q-hd"><span class="q-no">문항 ' + (i+1) + '</span><p class="q-text"></p></div>'
+      + '<div class="editor">'
+      +   '<div class="ed-tool">'
+      +     '<button class="ed-btn" onclick="notReady(\'굵게\')"><i data-lucide="bold" style="width:16px;height:16px"></i></button>'
+      +     '<button class="ed-btn" onclick="notReady(\'기울임\')"><i data-lucide="italic" style="width:16px;height:16px"></i></button>'
+      +     '<button class="ed-btn" onclick="notReady(\'밑줄\')"><i data-lucide="underline" style="width:16px;height:16px"></i></button>'
+      +     '<span class="ed-div"></span>'
+      +     '<button class="ed-btn" onclick="notReady(\'글머리 기호\')"><i data-lucide="list" style="width:16px;height:16px"></i></button>'
+      +     '<button class="ed-btn" onclick="notReady(\'번호 매기기\')"><i data-lucide="list-ordered" style="width:16px;height:16px"></i></button>'
+      +     '<span class="ed-div"></span>'
+      +     '<button class="ed-btn" onclick="notReady(\'수식 입력\')"><i data-lucide="sigma" style="width:16px;height:16px"></i></button>'
+      +   '</div>'
+      +   '<textarea class="ed-ta" placeholder="여기에 답을 쓰세요." oninput="onAnswer(' + i + ', this)" onpaste="blockPaste(event)"></textarea>'
+      + '</div>'
+      + '<div class="q-foot"><span class="q-count"><b class="cnt">0</b>자</span><span class="q-empty-mark"><i data-lucide="circle-alert" style="width:14px;height:14px"></i>아직 안 썼어요</span></div>';
+    d.querySelector('.q-text').textContent = q;
+    var ta = d.querySelector('textarea');
+    ta.value = ANSWERS[i] || '';
+    d.querySelector('.cnt').textContent = (ANSWERS[i] || '').length;
+    box.appendChild(d);
+  });
+  if(withProgress) updateProgress();
+  lucide.createIcons();
+}
+
+function onAnswer(i, ta){
+  ANSWERS[i] = ta.value;
+  var block = ta.closest('.q-block');
+  block.querySelector('.cnt').textContent = ta.value.length;
+  block.classList.remove('miss');
+  updateProgress();
+}
+
+function blockPaste(e){
+  e.preventDefault();
+  toastMsg('외부에서 복사한 내용은 붙여넣을 수 없어요.', true);
+}
+
+function updateProgress(){
+  var note = document.getElementById('progressNote');
+  if(!note) return;
+  var done = ANSWERS.filter(function(a){ return a.trim() !== ''; }).length;
+  note.innerHTML = done === QUESTIONS.length
+    ? '문항 <b>' + QUESTIONS.length + '개</b>를 모두 썼어요.'
+    : '<b>' + done + '/' + QUESTIONS.length + '개</b> 작성했어요.';
+}
+
+/* ───────── 임시 저장 · 제출 ───────── */
+function tempSave(){
+  var el = document.getElementById('savedAt');
+  if(el) el.textContent = '방금 전';
+  toastMsg('임시 저장했어요.');
+}
+
+function submitTask(){
+  var missing = [];
+  ANSWERS.forEach(function(a, i){ if(a.trim() === '') missing.push(i); });
+  document.querySelectorAll('#qList .q-block').forEach(function(b, i){
+    b.classList.toggle('miss', missing.indexOf(i) > -1);
+  });
+  if(missing.length){
+    toastMsg('아직 안 쓴 문항이 ' + missing.length + '개 있어요.', true);
+    var first = document.querySelectorAll('#qList .q-block')[missing[0]];
+    if(first) first.scrollIntoView({ behavior:'smooth', block:'center' });
+    lucide.createIcons();
+    return;
+  }
+  go('done');
+}
+
+/* ───────── 제출한 답안 ───────── */
+function renderAnswers(){
+  var box = document.getElementById('ansList');
+  box.innerHTML = '';
+  QUESTIONS.forEach(function(q, i){
+    var d = document.createElement('div');
+    d.className = 'ans-view';
+    d.innerHTML = '<p class="ans-q"><span class="n">문항 ' + (i+1) + '.</span> </p><p class="ans-a"></p>';
+    d.querySelector('.ans-q').appendChild(document.createTextNode(q));
+    d.querySelector('.ans-a').textContent = ANSWERS[i] && ANSWERS[i].trim() !== '' ? ANSWERS[i] : '(작성하지 않음)';
+    box.appendChild(d);
+  });
+}
+
+/* ───────── PDF ───────── */
+function renderPdf(){
+  var box = document.getElementById('pdfBody');
+  box.innerHTML = '';
+  QUESTIONS.forEach(function(q, i){
+    var d = document.createElement('div');
+    d.className = 'pp-q';
+    d.innerHTML = '<p class="pp-q-t"></p><p class="pp-q-a"></p>';
+    d.querySelector('.pp-q-t').textContent = '문항 ' + (i+1) + '. ' + q;
+    d.querySelector('.pp-q-a').textContent = ANSWERS[i] && ANSWERS[i].trim() !== '' ? ANSWERS[i] : '(작성하지 않음)';
+    box.appendChild(d);
+  });
+}
+
+/* ───────── 다른 화면 이동 감지 (실제 브라우저 이벤트) ───────── */
+function onLeave(type){
+  if(currentScene !== 'write' || leaveStart) return;
+  leaveStart = Date.now(); leaveType = type;
+}
+function onReturn(){
+  if(!leaveStart) return;
+  var dur = Math.round((Date.now() - leaveStart) / 1000);
+  if(dur >= 3){
+    var b = document.getElementById('leaveBanner');
+    document.getElementById('lbTitle').textContent = '다른 화면에 다녀왔어요 (' + fmtDur(dur) + ')';
+    b.classList.add('show');
+    lucide.createIcons();
+  }
+  leaveStart = null; leaveType = null;
+}
+document.addEventListener('visibilitychange', function(){ document.hidden ? onLeave('탭 전환') : onReturn(); });
+window.addEventListener('blur',  function(){ if(!document.hidden) onLeave('다른 창 이동'); });
+window.addEventListener('focus', function(){ if(!document.hidden) onReturn(); });
+function fmtDur(s){ return s >= 60 ? Math.floor(s/60) + '분' + (s%60 ? ' ' + s%60 + '초' : '') : s + '초'; }
+
+/* ───────── 공통 ───────── */
+var _tt;
+function toastMsg(m, isErr){
+  var t = document.getElementById('toast');
+  document.getElementById('toastMsg').textContent = m;
+  t.classList.toggle('err', !!isErr);
+  t.classList.add('show');
+  clearTimeout(_tt);
+  _tt = setTimeout(function(){ t.classList.remove('show'); }, 2400);
+}
+function notReady(n){ toastMsg((n || '해당 기능') + '은(는) 이 목업에 포함되지 않았어요.'); }
+function toggleNav(){
+  document.getElementById('icon-sb').classList.toggle('expanded');
+  document.body.classList.toggle('nav-expanded');
+}
+
+/* ───────── 초기화 ───────── */
+var _h = location.hash.slice(1);
+go(_h && document.getElementById('scr-'+_h) ? _h : 'notice');
+</script>
+</body>
+</html>

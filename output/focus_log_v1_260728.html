@@ -366,7 +366,7 @@ body.nav-expanded .main-wrap{ padding-left:200px; }
                 <th style="min-width:98px;">최근 제출 일시</th>
                 <th>제출 상세</th>
                 <th style="width:150px;" id="thLeave">다른 화면 이동</th>
-                <th style="width:168px;">과제물 관리</th>
+                <th style="width:240px;">과제물 관리</th>
               </tr></thead>
               <tbody id="teacherTbody"></tbody>
             </table>
@@ -529,10 +529,18 @@ function renderTeacher(){
       leaveCell = '<button class="leave-cell-btn" onclick="toggleDetail(\''+r.id+'\')">'+label+' <i data-lucide="chevron-down" style="width:16px;height:16px;"></i></button>';
     }
 
-    /* 과제물 관리 셀 (Figma: 변경/삭제 · 업로드) */
-    const manageCell = isSubmit
-      ? '<button class="row-btn" onclick="notReady(\'변경/삭제\')"><i data-lucide="rotate-ccw"></i>변경/삭제</button>'
-      : '<button class="row-btn" onclick="notReady(\'업로드\')"><i data-lucide="upload"></i>업로드</button>';
+    /* 과제물 관리 셀 (Figma: 변경/삭제 · 업로드) + 직접 작성 답안 PDF 내려받기(신규) */
+    let manageCell;
+    if(!isSubmit){
+      manageCell = '<button class="row-btn" onclick="notReady(\'업로드\')"><i data-lucide="upload"></i>업로드</button>';
+    } else if(r.type === 'text'){
+      manageCell = '<div style="display:inline-flex;align-items:center;gap:2px;">'
+        + '<button class="row-btn" title="답안 PDF 내려받기" onclick="location.href=\'student_submit_v1_260729.html#pdf\'"><i data-lucide="file-down" style="width:20px;height:20px"></i>PDF</button>'
+        + '<button class="row-btn" onclick="notReady(\'변경/삭제\')"><i data-lucide="rotate-ccw"></i>변경/삭제</button>'
+        + '</div>';
+    } else {
+      manageCell = '<button class="row-btn" onclick="notReady(\'변경/삭제\')"><i data-lucide="rotate-ccw"></i>변경/삭제</button>';
+    }
 
     const tr = document.createElement('tr');
     tr.innerHTML = '<td><input type="checkbox" class="chk"></td>'
