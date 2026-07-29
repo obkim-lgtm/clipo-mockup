@@ -6,7 +6,7 @@
   <link rel="icon" type="image/png" href="clipo_favicon.png">
   <title>과제물 관리 — 과제물 인식 (CLIPO)</title>
   <!-- 라우트 선감지: #scoring 등으로 진입 시 과제물 화면 초기 깜빡임 방지 -->
-  <script>(function(){var h=location.hash,s=location.search;if((h&&h!=='#task')||/[?&]sdemo=/.test(s)||/[?&]nav=(form|uploadPdf|uploadBulk|uploadSurvey|run|ocrb|scoring)/.test(s)){document.documentElement.classList.add('route-nontask');}})();</script>
+  <script>(function(){var h=location.hash,s=location.search;if((h&&h!=='#task')||/[?&]s?demo=/.test(s)||/[?&]nav=(form|uploadPdf|uploadBulk|uploadSurvey|run|ocrb|scoring)/.test(s)){document.documentElement.classList.add('route-nontask');}})();</script>
   <style>html.route-nontask #screen-task{display:none!important;}</style>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard-gov.min.css">
   <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
@@ -4584,6 +4584,7 @@ function surveyShowCase(c) {
     b.style.borderColor = on ? '#416bff' : '#d9d9d9';
   });
   if (document.getElementById('survey-file-chip').style.display !== 'none') applySurveyCase();
+  if (typeof syncDemoNavs === 'function') syncDemoNavs(); // 까망이 활성 표시를 현재 케이스에 맞춤
 }
 function surveyFilePicked() {
   document.getElementById('survey-file-chip').style.display = 'flex';
@@ -5872,7 +5873,12 @@ function syncDemoNavs(){
   if (typeof window.mockNavSetCurrent === 'function') {
     var _mn = { 'screen-task':'task','screen-form':'form','screen-list':'listDetail','screen-bulkmatch':'uploadBulk','screen-survey-grade':'studentDetail','screen-scoring':'run','screen-ocr-b':'ocrbNormal' };
     var _r = _mn[id] || '';
-    if (id === 'screen-upload') { var _sv = document.getElementById('upload-state-survey'); _r = (_sv && _sv.style.display === 'block') ? 'uploadSurvey' : ''; }
+    if (id === 'screen-upload') {
+      var _sv = document.getElementById('upload-state-survey');
+      // 설문 업로드 화면은 데모 케이스(정상/양식 불일치/매칭 실패/제약 초과)까지 활성 표시
+      var _sc = { format:'surveyFormat', match:'surveyMatch', over:'surveyOver' };
+      _r = (_sv && _sv.style.display === 'block') ? (_sc[surveyCase] || 'uploadSurvey') : '';
+    }
     if (id === 'screen-ocr-b') { var _os = STUDENTS_B1[currentOcrBStudentIdx]; _r = (_os && _os.ocrStatus === 'processing') ? 'ocrbProgress' : (_os && _os.ocrStatus === 'failed') ? 'ocrbFail' : (_os && _os.ocrStatus === 'lowAccuracy') ? 'ocrbLow' : ((_os && _os.needsReview) ? 'ocrbReview' : 'ocrbNormal'); }
     window.mockNavSetCurrent(_r);
   }
@@ -6532,6 +6538,9 @@ function bmShowCase(key){
     form:         'task_ocr_v3_260623.html?nav=form',
     uploadPdf:    'task_ocr_v3_260623.html?nav=uploadPdf',
     uploadSurvey: 'task_ocr_v3_260623.html?nav=uploadSurvey',
+    surveyFormat: 'task_ocr_v3_260623.html?demo=5',
+    surveyMatch:  'task_ocr_v3_260623.html?demo=6',
+    surveyOver:   'task_ocr_v3_260623.html?demo=7',
     listDetail:   'task_ocr_v3_260623.html?nav=list',
     uploadBulk:   'task_ocr_v3_260623.html?nav=uploadBulk',
     run:          'task_ocr_v3_260623.html?nav=run',
@@ -6548,7 +6557,8 @@ function bmShowCase(key){
   };
   var GROUPS = [
     { t:'과제물 관리', ctx:'task', items:[['task','과제물 관리 목록'],['listDetail','학급 과제물 상세']] },
-    { t:'학급 일괄업로드 팝업', ctx:'task', items:[['uploadBulk','여러 파일 일괄 업로드']] }, // 설문 응답: 이번 배포 미포함(C-설문 일괄 업로드 별도 건)이라 내비 미노출 — ?nav=uploadSurvey 딥링크·모달 카드 진입은 유지
+    { t:'학급 일괄업로드 팝업', ctx:'task', items:[['uploadBulk','여러 파일 일괄 업로드']] },
+    { t:'설문 응답 업로드', ctx:'task', items:[['uploadSurvey','정상'],['surveyFormat','양식 불일치'],['surveyMatch','학생 매칭 실패'],['surveyOver','제약 초과']] },
     { t:'채점', ctx:'scoring', items:[['run','채점 실행'],['classDetail','학급 채점 현황']] },
     { t:'인식 결과 확인', ctx:'scoring', items:[['ocrbNormal','정상'],['ocrbProgress','인식 진행 중'],['ocrbReview','확인 필요'],['ocrbLow','인식 정확도 낮음'],['ocrbFail','인식 실패']] },
     { t:'학생 채점 상세', ctx:'scoring', items:[['studentDetail','초등'],['caseSecondaryCur','중고등 (현재 버전)'],['caseSecondaryInline','중고등 (인라인 수정)'],['caseTyping','과제 입력 제출']] }
