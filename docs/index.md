@@ -11,6 +11,7 @@
 - 최근 작업 맥락이 필요하면 → [sessions/](sessions/) 최신 2일치
 - **새 화면/컴포넌트 그리기 전(고정 요소·토큰·타이포·컴포넌트·개발 화면 기준) → [design-system.md](design-system.md)** (권위 소스 output/*.html 복제·확장, 새로 짜지 말 것)
 - **라벨·문구·UI 패턴 만들거나 바꾸기 전(일관성·인라인·변경 영향 범위 grep) → [workflow.md](workflow.md)**
+- **목업 내비게이터(까망이)에 화면·케이스 추가하거나 케이스 선택기 만들기 전 → [mockup-navigator.md](mockup-navigator.md)** (전용 패널 금지·진입 항목→케이스 그룹·딥링크·다중 파일 동기화)
 - **크레딧·이용권 UI 작업 전(유형·소진순서·유효기간·환불) → (Notion) "CLIPO 크레딧 정책 (26.07.21)" · 화면 기준 output/subscription_manage_v1_260513.html · PRD "C-이용권 관리·AI 크레딧 모달 개편"**
 - 다른 PC 인수인계 / 연수 이관 안내(연수는 clipo_training 프로젝트 소유) → [ops.md](ops.md)
 - 목업 작업 방식·산출물 구성 요약 → ../CLAUDE.md
