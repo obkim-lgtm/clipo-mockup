@@ -190,6 +190,23 @@ body.pdf-mode .sf-copy{ color:#8b8f9c; }
 .screen{ display:none; }
 .screen.active{ display:block; }
 
+/* ===== 확인 모달 ===== */
+.md-ov{ display:none; position:fixed; inset:0; background:rgba(34,38,49,.45); z-index:2500; align-items:center; justify-content:center; padding:40px 20px; }
+.md-ov.show{ display:flex; }
+.md{ background:#fff; border-radius:14px; width:100%; max-width:460px; box-shadow:0 20px 50px rgba(0,0,0,.25); overflow:hidden; }
+.md-body{ padding:32px 32px 24px; text-align:center; }
+.md-ic{ width:56px; height:56px; border-radius:50%; background:#fff7ed; color:#ea580c; display:inline-flex; align-items:center; justify-content:center; margin-bottom:18px; }
+.md-ic i, .md-ic svg{ width:26px; height:26px; }
+.md-t{ font-size:20px; font-weight:700; color:#222631; margin:0 0 10px; line-height:1.45; }
+.md-d{ font-size:16px; color:#3b3f4c; margin:0; line-height:1.7; }
+.md-names{ background:#f6f7f9; border-radius:8px; padding:12px 16px; margin-top:16px; font-size:15px; font-weight:600; color:#c2410c; line-height:1.6; }
+.md-ft{ display:flex; gap:10px; padding:0 32px 28px; }
+.md-ft button{ flex:1; height:48px; border-radius:9999px; font-size:16px; font-weight:600; font-family:inherit; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; line-height:1; vertical-align:middle; }
+.md-cancel{ border:1px solid #d9d9d9; background:#fff; color:#3b3f4c; }
+.md-cancel:hover{ background:#f6f7f9; }
+.md-ok{ border:none; background:#416bff; color:#fff; }
+.md-ok:hover{ background:#365eef; }
+
 /* ===== 목업 내비게이터 (화면 밖 · 드래그 가능) ===== */
 #mockpick{ position:fixed; left:24px; bottom:24px; z-index:3000; background:#1F2233; border-radius:14px; padding:8px; box-shadow:0 10px 30px rgba(0,0,0,.35); width:max-content; max-width:340px; cursor:move; user-select:none; }
 #mockpick .mp-head{ font-size:11px; font-weight:700; color:#8A8FB0; letter-spacing:.04em; display:flex; align-items:center; justify-content:space-between; gap:16px; padding:6px 8px; cursor:pointer; }
@@ -555,6 +572,22 @@ body.pdf-mode .sf-copy{ color:#8b8f9c; }
 
 <div id="toast" class="toast"><i data-lucide="circle-check-big" style="width:20px;height:20px;flex-shrink:0;"></i><span id="toastMsg"></span></div>
 
+<!-- 빈 문항 확인 모달 -->
+<div class="md-ov" id="missModal" onclick="if(event.target===this) closeMiss()">
+  <div class="md">
+    <div class="md-body">
+      <div class="md-ic"><i data-lucide="circle-alert"></i></div>
+      <p class="md-t">아직 안 쓴 문항이 있어요</p>
+      <p class="md-d">이대로 제출하면 빈 문항은 답을 쓰지 않은 것으로 선생님께 전달돼요.<br>마감 전까지는 다시 제출할 수 있어요.</p>
+      <div class="md-names" id="missNames"></div>
+    </div>
+    <div class="md-ft">
+      <button class="md-cancel" onclick="closeMiss()">계속 쓰기</button>
+      <button class="md-ok" onclick="confirmSubmit()">이대로 제출</button>
+    </div>
+  </div>
+</div>
+
 <!-- 목업 내비게이터 -->
 <div id="mockpick">
   <div class="mp-head" onclick="mpToggle()"><span>목업 내비게이터 · 학생 과제 제출 (CLIPO)</span><span id="mpArrow">▾</span></div>
@@ -685,21 +718,38 @@ function tempSave(){
   toastMsg('임시 저장했어요.');
 }
 
+/* 빈 문항이 있어도 제출은 되지만, 한 번 확인받는다 */
 function submitTask(){
   var missing = [];
   ANSWERS.forEach(function(a, i){ if(a.trim() === '') missing.push(i); });
   document.querySelectorAll('#qList .q-block').forEach(function(b, i){
     b.classList.toggle('miss', missing.indexOf(i) > -1);
   });
+  lucide.createIcons();
+
   if(missing.length){
-    toastMsg('아직 안 쓴 문항이 ' + missing.length + '개 있어요.', true);
-    var first = document.querySelectorAll('#qList .q-block')[missing[0]];
-    if(first) first.scrollIntoView({ behavior:'smooth', block:'center' });
+    document.getElementById('missNames').textContent =
+      '문항 ' + missing.map(function(i){ return i + 1; }).join(', ') + '번을 아직 안 썼어요';
+    document.getElementById('missModal').classList.add('show');
     lucide.createIcons();
     return;
   }
   go('done');
 }
+function closeMiss(){
+  document.getElementById('missModal').classList.remove('show');
+  var first = document.querySelector('#qList .q-block.miss');
+  if(first){
+    first.scrollIntoView({ behavior:'smooth', block:'center' });
+    var ta = first.querySelector('.ed-ta');
+    if(ta) setTimeout(function(){ ta.focus(); }, 400);
+  }
+}
+function confirmSubmit(){
+  document.getElementById('missModal').classList.remove('show');
+  go('done');
+}
+document.addEventListener('keydown', function(e){ if(e.key === 'Escape') closeMiss(); });
 
 /* ───────── 제출한 답안 ───────── */
 function renderAnswers(targetId){
