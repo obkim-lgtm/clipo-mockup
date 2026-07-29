@@ -1498,12 +1498,28 @@ var Q_MAX = 10;
 var SUBMITTED = 0;
 function setSubmitted(n){
   SUBMITTED = n;
-  if(n > 0 && QUESTIONS.length === 0) QUESTIONS = Q_SAMPLE.slice();
+  /* 제출이 들어왔다는 건 설계가 저장되고 직접 작성이 켜진 상태라는 뜻 */
+  if(n > 0){
+    if(QUESTIONS.length === 0) QUESTIONS = Q_SAMPLE.slice();
+    document.getElementById('way-write').classList.add('on');
+    document.getElementById('way-none').style.display = 'none';
+  }
   document.querySelectorAll('#mockjump .mj-btn[data-sub]').forEach(function(b){
     b.classList.toggle('on', (b.getAttribute('data-sub') === 'yes') === (n > 0));
   });
   renderQuestions();
   updateSummary();
+
+  /* 지금 목록에 있으면 변화가 안 보이므로 설계 상세로 데려간다 */
+  var onList = document.getElementById('scr-list').classList.contains('active');
+  if(onList) go('design');
+  toastMsg(n > 0
+    ? '학생 ' + n + '명이 제출한 상태예요. 문항이 잠깁니다.'
+    : '아직 제출이 없는 상태예요. 문항을 수정할 수 있어요.');
+  setTimeout(function(){
+    var el = document.getElementById('qsum');
+    if(el) el.scrollIntoView({ behavior:'smooth', block:'center' });
+  }, 120);
 }
 var Q_SAMPLE = [
   '현대사회의 변동 양상 중 한 가지를 골라, 그 변동이 나타나게 된 원인을 서술하시오.',
