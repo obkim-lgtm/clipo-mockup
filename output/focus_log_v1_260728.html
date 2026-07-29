@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="icon" type="image/png" href="clipo_favicon.png">
-<title>화면 이탈 집중 로그 — 컨셉 목업 (CLIPO)</title>
+<title>다른 화면 이동 기록 — 컨셉 목업 (CLIPO)</title>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard-gov.min.css">
 <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
 <style>
@@ -117,6 +117,12 @@ body.nav-expanded .main-wrap{ padding-left:200px; }
 .info-box i{ width:20px; height:20px; color:#416bff; flex-shrink:0; margin-top:2px; }
 .info-box p{ margin:0; font-size:15px; color:#3b3f4c; line-height:1.65; font-weight:500; }
 
+/* ===== 기록 상태 표시 (읽기 전용 — 설정은 평가 설계에서) ===== */
+.rec-state{ display:inline-flex; align-items:center; gap:6px; height:28px; padding:0 12px; border-radius:100px; background:#eef0f3; color:#3b3f4c; font-size:13px; font-weight:600; line-height:1; white-space:nowrap; flex-shrink:0; }
+.rec-state i{ width:14px; height:14px; color:#6d7381; }
+.rec-state.off{ color:#9aa0ad; }
+.rec-state.off i{ color:#b3b6bd; }
+
 /* ===== 토글 ===== */
 .toggle{ display:inline-flex; align-items:center; gap:8px; cursor:pointer; user-select:none; }
 .toggle input{ display:none; }
@@ -213,7 +219,7 @@ body.nav-expanded .main-wrap{ padding-left:200px; }
         </div>
         <div class="stu-rule">
           <i data-lucide="monitor-x"></i>
-          <p><b>다른 탭·창으로 이동하면 화면을 벗어난 시각과 시간이 기록돼요.</b><br><span class="sub">기록은 선생님께 전달돼요. 방문한 사이트는 수집하지 않아요.</span></p>
+          <p><b>다른 탭·창으로 이동하면 그 시각과 머문 시간이 기록돼요.</b><br><span class="sub">기록은 선생님께 전달돼요. 방문한 사이트는 수집하지 않아요.</span></p>
         </div>
         <div class="stu-rule">
           <i data-lucide="clipboard-x"></i>
@@ -243,15 +249,15 @@ body.nav-expanded .main-wrap{ padding-left:200px; }
     <div id="leaveBanner">
       <i data-lucide="timer"></i>
       <div>
-        <p class="lb-title" id="lbTitle">제출 화면을 벗어났다가 돌아왔어요 (32초)</p>
-        <p class="lb-desc">벗어난 시각과 시간이 선생님께 기록돼요. 제출이 끝날 때까지 이 화면에 머물러 주세요.</p>
+        <p class="lb-title" id="lbTitle">다른 화면에 다녀왔어요 (32초)</p>
+        <p class="lb-desc">이동한 시각과 머문 시간이 선생님께 기록돼요. 제출이 끝날 때까지 이 화면에 머물러 주세요.</p>
       </div>
     </div>
 
     <div class="stu-card">
       <div style="display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:20px;">
         <h2 style="font-size:20px;font-weight:700;color:#222631;margin:0;">주장하는 글 쓰기</h2>
-        <span class="rec-chip"><i data-lucide="monitor-check"></i>화면 이탈 기록 중</span>
+        <span class="rec-chip"><i data-lucide="monitor-check"></i>다른 화면 이동 기록 중</span>
       </div>
 
       <div style="background:#f6f7f9;border-radius:8px;padding:16px 20px;margin-bottom:20px;">
@@ -338,20 +344,16 @@ body.nav-expanded .main-wrap{ padding-left:200px; }
         </div>
 
         <!-- 화면 이탈 기록 안내 (신규 제안: 영향 필드 앞에 설명) -->
-        <div class="info-box">
+        <div class="info-box" id="leaveInfo">
           <i data-lucide="info"></i>
-          <p>화면 이탈 기록은 학생이 제출 화면에서 <b>다른 탭·창으로 이동한 시각과 시간</b>이에요. 방문한 사이트는 수집하지 않고, 스마트폰 등 다른 기기 사용은 감지되지 않아요. 자동 판정이나 감점 없이 <b>참고 정보로만</b> 제공돼요.</p>
+          <p>다른 화면 이동 기록은 학생이 제출 화면에서 <b>다른 탭·창으로 이동한 시각과 머문 시간</b>이에요. 방문한 사이트는 수집하지 않고, 스마트폰 등 다른 기기 사용은 감지되지 않아요. 자동 판정이나 감점 없이 <b>참고 정보로만</b> 제공돼요.</p>
         </div>
 
         <!-- 학생 제출 현황 카드 -->
         <div class="ev-card">
           <div style="display:flex;align-items:center;justify-content:space-between;gap:16px;">
             <h3 style="font-size:18px;font-weight:600;color:#18181b;margin:0;">학생 제출 현황 <span style="font-size:15px;color:#6d7381;font-weight:500;">6/9명 제출</span></h3>
-            <label class="toggle">
-              <input type="checkbox" id="focusToggle" checked onchange="toggleFocusLog(this.checked)">
-              <span class="toggle-track"><span class="toggle-thumb"></span></span>
-              <span class="toggle-label">화면 이탈 기록</span>
-            </label>
+            <span class="rec-state" id="recState"><i data-lucide="monitor-check"></i>다른 화면 이동 기록 켜짐</span>
           </div>
 
           <div class="tbl-wrap">
@@ -363,14 +365,14 @@ body.nav-expanded .main-wrap{ padding-left:200px; }
                 <th style="width:98px;">상태</th>
                 <th style="min-width:98px;">최근 제출 일시</th>
                 <th>제출 상세</th>
-                <th style="width:150px;">화면 이탈</th>
+                <th style="width:150px;" id="thLeave">다른 화면 이동</th>
                 <th style="width:168px;">과제물 관리</th>
               </tr></thead>
               <tbody id="teacherTbody"></tbody>
             </table>
           </div>
 
-          <p id="toggleOffNote" style="display:none;margin:-6px 0 0;font-size:14px;font-weight:500;color:#6d7381;">이 과제는 화면 이탈 기록이 꺼져 있어요. 다음 제출부터 기록하려면 켜 주세요.</p>
+          <p id="toggleOffNote" style="display:none;margin:-6px 0 0;font-size:14px;font-weight:500;color:#6d7381;">이 과제는 다른 화면 이동 기록을 사용하지 않아요. 기록은 평가 설계에서 과제를 만들 때 켤 수 있어요.</p>
         </div>
       </div>
     </div>
@@ -387,19 +389,22 @@ body.nav-expanded .main-wrap{ padding-left:200px; }
 
 <!-- 목업 내비게이터 -->
 <div id="mockpick">
-  <div class="mp-head" onclick="mpToggle(event)"><span>목업 내비게이터 · 화면 이탈 집중 로그 (CLIPO)</span><span id="mpArrow">▾</span></div>
+  <div class="mp-head" onclick="mpToggle(event)"><span>목업 내비게이터 · 다른 화면 이동 기록 (CLIPO)</span><span id="mpArrow">▾</span></div>
   <div class="mp-body" id="mpBody">
     <div class="mp-cap">화면 선택</div>
     <button class="mp-btn" data-scene="student-notice" onclick="go('student-notice')">① 학생 · 제출 시작<span class="mp-sub">사전 고지</span></button>
-    <button class="mp-btn" data-scene="student-write" onclick="go('student-write')">② 학생 · 제출 중<span class="mp-sub">이탈 감지 — 실제 동작</span></button>
-    <button class="mp-btn" data-scene="teacher-log" onclick="go('teacher-log')">③ 교사 · 과제 제출 현황<span class="mp-sub">직접 제출 화면 + 이탈 로그</span></button>
+    <button class="mp-btn" data-scene="student-write" onclick="go('student-write')">② 학생 · 제출 중<span class="mp-sub">이동 감지 — 실제 동작</span></button>
+    <button class="mp-btn" data-scene="teacher-log" onclick="go('teacher-log')">③ 교사 · 과제 제출 현황<span class="mp-sub">직접 제출 화면 + 이동 기록</span></button>
     <div id="mpDemo" style="display:none;">
       <div class="mp-cap">라이브 데모</div>
       <div class="mp-note">②번 화면에서 <b style="color:#C9CCE0;">실제로 다른 탭에 갔다가 돌아와 보세요</b> — 브라우저 이벤트로 감지해 배너와 기록이 남아요. 3초 미만은 기록되지 않아요.</div>
-      <div class="mp-feed" id="mpFeed"><div class="mp-feed-item mute"><b>대기 중</b> — 아직 이탈 기록이 없어요.</div></div>
+      <div class="mp-feed" id="mpFeed"><div class="mp-feed-item mute"><b>대기 중</b> — 아직 이동 기록이 없어요.</div></div>
       <div class="mp-note" id="mpTotal">김서윤 누적: 0회 · 0초 → ③ 교사 화면에 반영됨</div>
     </div>
-    <div class="mp-note">※ ③ 교사 화면은 피그마 직접 제출 시안(295-7609) 기준. "화면 이탈" 열과 안내·토글만 신규 제안이에요. 학생 화면(①·②)은 컨셉 시안.</div>
+    <div class="mp-cap">과제 설정 (평가 설계에서 정함)</div>
+    <button class="mp-btn on" data-rec="on" onclick="toggleFocusLog(true)">기록 켠 과제<span class="mp-sub">열·안내 표시</span></button>
+    <button class="mp-btn" data-rec="off" onclick="toggleFocusLog(false)">기록 끈 과제<span class="mp-sub">열 자체가 없음</span></button>
+    <div class="mp-note">※ ③ 교사 화면은 피그마 직접 제출 시안(295-7609) 기준. "다른 화면 이동" 열과 안내가 신규 제안이에요. 기록 켜고 끄기는 <b style="color:#C9CCE0;">평가 설계</b>에서만 정하고, 이 화면은 결과만 보여줍니다. 학생 화면(①·②)은 컨셉 시안.</div>
   </div>
 </div>
 
@@ -449,7 +454,7 @@ window.addEventListener('focus', ()=>{ if(!document.hidden) onReturn(); });
 
 function showBanner(dur){
   const b = document.getElementById('leaveBanner');
-  document.getElementById('lbTitle').textContent = '제출 화면을 벗어났다가 돌아왔어요 ('+fmtDur(dur)+')';
+  document.getElementById('lbTitle').textContent = '다른 화면에 다녀왔어요 ('+fmtDur(dur)+')';
   b.classList.add('show');
   lucide.createIcons();
 }
@@ -535,7 +540,7 @@ function renderTeacher(){
       + '<td>'+(isSubmit?'<span class="b-submit">제출 완료</span>':'<span class="b-absent">미제출</span>')+'</td>'
       + '<td>'+(isSubmit? r.date : '-')+'</td>'
       + '<td>'+detailCell+'</td>'
-      + '<td>'+leaveCell+'</td>'
+      + (focusLogOn ? '<td>'+leaveCell+'</td>' : '')
       + '<td>'+manageCell+'</td>';
     tb.appendChild(tr);
 
@@ -547,9 +552,9 @@ function renderTeacher(){
         return '<div class="leave-evt"><span class="leave-evt-time">'+e.time.slice(0,5)+'</span><span class="leave-evt-type"><i data-lucide="external-link" style="width:13px;height:13px;"></i>'+e.type+'</span><span class="leave-evt-dur">'+fmtDur(e.dur)+'</span></div>';
       }).join('');
       dtr.innerHTML = '<td colspan="8"><div class="leave-detail-inner">'
-        + '<p style="margin:0 0 6px;font-size:14px;font-weight:600;color:#3b3f4c;">'+r.name+' · 화면 이탈 기록</p>'
+        + '<p style="margin:0 0 6px;font-size:14px;font-weight:600;color:#3b3f4c;">'+r.name+' · 다른 화면 이동 기록</p>'
         + evHtml
-        + '<p style="margin:10px 0 0;font-size:13px;font-weight:500;color:#9aa0ad;">3초 미만 이탈은 기록되지 않아요.</p>'
+        + '<p style="margin:10px 0 0;font-size:13px;font-weight:500;color:#9aa0ad;">3초 미만 이동은 기록되지 않아요.</p>'
         + '</div></td>';
       tb.appendChild(dtr);
     }
@@ -560,7 +565,16 @@ function toggleDetail(id){ openRow = (openRow===id) ? null : id; renderTeacher()
 function toggleFocusLog(on){
   focusLogOn = on; openRow = null;
   document.getElementById('toggleOffNote').style.display = on ? 'none' : 'block';
+  document.getElementById('thLeave').style.display = on ? '' : 'none';
+  document.getElementById('leaveInfo').style.display = on ? 'flex' : 'none';
+  var st = document.getElementById('recState');
+  st.classList.toggle('off', !on);
+  st.innerHTML = '<i data-lucide="' + (on ? 'monitor-check' : 'monitor-off') + '"></i>다른 화면 이동 기록 ' + (on ? '켜짐' : '꺼짐');
+  document.querySelectorAll('#mockpick .mp-btn[data-rec]').forEach(function(b){
+    b.classList.toggle('on', (b.getAttribute('data-rec') === 'on') === on);
+  });
   renderTeacher();
+  lucide.createIcons();
 }
 function toggleNav(){
   document.getElementById('icon-sb').classList.toggle('expanded');
