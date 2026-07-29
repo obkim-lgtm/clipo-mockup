@@ -309,7 +309,9 @@
 
     /* ===== 씬 전환 ===== */
     .screen{ display:none; }
-    .screen.active{ display:block; }
+    /* 푸터가 화면 아래에 붙도록 씬 → page-wrap을 세로 flex로 */
+    .screen.active{ display:flex; flex-direction:column; min-height:calc(100vh - 58px); }
+    .screen.active > .page-wrap{ flex:1; display:flex; flex-direction:column; width:100%; }
 
     /* ===== 제출 방식 블록 (신규 재구성) ===== */
     .way{ border:1px solid #d9d9d9; border-radius:10px; overflow:hidden; margin-bottom:12px; background:#fff; }
@@ -400,7 +402,9 @@
     .ds-icon-btn:hover{ background:#f6f7f9; }
     /* 문항 미작성 배지 (신규) */
     .ds-warn{ display:inline-flex; align-items:center; justify-content:center; gap:5px; height:26px; padding:0 10px; border-radius:6px; background:#fff3f4; color:#ab303a; font-size:13px; font-weight:600; line-height:1; white-space:nowrap; align-self:flex-start; }
-    .ds-warn i{ width:14px; height:14px; }
+    .ds-warn i, .ds-warn svg{ width:14px; height:14px; }
+    .ds-tag{ display:inline-flex; align-items:center; justify-content:center; gap:5px; height:26px; padding:0 10px; border-radius:6px; background:#f1f3f5; color:#3b3f4c; font-size:13px; font-weight:600; line-height:1; white-space:nowrap; align-self:flex-start; }
+    .ds-tag i, .ds-tag svg{ width:14px; height:14px; color:#6d7381; }
 
     .site-footer{ margin-top:auto; padding:48px 0 40px; display:flex; flex-direction:column; align-items:center; gap:16px; }
     .sf-links{ display:flex; align-items:center; }
@@ -861,7 +865,7 @@
     </div>
 
     <div class="ds-grid">
-      <div class="ds-card" onclick="go('design')">
+      <div class="ds-card" onclick="openDesign(0)">
         <div>
           <div class="ds-title">사회 변동과 현대사회의 문제 분석</div>
           <div id="ds-warn-slot" style="margin-top:10px;"></div>
@@ -876,8 +880,24 @@
         </div>
       </div>
 
+      <!-- 케이스: 학생이 이미 제출함 → 문항 잠김 -->
+      <div class="ds-card" onclick="openDesign(3)">
+        <div>
+          <div class="ds-title">2학기 중간 수행평가 — 사회 변동 서술</div>
+          <div style="margin-top:10px;"><span class="ds-tag"><i data-lucide="lock" style="width:14px;height:14px"></i>학생 3명 제출함 · 문항 잠김</span></div>
+        </div>
+        <div class="ds-meta">
+          <span class="ds-meta-txt">26.07.27 수정됨 · 교내 공개</span>
+          <div class="ds-icons">
+            <button class="ds-icon-btn" onclick="event.stopPropagation();notReady('평가계획으로 저장')" title="평가계획으로 저장"><i data-lucide="file-output" style="width:16px;height:16px;"></i></button>
+            <button class="ds-icon-btn" onclick="event.stopPropagation();notReady('다운로드')" title="다운로드"><i data-lucide="download" style="width:16px;height:16px;"></i></button>
+            <button class="ds-icon-btn" onclick="event.stopPropagation();notReady('삭제')" title="삭제"><i data-lucide="trash-2" style="width:16px;height:16px;"></i></button>
+          </div>
+        </div>
+      </div>
+
       <!-- 케이스: 저장 완료 + 문항 미작성 (과제는 시작되는데 문항만 빈 상태) -->
-      <div class="ds-card" onclick="go('design')">
+      <div class="ds-card" onclick="openDesign(0)">
         <div>
           <div class="ds-title">1학기 사회 논술형 평가</div>
           <div style="margin-top:10px;"><span class="ds-warn"><i data-lucide="circle-alert" style="width:14px;height:14px"></i>문항 미작성</span></div>
@@ -893,7 +913,7 @@
       </div>
 
       <!-- 케이스: 임시 저장 (배지 없음) -->
-      <div class="ds-card" onclick="go('design')">
+      <div class="ds-card" onclick="openDesign(0)">
         <div class="ds-title">2학기 사회 서술형 평가</div>
         <div class="ds-meta">
           <span class="ds-meta-txt temp">임시 저장됨</span>
@@ -905,7 +925,7 @@
         </div>
       </div>
 
-      <div class="ds-card" onclick="go('design')">
+      <div class="ds-card" onclick="openDesign(0)">
         <div class="ds-title">선생님 업로드 평가</div>
         <div class="ds-meta">
           <span class="ds-meta-txt">26.06.05 수정됨 · 교내 공개</span>
@@ -917,7 +937,7 @@
         </div>
       </div>
 
-      <div class="ds-card" onclick="go('design')">
+      <div class="ds-card" onclick="openDesign(0)">
         <div class="ds-title">학생 업로드 평가</div>
         <div class="ds-meta">
           <span class="ds-meta-txt">26.06.05 수정됨 · 교내 공개</span>
@@ -942,16 +962,12 @@
 <div id="mockjump" style="position:fixed;left:24px;bottom:24px;z-index:3000;background:#1F2233;border-radius:14px;padding:8px;box-shadow:0 10px 30px rgba(0,0,0,.35);width:max-content;max-width:320px;cursor:move;user-select:none;">
   <div style="font-size:11px;font-weight:700;color:#8A8FB0;letter-spacing:.04em;padding:6px 8px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:16px;" onclick="mjToggle()"><span>목업 내비게이터 · 학생 직접 작성 (CLIPO)</span><span id="mjArrow">▾</span></div>
   <div id="mjBody" style="display:flex;flex-direction:column;gap:6px;margin-top:6px;">
-    <div style="font-size:10px;font-weight:700;color:#6B6F8C;letter-spacing:.05em;padding:7px 8px 2px;">제출 상태</div>
-    <button class="mj-btn on" data-sub="no" onclick="setSubmitted(0)">제출 전<span class="mj-sub">문항 수정 가능</span></button>
-    <button class="mj-btn" data-sub="yes" onclick="setSubmitted(3)">3명 제출함<span class="mj-sub">문항 잠김</span></button>
-
     <div style="font-size:10px;font-weight:700;color:#6B6F8C;letter-spacing:.05em;padding:7px 8px 2px;">이어지는 화면</div>
     <button class="mj-btn" onclick="location.href='student_home_v1_260729.html'">학생 · 과제 홈<span class="mj-sub">할 일 우선 재배열</span></button>
     <button class="mj-btn" onclick="location.href='student_submit_v1_260729.html'">학생 · 과제 제출<span class="mj-sub">문항형 · 이동 감지</span></button>
     <button class="mj-btn" onclick="location.href='focus_log_v1_260728.html#teacher-log'">교사 · 과제물 관리<span class="mj-sub">제출 현황 · 답안 PDF</span></button>
     <button class="mj-btn" onclick="location.href='scoring_direct_write_v1_260729.html'">교사 · 학생 채점 상세<span class="mj-sub">답안이 문항 단위로 보임</span></button>
-    <div style="font-size:11px;font-weight:500;color:#8A8FB0;line-height:1.55;padding:6px 8px 4px;max-width:290px;white-space:normal;">※ 이 파일 안에서는 목록 · 설계 상세 · 문항 작성이 버튼으로 이어져 있어요.</div>
+    <div style="font-size:11px;font-weight:500;color:#8A8FB0;line-height:1.55;padding:6px 8px 4px;max-width:290px;white-space:normal;">※ 목록의 카드마다 상태가 달라요. <b style="color:#C9CCE0;">2학기 중간 수행평가</b>는 학생이 이미 제출해 문항이 잠긴 과제입니다.</div>
   </div>
 </div>
 <style>
@@ -1504,22 +1520,14 @@ function setSubmitted(n){
     document.getElementById('way-write').classList.add('on');
     document.getElementById('way-none').style.display = 'none';
   }
-  document.querySelectorAll('#mockjump .mj-btn[data-sub]').forEach(function(b){
-    b.classList.toggle('on', (b.getAttribute('data-sub') === 'yes') === (n > 0));
-  });
   renderQuestions();
   updateSummary();
+}
 
-  /* 지금 목록에 있으면 변화가 안 보이므로 설계 상세로 데려간다 */
-  var onList = document.getElementById('scr-list').classList.contains('active');
-  if(onList) go('design');
-  toastMsg(n > 0
-    ? '학생 ' + n + '명이 제출한 상태예요. 문항이 잠깁니다.'
-    : '아직 제출이 없는 상태예요. 문항을 수정할 수 있어요.');
-  setTimeout(function(){
-    var el = document.getElementById('qsum');
-    if(el) el.scrollIntoView({ behavior:'smooth', block:'center' });
-  }, 120);
+/* 목록 카드 → 그 과제의 상태로 설계 상세 열기 */
+function openDesign(submitted){
+  setSubmitted(submitted);
+  go('design');
 }
 var Q_SAMPLE = [
   '현대사회의 변동 양상 중 한 가지를 골라, 그 변동이 나타나게 된 원인을 서술하시오.',
