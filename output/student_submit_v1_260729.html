@@ -512,7 +512,7 @@ body.pdf-mode .sf-copy{ color:#8b8f9c; }
       <div class="done-wrap">
         <div class="done-ic"><i data-lucide="check" style="width:32px;height:32px"></i></div>
         <p class="done-t">제출했어요</p>
-        <p class="done-d">마감 전까지는 다시 제출할 수 있어요. 다시 제출하면 마지막에 낸 답안으로 바뀌어요.</p>
+        <p class="done-d" id="doneDesc">마감 전까지는 다시 제출할 수 있어요. 다시 제출하면 마지막에 낸 답안으로 바뀌어요.</p>
 
         <div class="done-box">
           <div class="done-row"><span class="done-lb">과제</span><span class="done-vl">사회 변동과 현대사회의 문제 분석</span></div>
@@ -526,8 +526,10 @@ body.pdf-mode .sf-copy{ color:#8b8f9c; }
       <h3 class="card-title">제출한 답안</h3>
       <div id="ansList"></div>
       <div class="actions">
-        <button class="btn btn-outline" onclick="go('write')"><i data-lucide="pencil-line" style="width:16px;height:16px"></i>다시 제출</button>
-        <button class="btn btn-primary" onclick="location.href='student_home_v1_260729.html'">과제 목록으로</button>
+        <span class="act-note" id="openedNote" style="display:none;">결과가 공개된 뒤에는 다시 제출할 수 없어요.</span>
+        <button class="btn btn-outline" id="btnResubmit" onclick="go('write')"><i data-lucide="pencil-line" style="width:16px;height:16px"></i>다시 제출</button>
+        <button class="btn btn-primary" id="btnToList" onclick="location.href='student_home_v1_260729.html'">과제 목록으로</button>
+        <button class="btn btn-primary" id="btnToResult" style="display:none;" onclick="notReady('결과 보기')">결과 보기 <i data-lucide="chevron-right" style="width:16px;height:16px"></i></button>
       </div>
     </div>
 
@@ -608,6 +610,10 @@ body.pdf-mode .sf-copy{ color:#8b8f9c; }
     <button class="mp-btn" data-scene="fileonly" onclick="go('fileonly')">파일 제출만<span class="mp-sub">작성 칸 없음</span></button>
     <button class="mp-btn" data-scene="preparing" onclick="go('preparing')">문항 미작성<span class="mp-sub">선생님이 준비 중</span></button>
     <button class="mp-btn" data-scene="closed" onclick="go('closed')">제출 못 한 채 마감<span class="mp-sub">쓰던 내용은 남음</span></button>
+
+    <div class="mp-cap">③ 제출 완료 화면 상태</div>
+    <button class="mp-btn on" data-opened="no" onclick="setOpened(false)">결과 공개 전<span class="mp-sub">다시 제출 가능</span></button>
+    <button class="mp-btn" data-opened="yes" onclick="setOpened(true)">결과 공개 후<span class="mp-sub">재제출 차단</span></button>
 
     <div class="mp-cap">교사가 보는 것</div>
     <button class="mp-btn" onclick="location.href='focus_log_v1_260728.html#teacher-log'">과제물 관리<span class="mp-sub">제출 현황 · 다른 화면 이동</span></button>
@@ -741,6 +747,21 @@ function submitTask(){
   }
   go('done');
 }
+/* 결과가 공개되면 재제출을 막는다 — 점수를 보고 답을 고치는 일이 없게 */
+function setOpened(on){
+  document.getElementById('doneDesc').textContent = on
+    ? '선생님이 결과를 공개했어요. 이제 답안을 바꿀 수 없어요.'
+    : '마감 전까지는 다시 제출할 수 있어요. 다시 제출하면 마지막에 낸 답안으로 바뀌어요.';
+  document.getElementById('openedNote').style.display = on ? 'inline' : 'none';
+  document.getElementById('btnResubmit').style.display = on ? 'none' : '';
+  document.getElementById('btnToList').style.display   = on ? 'none' : '';
+  document.getElementById('btnToResult').style.display = on ? '' : 'none';
+  document.querySelectorAll('#mockpick .mp-btn[data-opened]').forEach(function(b){
+    b.classList.toggle('on', (b.getAttribute('data-opened') === 'yes') === on);
+  });
+  lucide.createIcons();
+}
+
 function closeMiss(){
   document.getElementById('missModal').classList.remove('show');
   var first = document.querySelector('#qList .q-block.miss');

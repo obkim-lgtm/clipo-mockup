@@ -117,6 +117,13 @@ a{ text-decoration:none; color:inherit; }
 .del-d{ font-size:16px; color:#6d7381; margin:0; line-height:1.7; }
 
 /* ===== 우측: 채점 패널 ===== */
+/* 재제출 알림 */
+.resub{ background:#fff7ed; border-radius:10px; padding:16px 18px; display:flex; align-items:center; gap:12px; }
+.resub i, .resub svg{ width:22px; height:22px; color:#ea580c; flex-shrink:0; }
+.rs-t{ font-size:16px; font-weight:700; color:#c2410c; margin:0 0 3px; line-height:1.45; }
+.rs-d{ font-size:14px; font-weight:500; color:#9a5b2e; margin:0; line-height:1.6; }
+.rs-d b{ color:#c2410c; }
+
 .sc-top{ background:#fff; border-radius:10px; padding:16px 20px; display:flex; align-items:center; gap:16px; box-shadow:0 1px 3px rgba(0,0,0,.06); flex-wrap:wrap; }
 .sc-total{ font-size:18px; font-weight:700; color:#222631; }
 .sc-total em{ font-style:normal; color:#416bff; }
@@ -320,6 +327,16 @@ a{ text-decoration:none; color:inherit; }
     <!-- ═══════════ 우측 · 채점 ═══════════ -->
     <div class="pane-r">
 
+      <!-- 채점 이후 학생이 다시 낸 경우 — 점수는 유지하고 사실만 알린다 -->
+      <div class="resub" id="resubNote" style="display:none;">
+        <i data-lucide="refresh-cw"></i>
+        <div>
+          <p class="rs-t">채점한 뒤에 학생이 다시 제출했어요</p>
+          <p class="rs-d">왼쪽은 <b>새로 낸 답안</b>이고, 오른쪽 점수는 <b>07/29 16:10에 매긴 그대로</b>예요. 확인한 뒤 필요하면 다시 채점해 주세요.</p>
+        </div>
+        <button class="btn btn-primary btn-sm" style="flex-shrink:0;" onclick="toastMsg('다시 채점하고 있어요.')"><i data-lucide="wand-sparkles" style="width:14px;height:14px"></i>다시 채점</button>
+      </div>
+
       <div class="sc-top">
         <span class="sc-total">총점 <em id="totalNow">72</em> / 100 점 (B)</span>
         <div class="sc-radios">
@@ -412,6 +429,10 @@ a{ text-decoration:none; color:inherit; }
     <button class="mp-btn on" data-doc="write" onclick="pickDoc('write')">클리포를 통한 제출<span class="mp-sub">문항 단위 — 신규</span></button>
     <button class="mp-btn" data-doc="file" onclick="pickDoc('file')">파일 첨부<span class="mp-sub">기존 뷰어</span></button>
     <button class="mp-btn" data-doc="deleted" onclick="pickDoc('deleted')">과제물 삭제됨<span class="mp-sub">점수·피드백은 남음</span></button>
+
+    <div class="mp-cap">학생 상태</div>
+    <button class="mp-btn on" data-resub="no" onclick="setResub(false)">채점 중<span class="mp-sub">기본</span></button>
+    <button class="mp-btn" data-resub="yes" onclick="setResub(true)">채점 후 재제출함<span class="mp-sub">점수 유지 + 알림</span></button>
 
     <div class="mp-cap">이어지는 화면</div>
     <button class="mp-btn" onclick="location.href='task_direct_write_v1_260729.html'">교사 · 평가 설계</button>
@@ -524,6 +545,14 @@ function resetScore(){
 function updateTotal(){
   var sum = CRITERIA.reduce(function(a, c){ return a + (c.picked || 0); }, 0);
   document.getElementById('totalNow').textContent = sum;
+}
+
+function setResub(on){
+  document.getElementById('resubNote').style.display = on ? 'flex' : 'none';
+  document.querySelectorAll('#mockpick .mp-btn[data-resub]').forEach(function(b){
+    b.classList.toggle('on', (b.getAttribute('data-resub') === 'yes') === on);
+  });
+  lucide.createIcons();
 }
 
 function pickRad(el){
