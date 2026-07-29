@@ -159,6 +159,17 @@ body.nav-expanded .main-wrap{ padding-left:200px; }
 .empty-t{ font-size:20px; font-weight:600; color:#222631; margin:0 0 8px; }
 .empty-d{ font-size:16px; color:#6d7381; margin:0; line-height:1.65; }
 
+/* ===== PDF 화면은 앱 프레임 밖 — 내려받은 파일을 여는 뷰어 ===== */
+body.pdf-mode{ background:#4a4f5e; }
+body.pdf-mode .g-hd, body.pdf-mode .icon-sb{ display:none; }
+body.pdf-mode .main-wrap{ padding-top:0; padding-left:0; }
+body.pdf-mode .page-wrap{ padding-top:32px; }
+body.pdf-mode .page-h1{ color:#fff; }
+body.pdf-mode .page-sub{ color:#c9ccd6; }
+body.pdf-mode .back-link{ color:#c9ccd6; }
+body.pdf-mode .back-link:hover{ color:#fff; }
+body.pdf-mode .sf-copy{ color:#8b8f9c; }
+
 /* ===== PDF 미리보기 (교사 다운로드 결과) ===== */
 .pdf-bar{ background:#2a2e3a; color:#e7e9ee; padding:14px 20px; border-radius:10px 10px 0 0; display:flex; align-items:center; gap:12px; font-size:15px; font-weight:500; }
 .pdf-bar i{ width:18px; height:18px; }
@@ -178,6 +189,18 @@ body.nav-expanded .main-wrap{ padding-left:200px; }
 
 .screen{ display:none; }
 .screen.active{ display:block; }
+
+/* ===== 목업 내비게이터 (화면 밖 · 드래그 가능) ===== */
+#mockpick{ position:fixed; left:24px; bottom:24px; z-index:3000; background:#1F2233; border-radius:14px; padding:8px; box-shadow:0 10px 30px rgba(0,0,0,.35); width:max-content; max-width:340px; cursor:move; user-select:none; }
+#mockpick .mp-head{ font-size:11px; font-weight:700; color:#8A8FB0; letter-spacing:.04em; display:flex; align-items:center; justify-content:space-between; gap:16px; padding:6px 8px; cursor:pointer; }
+#mockpick .mp-body{ display:flex; flex-direction:column; gap:6px; margin-top:6px; }
+#mockpick .mp-cap{ font-size:10px; font-weight:700; color:#6B6F8C; letter-spacing:.05em; padding:7px 8px 2px; }
+#mockpick .mp-btn{ width:100%; text-align:left; white-space:nowrap; padding:9px 12px; border-radius:9px; border:1px solid #3A3F58; background:#2A2E44; color:#C9CCE0; font-size:13px; font-weight:600; font-family:inherit; cursor:pointer; line-height:1.35; }
+#mockpick .mp-btn:hover{ background:#33384f; }
+#mockpick .mp-btn.on{ background:#416bff; color:#fff; border-color:#416bff; }
+#mockpick .mp-sub{ font-size:11px; font-weight:500; color:#8A8FB0; margin-left:8px; }
+#mockpick .mp-btn.on .mp-sub{ color:#D6E2FF; }
+#mockpick .mp-note{ font-size:11px; font-weight:500; color:#8A8FB0; line-height:1.55; padding:6px 8px 4px; max-width:310px; white-space:normal; }
 
 /* ===== 토스트 ===== */
 .toast{ position:fixed; bottom:28px; left:50%; transform:translateX(-50%) translateY(12px); opacity:0; min-width:300px; max-width:520px; padding:15px 22px; border-radius:8px; display:flex; align-items:center; gap:12px; font-size:15px; font-weight:600; box-shadow:0 0 1px #2226314D, 0 4px 12px #00000026; z-index:9999; transition:opacity .2s ease, transform .2s ease; pointer-events:none; background:#319d64; color:#fff; }
@@ -245,8 +268,8 @@ body.nav-expanded .main-wrap{ padding-left:200px; }
         </div>
       </div>
 
-      <div style="display:flex;justify-content:center;">
-        <button class="btn btn-primary btn-lg" onclick="go('write')">제출 시작</button>
+      <div class="actions">
+        <button class="btn btn-primary" onclick="go('write')">제출 시작 <i data-lucide="arrow-right" style="width:16px;height:16px"></i></button>
       </div>
     </div>
 
@@ -320,11 +343,6 @@ body.nav-expanded .main-wrap{ padding-left:200px; }
         <span class="due">제출 마감 7월 30일(목) 16:00 · <b>내일 마감</b></span>
       </div>
       <h2 class="task-name">사회 변동과 현대사회의 문제 분석</h2>
-
-      <div class="info" style="margin-top:18px;">
-        <i data-lucide="info"></i>
-        <p><b>직접 작성하거나 파일로 내거나, 편한 방법을 고르면 돼요.</b> 둘 다 내면 마지막에 낸 것으로 제출돼요.</p>
-      </div>
 
       <div class="chip-row" style="margin-top:20px;">
         <span class="chip warn"><i data-lucide="clipboard-x"></i>복사 및 붙여넣기 불가</span>
@@ -468,15 +486,15 @@ body.nav-expanded .main-wrap{ padding-left:200px; }
 <!-- ═══════════════ ⑦ 교사가 받는 PDF ═══════════════ -->
 <div id="scr-pdf" class="screen">
   <div class="page-wrap" style="max-width:940px;">
-    <h1 class="page-h1" style="margin-top:8px;">답안 PDF</h1>
+    <button class="back-link" onclick="location.href='focus_log_v1_260728.html#teacher-log'"><i data-lucide="chevron-left" style="width:18px;height:18px"></i>과제물 관리로 돌아가기</button>
+    <h1 class="page-h1">답안 PDF</h1>
     <p class="page-sub">교사가 과제물 관리에서 학생 답안을 내려받으면 이 형태로 저장됩니다. 지금은 txt로만 받을 수 있어 이 화면이 신규 제안입니다.</p>
 
     <div class="pdf-bar">
       <i data-lucide="file-text"></i>
       <span>10101_김서윤_사회 변동과 현대사회의 문제 분석.pdf</span>
       <div class="pb-r">
-        <button onclick="notReady('인쇄')"><i data-lucide="printer" style="width:15px;height:15px"></i>인쇄</button>
-        <button onclick="notReady('저장')"><i data-lucide="download" style="width:15px;height:15px"></i>저장</button>
+        <button onclick="notReady('PDF 저장')"><i data-lucide="download" style="width:15px;height:15px"></i>PDF 저장</button>
       </div>
     </div>
 
@@ -507,6 +525,29 @@ body.nav-expanded .main-wrap{ padding-left:200px; }
 
 <div id="toast" class="toast"><i data-lucide="circle-check-big" style="width:20px;height:20px;flex-shrink:0;"></i><span id="toastMsg"></span></div>
 
+<!-- 목업 내비게이터 -->
+<div id="mockpick">
+  <div class="mp-head" onclick="mpToggle()"><span>목업 내비게이터 · 학생 과제 제출 (CLIPO)</span><span id="mpArrow">▾</span></div>
+  <div class="mp-body" id="mpBody">
+    <div class="mp-cap">주요 플로우 — 직접 작성</div>
+    <button class="mp-btn" onclick="location.href='student_home_v1_260729.html'">⓪ 과제 홈<span class="mp-sub">여기서 골라 들어와요</span></button>
+    <button class="mp-btn on" data-scene="notice" onclick="go('notice')">① 시작 전 안내<span class="mp-sub">규칙 고지</span></button>
+    <button class="mp-btn" data-scene="write" onclick="go('write')">② 작성<span class="mp-sub">문항 3개 · 이동 감지 실동작</span></button>
+    <button class="mp-btn" data-scene="done" onclick="go('done')">③ 제출 완료<span class="mp-sub">답안 확인 · 다시 제출</span></button>
+
+    <div class="mp-cap">다른 설정으로 낸 과제</div>
+    <button class="mp-btn" data-scene="both" onclick="go('both')">직접 작성 + 파일 제출<span class="mp-sub">둘 다 허용</span></button>
+    <button class="mp-btn" data-scene="fileonly" onclick="go('fileonly')">파일 제출만<span class="mp-sub">작성 칸 없음</span></button>
+    <button class="mp-btn" data-scene="preparing" onclick="go('preparing')">문항 미작성<span class="mp-sub">선생님이 준비 중</span></button>
+
+    <div class="mp-cap">교사가 보는 것</div>
+    <button class="mp-btn" onclick="location.href='focus_log_v1_260728.html#teacher-log'">과제물 관리<span class="mp-sub">제출 현황 · 다른 화면 이동</span></button>
+    <button class="mp-btn" data-scene="pdf" onclick="go('pdf')">답안 PDF<span class="mp-sub">문항 + 답안 + 제출 시각</span></button>
+
+    <div class="mp-note">※ ②에서 <b style="color:#C9CCE0;">실제로 다른 탭에 갔다 오면</b> 배너가 떠요(3초 미만은 기록 안 함). 붙여넣기도 실제로 막힙니다.</div>
+  </div>
+</div>
+
 <script>
 /* ───────── 데이터 ───────── */
 var QUESTIONS = [
@@ -527,6 +568,8 @@ function go(scene){
   currentScene = scene;
   document.querySelectorAll('.screen').forEach(function(s){ s.classList.remove('active'); });
   document.getElementById('scr-'+scene).classList.add('active');
+  document.body.classList.toggle('pdf-mode', scene === 'pdf');
+  document.querySelectorAll('#mockpick .mp-btn[data-scene]').forEach(function(b){ b.classList.toggle('on', b.getAttribute('data-scene') === scene); });
   if(location.hash !== '#'+scene) history.replaceState(null, '', '#'+scene);
   if(scene === 'write')  renderQuestions('qList', true);
   if(scene === 'both')   renderQuestions('qListBoth', false);
@@ -682,6 +725,31 @@ function toggleNav(){
   document.getElementById('icon-sb').classList.toggle('expanded');
   document.body.classList.toggle('nav-expanded');
 }
+
+/* ───────── 목업 내비게이터 ───────── */
+function mpToggle(){
+  var b = document.getElementById('mpBody');
+  var hidden = b.style.display === 'none';
+  b.style.display = hidden ? 'flex' : 'none';
+  document.getElementById('mpArrow').textContent = hidden ? '▾' : '▸';
+}
+(function(){
+  var el = document.getElementById('mockpick');
+  var sx, sy, ox, oy, dragging = false;
+  el.addEventListener('mousedown', function(e){
+    if(e.target.closest('button')) return;
+    dragging = true; sx = e.clientX; sy = e.clientY;
+    var r = el.getBoundingClientRect(); ox = r.left; oy = r.top;
+    e.preventDefault();
+  });
+  document.addEventListener('mousemove', function(e){
+    if(!dragging) return;
+    el.style.left = (ox + e.clientX - sx) + 'px';
+    el.style.top  = (oy + e.clientY - sy) + 'px';
+    el.style.right = 'auto'; el.style.bottom = 'auto';
+  });
+  document.addEventListener('mouseup', function(){ dragging = false; });
+})();
 
 /* ───────── 초기화 ───────── */
 var _h = location.hash.slice(1);

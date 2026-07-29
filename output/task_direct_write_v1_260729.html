@@ -921,6 +921,23 @@
 </div>
 <!-- ═══════════ /씬 3 ═══════════ -->
 
+<!-- 이어지는 화면 (목업 전용 · 좌측 하단 고정) -->
+<div id="mockjump" style="position:fixed;left:24px;bottom:24px;z-index:3000;background:#1F2233;border-radius:14px;padding:8px;box-shadow:0 10px 30px rgba(0,0,0,.35);width:max-content;max-width:320px;cursor:move;user-select:none;">
+  <div style="font-size:11px;font-weight:700;color:#8A8FB0;letter-spacing:.04em;padding:6px 8px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:16px;" onclick="mjToggle()"><span>목업 내비게이터 · 학생 직접 작성 (CLIPO)</span><span id="mjArrow">▾</span></div>
+  <div id="mjBody" style="display:flex;flex-direction:column;gap:6px;margin-top:6px;">
+    <div style="font-size:10px;font-weight:700;color:#6B6F8C;letter-spacing:.05em;padding:7px 8px 2px;">이어지는 화면</div>
+    <button class="mj-btn" onclick="location.href='student_home_v1_260729.html'">학생 · 과제 홈<span class="mj-sub">할 일 우선 재배열</span></button>
+    <button class="mj-btn" onclick="location.href='student_submit_v1_260729.html'">학생 · 과제 제출<span class="mj-sub">문항형 · 이동 감지</span></button>
+    <button class="mj-btn" onclick="location.href='focus_log_v1_260728.html#teacher-log'">교사 · 과제물 관리<span class="mj-sub">제출 현황 · 답안 PDF</span></button>
+    <div style="font-size:11px;font-weight:500;color:#8A8FB0;line-height:1.55;padding:6px 8px 4px;max-width:290px;white-space:normal;">※ 이 파일 안에서는 목록 · 설계 상세 · 문항 작성이 버튼으로 이어져 있어요.</div>
+  </div>
+</div>
+<style>
+  .mj-btn{ width:100%; text-align:left; white-space:nowrap; padding:9px 12px; border-radius:9px; border:1px solid #3A3F58; background:#2A2E44; color:#C9CCE0; font-size:13px; font-weight:600; font-family:inherit; cursor:pointer; line-height:1.35; }
+  .mj-btn:hover{ background:#33384f; }
+  .mj-sub{ font-size:11px; font-weight:500; color:#8A8FB0; margin-left:8px; }
+</style>
+
 </div>
 
 <!-- 학생 화면 미리보기 모달 -->
@@ -1651,6 +1668,32 @@ function renderList(){
     : '';
   lucide.createIcons();
 }
+
+/* ── 목업 내비게이터 (접기 · 드래그) ── */
+function mjToggle(){
+  var b = document.getElementById('mjBody');
+  var hidden = b.style.display === 'none';
+  b.style.display = hidden ? 'flex' : 'none';
+  document.getElementById('mjArrow').textContent = hidden ? '▾' : '▸';
+}
+window.addEventListener('DOMContentLoaded', function(){
+  var el = document.getElementById('mockjump');
+  if(!el) return;
+  var sx, sy, ox, oy, dragging = false;
+  el.addEventListener('mousedown', function(e){
+    if(e.target.closest('button')) return;
+    dragging = true; sx = e.clientX; sy = e.clientY;
+    var r = el.getBoundingClientRect(); ox = r.left; oy = r.top;
+    e.preventDefault();
+  });
+  document.addEventListener('mousemove', function(e){
+    if(!dragging) return;
+    el.style.left = (ox + e.clientX - sx) + 'px';
+    el.style.top  = (oy + e.clientY - sy) + 'px';
+    el.style.right = 'auto'; el.style.bottom = 'auto';
+  });
+  document.addEventListener('mouseup', function(){ dragging = false; });
+});
 
 /* ── 초기화 ── */
 renderQuestions();
