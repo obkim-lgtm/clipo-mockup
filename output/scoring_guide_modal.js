@@ -12,7 +12,7 @@
    근거: 레나 QA 정리 "AI 채점이 어려운 경우 (v3.2)"
    HIAI판(hiai_mockup/output/scoring_guide_modal.js)과 같은 기획, 아래만 다름:
      · 디자인 토큰 CLIPO (Primary #416bff, Pretendard GOV)
-     · "활동지" → "문제지" (CLIPO에서 활동지는 별도 탭 이름이라 혼동)
+     · 표기는 HIAI와 동일하게 "활동지" 유지 (2026-07-29 올립 결정 — 문제지 표기 안 씀)
      · 크레딧 안내 추가 — CLIPO는 학생 1명당 1개 차감이라 페이지 수와 무관
      · 3번 케이스에 행동 순서 명시 — CLIPO는 예방 안내가 평가 설계(수합 몇 주 전)에만 있어
        "첨삭 전"만으로는 시점이 안 잡힘
@@ -58,13 +58,13 @@
       '<button class="sg-x" onclick="closeScoringGuide()"><i data-lucide="x" style="width:20px;height:20px;"></i></button>' +
       '<div class="sg-head">' +
         '<h3 class="sg-title">채점 정확도를 높이는 준비 팁</h3>' +
-        '<p class="sg-sub">문제지를 만들 때와 과제물을 스캔할 때 아래 세 가지를 확인해 주세요.</p>' +
+        '<p class="sg-sub">활동지를 만들 때와 과제물을 스캔할 때 아래 세 가지를 확인해 주세요.</p>' +
       '</div>' +
       '<div class="sg-body">' +
 
         '<div class="gcase">' +
           '<div class="gcase-txt">' +
-            '<p class="gcase-title">1. 문제지는 위에서 아래로, 한 단으로 구성해 주세요</p>' +
+            '<p class="gcase-title">1. 활동지는 위에서 아래로, 한 단으로 구성해 주세요</p>' +
             '<p class="gcase-desc">여러 단으로 빽빽하게 나누면 읽는 순서가 섞이고, 답란이 좁으면 <b>학생 답이 옆 영역을 넘어가 인식이 어려워요.</b> 크레딧은 학생 1명당 1개라 <b>페이지가 늘어도 더 들지 않으니</b> 답란을 넉넉하게 잡아주세요.</p>' +
           '</div>' +
           '<div class="gcase-figs">' +
