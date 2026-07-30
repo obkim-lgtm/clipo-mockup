@@ -174,6 +174,13 @@
     .crit-x{ width:28px; height:28px; border:none; background:none; cursor:pointer; color:#9ea3ad; border-radius:6px; display:inline-flex; align-items:center; justify-content:center; }
     .crit-x:hover{ background:#f6f7f9; color:#db3e51; }
     .crit-tools{ display:flex; gap:8px; margin-top:12px; }
+    /* 채점요소 복잡도 경고 (evaluation_design_v4_260615와 동일 스펙) */
+    .rub-warn{ display:none; align-items:flex-start; gap:8px; background:#fff7ed; border-radius:8px; padding:12px 14px; margin-top:12px; }
+    .rub-warn.show{ display:flex; }
+    .rub-warn i{ width:17px; height:17px; color:#f97316; flex-shrink:0; margin-top:2px; }
+    .rub-warn p{ font-size:15px; color:#3b3f4c; line-height:1.6; margin:0; }
+    .rub-warn b{ color:#9a3412; font-weight:600; }
+    .rub-elem.warn{ border-color:#f97316; background:#fffbf8; }
     .rub-elem{ flex:0 0 200px; align-self:stretch; height:auto; border:1px solid #d9d9d9; border-radius:8px; padding:14px; font-size:16px; font-family:inherit; color:#222631; outline:none; background:#fff; resize:none; line-height:1.5; }
     .rub-elem:focus{ border-color:#416bff; box-shadow:0 0 0 3px rgba(65,107,255,.12); }
     .rub-elem::placeholder{ color:#9ea3ad; }
@@ -601,6 +608,43 @@
   lucide.createIcons();
   sortMine();
   (function(){ try{ var p=new URLSearchParams(location.search); if(p.get('tab')==='shared') showPTab('shared'); else if(p.get('make')==='sheet') showSheetCreate(); }catch(e){} })();
+
+// ── 채점요소 복잡도 인라인 안내 (evaluation_design_v4_260615와 동일 스펙) ──
+//  R1 배점 표기 2회 이상  R2 나열 마커 2회 이상  R3 채점요소에 배점 있는데 급간 칸이 빔(구조 비교)
+// 판정에 쓰지 않는 것: 글자 수 · 줄바꿈
+var RE_SCORE = /\d+\s*점/g;
+var RE_ENUM  = /[①②③④⑤⑥⑦⑧⑨⑩]|요소\s*\d|첫째|둘째|셋째|\d\s*\)|^\s*[가나다]\./gm;
+function checkRubElem(ta){
+  var crit = ta.closest('.crit');
+  if(!crit) return;
+  var v = ta.value;
+  var r1 = (v.match(RE_SCORE) || []).length >= 2;
+  var r2 = (v.match(RE_ENUM)  || []).length >= 2;
+  var r3 = false;
+  if(!r1 && RE_SCORE.test(v)){
+    RE_SCORE.lastIndex = 0;
+    var cells = crit.querySelectorAll('.sc-desc input');
+    if(cells.length) r3 = Array.prototype.every.call(cells, function(c){ return !c.value.trim(); });
+  }
+  RE_SCORE.lastIndex = 0; RE_ENUM.lastIndex = 0;
+  var complex = r1 || r2 || r3;
+  ta.classList.toggle('warn', complex);
+  var warn = crit.querySelector('.rub-warn');
+  if(!warn){
+    if(!complex) return;
+    warn = document.createElement('div');
+    warn.className = 'rub-warn';
+    warn.innerHTML = '<i data-lucide="triangle-alert"></i><p><b>한 채점기준에 여러 판단이 섞여 있어요.</b> 기준·배점·예시가 한 칸에 뭉쳐 있으면 채점에 실패할 수 있어요. 판단 하나씩 채점기준을 나누고, 배점별 판단은 오른쪽 급간 칸에 적어주세요.</p>';
+    var tools = crit.querySelector('.crit-tools');
+    if(tools) crit.insertBefore(warn, tools); else crit.appendChild(warn);
+    if(window.lucide) lucide.createIcons();
+  }
+  warn.classList.toggle('show', complex);
+}
+// 위임 리스너 — 기준 추가·AI 생성으로 새로 생긴 카드에도 자동 적용
+document.addEventListener('input', function(e){
+  if(e.target.tagName === 'TEXTAREA' && e.target.classList.contains('rub-elem')) checkRubElem(e.target);
+});
 </script>
 </body>
 </html>

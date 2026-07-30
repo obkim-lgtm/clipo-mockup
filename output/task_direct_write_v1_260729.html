@@ -164,6 +164,17 @@
     .up-card-desc{ font-size:14px; color:#6d7381; line-height:1.55; margin:0 0 14px; min-height:42px; }
     .up-badge{ display:inline-flex; align-items:center; gap:4px; font-size:13px; font-weight:600; border-radius:6px; padding:4px 10px; }
     .up-badge.on{ background:#e9f2ff; color:#3151c4; }
+
+    /* ===== 준비 팁 진입 배너 (과제물 업로드 방법 = 선생님 업로드일 때만) =====
+       중립 회색 — 바로 위 선택 카드가 파란 하이라이트라 파란 배너면 선택 상태처럼 읽힘 */
+    .tip-bar{ display:none; align-items:center; gap:12px; background:#f6f7f9; border-radius:8px; padding:14px 16px; margin-top:12px; }
+    .tip-bar.show{ display:flex; }
+    .tip-bar-ic{ width:36px; height:36px; border-radius:8px; background:#eceef2; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+    .tip-bar-ic i{ width:20px; height:20px; color:#6d7381; }
+    .tip-bar-t{ font-size:15px; font-weight:600; color:#222631; line-height:1.4; margin:0 0 3px; }
+    .tip-bar-d{ font-size:14px; color:#6d7381; line-height:1.5; margin:0; }
+    .tip-bar-btn{ flex-shrink:0; height:36px; padding:0 14px; background:#fff; color:#416bff; border:1px solid #c7cbd3; border-radius:6px; font-family:inherit; font-size:14px; font-weight:600; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; line-height:1; vertical-align:middle; gap:6px; }
+    .tip-bar-btn:hover{ border-color:#416bff; background:#f4f8ff; }
     .up-badge.off{ background:#f1f3f5; color:#9ea3ad; }
 
     /* ===== 학생 제출 방법 설정 (업로드 방법=학생 선택 시) ===== */
@@ -646,6 +657,17 @@
           <p class="up-card-desc">과제물을 업로드하지 않고 AI 채점을 진행합니다.</p>
           <span class="up-badge off">AI 자동 채점 미지원</span>
         </div>
+      </div>
+
+      <!-- 준비 팁 진입 — 손글씨 스캔이 관여하는 '선생님 직접 일괄 업로드'일 때만 노출.
+           이 화면은 기본값이 '학생 직접 입력'이라 처음엔 숨겨진 상태 -->
+      <div class="tip-bar" id="tip-bar">
+        <div class="tip-bar-ic"><i data-lucide="scan-text"></i></div>
+        <div style="flex:1;min-width:0;">
+          <p class="tip-bar-t">과제물을 이렇게 준비하면 AI가 더 잘 읽어요</p>
+          <p class="tip-bar-d">한 단으로 구성 &nbsp;·&nbsp; 답란 넉넉하게 &nbsp;·&nbsp; 채점 표시 전에 스캔</p>
+        </div>
+        <button class="tip-bar-btn" onclick="openScoringGuide()">준비 팁 보기 <i data-lucide="chevron-right" style="width:15px;height:15px;"></i></button>
       </div>
     </div>
 
@@ -1177,8 +1199,12 @@ function pickRadio(el){ var line=el.closest('.radio-line'); line.querySelectorAl
 function pickUpload(el){
   document.querySelectorAll('.up-card').forEach(function(c){c.classList.remove('on');});
   el.classList.add('on');
+  var m = el.getAttribute('data-method');
   var sec = document.getElementById('student-submit-sec');
-  sec.style.display = (el.getAttribute('data-method')==='student') ? 'block' : 'none';
+  sec.style.display = (m==='student') ? 'block' : 'none';
+  // 준비 팁은 손글씨 스캔이 관여하는 '선생님 직접 일괄 업로드'일 때만
+  var tip = document.getElementById('tip-bar');
+  if (tip) tip.classList.toggle('show', m==='teacher');
 }
 // 체크박스 / 스위치 / 가로 스테퍼 / 제출 기간 라디오
 function toggleCbx(el){ el.classList.toggle('on'); }
@@ -1496,23 +1522,38 @@ renumber('ach-list','성취기준','ach-count');
 renumber('rub-list','채점기준','rub-count');
 lucide.createIcons();
 
-// ── 채점요소가 길어지면 인라인 안내 (QA: 한 칸에 기준·배점·예시가 뭉치면 채점 실패) ──
-var RUB_ELEM_LIMIT = 80;
+// ── 채점요소 복잡도 인라인 안내 (QA: 한 칸에 기준·배점·예시가 뭉치면 채점 실패) ──
+// 판정 규칙 (개발 스펙과 1:1 · evaluation_design_v4_260615와 동일) — 길이가 아니라 "여러 판단이 뭉쳤는지"
+//  R1 배점 표기 2회 이상  R2 나열 마커 2회 이상  R3 채점요소에 배점이 있는데 급간 칸이 비어 있음(구조 비교)
+// 판정에 쓰지 않는 것: 글자 수 · 줄바꿈
+var RE_SCORE = /\d+\s*점/g;
+var RE_ENUM  = /[①②③④⑤⑥⑦⑧⑨⑩]|요소\s*\d|첫째|둘째|셋째|\d\s*\)|^\s*[가나다]\./gm;
 function checkRubElem(ta){
   var crit = ta.closest('.crit');
   if(!crit) return;
-  var long = ta.value.length >= RUB_ELEM_LIMIT;
-  ta.classList.toggle('warn', long);
+  var v = ta.value;
+  var r1 = (v.match(RE_SCORE) || []).length >= 2;
+  var r2 = (v.match(RE_ENUM)  || []).length >= 2;
+  var r3 = false;
+  if(!r1 && RE_SCORE.test(v)){
+    RE_SCORE.lastIndex = 0;
+    var cells = crit.querySelectorAll('.sc-desc input');
+    if(cells.length) r3 = Array.prototype.every.call(cells, function(c){ return !c.value.trim(); });
+  }
+  RE_SCORE.lastIndex = 0; RE_ENUM.lastIndex = 0;
+  var complex = r1 || r2 || r3;
+  ta.classList.toggle('warn', complex);
   var warn = crit.querySelector('.rub-warn');
   if(!warn){
+    if(!complex) return;
     warn = document.createElement('div');
     warn.className = 'rub-warn';
-    warn.innerHTML = '<i data-lucide="triangle-alert"></i><p><b>채점요소가 너무 길어요.</b> 여러 판단과 배점이 한 칸에 있으면 채점에 실패할 수 있어요. 채점요소는 한 문장으로 쓰고, 배점별 판단은 오른쪽 급간 칸에 나눠 적어주세요.</p>';
+    warn.innerHTML = '<i data-lucide="triangle-alert"></i><p><b>한 채점기준에 여러 판단이 섞여 있어요.</b> 기준·배점·예시가 한 칸에 뭉쳐 있으면 채점에 실패할 수 있어요. 판단 하나씩 채점기준을 나누고, 배점별 판단은 오른쪽 급간 칸에 적어주세요.</p>';
     var tools = crit.querySelector('.crit-tools');
     if(tools) crit.insertBefore(warn, tools); else crit.appendChild(warn);
     lucide.createIcons();
   }
-  warn.classList.toggle('show', long);
+  warn.classList.toggle('show', complex);
 }
 document.getElementById('rub-list').addEventListener('input', function(e){
   if(e.target.classList.contains('rub-elem')) checkRubElem(e.target);
@@ -1834,5 +1875,7 @@ window.addEventListener('DOMContentLoaded', function(){
 });
 </script>
 
+<!-- 채점 정확도를 높이는 준비 팁 모달 — 공용 컴포넌트 (scoring_guide_modal.js 하나만 수정) -->
+<script src="scoring_guide_modal.js"></script>
 </body>
 </html>
