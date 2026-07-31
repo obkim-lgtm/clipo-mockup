@@ -140,6 +140,23 @@
     .wait-box{ width:520px; max-width:100%; background:#f4f8ff; border:1px solid #d6e4ff; border-radius:10px; padding:16px 18px; text-align:left; display:flex; flex-direction:column; gap:10px; }
     .wait-links{ display:flex; gap:8px; margin-top:20px; }
 
+    /* ===== 내 정보 ===== */
+    .me-row{ display:flex; align-items:center; gap:16px; padding:13px 0; }
+    .me-lb{ width:120px; flex-shrink:0; font-size:16px; color:#6d7381; }
+    .me-vl{ flex:1; min-width:0; font-size:16px; font-weight:500; }
+    .btn-sm{ height:38px; padding:0 14px; border:1px solid #ccdfff; background:#f4f8ff; color:#3151c4; border-radius:8px; font-size:15px; font-weight:600; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; line-height:1; gap:6px; vertical-align:middle; flex-shrink:0; }
+    .btn-sm:hover{ background:#e9f2ff; }
+    .txt-btn{ background:none; border:none; padding:4px 0; font-size:15px; color:#6d7381; cursor:pointer; text-decoration:underline; line-height:1; }
+    .me-empty{ background:#f6f7f9; border-radius:10px; padding:34px 24px; display:flex; flex-direction:column; align-items:center; text-align:center; }
+    .me-empty-t{ font-size:18px; font-weight:700; margin:0 0 8px; }
+    .me-empty-d{ font-size:16px; color:#3b3f4c; line-height:1.65; margin:0 0 18px; max-width:520px; }
+    .me-empty-d b{ color:#222631; font-weight:700; }
+    .tgl{ display:inline-flex; align-items:center; gap:10px; cursor:pointer; user-select:none; flex-shrink:0; }
+    .tgl-track{ width:44px; height:24px; border-radius:100px; background:#d9d9d9; position:relative; transition:background .15s; flex-shrink:0; }
+    .tgl-knob{ position:absolute; top:3px; left:3px; width:18px; height:18px; border-radius:50%; background:#fff; transition:left .15s; box-shadow:0 1px 3px rgba(0,0,0,.2); }
+    .tgl.on .tgl-track{ background:#416bff; }
+    .tgl.on .tgl-knob{ left:23px; }
+
     .rail-card{ background:#fff; border-radius:12px; padding:20px; box-shadow:0 0 1px #2226314D, 0 2px 8px #0000000F; }
     .rail-hd{ display:flex; align-items:center; justify-content:space-between; margin-bottom:14px; }
     .rail-title{ font-size:17px; font-weight:700; }
@@ -187,7 +204,7 @@
     <div class="hd-plan"><span class="plan-badge">무료 체험</span><span class="hd-dday">D-180</span></div>
     <div class="credit-wrap"><i data-lucide="bot" style="width:20px;height:20px;color:#416bff"></i>50 크레딧</div>
     <span class="unauth-badge">미인증</span>
-    <button class="user-btn" onclick="toastMsg('내 정보는 이 목업에서 제공하지 않습니다.', true)">꽃붕어33 선생님(일반교사) <i data-lucide="chevron-down" style="width:16px;height:16px"></i></button>
+    <button class="user-btn" onclick="go('me')">꽃붕어33 선생님(일반교사) <i data-lucide="chevron-down" style="width:16px;height:16px"></i></button>
   </div>
 </header>
 
@@ -214,7 +231,7 @@
 
   <!-- ================= 씬 1·2·3 : 교사 인증 요청 ================= -->
   <div class="scene" id="scene-verify">
-    <span class="back-link" onclick="go('wait')"><i data-lucide="chevron-left" style="width:16px;height:16px"></i> 이전으로</span>
+    <span class="back-link" onclick="go('home')"><i data-lucide="chevron-left" style="width:16px;height:16px"></i> 이전으로</span>
     <h1 class="page-h1">교사 인증</h1>
     <p class="page-sub">재직 중인 학교와 인증 방법을 확인한 뒤 인증을 요청해 주세요.</p>
 
@@ -333,24 +350,12 @@
     </div>
   </div>
 
-  <!-- ================= 씬 5 : 승인 대기중 홈 ================= -->
-  <div class="scene" id="scene-wait">
+  <!-- ================= 씬 5·6 : 홈 (미인증 안내 / 승인 대기중) ================= -->
+  <div class="scene" id="scene-home">
     <div class="home-cols">
       <div class="home-main">
         <h1 class="my-title">내 수업</h1>
-        <div class="wait-panel">
-          <div class="wait-illus"><i data-lucide="mail-check" style="width:52px;height:52px"></i></div>
-          <span class="wait-chip"><i data-lucide="loader" style="width:14px;height:14px"></i>승인 대기중</span>
-          <h2 class="wait-t">교사 인증 승인을 기다리고 있어요</h2>
-          <p class="wait-d"><b id="wait-school">데이터드리븐 중학교</b> 소속으로 인증을 요청하셨어요.<br>평일 근무 시간에는 보통 <b>1~2시간 이내</b>에 승인돼요.</p>
-          <div class="wait-box">
-            <div class="db-row"><i data-lucide="clock"></i><div>근무 시간 이후나 주말·공휴일에 요청하신 경우 <b>다음 영업일 오전</b>에 처리돼요. 늦어도 영업일 기준 48시간 안에는 완료해 드려요.</div></div>
-            <div class="db-row"><i data-lucide="mail"></i><div>승인되면 <b>flowerfish33@dd.ms.kr</b> 로 안내 메일을 보내드려요.</div></div>
-          </div>
-          <div class="wait-links">
-            <button class="btn-line" style="height:44px" onclick="notReady('고객센터 문의')"><i data-lucide="headphones" style="width:16px;height:16px"></i>고객센터 문의</button>
-          </div>
-        </div>
+        <div class="wait-panel" id="home-panel"></div>
       </div>
 
       <div class="home-rail">
@@ -374,6 +379,35 @@
     </div>
   </div>
 
+  <!-- ================= 씬 7 : 내 정보 (미인증 / 대기중 / 인증 완료) ================= -->
+  <div class="scene" id="scene-me">
+    <h1 class="page-h1" style="margin-top:0">내 정보</h1>
+    <p class="page-sub">계정 정보와 학교 정보를 확인하고 수정할 수 있어요.</p>
+
+    <div class="card">
+      <p class="card-t" style="margin-bottom:8px">계정 정보</p>
+      <div class="me-row"><span class="me-lb">이름</span><span class="me-vl">꽃붕어33</span><button class="btn-sm" onclick="notReady('이름 변경')"><i data-lucide="pencil" style="width:15px;height:15px"></i>이름 변경</button></div>
+      <div class="me-row"><span class="me-lb">이메일(ID)</span><span class="me-vl">flowerfish33@dd.ms.kr</span></div>
+      <div class="me-row"><span class="me-lb">연락처</span><span class="me-vl">010-5600-0893</span><button class="btn-sm" onclick="notReady('번호 변경')"><i data-lucide="pencil" style="width:15px;height:15px"></i>번호 변경</button></div>
+    </div>
+
+    <div class="card">
+      <p class="card-t" style="margin-bottom:14px">학교 정보</p>
+      <div id="me-school"></div>
+    </div>
+
+    <div class="card">
+      <p class="card-t">메일 수신</p>
+      <p class="card-d">과목별 채점 팁, AI 활용법 등 평가 시간을 줄여주는 실전 정보와 혜택 소식을 보내드려요.</p>
+      <div class="me-row" style="padding-top:4px">
+        <span class="me-lb">이메일</span><span class="me-vl">flowerfish33@dd.ms.kr</span>
+        <span class="tgl on" id="mail-tgl" onclick="this.classList.toggle('on')"><span style="font-size:15px;color:#3b3f4c">메일 수신</span><span class="tgl-track"><span class="tgl-knob"></span></span></span>
+      </div>
+    </div>
+
+    <div style="padding:18px 4px 0"><button class="txt-btn" onclick="notReady('회원 탈퇴')">회원 탈퇴</button></div>
+  </div>
+
   <footer class="site-footer">
     <div class="sf-links"><a href="#" onclick="return false;">회사소개</a><a href="#" onclick="return false;">이용약관</a><a href="#" onclick="return false;">개인정보처리방침</a><a href="#" onclick="return false;">고객센터</a></div>
     <div class="sf-copy">© 2026. Datadriven Inc. All rights reserved.</div>
@@ -390,12 +424,18 @@
     <button class="mk-fold" onclick="event.stopPropagation();document.getElementById('mkNav').classList.toggle('folded')"><i data-lucide="chevrons-down-up" style="width:15px;height:15px"></i></button>
   </div>
   <div class="mk-body" onmousedown="event.stopPropagation()">
-    <div class="h">화면</div>
+    <div class="h">인증 요청</div>
     <button class="sc" id="mk-start" onclick="go('start')">① 인증 진입<small>학교 선택 전</small></button>
     <button class="sc" id="mk-doc" onclick="go('doc')">② 서류 업로드<small>설문 포함</small></button>
     <button class="sc" id="mk-code" onclick="go('code')">③ 인증코드<small>연수 = 설문 생략</small></button>
     <button class="sc" id="mk-done" onclick="go('done')">④ 신청 완료</button>
-    <button class="sc" id="mk-wait" onclick="go('wait')">⑤ 승인 대기중 홈</button>
+    <div class="h">홈</div>
+    <button class="sc" id="mk-home" onclick="go('home')">⑤ 미인증 홈<small>인증 안내</small></button>
+    <button class="sc" id="mk-wait" onclick="go('wait')">⑥ 승인 대기중 홈</button>
+    <div class="h">내 정보</div>
+    <button class="sc" id="mk-me" onclick="go('me')">⑦ 미인증</button>
+    <button class="sc" id="mk-me-wait" onclick="go('me-wait')">⑧ 승인 대기중</button>
+    <button class="sc" id="mk-me-done" onclick="go('me-done')">⑨ 인증 완료<small>참고 · 개선 대상 아님</small></button>
     <div class="h">케이스</div>
     <button class="sc" onclick="caseFilled()">입력 다 채우기</button>
     <button class="sc" onclick="caseEmpty()">초기화(빈 상태)</button>
@@ -520,33 +560,101 @@ function submitVerify(){
   go('done');
 }
 
+/* ===== 홈 패널 (미인증 안내 / 승인 대기중) =====
+   [개선] 미인증 홈은 '요청 시작'이 목표인 자리 — 미인증 교사의 85%가 인증 요청 자체를 시작하지 않음.
+   기존: "학생 정보 보호와 원활한 서비스 이용을 위해 교사 인증이 필요합니다. (1분 이내)"
+     → 회사 사정이 앞에 오고, 교사가 얻는 것과 걸리는 시간이 없음.
+   변경: 제목 = 인증하면 얻는 것 / 본문 = 왜 필요한지(짧게) → 준비물 → 걸리는 시간 순. */
+var HOME_PANEL = {
+  unauth:
+    '<div class="wait-illus"><i data-lucide="graduation-cap" style="width:52px;height:52px"></i></div>'
+    + '<h2 class="wait-t">교사 인증하면 바로 수업을 만들 수 있어요</h2>'
+    + '<p class="wait-d">학생 답안을 다루는 서비스라, 실제 재직 중인 선생님인지 확인하고 있어요.<br>'
+    + '<b>재직 인증 자료나 연수 인증코드</b>만 준비하시면 돼요. 입력은 1분이면 끝나고, '
+    + '평일 근무 시간에는 보통 <b>1~2시간 이내</b>에 승인돼요.</p>'
+    + '<button class="btn-primary" onclick="go(\'start\')">교사 인증 시작 <i data-lucide="chevron-right" style="width:18px;height:18px"></i></button>',
+  waiting:
+    '<div class="wait-illus"><i data-lucide="mail-check" style="width:52px;height:52px"></i></div>'
+    + '<span class="wait-chip"><i data-lucide="loader" style="width:14px;height:14px"></i>승인 대기중</span>'
+    + '<h2 class="wait-t">교사 인증 승인을 기다리고 있어요</h2>'
+    + '<p class="wait-d"><b>' + '{{school}}' + '</b> 소속으로 인증을 요청하셨어요.<br>평일 근무 시간에는 보통 <b>1~2시간 이내</b>에 승인돼요.</p>'
+    + '<div class="wait-box">'
+    + '<div class="db-row"><i data-lucide="clock"></i><div>근무 시간 이후나 주말·공휴일에 요청하신 경우 <b>다음 영업일 오전</b>에 처리돼요. 늦어도 영업일 기준 48시간 안에는 완료해 드려요.</div></div>'
+    + '<div class="db-row"><i data-lucide="mail"></i><div>승인되면 <b>flowerfish33@dd.ms.kr</b> 로 안내 메일을 보내드려요.</div></div>'
+    + '</div>'
+    + '<div class="wait-links"><button class="btn-line" style="height:44px" onclick="notReady(\'고객센터 문의\')"><i data-lucide="headphones" style="width:16px;height:16px"></i>고객센터 문의</button></div>'
+};
+function renderHome(mode){
+  document.getElementById('home-panel').innerHTML =
+    HOME_PANEL[mode].replace('{{school}}', state.school || '데이터드리븐 중학교');
+  lucide.createIcons();
+}
+
+/* ===== 내 정보 · 학교 정보 카드 (상태별) =====
+   [개선] 대기중 상태의 비활성 버튼('인증 승인 대기중')은 눌리지 않는 상태 표시일 뿐이라 상태 칩으로 교체.
+   학교 정보 카드이므로 '어느 학교로 요청했는지'를 여기서 확인할 수 있게 한다. */
+var ME_SCHOOL = {
+  unauth:
+    '<div class="me-empty">'
+    + '<p class="me-empty-t">아직 등록된 학교가 없어요</p>'
+    + '<p class="me-empty-d">교사 인증을 마치면 <b>재직 학교와 담당 교과</b>가 여기에 표시돼요.<br>'
+    + '평일 근무 시간에는 보통 <b>1~2시간 이내</b>에 승인돼요.</p>'
+    + '<button class="btn-primary" onclick="go(\'start\')">교사 인증 시작 <i data-lucide="chevron-right" style="width:18px;height:18px"></i></button>'
+    + '</div>',
+  waiting:
+    '<div class="me-row" style="padding-top:0"><span class="me-lb">학교</span>'
+    + '<span class="me-vl">{{school}}</span>'
+    + '<span class="wait-chip" style="margin:0"><i data-lucide="loader" style="width:14px;height:14px"></i>승인 대기중</span></div>'
+    + '<div class="wait-box" style="width:100%;margin-top:6px">'
+    + '<div class="db-row"><i data-lucide="mail"></i><div>승인되면 <b>flowerfish33@dd.ms.kr</b> 로 안내 메일을 보내드려요.</div></div>'
+    + '</div>',
+  done:
+    '<div class="me-row" style="padding-top:0"><span class="me-lb">학교</span><span class="me-vl">{{school}}</span>'
+    + '<button class="btn-sm" onclick="notReady(\'소속 변경\')"><i data-lucide="pencil" style="width:15px;height:15px"></i>소속 변경</button></div>'
+    + '<div class="me-row"><span class="me-lb">담당 교과</span><span class="me-vl">국어, 사회</span>'
+    + '<button class="btn-sm" onclick="notReady(\'교과 변경\')"><i data-lucide="pencil" style="width:15px;height:15px"></i>교과 변경</button></div>'
+};
+function renderMe(mode){
+  document.getElementById('me-school').innerHTML =
+    ME_SCHOOL[mode].replace('{{school}}', state.school || '데이터드리븐 중학교');
+  lucide.createIcons();
+}
+
 /* ===== 씬 라우팅 ===== */
 function go(scene){
   if (scene === 'start'){ caseEmpty(); return; }
   if (scene === 'doc' || scene === 'code'){
     if (!state.school) pickSchool();
     setMethod(scene === 'code' ? 'code' : 'doc');
-    showScene('verify');
+    showScene('verify', 'doc');
     return;
   }
-  if (scene === 'verify'){ showScene('verify'); location.hash = (state.method === 'code') ? 'code' : 'doc'; syncNavBtns(); return; }
-  showScene(scene);
-  location.hash = (scene === 'wait') ? 'wait' : 'done';
-  syncNavBtns();
+  if (scene === 'verify'){ showScene('verify', state.method === 'code' ? 'code' : 'doc'); return; }
+  if (scene === 'home' || scene === 'wait'){
+    renderHome(scene === 'wait' ? 'waiting' : 'unauth');
+    showScene('home', scene);
+    return;
+  }
+  if (scene === 'me' || scene === 'me-wait' || scene === 'me-done'){
+    renderMe(scene === 'me' ? 'unauth' : (scene === 'me-wait' ? 'waiting' : 'done'));
+    showScene('me', scene);
+    return;
+  }
+  showScene('done', 'done');
 }
-function showScene(name){
+function showScene(name, hash){
   document.querySelectorAll('.scene').forEach(function(s){ s.classList.remove('on'); });
-  var target = document.getElementById('scene-' + (name === 'verify' ? 'verify' : name));
+  var target = document.getElementById('scene-' + name);
   if (target) target.classList.add('on');
-  document.getElementById('nav-home').classList.toggle('active', name === 'wait');
-  /* 대기 중 사용자에게 의미 있는 정보 = 신청 시각이 아니라 '어느 학교로 요청했는지'(잘못 골랐는지 확인 가능) */
-  if (name === 'wait' && state.school) document.getElementById('wait-school').textContent = state.school;
+  document.getElementById('nav-home').classList.toggle('active', name === 'home');
+  if (hash) location.hash = hash;
   window.scrollTo({ top:0 });
+  syncNavBtns();
   lucide.createIcons();
 }
 function syncNavBtns(){
   var h = (location.hash || '#start').replace('#','');
-  ['start','doc','code','done','wait'].forEach(function(k){
+  ['start','doc','code','done','home','wait','me','me-wait','me-done'].forEach(function(k){
     var b = document.getElementById('mk-' + k);
     if (b) b.classList.toggle('on', k === h);
   });
@@ -563,16 +671,14 @@ function caseEmpty(){
   document.getElementById('etc-wrap').classList.remove('on');
   document.getElementById('etc-inp').value = '';
   ['err-method','err-subj','err-channel'].forEach(clearErr);
-  showScene('verify');
-  location.hash = 'start';
-  syncNavBtns();
+  showScene('verify', 'start');
 }
 function caseFilled(){
   if (!state.school) pickSchool();
   pickFile(); pickSubject();
   var cb = document.querySelector('#ch-list input[value="training"]');
   if (cb && !cb.checked){ cb.checked = true; onChannelChange(); }
-  showScene('verify');
+  showScene('verify', 'doc');
   toastMsg('입력을 모두 채웠어요. [인증 요청]을 눌러보세요.', true);
 }
 
@@ -622,7 +728,7 @@ document.addEventListener('input', function(e){
 renderChannels();
 (function(){
   var h = (location.hash || '').replace('#','');
-  if (h === 'doc' || h === 'code' || h === 'done' || h === 'wait') go(h);
+  if (['doc','code','done','home','wait','me','me-wait','me-done'].indexOf(h) !== -1) go(h);
   else caseEmpty();
 })();
 lucide.createIcons();
