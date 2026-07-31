@@ -95,6 +95,16 @@
     #tBanner .nbox{ margin-bottom:0; }
     /* 배너 안 버튼 — 본문 CTA(48px 알약)보다 작게, 배너 스케일에 맞춤 */
     .nb-act .btn-primary, .nb-act .btn-line, .nb-act .btn-out{ height:38px; padding:0 16px; border-radius:8px; font-size:14px; font-weight:600; }
+    /* 배너 안 버튼은 중립색 — 배너 색(상황)과 버튼 색(액션)이 서로 다른 말을 하지 않게 */
+    .nb-act .btn-primary{ background:#fff; color:#222631; border:1px solid #c7cbd3; }
+    .nb-act .btn-primary:hover{ background:#f6f7f9; border-color:#a9aeb8; }
+
+    /* 상시 안내 — 배너가 아니라 본문 보조 텍스트. 배경 없음 */
+    .hint-line{ display:flex; gap:9px; align-items:flex-start; margin-top:18px; padding-top:16px; border-top:1px solid #f1f3f5; }
+    .hint-line i{ width:17px; height:17px; flex-shrink:0; margin-top:3px; color:#9aa0ad; }
+    .hint-line .hl-tx{ flex:1; min-width:0; font-size:15px; color:#6d7381; line-height:1.6; }
+    .hint-line .hl-tx b{ color:#3b3f4c; font-weight:600; }
+    .hint-line .hl-act{ flex-shrink:0; align-self:center; }
     /* ===== F1 · 소속 해제 ===== */
     .bt-danger{ border-color:#fbccd2; background:#fdeef0; color:#c0303f; }
     .bt-danger:hover{ background:#fbe1e5; }
@@ -1119,10 +1129,12 @@ function renderTeachers(n){
   }).join('');
 
   var hasRep = d.some(function(t){ return t.role==='rep' && t.state==='on'; });
+  /* 상시 안내 — 상단 배너(지금 조치가 필요한 상황)와 헷갈리지 않도록 배경 없는 보조 텍스트로 */
   document.getElementById('tHint').innerHTML = hasRep
-    ? nbox('info','users','대표 선생님은 여러 분 지정하실 수 있어요',
-        '한 분이 학교를 옮기셔도 학교가 멈추지 않도록 두 분 이상 지정해 두시길 권해요.',
-        meIsRep ? '<button class="btn-out" onclick="toastMsg(\'대표 선생님을 추가로 지정했어요\')">대표 선생님 추가</button>' : '')
+    ? '<div class="hint-line"><i data-lucide="users"></i>'
+      + '<span class="hl-tx"><b>대표 선생님은 여러 분 지정하실 수 있어요.</b> 한 분이 학교를 옮기셔도 학교가 멈추지 않도록 두 분 이상 지정해 두시길 권해요.</span>'
+      + (meIsRep ? '<span class="hl-act"><button class="btn-tiny" onclick="toastMsg(\'대표 선생님을 추가로 지정했어요\')">대표 선생님 추가</button></span>' : '')
+      + '</div>'
     : '';
   var hu = document.getElementById('hdUserName');
   if (hu) hu.textContent = '박지훈 선생님(' + (meIsRep ? '대표교사' : '일반교사') + ')';
