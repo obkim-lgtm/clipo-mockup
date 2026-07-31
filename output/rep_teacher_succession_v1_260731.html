@@ -91,6 +91,16 @@
     .nbox .nb-act{ margin-left:auto; flex-shrink:0; align-self:center; }
     .nb-close{ width:30px; height:30px; border:none; background:none; color:#6d7381; cursor:pointer; border-radius:6px; display:inline-flex; align-items:center; justify-content:center; line-height:1; vertical-align:middle; }
     .nb-close:hover{ background:#0000000d; color:#3b3f4c; }
+    /* ===== F1 · 소속 해제 ===== */
+    .bt-danger{ border-color:#fbccd2; background:#fdeef0; color:#c0303f; }
+    .bt-danger:hover{ background:#fbe1e5; }
+    .rel-box{ border:1px solid #fbccd2; background:#fffafb; border-radius:10px; padding:20px 22px; }
+    .rel-h{ font-size:18px; font-weight:700; color:#c0303f; display:flex; align-items:center; gap:9px; margin-bottom:8px; }
+    .rel-tx{ font-size:16px; color:#3b3f4c; line-height:1.6; margin:0 0 16px; }
+    .rel-row{ display:flex; gap:10px; align-items:flex-start; font-size:15px; color:#3b3f4c; line-height:1.55; padding:7px 0; text-align:left; }
+    .rel-row i{ width:17px; height:17px; flex-shrink:0; margin-top:3px; color:#6d7381; }
+    .rel-act{ display:flex; gap:9px; margin-top:16px; padding-top:16px; border-top:1px solid #fbccd2; }
+    .rel-mini{ background:#f8f9fb; border-radius:8px; padding:12px 14px; margin-bottom:22px; }
     .nb-warn{ background:#fff4ec; border:1px solid #ffd9bd; color:#8a4a12; }
     .nb-warn .nb-ic{ color:#f97316; }
     .nb-info{ background:#f4f8ff; border:1px solid #d6e4ff; color:#3151c4; }
@@ -643,6 +653,28 @@
     <button class="sc" id="mk-af1" onclick="go('af1')">B 대표 없음 · 내가 맡기</button>
     <button class="sc" id="mk-af2" onclick="go('af2')">C 넘겨받은 뒤</button>
     <button class="sc" id="mk-af3" onclick="go('af3')">D 자동 승계<small>비권장</small></button>
+
+    <div class="h">대표교사가 남을 해제할 때</div>
+    <button class="sc" id="mk-af2b" onclick="go('af3')">해제하는 쪽<small>목록에서 실행</small></button>
+    <button class="sc" id="mk-released" onclick="go('released')">해제당한 선생님<small>보관 중 · 재인증하면 복구</small></button>
+  </div>
+</div>
+
+<!-- 소속 해제 확인 (대표교사 시점) -->
+<div class="ovl" id="relOvl">
+  <div class="mdl">
+    <span class="mdl-ic" style="background:#fdeef0;color:#c0303f"><i data-lucide="user-x" style="width:26px;height:26px"></i></span>
+    <p class="mdl-t"><span id="relName">이수민</span> 선생님의 소속을<br>해제할까요?</p>
+    <p class="mdl-d">이 학교 목록에서 빠지고, 선생님이 작성하신 채점 결과와 기록은 <b>보관 상태로 전환</b>돼요.</p>
+    <div class="rel-mini">
+      <div class="rel-row"><i data-lucide="mail"></i><div><b>해제 사실을 이메일로 알려드려요.</b> 재인증하면 자료를 다시 볼 수 있다는 안내도 함께 보내요</div></div>
+      <div class="rel-row"><i data-lucide="rotate-ccw"></i><div>같은 학교로 재인증하면 <b>그대로 복구</b>돼요</div></div>
+      <div class="rel-row"><i data-lucide="clock"></i><div><b>180일</b> 안에 재인증하지 않거나 다른 학교로 인증하면 삭제돼요</div></div>
+    </div>
+    <div class="mdl-act">
+      <button class="btn-line" onclick="closeRelease()">취소</button>
+      <button class="btn-primary" onclick="doRelease()">소속 해제</button>
+    </div>
   </div>
 </div>
 
@@ -879,6 +911,17 @@ var ME_SCHOOL = {
     + '<div class="wait-box" style="width:100%;margin-top:6px">'
     + '<div class="db-row"><i data-lucide="mail"></i><div>승인되면 <b>flowerfish33@dd.ms.kr</b> 로 안내 메일을 보내드려요.</div></div>'
     + '</div>',
+  /* 대표교사가 해제한 상태 — 즉시 파기하지 않고 유예. 재인증하면 그대로 복구 */
+  released:
+    '<div class="rel-box">'
+    + '<div class="rel-h"><i data-lucide="user-x" style="width:20px;height:20px"></i>데이터드리븐 중학교 소속이 해제되었어요</div>'
+    + '<p class="rel-tx">학교의 대표 선생님이 소속을 해제했어요. 선생님이 만드신 자료는 <b>아직 지워지지 않았고 그대로 보관 중</b>이에요.</p>'
+    + '<div class="rel-row"><i data-lucide="rotate-ccw"></i><div><b>같은 학교로 다시 인증하시면</b> 자료를 그대로 다시 보실 수 있어요.</div></div>'
+    + '<div class="rel-row"><i data-lucide="clock"></i><div>보관 기한 <b>2027년 1월 27일까지 (D-180)</b>. 이때까지 재인증하지 않으시면 삭제돼요.</div></div>'
+    + '<div class="rel-row"><i data-lucide="alert-triangle"></i><div><b>다른 학교로 인증하시면</b> 이전 학교 자료는 그때 삭제돼요.</div></div>'
+    + '<div class="rel-act"><button class="btn-primary" onclick="notReady(\'재인증\')">같은 학교로 재인증</button>'
+    + '<button class="btn-line" onclick="go(\'start\')">다른 학교로 인증</button></div>'
+    + '</div>',
   done:
     '<div class="me-row" style="padding-top:0"><span class="me-lb">학교</span><span class="me-vl">{{school}}</span>'
     + '<button class="btn-sm" onclick="startLeave()"><i data-lucide="building-2" style="width:15px;height:15px"></i>소속 변경</button></div>'
@@ -927,6 +970,7 @@ function go(scene){
   if (ov && scene !== 'cur') ov.classList.remove('on');
   var lv = document.getElementById('leaveOvl'); if (lv) lv.classList.remove('on');
   var dl = document.getElementById('dlOvl'); if (dl) dl.classList.remove('on');
+  var rl = document.getElementById('relOvl'); if (rl) rl.classList.remove('on');
   if (scene === 'start'){ caseEmpty(); return; }
   if (scene === 'doc' || scene === 'code'){
     if (!state.school) pickSchool();
@@ -940,6 +984,8 @@ function go(scene){
     showScene('home', scene);
     return;
   }
+  /* 대표교사가 해제한 뒤 당사자가 보는 화면 — 유예 중, 재인증하면 복구 */
+  if (scene === 'released'){ renderMe('released'); showScene('me','released'); return; }
   if (scene === 'me' || scene === 'me-wait' || scene === 'me-done'){
     renderMe(scene === 'me' ? 'unauth' : (scene === 'me-wait' ? 'waiting' : 'done'));
     showScene('me', scene);
@@ -990,6 +1036,10 @@ function askLeave(){
 }
 function openDl(){ document.getElementById('dlOvl').classList.add('on'); lucide.createIcons(); }
 function closeDl(){ document.getElementById('dlOvl').classList.remove('on'); }
+var REL_TARGET = '';
+function askRelease(nm){ REL_TARGET = nm; document.getElementById('relName').textContent = nm; document.getElementById('relOvl').classList.add('on'); lucide.createIcons(); }
+function closeRelease(){ document.getElementById('relOvl').classList.remove('on'); }
+function doRelease(){ closeRelease(); toastMsg(REL_TARGET + ' 선생님의 소속을 해제하고 안내 메일을 보냈어요.'); go('released'); }
 function closeLeave(){ document.getElementById('leaveOvl').classList.remove('on'); }
 function doLeave(){
   closeLeave();
@@ -1057,7 +1107,8 @@ function renderTeachers(n){
     var stB = gone ? '<span class="rl-badge bg-off">소속 변경함</span>' : '<span class="rl-badge bg-on">재직 중</span>';
     var act = gone ? '<span class="tt-em">—</span>'
       : (me ? '<span class="tt-em">나</span>'
-            : '<button class="btn-tiny" ' + (meIsRep && !me ? '' : 'disabled') + ' onclick="toastMsg(\'권한을 바꿨어요\')">권한 변경</button>');
+            : '<button class="btn-tiny" ' + (meIsRep && !me ? '' : 'disabled') + ' onclick="toastMsg(\'권한을 바꿨어요\')">권한 변경</button>'
+              + (meIsRep && !me ? ' <button class="btn-tiny bt-danger" onclick="askRelease(\'' + t.nm + '\')">소속 해제</button>' : ''));
     return '<tr class="' + (me?'me ':'') + (gone?'gone':'') + '"><td style="font-weight:600">' + t.nm
       + (me ? ' <span class="tt-em">(나)</span>' : '') + '</td><td class="tt-em">' + t.em + '</td><td>' + t.sub
       + '</td><td>' + roleB + '</td><td>' + stB + '</td><td>' + act + '</td></tr>';
