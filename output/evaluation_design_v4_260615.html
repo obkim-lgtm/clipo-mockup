@@ -276,11 +276,6 @@
     .stop-pop-title{ font-size:15px; font-weight:700; color:#222631; margin:0 0 8px; }
     .stop-pop-desc{ font-size:14px; color:#52525b; line-height:1.55; margin:0 0 12px; }
     .stop-pop-actions{ display:flex; justify-content:flex-end; }
-    /* 생성 완료 알림 배너 (드로워 닫은 뒤 완료된 경우) — 배경+아이콘, 좌측 띠 없음 */
-    .rub-done-banner{ display:none; align-items:center; gap:10px; padding:14px 16px; border-radius:10px; background:#e9f2ff; margin-bottom:16px; }
-    .rub-done-banner.show{ display:flex; }
-    .rub-done-banner i{ color:#416bff; flex-shrink:0; }
-    .rub-done-text{ flex:1; font-size:15px; color:#222631; line-height:1.5; }
     /* 오류 배너 (Figma 2996:17229) — 배경+아이콘, 좌측 띠 없음 */
     .rub-err{ display:none; align-items:flex-start; gap:8px; padding:14px 16px; border-radius:10px; background:#fdecec; font-size:15px; color:#222631; line-height:1.5; margin:2px 0 20px; }
     .rub-err.show{ display:flex; }
@@ -453,13 +448,6 @@
         <span class="sec-count"><span id="rub-count">3</span>개 / 15개</span>
       </div>
       <p class="sec-desc">채점기준은 최대 15개까지 입력 가능합니다. 채점요소는 <b style="font-weight:600;color:#3b3f4c;">한 문장으로 간결하게</b> 쓰고, 배점별 판단은 오른쪽 급간 칸에 나눠 적어주세요. 감점하고 싶은 내용은 채점기준에 적어야 AI가 채점에 반영합니다.</p>
-
-      <!-- 생성 완료 알림 (드로워를 닫은 뒤 완료된 경우) -->
-      <div class="rub-done-banner" id="rubDoneBanner">
-        <i data-lucide="circle-check-big" style="width:18px;height:18px"></i>
-        <span class="rub-done-text">채점기준 생성이 끝났어요. 결과를 확인하고 원하는 기준만 골라 추가해 보세요.</span>
-        <button class="btn btn-primary btn-sm" onclick="openRubResultFromBanner()">결과 확인</button>
-      </div>
 
       <div class="ai-promo">
         <p class="ai-promo-title">채점기준을 AI로 빠르게 만들어보세요!</p>
@@ -728,7 +716,7 @@
         <div class="rub-loading-wrap">
           <div class="rub-load-orb"><i data-lucide="wand-sparkles"></i></div>
           <p class="rub-load-msg" id="rubLoadMsg">AI가 채점기준을 만들고 있어요</p>
-          <div class="rub-load-note"><i data-lucide="info" style="width:16px;height:16px"></i><span>생성에 보통 1~2분, 길면 3분까지 걸려요.<br>이 창을 닫아도 생성은 계속돼요. 완료되면 알려드릴게요.</span></div>
+          <div class="rub-load-note"><i data-lucide="info" style="width:16px;height:16px"></i><span>생성에 보통 1~2분, 길면 3분까지 걸려요.<br>이 창을 열어 두시면 완료되는 대로 결과가 보여요.</span></div>
         </div>
       </div>
 
@@ -887,10 +875,10 @@ function openRubAi(){
   lucide.createIcons();
 }
 function closeRubAi(){
-  // 창을 닫아도 생성은 백그라운드로 계속됨 → 그냥 닫고, 생성 중이면 계속 진행 안내
+  // 닫아도 생성은 중단되지 않음(확인됨) → 막지 않고 그냥 닫는다.
+  // 완료 알림은 이번 범위 밖이라 별도 안내 없음.
   document.getElementById('stopPop').classList.remove('show');
   document.getElementById('rubAiDrawer').classList.remove('open');
-  if(rubLoading){ toastMsg('생성은 뒤에서 계속 진행돼요. 완료되면 알려드릴게요.'); }
   syncRubDemoToggle();
 }
 function pickMode(mode){
@@ -1019,31 +1007,21 @@ function finishRubAi(){
   stopRubTimers();
   var open = document.getElementById('rubAiDrawer').classList.contains('open');
   if(!open){
-    // 닫은 채 완료됨 → 결과를 보관하고 페이지에 완료 배너로 알림 (다시 열어 확인)
+    // 닫은 채 완료된 경우: 완료 알림은 제공하지 않음(이번 배포 범위 밖).
+    // ⚠️ 다시 열었을 때 결과가 남아 있는지는 개발 확인 전 — 목업에선 편의상 보관해 둠.
     rubResultReady = true;
-    showRubDoneBanner();
-    toastMsg('채점기준 생성이 끝났어요. 결과를 확인해 주세요.');
     return;
   }
   openRubResult();
 }
 function openRubResult(){
   rubResultReady = false;
-  hideRubDoneBanner();
   renderRubResultPane();
   rubShow(false, false, true);
   setRubFooter('result');
   updateRubApply();
   document.querySelector('#rubAiDrawer .dw-body').scrollTop = 0;
   lucide.createIcons();
-}
-// 생성 완료 알림 배너 (채점기준 섹션 상단) — 눌러서 결과 열기
-function showRubDoneBanner(){ document.getElementById('rubDoneBanner').classList.add('show'); }
-function hideRubDoneBanner(){ document.getElementById('rubDoneBanner').classList.remove('show'); }
-function openRubResultFromBanner(){
-  document.getElementById('rubAiDrawer').classList.add('open');
-  syncRubDemoToggle();
-  openRubResult();
 }
 function renderRubResultPane(){
   var curr = document.querySelectorAll('#rub-list .crit').length;
