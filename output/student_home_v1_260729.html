@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
+<script>window.MOCK_NAV_ENTRY_HASH = location.hash;</script>  <!-- 페이지 초기화가 해시를 덮기 전에 진입 해시 보존 (까망이 딥링크) -->
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="icon" type="image/png" href="clipo_favicon.png">
@@ -638,5 +639,19 @@ function toggleNav(){
 var _h = location.hash.slice(1);
 go(_h && document.getElementById('scr-'+_h) ? _h : 'new');
 </script>
-</body>
+
+<!-- ===== 목업 내비게이터(까망이) 연결 — 규칙: docs/mockup-navigator.md ===== -->
+<script>
+window.MOCK_NAV_FILE  = 'home';
+window.MOCK_NAV_APPLY = {
+  shNew: function(){ go('new'); },
+  shCur: function(){ go('current'); }
+};
+(function(){
+  var MAP = { 'new':'shNew', current:'shCur' };
+  var _go = window.go;
+  if (typeof _go === 'function') window.go = function(s){ _go.apply(this, arguments); if (window.mockNavSetCurrent && MAP[s]) window.mockNavSetCurrent(MAP[s]); };
+})();
+</script>
+<script src="mock_nav_dw.js?v=260730c"></script></body>
 </html>

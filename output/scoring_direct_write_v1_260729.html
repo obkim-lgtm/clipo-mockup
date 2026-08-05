@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
+<script>window.MOCK_NAV_ENTRY_HASH = location.hash;</script>  <!-- 페이지 초기화가 해시를 덮기 전에 진입 해시 보존 (까망이 딥링크) -->
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="icon" type="image/png" href="clipo_favicon.png">
@@ -621,5 +622,24 @@ if(_h === 'resubmitted'){
 
 lucide.createIcons();
 </script>
-</body>
+
+<!-- ===== 목업 내비게이터(까망이) 연결 — 규칙: docs/mockup-navigator.md ===== -->
+<script>
+window.MOCK_NAV_FILE  = 'scoring';
+window.MOCK_NAV_APPLY = {
+  scWrite:    function(){ pickDoc('write'); },
+  scFile:     function(){ pickDoc('file'); },
+  scDeleted:  function(){ pickDoc('deleted'); },
+  scResubNo:  function(){ setResub(false); },
+  scResubYes: function(){ setResub(true); }
+};
+(function(){
+  var MAP = { write:'scWrite', file:'scFile', deleted:'scDeleted' };
+  var _pd = window.pickDoc;
+  if (typeof _pd === 'function') window.pickDoc = function(v){ _pd.apply(this, arguments); if (window.mockNavSetCurrent && MAP[v]) window.mockNavSetCurrent(MAP[v]); };
+  var _sr = window.setResub;
+  if (typeof _sr === 'function') window.setResub = function(v){ _sr.apply(this, arguments); if (window.mockNavSetCurrent) window.mockNavSetCurrent(v ? 'scResubYes' : 'scResubNo'); };
+})();
+</script>
+<script src="mock_nav_dw.js?v=260730c"></script></body>
 </html>

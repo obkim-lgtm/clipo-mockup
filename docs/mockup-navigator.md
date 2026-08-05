@@ -3,10 +3,54 @@
 시연용 다크 플로팅 패널. 제품 UI가 아니라 **목업을 보여주기 위한 도구**다.
 새 목업을 만들 때나 기존 목업에 케이스를 추가할 때 이 규칙을 따른다.
 
-구현체: `#mockNav` (output/*.html 하단 "목업 내비게이터(까망이)" script 블록).
-현재 삽입 파일: `task_ocr_v3` · `class_scoring_detail_v3` · `scoring_elementary_v3` ·
-`scoring_survey_v1` · `scoring_secondary_v1` · `scoring_secondary_current_v1`
-(확인: `grep -l mockNav output/*.html`)
+구현체는 두 갈래다. **새 목업은 공유 파일 방식(B)을 쓴다.**
+
+| 방식 | 구현체 | 삽입 파일 |
+|---|---|---|
+| A. 파일 내장 (기존) | 각 HTML 하단 `#mockNav` script 블록 | `task_ocr_v3` · `task_ocr_inline_v1` · `class_scoring_detail_v3` · `scoring_elementary_v3` · `scoring_survey_v1` · `scoring_secondary_v1` · `scoring_secondary_current_v1` |
+| B. 공유 파일 (권장) | `output/mock_nav_dw.js` 하나 | `task_direct_write_v1_260729` · `focus_log_v1_260728` · `scoring_direct_write_v1_260729` · `student_home_v1_260729` · `student_submit_v1_260729` |
+
+확인: `grep -l mockNav output/*.html` · `grep -l mock_nav_dw output/*.html`
+
+B가 §5(전 파일 동일해야 함)를 구조적으로 보장한다 — 라벨·그룹을 공유 파일 한 곳만 고치면 된다.
+A로 된 기존 세트는 그대로 두고, 손볼 일이 생기면 그때 B로 옮긴다.
+
+## 0. 공유 파일 방식(B) 붙이는 법
+
+각 HTML에 두 군데를 넣는다.
+
+**① `<head>` 맨 앞** — 진입 해시 보존:
+```html
+<script>window.MOCK_NAV_ENTRY_HASH = location.hash;</script>
+```
+> **반드시 필요하다.** 목업 대부분이 `</body>` 직전에 `go(location.hash…)` 같은 초기화를
+> 두는데, 이게 까망이보다 먼저 돌면서 **모르는 해시를 자기 기본 화면으로 `replaceState` 해버린다.**
+> 그러면 딥링크(`#result-after` 등)가 통째로 씹힌다. head에서 원본 해시를 먼저 잡아둬야 한다.
+
+**② `</body>` 직전** — 파일 키 + 케이스 핸들러 + 스크립트:
+```html
+<script>
+window.MOCK_NAV_FILE  = 'submit';                    // mock_nav_dw.js 의 FILES 키
+window.MOCK_NAV_APPLY = {                            // route → 이 파일 안에서 그 케이스를 적용
+  ssWrite: function(){ go('write'); },
+  ssAfter: function(){ go('done'); setOpened(true); }
+};
+(function(){                                          // 화면 안에서 이동해도 활성 표시가 따라오게
+  var MAP = { write:'ssWrite', done:'ssDone' };
+  var _go = window.go;
+  if (typeof _go === 'function') window.go = function(s){
+    _go.apply(this, arguments);
+    if (window.mockNavSetCurrent && MAP[s]) window.mockNavSetCurrent(MAP[s]);
+  };
+})();
+</script>
+<script src="mock_nav_dw.js?v=260730c"></script>
+```
+
+- 공유 JS를 고치면 **`?v=` 를 올린다** (루트 CLAUDE.md 캐시 규칙). 안 올리면 구버전이 캐시에서 로드돼
+  "고쳤는데 그대로"가 된다 — 실제로 겪음.
+- 딥링크 적용은 `load` 이후에 돈다(페이지 초기화보다 뒤에 와야 하므로). 패널 자체는 즉시 그려진다.
+- 구형 패널(`#mockpick`)·화면 전용 토글은 공유 CSS가 `display:none`으로 덮는다 — 마크업은 남겨둔다.
 
 ## 1. 목업 도구는 하나, 어느 화면에서도 나갈 수 있어야 한다
 
