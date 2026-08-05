@@ -20,7 +20,9 @@
 - 창의적 체험활동 이어받기 → ../context_creative.md · 정책 스펙 → ../creative_activity_policy_spec.md
 - 세특 간편 생성기 이어받기 → ../context_quick_seteuk.md
 - 활동지 AI 탭 이어받기 → ../context_question_tab.md
-- OCR·채점 포팅(HIAI 동일 기획) 스펙 → ../HANDOFF_hiai_ocr_scoring_port_260625.md
+- OCR·채점 포팅(HIAI 동일 기획) 스펙 → handoff/HANDOFF_hiai_ocr_scoring_port_260625.md
+- 그 외 인수인계 문서 → handoff/ (교사의날 이벤트·OCR 채점 260615·초등 채점 v2)
+- 내부 검토 문서 → reviews/ (**gitignore 대상 — public repo라 커밋 금지**)
 - PRD 작성 → ../prd_guide.md
 - 연수 페이지 배포·운영 → ../CLAUDE.md "연수 페이지 운영 가이드" (Netlify, training.clipo.ai)
 
