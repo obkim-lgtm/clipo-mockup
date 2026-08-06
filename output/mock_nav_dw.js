@@ -28,6 +28,11 @@
     rubErr:      { f:'design',  h:'rubric-error' },
     flOn:        { f:'task',    h:'log-on' },
     flOff:       { f:'task',    h:'log-off' },
+    flKim:       { f:'task',    h:'case-kim' },
+    flPark:      { f:'task',    h:'case-park' },
+    flLee:       { f:'task',    h:'case-lee' },
+    flJung:      { f:'task',    h:'case-jung' },
+    flHan:       { f:'task',    h:'case-han' },
     scWrite:     { f:'scoring', h:'doc-write' },
     scFile:      { f:'scoring', h:'doc-file' },
     scDeleted:   { f:'scoring', h:'doc-deleted' },
@@ -47,23 +52,25 @@
     ssPdf:       { f:'submit',  h:'pdf' }
   };
 
-  /* 상세로 들어가면 케이스 목록으로 펼쳐지는 그룹 (진입 항목은 그 화면에서 숨김) */
-  var HOME_CASES    = ['shNew','shCur'];
-  var SUBMIT_CASES  = ['ssNotice','ssWrite','ssDone','ssBoth','ssFileonly','ssPreparing','ssClosed','ssBefore','ssAfter','ssPdf'];
-  var SCORING_CASES = ['scWrite','scFile','scDeleted','scResubNo','scResubYes'];
-  var RUBRIC_CASES  = ['dwQuestions','rubOk','rubErr'];   /* 채점기준 AI 데모는 문항 작성 화면에서만 */
-
+  /* 전체 화면·케이스를 항상 펼쳐 둔다. 길이는 패널 내부 스크롤로 처리(2026-08-06).
+   * 예전에는 해당 화면에 들어가야 케이스가 보였는데, 어떤 케이스가 있는지 자체를 알 수 없어
+   * "차트가 없다"처럼 못 찾는 일이 생겼다. */
   var GROUPS = [
-    { t:'교사 · 평가 설계',    items:[['dwList','과제 목록'],['dwDesign','과제 설계'],['dwQuestions','문항 작성']] },
-    { t:'채점기준 AI',         showOn:RUBRIC_CASES, items:[['rubOk','성공'],['rubErr','오류']] },
-    { t:'교사 · 과제물 관리',  items:[['flOn','기록 켠 과제'],['flOff','기록 끈 과제']] },
-    { t:'교사 · 채점 상세',    items:[['scWrite','클리포를 통한 제출'],['scFile','파일 첨부'],['scDeleted','과제물 삭제됨']] },
-    { t:'채점 학생 상태',      showOn:SCORING_CASES, items:[['scResubNo','채점 중'],['scResubYes','채점 후 재제출함']] },
-    { t:'학생 화면',           items:[['shNew','학생 과제 홈',{hideOnCur:HOME_CASES}],['ssNotice','학생 제출',{hideOnCur:SUBMIT_CASES}]] },
-    { t:'학생 과제 홈',        showOn:HOME_CASES,   items:[['shNew','개선안'],['shCur','현재 개발 화면']] },
-    { t:'학생 제출 — 주요 플로우', showOn:SUBMIT_CASES, items:[['ssNotice','① 시작 전 안내'],['ssWrite','② 작성'],['ssDone','③ 제출 완료']] },
-    { t:'다른 설정으로 낸 과제',   showOn:SUBMIT_CASES, items:[['ssBoth','직접 작성 + 파일 제출'],['ssFileonly','파일 제출만'],['ssPreparing','문항 미작성'],['ssClosed','제출 못 한 채 마감']] },
-    { t:'제출 완료 화면 상태',     showOn:SUBMIT_CASES, items:[['ssBefore','결과 공개 전'],['ssAfter','결과 공개 후'],['ssPdf','답안 PDF']] }
+    { t:'교사 · 평가 설계',        items:[['dwList','과제 목록'],['dwDesign','과제 설계'],['dwQuestions','문항 작성']] },
+    { t:'└ 채점기준 AI 생성',      items:[['rubOk','성공'],['rubErr','오류']] },
+    { t:'교사 · 과제물 관리',      items:[['flOn','기록 켠 과제'],['flOff','기록 끈 과제']] },
+    { t:'└ 작성 과정 케이스',      items:[
+        ['flKim','김서윤 · 재제출',{sub:'작성 구간 2개 누적'}],
+        ['flPark','박지민 · 이탈 잦음',{sub:'이탈 후 계단식 급증'}],
+        ['flLee','이준호 · 기록 공백',{sub:'네트워크 끊김 구간'}],
+        ['flJung','정현우 · 이탈 없음',{sub:'멈춤·삭제가 남은 곡선'}],
+        ['flHan','한지우 · 작성 3회',{sub:'미제출 · 구간 3개 세로 배치'}]] },
+    { t:'교사 · 채점 상세',        items:[['scWrite','클리포를 통한 제출'],['scFile','파일 첨부'],['scDeleted','과제물 삭제됨']] },
+    { t:'└ 채점 학생 상태',        items:[['scResubNo','채점 중'],['scResubYes','채점 후 재제출함']] },
+    { t:'학생 · 과제 홈',          items:[['shNew','개선안'],['shCur','현재 개발 화면']] },
+    { t:'학생 · 제출 주요 플로우', items:[['ssNotice','① 시작 전 안내'],['ssWrite','② 작성'],['ssDone','③ 제출 완료']] },
+    { t:'└ 다른 설정으로 낸 과제', items:[['ssBoth','직접 작성 + 파일 제출'],['ssFileonly','파일 제출만'],['ssPreparing','문항 미작성'],['ssClosed','제출 못 한 채 마감']] },
+    { t:'└ 제출 완료 화면 상태',   items:[['ssBefore','결과 공개 전'],['ssAfter','결과 공개 후'],['ssPdf','답안 PDF']] }
   ];
 
   var ME    = window.MOCK_NAV_FILE || '';
@@ -84,20 +91,24 @@
     return '';
   }
 
-  var css = '#mockNav{position:fixed;right:24px;bottom:24px;z-index:5000;width:222px;background:#222736;color:#C9CCE0;border-radius:14px;padding:10px;box-shadow:0 12px 34px rgba(0,0,0,.38);font-family:"Pretendard GOV",sans-serif;}'
-    + '#mockNav .mn-head{display:flex;align-items:center;justify-content:space-between;gap:10px;cursor:move;padding:4px 4px 8px;}'
+  var css = '#mockNav{position:fixed;right:24px;bottom:24px;z-index:5000;width:236px;max-height:calc(100vh - 48px);display:flex;flex-direction:column;background:#222736;color:#C9CCE0;border-radius:14px;padding:10px;box-shadow:0 12px 34px rgba(0,0,0,.38);font-family:"Pretendard GOV",sans-serif;}'
+    + '#mockNav .mn-head{display:flex;align-items:center;justify-content:space-between;gap:10px;cursor:move;padding:4px 4px 8px;flex-shrink:0;}'
     + '#mockNav .mn-hl{display:inline-flex;align-items:center;gap:7px;font-size:11px;font-weight:800;letter-spacing:.06em;color:#8A8FB0;}'
     + '#mockNav .mn-dot{width:10px;height:10px;border-radius:50%;background:#416bff;box-shadow:0 0 0 3px rgba(65,107,255,.25);flex-shrink:0;}'
     + '#mockNav .mn-mini{display:none;}'
     + '#mockNav .mn-caret{background:none;border:none;color:#8A8FB0;cursor:pointer;font-size:12px;padding:2px 4px;line-height:1;transition:transform .15s;}'
-    + '#mockNav .mn-body{display:flex;flex-direction:column;gap:4px;max-height:72vh;overflow:auto;}'
+    + '#mockNav .mn-body{display:flex;flex-direction:column;gap:4px;flex:1 1 auto;min-height:0;overflow-y:auto;overflow-x:hidden;padding-right:4px;scrollbar-width:thin;scrollbar-color:#4a5170 transparent;overscroll-behavior:contain;}'
+    + '#mockNav .mn-body::-webkit-scrollbar{width:6px;}'
+    + '#mockNav .mn-body::-webkit-scrollbar-track{background:transparent;}'
+    + '#mockNav .mn-body::-webkit-scrollbar-thumb{background:#4a5170;border-radius:3px;}'
+    + '#mockNav .mn-body::-webkit-scrollbar-thumb:hover{background:#5c6488;}'
     + '#mockNav .mn-group{font-size:10px;font-weight:800;letter-spacing:.08em;color:#6b7192;margin:9px 4px 3px;}'
     + '#mockNav .mn-btn{width:100%;text-align:left;white-space:nowrap;padding:8px 11px;border-radius:9px;border:1px solid #333a52;background:#2A2F44;color:#C9CCE0;font-size:13px;font-weight:700;font-family:inherit;cursor:pointer;line-height:1.3;}'
     + '#mockNav .mn-btn:hover{background:#333a55;}'
     + '#mockNav .mn-btn.on{background:#416bff;color:#fff;border-color:#416bff;}'
     + '#mockNav .mn-sub{display:block;font-size:11px;font-weight:600;color:#8A8FB0;margin-top:2px;white-space:normal;line-height:1.35;}'
     + '#mockNav .mn-btn.on .mn-sub{color:#D6E2FF;}'
-    + '#mockNav.mn-collapsed{width:auto;}'
+    + '#mockNav.mn-collapsed{width:auto;max-height:none;}'
     + '#mockNav.mn-collapsed .mn-body{display:none;}'
     + '#mockNav.mn-collapsed .mn-full{display:none;}'
     + '#mockNav.mn-collapsed .mn-mini{display:inline;}'
