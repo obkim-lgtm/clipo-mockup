@@ -57,7 +57,7 @@
    * "차트가 없다"처럼 못 찾는 일이 생겼다. */
   var GROUPS = [
     { t:'교사 · 평가 설계',        items:[['dwList','과제 목록'],['dwDesign','과제 설계'],['dwQuestions','문항 작성']] },
-    { t:'└ 채점기준 AI 생성',      items:[['rubOk','성공'],['rubErr','오류']] },
+    /* 채점기준 AI 성공/오류는 별도 그룹으로 두지 않는다 — 문항 작성 화면 안의 [AI 생성] 버튼으로 시연 (2026-08-06 올립) */
     { t:'교사 · 과제물 관리',      items:[['flOn','기록 켠 과제'],['flOff','기록 끈 과제']] },
     { t:'└ 작성 과정 케이스',      items:[
         ['flKim','김서윤 · 재제출',{sub:'타임라인 1개 + 제출 마커 3개'}],
@@ -91,7 +91,7 @@
     return '';
   }
 
-  var css = '#mockNav{position:fixed;right:24px;bottom:24px;z-index:5000;width:236px;max-height:calc(100vh - 48px);display:flex;flex-direction:column;background:#222736;color:#C9CCE0;border-radius:14px;padding:10px;box-shadow:0 12px 34px rgba(0,0,0,.38);font-family:"Pretendard GOV",sans-serif;}'
+  var css = '#mockNav{position:fixed;right:24px;bottom:24px;z-index:5000;width:236px;max-height:calc(50vh - 24px);display:flex;flex-direction:column;background:#222736;color:#C9CCE0;border-radius:14px;padding:10px;box-shadow:0 12px 34px rgba(0,0,0,.38);font-family:"Pretendard GOV",sans-serif;}'
     + '#mockNav .mn-head{display:flex;align-items:center;justify-content:space-between;gap:10px;cursor:move;padding:4px 4px 8px;flex-shrink:0;}'
     + '#mockNav .mn-hl{display:inline-flex;align-items:center;gap:7px;font-size:11px;font-weight:800;letter-spacing:.06em;color:#8A8FB0;}'
     + '#mockNav .mn-dot{width:10px;height:10px;border-radius:50%;background:#416bff;box-shadow:0 0 0 3px rgba(65,107,255,.25);flex-shrink:0;}'
@@ -125,6 +125,7 @@
   var bodyEl = wrap.querySelector('#mnBody');
 
   function render(){
+    var keep = bodyEl.scrollTop;   /* 케이스 전환 재렌더 시 스크롤 유지 */
     var rows = '';
     GROUPS.filter(function(g){ return !g.showOn || g.showOn.indexOf(CUR) > -1; }).forEach(function(g){
       var items = g.items.filter(function(it){ return !(it[2] && it[2].hideOnCur && it[2].hideOnCur.indexOf(CUR) > -1); });
@@ -139,7 +140,13 @@
     bodyEl.querySelectorAll('.mn-btn').forEach(function(b){
       b.addEventListener('click', function(e){ e.stopPropagation(); go(b.dataset.r); });
     });
+    bodyEl.scrollTop = keep;
   }
+
+  /* 스크롤 위치는 파일 간에도 유지 — 화면을 옮겨도 보던 자리에서 이어 봄 */
+  bodyEl.addEventListener('scroll', function(){
+    try { localStorage.setItem('clipoMockNavScroll', String(bodyEl.scrollTop)); } catch(e){}
+  });
 
   /* 같은 파일이면 핸들러로 즉시 전환, 다른 파일이면 딥링크로 이동 */
   function go(r){
@@ -163,6 +170,7 @@
   var entry = routeFromHash();
   CUR = entry || firstRouteOfMe();
   render();
+  try { bodyEl.scrollTop = parseInt(localStorage.getItem('clipoMockNavScroll') || '0', 10); } catch(e){}
 
   function applyEntry(){
     if (!entry || typeof APPLY[entry] !== 'function') return;
