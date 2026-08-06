@@ -214,6 +214,41 @@
 
     /* 채점요소 복잡도 경고 스타일은 위 .rub-warn / .rub-elem.warn 을 그대로 사용 (중복 정의 제거) */
 
+    /* ===== 채점기준 입력 예시 모달 (개발 화면 구조 + 안 좋은 예 블록 신규) ===== */
+    .ex-ov{ display:none; position:fixed; inset:0; background:rgba(34,38,49,.45); z-index:1700; justify-content:center; overflow-y:auto; padding:24px; }
+    .ex-ov.open{ display:flex; }
+    .ex-modal{ background:#fff; border-radius:12px; box-shadow:0 20px 60px rgba(0,0,0,.25); width:760px; max-width:100%; margin:auto; position:relative; }
+    .ex-hd{ padding:24px 24px 4px; }
+    .ex-title{ font-size:18px; font-weight:600; color:#222631; margin:0; }
+    .ex-x{ position:absolute; top:16px; right:16px; width:36px; height:36px; border:none; background:none; border-radius:6px; cursor:pointer; color:#6d7381; display:inline-flex; align-items:center; justify-content:center; }
+    .ex-x:hover{ background:#f1f3f5; }
+    .ex-body{ padding:16px 24px 24px; display:flex; flex-direction:column; gap:22px; }
+    /* 예시 블록 헤더 — 태그 + 설명 */
+    .ex-lead{ display:flex; align-items:flex-start; gap:10px; margin-bottom:10px; }
+    .ex-tag{ flex-shrink:0; display:inline-flex; align-items:center; justify-content:center; line-height:1; height:26px; padding:0 10px; border-radius:6px; font-size:13px; font-weight:600; }
+    .ex-tag.bad{ background:#ffeaea; color:#c8323f; }
+    .ex-tag.good{ background:#e9f2ff; color:#3151c4; }
+    .ex-lead-txt{ font-size:15px; color:#3b3f4c; line-height:1.55; }
+    /* 예시 표 — 좌: 채점기준 / 우: 배점 및 세부 기준 */
+    .ex-tbl{ border:1px solid #dde1e8; border-radius:8px; overflow:hidden; display:flex; }
+    .ex-tbl.bad{ border-color:#f5c2c7; }
+    .ex-col-l{ width:190px; flex-shrink:0; border-right:1px solid #dde1e8; display:flex; flex-direction:column; }
+    .ex-tbl.bad .ex-col-l{ border-right-color:#f5c2c7; }
+    .ex-col-r{ flex:1; min-width:0; }
+    .ex-th{ background:#f6f7f9; padding:9px 14px; font-size:13px; font-weight:600; color:#6d7381; border-bottom:1px solid #dde1e8; }
+    .ex-tbl.bad .ex-th{ background:#fff5f5; border-bottom-color:#f5c2c7; }
+    .ex-elem{ padding:14px; font-size:15px; color:#222631; line-height:1.6; flex:1; }
+    .ex-row{ display:flex; border-bottom:1px solid #eceef2; }
+    .ex-row:last-child{ border-bottom:none; }
+    .ex-sc{ width:64px; flex-shrink:0; padding:12px 8px; text-align:center; font-size:15px; font-weight:600; color:#222631; border-right:1px solid #eceef2; }
+    .ex-desc{ flex:1; min-width:0; padding:12px 14px; font-size:15px; color:#3b3f4c; line-height:1.6; }
+    .ex-desc em{ font-style:normal; color:#416bff; }
+    /* 안 좋은 예 하단 사유 */
+    .ex-why{ display:flex; align-items:flex-start; gap:8px; margin-top:10px; padding:11px 14px; background:#fff5f5; border-radius:8px; }
+    .ex-why i{ width:16px; height:16px; color:#c8323f; flex-shrink:0; margin-top:2px; }
+    .ex-why p{ margin:0; font-size:14px; color:#3b3f4c; line-height:1.6; }
+    .ex-why b{ font-weight:600; color:#c8323f; }
+
     /* ===== 채점기준 AI 생성 드로워 ===== */
     .dw-ov{ position:fixed; inset:0; background:rgba(0,0,0,.4); z-index:1600; display:none; }
     .dw-ov.open{ display:block; }
@@ -498,7 +533,7 @@
           <button class="btn btn-secondary btn-sm" onclick="addRub()"><i data-lucide="plus" style="width:14px;height:14px"></i>기준 추가</button>
           <button class="btn btn-ai btn-sm" onclick="openRubAi()"><i data-lucide="wand-sparkles" style="width:14px;height:14px"></i>AI 생성</button>
         </div>
-        <button style="background:none;border:none;cursor:pointer;font-family:inherit;font-size:14px;font-weight:600;color:#416bff;display:inline-flex;align-items:center;gap:4px;" onclick="toastMsg('입력 가이드는 이 목업에서 제공하지 않습니다.')">어떻게 입력해야 하나요? <i data-lucide="help-circle" style="width:14px;height:14px"></i></button>
+        <button style="background:none;border:none;cursor:pointer;font-family:inherit;font-size:14px;font-weight:600;color:#416bff;display:inline-flex;align-items:center;gap:4px;" onclick="openRubEx()">어떻게 입력해야 하나요? <i data-lucide="help-circle" style="width:14px;height:14px"></i></button>
       </div>
     </div>
 
@@ -1160,5 +1195,94 @@ document.querySelectorAll('#rub-list .rub-elem').forEach(checkRubElem);
 
 <!-- 채점 정확도를 높이는 준비 팁 모달 — 공용 컴포넌트 (scoring_guide_modal.js 하나만 수정) -->
 <script src="scoring_guide_modal.js"></script>
+
+<!-- ===== 채점기준 입력 예시 모달 =====
+     개발 화면의 좋은 예 2종(정량·정성)은 그대로 두고, 앞에 안 좋은 예 1개를 얹었다.
+     안 좋은 예를 유형별로 나누지 않는 이유: 이 모달의 축은 정량/정성인데
+     좋은·안좋은 축을 겹치면 구조가 흐려진다. 문제 인식 1개 → 해법 2개 순서.
+     배점이 섞인 케이스는 예시에서 제외(흔치 않음, 레나 QA 의견) — 단 감지 규칙 R1은 유지. -->
+<div class="ex-ov" id="rubExModal" onclick="if(event.target===this) closeRubEx()">
+  <div class="ex-modal">
+    <button class="ex-x" onclick="closeRubEx()"><i data-lucide="x" style="width:20px;height:20px"></i></button>
+    <div class="ex-hd"><h3 class="ex-title">채점기준 입력 예시</h3></div>
+    <div class="ex-body">
+
+      <!-- 안 좋은 예 (신규) -->
+      <div>
+        <div class="ex-lead">
+          <span class="ex-tag bad">안 좋은 예</span>
+          <span class="ex-lead-txt">채점기준 한 칸에 여러 요소가 섞이면, 한 번에 여러 가지를 판단해야 해서 채점이 실패할 수 있어요.</span>
+        </div>
+        <div class="ex-tbl bad">
+          <div class="ex-col-l">
+            <div class="ex-th">채점기준</div>
+            <div class="ex-elem">요소① 장래희망: 장래희망을 구체적으로 밝힘.<br>요소② 이유: 그 희망을 갖게 된 이유를 서술함.<br>요소③ 노력: 장래희망을 이루기 위한 노력을 서술함.</div>
+          </div>
+          <div class="ex-col-r">
+            <div class="ex-th">배점 및 세부 기준</div>
+            <div class="ex-row"><div class="ex-sc">7</div><div class="ex-desc">세 가지 내용이 대체로 잘 드러나고 전체적으로 설득력이 있음</div></div>
+            <div class="ex-row"><div class="ex-sc">5</div><div class="ex-desc">대부분의 내용이 어느 정도 포함되어 있으나 설득력이나 구체성이 다소 부족함</div></div>
+            <div class="ex-row"><div class="ex-sc">3</div><div class="ex-desc">일부 내용이 빠져 있거나 표현이 다소 막연함</div></div>
+          </div>
+        </div>
+        <div class="ex-why">
+          <i data-lucide="alert-triangle"></i>
+          <p><b>세 가지를 한 번에 판단해야 해요.</b> 장래희망만 잘 쓰고 노력이 빠진 답안에 몇 점을 줘야 할지 기준이 없어, AI와 선생님의 판단이 달라집니다. 요소마다 채점기준을 나눠 주세요.</p>
+        </div>
+      </div>
+
+      <!-- 좋은 예 1: 정량 (개발 화면 그대로) -->
+      <div>
+        <div class="ex-lead">
+          <span class="ex-tag good">정량 평가 요소</span>
+          <span class="ex-lead-txt">정량적으로 측정할 세부 항목이 모두 포함되도록 채점기준을 구체적으로 입력해 주세요.</span>
+        </div>
+        <div class="ex-tbl">
+          <div class="ex-col-l">
+            <div class="ex-th">채점기준</div>
+            <div class="ex-elem">단열팽창<br>단열압축 비교</div>
+          </div>
+          <div class="ex-col-r">
+            <div class="ex-th">배점 및 세부 기준</div>
+            <div class="ex-row"><div class="ex-sc">10</div><div class="ex-desc"><em>4가지 항목(온도 변화, 단열 팽창, 단열 압축, 상대습도 변화)</em>을 모두 활용하여 정확하게 서술함.</div></div>
+            <div class="ex-row"><div class="ex-sc">8</div><div class="ex-desc">4가지 항목 중 3가지를 활용하여 서술함.</div></div>
+            <div class="ex-row"><div class="ex-sc">6</div><div class="ex-desc">4가지 항목 중 2가지 이하를 활용하여 서술이 미흡함.</div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 좋은 예 2: 정성 (개발 화면 그대로) -->
+      <div>
+        <div class="ex-lead">
+          <span class="ex-tag good">정성 평가 요소</span>
+          <span class="ex-lead-txt">정성적으로 관찰할 항목이 수준별로 구별되도록 채점기준을 구체적으로 입력해 주세요.</span>
+        </div>
+        <div class="ex-tbl">
+          <div class="ex-col-l">
+            <div class="ex-th">채점기준</div>
+            <div class="ex-elem">대중매체와 개인 인터넷 방송의 특성 이해</div>
+          </div>
+          <div class="ex-col-r">
+            <div class="ex-th">배점 및 세부 기준</div>
+            <div class="ex-row"><div class="ex-sc">10</div><div class="ex-desc">대중매체와 개인 인터넷 방송의 특성을 <em>구체적으로</em> 설명하고, <em>사회적 영향력, 정보 전달 방식, 신뢰성 등을 포함하여</em> 장단점을 비교 분석할 수 있다.</div></div>
+            <div class="ex-row"><div class="ex-sc">8</div><div class="ex-desc">대중매체와 개인 인터넷 방송의 특성을 설명하고, 주요한 장단점을 비교할 수 있다.</div></div>
+            <div class="ex-row"><div class="ex-sc">6</div><div class="ex-desc">대중매체와 개인 인터넷 방송의 차이점을 <em>간단히</em> 말할 수 있다.</div></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+<script>
+function openRubEx(){
+  document.getElementById('rubExModal').classList.add('open');
+  if(window.lucide) lucide.createIcons();
+}
+function closeRubEx(){
+  document.getElementById('rubExModal').classList.remove('open');
+}
+document.addEventListener('keydown', function(e){ if(e.key==='Escape') closeRubEx(); });
+</script>
 </body>
 </html>
