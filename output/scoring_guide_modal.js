@@ -50,24 +50,22 @@
     '.gfig-cap{font-size:14px;font-weight:600;text-align:center;line-height:1.35;}',
     '.gfig-cap.bad{color:#f2525f;}',
     '.gfig-cap.good{color:#1ab864;}',
-    '.gcalm{background:#f6f7f9;border-radius:8px;padding:12px 16px;display:flex;align-items:flex-start;gap:8px;}',
-    '.gcalm i{width:17px;height:17px;color:#6d7381;flex-shrink:0;margin-top:2px;}',
-    '.gcalm p{font-size:14px;color:#3b3f4c;line-height:1.6;margin:0;}'
+    '.sg-body{padding-bottom:4px;}'  /* 하단 안내(gcalm)는 2026-07-29 삭제 — 교사가 이미 아는 내용(점수 직접 수정 가능) */
   ].join('\n');
 
   var HTML =
     '<div class="sg-dialog">' +
       '<button class="sg-x" onclick="closeScoringGuide()"><i data-lucide="x" style="width:20px;height:20px;"></i></button>' +
       '<div class="sg-head">' +
-        '<h3 class="sg-title">채점 정확도를 높이는 준비 팁</h3>' +
-        '<p class="sg-sub">활동지를 만들 때와 과제물을 스캔할 때 아래 세 가지를 확인해 주세요.</p>' +
+        '<h3 class="sg-title">과제물을 이렇게 준비하면 AI가 더 잘 읽어요</h3>' +
+        '<p class="sg-sub">활동지를 만들 때와 과제물을 스캔할 때, 아래 세 가지만 확인해 주세요.</p>' +
       '</div>' +
       '<div class="sg-body">' +
 
         '<div class="gcase">' +
           '<div class="gcase-txt">' +
             '<p class="gcase-title">1. 활동지는 위에서 아래로, 한 단으로 구성해 주세요</p>' +
-            '<p class="gcase-desc">여러 단으로 빽빽하게 나누면 읽는 순서가 섞이고, 답란이 좁으면 <b>학생 답이 옆 영역을 넘어가 인식이 어려워요.</b> 크레딧은 학생 1명당 1개라 <b>페이지가 늘어도 더 들지 않으니</b> 답란을 넉넉하게 잡아주세요.</p>' +
+            '<p class="gcase-desc">여러 단으로 빽빽하면 읽는 순서가 섞이고, 답란이 좁으면 학생 답이 옆 영역으로 넘어가요. 크레딧은 학생 1명당 1개라 페이지가 늘어도 더 들지 않으니,<br>답안 영역을 넉넉하게 구성해 주세요.</p>' +
           '</div>' +
           '<div class="gcase-figs">' +
             '<div class="gfig">' +
@@ -112,7 +110,7 @@
         '<div class="gcase">' +
           '<div class="gcase-txt">' +
             '<p class="gcase-title">2. 그림·지도 위에 겹쳐 쓴 글씨는 인식이 어려워요</p>' +
-            '<p class="gcase-desc">그림 위에 쓴 글씨는 <b>인식 정확도가 낮아질 수 있어요.</b> 글씨는 그림 밖 여백에 쓰도록 안내해 주시고, 이런 과제는 채점 후 <b>AI 채점 근거</b>를 꼭 확인해 주세요.</p>' +
+            '<p class="gcase-desc">글씨와 그림이 겹치면 글자의 경계를 구분하기 어려워요.<br>이런 과제는 채점 후 AI 채점 근거를 함께 확인해 주세요.</p>' +
           '</div>' +
           '<div class="gcase-figs">' +
             '<div class="gfig">' +
@@ -152,7 +150,7 @@
         '<div class="gcase">' +
           '<div class="gcase-txt">' +
             '<p class="gcase-title">3. 과제를 걷은 뒤, 채점 표시를 하기 전에 스캔해 주세요</p>' +
-            '<p class="gcase-desc">답안에 빨간펜 첨삭이 남아 있으면 <b>고쳐 쓴 내용을 학생 답으로 읽을 수 있어요.</b> 걷은 과제를 먼저 스캔해 올리고, 채점 표시는 그 뒤에 해주세요.</p>' +
+            '<p class="gcase-desc">빨간펜 첨삭이 남아 있으면 AI가 고쳐 쓴 내용을 학생 답으로 읽을 수 있어요.<br>걷은 그대로 과제물을 먼저 스캔해 주세요.</p>' +
           '</div>' +
           '<div class="gcase-figs">' +
             '<div class="gfig">' +
@@ -188,10 +186,6 @@
           '</div>' +
         '</div>' +
 
-        '<div class="gcalm">' +
-          '<i data-lucide="info"></i>' +
-          '<p>안내와 다르게 준비돼도 업로드와 채점은 그대로 진행돼요. AI가 답안을 잘못 읽은 것 같으면 <b>AI 채점 근거를 확인하고 점수를 직접 수정</b>할 수 있어요.</p>' +
-        '</div>' +
       '</div>' +
       '<div class="sg-foot">' +
         '<button class="sg-ok" onclick="closeScoringGuide()">확인</button>' +
