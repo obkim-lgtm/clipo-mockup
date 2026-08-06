@@ -1,6 +1,6 @@
 /* ===== 목업 내비게이터 (까망이) — 학생 직접 작성 세트 5종 공통 =====
  * 규칙: docs/mockup-navigator.md
- * 삽입 파일: task_direct_write_v1_260729 · focus_log_v1_260728 ·
+ * 삽입 파일: task_direct_write_v1_260729 · focus_log_v2_260806 ·
  *            scoring_direct_write_v1_260729 · student_home_v1_260729 ·
  *            student_submit_v1_260729
  *
@@ -13,7 +13,7 @@
 (function(){
   var FILES = {
     design:  'task_direct_write_v1_260729.html',
-    task:    'focus_log_v1_260728.html',
+    task:    'focus_log_v2_260806.html',
     scoring: 'scoring_direct_write_v1_260729.html',
     home:    'student_home_v1_260729.html',
     submit:  'student_submit_v1_260729.html'
