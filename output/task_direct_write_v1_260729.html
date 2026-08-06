@@ -191,6 +191,7 @@
     .sw-knob{ position:absolute; top:2px; left:2px; width:18px; height:18px; border-radius:50%; background:#fff; transition:left .15s; box-shadow:0 1px 3px rgba(0,0,0,.2); }
     .sw.on .sw-track{ background:#416bff; }
     .sw.on .sw-knob{ left:20px; }
+    .sw.disabled{ opacity:.5; cursor:default; }
     .hstep{ display:inline-flex; align-items:center; height:44px; border:1px solid #d9d9d9; border-radius:8px; overflow:hidden; }
     .hstep button{ width:44px; height:100%; border:none; background:#fff; cursor:pointer; color:#3b3f4c; font-size:18px; display:flex; align-items:center; justify-content:center; }
     .hstep button:hover{ background:#f6f7f9; }
@@ -728,11 +729,15 @@
 
             <div>
               <p class="way-sub">작성 환경</p>
+              <div class="alert-info" id="recLockNote" style="display:none;margin-bottom:12px;">
+                <i data-lucide="lock" style="width:18px;height:18px"></i>
+                <div class="ai-txt"><b>제출한 학생이 있어 작성 과정 기록은 바꿀 수 없어요.</b><br>과제 도중에 켜거나 끄면 먼저 낸 학생만 기록이 없어, 기록이 없는 것인지 켜지 않았던 것인지 구분할 수 없게 됩니다.</div>
+              </div>
               <span class="sw on" onclick="toggleSw(this)"><span class="sw-track"><span class="sw-knob"></span></span>복사 및 붙여넣기 금지</span>
-              <span class="sw on" onclick="toggleSw(this)" style="margin-top:10px;"><span class="sw-track"><span class="sw-knob"></span></span>다른 탭·창 이동 기록</span>
+              <span class="sw" id="swRecord" onclick="toggleRecordSw(this)" style="margin-top:10px;"><span class="sw-track"><span class="sw-knob"></span></span>작성 과정 기록</span>
               <div class="alert-info" style="margin-top:14px;">
                 <i data-lucide="info" style="width:18px;height:18px"></i>
-                <div class="ai-txt">켜면 학생이 작성 화면에서 다른 탭·창으로 이동한 <b>시각과 머문 시간</b>이 남고, 과제물 관리 화면에서 확인할 수 있습니다. 방문한 사이트는 수집하지 않고, 스마트폰 등 다른 기기 사용은 감지되지 않습니다. 자동 판정이나 감점 없이 참고 정보로만 제공되며, 학생에게는 작성 시작 전에 안내됩니다.</div>
+                <div class="ai-txt">켜면 학생이 답안을 쓰는 동안 다른 탭·창으로 이동한 <b>시각·머문 시간</b>과 <b>글자 수 변화</b>가 남고, 과제물 관리 화면에서 확인할 수 있습니다. 방문한 사이트와 답안 내용은 저장하지 않고, 스마트폰 등 다른 기기 사용은 감지되지 않습니다. 자동 판정이나 감점 없이 참고 정보로만 제공되며, 학생에게는 작성 시작 전에 안내됩니다. <b>제출이 한 건이라도 들어오면 켜고 끌 수 없습니다.</b></div>
               </div>
             </div>
           </div>
@@ -1643,13 +1648,24 @@ function toggleWay(k){
   document.getElementById('way-none').style.display = none ? '' : 'none';
 }
 
-/* 제출이 들어오면 방식만 잠근다 (세부 설정은 계속 조절 가능) */
+/* 작성 과정 기록 — 기본 꺼짐, 제출이 1건이라도 들어오면 켜기·끄기 잠금 */
+function toggleRecordSw(el){
+  if(SUBMITTED > 0){
+    toastMsg('제출한 학생이 있어 작성 과정 기록은 바꿀 수 없어요.');
+    return;
+  }
+  el.classList.toggle('on');
+}
+
+/* 제출이 들어오면 방식과 작성 과정 기록을 잠근다 (나머지 세부 설정은 계속 조절 가능) */
 function applyWayLock(){
   var locked = SUBMITTED > 0;
   document.getElementById('waysLockNote').style.display = locked ? 'flex' : 'none';
   document.getElementById('waysLockCnt').textContent = SUBMITTED;
   document.getElementById('way-write').classList.toggle('locked', locked);
   document.getElementById('way-file').classList.toggle('locked', locked);
+  document.getElementById('recLockNote').style.display = locked ? 'flex' : 'none';
+  document.getElementById('swRecord').classList.toggle('disabled', locked);
   lucide.createIcons();
 }
 

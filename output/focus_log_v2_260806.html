@@ -126,6 +126,10 @@ body.nav-expanded .main-wrap{ padding-left:200px; }
 .tl-row{ display:flex; align-items:stretch; gap:0; width:100%; }
 .tl-sess{ min-width:150px; display:flex; flex-direction:column; gap:6px; }
 .tl-sess + .tl-sess{ border-left:1px dashed #c7cbd3; padding-left:14px; margin-left:14px; }
+/* 작성 구간이 3개 이상이면 가로로 붙이지 않고 세로로 쌓는다 — 구간마다 폭을 다 쓰게 해서 곡선이 짧아지지 않게 */
+.tl-row.stack{ flex-direction:column; gap:18px; }
+.tl-row.stack .tl-sess{ flex:0 0 auto !important; width:100%; }
+.tl-row.stack .tl-sess + .tl-sess{ border-left:none; padding-left:0; margin-left:0; border-top:1px dashed #c7cbd3; padding-top:16px; }
 .tl-sess-hd{ display:flex; align-items:baseline; gap:8px; flex-wrap:wrap; }
 .tl-sess-name{ font-size:14px; font-weight:600; color:#222631; }
 .tl-sess-when{ font-size:13px; font-weight:500; color:#6d7381; }
@@ -381,7 +385,7 @@ body.nav-expanded .main-wrap{ padding-left:200px; }
     <button class="mp-btn" onclick="openCase('10103')">박지민 · 이탈 잦음<span class="mp-sub">이탈 후 계단식 급증</span></button>
     <button class="mp-btn" onclick="openCase('10102')">이준호 · 기록 공백<span class="mp-sub">네트워크 끊김 구간</span></button>
     <button class="mp-btn" onclick="openCase('10105')">정현우 · 이탈 없음<span class="mp-sub">멈춤·삭제가 남은 곡선</span></button>
-    <button class="mp-btn" onclick="openCase('10106')">한지우 · 미제출<span class="mp-sub">쓰던 기록만 있음</span></button>
+    <button class="mp-btn" onclick="openCase('10106')">한지우 · 작성 3회<span class="mp-sub">미제출 · 구간 3개는 세로 배치</span></button>
 
     <div class="mp-cap">이어지는 화면</div>
     <button class="mp-btn" onclick="location.href='student_submit_v1_260729.html'">학생 · 과제 제출<span class="mp-sub">문항형 · 이동 감지 실동작</span></button>
@@ -451,11 +455,17 @@ const teacherRows = [
         events:[] }
     ] },
   { id:'10109', name:'임도윤', status:'제출', date:'07/28 16:10 선생님 제출', type:'file', detail:'10109_임도윤.pdf 외 1', teacherUpload:true },
-  { id:'10106', name:'한지우', status:'미제출', draft:'812자', draftAt:'07/28 15:52 저장',
+  { id:'10106', name:'한지우', status:'미제출', draft:'812자', draftAt:'07/29 09:02 저장',
     sessions:[
-      { name:'작성 중', date:'07/28', start:'15:10', submitted:false,
-        series:[0,15,35,55,50,72,95,118,112,135,160,182,178,200,225,248,242,265,290,312,330,330,352,375,398,392,415,438,460,455,478,500,522,518,542,565,588,610,640,680,720,768,812],
-        events:[ {at:20, type:'탭 전환', dur:65} ] }
+      { name:'1차 작성', date:'07/28', start:'15:10', submitted:false,
+        series:[0,15,35,55,50,72,95,118,112,135,160,182,178,200,225,248,242,265,290,312,330,330,352,375,398,392,415,438,460,455,478,500,520],
+        events:[ {at:20, type:'탭 전환', dur:65} ] },
+      { name:'2차 작성', date:'07/28', start:'16:30', submitted:false,
+        series:[520,528,545,562,558,578,598,615,610,630,648,665,660,678,690],
+        events:[] },
+      { name:'3차 작성', date:'07/29', start:'08:50', submitted:false,
+        series:[690,698,715,732,728,748,765,782,778,795,805,808,812],
+        events:[ {at:5, type:'탭 전환', dur:22} ] }
     ] },
   { id:'10107', name:'조민재', status:'미제출' },
   { id:'10108', name:'윤하은', status:'미제출' }
@@ -534,7 +544,7 @@ function sessChart(s, maxVal){
   return '<svg class="tl-chart" viewBox="0 0 '+W+' '+H+'" preserveAspectRatio="none">'+out+'</svg>';
 }
 
-function sessBlock(s, maxVal){
+function sessBlock(s, maxVal, isLast){
   const N = sessMinutes(s);
   const evs = sessEvents(s);
   const meta = evs.length
@@ -542,7 +552,7 @@ function sessBlock(s, maxVal){
     : '<span class="tl-sess-meta none">이탈 없음</span>';
   const endLine = s.submitted
     ? '<span class="tl-end"><i data-lucide="check-circle-2"></i>'+hm(s.start, N)+' '+(s.resubmit?'재제출':'제출')+'</span>'
-    : '<span class="tl-end draft"><i data-lucide="pencil-line"></i>'+hm(s.start, N)+' 저장 · 아직 제출 안 함</span>';
+    : '<span class="tl-end draft"><i data-lucide="pencil-line"></i>'+hm(s.start, N)+' 저장'+(isLast?' · 아직 제출 안 함':'')+'</span>';
 
   return '<div class="tl-sess" style="flex:'+Math.max(N,4)+' 1 0;">'
     + '<div class="tl-sess-hd"><span class="tl-sess-name">'+s.name+'</span>'
@@ -645,10 +655,10 @@ function renderTeacher(){
           + '<span><i class="lg-swatch" style="background:#fff1e6;border:1px solid #f7d3ba;"></i>다른 화면</span>'
           + '<span><i class="lg-swatch" style="background:#eef0f3;border:1px solid #dde1e8;"></i>기록 공백</span>'
         + '</div>'
-        + '<div class="tl-row">' + sessions.map(s=>sessBlock(s, maxVal)).join('') + '</div>'
+        + '<div class="tl-row'+(sessions.length>=3?' stack':'')+'">' + sessions.map((s,i)=>sessBlock(s, maxVal, i===sessions.length-1)).join('') + '</div>'
         + (evHtml ? '<div class="ld-evt-wrap">'+evHtml+'</div>' : '')
         + '<p class="ld-foot">3초 미만 이동은 기록되지 않아요. 방문한 사이트와 답안 내용은 저장하지 않아요.'
-        + (sessions.length>1 ? ' 재제출로 작성 구간이 늘어나도 이전 구간은 그대로 남아요.' : '')
+        + (sessions.length>1 ? ' 이어 쓰거나 재제출해서 작성 구간이 늘어나도 이전 구간은 그대로 남아요.' : '')
         + '</p>'
         + '</div></td>';
       tb.appendChild(dtr);
