@@ -753,8 +753,8 @@ renumber('rub-list','채점기준','rub-count');
 lucide.createIcons();
 
 // ── 채점요소 복잡도 인라인 안내 (evaluation_design_v4_260615와 동일 스펙) ──
-//  R1 배점 표기 2회 이상  R2 나열 마커 2회 이상  R3 채점요소에 배점 있는데 급간 칸이 빔(구조 비교)
-// 판정에 쓰지 않는 것: 글자 수 · 줄바꿈
+//  R1 배점 표기 2회 이상  R2 나열 마커 2회 이상   ※ 모든 조건 "2회 이상" — 1회만 등장하는 정상 입력엔 미발동
+// 판정에 쓰지 않는 것: 글자 수 · 줄바꿈 · 배점↔급간 구조 비교(R3, 오탐으로 제외)
 var RE_SCORE = /\d+\s*점/g;
 var RE_ENUM  = /[①②③④⑤⑥⑦⑧⑨⑩]|요소\s*\d|첫째|둘째|셋째|\d\s*\)|^\s*[가나다]\./gm;
 function checkRubElem(ta){
@@ -763,14 +763,10 @@ function checkRubElem(ta){
   var v = ta.value;
   var r1 = (v.match(RE_SCORE) || []).length >= 2;
   var r2 = (v.match(RE_ENUM)  || []).length >= 2;
-  var r3 = false;
-  if(!r1 && RE_SCORE.test(v)){
-    RE_SCORE.lastIndex = 0;
-    var cells = crit.querySelectorAll('.sc-desc input');
-    if(cells.length) r3 = Array.prototype.every.call(cells, function(c){ return !c.value.trim(); });
-  }
+  // R3(배점 있는데 급간 비어 있음)은 2026-07-29 제외 — 배점을 먼저 쓰고 급간을 이어서 채우는
+  // 정상 입력 순서에도 걸려 오탐이 됨 (빌 의견, 올립 동의)
   RE_SCORE.lastIndex = 0; RE_ENUM.lastIndex = 0;
-  var complex = r1 || r2 || r3;
+  var complex = r1 || r2;
   ta.classList.toggle('warn', complex);
   var warn = crit.querySelector('.rub-warn');
   if(!warn){
