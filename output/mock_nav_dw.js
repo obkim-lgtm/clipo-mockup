@@ -91,7 +91,7 @@
     return '';
   }
 
-  var css = '#mockNav{position:fixed;right:24px;bottom:24px;z-index:5000;width:236px;max-height:calc(50vh - 24px);display:flex;flex-direction:column;background:#222736;color:#C9CCE0;border-radius:14px;padding:10px;box-shadow:0 12px 34px rgba(0,0,0,.38);font-family:"Pretendard GOV",sans-serif;}'
+  var css = '#mockNav{position:fixed;left:24px;bottom:24px;z-index:5000;width:236px;max-height:calc(50vh - 24px);display:flex;flex-direction:column;background:#222736;color:#C9CCE0;border-radius:14px;padding:10px;box-shadow:0 12px 34px rgba(0,0,0,.38);font-family:"Pretendard GOV",sans-serif;}'
     + '#mockNav .mn-head{display:flex;align-items:center;justify-content:space-between;gap:10px;cursor:move;padding:4px 4px 8px;flex-shrink:0;}'
     + '#mockNav .mn-hl{display:inline-flex;align-items:center;gap:7px;font-size:11px;font-weight:800;letter-spacing:.06em;color:#8A8FB0;}'
     + '#mockNav .mn-dot{width:10px;height:10px;border-radius:50%;background:#416bff;box-shadow:0 0 0 3px rgba(65,107,255,.25);flex-shrink:0;}'
@@ -115,6 +115,12 @@
     + '#mockNav.mn-collapsed .mn-caret{transform:rotate(180deg);}'
     + '#mockpick,#mockjump,#rubDemoToggle{display:none!important;}';   /* 구형 패널·전용 토글은 까망이로 통합 */
   var st = document.createElement('style'); st.textContent = css; document.head.appendChild(st);
+
+  /* 구형 패널은 CSS 숨김에 더해 DOM에서 제거 — CSS만으로는 캐시·id 누락 시 두 개가 떠 보이는 사고 재발 (2026-08-06 ×2회) */
+  ['mockpick','mockjump','rubDemoToggle'].forEach(function(id){
+    var el = document.getElementById(id);
+    if (el && el.parentNode) el.parentNode.removeChild(el);
+  });
 
   var wrap = document.createElement('div'); wrap.id = 'mockNav';
   wrap.innerHTML =
@@ -184,13 +190,14 @@
   /* 위치·접힘 상태 유지 (파일 간 공유) */
   function saveNavState(){
     try {
-      localStorage.setItem('clipoMockNavPos', JSON.stringify({ left: wrap.style.left, top: wrap.style.top }));
+      /* 키를 PosL로 교체(2026-08-06) — 기본 위치를 좌하단으로 바꾸며 예전 우측 저장값이 덮지 않게 */
+      localStorage.setItem('clipoMockNavPosL', JSON.stringify({ left: wrap.style.left, top: wrap.style.top }));
       localStorage.setItem('clipoMockNavCollapsed', wrap.classList.contains('mn-collapsed') ? '1' : '0');
     } catch(e){}
   }
   (function restore(){
     try {
-      var pos = JSON.parse(localStorage.getItem('clipoMockNavPos') || 'null');
+      var pos = JSON.parse(localStorage.getItem('clipoMockNavPosL') || 'null');
       if (pos && pos.left && pos.top) { wrap.style.left = pos.left; wrap.style.top = pos.top; wrap.style.right = 'auto'; wrap.style.bottom = 'auto'; }
       if (localStorage.getItem('clipoMockNavCollapsed') === '1') wrap.classList.add('mn-collapsed');
     } catch(e){}
