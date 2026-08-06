@@ -122,14 +122,11 @@ body.nav-expanded .main-wrap{ padding-left:200px; }
 .lg-swatch{ width:14px; height:10px; border-radius:2px; display:inline-block; }
 .lg-line{ width:16px; height:0; border-top:2px solid #416bff; display:inline-block; }
 
-/* 구간 타임라인 */
-.tl-row{ display:flex; align-items:stretch; gap:0; width:100%; }
-.tl-sess{ min-width:150px; display:flex; flex-direction:column; gap:6px; }
-.tl-sess + .tl-sess{ border-left:1px dashed #c7cbd3; padding-left:14px; margin-left:14px; }
-/* 작성 구간이 3개 이상이면 가로로 붙이지 않고 세로로 쌓는다 — 구간마다 폭을 다 쓰게 해서 곡선이 짧아지지 않게 */
-.tl-row.stack{ flex-direction:column; gap:18px; }
-.tl-row.stack .tl-sess{ flex:0 0 auto !important; width:100%; }
-.tl-row.stack .tl-sess + .tl-sess{ border-left:none; padding-left:0; margin-left:0; border-top:1px dashed #c7cbd3; padding-top:16px; }
+/* 타임라인 — 과제물이 학생당 1개이므로 타임라인도 학생당 1개다 (2026-08-06 확정).
+   재제출은 블록이 늘어나는 게 아니라 같은 타임라인 위에 제출 마커가 하나 더 찍히는 것.
+   나눠 쓴 구간(차시·이어쓰기)은 한 차트 안에서 끊어 그린다. */
+.tl-one{ display:flex; flex-direction:column; gap:6px; width:100%; }
+.tl-submits{ display:flex; align-items:center; gap:16px; flex-wrap:wrap; }
 .tl-sess-hd{ display:flex; align-items:baseline; gap:8px; flex-wrap:wrap; }
 .tl-sess-name{ font-size:14px; font-weight:600; color:#222631; }
 .tl-sess-when{ font-size:13px; font-weight:500; color:#6d7381; }
@@ -426,13 +423,16 @@ function toastMsg(msg){
    sessions[] = 작성 구간. series = 1분 간격 글자 수(정수, null=기록 공백).
    events[].at = 구간 시작 후 경과 분. 복귀 후 증가량은 series에서 계산한다(수기 입력 금지). */
 const teacherRows = [
-  { id:'10101', name:'김서윤', status:'제출', date:'07/29 09:18 학생 제출', type:'text', detail:'840자',
+  { id:'10101', name:'김서윤', status:'제출', date:'07/29 16:25 학생 제출', type:'text', detail:'868자',
     sessions:[
-      { name:'1차 작성', date:'07/28', start:'14:00', submitted:true,
+      { date:'07/28', start:'14:00', submitted:true,
         series:[0,8,24,41,55,55,70,96,118,130,126,145,168,190,190,205,232,255,248,270,295,318,318,335,360,382,400,395,415,440,462,470,470,488,510,533,528,550,572,595,610,610,632,655,670,665,688,710,730,748,762,772,780],
         events:[ {at:31, type:'탭 전환', dur:45} ] },
-      { name:'2차 작성', date:'07/29', start:'09:10', submitted:true, resubmit:true,
+      { date:'07/29', start:'09:10', submitted:true,
         series:[780,782,790,788,800,815,812,828,840],
+        events:[] },
+      { date:'07/29', start:'16:20', submitted:true,
+        series:[840,841,848,856,861,868],
         events:[] }
     ] },
   { id:'10102', name:'이준호', status:'제출', date:'07/28 14:48 학생 제출', type:'text', detail:'542자',
@@ -457,13 +457,13 @@ const teacherRows = [
   { id:'10109', name:'임도윤', status:'제출', date:'07/28 16:10 선생님 제출', type:'file', detail:'10109_임도윤.pdf 외 1', teacherUpload:true },
   { id:'10106', name:'한지우', status:'미제출', draft:'812자', draftAt:'07/29 09:02 저장',
     sessions:[
-      { name:'1차 작성', date:'07/28', start:'15:10', submitted:false,
+      { date:'07/28', start:'15:10', submitted:false,
         series:[0,15,35,55,50,72,95,118,112,135,160,182,178,200,225,248,242,265,290,312,330,330,352,375,398,392,415,438,460,455,478,500,520],
         events:[ {at:20, type:'탭 전환', dur:65} ] },
-      { name:'2차 작성', date:'07/28', start:'16:30', submitted:false,
+      { date:'07/28', start:'16:30', submitted:false,
         series:[520,528,545,562,558,578,598,615,610,630,648,665,660,678,690],
         events:[] },
-      { name:'3차 작성', date:'07/29', start:'08:50', submitted:false,
+      { date:'07/29', start:'08:50', submitted:false,
         series:[690,698,715,732,728,748,765,782,778,795,805,808,812],
         events:[ {at:5, type:'탭 전환', dur:22} ] }
     ] },
@@ -503,64 +503,91 @@ function gainAfter(s, e){
   return { gain: seriesAt(s.series, end) - seriesAt(s.series, back), mins: Math.round(mins) };
 }
 
-/* ───────── 구간 차트 (글자 수 곡선 + 이탈 구간) ───────── */
-function sessChart(s, maxVal){
-  const N = sessMinutes(s);
-  const W = 1000, H = 88, PAD = 6;
-  const x = m => (N===0 ? 0 : (m/N) * W);
+/* ───────── 학생당 타임라인 1개 (2026-08-06 확정) ─────────
+   과제물이 학생당 1개이므로 회차 개념 없음. 제출·재제출은 타임라인 위의 마커. */
+function rowMinutes(r){ return rowSessions(r).reduce((a,s)=>a+sessMinutes(s),0); }
+function submitCount(r){ return rowSessions(r).filter(s=>s.submitted).length; }
+
+/* ───────── 타임라인 차트 (글자 수 곡선 + 이탈 구간 + 제출 마커) ─────────
+   나눠 쓴 구간을 한 차트에 이어 붙이되, 안 쓴 시간(구간 경계)은 끊어 그린다 */
+function studentChart(sessions, maxVal){
+  const W = 1000, H = 88, PAD = 6, GAP = 18;
+  const total = Math.max(1, sessions.reduce((a,s)=>a+sessMinutes(s),0));
+  const usable = W - GAP * (sessions.length - 1);
   const y = v => H - PAD - (maxVal===0 ? 0 : (v/maxVal) * (H - PAD*2 - 4));
-  let out = '';
+  let out = '', xoff = 0;
 
-  /* 이탈·공백 구간 음영 */
-  (s.events||[]).forEach(e=>{
-    const x1 = x(e.at), x2 = x(Math.min(N, e.at + e.dur/60));
-    const w = Math.max(3, x2-x1);
-    if(e.type==='gap'){
-      out += '<rect x="'+x1+'" y="0" width="'+w+'" height="'+H+'" fill="#eef0f3"><title>'+hm(s.start, e.at)+' 기록 공백 · '+fmtDur(e.dur)+'</title></rect>';
-    } else {
-      const g = gainAfter(s, e);
-      const tip = hm(s.start, e.at)+' '+e.type+' · '+fmtDur(e.dur) + (g ? ' · 복귀 후 '+g.mins+'분간 +'+g.gain+'자' : '');
-      out += '<rect x="'+x1+'" y="0" width="'+w+'" height="'+H+'" fill="#fff1e6"><title>'+tip+'</title></rect>';
-      out += '<line x1="'+x1+'" y1="0" x2="'+x1+'" y2="'+H+'" stroke="#f59e6b" stroke-width="1" stroke-dasharray="3 3" vector-effect="non-scaling-stroke"/>';
+  sessions.forEach(function(s, si){
+    const N = Math.max(1, sessMinutes(s));
+    const sw = (N/total) * usable;
+    const x = m => xoff + (m/N) * sw;
+
+    /* 구간 경계 = 안 쓴 시간 (임시저장 후 나감·다음 차시에 이어 씀) */
+    if(si > 0){
+      out += '<line x1="'+(xoff - GAP/2)+'" y1="4" x2="'+(xoff - GAP/2)+'" y2="'+(H-4)+'" stroke="#c7cbd3" stroke-width="1.5" stroke-dasharray="4 4" vector-effect="non-scaling-stroke"><title>'+s.date+' '+s.start+'에 이어 씀</title></line>';
     }
-  });
 
-  /* 글자 수 곡선 — 기록 공백에서 끊어 그린다 */
-  let segs = [], cur = [];
-  s.series.forEach((v,i)=>{
-    if(v===null){ if(cur.length) segs.push(cur); cur=[]; return; }
-    cur.push([x(i), y(v)]);
-  });
-  if(cur.length) segs.push(cur);
+    /* 이탈·공백 구간 음영 */
+    (s.events||[]).forEach(e=>{
+      const x1 = x(e.at), x2 = x(Math.min(N, e.at + e.dur/60));
+      const w = Math.max(3, x2-x1);
+      if(e.type==='gap'){
+        out += '<rect x="'+x1+'" y="0" width="'+w+'" height="'+H+'" fill="#eef0f3"><title>'+hm(s.start, e.at)+' 기록 공백 · '+fmtDur(e.dur)+'</title></rect>';
+      } else {
+        const g = gainAfter(s, e);
+        const tip = hm(s.start, e.at)+' '+e.type+' · '+fmtDur(e.dur) + (g ? ' · 복귀 후 '+g.mins+'분간 +'+g.gain+'자' : '');
+        out += '<rect x="'+x1+'" y="0" width="'+w+'" height="'+H+'" fill="#fff1e6"><title>'+tip+'</title></rect>';
+        out += '<line x1="'+x1+'" y1="0" x2="'+x1+'" y2="'+H+'" stroke="#f59e6b" stroke-width="1" stroke-dasharray="3 3" vector-effect="non-scaling-stroke"/>';
+      }
+    });
 
-  segs.forEach(seg=>{
-    if(seg.length > 1){
-      const area = 'M'+seg[0][0]+','+H+' L'+seg.map(p=>p[0]+','+p[1]).join(' L')+' L'+seg[seg.length-1][0]+','+H+' Z';
-      out += '<path d="'+area+'" fill="#416bff" fill-opacity="0.07"/>';
+    /* 글자 수 곡선 — 기록 공백에서 끊어 그린다 */
+    let segs = [], cur = [];
+    s.series.forEach((v,i)=>{
+      if(v===null){ if(cur.length) segs.push(cur); cur=[]; return; }
+      cur.push([x(i), y(v)]);
+    });
+    if(cur.length) segs.push(cur);
+    segs.forEach(seg=>{
+      if(seg.length > 1){
+        const area = 'M'+seg[0][0]+','+H+' L'+seg.map(p=>p[0]+','+p[1]).join(' L')+' L'+seg[seg.length-1][0]+','+H+' Z';
+        out += '<path d="'+area+'" fill="#416bff" fill-opacity="0.07"/>';
+      }
+      out += '<polyline points="'+seg.map(p=>p[0]+','+p[1]).join(' ')+'" fill="none" stroke="#416bff" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" vector-effect="non-scaling-stroke"/>';
+    });
+
+    /* 제출 마커 — 제출로 끝난 구간의 끝 지점 */
+    if(s.submitted){
+      out += '<line x1="'+(xoff + sw)+'" y1="0" x2="'+(xoff + sw)+'" y2="'+H+'" stroke="#319d64" stroke-width="2" vector-effect="non-scaling-stroke"><title>'+s.date+' '+hm(s.start, N)+' 제출</title></line>';
     }
-    out += '<polyline points="'+seg.map(p=>p[0]+','+p[1]).join(' ')+'" fill="none" stroke="#416bff" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" vector-effect="non-scaling-stroke"/>';
+
+    xoff += sw + GAP;
   });
 
   return '<svg class="tl-chart" viewBox="0 0 '+W+' '+H+'" preserveAspectRatio="none">'+out+'</svg>';
 }
 
-function sessBlock(s, maxVal, isLast){
-  const N = sessMinutes(s);
-  const evs = sessEvents(s);
-  const meta = evs.length
-    ? '<span class="tl-sess-meta">이탈 '+evs.length+'회 · '+fmtDur(sessLeaveSec(s))+'</span>'
-    : '<span class="tl-sess-meta none">이탈 없음</span>';
-  const endLine = s.submitted
-    ? '<span class="tl-end"><i data-lucide="check-circle-2"></i>'+hm(s.start, N)+' '+(s.resubmit?'재제출':'제출')+'</span>'
-    : '<span class="tl-end draft"><i data-lucide="pencil-line"></i>'+hm(s.start, N)+' 저장'+(isLast?' · 아직 제출 안 함':'')+'</span>';
+function studentBlock(r, sessions, maxVal){
+  const first = sessions[0], last = sessions[sessions.length-1];
+  const endHm = hm(last.start, sessMinutes(last));
+  const when = first.date + (last.date !== first.date ? '~'+last.date : '')
+    + ' · 총 ' + rowMinutes(r) + '분 작성'
+    + (sessions.length > 1 ? ' · ' + sessions.length + '번에 나눠 씀' : '');
 
-  return '<div class="tl-sess" style="flex:'+Math.max(N,4)+' 1 0;">'
-    + '<div class="tl-sess-hd"><span class="tl-sess-name">'+s.name+'</span>'
-    + '<span class="tl-sess-when">'+s.date+' '+s.start+'~'+hm(s.start,N)+' · '+N+'분</span>'
-    + meta + '</div>'
-    + sessChart(s, maxVal)
-    + '<div class="tl-axis"><span>'+s.start+'</span><span>'+hm(s.start,N)+'</span></div>'
-    + '<div>'+endLine+'</div>'
+  /* 제출 이력 한 줄 — 마커와 1:1 대응 */
+  const subs = sessions.filter(s=>s.submitted);
+  let submits = subs.map(function(s, i){
+    return '<span class="tl-end"><i data-lucide="check-circle-2"></i>'+s.date+' '+hm(s.start, sessMinutes(s))+' '+(i>0?'재제출':'제출')+'</span>';
+  }).join('');
+  if(!last.submitted){
+    submits += '<span class="tl-end draft"><i data-lucide="pencil-line"></i>'+last.date+' '+endHm+' 저장 · 아직 제출 안 함</span>';
+  }
+
+  return '<div class="tl-one">'
+    + '<div class="tl-sess-hd"><span class="tl-sess-name">'+when+'</span></div>'
+    + studentChart(sessions, maxVal)
+    + '<div class="tl-axis"><span>'+first.date+' '+first.start+'</span><span>'+last.date+' '+endHm+'</span></div>'
+    + '<div class="tl-submits">'+submits+'</div>'
     + '</div>';
 }
 
@@ -621,7 +648,9 @@ function renderTeacher(){
     else {
       const cnt = rowLeaveCount(r), sec = rowLeaveSec(r);
       const main = cnt ? '이탈 '+cnt+'회 · '+fmtDur(sec) : '이탈 없음';
-      const sub = (sessions.length > 1) ? '<span class="lc-sub">작성 '+sessions.length+'회</span>' : '';
+      /* 재제출한 학생만 제출 횟수 병기 — 대부분은 1회라 표기 없음 */
+      const subCnt = submitCount(r);
+      const sub = (subCnt >= 2) ? '<span class="lc-sub">제출 '+subCnt+'회</span>' : '';
       leaveCell = '<button class="leave-cell-btn'+(cnt?'':' quiet')+'" onclick="toggleDetail(\''+r.id+'\')">'
         + '<span class="lc-main">'+main+' <i data-lucide="chevron-'+(openRow===r.id?'up':'down')+'" style="width:16px;height:16px;"></i></span>'
         + sub + '</button>';
@@ -642,7 +671,7 @@ function renderTeacher(){
       + '<td>'+manageCell+'</td>';
     tb.appendChild(tr);
 
-    /* 펼침 — 작성 구간 타임라인 */
+    /* 펼침 — 학생당 타임라인 1개. 제출·재제출은 초록 마커 */
     if(focusLogOn && openRow===r.id && sessions.length){
       const maxVal = Math.max.apply(null, sessions.flatMap(s=>s.series.filter(v=>v!==null)));
       const dtr = document.createElement('tr');
@@ -654,11 +683,12 @@ function renderTeacher(){
           + '<span><i class="lg-line"></i>글자 수</span>'
           + '<span><i class="lg-swatch" style="background:#fff1e6;border:1px solid #f7d3ba;"></i>다른 화면</span>'
           + '<span><i class="lg-swatch" style="background:#eef0f3;border:1px solid #dde1e8;"></i>기록 공백</span>'
+          + '<span><i class="lg-line" style="border-top:2px solid #319d64;"></i>제출</span>'
         + '</div>'
-        + '<div class="tl-row'+(sessions.length>=3?' stack':'')+'">' + sessions.map((s,i)=>sessBlock(s, maxVal, i===sessions.length-1)).join('') + '</div>'
+        + studentBlock(r, sessions, maxVal)
         + (evHtml ? '<div class="ld-evt-wrap">'+evHtml+'</div>' : '')
         + '<p class="ld-foot">3초 미만 이동은 기록되지 않아요. 방문한 사이트와 답안 내용은 저장하지 않아요.'
-        + (sessions.length>1 ? ' 이어 쓰거나 재제출해서 작성 구간이 늘어나도 이전 구간은 그대로 남아요.' : '')
+        + (submitCount(r)>1 ? ' 재제출해도 답안만 바뀌고 작성 과정 기록은 처음부터 그대로 남아요.' : '')
         + '</p>'
         + '</div></td>';
       tb.appendChild(dtr);
@@ -793,5 +823,5 @@ window.MOCK_NAV_APPLY = {
   if (typeof _tf === 'function') window.toggleFocusLog = function(v){ _tf.apply(this, arguments); if (window.mockNavSetCurrent) window.mockNavSetCurrent(v ? 'flOn' : 'flOff'); };
 })();
 </script>
-<script src="mock_nav_dw.js?v=260806c"></script></body>
+<script src="mock_nav_dw.js?v=260806d"></script></body>
 </html>
