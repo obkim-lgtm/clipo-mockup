@@ -44,13 +44,14 @@ window.MOCK_NAV_APPLY = {                            // route → 이 파일 안
   };
 })();
 </script>
-<script src="mock_nav_dw.js?v=260730c"></script>
+<script src="mock_nav_dw.js?v=260806a"></script>
 ```
 
 - 공유 JS를 고치면 **`?v=` 를 올린다** (루트 CLAUDE.md 캐시 규칙). 안 올리면 구버전이 캐시에서 로드돼
   "고쳤는데 그대로"가 된다 — 실제로 겪음.
 - 딥링크 적용은 `load` 이후에 돈다(페이지 초기화보다 뒤에 와야 하므로). 패널 자체는 즉시 그려진다.
-- 구형 패널(`#mockpick`)·화면 전용 토글은 공유 CSS가 `display:none`으로 덮는다 — 마크업은 남겨둔다.
+- 구형 패널(`#mockpick`·`#mockjump`)·화면 전용 토글은 공유 CSS가 `display:none`으로 덮는다 — 마크업은 남겨둔다.
+  **구형 패널 id가 새로 나오면 공유 JS의 숨김 목록에 추가한다** — 빠지면 까망이가 두 개로 보인다(2026-08-06 `#mockjump`로 실제 발생).
 
 ## 1. 목업 도구는 하나, 어느 화면에서도 나갈 수 있어야 한다
 

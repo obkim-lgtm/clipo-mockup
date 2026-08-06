@@ -102,7 +102,7 @@
     + '#mockNav.mn-collapsed .mn-full{display:none;}'
     + '#mockNav.mn-collapsed .mn-mini{display:inline;}'
     + '#mockNav.mn-collapsed .mn-caret{transform:rotate(180deg);}'
-    + '#mockpick,#rubDemoToggle{display:none!important;}';   /* 구형 패널·전용 토글은 까망이로 통합 */
+    + '#mockpick,#mockjump,#rubDemoToggle{display:none!important;}';   /* 구형 패널·전용 토글은 까망이로 통합 */
   var st = document.createElement('style'); st.textContent = css; document.head.appendChild(st);
 
   var wrap = document.createElement('div'); wrap.id = 'mockNav';
