@@ -214,6 +214,10 @@
 
     /* 채점요소 복잡도 경고 스타일은 위 .rub-warn / .rub-elem.warn 을 그대로 사용 (중복 정의 제거) */
 
+    /* 예시 모달 진입 링크 — 문장 안에 인라인으로 붙는 텍스트 버튼 */
+    .ex-link{ background:none; border:none; padding:0; margin-left:4px; cursor:pointer; font-family:inherit; font-size:inherit; font-weight:600; color:#416bff; text-decoration:underline; text-underline-offset:2px; line-height:inherit; vertical-align:baseline; }
+    .ex-link:hover{ color:#365eef; }
+
     /* ===== 채점기준 입력 예시 모달 (개발 화면 구조 + 안 좋은 예 블록 신규) ===== */
     .ex-ov{ display:none; position:fixed; inset:0; background:rgba(34,38,49,.45); z-index:1700; justify-content:center; overflow-y:auto; padding:24px; }
     .ex-ov.open{ display:flex; }
@@ -482,7 +486,10 @@
         <span class="sec-title">채점기준 <span class="help" title="구체적일수록 AI 채점 정확도가 향상됩니다"><i data-lucide="help-circle" style="width:16px;height:16px"></i></span></span>
         <span class="sec-count"><span id="rub-count">3</span>개 / 15개</span>
       </div>
-      <p class="sec-desc">채점기준은 최대 15개까지 입력 가능합니다. 채점요소는 <b style="font-weight:600;color:#3b3f4c;">한 문장으로 간결하게</b> 쓰고, 배점별 판단은 오른쪽 급간 칸에 나눠 적어주세요. 감점하고 싶은 내용은 채점기준에 적어야 AI가 채점에 반영합니다.</p>
+      <!-- 설명 끝에 예시 링크 — 설명은 위, 예시 버튼은 섹션 맨 아래로 떨어져 있어 따로 놀던 것을 연결 -->
+      <p class="sec-desc">채점기준은 최대 15개까지 입력 가능합니다. 채점요소는 <b style="font-weight:600;color:#3b3f4c;">한 문장으로 간결하게</b> 쓰고, 배점별 판단은 오른쪽 급간 칸에 나눠 적어주세요. 감점하고 싶은 내용은 채점기준에 적어야 AI가 채점에 반영합니다.
+        <button class="ex-link" onclick="openRubEx()">입력 예시 보기</button>
+      </p>
 
       <div class="ai-promo">
         <p class="ai-promo-title">채점기준을 AI로 빠르게 만들어보세요!</p>
@@ -1160,7 +1167,8 @@ function checkRubElem(ta){
     if(!complex) return;
     warn = document.createElement('div');
     warn.className = 'rub-warn';
-    warn.innerHTML = '<i data-lucide="triangle-alert"></i><p><b>한 채점기준에 여러 판단이 섞여 있어요.</b> 기준·배점·예시가 한 칸에 뭉쳐 있으면 채점에 실패할 수 있어요. 판단 하나씩 채점기준을 나누고, 배점별 판단은 오른쪽 급간 칸에 적어주세요.</p>';
+    // 잘못 입력한 그 순간이 예시가 가장 필요한 시점 — 경고 안에서 바로 이어지게 한다
+    warn.innerHTML = '<i data-lucide="triangle-alert"></i><p><b>한 채점기준에 여러 판단이 섞여 있어요.</b> 기준·배점·예시가 한 칸에 뭉쳐 있으면 채점에 실패할 수 있어요. 판단 하나씩 채점기준을 나누고, 배점별 판단은 오른쪽 급간 칸에 적어주세요.<button class="ex-link" onclick="openRubEx()">입력 예시 보기</button></p>';
     var tools = crit.querySelector('.crit-tools');
     if(tools) crit.insertBefore(warn, tools); else crit.appendChild(warn);
     lucide.createIcons();
