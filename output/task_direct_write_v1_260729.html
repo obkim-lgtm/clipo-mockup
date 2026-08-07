@@ -911,7 +911,9 @@
       </div>
 
       <div class="qdw-ft">
-        <button class="btn btn-outline btn-lg" style="margin-right:auto;" onclick="openPreview()"><i data-lucide="monitor" style="width:16px;height:16px"></i>학생 화면 미리보기</button>
+        <!-- 학생 화면 미리보기 — 이번 범위에서 제외, 다음 제공 (2026-08-07 올립).
+             드로워 뒤에 가려 열려서 쓸 수 없었고, 진입점만 걷어냄 -->
+        <div style="margin-right:auto;"></div>
         <button class="btn btn-outline btn-lg" id="btnQCancel" onclick="leaveQuestions()">취소</button>
         <button class="btn btn-primary btn-lg" id="btnQSave" onclick="saveQuestions()"><i data-lucide="check" style="width:16px;height:16px"></i>문항 저장</button>
         <button class="btn btn-primary btn-lg" id="btnQBack" style="display:none;" onclick="goDesign()">확인</button>
@@ -1078,23 +1080,7 @@
   </div>
 </div>
 
-<div class="pv-ov" id="pvOverlay" onclick="if(event.target===this) closePreview()">
-  <div class="pv">
-    <div class="pv-hd">
-      <h3 class="pv-title">학생 화면 미리보기</h3>
-      <button class="pv-close" onclick="closePreview()"><i data-lucide="x" style="width:20px;height:20px"></i></button>
-    </div>
-    <div class="pv-body">
-      <div class="qprev">
-        <p class="qprev-hd"><i data-lucide="monitor" style="width:15px;height:15px"></i>학생에게 이렇게 보입니다</p>
-        <div id="qprev-list"></div>
-      </div>
-    </div>
-    <div class="pv-ft">
-      <button class="btn btn-primary" onclick="closePreview()">닫기</button>
-    </div>
-  </div>
-</div>
+<!-- 학생 화면 미리보기 모달 — 이번 범위 제외, 다음 제공 (2026-08-07 올립). 진입점과 함께 제거 -->
 
 <!-- 수식 입력 팝업 -->
 <div class="pv-ov" id="fxModal" onclick="if(event.target===this) closeFx()">
@@ -1831,13 +1817,8 @@ function renderQuestions(){
   lucide.createIcons();
 }
 
-/* 미리보기 모달 — 열 때만 그린다 (입력과 이중 표시 방지) */
-function openPreview(){
-  renderPreview();
-  document.getElementById('pvOverlay').classList.add('show');
-  lucide.createIcons();
-}
-function closePreview(){ document.getElementById('pvOverlay').classList.remove('show'); }
+/* openPreview / closePreview / renderPreview — 학생 화면 미리보기와 함께 제거 (2026-08-07 올립).
+   다음 제공 때 되살릴 수 있게 .qprev* 스타일은 남겨둔다 */
 
 /* 수식 입력 팝업 */
 var _fxTarget = null;
@@ -1870,34 +1851,8 @@ function fxInsertToTarget(){
   toastMsg('수식을 문항에 넣었어요.');
 }
 
-document.addEventListener('keydown', function(e){ if(e.key === 'Escape'){ closePreview(); closeFx(); } });
+document.addEventListener('keydown', function(e){ if(e.key === 'Escape'){ closeFx(); } });
 
-function renderPreview(){
-  var p = document.getElementById('qprev-list');
-  p.innerHTML = '';
-  if(QUESTIONS.length === 0){
-    var n = document.createElement('div');
-    n.className = 'qprev-q';
-    n.innerHTML = '<p style="color:#9aa0ad;">작성한 문항이 없어 학생 화면에 문항이 보이지 않습니다.</p>';
-    p.appendChild(n);
-    return;
-  }
-  QUESTIONS.forEach(function(q, i){
-    var d = document.createElement('div'); d.className = 'qprev-q';
-    var t = document.createElement('p');
-    var b = document.createElement('b'); b.textContent = '문항 ' + (i+1) + '. ';
-    t.appendChild(b);
-    t.appendChild(document.createTextNode(q.trim() === '' ? '(내용을 입력해 주세요)' : q));
-    d.appendChild(t);
-    var a = document.createElement('div'); a.className = 'qprev-ans'; a.textContent = '답안 작성 칸';
-    d.appendChild(a);
-    /* 문항마다 다른 글자 수 제한이 학생에게 어떻게 보이는지 함께 확인 (2026-08-07) */
-    var c = document.createElement('div'); c.className = 'qprev-cnt';
-    c.textContent = '0 / ' + qLimit(i).toLocaleString() + '자';
-    d.appendChild(c);
-    p.appendChild(d);
-  });
-}
 
 function onQInput(i, v){ QUESTIONS[i] = v; }
 
