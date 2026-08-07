@@ -75,6 +75,9 @@ body.nav-expanded .main-wrap{ padding-left:200px; }
 
 /* ===== 지금 낼 과제 카드 ===== */
 .todo-list{ display:flex; flex-direction:column; gap:12px; }
+#todoMore{ display:flex; flex-direction:column; gap:12px; }
+.todo-more{ width:100%; margin-top:12px; height:48px; border:1px solid #dde1e8; border-radius:12px; background:#fff; color:#3b3f4c; font-family:inherit; font-size:15px; font-weight:600; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; line-height:1; vertical-align:middle; gap:6px; }
+.todo-more:hover{ background:#f6f7f9; border-color:#c7cbd3; }
 .todo{ background:#fff; border:1px solid #dde1e8; border-radius:12px; padding:20px 24px; display:flex; align-items:center; gap:20px; cursor:pointer; transition:border-color .12s, box-shadow .12s; }
 .todo:hover{ border-color:#416bff; box-shadow:0 2px 8px rgba(65,107,255,.08); }
 .todo.urgent{ border-color:#fc9ba2; }
@@ -201,7 +204,7 @@ body.nav-expanded .main-wrap{ padding-left:200px; }
     <div class="sec">
       <div class="sec-hd">
         <h2 class="sec-t">지금 낼 과제</h2>
-        <span class="sec-n">4</span>
+        <span class="sec-n">6</span>
       </div>
       <p class="sec-d">마감이 가까운 순서예요. 마감을 정하지 않은 과제는 맨 아래에 있어요.</p>
 
@@ -249,21 +252,56 @@ body.nav-expanded .main-wrap{ padding-left:200px; }
           </div>
         </div>
 
-        <!-- 마감을 정하지 않은 과제 — 맨 아래 -->
         <div class="todo" onclick="location.href='student_submit_v1_260729.html#notice'">
           <div class="todo-l">
             <div class="todo-top">
-              <span class="b-subject">국어</span>
-              <span class="b-due none">마감 없음</span>
+              <span class="b-subject">수학</span>
+              <span class="b-due later">9일 남음</span>
             </div>
-            <p class="todo-nm">문학 작품 감상문 쓰기</p>
-            <p class="todo-meta">언제든 낼 수 있어요 · 이수민 선생님</p>
+            <p class="todo-nm">일차함수 활용 문제 풀이 과정 쓰기</p>
+            <p class="todo-meta">8월 7일(금) 16:00까지 · 박정호 선생님</p>
           </div>
           <div class="todo-r">
             <button class="btn btn-outline" onclick="event.stopPropagation();location.href='student_submit_v1_260729.html#notice'">제출</button>
           </div>
         </div>
+
+        <!-- 5개까지만 펼치고 나머지는 접는다 (2026-08-07 확정).
+             접기는 두지 않음 — 한 번 펼치면 그대로. '지금 낼 과제'는 접으면 잊게 되는 섹션 -->
+        <div id="todoMore" style="display:none;">
+          <div class="todo" onclick="location.href='student_submit_v1_260729.html#notice'">
+            <div class="todo-l">
+              <div class="todo-top">
+                <span class="b-subject">영어</span>
+                <span class="b-due later">12일 남음</span>
+              </div>
+              <p class="todo-nm">영어 에세이 — My Future Job</p>
+              <p class="todo-meta">8월 10일(월) 16:00까지 · 최수현 선생님</p>
+            </div>
+            <div class="todo-r">
+              <button class="btn btn-outline" onclick="event.stopPropagation();location.href='student_submit_v1_260729.html#notice'">제출</button>
+            </div>
+          </div>
+
+          <!-- 마감을 정하지 않은 과제 — 맨 아래 -->
+          <div class="todo" onclick="location.href='student_submit_v1_260729.html#notice'">
+            <div class="todo-l">
+              <div class="todo-top">
+                <span class="b-subject">국어</span>
+                <span class="b-due none">마감 없음</span>
+              </div>
+              <p class="todo-nm">문학 작품 감상문 쓰기</p>
+              <p class="todo-meta">언제든 낼 수 있어요 · 이수민 선생님</p>
+            </div>
+            <div class="todo-r">
+              <button class="btn btn-outline" onclick="event.stopPropagation();location.href='student_submit_v1_260729.html#notice'">제출</button>
+            </div>
+          </div>
+        </div>
       </div>
+
+      <!-- 남은 개수를 적는다 — 몇 개가 숨어 있는지 모르면 안 누르고 넘어감 -->
+      <button class="todo-more" id="todoMoreBtn" onclick="showMoreTodo()">2개 더 보기 <i data-lucide="chevron-down" style="width:16px;height:16px"></i></button>
     </div>
 
     <!-- 제출한 과제 -->
@@ -625,6 +663,12 @@ window.addEventListener('hashchange', function(){
 });
 
 function fold(id){ document.getElementById(id).classList.toggle('folded'); }
+
+/* 지금 낼 과제 — 5개까지만 펼치고 나머지는 더 보기로. 접기는 두지 않는다 (2026-08-07) */
+function showMoreTodo(){
+  document.getElementById('todoMore').style.display = '';
+  document.getElementById('todoMoreBtn').style.display = 'none';
+}
 
 
 var _tt;
