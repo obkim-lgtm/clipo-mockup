@@ -418,6 +418,7 @@
     .qprev-q p{ margin:0; font-size:15px; color:#222631; line-height:1.65; }
     .qprev-q b{ color:#416bff; }
     .qprev-ans{ margin-top:10px; height:52px; border:1px solid #e4e6eb; border-radius:6px; background:#fbfbfc; display:flex; align-items:center; padding:0 14px; font-size:14px; color:#b3b6bd; }
+    .qprev-cnt{ margin-top:6px; text-align:right; font-size:13px; color:#9aa0ad; }
 
     /* ===== 평가 설계 목록 (task_ocr_v3_260623 패턴 이식) ===== */
     .ds-grid{ display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:20px; }
@@ -898,7 +899,7 @@
     <div class="sec" style="margin-top:20px;">
       <div class="sec-hd">
         <span class="sec-title">문항</span>
-        <span class="sec-count"><span id="q-count">3</span>개 / 10개</span>
+        <span class="sec-count"><span id="q-count">3</span>개 / 20개</span>
       </div>
 
       <div id="q-list"></div>
@@ -1627,7 +1628,7 @@ document.querySelectorAll('#rub-list .rub-elem').forEach(checkRubElem);
 /* ═══════════════ 신규 · 제출 방식 / 문항 작성 ═══════════════ */
 
 var QUESTIONS = [];   // 신규 설계 = 빈 상태가 기본
-var Q_MAX = 10;
+var Q_MAX = 20;
 
 /* 문항별 최대 글자 수 — 일괄 설정이 아니라 문항마다 (2026-08-07 올립).
    QUESTIONS와 인덱스를 맞춰 추가·삭제·이동 시 함께 움직인다. */
@@ -1860,6 +1861,10 @@ function renderPreview(){
     d.appendChild(t);
     var a = document.createElement('div'); a.className = 'qprev-ans'; a.textContent = '답안 작성 칸';
     d.appendChild(a);
+    /* 문항마다 다른 글자 수 제한이 학생에게 어떻게 보이는지 함께 확인 (2026-08-07) */
+    var c = document.createElement('div'); c.className = 'qprev-cnt';
+    c.textContent = '0 / ' + qLimit(i).toLocaleString() + '자';
+    d.appendChild(c);
     p.appendChild(d);
   });
 }

@@ -92,6 +92,9 @@ body.nav-expanded .main-wrap{ padding-left:200px; }
 .q-count{ font-size:14px; color:#6d7381; }
 .q-count b{ color:#3b3f4c; font-weight:600; }
 .q-empty-mark{ font-size:14px; font-weight:600; color:#ab303a; display:none; align-items:center; gap:4px; }
+/* 글자 수를 다 채운 문항 — 더 입력되지 않는 상태임을 카운터 외에도 알린다 (2026-08-07) */
+.q-block.full .editor{ border-color:#f7d3ba; }
+.q-block.full .q-count{ font-weight:600; }
 .q-block.miss{ border-color:#fc9ba2; }
 .q-block.miss .q-empty-mark{ display:inline-flex; }
 
@@ -657,7 +660,11 @@ var ANSWERS = [
   '저출산·고령화로 인해 생기는 문제 중 하나는 일할 사람이 줄어드는 것이다. 일하는 사람이 줄면 세금을 내는 사람도 줄어드는데, 돌봐야 할 노인은 늘어난다. 그래서 국가가 걷는 돈은 줄고 써야 하는 돈은 늘어나 부담이 한쪽으로 몰린다.',
   ''
 ];
-var Q_MAX_CHARS = 2000;   // 설계에서 정한 문항당 최대 글자 수 (기본 2,000자)
+/* 문항별 최대 글자 수 — 교사가 문항 작성에서 문항마다 정한 값이 내려온다 (기본 500자).
+   일괄값이 아니므로 문항 수와 길이를 맞춘다 (2026-08-07) */
+var Q_LIMITS = [800, 600, 500];
+var Q_LIMIT_DEFAULT = 500;
+function qLimit(i){ return Q_LIMITS[i] || Q_LIMIT_DEFAULT; }
 var currentScene = 'notice';
 var leaveStart = null, leaveType = null;
 
@@ -702,9 +709,9 @@ function renderQuestions(targetId, withProgress){
       +     '<span class="ed-div"></span>'
       +     '<button class="ed-btn" onclick="notReady(\'수식 입력\')"><i data-lucide="sigma" style="width:16px;height:16px"></i></button>'
       +   '</div>'
-      +   '<textarea class="ed-ta" placeholder="여기에 답을 쓰세요." oninput="onAnswer(' + i + ', this)" onpaste="blockPaste(event)"></textarea>'
+      +   '<textarea class="ed-ta" placeholder="여기에 답을 쓰세요." maxlength="' + qLimit(i) + '" oninput="onAnswer(' + i + ', this)" onpaste="blockPaste(event)"></textarea>'
       + '</div>'
-      + '<div class="q-foot"><span class="q-count"><b class="cnt">0</b> / ' + Q_MAX_CHARS.toLocaleString() + '자</span><span class="q-empty-mark"><i data-lucide="circle-alert" style="width:14px;height:14px"></i>아직 안 썼어요</span></div>';
+      + '<div class="q-foot"><span class="q-count"><b class="cnt">0</b> / ' + qLimit(i).toLocaleString() + '자</span><span class="q-empty-mark"><i data-lucide="circle-alert" style="width:14px;height:14px"></i>아직 안 썼어요</span></div>';
     d.querySelector('.q-text').textContent = q;
     var ta = d.querySelector('textarea');
     ta.value = ANSWERS[i] || '';
@@ -716,15 +723,20 @@ function renderQuestions(targetId, withProgress){
 }
 
 function onAnswer(i, ta){
-  if(ta.value.length > Q_MAX_CHARS){
-    ta.value = ta.value.slice(0, Q_MAX_CHARS);
-    toastMsg('문항 하나에 ' + Q_MAX_CHARS.toLocaleString() + '자까지 쓸 수 있어요.', true);
+  var max = qLimit(i);
+  /* maxlength로 1차 차단되지만, 붙여넣기·IME 조합 등으로 넘어오는 경우가 있어 여기서도 자른다 */
+  if(ta.value.length > max){
+    ta.value = ta.value.slice(0, max);
+    toastMsg('이 문항은 ' + max.toLocaleString() + '자까지 쓸 수 있어요.', true);
   }
   ANSWERS[i] = ta.value;
   var block = ta.closest('.q-block');
   var cnt = block.querySelector('.cnt');
   cnt.textContent = ta.value.length.toLocaleString();
-  cnt.style.color = ta.value.length >= Q_MAX_CHARS ? '#ab303a' : '';
+  /* 남은 글자가 얼마 없으면 미리 알린다 — 다 차고 나서야 알면 이미 지워야 하는 상황 */
+  var left = max - ta.value.length;
+  cnt.style.color = left <= 0 ? '#ab303a' : (left <= max * 0.1 ? '#c2410c' : '');
+  block.classList.toggle('full', left <= 0);
   block.classList.remove('miss');
   updateProgress();
 }
