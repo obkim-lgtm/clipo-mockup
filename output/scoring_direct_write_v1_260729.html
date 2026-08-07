@@ -66,29 +66,39 @@ a{ text-decoration:none; color:inherit; }
 /* ===== 2단 레이아웃 ===== */
 .split{ display:flex; align-items:stretch; min-height:calc(100vh - 58px - 53px - 60px); }
 .pane-l{ flex:1; min-width:0; background:#f1f3f5; display:flex; flex-direction:column; }
-.pane-r{ width:470px; flex-shrink:0; background:#f6f7f9; border-left:1px solid #dde1e8; padding:20px; display:flex; flex-direction:column; gap:16px; }
+/* 채점 패널 너비는 교사가 조절 (2026-08-07 올립) — 답안이 긴 과제와 채점근거가 긴 과제에서 원하는 쪽이 다름 */
+.pane-r{ width:var(--paneR, 470px); flex-shrink:0; background:#f6f7f9; border-left:1px solid #dde1e8; padding:20px; display:flex; flex-direction:column; gap:16px; }
+
+/* 좌우 너비 조절 핸들 */
+.pane-resizer{ width:10px; flex-shrink:0; cursor:col-resize; background:transparent; position:relative; display:flex; align-items:center; justify-content:center; }
+.pane-resizer::before{ content:''; width:2px; height:100%; background:#dde1e8; transition:background .12s; }
+.pane-resizer:hover::before, .pane-resizer.dragging::before{ background:#416bff; width:3px; }
+.pane-resizer::after{ content:''; position:absolute; width:24px; height:44px; border-radius:6px; background:#fff; border:1px solid #dde1e8; box-shadow:0 1px 3px rgba(0,0,0,.08); opacity:0; transition:opacity .12s;
+  background-image:radial-gradient(#9aa0ad 1px, transparent 1px); background-size:4px 4px; background-position:center; }
+.pane-resizer:hover::after, .pane-resizer.dragging::after{ opacity:1; }
+body.resizing{ cursor:col-resize; user-select:none; }
 
 /* ===== 좌측: 제출물 탭 (다크) ===== */
-.doc-tabs{ background:#2a2e3a; display:flex; align-items:stretch; overflow-x:auto; }
+.doc-tabs{ background:#2a2e3a; display:flex; align-items:stretch; overflow-x:auto; color:#c9ccd6; font-size:14px; }
 .doc-tab{ padding:14px 18px; font-size:14px; font-weight:500; color:#9aa0ad; background:none; border:none; cursor:pointer; font-family:inherit; white-space:nowrap; display:inline-flex; align-items:center; justify-content:center; gap:6px; line-height:1; border-right:1px solid #3a3f4c; }
 .doc-tab:hover{ color:#e7e9ee; }
 .doc-tab.on{ background:#3a3f4c; color:#fff; }
 .doc-tab i, .doc-tab svg{ width:14px; height:14px; }
 
 /* ===== 좌측: 툴바 ===== */
-.doc-tool{ background:#3a3f4c; height:44px; display:flex; align-items:center; gap:14px; padding:0 16px; color:#c9ccd6; font-size:14px; }
+/* .doc-tool — 별도 툴바 단 제거, 도구는 탭 줄 오른쪽(.dt-r)으로 통합 (2026-08-07) */
 .dt-div{ width:1px; height:16px; background:#4f5563; }
 .dt-btn{ width:30px; height:30px; border:none; background:none; border-radius:5px; color:#c9ccd6; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; line-height:1; }
 .dt-btn:hover{ background:#4a4f5e; color:#fff; }
 .dt-btn i, .dt-btn svg{ width:16px; height:16px; }
 .dt-page{ display:inline-flex; align-items:center; gap:8px; }
 .dt-page-now{ min-width:34px; height:26px; border-radius:4px; background:#4a4f5e; color:#fff; font-size:13px; font-weight:600; display:inline-flex; align-items:center; justify-content:center; }
-.dt-jump{ display:inline-flex; align-items:center; gap:6px; }
-.dt-chip{ height:26px; padding:0 11px; border-radius:100px; border:1px solid #545a6b; background:none; color:#c9ccd6; font-size:13px; font-weight:600; font-family:inherit; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; line-height:1; }
-.dt-chip:hover{ background:#4a4f5e; color:#fff; }
-.dt-chip.on{ background:#416bff; border-color:#416bff; color:#fff; }
+/* .dt-jump / .dt-chip — 문항 퀵이동 칩과 함께 제거 (2026-08-07) */
 .dt-meta{ color:#9aa0ad; }
-.dt-r{ margin-left:auto; display:flex; align-items:center; gap:10px; }
+/* 작성 과정 새 탭 링크 — 데이터 없이 진입로만, 강조 없이 조용하게 (2026-08-07) */
+.dt-link{ background:none; border:none; cursor:pointer; font-family:inherit; font-size:13px; font-weight:500; color:#c9ccd6; display:inline-flex; align-items:center; justify-content:center; line-height:1; vertical-align:middle; gap:5px; padding:6px 8px; border-radius:5px; }
+.dt-link:hover{ background:#3a3f4d; color:#fff; }
+.dt-r{ margin-left:auto; display:flex; align-items:center; gap:10px; padding:0 16px; flex-shrink:0; }
 
 /* ===== 좌측: 본문 ===== */
 .doc-body{ flex:1; overflow-y:auto; padding:28px; display:flex; justify-content:center; }
@@ -107,6 +117,9 @@ a{ text-decoration:none; color:inherit; }
 .doc-sum{ background:#fff; border-radius:10px; box-shadow:0 1px 3px rgba(0,0,0,.06); padding:16px 22px; margin-bottom:18px; display:flex; align-items:center; gap:20px; flex-wrap:wrap; font-size:15px; color:#3b3f4c; }
 .doc-sum b{ color:#222631; font-weight:600; }
 .doc-sum .sep{ width:1px; height:14px; background:#dde1e8; }
+/* 작성 과정 새 탭 링크 — 데이터 없이 진입로만 (2026-08-07) */
+.sum-link{ margin-left:auto; background:none; border:none; cursor:pointer; font-family:inherit; font-size:15px; font-weight:500; color:#3151c4; display:inline-flex; align-items:center; justify-content:center; line-height:1; vertical-align:middle; gap:5px; padding:7px 10px; border-radius:6px; }
+.sum-link:hover{ background:#e9f2ff; }
 
 /* 파일 뷰어 (기존) */
 .paper{ background:#fff; box-shadow:0 1px 3px rgba(0,0,0,.1); min-height:900px; display:flex; align-items:center; justify-content:center; color:#c7cbd3; }
@@ -140,12 +153,15 @@ a{ text-decoration:none; color:inherit; }
 .help{ margin-left:auto; color:#b3b6bd; display:inline-flex; cursor:help; }
 .help i, .help svg{ width:18px; height:18px; }
 
-.sc-tools{ display:flex; align-items:center; gap:8px; margin-bottom:18px; flex-wrap:wrap; }
+/* 한 줄 유지 — 줄바꿈되면 오른쪽 버튼만 아래로 밀려 정렬이 깨져 보임 (2026-08-07) */
+.sc-tools{ display:flex; align-items:center; gap:8px; margin-bottom:18px; flex-wrap:nowrap; }
 .cbx{ display:inline-flex; align-items:center; gap:7px; cursor:pointer; font-size:14px; font-weight:600; color:#3151c4; background:#e9f2ff; border-radius:6px; padding:8px 12px; line-height:1; user-select:none; }
 .cbx-box{ width:16px; height:16px; border-radius:3px; border:1.5px solid #a9c1ff; background:#fff; display:inline-flex; align-items:center; justify-content:center; flex-shrink:0; }
 .cbx.on .cbx-box{ background:#416bff; border-color:#416bff; }
 .cbx.on .cbx-box::after{ content:''; width:4px; height:8px; border:solid #fff; border-width:0 2px 2px 0; transform:rotate(45deg) translate(-1px,-1px); }
-.sc-tools-r{ margin-left:auto; display:flex; gap:6px; }
+.sc-tools-r{ margin-left:auto; display:flex; gap:6px; flex-shrink:0; }
+.sc-tools .cbx{ white-space:nowrap; }
+.sc-tools .btn-sm{ white-space:nowrap; }
 
 .crit{ padding:18px 0; border-top:1px solid #eceef2; }
 .crit:first-of-type{ border-top:none; padding-top:0; }
@@ -255,40 +271,29 @@ a{ text-decoration:none; color:inherit; }
 
     <!-- ═══════════ 좌측 · 제출물 ═══════════ -->
     <div class="pane-l">
+      <!-- 탭 줄 + 도구를 한 줄로 (2026-08-07 올립) — 문항 칩이 빠지면서 툴바에 컨트롤 하나만 남아
+           별도 단을 유지할 이유가 없어짐. 제출물이 여러 개가 아니라 탭 오른쪽에 여유가 있다. -->
       <div class="doc-tabs" id="docTabs">
         <button class="doc-tab on" data-doc="write" onclick="pickDoc('write')"><i data-lucide="type"></i>클리포를 통한 제출</button>
         <button class="doc-tab" data-doc="file" onclick="pickDoc('file')"><i data-lucide="paperclip"></i>10101_김서윤_활동지.pdf</button>
-      </div>
 
-      <!-- 툴바: 직접 작성 -->
-      <div class="doc-tool" id="toolWrite">
-        <span class="dt-meta">07/29 15:24 제출</span>
-        <div class="dt-div"></div>
-        <div class="dt-jump">
-          <span class="dt-meta">문항</span>
-          <button class="dt-chip on" onclick="jumpQ(0,this)">1</button>
-          <button class="dt-chip" onclick="jumpQ(1,this)">2</button>
-          <button class="dt-chip" onclick="jumpQ(2,this)">3</button>
-        </div>
-        <div class="dt-r">
+        <!-- 도구: 직접 작성 -->
+        <div class="dt-r" id="toolWrite">
           <span class="dt-meta">글자 크기</span>
           <button class="dt-btn" title="작게" onclick="fontStep(-1)"><i data-lucide="minus"></i></button>
           <span class="dt-meta" id="fsLabel">100%</span>
           <button class="dt-btn" title="크게" onclick="fontStep(1)"><i data-lucide="plus"></i></button>
         </div>
-      </div>
 
-      <!-- 툴바: 파일 -->
-      <div class="doc-tool" id="toolFile" style="display:none;">
-        <span class="dt-meta">07/29 15:24 업로드</span>
-        <div class="dt-div"></div>
-        <div class="dt-page">
-          <button class="dt-btn" onclick="notReady('이전 쪽')"><i data-lucide="chevron-left"></i></button>
-          <span class="dt-page-now">1</span>
-          <span class="dt-meta">/ 3</span>
-          <button class="dt-btn" onclick="notReady('다음 쪽')"><i data-lucide="chevron-right"></i></button>
-        </div>
-        <div class="dt-r">
+        <!-- 도구: 파일 -->
+        <div class="dt-r" id="toolFile" style="display:none;">
+          <div class="dt-page">
+            <button class="dt-btn" onclick="notReady('이전 쪽')"><i data-lucide="chevron-left"></i></button>
+            <span class="dt-page-now">1</span>
+            <span class="dt-meta">/ 3</span>
+            <button class="dt-btn" onclick="notReady('다음 쪽')"><i data-lucide="chevron-right"></i></button>
+          </div>
+          <div class="dt-div"></div>
           <button class="dt-btn" title="회전" onclick="notReady('회전')"><i data-lucide="rotate-cw"></i></button>
           <span class="dt-meta">100%</span>
           <button class="dt-btn" title="확대" onclick="notReady('확대')"><i data-lucide="zoom-in"></i></button>
@@ -299,12 +304,13 @@ a{ text-decoration:none; color:inherit; }
       <div class="doc-body">
         <!-- 직접 작성 답안 (신규) -->
         <div class="doc-sheet" id="sheetWrite">
+          <!-- '문항 3개에 답했어요'는 제거 — 툴바 문항 칩(1·2·3)과 중복. 그 자리에 작성 과정 링크 (2026-08-07 올립) -->
           <div class="doc-sum">
-            <span><b>문항 3개</b>에 답했어요</span>
-            <span class="sep"></span>
             <span>모두 <b>1,247자</b></span>
             <span class="sep"></span>
             <span>07월 29일(수) 15:24 제출</span>
+            <span class="sep"></span>
+            <button class="sum-link" title="과제물 관리에서 이 학생의 작성 과정을 새 탭으로 열어요" onclick="window.open('focus_log_v2_260806.html#case-kim','_blank')">작성 과정 보기 <i data-lucide="external-link" style="width:13px;height:13px"></i></button>
           </div>
           <div id="qList"></div>
         </div>
@@ -324,6 +330,9 @@ a{ text-decoration:none; color:inherit; }
         </div>
       </div>
     </div>
+
+    <!-- 좌우 너비 조절 -->
+    <div class="pane-resizer" id="paneResizer" title="드래그해서 너비 조절 · 더블클릭하면 기본값"></div>
 
     <!-- ═══════════ 우측 · 채점 ═══════════ -->
     <div class="pane-r">
@@ -504,12 +513,43 @@ function pickDoc(doc){
   lucide.createIcons();
 }
 
-function jumpQ(i, btn){
-  document.querySelectorAll('.dt-jump .dt-chip').forEach(function(c){ c.classList.remove('on'); });
-  btn.classList.add('on');
-  var el = document.getElementById('q' + i);
-  if(el) el.scrollIntoView({ behavior:'smooth', block:'start' });
-}
+/* ───────── 좌우 너비 조절 (2026-08-07) ─────────
+   답안이 긴 과제와 채점근거가 긴 과제에서 원하는 비율이 달라 교사가 직접 맞춘다.
+   폭은 localStorage로 유지, 더블클릭하면 기본값(470px). */
+(function(){
+  var R_MIN = 380, R_MAX = 760, R_DEFAULT = 470;
+  var rz = document.getElementById('paneResizer');
+  var split = document.querySelector('.split');
+  if(!rz || !split) return;
+
+  function setW(px){
+    var w = Math.min(R_MAX, Math.max(R_MIN, Math.round(px)));
+    document.documentElement.style.setProperty('--paneR', w + 'px');
+    try { localStorage.setItem('clipoScorePaneR', String(w)); } catch(e){}
+  }
+  try {
+    var saved = parseInt(localStorage.getItem('clipoScorePaneR') || '', 10);
+    if(saved) setW(saved);
+  } catch(e){}
+
+  var dragging = false;
+  rz.addEventListener('mousedown', function(e){
+    dragging = true;
+    rz.classList.add('dragging'); document.body.classList.add('resizing');
+    e.preventDefault();
+  });
+  document.addEventListener('mousemove', function(e){
+    if(!dragging) return;
+    /* 오른쪽 패널 너비 = 화면 오른쪽 끝 - 커서 위치 */
+    setW(split.getBoundingClientRect().right - e.clientX);
+  });
+  document.addEventListener('mouseup', function(){
+    if(!dragging) return;
+    dragging = false;
+    rz.classList.remove('dragging'); document.body.classList.remove('resizing');
+  });
+  rz.addEventListener('dblclick', function(){ setW(R_DEFAULT); });
+})();
 
 function fontStep(dir){
   fontPct = Math.min(140, Math.max(80, fontPct + dir * 10));

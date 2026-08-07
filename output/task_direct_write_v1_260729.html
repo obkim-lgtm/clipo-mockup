@@ -192,6 +192,17 @@
     .sw.on .sw-track{ background:#416bff; }
     .sw.on .sw-knob{ left:20px; }
     .sw.disabled{ opacity:.5; cursor:default; }
+    /* 문항별 최대 글자 수 — 수식 입력과 같은 줄에 둬서 카드 높이를 늘리지 않는다 (2026-08-07 올립) */
+    .qlim{ display:inline-flex; align-items:center; gap:8px; margin-left:auto; }
+    .qlim-lb{ font-size:13px; font-weight:500; color:#6d7381; white-space:nowrap; }
+    .qlim-ctl{ display:inline-flex; align-items:center; height:32px; border:1px solid #d9d9d9; border-radius:7px; overflow:hidden; background:#fff; }
+    .qlim-ctl button{ width:30px; height:100%; border:none; background:#fff; cursor:pointer; color:#3b3f4c; font-size:15px; display:flex; align-items:center; justify-content:center; font-family:inherit; }
+    .qlim-ctl button:hover{ background:#f6f7f9; }
+    .qlim-in{ width:56px; height:100%; border:none; border-left:1px solid #eceef2; text-align:right; font-size:14px; font-weight:600; color:#222631; font-family:inherit; padding:0 2px 0 6px; background:#fff; }
+    .qlim-in:focus{ outline:2px solid #416bff; outline-offset:-2px; }
+    .qlim-unit{ font-size:14px; font-weight:600; color:#222631; padding-right:8px; border-right:1px solid #eceef2; }
+    .qlim-fix{ font-size:13px; font-weight:600; color:#3b3f4c; white-space:nowrap; }
+
     .hstep{ display:inline-flex; align-items:center; height:44px; border:1px solid #d9d9d9; border-radius:8px; overflow:hidden; }
     .hstep button{ width:44px; height:100%; border:none; background:#fff; cursor:pointer; color:#3b3f4c; font-size:18px; display:flex; align-items:center; justify-content:center; }
     .hstep button:hover{ background:#f6f7f9; }
@@ -378,7 +389,7 @@
     .q-empty span{ font-size:15px; color:#6d7381; }
 
     /* 수식 입력 (question_tab_v1_260617 패턴 이식) */
-    .ans-tool{ display:flex; margin-top:-4px; }
+    .ans-tool{ display:flex; align-items:center; margin-top:-4px; }
     .fx-btn{ display:inline-flex; align-items:center; justify-content:center; gap:5px; line-height:1; vertical-align:middle; font-size:13px; font-weight:500; color:#3b3f4c; background:#fff; border:1px solid #3b3f4c; border-radius:7px; padding:7px 12px; cursor:pointer; font-family:inherit; }
     .fx-btn:hover{ background:#f6f7f9; }
     .fx-btn i{ color:#6d7381; }
@@ -718,26 +729,25 @@
             </div>
 
             <div>
-              <p class="way-sub">문항당 최대 글자 수</p>
-              <div class="hstep" data-step="500" data-min="500" data-max="5000" data-unit="자">
-                <button onclick="hstep(this,-1)">−</button>
-                <span class="hstep-val" style="min-width:84px;">2,000자</span>
-                <button onclick="hstep(this,1)">+</button>
-              </div>
-              <p class="sec-desc" style="margin:8px 0 0;">학생이 문항 하나에 쓸 수 있는 글자 수예요. 500자 단위로 조절합니다.</p>
-            </div>
-
-            <div>
               <p class="way-sub">작성 환경</p>
               <div class="alert-info" id="recLockNote" style="display:none;margin-bottom:12px;">
                 <i data-lucide="lock" style="width:18px;height:18px"></i>
                 <div class="ai-txt"><b>제출한 학생이 있어 작성 과정 기록은 바꿀 수 없어요.</b><br>과제 도중에 켜거나 끄면 먼저 낸 학생만 기록이 없어, 기록이 없는 것인지 켜지 않았던 것인지 구분할 수 없게 됩니다.</div>
               </div>
-              <span class="sw on" onclick="toggleSw(this)"><span class="sw-track"><span class="sw-knob"></span></span>복사 및 붙여넣기 금지</span>
-              <span class="sw" id="swRecord" onclick="toggleRecordSw(this)" style="margin-top:10px;"><span class="sw-track"><span class="sw-knob"></span></span>작성 과정 기록</span>
+              <!-- 토글마다 설명을 바로 아래 붙여 어느 설정의 설명인지 분명하게 (2026-08-07) -->
+              <div style="margin-bottom:18px;">
+                <span class="sw on" onclick="toggleSw(this)"><span class="sw-track"><span class="sw-knob"></span></span>복사 및 붙여넣기 금지</span>
+                <p class="sec-desc" style="margin:6px 0 0 50px;">외부에서 복사한 내용을 학생이 답안에 붙여넣을 수 없어요.</p>
+              </div>
+
+              <span class="sw" id="swRecord" onclick="toggleRecordSw(this)"><span class="sw-track"><span class="sw-knob"></span></span>작성 과정 기록</span>
+              <p class="sec-desc" style="margin:6px 0 0 50px;">학생이 답안을 쓰는 동안 다른 화면으로 이동한 시각과 글자 수 변화를 남겨요.</p>
+
+              <!-- 상세 안내·예시는 켰을 때만 — 꺼둔 교사에게 상시로 보여줄 정보가 아님 (2026-08-07 올립) -->
+              <div id="recDetail" style="display:none;margin-left:50px;">
               <div class="alert-info" style="margin-top:14px;">
                 <i data-lucide="info" style="width:18px;height:18px"></i>
-                <div class="ai-txt">켜면 학생이 답안을 쓰는 동안 다른 탭·창으로 이동한 <b>시각·머문 시간</b>과 <b>글자 수 변화</b>가 남고, 과제물 관리 화면에서 확인할 수 있습니다. 방문한 사이트와 답안 내용은 저장하지 않고, 스마트폰 등 다른 기기 사용은 감지되지 않습니다. 3초 미만 이동은 기록하지 않으며, 자동 판정이나 감점 없이 참고 정보로만 제공됩니다. 학생에게는 작성 시작 전과 작성 중에 안내되고 다른 화면에 다녀오면 기록이 남았음을 알려줍니다. <b>제출이 한 건이라도 들어오면 켜고 끌 수 없습니다.</b></div>
+                <div class="ai-txt">기록은 <b>과제물 관리</b> 화면에서 학생별로 확인합니다. 방문한 사이트와 답안 내용은 저장하지 않고, 스마트폰 등 다른 기기 사용은 감지되지 않습니다. 3초 미만 이동은 기록하지 않으며, 자동 판정이나 감점 없이 참고 정보로만 제공됩니다. 학생에게는 작성 시작 전과 작성 중에 안내되고, 다른 화면에 다녀오면 기록이 남았음을 알려줍니다. <b>제출이 한 건이라도 들어오면 켜고 끌 수 없습니다.</b></div>
               </div>
 
               <!-- 결과 화면 예시 — 처음 보는 기능이라 켜기 전에 무엇을 얻는지 보여준다 (2026-08-06 올립) -->
@@ -756,6 +766,7 @@
                   <line x1="960" y1="0" x2="960" y2="72" stroke="#319d64" stroke-width="2" vector-effect="non-scaling-stroke"></line>
                 </svg>
                 <p style="margin:8px 0 0;font-size:13px;font-weight:500;color:#6d7381;">이탈 1회 · 2분 10초 · 복귀 후 5분간 +312자 · 14:52 제출</p>
+              </div>
               </div>
             </div>
           </div>
@@ -865,7 +876,7 @@
   </div>
 
   <div class="page-wrap">
-    <button class="back-link" onclick="goDesign()"><i data-lucide="chevron-left" style="width:18px;height:18px"></i>설계로 돌아가기</button>
+    <button class="back-link" onclick="leaveQuestions()"><i data-lucide="chevron-left" style="width:18px;height:18px"></i>설계로 돌아가기</button>
     <h1 class="page-h1">문항 작성</h1>
     <p class="page-sub">학생이 클리포 화면에서 보고 답할 문항을 작성합니다. 작성한 순서대로 학생에게 보이며, 자료나 이미지는 설계의 <b style="font-weight:600;">과제 안내</b>에 첨부합니다.</p>
 
@@ -897,7 +908,7 @@
 
     <div class="form-actions">
       <button class="btn btn-outline btn-lg" style="margin-right:auto;" onclick="openPreview()"><i data-lucide="monitor" style="width:16px;height:16px"></i>학생 화면 미리보기</button>
-      <button class="btn btn-outline btn-lg" id="btnQCancel" onclick="goDesign()">취소</button>
+      <button class="btn btn-outline btn-lg" id="btnQCancel" onclick="leaveQuestions()">취소</button>
       <button class="btn btn-primary btn-lg" id="btnQSave" onclick="saveQuestions()"><i data-lucide="check" style="width:16px;height:16px"></i>문항 저장</button>
       <button class="btn btn-primary btn-lg" id="btnQBack" style="display:none;" onclick="goDesign()">확인</button>
     </div>
@@ -1054,6 +1065,19 @@
 </div>
 
 <!-- 학생 화면 미리보기 모달 -->
+<!-- 문항 미저장 이탈 가드 — 짧은 확인이므로 모달 허용 -->
+<div class="pv-ov" id="qGuard" onclick="if(event.target===this) qGuardStay()">
+  <div style="background:#fff;border-radius:14px;width:100%;max-width:440px;box-shadow:0 20px 50px rgba(0,0,0,.25);padding:32px 32px 28px;">
+    <p style="font-size:20px;font-weight:700;color:#222631;margin:0 0 10px;line-height:1.45;">저장하지 않은 문항이 있어요</p>
+    <p style="font-size:16px;color:#3b3f4c;margin:0 0 24px;line-height:1.7;">저장하지 않고 나가면 방금 고친 문항과 글자 수 설정이 사라져요.</p>
+    <div style="display:flex;gap:10px;">
+      <button class="btn btn-outline btn-lg" style="flex:1;" onclick="qGuardDiscard()">저장 안 함</button>
+      <button class="btn btn-primary btn-lg" style="flex:1;" onclick="qGuardSave()">저장</button>
+    </div>
+    <button style="display:block;margin:14px auto 0;background:none;border:none;cursor:pointer;font-family:inherit;font-size:15px;font-weight:500;color:#6d7381;" onclick="qGuardStay()">계속 작성</button>
+  </div>
+</div>
+
 <div class="pv-ov" id="pvOverlay" onclick="if(event.target===this) closePreview()">
   <div class="pv">
     <div class="pv-hd">
@@ -1605,6 +1629,11 @@ document.querySelectorAll('#rub-list .rub-elem').forEach(checkRubElem);
 var QUESTIONS = [];   // 신규 설계 = 빈 상태가 기본
 var Q_MAX = 10;
 
+/* 문항별 최대 글자 수 — 일괄 설정이 아니라 문항마다 (2026-08-07 올립).
+   QUESTIONS와 인덱스를 맞춰 추가·삭제·이동 시 함께 움직인다. */
+var Q_LIMIT_DEFAULT = 500;
+var Q_LIMITS = [];
+
 /* 제출이 하나라도 들어오면 문항을 잠근다.
    문항을 고치거나 지우면 먼저 낸 학생이 다른 질문에 답한 것이 되기 때문. */
 var SUBMITTED = 0;
@@ -1612,7 +1641,7 @@ function setSubmitted(n){
   SUBMITTED = n;
   /* 제출이 들어왔다는 건 설계가 저장되고 직접 작성이 켜진 상태라는 뜻 */
   if(n > 0){
-    if(QUESTIONS.length === 0) QUESTIONS = Q_SAMPLE.slice();
+    if(QUESTIONS.length === 0){ QUESTIONS = Q_SAMPLE.slice(); Q_LIMITS = QUESTIONS.map(function(){ return Q_LIMIT_DEFAULT; }); }
     document.getElementById('way-write').classList.add('on');
     document.getElementById('way-none').style.display = 'none';
   }
@@ -1641,7 +1670,32 @@ function go(scene){
   window.scrollTo(0,0);
   lucide.createIcons();
 }
-function goQuestions(){ renderQuestions(); go('questions'); }
+/* 문항 화면 진입 시 스냅샷 — 저장 없이 나가면 이 상태로 되돌린다.
+   입력이 QUESTIONS에 즉시 반영되는 구조라, 스냅샷이 없으면 [취소]가 취소가 아니게 됨 (2026-08-07) */
+var Q_SNAP = null, L_SNAP = null;
+function goQuestions(){
+  Q_SNAP = QUESTIONS.slice(); L_SNAP = Q_LIMITS.slice();
+  renderQuestions(); go('questions');
+}
+function qDirty(){
+  return Q_SNAP !== null && (JSON.stringify(QUESTIONS) !== JSON.stringify(Q_SNAP) || JSON.stringify(Q_LIMITS) !== JSON.stringify(L_SNAP));
+}
+/* 문항 화면에서 나가기 — 저장 안 한 변경이 있으면 가드 */
+function leaveQuestions(){
+  if(SUBMITTED > 0 || !qDirty()){ goDesign(); return; }
+  document.getElementById('qGuard').classList.add('show');
+  lucide.createIcons();
+}
+function qGuardStay(){ document.getElementById('qGuard').classList.remove('show'); }
+function qGuardDiscard(){
+  QUESTIONS = Q_SNAP.slice(); Q_LIMITS = L_SNAP.slice();
+  document.getElementById('qGuard').classList.remove('show');
+  goDesign();
+}
+function qGuardSave(){
+  document.getElementById('qGuard').classList.remove('show');
+  saveQuestions();   /* 빈 문항 등 검증에 걸리면 토스트가 뜨고 화면에 남는다 */
+}
 function goDesign(){ updateSummary(); go('design'); }
 /* 원본의 goDesignList는 옛 목록 파일로 이탈 → 이 파일 안의 목록 씬으로 재정의 */
 function goDesignList(){ renderList(); go('list'); }
@@ -1669,6 +1723,13 @@ function toggleRecordSw(el){
     return;
   }
   el.classList.toggle('on');
+  syncRecordDetail();
+}
+/* 상세 안내·결과 예시는 켰을 때만 노출 */
+function syncRecordDetail(){
+  var on = document.getElementById('swRecord').classList.contains('on');
+  document.getElementById('recDetail').style.display = on ? '' : 'none';
+  lucide.createIcons();
 }
 
 /* 제출이 들어오면 방식과 작성 과정 기록을 잠근다 (나머지 세부 설정은 계속 조절 가능) */
@@ -1680,6 +1741,7 @@ function applyWayLock(){
   document.getElementById('way-file').classList.toggle('locked', locked);
   document.getElementById('recLockNote').style.display = locked ? 'flex' : 'none';
   document.getElementById('swRecord').classList.toggle('disabled', locked);
+  syncRecordDetail();
   lucide.createIcons();
 }
 
@@ -1716,7 +1778,21 @@ function renderQuestions(){
             + '</div>')
       + '</div>'
       + '<textarea class="qta" placeholder="학생에게 보일 문항을 입력해 주세요."' + (locked ? ' readonly' : ' oninput="onQInput('+i+', this.value)"') + '></textarea>'
-      + (locked ? '' : '<div class="ans-tool"><button class="fx-btn" onclick="openFx(this)"><i data-lucide="sigma" style="width:14px;height:14px"></i>수식 입력</button></div>');
+      /* 문항별 최대 글자 수 — 수식 입력과 같은 줄(오른쪽)에 둬서 카드 높이를 늘리지 않는다 */
+      + '<div class="ans-tool">'
+      +   (locked ? '' : '<button class="fx-btn" onclick="openFx(this)"><i data-lucide="sigma" style="width:14px;height:14px"></i>수식 입력</button>')
+      +   '<div class="qlim">'
+      +     '<span class="qlim-lb">답안 최대 글자 수</span>'
+      +     (locked
+              ? '<span class="qlim-fix">' + qLimit(i).toLocaleString() + '자</span>'
+              : '<div class="qlim-ctl">'
+                + '<button title="100자 줄이기" onclick="qLimStep(' + i + ',-1)">−</button>'
+                + '<input class="qlim-in" type="text" inputmode="numeric" value="' + qLimit(i).toLocaleString() + '" onchange="qLimSet(' + i + ',this)" onblur="qLimSet(' + i + ',this)">'
+                + '<span class="qlim-unit">자</span>'
+                + '<button title="100자 늘리기" onclick="qLimStep(' + i + ',1)">+</button>'
+                + '</div>')
+      +   '</div>'
+      + '</div>';
     d.querySelector('textarea').value = q;
     list.appendChild(d);
   });
@@ -1790,18 +1866,39 @@ function renderPreview(){
 
 function onQInput(i, v){ QUESTIONS[i] = v; }
 
+/* 문항별 최대 글자 수 — 기본 500자, ±100자 스텝, 직접 입력 가능 (100~5,000) */
+var Q_LIMIT_MIN = 100, Q_LIMIT_MAX = 5000, Q_LIMIT_STEP = 100;
+function qLimit(i){ return Q_LIMITS[i] || Q_LIMIT_DEFAULT; }
+function qLimClamp(v){
+  if(isNaN(v)) return Q_LIMIT_DEFAULT;
+  v = Math.round(v / Q_LIMIT_STEP) * Q_LIMIT_STEP;   /* 직접 입력도 100자 단위로 맞춤 */
+  return Math.min(Q_LIMIT_MAX, Math.max(Q_LIMIT_MIN, v));
+}
+function qLimStep(i, dir){
+  Q_LIMITS[i] = qLimClamp(qLimit(i) + dir * Q_LIMIT_STEP);
+  var card = document.querySelectorAll('#q-list .qcard')[i];
+  if(card) card.querySelector('.qlim-in').value = Q_LIMITS[i].toLocaleString();
+}
+function qLimSet(i, input){
+  var v = qLimClamp(parseInt(String(input.value).replace(/[^0-9]/g, ''), 10));
+  Q_LIMITS[i] = v;
+  input.value = v.toLocaleString();
+}
+
 function addQuestion(){
   if(QUESTIONS.length >= Q_MAX){ toastMsg('문항은 최대 ' + Q_MAX + '개까지 추가할 수 있어요.'); return; }
   QUESTIONS.push('');
+  Q_LIMITS.push(Q_LIMIT_DEFAULT);
   renderQuestions();
   var tas = document.querySelectorAll('#q-list .qta');
   if(tas.length){ tas[tas.length-1].focus(); tas[tas.length-1].scrollIntoView({behavior:'smooth', block:'center'}); }
 }
-function delQ(i){ QUESTIONS.splice(i,1); renderQuestions(); }
+function delQ(i){ QUESTIONS.splice(i,1); Q_LIMITS.splice(i,1); renderQuestions(); }
 function moveQ(i, dir){
   var j = i + dir;
   if(j < 0 || j >= QUESTIONS.length) return;
   var tmp = QUESTIONS[i]; QUESTIONS[i] = QUESTIONS[j]; QUESTIONS[j] = tmp;
+  var tl = qLimit(i); Q_LIMITS[i] = qLimit(j); Q_LIMITS[j] = tl;
   renderQuestions();
 }
 
@@ -1837,6 +1934,7 @@ function saveQuestions(){
   var empty = QUESTIONS.filter(function(q){ return q.trim() === ''; }).length;
   if(empty > 0){ toastMsg('내용이 비어 있는 문항이 ' + empty + '개 있어요. 채우거나 삭제해 주세요.'); return; }
   updateSummary();
+  Q_SNAP = QUESTIONS.slice(); L_SNAP = Q_LIMITS.slice();   /* 저장됨 = 더 이상 미저장 변경 없음 */
   toastMsg('문항 ' + QUESTIONS.length + '개를 저장했습니다.');
   setTimeout(function(){ go('design'); }, 900);
 }
