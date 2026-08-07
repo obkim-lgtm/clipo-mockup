@@ -114,8 +114,14 @@ body.nav-expanded .main-wrap{ padding-left:200px; }
 .leave-none{ color:#b3b6bd; font-size:15px; }
 
 /* ===== 작성 과정 상세 (인라인 펼침) ===== */
-.leave-detail td{ background:#fbfbfc; }
-.leave-detail-inner{ padding:10px 24px 18px; text-align:left; }
+/* 작성 과정 팝업 (2026-08-07 회의 — 행 펼침에서 전환) */
+.pc{ background:#fff; border-radius:14px; width:100%; max-width:1080px; max-height:88vh; box-shadow:0 20px 50px rgba(0,0,0,.25); display:flex; flex-direction:column; overflow:hidden; }
+.pc-hd{ display:flex; align-items:flex-start; gap:16px; padding:24px 28px 18px; border-bottom:1px solid #dde1e8; flex-shrink:0; }
+.pc-t{ font-size:19px; font-weight:700; color:#18181b; margin:0 0 6px; line-height:1.35; }
+.pc-s{ font-size:14px; font-weight:500; color:#6d7381; margin:0; line-height:1.5; }
+.pc-x{ margin-left:auto; width:36px; height:36px; border:none; background:none; border-radius:8px; color:#6d7381; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; flex-shrink:0; }
+.pc-x:hover{ background:#f1f3f5; }
+.pc-bd{ flex:1; min-height:0; overflow-y:auto; padding:20px 28px 28px; text-align:left; }
 .ld-title{ margin:0 0 4px; font-size:15px; font-weight:600; color:#3b3f4c; }
 .ld-legend{ display:flex; align-items:center; gap:16px; margin:0 0 14px; font-size:13px; font-weight:500; color:#6d7381; }
 .ld-legend span{ display:inline-flex; align-items:center; gap:6px; }
@@ -354,6 +360,20 @@ body.nav-expanded .main-wrap{ padding-left:200px; }
 <div id="toast" class="toast"><i data-lucide="circle-check-big" style="width:20px;height:20px;color:white;flex-shrink:0;"></i><span id="toastMsg"></span></div>
 
 <!-- 삭제 확인 모달 -->
+<!-- 작성 과정 팝업 — 타임라인은 가로가 넓어야 읽혀서 넓은 모달로 (2026-08-07 회의) -->
+<div class="md-ov" id="pcModal" onclick="if(event.target===this) closeProcess()">
+  <div class="pc">
+    <div class="pc-hd">
+      <div>
+        <p class="pc-t" id="pcTitle">10101 김서윤 · 작성 과정</p>
+        <p class="pc-s" id="pcSum"></p>
+      </div>
+      <button class="pc-x" onclick="closeProcess()" title="닫기"><i data-lucide="x" style="width:20px;height:20px"></i></button>
+    </div>
+    <div class="pc-bd" id="pcBody"></div>
+  </div>
+</div>
+
 <div class="md-ov" id="delModal" onclick="if(event.target===this) closeDel()">
   <div class="md">
     <div class="md-body">
@@ -472,7 +492,7 @@ const teacherRows = [
 ];
 
 let focusLogOn = true;
-let openRow = null;
+/* openRow — 팝업으로 전환하며 제거 (2026-08-07) */
 let sortMode = 'default';   /* default | leaveDesc */
 
 /* ───────── 파생값 (모두 series·events에서 계산) ───────── */
@@ -651,8 +671,8 @@ function renderTeacher(){
       /* 재제출한 학생만 제출 횟수 병기 — 대부분은 1회라 표기 없음 */
       const subCnt = submitCount(r);
       const sub = (subCnt >= 2) ? '<span class="lc-sub">제출 '+subCnt+'회</span>' : '';
-      leaveCell = '<button class="leave-cell-btn'+(cnt?'':' quiet')+'" onclick="toggleDetail(\''+r.id+'\')">'
-        + '<span class="lc-main">'+main+' <i data-lucide="chevron-'+(openRow===r.id?'up':'down')+'" style="width:16px;height:16px;"></i></span>'
+      leaveCell = '<button class="leave-cell-btn'+(cnt?'':' quiet')+'" onclick="openProcess(\''+r.id+'\')">'
+        + '<span class="lc-main">'+main+' <i data-lucide="maximize-2" style="width:15px;height:15px;"></i></span>'
         + sub + '</button>';
     }
 
@@ -671,35 +691,44 @@ function renderTeacher(){
       + '<td>'+manageCell+'</td>';
     tb.appendChild(tr);
 
-    /* 펼침 — 학생당 타임라인 1개. 제출·재제출은 초록 마커 */
-    if(focusLogOn && openRow===r.id && sessions.length){
-      const maxVal = Math.max.apply(null, sessions.flatMap(s=>s.series.filter(v=>v!==null)));
-      const dtr = document.createElement('tr');
-      dtr.className = 'leave-detail';
-      const evHtml = evtList(sessions);
-      dtr.innerHTML = '<td colspan="8"><div class="leave-detail-inner">'
-        + '<p class="ld-title">'+r.name+' · 작성 과정</p>'
-        + '<div class="ld-legend">'
-          + '<span><i class="lg-line"></i>글자 수</span>'
-          + '<span><i class="lg-swatch" style="background:#fff1e6;border:1px solid #f7d3ba;"></i>다른 화면</span>'
-          + '<span><i class="lg-swatch" style="background:#eef0f3;border:1px solid #dde1e8;"></i>기록 공백</span>'
-          + '<span><i class="lg-line" style="border-top:2px solid #319d64;"></i>제출</span>'
-        + '</div>'
-        + studentBlock(r, sessions, maxVal)
-        + (evHtml ? '<div class="ld-evt-wrap">'+evHtml+'</div>' : '')
-        + '</div></td>';
-      tb.appendChild(dtr);
-    }
   });
   updateSel();
   lucide.createIcons();
 }
-function toggleDetail(id){ openRow = (openRow===id) ? null : id; renderTeacher(); }
+
+/* ───────── 작성 과정 팝업 (2026-08-07 회의) ─────────
+   행 펼침(아코디언)에서 팝업으로 전환 — 타임라인은 가로가 넓어야 읽히고,
+   과제물 관리·채점 화면 양쪽에서 같은 컴포넌트로 띄울 수 있어야 함 */
+function openProcess(id){
+  const r = teacherRows.find(x => x.id === id);
+  const sessions = rowSessions(r);
+  if(!r || !sessions.length) return;
+  const maxVal = Math.max.apply(null, sessions.flatMap(s=>s.series.filter(v=>v!==null)));
+  const evHtml = evtList(sessions);
+  const cnt = rowLeaveCount(r), sec = rowLeaveSec(r);
+
+  document.getElementById('pcTitle').textContent = r.id + ' ' + r.name + ' · 작성 과정';
+  document.getElementById('pcSum').textContent = (cnt ? '이탈 '+cnt+'회 · '+fmtDur(sec) : '이탈 없음')
+    + ' · 총 ' + rowMinutes(r) + '분 작성' + (submitCount(r) >= 2 ? ' · 제출 '+submitCount(r)+'회' : '');
+  document.getElementById('pcBody').innerHTML =
+      '<div class="ld-legend">'
+      + '<span><i class="lg-line"></i>글자 수</span>'
+      + '<span><i class="lg-swatch" style="background:#fff1e6;border:1px solid #f7d3ba;"></i>다른 화면</span>'
+      + '<span><i class="lg-swatch" style="background:#eef0f3;border:1px solid #dde1e8;"></i>기록 공백</span>'
+      + '<span><i class="lg-line" style="border-top:2px solid #319d64;"></i>제출</span>'
+    + '</div>'
+    + studentBlock(r, sessions, maxVal)
+    + (evHtml ? '<div class="ld-evt-wrap">'+evHtml+'</div>' : '');
+  document.getElementById('pcModal').classList.add('show');
+  lucide.createIcons();
+}
+function closeProcess(){ document.getElementById('pcModal').classList.remove('show'); }
+document.addEventListener('keydown', e => { if(e.key === 'Escape') closeProcess(); });
+
 function openCase(id){
   if(!focusLogOn) toggleFocusLog(true);
-  openRow = id; renderTeacher();
-  const tr = Array.prototype.find.call(document.querySelectorAll('#teacherTbody tr'), t=>t.children[1] && t.children[1].textContent===id);
-  if(tr) tr.scrollIntoView({behavior:'smooth', block:'center'});
+  renderTeacher();
+  openProcess(id);
 }
 
 /* ───────── 정렬 ───────── */
@@ -757,7 +786,7 @@ function confirmDel(){
   toastMsg('과제물 ' + n + '건을 삭제했어요.');
 }
 function toggleFocusLog(on){
-  focusLogOn = on; openRow = null;
+  focusLogOn = on;
   document.getElementById('toggleOffNote').style.display = on ? 'none' : 'block';
   document.getElementById('thLeave').style.display = on ? '' : 'none';
   var st = document.getElementById('recState');

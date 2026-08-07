@@ -381,12 +381,26 @@
     .qi-btn:hover{ background:#f1f3f5; color:#222631; }
     .qi-btn:disabled{ color:#d9d9d9; cursor:default; background:none; }
     .qi-btn.del:hover{ background:#fff3f4; color:#ab303a; }
+    /* 삭제 잠김 — 버튼은 남기되 눌러도 안 지워지고 사유를 알려준다 (2026-08-07) */
+    .qi-btn.del.is-locked{ color:#b3b6bd; }
+    .qi-btn.del.is-locked:hover{ background:#f1f3f5; color:#6d7381; }
     .qta{ width:100%; min-height:96px; border:1px solid #d9d9d9; border-radius:8px; padding:14px 16px; font-size:16px; font-family:inherit; line-height:1.7; color:#222631; resize:vertical; outline:none; }
     .qta:focus{ border-color:#416bff; box-shadow:0 0 0 2px rgba(65,107,255,.12); }
     .qta::placeholder{ color:#9aa0ad; }
     .q-empty{ border:1px dashed #c7cbd3; border-radius:10px; padding:44px 20px; text-align:center; background:#fff; margin-bottom:12px; }
     .q-empty p{ margin:0 0 4px; font-size:16px; font-weight:600; color:#3b3f4c; }
     .q-empty span{ font-size:15px; color:#6d7381; }
+
+    /* ===== 문항 작성 드로워 (2026-08-07 회의 — 페이지에서 전환) ===== */
+    .qdw-ov{ position:fixed; inset:0; background:rgba(34,38,49,.45); z-index:2200; display:flex; justify-content:flex-end; }
+    .qdw{ width:min(920px, 92vw); background:#fff; height:100%; display:flex; flex-direction:column; box-shadow:-12px 0 40px rgba(0,0,0,.18); }
+    .qdw-hd{ display:flex; align-items:flex-start; gap:16px; padding:24px 28px 18px; border-bottom:1px solid #dde1e8; flex-shrink:0; }
+    .qdw-t{ font-size:20px; font-weight:700; color:#18181b; margin:0 0 6px; line-height:1.3; }
+    .qdw-d{ font-size:14px; font-weight:500; color:#6d7381; margin:0; line-height:1.5; }
+    .qdw-x{ margin-left:auto; width:36px; height:36px; border:none; background:none; border-radius:8px; color:#6d7381; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; flex-shrink:0; }
+    .qdw-x:hover{ background:#f1f3f5; }
+    .qdw-bd{ flex:1; min-height:0; overflow-y:auto; padding:20px 28px 28px; }
+    .qdw-ft{ display:flex; align-items:center; gap:10px; padding:16px 28px; border-top:1px solid #dde1e8; background:#fbfbfc; flex-shrink:0; }
 
     /* 수식 입력 (question_tab_v1_260617 패턴 이식) */
     .ans-tool{ display:flex; align-items:center; margin-top:-4px; }
@@ -864,60 +878,45 @@
 <!-- ═══════════ /씬 1 ═══════════ -->
 
 <!-- ═══════════ 씬 2 · 문항 작성 (신규 페이지) ═══════════ -->
+<!-- 문항 작성 — 별도 페이지가 아니라 우측 드로워 (2026-08-07 회의).
+     설계 화면을 떠나지 않아 맥락이 유지되고, 저장 후 돌아갈 곳을 다시 찾지 않아도 됨 -->
 <div id="scr-questions" class="screen">
-  <div class="tab-band">
-    <div class="tab-band-inner">
-      <button class="sub-tab" onclick="location.href='co_teacher_review_v1_260611.html'">수업 홈</button>
-      <button class="sub-tab on" onclick="goDesignList()">평가 설계</button>
-      <button class="sub-tab" onclick="location.href='question_tab_v1_260617.html'">활동지</button>
-      <button class="sub-tab" onclick="location.href='task_ocr_v3_260623.html'">과제물 관리</button>
-      <button class="sub-tab" onclick="location.href='task_ocr_v3_260623.html#scoring'">채점</button>
-      <button class="sub-tab" onclick="notReady('세부능력 및 특기사항 지원')">세부능력 및 특기사항 지원</button>
-    </div>
-  </div>
-
-  <div class="page-wrap">
-    <button class="back-link" onclick="leaveQuestions()"><i data-lucide="chevron-left" style="width:18px;height:18px"></i>설계로 돌아가기</button>
-    <h1 class="page-h1">문항 작성</h1>
-    <p class="page-sub">학생이 클리포 화면에서 보고 답할 문항을 작성합니다. 작성한 순서대로 학생에게 보이며, 자료나 이미지는 설계의 <b style="font-weight:600;">과제 안내</b>에 첨부합니다.</p>
-
-    <!-- 설계 컨텍스트 유지 -->
-    <div class="qctx">
-      <div class="qctx-item"><span class="qctx-lb">평가(과제)명</span><span class="qctx-vl">사회 변동과 현대사회의 문제 분석</span></div>
-      <div class="qctx-div"></div>
-      <div class="qctx-item"><span class="qctx-lb">총점</span><span class="qctx-vl">100점</span></div>
-      <div class="qctx-div"></div>
-      <div class="qctx-item"><span class="qctx-lb">채점기준</span><span class="qctx-vl">3개</span></div>
-    </div>
-
-    <!-- 잠금 안내는 영향 필드 앞 -->
-    <div class="alert-info warn" id="lockNote" style="display:none;margin-top:20px;">
-      <i data-lucide="lock" style="width:18px;height:18px"></i>
-      <div class="ai-txt"><b>이미 제출한 학생이 <span id="lockCnt">3</span>명 있어 문항을 바꿀 수 없어요.</b><br>문항을 고치거나 지우면 먼저 낸 학생이 다른 질문에 답한 것이 됩니다. 문항을 바꾸려면 이 과제의 제출을 마감하고 새 과제로 만들어 주세요.</div>
-    </div>
-
-    <div class="sec" style="margin-top:20px;">
-      <div class="sec-hd">
-        <span class="sec-title">문항</span>
-        <span class="sec-count"><span id="q-count">3</span>개 / 20개</span>
+  <div class="qdw-ov" onclick="if(event.target===this) leaveQuestions()">
+    <div class="qdw">
+      <div class="qdw-hd">
+        <div>
+          <p class="qdw-t">문항 작성</p>
+          <p class="qdw-d">사회 변동과 현대사회의 문제 분석 · 총점 100점 · 채점기준 3개</p>
+        </div>
+        <button class="qdw-x" onclick="leaveQuestions()" title="닫기"><i data-lucide="x" style="width:20px;height:20px"></i></button>
       </div>
 
-      <div id="q-list"></div>
+      <div class="qdw-bd">
+        <p class="sec-desc">학생이 클리포 화면에서 보고 답할 문항이에요. 작성한 순서대로 학생에게 보이며, 자료나 이미지는 설계의 <b style="font-weight:600;">과제 안내</b>에 첨부합니다.</p>
 
-      <button class="btn btn-add" id="btnAddQ" onclick="addQuestion()"><i data-lucide="plus" style="width:16px;height:16px"></i>문항 추가</button>
+        <!-- 잠금 안내는 영향 필드 앞 -->
+        <div class="alert-info warn" id="lockNote" style="display:none;">
+          <i data-lucide="lock" style="width:18px;height:18px"></i>
+          <div class="ai-txt"><b>이미 제출한 학생이 <span id="lockCnt">3</span>명 있어 문항을 지울 수 없어요.</b><br>문항을 지우면 먼저 낸 학생의 답안이 갈 곳을 잃습니다. 내용 수정과 문항 추가는 할 수 있고, <b>바뀐 내용은 이후 제출부터 적용</b>돼요.</div>
+        </div>
+
+        <div class="sec-hd" style="margin-top:18px;">
+          <span class="sec-title">문항</span>
+          <span class="sec-count"><span id="q-count">3</span>개 / 20개</span>
+        </div>
+
+        <div id="q-list"></div>
+
+        <button class="btn btn-add" id="btnAddQ" onclick="addQuestion()"><i data-lucide="plus" style="width:16px;height:16px"></i>문항 추가</button>
+      </div>
+
+      <div class="qdw-ft">
+        <button class="btn btn-outline btn-lg" style="margin-right:auto;" onclick="openPreview()"><i data-lucide="monitor" style="width:16px;height:16px"></i>학생 화면 미리보기</button>
+        <button class="btn btn-outline btn-lg" id="btnQCancel" onclick="leaveQuestions()">취소</button>
+        <button class="btn btn-primary btn-lg" id="btnQSave" onclick="saveQuestions()"><i data-lucide="check" style="width:16px;height:16px"></i>문항 저장</button>
+        <button class="btn btn-primary btn-lg" id="btnQBack" style="display:none;" onclick="goDesign()">확인</button>
+      </div>
     </div>
-
-    <div class="form-actions">
-      <button class="btn btn-outline btn-lg" style="margin-right:auto;" onclick="openPreview()"><i data-lucide="monitor" style="width:16px;height:16px"></i>학생 화면 미리보기</button>
-      <button class="btn btn-outline btn-lg" id="btnQCancel" onclick="leaveQuestions()">취소</button>
-      <button class="btn btn-primary btn-lg" id="btnQSave" onclick="saveQuestions()"><i data-lucide="check" style="width:16px;height:16px"></i>문항 저장</button>
-      <button class="btn btn-primary btn-lg" id="btnQBack" style="display:none;" onclick="goDesign()">확인</button>
-    </div>
-
-    <footer class="site-footer">
-      <div class="sf-links"><a href="#" onclick="return false;">회사소개</a><a href="#" onclick="return false;">이용약관</a><a href="#" onclick="return false;">개인정보처리방침</a><a href="#" onclick="return false;">고객센터</a></div>
-      <div class="sf-copy">© 2026. Datadriven Inc. All rights reserved.</div>
-    </footer>
   </div>
 </div>
 <!-- ═══════════ /씬 2 ═══════════ -->
@@ -1635,6 +1634,11 @@ var Q_MAX = 20;
 var Q_LIMIT_DEFAULT = 500;
 var Q_LIMITS = [];
 
+/* 수식 입력은 수학·과학·기타 과목에서만 (2026-08-07 회의) — 학생 제출 화면과 같은 룰 */
+var SUBJECT = '사회';
+var FX_SUBJECTS = ['수학', '과학', '기타'];
+function showFx(){ return FX_SUBJECTS.indexOf(SUBJECT) > -1; }
+
 /* 제출이 하나라도 들어오면 문항을 잠근다.
    문항을 고치거나 지우면 먼저 낸 학생이 다른 질문에 답한 것이 되기 때문. */
 var SUBMITTED = 0;
@@ -1665,6 +1669,11 @@ var Q_SAMPLE = [
 /* ── 씬 전환 (해시 라우팅) ── */
 function go(scene){
   document.querySelectorAll('.screen').forEach(function(s){ s.classList.remove('active'); });
+  /* 문항 작성은 드로워 — 설계 화면을 뒤에 깔고 그 위에 띄운다 (2026-08-07 회의) */
+  if(scene === 'questions'){
+    document.getElementById('scr-design').classList.add('active');
+    renderQuestions();
+  }
   document.getElementById('scr-'+scene).classList.add('active');
   document.querySelectorAll('#mockjump .mj-btn[data-scene]').forEach(function(b){ b.classList.toggle('on', b.getAttribute('data-scene') === scene); });
   if(location.hash !== '#'+scene) history.replaceState(null,'','#'+scene);
@@ -1752,12 +1761,10 @@ function renderQuestions(){
   var locked = SUBMITTED > 0;
   list.innerHTML = '';
 
+  /* 제출이 들어와도 내용 수정·문항 추가는 열어두고 삭제만 막는다 (2026-08-07 회의).
+     삭제는 먼저 낸 학생의 답안이 갈 곳을 잃지만, 수정·추가는 뒤에 낼 학생에게만 영향 */
   document.getElementById('lockNote').style.display = locked ? 'flex' : 'none';
   document.getElementById('lockCnt').textContent = SUBMITTED;
-  document.getElementById('btnAddQ').style.display = locked ? 'none' : '';
-  document.getElementById('btnQSave').style.display = locked ? 'none' : '';
-  document.getElementById('btnQCancel').style.display = locked ? 'none' : '';
-  document.getElementById('btnQBack').style.display = locked ? '' : 'none';
 
   if(QUESTIONS.length === 0){
     var e = document.createElement('div');
@@ -1767,31 +1774,28 @@ function renderQuestions(){
   }
   QUESTIONS.forEach(function(q, i){
     var d = document.createElement('div');
-    d.className = 'qcard' + (locked ? ' locked' : '');
+    d.className = 'qcard';
     d.innerHTML = '<div class="qcard-hd">'
       + '<span class="qcard-no">문항 ' + (i+1) + '</span>'
-      + (locked
-          ? '<span class="lock-tag"><i data-lucide="lock"></i>바꿀 수 없음</span>'
-          : '<div class="qcard-tools">'
-            + '<button class="qi-btn" title="위로 이동" onclick="moveQ('+i+',-1)"' + (i===0 ? ' disabled' : '') + '><i data-lucide="chevron-up" style="width:18px;height:18px"></i></button>'
-            + '<button class="qi-btn" title="아래로 이동" onclick="moveQ('+i+',1)"' + (i===QUESTIONS.length-1 ? ' disabled' : '') + '><i data-lucide="chevron-down" style="width:18px;height:18px"></i></button>'
-            + '<button class="qi-btn del" title="삭제" onclick="delQ('+i+')"><i data-lucide="trash-2" style="width:18px;height:18px"></i></button>'
-            + '</div>')
+      + '<div class="qcard-tools">'
+      +   '<button class="qi-btn" title="위로 이동" onclick="moveQ('+i+',-1)"' + (i===0 ? ' disabled' : '') + '><i data-lucide="chevron-up" style="width:18px;height:18px"></i></button>'
+      +   '<button class="qi-btn" title="아래로 이동" onclick="moveQ('+i+',1)"' + (i===QUESTIONS.length-1 ? ' disabled' : '') + '><i data-lucide="chevron-down" style="width:18px;height:18px"></i></button>'
+      /* 삭제만 잠근다 — 잠금 상태에서도 버튼은 남기고 누르면 사유를 알려준다 */
+      +   '<button class="qi-btn del' + (locked ? ' is-locked' : '') + '" title="' + (locked ? '제출한 학생이 있어 지울 수 없어요' : '삭제') + '" onclick="delQ('+i+')"><i data-lucide="' + (locked ? 'lock' : 'trash-2') + '" style="width:18px;height:18px"></i></button>'
       + '</div>'
-      + '<textarea class="qta" placeholder="학생에게 보일 문항을 입력해 주세요."' + (locked ? ' readonly' : ' oninput="onQInput('+i+', this.value)"') + '></textarea>'
+      + '</div>'
+      + '<textarea class="qta" placeholder="학생에게 보일 문항을 입력해 주세요." oninput="onQInput('+i+', this.value)"></textarea>'
       /* 문항별 최대 글자 수 — 수식 입력과 같은 줄(오른쪽)에 둬서 카드 높이를 늘리지 않는다 */
       + '<div class="ans-tool">'
-      +   (locked ? '' : '<button class="fx-btn" onclick="openFx(this)"><i data-lucide="sigma" style="width:14px;height:14px"></i>수식 입력</button>')
+      +   (showFx() ? '<button class="fx-btn" onclick="openFx(this)"><i data-lucide="sigma" style="width:14px;height:14px"></i>수식 입력</button>' : '')
       +   '<div class="qlim">'
       +     '<span class="qlim-lb">답안 최대 글자 수</span>'
-      +     (locked
-              ? '<span class="qlim-fix">' + qLimit(i).toLocaleString() + '자</span>'
-              : '<div class="qlim-ctl">'
-                + '<button title="100자 줄이기" onclick="qLimStep(' + i + ',-1)">−</button>'
-                + '<input class="qlim-in" type="text" inputmode="numeric" value="' + qLimit(i).toLocaleString() + '" onchange="qLimSet(' + i + ',this)" onblur="qLimSet(' + i + ',this)">'
-                + '<span class="qlim-unit">자</span>'
-                + '<button title="100자 늘리기" onclick="qLimStep(' + i + ',1)">+</button>'
-                + '</div>')
+      +     '<div class="qlim-ctl">'
+      +       '<button title="100자 줄이기" onclick="qLimStep(' + i + ',-1)">−</button>'
+      +       '<input class="qlim-in" type="text" inputmode="numeric" value="' + qLimit(i).toLocaleString() + '" onchange="qLimSet(' + i + ',this)" onblur="qLimSet(' + i + ',this)">'
+      +       '<span class="qlim-unit">자</span>'
+      +       '<button title="100자 늘리기" onclick="qLimStep(' + i + ',1)">+</button>'
+      +     '</div>'
       +   '</div>'
       + '</div>';
     d.querySelector('textarea').value = q;
@@ -1898,7 +1902,14 @@ function addQuestion(){
   var tas = document.querySelectorAll('#q-list .qta');
   if(tas.length){ tas[tas.length-1].focus(); tas[tas.length-1].scrollIntoView({behavior:'smooth', block:'center'}); }
 }
-function delQ(i){ QUESTIONS.splice(i,1); Q_LIMITS.splice(i,1); renderQuestions(); }
+function delQ(i){
+  /* 제출이 들어온 뒤에는 삭제만 막는다 (2026-08-07 회의) */
+  if(SUBMITTED > 0){
+    toastMsg('제출한 학생이 ' + SUBMITTED + '명 있어 문항을 지울 수 없어요. 내용 수정과 문항 추가는 할 수 있어요.');
+    return;
+  }
+  QUESTIONS.splice(i,1); Q_LIMITS.splice(i,1); renderQuestions();
+}
 function moveQ(i, dir){
   var j = i + dir;
   if(j < 0 || j >= QUESTIONS.length) return;

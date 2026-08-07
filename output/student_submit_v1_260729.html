@@ -120,11 +120,7 @@ body.nav-expanded .main-wrap{ padding-left:200px; }
 .info.warn p{ color:#9a5b2e; }
 
 /* 이동 복귀 배너 */
-#leaveBanner{ display:none; background:#fff7ed; border-radius:10px; padding:16px 18px; align-items:flex-start; gap:12px; margin-bottom:20px; }
-#leaveBanner.show{ display:flex; }
-#leaveBanner i{ width:22px; height:22px; color:#ea580c; flex-shrink:0; margin-top:2px; }
-#leaveBanner .lb-t{ font-size:16px; font-weight:700; color:#c2410c; margin:0 0 3px; line-height:1.5; }
-#leaveBanner .lb-d{ font-size:15px; font-weight:500; color:#9a5b2e; margin:0; line-height:1.6; }
+/* #leaveBanner — 토스트로 교체 (2026-08-07 회의) */
 
 /* ===== 작성 과정 기록 안내 (메인 급 · 배경+아이콘, 좌측 띠 없음) ===== */
 .rec-notice{ background:#e9f2ff; border-radius:12px; padding:18px 20px; display:flex; align-items:flex-start; gap:14px; margin-bottom:20px; }
@@ -314,13 +310,7 @@ body.pdf-mode .sf-copy{ color:#8b8f9c; }
     <h1 class="page-h1">과제 제출 및 확인</h1>
     <p class="page-sub">과제 내용을 확인하고 직접 제출해 보세요.</p>
 
-    <div id="leaveBanner">
-      <i data-lucide="timer"></i>
-      <div>
-        <p class="lb-t" id="lbTitle">다른 화면에 다녀온 기록이 남았어요 (32초)</p>
-        <p class="lb-d">이동한 시각과 머문 시간이 선생님께 전달돼요.</p>
-      </div>
-    </div>
+    <!-- 이탈 알림은 배너가 아니라 토스트 (2026-08-07 회의) — 복붙 차단 안내와 동일 형태 -->
 
     <div class="rec-notice">
       <i data-lucide="monitor-check"></i>
@@ -665,6 +655,12 @@ var ANSWERS = [
 var Q_LIMITS = [800, 600, 500];
 var Q_LIMIT_DEFAULT = 500;
 function qLimit(i){ return Q_LIMITS[i] || Q_LIMIT_DEFAULT; }
+
+/* 수식 입력은 수학·과학·기타 과목에서만 (2026-08-07 회의 — 평가 설계와 같은 룰).
+   국어·사회 등에서는 쓰지 않는 도구라 편집기만 복잡해짐 */
+var SUBJECT = '사회';
+var FX_SUBJECTS = ['수학', '과학', '기타'];
+function showFx(){ return FX_SUBJECTS.indexOf(SUBJECT) > -1; }
 var currentScene = 'notice';
 var leaveStart = null, leaveType = null;
 
@@ -706,8 +702,9 @@ function renderQuestions(targetId, withProgress){
       +     '<span class="ed-div"></span>'
       +     '<button class="ed-btn" onclick="notReady(\'글머리 기호\')"><i data-lucide="list" style="width:16px;height:16px"></i></button>'
       +     '<button class="ed-btn" onclick="notReady(\'번호 매기기\')"><i data-lucide="list-ordered" style="width:16px;height:16px"></i></button>'
-      +     '<span class="ed-div"></span>'
-      +     '<button class="ed-btn" onclick="notReady(\'수식 입력\')"><i data-lucide="sigma" style="width:16px;height:16px"></i></button>'
+      +     (showFx()
+              ? '<span class="ed-div"></span><button class="ed-btn" onclick="notReady(\'수식 입력\')"><i data-lucide="sigma" style="width:16px;height:16px"></i></button>'
+              : '')
       +   '</div>'
       +   '<textarea class="ed-ta" placeholder="여기에 답을 쓰세요." maxlength="' + qLimit(i) + '" oninput="onAnswer(' + i + ', this)" onpaste="blockPaste(event)"></textarea>'
       + '</div>'
@@ -846,11 +843,10 @@ function onLeave(type){
 function onReturn(){
   if(!leaveStart) return;
   var dur = Math.round((Date.now() - leaveStart) / 1000);
+  /* 복붙 차단 안내와 같은 토스트로 통일 (2026-08-07 회의) — 배너는 화면에 남아 자리를 먹고,
+     같은 성격의 알림(하지 말라고 알려주는 것)이 형태가 둘로 갈리면 학생이 다르게 읽음 */
   if(dur >= 3){
-    var b = document.getElementById('leaveBanner');
-    document.getElementById('lbTitle').textContent = '다른 화면에 다녀온 기록이 남았어요 (' + fmtDur(dur) + ')';
-    b.classList.add('show');
-    lucide.createIcons();
+    toastMsg('다른 화면에 다녀온 기록이 남았어요 (' + fmtDur(dur) + ')', true);
   }
   leaveStart = null; leaveType = null;
 }

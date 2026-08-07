@@ -118,6 +118,50 @@ body.resizing{ cursor:col-resize; user-select:none; }
 .doc-sum b{ color:#222631; font-weight:600; }
 .doc-sum .sep{ width:1px; height:14px; background:#dde1e8; }
 /* 작성 과정 새 탭 링크 — 데이터 없이 진입로만 (2026-08-07) */
+/* ===== 작성 과정 팝업 — 과제물 관리와 동일 컴포넌트 (2026-08-07 회의) ===== */
+.md-ov{ display:none; position:fixed; inset:0; background:rgba(34,38,49,.45); z-index:2500; align-items:center; justify-content:center; padding:40px 20px; }
+.md-ov.show{ display:flex; }
+/* 작성 과정 팝업 (2026-08-07 회의 — 행 펼침에서 전환) */
+.pc{ background:#fff; border-radius:14px; width:100%; max-width:1080px; max-height:88vh; box-shadow:0 20px 50px rgba(0,0,0,.25); display:flex; flex-direction:column; overflow:hidden; }
+.pc-hd{ display:flex; align-items:flex-start; gap:16px; padding:24px 28px 18px; border-bottom:1px solid #dde1e8; flex-shrink:0; }
+.pc-t{ font-size:19px; font-weight:700; color:#18181b; margin:0 0 6px; line-height:1.35; }
+.pc-s{ font-size:14px; font-weight:500; color:#6d7381; margin:0; line-height:1.5; }
+.pc-x{ margin-left:auto; width:36px; height:36px; border:none; background:none; border-radius:8px; color:#6d7381; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; flex-shrink:0; }
+.pc-x:hover{ background:#f1f3f5; }
+.pc-bd{ flex:1; min-height:0; overflow-y:auto; padding:20px 28px 28px; text-align:left; }
+.ld-title{ margin:0 0 4px; font-size:15px; font-weight:600; color:#3b3f4c; }
+.ld-legend{ display:flex; align-items:center; gap:16px; margin:0 0 14px; font-size:13px; font-weight:500; color:#6d7381; }
+.ld-legend span{ display:inline-flex; align-items:center; gap:6px; }
+.lg-swatch{ width:14px; height:10px; border-radius:2px; display:inline-block; }
+.lg-line{ width:16px; height:0; border-top:2px solid #416bff; display:inline-block; }
+
+/* 타임라인 — 과제물이 학생당 1개이므로 타임라인도 학생당 1개다 (2026-08-06 확정).
+   재제출은 블록이 늘어나는 게 아니라 같은 타임라인 위에 제출 마커가 하나 더 찍히는 것.
+   나눠 쓴 구간(차시·이어쓰기)은 한 차트 안에서 끊어 그린다. */
+.tl-one{ display:flex; flex-direction:column; gap:6px; width:100%; }
+.tl-submits{ display:flex; align-items:center; gap:16px; flex-wrap:wrap; }
+.tl-sess-hd{ display:flex; align-items:baseline; gap:8px; flex-wrap:wrap; }
+.tl-sess-name{ font-size:14px; font-weight:600; color:#222631; }
+.tl-sess-when{ font-size:13px; font-weight:500; color:#6d7381; }
+.tl-sess-meta{ margin-left:auto; font-size:13px; font-weight:600; color:#ea580c; white-space:nowrap; }
+.tl-sess-meta.none{ color:#9aa0ad; font-weight:500; }
+.tl-chart{ width:100%; height:88px; display:block; border-bottom:1px solid #dde1e8; }
+.tl-axis{ display:flex; justify-content:space-between; font-size:12px; font-weight:500; color:#9aa0ad; }
+.tl-end{ display:inline-flex; align-items:center; gap:5px; font-size:13px; font-weight:600; color:#27724b; }
+.tl-end.draft{ color:#c2410c; }
+.tl-end i, .tl-end svg{ width:13px; height:13px; }
+
+/* 이벤트 목록 */
+.leave-evt{ display:flex; align-items:center; gap:14px; padding:9px 0; border-bottom:1px solid #eceef2; font-size:15px; }
+.leave-evt:last-of-type{ border-bottom:none; }
+.leave-evt-time{ color:#3b3f4c; font-weight:600; width:64px; flex-shrink:0; }
+.leave-evt-type{ display:inline-flex; align-items:center; justify-content:center; gap:5px; height:24px; padding:0 9px; border-radius:100px; background:#fff7ed; color:#ea580c; font-size:13px; font-weight:600; line-height:1; flex-shrink:0; }
+.leave-evt-type.gap{ background:#eef0f3; color:#6d7381; }
+.leave-evt-dur{ color:#222631; font-weight:600; }
+.leave-evt-gain{ font-size:14px; font-weight:500; color:#3b3f4c; }
+.leave-evt-gain b{ font-weight:700; color:#222631; }
+.leave-evt-note{ font-size:13px; font-weight:500; color:#6d7381; }
+.ld-evt-wrap{ margin-top:16px; border-top:1px solid #eceef2; padding-top:4px; }
 .sum-link{ margin-left:auto; background:none; border:none; cursor:pointer; font-family:inherit; font-size:15px; font-weight:500; color:#3151c4; display:inline-flex; align-items:center; justify-content:center; line-height:1; vertical-align:middle; gap:5px; padding:7px 10px; border-radius:6px; }
 .sum-link:hover{ background:#e9f2ff; }
 
@@ -310,7 +354,7 @@ body.resizing{ cursor:col-resize; user-select:none; }
             <span class="sep"></span>
             <span>07월 29일(수) 15:24 제출</span>
             <span class="sep"></span>
-            <button class="sum-link" title="과제물 관리에서 이 학생의 작성 과정을 새 탭으로 열어요" onclick="window.open('focus_log_v2_260806.html#case-kim','_blank')">작성 과정 보기 <i data-lucide="external-link" style="width:13px;height:13px"></i></button>
+            <button class="sum-link" title="이 학생의 작성 과정을 팝업으로 열어요" onclick="openProcess()">작성 과정 보기 <i data-lucide="maximize-2" style="width:13px;height:13px"></i></button>
           </div>
           <div id="qList"></div>
         </div>
@@ -426,6 +470,20 @@ body.resizing{ cursor:col-resize; user-select:none; }
       </div>
 
     </div>
+  </div>
+</div>
+
+<!-- 작성 과정 팝업 — 과제물 관리와 동일 컴포넌트 (2026-08-07 회의) -->
+<div class="md-ov" id="pcModal" onclick="if(event.target===this) closeProcess()">
+  <div class="pc">
+    <div class="pc-hd">
+      <div>
+        <p class="pc-t" id="pcTitle">10101 김서윤 · 작성 과정</p>
+        <p class="pc-s" id="pcSum"></p>
+      </div>
+      <button class="pc-x" onclick="closeProcess()" title="닫기"><i data-lucide="x" style="width:20px;height:20px"></i></button>
+    </div>
+    <div class="pc-bd" id="pcBody"></div>
   </div>
 </div>
 
@@ -557,6 +615,189 @@ function fontStep(dir){
   document.querySelectorAll('#qList .ans-q-bd p').forEach(function(p){ p.style.fontSize = (16 * fontPct / 100) + 'px'; });
 }
 
+/* ═══════════ 작성 과정 팝업 (2026-08-07 회의) ═══════════
+   과제물 관리(focus_log_v2)와 같은 컴포넌트. 채점 화면에서도 새 탭 이동 없이 바로 확인.
+   데이터는 지금 채점 중인 학생 1명분만 둔다. */
+var focusLogOn = true;
+var PROC_ROW = {
+  id:'10101', name:'김서윤',
+  sessions:[
+    { date:'07/28', start:'14:00', submitted:true,
+      series:[0,8,24,41,55,55,70,96,118,130,126,145,168,190,190,205,232,255,248,270,295,318,318,335,360,382,400,395,415,440,462,470,470,488,510,533,528,550,572,595,610,610,632,655,670,665,688,710,730,748,762,772,780],
+      events:[ {at:31, type:'탭 전환', dur:45} ] },
+    { date:'07/29', start:'09:10', submitted:true,
+      series:[780,782,790,788,800,815,812,828,840],
+      events:[] },
+    { date:'07/29', start:'15:20', submitted:true,
+      series:[840,841,848,856,861,868],
+      events:[] }
+  ]
+};
+function fmtDur(s){ return s>=60 ? Math.floor(s/60)+'분'+(s%60? ' '+s%60+'초':'') : s+'초'; }
+function hm(base, min){ var p=base.split(':').map(Number); var t=p[0]*60+p[1]+Math.round(min); return String(Math.floor(t/60)).padStart(2,'0')+':'+String(t%60).padStart(2,'0'); }
+
+/* ───────── 파생값 (모두 series·events에서 계산) ───────── */
+function sessMinutes(s){ return s.series.length - 1; }
+function sessEvents(s){ return (s.events||[]).filter(e=>e.type!=='gap'); }
+function sessLeaveSec(s){ return sessEvents(s).reduce((a,e)=>a+e.dur, 0); }
+function rowSessions(r){ return (focusLogOn && !r.teacherUpload && r.sessions) ? r.sessions : []; }
+function rowLeaveCount(r){ return rowSessions(r).reduce((a,s)=>a+sessEvents(s).length, 0); }
+function rowLeaveSec(r){ return rowSessions(r).reduce((a,s)=>a+sessLeaveSec(s), 0); }
+function rowHasGap(r){ return rowSessions(r).some(s=>(s.events||[]).some(e=>e.type==='gap')); }
+
+/* series에서 값 읽기 — 기록 공백(null)은 뒤로 걸어가며 가장 가까운 값을 쓴다 */
+function seriesAt(series, i){
+  i = Math.max(0, Math.min(series.length-1, Math.round(i)));
+  for(let k=i; k<series.length; k++){ if(series[k]!==null) return series[k]; }
+  for(let k=i; k>=0; k--){ if(series[k]!==null) return series[k]; }
+  return 0;
+}
+/* 이탈에서 돌아온 뒤 window분 동안 늘어난 글자 수 */
+const GAIN_WINDOW = 5;
+function gainAfter(s, e){
+  const back = e.at + e.dur/60;
+  const last = s.series.length-1;
+  if(back >= last) return null;
+  const end = Math.min(back + GAIN_WINDOW, last);
+  const mins = Math.round((end - back)*10)/10;
+  if(mins <= 0) return null;
+  return { gain: seriesAt(s.series, end) - seriesAt(s.series, back), mins: Math.round(mins) };
+}
+
+/* ───────── 학생당 타임라인 1개 (2026-08-06 확정) ─────────
+   과제물이 학생당 1개이므로 회차 개념 없음. 제출·재제출은 타임라인 위의 마커. */
+function rowMinutes(r){ return rowSessions(r).reduce((a,s)=>a+sessMinutes(s),0); }
+function submitCount(r){ return rowSessions(r).filter(s=>s.submitted).length; }
+
+/* ───────── 타임라인 차트 (글자 수 곡선 + 이탈 구간 + 제출 마커) ─────────
+   나눠 쓴 구간을 한 차트에 이어 붙이되, 안 쓴 시간(구간 경계)은 끊어 그린다 */
+function studentChart(sessions, maxVal){
+  const W = 1000, H = 88, PAD = 6, GAP = 18;
+  const total = Math.max(1, sessions.reduce((a,s)=>a+sessMinutes(s),0));
+  const usable = W - GAP * (sessions.length - 1);
+  const y = v => H - PAD - (maxVal===0 ? 0 : (v/maxVal) * (H - PAD*2 - 4));
+  let out = '', xoff = 0;
+
+  sessions.forEach(function(s, si){
+    const N = Math.max(1, sessMinutes(s));
+    const sw = (N/total) * usable;
+    const x = m => xoff + (m/N) * sw;
+
+    /* 구간 경계 = 안 쓴 시간 (임시저장 후 나감·다음 차시에 이어 씀) */
+    if(si > 0){
+      out += '<line x1="'+(xoff - GAP/2)+'" y1="4" x2="'+(xoff - GAP/2)+'" y2="'+(H-4)+'" stroke="#c7cbd3" stroke-width="1.5" stroke-dasharray="4 4" vector-effect="non-scaling-stroke"><title>'+s.date+' '+s.start+'에 이어 씀</title></line>';
+    }
+
+    /* 이탈·공백 구간 음영 */
+    (s.events||[]).forEach(e=>{
+      const x1 = x(e.at), x2 = x(Math.min(N, e.at + e.dur/60));
+      const w = Math.max(3, x2-x1);
+      if(e.type==='gap'){
+        out += '<rect x="'+x1+'" y="0" width="'+w+'" height="'+H+'" fill="#eef0f3"><title>'+hm(s.start, e.at)+' 기록 공백 · '+fmtDur(e.dur)+'</title></rect>';
+      } else {
+        const g = gainAfter(s, e);
+        const tip = hm(s.start, e.at)+' '+e.type+' · '+fmtDur(e.dur) + (g ? ' · 복귀 후 '+g.mins+'분간 +'+g.gain+'자' : '');
+        out += '<rect x="'+x1+'" y="0" width="'+w+'" height="'+H+'" fill="#fff1e6"><title>'+tip+'</title></rect>';
+        out += '<line x1="'+x1+'" y1="0" x2="'+x1+'" y2="'+H+'" stroke="#f59e6b" stroke-width="1" stroke-dasharray="3 3" vector-effect="non-scaling-stroke"/>';
+      }
+    });
+
+    /* 글자 수 곡선 — 기록 공백에서 끊어 그린다 */
+    let segs = [], cur = [];
+    s.series.forEach((v,i)=>{
+      if(v===null){ if(cur.length) segs.push(cur); cur=[]; return; }
+      cur.push([x(i), y(v)]);
+    });
+    if(cur.length) segs.push(cur);
+    segs.forEach(seg=>{
+      if(seg.length > 1){
+        const area = 'M'+seg[0][0]+','+H+' L'+seg.map(p=>p[0]+','+p[1]).join(' L')+' L'+seg[seg.length-1][0]+','+H+' Z';
+        out += '<path d="'+area+'" fill="#416bff" fill-opacity="0.07"/>';
+      }
+      out += '<polyline points="'+seg.map(p=>p[0]+','+p[1]).join(' ')+'" fill="none" stroke="#416bff" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" vector-effect="non-scaling-stroke"/>';
+    });
+
+    /* 제출 마커 — 제출로 끝난 구간의 끝 지점 */
+    if(s.submitted){
+      out += '<line x1="'+(xoff + sw)+'" y1="0" x2="'+(xoff + sw)+'" y2="'+H+'" stroke="#319d64" stroke-width="2" vector-effect="non-scaling-stroke"><title>'+s.date+' '+hm(s.start, N)+' 제출</title></line>';
+    }
+
+    xoff += sw + GAP;
+  });
+
+  return '<svg class="tl-chart" viewBox="0 0 '+W+' '+H+'" preserveAspectRatio="none">'+out+'</svg>';
+}
+
+function studentBlock(r, sessions, maxVal){
+  const first = sessions[0], last = sessions[sessions.length-1];
+  const endHm = hm(last.start, sessMinutes(last));
+  const when = first.date + (last.date !== first.date ? '~'+last.date : '')
+    + ' · 총 ' + rowMinutes(r) + '분 작성'
+    + (sessions.length > 1 ? ' · ' + sessions.length + '번에 나눠 씀' : '');
+
+  /* 제출 이력 한 줄 — 마커와 1:1 대응 */
+  const subs = sessions.filter(s=>s.submitted);
+  let submits = subs.map(function(s, i){
+    return '<span class="tl-end"><i data-lucide="check-circle-2"></i>'+s.date+' '+hm(s.start, sessMinutes(s))+' '+(i>0?'재제출':'제출')+'</span>';
+  }).join('');
+  if(!last.submitted){
+    submits += '<span class="tl-end draft"><i data-lucide="pencil-line"></i>'+last.date+' '+endHm+' 저장 · 아직 제출 안 함</span>';
+  }
+
+  return '<div class="tl-one">'
+    + '<div class="tl-sess-hd"><span class="tl-sess-name">'+when+'</span></div>'
+    + studentChart(sessions, maxVal)
+    + '<div class="tl-axis"><span>'+first.date+' '+first.start+'</span><span>'+last.date+' '+endHm+'</span></div>'
+    + '<div class="tl-submits">'+submits+'</div>'
+    + '</div>';
+}
+
+function evtList(sessions){
+  let rows = '';
+  sessions.forEach(s=>{
+    (s.events||[]).forEach(e=>{
+      if(e.type==='gap'){
+        rows += '<div class="leave-evt">'
+          + '<span class="leave-evt-time">'+hm(s.start, e.at)+'</span>'
+          + '<span class="leave-evt-type gap"><i data-lucide="wifi-off" style="width:13px;height:13px;"></i>기록 공백</span>'
+          + '<span class="leave-evt-dur">'+fmtDur(e.dur)+'</span>'
+          + '<span class="leave-evt-note">네트워크 연결이 끊겨 기록하지 못한 구간이에요.</span>'
+          + '</div>';
+      } else {
+        const g = gainAfter(s, e);
+        rows += '<div class="leave-evt">'
+          + '<span class="leave-evt-time">'+hm(s.start, e.at)+'</span>'
+          + '<span class="leave-evt-type"><i data-lucide="external-link" style="width:13px;height:13px;"></i>'+e.type+'</span>'
+          + '<span class="leave-evt-dur">'+fmtDur(e.dur)+'</span>'
+          + (g ? '<span class="leave-evt-gain">복귀 후 '+g.mins+'분간 <b>'+(g.gain>=0?'+':'')+g.gain+'자</b></span>' : '')
+          + '</div>';
+      }
+    });
+  });
+  return rows;
+}
+
+function openProcess(){
+  var r = PROC_ROW, sessions = rowSessions(r);
+  var maxVal = Math.max.apply(null, sessions.flatMap(function(s){ return s.series.filter(function(v){ return v!==null; }); }));
+  var cnt = rowLeaveCount(r), sec = rowLeaveSec(r);
+  document.getElementById('pcTitle').textContent = r.id + ' ' + r.name + ' · 작성 과정';
+  document.getElementById('pcSum').textContent = (cnt ? '이탈 '+cnt+'회 · '+fmtDur(sec) : '이탈 없음')
+    + ' · 총 ' + rowMinutes(r) + '분 작성' + (submitCount(r) >= 2 ? ' · 제출 '+submitCount(r)+'회' : '');
+  document.getElementById('pcBody').innerHTML =
+      '<div class="ld-legend">'
+      + '<span><i class="lg-line"></i>글자 수</span>'
+      + '<span><i class="lg-swatch" style="background:#fff1e6;border:1px solid #f7d3ba;"></i>다른 화면</span>'
+      + '<span><i class="lg-swatch" style="background:#eef0f3;border:1px solid #dde1e8;"></i>기록 공백</span>'
+      + '<span><i class="lg-line" style="border-top:2px solid #319d64;"></i>제출</span>'
+    + '</div>'
+    + studentBlock(r, sessions, maxVal)
+    + (evtList(sessions) ? '<div class="ld-evt-wrap">'+evtList(sessions)+'</div>' : '');
+  document.getElementById('pcModal').classList.add('show');
+  lucide.createIcons();
+}
+function closeProcess(){ document.getElementById('pcModal').classList.remove('show'); }
+document.addEventListener('keydown', function(e){ if(e.key === 'Escape') closeProcess(); });
 /* ───────── 우측 · 채점 ───────── */
 function renderCrit(){
   var box = document.getElementById('critList');
