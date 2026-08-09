@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="icon" type="image/png" href="clipo_favicon.png">
-  <title>소속 변경 · 대표 선생님 승계 (F1) — CLIPO</title>
+  <title>소속 변경 · 대표교사 승계 (F1) — CLIPO</title>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard-gov.min.css">
   <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
   <style>
@@ -69,6 +69,7 @@
     .rl-badge{ display:inline-flex; align-items:center; justify-content:center; line-height:1; vertical-align:middle; font-size:12px; font-weight:700; padding:5px 11px; border-radius:100px; }
     .rl-rep{ background:#e9f2ff; color:#3151c4; }
     .rl-gen{ background:#f1f3f5; color:#6d7381; }
+    .rl-pend{ background:#fff4ec; color:#8a4a12; }
     .rl-note{ font-size:14px; color:#6d7381; margin-left:10px; }
 
     /* ===== F1 · 스텝 인디케이터 ===== */
@@ -106,6 +107,11 @@
     .hint-line .hl-tx b{ color:#3b3f4c; font-weight:600; }
     .hint-line .hl-act{ flex-shrink:0; align-self:center; }
     /* ===== F1 · 소속 해제 ===== */
+    .btn-primary.btn-danger{ background:#c0303f; }
+    .btn-primary.btn-danger:hover{ background:#a72734; }
+    .rel-row.rr-warn{ color:#8a4a12; }
+    .rel-row.rr-warn i{ color:#f97316; }
+    .rel-row.rr-warn b{ color:#7a3f0f; }
     .bt-danger{ border-color:#fbccd2; background:#fdeef0; color:#c0303f; }
     .bt-danger:hover{ background:#fbe1e5; }
     .rel-box{ border:1px solid #fbccd2; background:#fffafb; border-radius:10px; padding:20px 22px; }
@@ -168,21 +174,43 @@
     table.tt th, table.tt td{ text-align:center; vertical-align:middle; padding:14px 10px; border-bottom:1px solid #f1f3f5; font-size:16px; }
     table.tt th{ font-size:14px; font-weight:600; color:#6d7381; background:#f6f7f9; border-bottom:1px solid #e7e9ee; }
     table.tt tr.me{ background:#f7faff; }
-    table.tt tr.gone td{ color:#9aa0ad; }
     .tt-em{ font-size:14px; color:#6d7381; }
+    /* 학교 설정 상단 서브탭 — 활성 시 색·밑줄만 바꾼다(폭 변화로 들썩이지 않게) */
+    .stab-band{ display:flex; gap:26px; border-bottom:1px solid #e7e9ee; margin-bottom:18px; }
+    .stab{ background:none; border:0; padding:13px 2px; margin-bottom:-1px; font-size:16px; color:#6d7381; cursor:pointer; border-bottom:2px solid transparent; display:inline-flex; align-items:center; justify-content:center; line-height:1; vertical-align:middle; }
+    .stab.on{ color:#416bff; border-bottom-color:#416bff; }
+    /* 권한 필터 (개발 화면 세그먼트) */
+    .seg{ display:flex; background:#fff; border:1px solid #e7e9ee; border-radius:12px; padding:7px; }
+    .seg button{ position:relative; flex:1; height:46px; border:0; background:none; border-radius:9px; font-size:16px; color:#3b3f4c; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; line-height:1; vertical-align:middle; }
+    .seg button + button::before{ content:''; position:absolute; left:0; top:11px; bottom:11px; width:1px; background:#eceef2; }
+    .seg button.on{ background:#416bff; color:#fff; }
+    .seg button.on::before, .seg button.on + button::before{ display:none; }
+    /* 표 안 텍스트 액션 (권한 변경 · 삭제) */
+    .tt-link{ background:none; border:0; padding:5px 7px; border-radius:6px; font-size:15px; font-family:inherit; color:#3b3f4c; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; line-height:1; vertical-align:middle; }
+    .tt-link:hover{ background:#f1f3f5; }
+    .tt-link.lnk{ color:#3151c4; }
+    .tt-link.dgr{ color:#c0303f; }
+    .tt-link.dgr:hover{ background:#fdeef0; }
+    .tt-link.off{ color:#c2c6cf; cursor:not-allowed; }
+    .tt-link.off:hover{ background:none; }
     .bg-off{ background:#fdeef0; color:#c0303f; }
     .bg-on{ background:#effaf4; color:#12653b; }
     .btn-tiny{ height:34px; padding:0 12px; border:1px solid #ccdfff; background:#f4f8ff; color:#3151c4; border-radius:8px; font-size:14px; font-weight:600; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; line-height:1; vertical-align:middle; }
     .btn-tiny:disabled{ background:#f1f3f5; color:#b0b5bf; border-color:#e7e9ee; cursor:not-allowed; }
 
     .act-bar{ display:flex; justify-content:flex-end; gap:10px; margin-top:22px; }
+    .agree{ display:flex; gap:11px; align-items:flex-start; margin-top:18px; padding:15px 17px; background:#f8f9fb; border:1px solid #eceef2; border-radius:10px; cursor:pointer; }
+    .agree input{ width:20px; height:20px; margin:0; flex-shrink:0; accent-color:#416bff; cursor:pointer; }
+    .agree .ag-tx{ font-size:15px; color:#3b3f4c; line-height:1.4; }
+    .btn-primary:disabled{ background:#c9d4f6; cursor:not-allowed; }
 
     /* ===== F1 · 현재 동작 모달 (대조군) ===== */
     .ovl{ position:fixed; inset:0; background:#0000006b; z-index:500; display:none; align-items:center; justify-content:center; }
     .ovl.on{ display:flex; }
     .mdl{ background:#fff; border-radius:14px; padding:32px 30px 26px; width:520px; text-align:center; box-shadow:0 18px 48px #00000033; }
     .mdl-ic{ width:52px; height:52px; border-radius:50%; background:#e9f2ff; color:#416bff; display:inline-flex; align-items:center; justify-content:center; margin-bottom:18px; }
-    .mdl-t{ font-size:19px; font-weight:700; line-height:1.5; margin:0 0 12px; }
+    /* 제목에 <br>을 박지 않는다 — 학교명·이름 길이가 달라지면 어색하게 끊긴다. 어절 단위로만 접히게 */
+    .mdl-t{ font-size:19px; font-weight:700; line-height:1.5; margin:0 0 12px; word-break:keep-all; }
     .mdl-d{ font-size:16px; color:#6d7381; line-height:1.6; margin:0 0 26px; }
     .mdl-act{ display:flex; gap:10px; }
     .mdl-act .btn-line, .mdl-act .btn-primary{ flex:1; border-radius:8px; }
@@ -197,6 +225,8 @@
     .dl-t{ font-size:17px; font-weight:700; margin:0 0 6px; }
     .dl-p{ font-size:16px; color:#3b3f4c; margin:0 0 6px; line-height:1.6; word-break:keep-all; }
     .dl-r{ font-size:15px; color:#6d7381; margin:0; line-height:1.55; }
+    .dl-p + .dl-p{ margin-top:-2px; }
+    .mdl-lead{ font-size:16px; color:#3b3f4c; line-height:1.65; margin:0 0 4px; word-break:keep-all; }
 
     /* ===== 카드 ===== */
     .card{ background:#fff; border-radius:12px; padding:24px; margin-top:20px; box-shadow:0 0 1px #2226314D, 0 2px 8px #0000000F; }
@@ -551,7 +581,7 @@
   <div class="scene" id="scene-leave1">
     <span class="back-link" onclick="go('me-done')"><i data-lucide="chevron-left" style="width:16px;height:16px"></i>내 정보</span>
     <h1 class="page-h1">소속 변경</h1>
-    <p class="page-sub">데이터드리븐 중학교를 떠나요</p>
+    <p class="page-sub">학교를 옮기실 때 이곳에서 소속을 변경하실 수 있어요.</p>
     <div class="card">
       <p class="card-t">학생에 관한 자료는 삭제돼요</p>
       <p class="card-d">선생님이 직접 만드신 자료는 새 학교에서도 그대로 쓰실 수 있어요.</p>
@@ -583,8 +613,15 @@
         </div>
       </div>
 
+      <!-- 되돌릴 수 없는 지점 직전 — 확인 체크 1개로 [다음]을 잠근다.
+           여러 개로 쪼개면 읽지 않고 체크만 하게 되므로 한 문장에 묶었다. -->
+      <label class="agree">
+        <input type="checkbox" id="s1Chk" onchange="syncS1()">
+        <span class="ag-tx">떠난 뒤에는 이 학교의 학생 자료를 <b>다시 볼 수 없다는 점</b>을 확인했고, 필요한 자료는 내려받았어요.</span>
+      </label>
+
       <div class="act-bar">
-        <button class="btn-primary" id="s1Next" onclick="nextFromS1()">다음</button>
+        <button class="btn-primary" id="s1Next" onclick="nextFromS1()" disabled>다음</button>
       </div>
     </div>
   </div>
@@ -593,20 +630,20 @@
   <div class="scene" id="scene-leave2">
     <span class="back-link" onclick="go('leave1')"><i data-lucide="chevron-left" style="width:16px;height:16px"></i>자료 확인</span>
     <h1 class="page-h1">소속 변경</h1>
-    <p class="page-sub">데이터드리븐 중학교를 떠나요</p>
+    <p class="page-sub">학교를 옮기실 때 이곳에서 소속을 변경하실 수 있어요.</p>
     <div class="card">
       <p class="card-t">떠나시기 전에 대표 권한을 넘겨주세요</p>
-      <p class="card-d">선생님은 이 학교의 <b>하나뿐인 대표 선생님</b>이세요. 넘기지 않고 떠나시면 남은 선생님들이 학생 계정을 등록하거나 삭제할 수 없어요.</p>
+      <!-- 학생 계정 등록은 모든 선생님이 할 수 있고, 삭제만 대표 권한이다 -->
+      <p class="card-d">선생님은 이 학교의 <b>하나뿐인 대표교사</b>세요. 넘기지 않고 떠나시면 남은 선생님들이 학생 계정을 삭제하거나 다른 선생님의 권한을 바꿀 수 없어요.</p>
       <div class="nbox nb-info">
         <i data-lucide="info" class="nb-ic"></i>
-        <div class="nb-main"><p class="nb-tx">넘어가는 건 <b>대표 권한뿐</b>이에요. 선생님이 만드신 평가계획과 채점 기준은 그대로 따라와요.</p></div>
+        <div class="nb-main"><p class="nb-tx">넘어가는 건 <b>대표 권한뿐</b>이에요. 선생님이 만드신 평가계획과 채점기준은 그대로 따라와요.</p></div>
       </div>
       <div class="pick" id="pickList"></div>
       <label style="display:flex;align-items:center;gap:10px;cursor:pointer;margin-top:20px">
         <input type="checkbox" id="skipChk" style="width:18px;height:18px;cursor:pointer" onchange="renderLeave2()">
         <span style="font-size:16px;color:#3b3f4c">지금은 정하지 않을게요</span>
       </label>
-      <div id="skipWarn" style="margin-top:14px"></div>
       <div class="act-bar">
         <button class="btn-line" onclick="go('leave1')">이전</button>
         <button class="btn-primary" id="s2Next" onclick="askLeave()">소속 변경</button>
@@ -616,14 +653,18 @@
 
   <!-- ================= F1-3 : 학교 설정 > 선생님 (남은 선생님 시점) ================= -->
   <div class="scene" id="scene-teachers">
-    <h1 class="page-h1" style="margin-top:0">학교 설정</h1>
-    <p class="page-sub">데이터드리븐 중학교</p>
+    <div class="stab-band">
+      <button class="stab" onclick="notReady('학생 목록')">학생</button>
+      <button class="stab on">선생님</button>
+    </div>
+    <h1 class="page-h1" style="margin-top:0">선생님 목록</h1>
+    <p class="page-sub">클리포 이용 선생님을 확인할 수 있습니다. 대표교사는 1명 이상 필수이며, 대표교사는 다른 선생님의 권한 변경이 가능합니다.</p>
     <div id="tBanner" style="margin-top:20px"></div>
+    <div class="seg" id="tSeg" style="margin-top:16px"></div>
     <div class="card" style="margin-top:12px">
-      <p class="card-t">선생님</p>
-      <p class="card-d">대표 선생님은 선생님 인증 승인 · 권한 변경 · 학생 계정 관리를 하실 수 있어요.</p>
+      <p class="card-t" id="tCount">전체</p>
       <table class="tt">
-        <thead><tr><th style="width:140px">이름</th><th>이메일</th><th style="width:100px">교과</th><th style="width:120px">권한</th><th style="width:120px">상태</th><th style="width:140px">관리</th></tr></thead>
+        <thead><tr><th style="width:104px">권한</th><th style="width:120px">이름</th><th>아이디(이메일)</th><th style="width:100px">최근 활동</th><th style="width:118px">인증일</th><th style="width:104px">권한 변경</th><th style="width:104px">소속 해제</th></tr></thead>
         <tbody id="tBody"></tbody>
       </table>
       <div id="tHint"></div>
@@ -662,22 +703,15 @@
       <button class="rsw" id="rw-rep2" onclick="setRole('rep2')">대표·여럿</button>
       <button class="rsw" id="rw-rep1" onclick="setRole('rep1')">대표·혼자</button>
     </div>
-    <button class="sc" id="mk-cur" onclick="go('cur')">현재 동작<small>대조군</small></button>
     <button class="sc" id="mk-leave1" onclick="go('leave1')">1단계 · 자료 확인</button>
     <button class="sc" id="mk-leave2" onclick="go('leave2')">2단계 · 대표 권한<small>대표·혼자만</small></button>
-    <button class="sc" id="mk-me" onclick="go('me')">소속 변경 직후<small>미인증</small></button>
     <button class="sc" id="mk-doc" onclick="go('doc')">이어서 새 학교 인증</button>
 
     <div class="h">남은 선생님 — 박지훈</div>
-    <button class="sc" id="mk-af0" onclick="go('af0')">A 학교가 잠김</button>
-    <button class="sc" id="mk-af1" onclick="go('af1')">B 대표 없음 · 내가 맡기</button>
-    <button class="sc" id="mk-af2" onclick="go('af2')">C 넘겨받은 뒤</button>
-    <button class="sc" id="mk-af3" onclick="go('af3')">D 내가 맡은 뒤<small>B에서 이어짐</small></button>
+    <button class="sc" id="mk-af1" onclick="go('af1')">대표 없음 · 내가 맡기</button>
 
     <div class="h">대표교사가 남을 해제할 때</div>
-    <button class="sc" id="mk-af2b" onclick="go('af3')">해제하는 쪽<small>D 화면 목록에서 실행</small></button>
-    <button class="sc" id="mk-released" onclick="go('released')">해제당한 선생님<small>보관 중 · 재인증하면 복구</small></button>
-    <button class="sc" id="mk-expired" onclick="go('expired')">180일 지나 접속<small>삭제 완료 · 팝업 1회</small></button>
+    <button class="sc" id="mk-af2b" onclick="go('af3')">해제하는 쪽<small>선생님 목록에서 실행</small></button>
     <button class="sc" id="mk-email" onclick="go('email')">안내 메일 예시<small>해제 시 발송</small></button>
   </div>
 </div>
@@ -699,20 +733,33 @@
   </div>
 </div>
 
+<!-- 대표 맡기 확인 (남은 선생님 시점) — 권한이 늘어나는 행위라 무엇이 가능해지는지 먼저 알린다 -->
+<div class="ovl" id="takeOvl">
+  <div class="mdl">
+    <span class="mdl-ic"><i data-lucide="user-check" style="width:26px;height:26px"></i></span>
+    <p class="mdl-t">대표교사를 맡으시겠어요?</p>
+    <p class="mdl-d">대표교사가 되시면 이 학교의 <b>학생 계정을 삭제</b>하거나 <b>다른 선생님의 권한을 바꾸실 수 있어요.</b><br>맡으신 뒤에도 다른 선생님을 대표교사로 추가하거나 권한을 넘기실 수 있어요.</p>
+    <div class="mdl-act">
+      <button class="btn-line" onclick="closeTakeRep()">취소</button>
+      <button class="btn-primary" onclick="doTakeRep()">대표 맡기</button>
+    </div>
+  </div>
+</div>
+
 <!-- 소속 해제 확인 (대표교사 시점) -->
 <div class="ovl" id="relOvl">
   <div class="mdl">
     <span class="mdl-ic" style="background:#fdeef0;color:#c0303f"><i data-lucide="user-x" style="width:26px;height:26px"></i></span>
-    <p class="mdl-t"><span id="relName">이수민</span> 선생님의 소속을<br>해제할까요?</p>
-    <p class="mdl-d">이 학교 목록에서 빠지고, 선생님이 작성하신 채점 결과와 기록은 <b>보관 상태로 전환</b>돼요.</p>
+    <p class="mdl-t"><span id="relName">이수민</span> 선생님의 소속을 해제할까요?</p>
+    <!-- 보관 기한·재인증 복구·안내 메일은 후속 배포 범위라 여기서 약속하지 않는다.
+         이번 배포에서 확실한 사실(열람 차단 + 되돌리기 어려움)만 남긴다 -->
+    <p class="mdl-d">이 학교 목록에서 빠지고, 그 선생님은 이 학교의 학생 자료를 <b>더 이상 열어보거나 내려받으실 수 없어요.</b></p>
     <div class="rel-mini">
-      <div class="rel-row"><i data-lucide="mail"></i><div><b>해제 사실을 이메일로 알려드려요.</b> 재인증하면 자료를 다시 볼 수 있다는 안내도 함께 보내요</div></div>
-      <div class="rel-row"><i data-lucide="rotate-ccw"></i><div>같은 학교로 재인증하면 <b>그대로 복구</b>돼요</div></div>
-      <div class="rel-row"><i data-lucide="clock"></i><div><b>180일</b> 안에 재인증하지 않거나 다른 학교로 인증하면 삭제돼요</div></div>
+      <div class="rel-row rr-warn"><i data-lucide="alert-triangle"></i><div><b>이미 학교를 옮기신 분이라면 되돌리기 어려워요.</b> 재인증은 지금 재직 중인 학교로만 되고, 학교에서 대신 자료를 넘겨드릴 방법도 없어요. 필요한 자료를 받으셨는지 먼저 확인해 주세요.</div></div>
     </div>
     <div class="mdl-act">
       <button class="btn-line" onclick="closeRelease()">취소</button>
-      <button class="btn-primary" onclick="doRelease()">소속 해제</button>
+      <button class="btn-primary btn-danger" onclick="doRelease()">소속 해제</button>
     </div>
   </div>
 </div>
@@ -724,15 +771,12 @@
       <p class="mdl-wt">자료 내려받는 방법</p>
       <button class="nb-close" onclick="closeDl()" aria-label="닫기"><i data-lucide="x" style="width:18px;height:18px"></i></button>
     </div>
-    <div class="nbox nb-warn" style="margin-bottom:18px">
-      <i data-lucide="alert-triangle" class="nb-ic"></i>
-      <div class="nb-main"><p class="nb-tx">아직 여러 학급을 한 번에 받는 기능은 없어요. 자료가 <b>학급 단위로</b> 받아지니, 맡고 계신 학급이 빠지지 않았는지 확인해 주세요.</p></div>
-    </div>
+    <p class="mdl-lead">자료는 화면별로 나뉘어 있어요. 아래 위치에서 각각 내려받아 주세요. 모두 <b>학급 단위</b>로 받아지니 맡고 계신 학급이 빠지지 않았는지 확인해 주세요.</p>
     <div class="dl-item">
       <span class="dl-n">1</span>
       <div class="dl-main">
         <p class="dl-t">과제물</p>
-        <p class="dl-p">[과제 제출 현황] 우측 상단 <b>[과제물 다운로드]</b></p>
+        <p class="dl-p">[수업] → [과제물 관리] → 학급별 상세 → [과제 제출 현황] → 우측 상단 <b>[과제물 다운로드]</b></p>
         <p class="dl-r">학급 단위 ZIP 파일로 받아져요. 압축을 풀면 학생별 제출물이 들어 있어요.</p>
       </div>
     </div>
@@ -740,7 +784,7 @@
       <span class="dl-n">2</span>
       <div class="dl-main">
         <p class="dl-t">채점 결과 · 피드백</p>
-        <p class="dl-p">[수업] → [수행평가 채점] → 학급별 상세 → [학급 채점 현황] → <b>[채점 결과 다운로드]</b></p>
+        <p class="dl-p">[수업] → [수행평가 채점] → 학급별 상세 → [학급 채점 현황] → 우측 상단 <b>[채점 결과 다운로드]</b></p>
         <p class="dl-r">학급 단위 점수와 피드백이 엑셀로 정리돼요. 나이스 기록·성적 입력에 쓰실 수 있어요.</p>
       </div>
     </div>
@@ -748,8 +792,11 @@
       <span class="dl-n">3</span>
       <div class="dl-main">
         <p class="dl-t">세특 · 행특 · 창체 기록</p>
-        <p class="dl-p">[세부능력 및 특기사항 지원] 화면 우측 <b>[엑셀 다운로드]</b></p>
-        <p class="dl-r">작성하신 기록을 먼저 저장하신 뒤 눌러 주세요.</p>
+        <p class="dl-p">[수업] → [세부능력 및 특기사항 지원] → 우측 상단 <b>[채점 결과 다운로드]</b></p>
+        <p class="dl-p">[세특 간편 생성기] → 5단계 [기록 편집] → 우측 상단 <b>[엑셀 내보내기]</b></p>
+        <p class="dl-p">[행동특성 및 종합의견 지원] → 3단계 [기록 편집] → 우측 상단 <b>[엑셀 내보내기]</b></p>
+        <p class="dl-p">[창의적 체험활동] → 3단계 [기록 생성 및 수정] → 우측 상단 <b>[엑셀 내보내기]</b></p>
+        <p class="dl-r">좌측 메뉴의 생성기는 모두 <b>마지막 단계</b>에 있어요. 직접 작성하신 기록은 <b>[저장]</b>을 먼저 누르셔야 함께 받아져요.</p>
       </div>
     </div>
     <p style="font-size:14.5px;color:#6d7381;line-height:1.6;margin:16px 0 0;padding-top:14px;border-top:1px solid #f1f3f5">소속 변경은 급하지 않아요. 지금 닫고 자료를 먼저 내려받으신 뒤, 다시 시작하셔도 돼요.</p>
@@ -763,8 +810,10 @@
 <div class="ovl" id="leaveOvl">
   <div class="mdl">
     <span class="mdl-ic"><i data-lucide="log-out" style="width:26px;height:26px"></i></span>
-    <p class="mdl-t">데이터드리븐 중학교 소속을<br>변경할까요?</p>
-    <p class="mdl-d">지금 변경하면 이 학교 인증이 해제되고 <b>되돌릴 수 없어요.</b><br><span id="leaveMsg"></span></p>
+    <p class="mdl-t">데이터드리븐 중학교 소속을 변경할까요?</p>
+    <!-- 최종 확인 전용 — 권한(일반·대표)에 따라 문구가 갈리지 않는 공통 모달.
+         대표 권한을 누구에게 넘겼는지는 실행 후 토스트로 알린다 -->
+    <p class="mdl-d">지금 변경하면 이 학교 인증이 해제되고 <b>되돌릴 수 없어요.</b><br>학생 명부 · 채점 결과 · 과제물 · 세특 · 행특 · 창체 기록은 이 학교에 남고, <b>선생님 계정에서는 볼 수 없게 돼요.</b></p>
     <div class="mdl-act">
       <button class="btn-line" onclick="closeLeave()">취소</button>
       <button class="btn-primary" onclick="doLeave()">소속 변경</button>
@@ -772,18 +821,6 @@
   </div>
 </div>
 
-<!-- 현재 동작 모달 (대조군) -->
-<div class="ovl" id="curOvl">
-  <div class="mdl">
-    <span class="mdl-ic"><i data-lucide="alert-circle" style="width:26px;height:26px"></i></span>
-    <p class="mdl-t">기존 교사 인증을 해제하고<br>현재 학교로 재인증이 필요합니다.</p>
-    <p class="mdl-d">교사 인증이 해제되면 학생에 대한<br>평가, 기록 데이터가 모두 삭제됩니다.</p>
-    <div class="mdl-act">
-      <button class="btn-line" onclick="closeCur()">취소</button>
-      <button class="btn-primary" onclick="closeCur();go('af0')">확인 후 재인증 진행</button>
-    </div>
-  </div>
-</div>
 
 <script>
 /* ===== 가입 경로 선택지 =====
@@ -955,10 +992,13 @@ var ME_SCHOOL = {
   released:
     '<div class="rel-box">'
     + '<div class="rel-h"><i data-lucide="user-x" style="width:20px;height:20px"></i>데이터드리븐 중학교 소속이 해제되었어요</div>'
-    + '<p class="rel-tx">학교의 대표 선생님이 소속을 해제했어요. 선생님이 만드신 자료는 <b>아직 지워지지 않았고 그대로 보관 중</b>이에요.</p>'
+    + '<p class="rel-tx">학교의 대표교사가 소속을 해제했어요. 선생님이 만드신 자료는 <b>아직 지워지지 않았고 그대로 보관 중</b>이에요.</p>'
     + '<div class="rel-row"><i data-lucide="rotate-ccw"></i><div><b>같은 학교로 다시 인증하시면</b> 자료를 그대로 다시 보실 수 있어요.</div></div>'
+    + '<div class="rel-row"><i data-lucide="lock"></i><div>재인증하시기 전까지는 <b>열어보거나 내려받으실 수 없어요.</b></div></div>'
     + '<div class="rel-row"><i data-lucide="clock"></i><div>보관 기한 <b>2027년 1월 27일까지 (D-180)</b>. 이때까지 재인증하지 않으시면 삭제돼요.</div></div>'
     + '<div class="rel-row"><i data-lucide="alert-triangle"></i><div><b>다른 학교로 인증하시면</b> 이전 학교 자료는 그때 삭제돼요.</div></div>'
+    + '<div class="rel-row"><i data-lucide="building-2"></i><div><b>이미 다른 학교로 옮기셨다면</b> — 재인증은 지금 재직 중인 학교로만 하실 수 있어요. 이전 학교의 학생 자료는 그 학교에 남는 자료라, 문의를 주셔도 계정으로 다시 열어드리기는 어려워요.</div></div>'
+    + '<div class="rel-row"><i data-lucide="check" style="color:#1ab864"></i><div>평가계획 · 채점기준 · 수업-평가 설계는 <b>그대로 남아 있어요.</b> 어느 학교에서든 계속 쓰실 수 있어요.</div></div>'
     + '<div class="rel-act"><button class="btn-primary" onclick="notReady(\'재인증\')">같은 학교로 재인증</button>'
     + '<button class="btn-line" onclick="go(\'start\')">다른 학교로 인증</button></div>'
     + '</div>',
@@ -987,20 +1027,27 @@ var WHO = {
   rep1: { nm:'김서연', sub:'국어, 사회', role:'대표교사', steps:['자료 확인','대표 권한'] }
 };
 var TEACHERS = [
-  { nm:'김서연', em:'seoyeon.k@dd.ms.kr',  sub:'국어' },
-  { nm:'박지훈', em:'jihoon.p@dd.ms.kr',   sub:'수학' },
-  { nm:'이수민', em:'sumin.l@dd.ms.kr',    sub:'영어' },
-  { nm:'정민재', em:'minjae.j@dd.ms.kr',   sub:'과학' },
-  { nm:'최은영', em:'eunyoung.c@dd.ms.kr', sub:'사회' }
+  { nm:'김서연', em:'seoyeon.k@dd.ms.kr',  sub:'국어', act:'44일 전', dt:'2025/03/02' },
+  { nm:'박지훈', em:'jihoon.p@dd.ms.kr',   sub:'수학', act:'오늘',    dt:'2025/03/02' },
+  { nm:'이수민', em:'sumin.l@dd.ms.kr',    sub:'영어', act:'3일 전',  dt:'2025/03/04' },
+  { nm:'정민재', em:'minjae.j@dd.ms.kr',   sub:'과학', act:'12일 전', dt:'2025/08/20' },
+  { nm:'최은영', em:'eunyoung.c@dd.ms.kr', sub:'사회', act:'2일 전',  dt:'2026/06/25' }
 ];
+/* 인증 대기 — 개발 화면과 동일하게 목록에 함께 나온다. 권한 변경·삭제는 잠김 */
+var PENDING = [
+  { nm:'김동진', em:'kimdj@kakao.com',    act:'247일 전' },
+  { nm:'한지우', em:'jiwoo.h@dd.ms.kr',   act:'3일 전' }
+];
+var TFILTER = 'all', TSTATE = 0;
+function setTFilter(f){ TFILTER = f; renderTeachers(TSTATE); }
 var ROLE = 'rep1', PICK = 2, SKIPPED = false;
 function renderMe(mode){
   var w = WHO[ROLE];
   var roleCell = (w.role === '대표교사')
     ? '<span class="rl-badge rl-rep">대표교사</span>'
         + (ROLE === 'rep2'
-            ? '<span class="rl-note">최은영 선생님도 대표 선생님이세요</span>'
-            : '<span class="rl-note">이 학교의 하나뿐인 대표 선생님이세요</span>')
+            ? '<span class="rl-note">최은영 선생님도 대표교사세요</span>'
+            : '<span class="rl-note">이 학교의 하나뿐인 대표교사세요</span>')
     : '<span class="rl-badge rl-gen">일반교사</span>';
   document.getElementById('me-school').innerHTML =
     ME_SCHOOL[mode]
@@ -1014,10 +1061,8 @@ function renderMe(mode){
 
 /* ===== 씬 라우팅 ===== */
 function go(scene){
-  /* 현재 동작 모달은 'cur' 씬에서만 떠 있는다 — 다른 화면으로 이동하면 무조건 닫는다 */
-  var ov = document.getElementById('curOvl');
-  if (ov && scene !== 'cur') ov.classList.remove('on');
   var lv = document.getElementById('leaveOvl'); if (lv) lv.classList.remove('on');
+  var tk = document.getElementById('takeOvl'); if (tk) tk.classList.remove('on');
   var dl = document.getElementById('dlOvl'); if (dl) dl.classList.remove('on');
   var rl = document.getElementById('relOvl'); if (rl) rl.classList.remove('on');
   var ex = document.getElementById('expOvl'); if (ex && scene !== 'expired') ex.classList.remove('on');
@@ -1050,7 +1095,6 @@ function go(scene){
     return;
   }
   /* ===== F1 ===== */
-  if (scene === 'cur'){ renderMe('done'); showScene('me','cur'); document.getElementById('curOvl').classList.add('on'); return; }
   if (scene === 'leave1'){ renderSteps(1); renderS1Note(); showScene('leave1','leave1'); return; }
   if (scene === 'leave2'){
     /* 대표·혼자일 때만 있는 단계 — 다른 역할이면 역할을 바꿔서 보여준다 */
@@ -1068,10 +1112,13 @@ function nbox(kind, icon, tt, tx, act){
     + (act ? '<div class="nb-act">' + act + '</div>' : '') + '</div>';
 }
 function setRole(r){ ROLE = r; SKIPPED = false; go('me-done'); }
-function closeCur(){ document.getElementById('curOvl').classList.remove('on'); }
 function startLeave(){ go('leave1'); }
 /* 대표·혼자만 화면이 하나 더 있다 (스텝 인디케이터는 쓰지 않음 — 제목·버튼 라벨로 충분) */
 function nextFromS1(){ if (ROLE === 'rep1') go('leave2'); else askLeave(); }
+function syncS1(){
+  var c = document.getElementById('s1Chk'), b = document.getElementById('s1Next');
+  if (c && b) b.disabled = !c.checked;
+}
 
 /* 1단계 버튼 라벨 — 대표·혼자는 화면이 하나 더 있어 '다음', 나머지는 여기서 끝 */
 function renderSteps(){
@@ -1082,13 +1129,6 @@ function renderSteps(){
 /* ===== 소속 변경 실행 — 되돌릴 수 없는 지점이라 확인 모달 ===== */
 function askLeave(){
   SKIPPED = (document.getElementById('skipChk') || {}).checked || false;
-  var who = SKIPPED ? '' : (TEACHERS[PICK] ? TEACHERS[PICK].nm : '');
-  var line = (ROLE === 'rep1')
-    ? (SKIPPED
-        ? '대표 권한은 넘기지 않으셨어요. 남은 선생님이 학교 설정 화면에서 직접 맡으실 수 있어요.'
-        : who + ' 선생님께 대표 권한이 넘어가요.')
-    : '학생 명부 · 채점 결과 · 과제물 · 세특 · 행특 · 창체 기록은 이 학교에 남아요.';
-  document.getElementById('leaveMsg').innerHTML = line;
   document.getElementById('leaveOvl').classList.add('on');
   lucide.createIcons();
 }
@@ -1099,12 +1139,25 @@ function askRelease(nm){ REL_TARGET = nm; document.getElementById('relName').tex
 function closeRelease(){ document.getElementById('relOvl').classList.remove('on'); }
 /* 만료 팝업은 1회성 — 닫아도 내 정보의 상태 안내는 그대로 남는다 */
 function closeExpired(){ document.getElementById('expOvl').classList.remove('on'); }
-function doRelease(){ closeRelease(); toastMsg(REL_TARGET + ' 선생님의 소속을 해제하고 안내 메일을 보냈어요.'); go('released'); }
+/* 안내 메일은 후속 배포 범위라 결과 문구에서도 약속하지 않는다 */
+function doRelease(){ closeRelease(); toastMsg(REL_TARGET + ' 선생님의 소속을 해제했어요.'); go('released'); }
+/* 대표 맡기 — 확인 후 D(내가 대표가 된 뒤) 상태로 */
+function askTakeRep(){ document.getElementById('takeOvl').classList.add('on'); lucide.createIcons(); }
+function closeTakeRep(){ document.getElementById('takeOvl').classList.remove('on'); }
+function doTakeRep(){ closeTakeRep(); toastMsg('대표교사를 맡으셨어요.'); go('af3'); }
 function closeLeave(){ document.getElementById('leaveOvl').classList.remove('on'); }
 function doLeave(){
   closeLeave();
-  toastMsg('데이터드리븐 중학교 소속이 해제되었어요.');
-  go('me');   /* 내 정보 · 미인증 — 여기서 새 학교 인증을 시작한다 */
+  /* 확인 모달은 권한과 무관한 공통 문구라, 대표 권한이 누구에게 갔는지는 결과 토스트로 알린다 */
+  var msg = '데이터드리븐 중학교 소속이 해제되었어요.';
+  if (ROLE === 'rep1'){
+    msg += SKIPPED
+      ? ' 대표 권한은 넘기지 않았어요.'
+      : ' ' + (TEACHERS[PICK] ? TEACHERS[PICK].nm : '') + ' 선생님께 대표 권한을 넘겼어요.';
+  }
+  toastMsg(msg);
+  /* 소속이 없어진 직후라 바로 교사 인증 화면(학교 미선택 상태)으로 넘긴다 */
+  go('start');
 }
 
 /* 1단계는 '무엇이 삭제되나' 한 과업만 다룬다 — 대표 권한 안내는 2단계·확인 모달에서 */
@@ -1121,64 +1174,69 @@ function renderLeave2(){
       + '<span class="pick-main"><span class="pick-nm">' + t.nm + ' 선생님</span><span class="pick-sub">' + t.sub + ' · ' + t.em + '</span></span>'
       + '<span class="pick-rd"></span></div>';
   }).join('');
-  document.getElementById('skipWarn').innerHTML = skip
-    ? nbox('warn','alert-triangle','대표 선생님 없이 학교가 남아요',
-        '남은 선생님들이 학교 설정 화면에서 직접 대표를 맡으실 수 있어요. 다만 맡으실 때까지는 학생 계정을 등록하거나 삭제할 수 없어요.','')
-    : '';
+  /* 넘기지 않는 선택의 결과는 카드 상단 설명이 이미 말하고 있고,
+     떠나시는 분께 남은 학교 사정을 경고로 다시 띄우면 선택을 되돌리라는 압박이 된다 */
   document.getElementById('s2Next').textContent = skip ? '넘기지 않고 소속 변경' : '넘기고 소속 변경';
   lucide.createIcons();
 }
 function pickRep(i){ PICK = i; renderLeave2(); }
-function doHandover(){
-  SKIPPED = document.getElementById('skipChk').checked;
-  toastMsg(SKIPPED ? '대표 권한을 넘기지 않고 진행했어요' : TEACHERS[PICK].nm + ' 선생님께 대표 권한을 넘겼어요');
-  go('verify');
-}
-
 /* 남은 선생님 : 0=현재동작(잠김) 1=대표없음 2=넘겨받음 3=자동승계 */
 function renderTeachers(n){
-  var d = TEACHERS.map(function(t){ return {nm:t.nm, em:t.em, sub:t.sub, role:'gen', state:'on'}; });
-  if (n === 0){ d[0].role='rep'; d[0].state='gone'; }
-  else {
-    if (n === 2) d[2].role = 'rep';
-    if (n === 3) d[1].role = 'rep';
-    d = d.filter(function(t){ return t.nm !== '김서연'; });
-  }
-  var meIsRep = d.some(function(t){ return t.nm==='박지훈' && t.role==='rep' && t.state==='on'; });
+  TSTATE = n;
+  var d = TEACHERS.map(function(t){ return {nm:t.nm, em:t.em, sub:t.sub, act:t.act, dt:t.dt, role:'gen'}; });
+  if (n === 3) d[1].role = 'rep';   /* 내가 대표를 맡은 뒤 */
+  /* 떠난 선생님은 목록에 흔적을 남기지 않고 바로 빠진다 (로그성 행을 두지 않음) */
+  d = d.filter(function(t){ return t.nm !== '김서연'; });
+  var meIsRep = d.some(function(t){ return t.nm==='박지훈' && t.role==='rep'; });
 
   var b = '';
-  if (n===0) b = nbox('warn','alert-triangle','대표 선생님이 이 학교에 안 계세요',
-    '대표 선생님으로 지정돼 있던 김서연 선생님이 이 학교에 안 계세요. 대표 자리가 비어 있어서 학생 계정을 등록하거나 삭제할 수 있는 분이 없어요.',
-    '<a class="btn-primary" href="https://clipo.ai/staffs/questions" target="_blank" rel="noopener">1:1 문의</a>');
-  if (n===1) b = nbox('warn','alert-triangle','대표 선생님이 안 계세요',
-    '김서연 선생님이 소속을 옮기시면서 대표 자리가 비었어요. 학생 계정을 등록하거나 삭제하려면 대표 선생님이 필요해요.',
-    '<button class="btn-primary" onclick="go(\'af3\')">내가 맡을게요</button>');
-  /* C = 정상 상태. 대표가 누구인지는 아래 목록 배지로 이미 보이므로 배너 없음 */
-  if (n===2) b = '';
-  /* D = 내가 대표가 된 뒤. 대표 지정은 팝업으로 이미 알려주므로 배너 없음.
-     목록의 대표교사 배지와 헤더 이름으로 충분 */
-  if (n===3) b = '';
+  if (n===1) b = nbox('warn','alert-triangle','대표교사가 안 계세요',
+    '기존 대표교사가 소속을 옮기시면서 대표 자리가 비었어요. 학생 계정을 삭제하거나 선생님 권한을 바꾸려면 대표교사가 필요해요.',
+    '<button class="btn-primary" onclick="askTakeRep()">내가 맡을게요</button>');
+  /* 내가 대표를 맡은 뒤엔 배너 없음 — 팝업으로 이미 알렸고, 목록 배지와 헤더 이름으로 충분 */
   document.getElementById('tBanner').innerHTML = b;
 
-  document.getElementById('tBody').innerHTML = d.map(function(t){
-    var me = (t.nm === '박지훈'), gone = (t.state === 'gone');
-    var roleB = t.role==='rep' ? '<span class="rl-badge rl-rep">대표교사</span>' : '<span class="rl-badge rl-gen">일반교사</span>';
-    var stB = gone ? '<span class="rl-badge bg-off">소속 변경함</span>' : '<span class="rl-badge bg-on">재직 중</span>';
-    var act = gone ? '<span class="tt-em">—</span>'
-      : (me ? '<span class="tt-em">나</span>'
-            : '<button class="btn-tiny" ' + (meIsRep && !me ? '' : 'disabled') + ' onclick="toastMsg(\'권한을 바꿨어요\')">권한 변경</button>'
-              + (meIsRep && !me ? ' <button class="btn-tiny bt-danger" onclick="askRelease(\'' + t.nm + '\')">소속 해제</button>' : ''));
-    return '<tr class="' + (me?'me ':'') + (gone?'gone':'') + '"><td style="font-weight:600">' + t.nm
-      + (me ? ' <span class="tt-em">(나)</span>' : '') + '</td><td class="tt-em">' + t.em + '</td><td>' + t.sub
-      + '</td><td>' + roleB + '</td><td>' + stB + '</td><td>' + act + '</td></tr>';
+  /* 인증 대기 선생님은 상태와 무관하게 늘 목록에 포함된다 */
+  var all = d.concat(PENDING.map(function(p){
+    return { nm:p.nm, em:p.em, act:p.act, dt:'', sub:'', role:'pend' };
+  }));
+  var CNT = { all: all.length, rep:0, gen:0, pend:0 };
+  all.forEach(function(t){ CNT[t.role==='rep'?'rep':(t.role==='pend'?'pend':'gen')]++; });
+
+  var SEG = [['all','전체'],['rep','대표교사'],['gen','일반교사'],['pend','인증 대기']];
+  document.getElementById('tSeg').innerHTML = SEG.map(function(s){
+    return '<button class="' + (TFILTER===s[0]?'on':'') + '" onclick="setTFilter(\'' + s[0] + '\')">' + s[1] + '</button>';
   }).join('');
 
-  var hasRep = d.some(function(t){ return t.role==='rep' && t.state==='on'; });
+  var rows = all.filter(function(t){ return TFILTER==='all' || t.role===TFILTER; });
+  document.getElementById('tCount').textContent =
+    SEG.filter(function(s){ return s[0]===TFILTER; })[0][1] + ' (' + CNT[TFILTER] + ')';
+
+  document.getElementById('tBody').innerHTML = rows.map(function(t){
+    var me = (t.nm === '박지훈'), pend = (t.role === 'pend');
+    var roleTx = t.role==='rep' ? '<span class="rl-badge rl-rep">대표교사</span>'
+               : (pend ? '<span class="rl-badge rl-pend">인증 대기</span>'
+                       : '<span class="rl-badge rl-gen">일반교사</span>');
+    /* 인증 대기는 인증일이 없어 그 자리에 [인증 요청]이 들어간다 (개발 화면과 동일) */
+    var dateCell = pend ? '<button class="tt-link lnk" onclick="toastMsg(\'인증 요청을 보냈어요\')">인증 요청</button>' : t.dt;
+    var canAct = meIsRep && !me && !pend;
+    var chg = canAct ? '<button class="tt-link" onclick="toastMsg(\'권한을 바꿨어요\')">권한 변경</button>'
+                     : '<span class="tt-link off">권한 변경</span>';
+    var del = canAct ? '<button class="tt-link dgr" onclick="askRelease(\'' + t.nm + '\')">소속 해제</button>'
+                     : '<span class="tt-link off">소속 해제</span>';
+    return '<tr class="' + (me?'me':'') + '"><td>' + roleTx
+      + '</td><td style="font-weight:600">' + t.nm
+      + (me ? ' <span class="tt-em">(나)</span>' : '')
+      + '</td><td class="tt-em">' + t.em + '</td><td class="tt-em">' + t.act
+      + '</td><td class="tt-em">' + dateCell + '</td><td>' + chg + '</td><td>' + del + '</td></tr>';
+  }).join('');
+
+  var hasRep = d.some(function(t){ return t.role==='rep'; });
   /* 상시 안내 — 상단 배너(지금 조치가 필요한 상황)와 헷갈리지 않도록 배경 없는 보조 텍스트로 */
+  /* 대표 추가는 표의 [권한 변경]이 이미 하는 일이라 별도 버튼을 두지 않는다 — 여기는 권고만 */
   document.getElementById('tHint').innerHTML = hasRep
-    ? '<div class="hint-line"><i data-lucide="users"></i>'
-      + '<span class="hl-tx"><b>대표 선생님은 여러 분 지정하실 수 있어요.</b> 한 분이 학교를 옮기셔도 학교가 멈추지 않도록 두 분 이상 지정해 두시길 권해요.</span>'
-      + (meIsRep ? '<span class="hl-act"><button class="btn-tiny" onclick="toastMsg(\'대표 선생님을 추가로 지정했어요\')">대표 선생님 추가</button></span>' : '')
+    ? '<div class="hint-line"><i data-lucide="info"></i>'
+      + '<span class="hl-tx">학교별 <b>1명 이상</b>의 대표교사가 반드시 필요해요. 한 분이 학교를 옮기셔도 학교가 멈추지 않도록 <b>두 분 이상</b> 지정해 두시길 권해요.</span>'
       + '</div>'
     : '';
   var hu = document.getElementById('hdUserName');
@@ -1189,6 +1247,8 @@ function showScene(name, hash){
   document.querySelectorAll('.scene').forEach(function(s){ s.classList.remove('on'); });
   var target = document.getElementById('scene-' + name);
   if (target) target.classList.add('on');
+  /* 1단계로 (다시) 들어오면 확인 체크는 초기화 — 이전 시도의 체크가 남지 않게 */
+  if (name === 'leave1'){ var c = document.getElementById('s1Chk'); if (c) c.checked = false; syncS1(); }
   document.getElementById('nav-home').classList.toggle('active', name === 'home');
   if (hash) location.hash = hash;
   window.scrollTo({ top:0 });
@@ -1198,7 +1258,7 @@ function showScene(name, hash){
 function syncNavBtns(){
   ['gen','rep2','rep1'].forEach(function(r){ var e=document.getElementById('rw-'+r); if(e) e.classList.toggle('on', r===ROLE); });
   var h = (location.hash || '#start').replace('#','');
-  ['me-done','cur','leave1','leave2','me','doc','af0','af1','af2','af3','released','expired','email'].forEach(function(k){
+  ['me-done','leave1','leave2','doc','af1','af3','released','expired','email'].forEach(function(k){
     var b = document.getElementById('mk-' + k);
     if (b) b.classList.toggle('on', k === h);
   });
@@ -1264,7 +1324,7 @@ document.addEventListener('input', function(e){
 renderChannels();
 (function(){
   var h = (location.hash || '').replace('#','');
-  if (['doc','code','done','home','wait','me','me-wait','me-done','cur','leave1','leave2','af0','af1','af2','af3','released','expired','email'].indexOf(h) !== -1) go(h);
+  if (['doc','code','done','home','wait','me-done','leave1','leave2','af1','af3','released','expired','email'].indexOf(h) !== -1) go(h);
   else go('me-done');
 })();
 lucide.createIcons();
