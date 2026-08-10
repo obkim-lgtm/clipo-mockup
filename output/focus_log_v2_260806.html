@@ -99,6 +99,8 @@ body.nav-expanded .main-wrap{ padding-left:200px; }
 .t-line{ display:inline-flex; align-items:center; gap:6px; min-width:0; }
 /* 제출 방식은 아이콘으로만 — 뱃지 3종이 겹쳐 셀이 시끄러웠다 (2026-08-07 올립) */
 .t-ic{ width:15px; height:15px; color:#9aa0ad; flex-shrink:0; }
+/* 미제출인데 해둔 것이 여러 줄일 때 — 2번째 줄부터 뱃지 자리만큼 들여쓴다 */
+.t-draft-pad{ width:69px; flex-shrink:0; }
 /* AI 채점 대상 태그 — 파일이 있으면 파일이, 없으면 타이핑이 채점된다(2026-08-07 개발 확인).
    규칙을 몰라도 무엇이 채점됐는지 화면에서 바로 보이게 (시스템이 아는 사실만 표시) */
 .t-ai{ display:inline-flex; align-items:center; justify-content:center; gap:4px; height:20px; padding:0 7px; border-radius:9999px; background:#e8f1ff; color:#3151c4; font-size:12px; font-weight:600; line-height:1; white-space:nowrap; }
@@ -202,6 +204,16 @@ body.nav-expanded .main-wrap{ padding-left:200px; }
 .toast.show{ opacity:1; transform:translateX(-50%) translateY(0); }
 
 /* 열 제목 도움말 + 정렬 */
+/* 열 설명 팝오버 (2026-08-07) — 표 래퍼가 overflow:hidden이라 body 기준 fixed로 띄운다 */
+.th-help-btn{ background:none; border:none; padding:2px; cursor:pointer; color:#9aa0ad; display:inline-flex; align-items:center; justify-content:center; line-height:1; border-radius:4px; }
+.th-help-btn:hover{ color:#6d7381; background:#eceef2; }
+#colHelp{ display:none; position:fixed; z-index:3000; width:330px; background:#fff; border:1px solid #dde1e8; border-radius:10px; box-shadow:0 8px 24px rgba(0,0,0,.14); padding:16px 18px; text-align:left; }
+#colHelp.show{ display:block; }
+#colHelp .ch-t{ font-size:15px; font-weight:600; color:#222631; margin:0 0 8px; line-height:1.5; }
+#colHelp ul{ margin:0; padding-left:18px; }
+#colHelp li{ font-size:14px; font-weight:500; color:#3b3f4c; line-height:1.65; margin-bottom:5px; }
+#colHelp li:last-child{ margin-bottom:0; }
+
 .th-help{ display:inline-flex; align-items:center; justify-content:center; gap:5px; line-height:1; }
 .th-help i, .th-help svg{ width:15px; height:15px; color:#9aa0ad; cursor:help; }
 .th-help:hover i, .th-help:hover svg{ color:#6d7381; }
@@ -349,7 +361,8 @@ body.nav-expanded .main-wrap{ padding-left:200px; }
                 <th style="width:186px;" id="thLeave">
                   <span class="th-help" style="gap:2px;">
                     <button class="th-sort" id="btnSort" onclick="cycleSort()">작성 과정 <i data-lucide="arrow-up-down" id="sortIcon"></i></button>
-                    <i data-lucide="help-circle" style="width:15px;height:15px" title="답안을 쓰는 동안 다른 탭·창으로 이동한 시각·머문 시간과, 글자 수가 어떻게 늘고 줄었는지 기록한 내용이에요. 방문한 사이트와 답안 내용은 저장하지 않고, 스마트폰 등 다른 기기 사용은 감지되지 않아요. 자동 판정이나 감점 없이 참고 정보로만 제공돼요."></i>
+                    <!-- title 속성은 호버로만 떠서 눌러도 반응이 없었다 → 클릭 팝오버로 (2026-08-07 올립) -->
+                    <button class="th-help-btn" onclick="toggleColHelp(this)" aria-label="작성 과정 설명"><i data-lucide="help-circle" style="width:15px;height:15px"></i></button>
                   </span>
                 </th>
                 <th style="width:168px;">과제물 관리</th>
@@ -375,6 +388,16 @@ body.nav-expanded .main-wrap{ padding-left:200px; }
 <div id="toast" class="toast"><i data-lucide="circle-check-big" style="width:20px;height:20px;color:white;flex-shrink:0;"></i><span id="toastMsg"></span></div>
 
 <!-- 삭제 확인 모달 -->
+<!-- 작성 과정 열 설명 팝오버 — 문구는 평가 설계 안내와 같은 내용으로 맞춘다 -->
+<div id="colHelp">
+  <p class="ch-t">작성 과정</p>
+  <ul>
+    <li>답안을 쓰는 동안 다른 화면으로 이동한 시각·머문 시간과 글자 수 변화예요.</li>
+    <li>방문한 사이트와 답안 내용은 저장하지 않아요. 3초보다 짧은 이동이나 스마트폰 같은 다른 기기 사용도 남지 않고요.</li>
+    <li>시스템은 있었던 일만 남겨요. 부정행위인지는 판단하지 않아요.</li>
+  </ul>
+</div>
+
 <!-- 작성 과정 팝업 — 타임라인은 가로가 넓어야 읽혀서 넓은 모달로 (2026-08-07 회의) -->
 <div class="md-ov" id="pcModal" onclick="if(event.target===this) closeProcess()">
   <div class="pc">
@@ -505,7 +528,8 @@ const teacherRows = [
         series:[690,698,715,732,728,748,765,782,778,795,805,808,812],
         events:[ {at:5, type:'탭 전환', dur:22} ] }
     ] },
-  { id:'10107', name:'조민재', status:'미제출' },
+  /* 파일만 올려두고 제출 버튼을 안 누른 케이스 — 직접 작성은 안 함 (2026-08-07 올립) */
+  { id:'10107', name:'조민재', status:'미제출', files:['10107_조민재_활동지.pdf'], draftAt:'07/29 10:15 저장' },
   { id:'10108', name:'윤하은', status:'미제출' }
 ];
 
@@ -712,10 +736,24 @@ function renderTeacher(){
     /* 제출 상세 셀 (Figma: 유형 뱃지 + 글자 수/파일명) */
     let detailCell;
     if(!isSubmit){
-      /* 제출은 안 했지만 쓰던 내용이 남아 있는 경우 — 상태는 미제출 그대로 두고 사실만 알린다 */
-      detailCell = r.draft
-        ? '<div style="display:inline-flex;align-items:center;gap:10px;min-width:0;"><span class="t-badge t-draft"><i data-lucide="pencil-line"></i>작성 중</span><button class="t-open" title="쓰던 내용 보기" onclick="location.href=\'student_submit_v1_260729.html#closed\'">'+r.draft+'<i data-lucide="external-link" style="width:13px;height:13px"></i></button></div>'
-        : '<span class="t-badge t-none">-</span>';
+      /* 제출은 안 했지만 해둔 것이 남아 있는 경우 — 상태는 미제출 그대로 두고 사실만 알린다.
+         타이핑만·파일만·둘 다 모두 같은 '작성 중' 신호로 묶는다 (교사가 챙길 대상이라는 뜻) */
+      const dFiles = r.files || [];
+      if(!r.draft && !dFiles.length){ detailCell = '<span class="t-badge t-none">-</span>'; }
+      else {
+        const dLines = [];
+        if(r.draft){
+          dLines.push('<i class="t-ic" data-lucide="type" title="직접 작성"></i><button class="t-open" title="쓰던 내용 보기" onclick="location.href=\'student_submit_v1_260729.html#closed\'">'+r.draft+'<i data-lucide="external-link" style="width:13px;height:13px"></i></button>');
+        }
+        dFiles.forEach(f=>{
+          dLines.push('<i class="t-ic" data-lucide="paperclip" title="파일 첨부"></i><button class="t-open" title="'+f+' 내려받기" onclick="downloadOne(\''+r.name+'\')">'+f+'<i data-lucide="download" style="width:13px;height:13px"></i></button>');
+        });
+        detailCell = '<div class="t-stack">'
+          + dLines.map((html, i)=> '<div class="t-line">'
+              + (i===0 ? '<span class="t-badge t-draft"><i data-lucide="pencil-line"></i>작성 중</span>' : '<span class="t-draft-pad"></span>')
+              + html + '</div>').join('')
+          + '</div>';
+      }
     }
     else { detailCell = submitCell(r); }
 
@@ -782,13 +820,27 @@ function openProcess(id){
   lucide.createIcons();
 }
 function closeProcess(){ document.getElementById('pcModal').classList.remove('show'); }
-document.addEventListener('keydown', e => { if(e.key === 'Escape') closeProcess(); });
+document.addEventListener('keydown', e => { if(e.key === 'Escape'){ closeProcess(); closeColHelp(); } });
 
 function openCase(id){
   if(!focusLogOn) toggleFocusLog(true);
   renderTeacher();
   openProcess(id);
 }
+
+/* ───────── 열 설명 팝오버 ───────── */
+function toggleColHelp(btn){
+  const pop = document.getElementById('colHelp');
+  if(pop.classList.contains('show')){ pop.classList.remove('show'); return; }
+  const r = btn.getBoundingClientRect();
+  /* 열이 오른쪽에 있어 왼쪽으로 흘리고, 화면 밖으로 나가지 않게 잡는다 */
+  pop.style.top  = (r.bottom + 8) + 'px';
+  pop.style.left = Math.max(12, Math.min(r.right - 330, window.innerWidth - 342)) + 'px';
+  pop.classList.add('show');
+}
+function closeColHelp(){ document.getElementById('colHelp').classList.remove('show'); }
+document.addEventListener('click', e => { if(!e.target.closest('.th-help-btn') && !e.target.closest('#colHelp')) closeColHelp(); });
+window.addEventListener('scroll', closeColHelp, true);
 
 /* ───────── 정렬 ───────── */
 function cycleSort(){
