@@ -94,6 +94,15 @@ body.nav-expanded .main-wrap{ padding-left:200px; }
 .t-none{ background:#f1f3f5; color:#27272a; }
 .t-draft{ background:#fff7ed; color:#c2410c; }
 .t-detail{ font-size:15px; font-weight:500; color:#52525b; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+/* 직접 작성 + 파일 첨부를 함께 낸 경우 — 열을 나누지 않고 셀 안에 쌓는다 (2026-08-07) */
+.t-stack{ display:inline-flex; flex-direction:column; gap:2px; align-items:flex-start; }
+.t-line{ display:inline-flex; align-items:center; gap:6px; min-width:0; }
+/* 제출 방식은 아이콘으로만 — 뱃지 3종이 겹쳐 셀이 시끄러웠다 (2026-08-07 올립) */
+.t-ic{ width:15px; height:15px; color:#9aa0ad; flex-shrink:0; }
+/* AI 채점 대상 태그 — 파일이 있으면 파일이, 없으면 타이핑이 채점된다(2026-08-07 개발 확인).
+   규칙을 몰라도 무엇이 채점됐는지 화면에서 바로 보이게 (시스템이 아는 사실만 표시) */
+.t-ai{ display:inline-flex; align-items:center; justify-content:center; gap:4px; height:20px; padding:0 7px; border-radius:9999px; background:#e8f1ff; color:#3151c4; font-size:12px; font-weight:600; line-height:1; white-space:nowrap; }
+.t-ai i, .t-ai svg{ width:11px; height:11px; }
 /* 직접 작성 답안 열기 */
 .t-open{ background:none; border:none; cursor:pointer; font-family:inherit; font-size:15px; font-weight:500; color:#3151c4; display:inline-flex; align-items:center; justify-content:center; line-height:1; vertical-align:middle; gap:5px; padding:6px 8px; border-radius:4px; white-space:nowrap; }
 .t-open:hover{ background:#e9f2ff; }
@@ -200,6 +209,9 @@ body.nav-expanded .main-wrap{ padding-left:200px; }
 .th-sort:hover{ background:#eceef2; }
 .th-sort i, .th-sort svg{ width:15px; height:15px; color:#9aa0ad; }
 .th-sort.on{ color:#365eef; }
+.th-sort.off{ color:#b3b6bd; cursor:default; }
+.th-sort.off:hover{ background:none; }
+.th-sort.off i, .th-sort.off svg{ color:#c7cbd3; }
 .th-sort.on i, .th-sort.on svg{ color:#365eef; }
 
 /* ===== 삭제 확인 모달 ===== */
@@ -330,8 +342,10 @@ body.nav-expanded .main-wrap{ padding-left:200px; }
                 <th style="width:98px;">학번</th>
                 <th style="width:98px;">이름</th>
                 <th style="width:98px;">상태</th>
-                <th style="width:176px;">최근 제출 일시</th>
-                <th>제출 상세</th>
+                <th style="width:132px;">최근 제출 일시</th>
+                <!-- '제출 상세' → '제출물' (2026-08-07 올립) — 뱃지가 빠지고 값만 남아
+                     '자세히 보는 곳'이 아니라 '학생이 낸 것'을 가리키는 이름이 맞음 -->
+                <th>제출물</th>
                 <th style="width:186px;" id="thLeave">
                   <span class="th-help" style="gap:2px;">
                     <button class="th-sort" id="btnSort" onclick="cycleSort()">작성 과정 <i data-lucide="arrow-up-down" id="sortIcon"></i></button>
@@ -456,7 +470,9 @@ const teacherRows = [
         series:[840,841,848,856,861,868],
         events:[] }
     ] },
-  { id:'10102', name:'이준호', status:'제출', date:'07/28 14:48 학생 제출', type:'text', detail:'542자',
+  /* 두 방식을 모두 켜면 학생이 둘 다 낼 수 있다(체크박스라 택1이 아님).
+     예전에는 직접 작성만 표에 보이고 파일은 낸 줄도 몰랐다 (2026-08-07 수정) */
+  { id:'10102', name:'이준호', status:'제출', date:'07/28 14:48 학생 제출', type:'text', detail:'542자', files:['10102_이준호_참고자료.pdf','10102_이준호_그래프.png'],
     sessions:[
       { name:'작성', date:'07/28', start:'14:00', submitted:true,
         series:[0,10,26,40,38,52,70,88,100,98,115,132,140,142,158,175,190,186,200,null,null,null,228,245,262,258,275,292,305,320,318,335,352,368,380,378,395,412,428,440,438,455,470,485,498,510,520,532,542],
@@ -468,14 +484,15 @@ const teacherRows = [
         series:[0,0,6,10,10,10,62,70,74,78,78,80,130,138,142,146,150,154,154,156,200,206,210,214,214,216,258,262,266,270,274,274,276,318,322,326,330,334,338,342,342,344,372,376,378,380,382,383,384,385,386,386,387,387,388,388],
         events:[ {at:3, type:'탭 전환', dur:74}, {at:10, type:'탭 전환', dur:41}, {at:18, type:'다른 창 이동', dur:12}, {at:24, type:'탭 전환', dur:58}, {at:31, type:'탭 전환', dur:38}, {at:40, type:'다른 창 이동', dur:29} ] }
     ] },
-  { id:'10104', name:'최유진', status:'제출', date:'07/28 14:51 학생 제출', type:'file', detail:'10104_최유진.pdf' },
+  /* 파일 최대 5개 케이스 — 셀이 얼마나 길어지는지 확인용 */
+  { id:'10104', name:'최유진', status:'제출', date:'07/28 14:51 학생 제출', type:'file', files:['10104_최유진_1면.jpg','10104_최유진_2면.jpg','10104_최유진_3면.jpg','10104_최유진_4면.jpg','10104_최유진_5면.jpg'] },
   { id:'10105', name:'정현우', status:'제출', date:'07/28 14:44 학생 제출', type:'text', detail:'634자',
     sessions:[
       { name:'작성', date:'07/28', start:'14:00', submitted:true,
         series:[0,12,30,48,44,60,80,100,96,115,135,155,150,170,190,210,205,225,245,262,258,278,298,315,310,330,350,368,362,382,402,420,415,435,455,472,468,488,508,525,540,558,578,606,634],
         events:[] }
     ] },
-  { id:'10109', name:'임도윤', status:'제출', date:'07/28 16:10 선생님 제출', type:'file', detail:'10109_임도윤.pdf 외 1', teacherUpload:true },
+  { id:'10109', name:'임도윤', status:'제출', date:'07/28 16:10 선생님 제출', type:'file', files:['10109_임도윤.pdf','10109_임도윤_추가.pdf'], teacherUpload:true },
   { id:'10106', name:'한지우', status:'미제출', draft:'812자', draftAt:'07/29 09:02 저장',
     sessions:[
       { date:'07/28', start:'15:10', submitted:false,
@@ -637,6 +654,46 @@ function evtList(sessions){
   return rows;
 }
 
+/* AI 채점 대상 태그 — 규칙: 파일이 하나라도 있으면 파일(여러 개면 가장 최근 업로드),
+   없으면 클리포에 쓴 텍스트. 2026-08-07 개발 확인. 규칙을 몰라도 화면에서 바로 보이게 한다. */
+function aiTag(){
+  return '<span class="t-ai" title="AI 채점 대상이에요. 제출물이 여러 개여도 1개만 채점되고, 파일이 있으면 가장 최근에 올린 파일이 대상이에요."><i data-lucide="sparkles"></i>AI 채점 대상</span>';
+}
+
+/* 제출 일시 셀 — 시각만 남긴다 (2026-08-07 올립). 표 너비 확보.
+   '학생 제출 / 선생님 제출'은 지우지 않고 호버 툴팁으로 옮겨, 대리 업로드 여부는 확인 가능하게 */
+function dateCell(r, isSubmit){
+  const raw = isSubmit ? r.date : (r.draftAt || '-');
+  const m = raw.match(/^(.*?)\s*(학생 제출|선생님 제출|저장)$/);
+  if(!m) return raw;
+  return '<span title="'+m[2]+'">'+m[1]+'</span>';
+}
+
+/* 제출물 셀 — 방식 라벨(직접 작성/파일 첨부)을 아이콘으로 대체 (2026-08-07 올립).
+   글자 수인지 파일명인지는 값만 봐도 갈려서 라벨이 정보를 더하지 않았다.
+   AI 채점 태그는 제출물이 2개 이상일 때만 — 하나뿐이면 그게 대상인 게 자명하다. */
+function submitCell(r){
+  const files = r.files || [];
+  const lines = [];
+  if(r.type === 'text'){
+    lines.push('<button class="t-open" onclick="location.href=\'student_submit_v1_260729.html#pdf\'">'+r.detail+'<i data-lucide="external-link" style="width:13px;height:13px"></i></button>');
+  }
+  files.forEach(f=>{
+    lines.push('<button class="t-open" title="'+f+' 내려받기" onclick="downloadOne(\''+r.name+'\')">'+f+'<i data-lucide="download" style="width:13px;height:13px"></i></button>');
+  });
+  /* 채점 대상 = 파일이 있으면 마지막(가장 최근) 파일, 없으면 타이핑 */
+  const aiIdx = files.length ? lines.length - 1 : 0;
+  const showTag = lines.length >= 2;
+
+  return '<div class="t-stack">' + lines.map((html, i)=>{
+    const isFile = (r.type === 'text') ? i > 0 : true;
+    return '<div class="t-line">'
+      + '<i class="t-ic" data-lucide="'+(isFile ? 'paperclip' : 'type')+'" title="'+(isFile ? '파일 첨부' : '직접 작성')+'"></i>'
+      + html + (showTag && i === aiIdx ? aiTag() : '')
+      + '</div>';
+  }).join('') + '</div>';
+}
+
 /* ───────── 표 렌더 ───────── */
 function renderTeacher(){
   const tb = document.getElementById('teacherTbody');
@@ -657,11 +714,10 @@ function renderTeacher(){
     if(!isSubmit){
       /* 제출은 안 했지만 쓰던 내용이 남아 있는 경우 — 상태는 미제출 그대로 두고 사실만 알린다 */
       detailCell = r.draft
-        ? '<div style="display:inline-flex;align-items:center;gap:8px;min-width:0;"><span class="t-badge t-draft"><i data-lucide="pencil-line"></i>작성 중</span><button class="t-open" title="쓰던 내용 보기" onclick="location.href=\'student_submit_v1_260729.html#closed\'">'+r.draft+'<i data-lucide="external-link" style="width:13px;height:13px"></i></button></div>'
+        ? '<div style="display:inline-flex;align-items:center;gap:10px;min-width:0;"><span class="t-badge t-draft"><i data-lucide="pencil-line"></i>작성 중</span><button class="t-open" title="쓰던 내용 보기" onclick="location.href=\'student_submit_v1_260729.html#closed\'">'+r.draft+'<i data-lucide="external-link" style="width:13px;height:13px"></i></button></div>'
         : '<span class="t-badge t-none">-</span>';
     }
-    else if(r.type==='text'){ detailCell = '<div style="display:inline-flex;align-items:center;gap:8px;"><span class="t-badge t-text"><i data-lucide="type"></i>직접 작성</span><button class="t-open" onclick="location.href=\'student_submit_v1_260729.html#pdf\'">'+r.detail+'<i data-lucide="external-link" style="width:13px;height:13px"></i></button></div>'; }
-    else { detailCell = '<div style="display:inline-flex;align-items:center;gap:8px;min-width:0;"><span class="t-badge t-file"><i data-lucide="paperclip"></i>파일 첨부</span><button class="t-open" title="'+r.detail+' 내려받기" onclick="downloadOne(\''+r.name+'\')">'+r.detail+'<i data-lucide="download" style="width:13px;height:13px"></i></button></div>'; }
+    else { detailCell = submitCell(r); }
 
     /* 작성 과정 요약 셀 — 열은 항상 두고, 기록이 없으면 - (2026-08-07 올립).
        켜짐/꺼짐에 따라 열이 생겼다 사라지면 같은 화면이 과제마다 달라 보임 */
@@ -688,7 +744,7 @@ function renderTeacher(){
     tr.innerHTML = '<td><input type="checkbox" class="chk row-chk"' + (isSubmit ? '' : ' disabled title="제출한 과제물이 없어요"') + ' onchange="updateSel()"></td>'
       + '<td>'+r.id+'</td><td>'+r.name+'</td>'
       + '<td>'+(isSubmit?'<span class="b-submit">제출 완료</span>':'<span class="b-absent">미제출</span>')+'</td>'
-      + '<td class="td-date">'+(isSubmit? r.date : (r.draftAt || '-'))+'</td>'
+      + '<td class="td-date">'+dateCell(r, isSubmit)+'</td>'
       + '<td>'+detailCell+'</td>'
       + '<td>'+leaveCell+'</td>'
       + '<td>'+manageCell+'</td>';
@@ -736,11 +792,19 @@ function openCase(id){
 
 /* ───────── 정렬 ───────── */
 function cycleSort(){
+  /* 기록이 꺼진 과제는 전부 -라 정렬할 것이 없다 — 눌러도 안 되는 걸 누르게 두지 않는다 (2026-08-07) */
+  if(!focusLogOn) return;
   sortMode = (sortMode === 'default') ? 'leaveDesc' : 'default';
-  const b = document.getElementById('btnSort');
-  b.classList.toggle('on', sortMode==='leaveDesc');
-  b.innerHTML = '작성 과정 <i data-lucide="'+(sortMode==='leaveDesc'?'arrow-down-wide-narrow':'arrow-up-down')+'"></i>';
+  syncSortBtn();
   renderTeacher();
+}
+function syncSortBtn(){
+  const b = document.getElementById('btnSort');
+  b.classList.toggle('on', focusLogOn && sortMode==='leaveDesc');
+  b.classList.toggle('off', !focusLogOn);
+  b.title = focusLogOn ? '이탈 시간이 긴 순서로 정렬해요' : '이 과제는 작성 과정을 기록하지 않아 정렬할 수 없어요';
+  b.innerHTML = '작성 과정 <i data-lucide="'+(focusLogOn && sortMode==='leaveDesc' ? 'arrow-down-wide-narrow' : 'arrow-up-down')+'"></i>';
+  lucide.createIcons();
 }
 
 /* ───────── 일괄 다운로드 / 삭제 ───────── */
@@ -792,6 +856,8 @@ function toggleFocusLog(on){
   focusLogOn = on;
   /* 열·타이틀 칩은 항상 그대로 — 꺼진 과제는 셀이 -로 나올 뿐 (2026-08-07 올립) */
   document.getElementById('toggleOffNote').style.display = on ? 'none' : 'block';
+  if(!on) sortMode = 'default';   /* 정렬 상태도 초기화 */
+  syncSortBtn();
   renderTeacher();
   lucide.createIcons();
 }
