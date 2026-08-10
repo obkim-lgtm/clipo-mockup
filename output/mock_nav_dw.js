@@ -23,6 +23,7 @@
   var ROUTES = {
     dwList:      { f:'design',  h:'list' },
     dwDesign:    { f:'design',  h:'design' },
+    dwWriting:   { f:'design',  h:'design-writing' },
     dwQuestions: { f:'design',  h:'questions' },
     rubOk:       { f:'design',  h:'rubric-ok' },
     rubErr:      { f:'design',  h:'rubric-error' },
@@ -56,7 +57,7 @@
    * 예전에는 해당 화면에 들어가야 케이스가 보였는데, 어떤 케이스가 있는지 자체를 알 수 없어
    * "차트가 없다"처럼 못 찾는 일이 생겼다. */
   var GROUPS = [
-    { t:'교사 · 평가 설계',        items:[['dwList','과제 목록'],['dwDesign','과제 설계'],['dwQuestions','문항 작성']] },
+    { t:'교사 · 평가 설계',        items:[['dwList','과제 목록'],['dwDesign','과제 설계'],['dwWriting','과제 설계 · 작성 중',{sub:'학생이 열어봐서 기록 설정 잠김'}],['dwQuestions','문항 작성']] },
     /* 채점기준 AI 성공/오류는 별도 그룹으로 두지 않는다 — 문항 작성 화면 안의 [AI 생성] 버튼으로 시연 (2026-08-06 올립) */
     { t:'교사 · 과제물 관리',      items:[['flOn','기록 켠 과제'],['flOff','기록 끈 과제']] },
     { t:'└ 작성 과정 케이스',      items:[
