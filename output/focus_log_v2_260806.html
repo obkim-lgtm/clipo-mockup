@@ -312,8 +312,9 @@ body.nav-expanded .main-wrap{ padding-left:200px; }
         <div class="ev-card">
           <div style="display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;">
             <div style="display:flex;align-items:center;gap:12px;min-width:0;">
+              <!-- '작성 과정 기록 켜짐' 칩 제거 (2026-08-07 올립) — 타이틀 정보량 과다.
+                   열이 상시 노출되므로 켜짐/꺼짐은 셀 값(기록 vs -)으로 드러남 -->
               <h3 style="font-size:18px;font-weight:600;color:#18181b;margin:0;">학생 제출 현황 <span style="font-size:15px;color:#6d7381;font-weight:500;">6/9명 제출</span></h3>
-              <span class="rec-state" id="recState"><i data-lucide="monitor-check"></i>작성 과정 기록 켜짐</span>
             </div>
             <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;">
               <span id="selCount" style="font-size:14px;font-weight:500;color:#6d7381;display:none;">3명 선택</span>
@@ -662,9 +663,11 @@ function renderTeacher(){
     else if(r.type==='text'){ detailCell = '<div style="display:inline-flex;align-items:center;gap:8px;"><span class="t-badge t-text"><i data-lucide="type"></i>직접 작성</span><button class="t-open" onclick="location.href=\'student_submit_v1_260729.html#pdf\'">'+r.detail+'<i data-lucide="external-link" style="width:13px;height:13px"></i></button></div>'; }
     else { detailCell = '<div style="display:inline-flex;align-items:center;gap:8px;min-width:0;"><span class="t-badge t-file"><i data-lucide="paperclip"></i>파일 첨부</span><button class="t-open" title="'+r.detail+' 내려받기" onclick="downloadOne(\''+r.name+'\')">'+r.detail+'<i data-lucide="download" style="width:13px;height:13px"></i></button></div>'; }
 
-    /* 작성 과정 요약 셀 — 요약만, 곡선·상세는 펼침에서 */
+    /* 작성 과정 요약 셀 — 열은 항상 두고, 기록이 없으면 - (2026-08-07 올립).
+       켜짐/꺼짐에 따라 열이 생겼다 사라지면 같은 화면이 과제마다 달라 보임 */
     let leaveCell;
-    if(!focusLogOn || !sessions.length){ leaveCell = '<span class="leave-none">-</span>'; }
+    if(!focusLogOn){ leaveCell = '<span class="leave-none" title="이 과제는 작성 과정을 기록하지 않아요. 기록은 평가 설계에서 켤 수 있어요.">-</span>'; }
+    else if(!sessions.length){ leaveCell = '<span class="leave-none">-</span>'; }
     else {
       const cnt = rowLeaveCount(r), sec = rowLeaveSec(r);
       const main = cnt ? '이탈 '+cnt+'회 · '+fmtDur(sec) : '이탈 없음';
@@ -687,7 +690,7 @@ function renderTeacher(){
       + '<td>'+(isSubmit?'<span class="b-submit">제출 완료</span>':'<span class="b-absent">미제출</span>')+'</td>'
       + '<td class="td-date">'+(isSubmit? r.date : (r.draftAt || '-'))+'</td>'
       + '<td>'+detailCell+'</td>'
-      + (focusLogOn ? '<td>'+leaveCell+'</td>' : '')
+      + '<td>'+leaveCell+'</td>'
       + '<td>'+manageCell+'</td>';
     tb.appendChild(tr);
 
@@ -787,14 +790,8 @@ function confirmDel(){
 }
 function toggleFocusLog(on){
   focusLogOn = on;
+  /* 열·타이틀 칩은 항상 그대로 — 꺼진 과제는 셀이 -로 나올 뿐 (2026-08-07 올립) */
   document.getElementById('toggleOffNote').style.display = on ? 'none' : 'block';
-  document.getElementById('thLeave').style.display = on ? '' : 'none';
-  var st = document.getElementById('recState');
-  st.classList.toggle('off', !on);
-  st.innerHTML = '<i data-lucide="' + (on ? 'monitor-check' : 'monitor-off') + '"></i>작성 과정 기록 ' + (on ? '켜짐' : '꺼짐');
-  document.querySelectorAll('#mockpick .mp-btn[data-rec]').forEach(function(b){
-    b.classList.toggle('on', (b.getAttribute('data-rec') === 'on') === on);
-  });
   renderTeacher();
   lucide.createIcons();
 }
