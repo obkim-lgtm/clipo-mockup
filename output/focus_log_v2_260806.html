@@ -95,16 +95,7 @@ body.nav-expanded .main-wrap{ padding-left:200px; }
 .t-draft{ background:#fff7ed; color:#c2410c; }
 .t-detail{ font-size:15px; font-weight:500; color:#52525b; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 /* 직접 작성 + 파일 첨부를 함께 낸 경우 — 열을 나누지 않고 셀 안에 쌓는다 (2026-08-07) */
-.t-stack{ display:inline-flex; flex-direction:column; gap:2px; align-items:flex-start; }
 .t-line{ display:inline-flex; align-items:center; gap:6px; min-width:0; }
-/* 제출 방식은 아이콘으로만 — 뱃지 3종이 겹쳐 셀이 시끄러웠다 (2026-08-07 올립) */
-.t-ic{ width:15px; height:15px; color:#9aa0ad; flex-shrink:0; }
-/* 미제출인데 해둔 것이 여러 줄일 때 — 2번째 줄부터 뱃지 자리만큼 들여쓴다 */
-.t-draft-pad{ width:69px; flex-shrink:0; }
-/* AI 채점 대상 태그 — 파일이 있으면 파일이, 없으면 타이핑이 채점된다(2026-08-07 개발 확인).
-   규칙을 몰라도 무엇이 채점됐는지 화면에서 바로 보이게 (시스템이 아는 사실만 표시) */
-.t-ai{ display:inline-flex; align-items:center; justify-content:center; gap:4px; height:20px; padding:0 7px; border-radius:9999px; background:#e8f1ff; color:#3151c4; font-size:12px; font-weight:600; line-height:1; white-space:nowrap; }
-.t-ai i, .t-ai svg{ width:11px; height:11px; }
 /* 직접 작성 답안 열기 */
 .t-open{ background:none; border:none; cursor:pointer; font-family:inherit; font-size:15px; font-weight:500; color:#3151c4; display:inline-flex; align-items:center; justify-content:center; line-height:1; vertical-align:middle; gap:5px; padding:6px 8px; border-radius:4px; white-space:nowrap; }
 .t-open:hover{ background:#e9f2ff; }
@@ -372,7 +363,6 @@ body.nav-expanded .main-wrap{ padding-left:200px; }
           </div>
 
           <p id="sortNote" style="display:none;margin:-6px 0 0;font-size:14px;font-weight:500;color:#6d7381;">다른 화면에 머문 시간이 긴 순서로 정렬했어요. 순서는 참고용이고, 많고 적음이 곧 판정은 아니에요.</p>
-          <p id="toggleOffNote" style="display:none;margin:-6px 0 0;font-size:14px;font-weight:500;color:#6d7381;">이 과제는 작성 과정을 기록하지 않아요. 기록은 평가 설계에서 과제를 만들 때 켤 수 있어요.</p>
         </div>
       </div>
     </div>
@@ -432,8 +422,6 @@ body.nav-expanded .main-wrap{ padding-left:200px; }
   <div class="mp-head" onclick="mpToggle(event)"><span>목업 내비게이터 · 작성 과정 기록 (CLIPO)</span><span id="mpArrow">▾</span></div>
   <div class="mp-body" id="mpBody">
     <div class="mp-cap">과제 설정 (평가 설계에서 정함)</div>
-    <button class="mp-btn on" data-rec="on" onclick="toggleFocusLog(true)">기록 켠 과제<span class="mp-sub">열 표시</span></button>
-    <button class="mp-btn" data-rec="off" onclick="toggleFocusLog(false)">기록 끈 과제<span class="mp-sub">열 자체가 없음</span></button>
 
     <div class="mp-cap">눈여겨볼 케이스</div>
     <button class="mp-btn" onclick="openCase('10101')">김서윤 · 재제출<span class="mp-sub">작성 구간 2개 · 누적 보존</span></button>
@@ -493,9 +481,7 @@ const teacherRows = [
         series:[840,841,848,856,861,868],
         events:[] }
     ] },
-  /* 두 방식을 모두 켜면 학생이 둘 다 낼 수 있다(체크박스라 택1이 아님).
-     예전에는 직접 작성만 표에 보이고 파일은 낸 줄도 몰랐다 (2026-08-07 수정) */
-  { id:'10102', name:'이준호', status:'제출', date:'07/28 14:48 학생 제출', type:'text', detail:'542자', files:['10102_이준호_참고자료.pdf','10102_이준호_그래프.png'],
+  { id:'10102', name:'이준호', status:'제출', date:'07/28 14:48 학생 제출', type:'text', detail:'542자',
     sessions:[
       { name:'작성', date:'07/28', start:'14:00', submitted:true,
         series:[0,10,26,40,38,52,70,88,100,98,115,132,140,142,158,175,190,186,200,null,null,null,228,245,262,258,275,292,305,320,318,335,352,368,380,378,395,412,428,440,438,455,470,485,498,510,520,532,542],
@@ -508,14 +494,14 @@ const teacherRows = [
         events:[ {at:3, type:'탭 전환', dur:74}, {at:10, type:'탭 전환', dur:41}, {at:18, type:'다른 창 이동', dur:12}, {at:24, type:'탭 전환', dur:58}, {at:31, type:'탭 전환', dur:38}, {at:40, type:'다른 창 이동', dur:29} ] }
     ] },
   /* 파일 최대 5개 케이스 — 셀이 얼마나 길어지는지 확인용 */
-  { id:'10104', name:'최유진', status:'제출', date:'07/28 14:51 학생 제출', type:'file', files:['10104_최유진_1면.jpg','10104_최유진_2면.jpg','10104_최유진_3면.jpg','10104_최유진_4면.jpg','10104_최유진_5면.jpg'] },
+  { id:'10104', name:'최유진', status:'제출', date:'07/28 14:51 학생 제출', type:'file', detail:'10104_최유진.pdf' },
   { id:'10105', name:'정현우', status:'제출', date:'07/28 14:44 학생 제출', type:'text', detail:'634자',
     sessions:[
       { name:'작성', date:'07/28', start:'14:00', submitted:true,
         series:[0,12,30,48,44,60,80,100,96,115,135,155,150,170,190,210,205,225,245,262,258,278,298,315,310,330,350,368,362,382,402,420,415,435,455,472,468,488,508,525,540,558,578,606,634],
         events:[] }
     ] },
-  { id:'10109', name:'임도윤', status:'제출', date:'07/28 16:10 선생님 제출', type:'file', files:['10109_임도윤.pdf','10109_임도윤_추가.pdf'], teacherUpload:true },
+  { id:'10109', name:'임도윤', status:'제출', date:'07/28 16:10 선생님 제출', type:'file', detail:'10109_임도윤.pdf 외 1', teacherUpload:true },
   { id:'10106', name:'한지우', status:'미제출', draft:'812자', draftAt:'07/29 09:02 저장',
     sessions:[
       { date:'07/28', start:'15:10', submitted:false,
@@ -528,12 +514,12 @@ const teacherRows = [
         series:[690,698,715,732,728,748,765,782,778,795,805,808,812],
         events:[ {at:5, type:'탭 전환', dur:22} ] }
     ] },
-  /* 파일만 올려두고 제출 버튼을 안 누른 케이스 — 직접 작성은 안 함 (2026-08-07 올립) */
-  { id:'10107', name:'조민재', status:'미제출', files:['10107_조민재_활동지.pdf'], draftAt:'07/29 10:15 저장' },
+  /* 파일만 올려두고 제출 버튼을 안 누른 케이스 (2026-08-07 올립) */
+  { id:'10107', name:'조민재', status:'미제출', draftFile:'10107_조민재_활동지.pdf', draftAt:'07/29 10:15 저장' },
   { id:'10108', name:'윤하은', status:'미제출' }
 ];
 
-let focusLogOn = true;
+/* 로그는 모든 직접 제출 과제에 상시 수집 (2026-08-10 회의) — 과제별 on/off 없음 */
 /* openRow — 팝업으로 전환하며 제거 (2026-08-07) */
 let sortMode = 'default';   /* default | leaveDesc */
 
@@ -541,7 +527,7 @@ let sortMode = 'default';   /* default | leaveDesc */
 function sessMinutes(s){ return s.series.length - 1; }
 function sessEvents(s){ return (s.events||[]).filter(e=>e.type!=='gap'); }
 function sessLeaveSec(s){ return sessEvents(s).reduce((a,e)=>a+e.dur, 0); }
-function rowSessions(r){ return (focusLogOn && !r.teacherUpload && r.sessions) ? r.sessions : []; }
+function rowSessions(r){ return (!r.teacherUpload && r.sessions) ? r.sessions : []; }
 function rowLeaveCount(r){ return rowSessions(r).reduce((a,s)=>a+sessEvents(s).length, 0); }
 function rowLeaveSec(r){ return rowSessions(r).reduce((a,s)=>a+sessLeaveSec(s), 0); }
 function rowHasGap(r){ return rowSessions(r).some(s=>(s.events||[]).some(e=>e.type==='gap')); }
@@ -678,12 +664,6 @@ function evtList(sessions){
   return rows;
 }
 
-/* AI 채점 대상 태그 — 규칙: 파일이 하나라도 있으면 파일(여러 개면 가장 최근 업로드),
-   없으면 클리포에 쓴 텍스트. 2026-08-07 개발 확인. 규칙을 몰라도 화면에서 바로 보이게 한다. */
-function aiTag(){
-  return '<span class="t-ai" title="AI 채점 대상이에요. 제출물이 여러 개여도 1개만 채점되고, 파일이 있으면 가장 최근에 올린 파일이 대상이에요."><i data-lucide="sparkles"></i>AI 채점 대상</span>';
-}
-
 /* 제출 일시 셀 — 시각만 남긴다 (2026-08-07 올립). 표 너비 확보.
    '학생 제출 / 선생님 제출'은 지우지 않고 호버 툴팁으로 옮겨, 대리 업로드 여부는 확인 가능하게 */
 function dateCell(r, isSubmit){
@@ -693,29 +673,16 @@ function dateCell(r, isSubmit){
   return '<span title="'+m[2]+'">'+m[1]+'</span>';
 }
 
-/* 제출물 셀 — 방식 라벨(직접 작성/파일 첨부)을 아이콘으로 대체 (2026-08-07 올립).
-   글자 수인지 파일명인지는 값만 봐도 갈려서 라벨이 정보를 더하지 않았다.
-   AI 채점 태그는 제출물이 2개 이상일 때만 — 하나뿐이면 그게 대상인 게 자명하다. */
+/* 제출물 셀 (2026-08-10 회의로 원복) — 제출물 1건만 표시.
+   여러 파일 표시·개별 다운로드·AI 채점 대상 뱃지는 모두 미반영으로 결정됐다.
+   (과제물 제출을 여러 개 되게 하거나 추후 다른 방향으로 보완) */
 function submitCell(r){
-  const files = r.files || [];
-  const lines = [];
   if(r.type === 'text'){
-    lines.push('<button class="t-open" onclick="location.href=\'student_submit_v1_260729.html#pdf\'">'+r.detail+'<i data-lucide="external-link" style="width:13px;height:13px"></i></button>');
+    return '<div class="t-line"><span class="t-badge t-text"><i data-lucide="type"></i>직접 작성</span>'
+      + '<button class="t-open" onclick="location.href=\'student_submit_v1_260729.html#pdf\'">'+r.detail+'<i data-lucide="external-link" style="width:13px;height:13px"></i></button></div>';
   }
-  files.forEach(f=>{
-    lines.push('<button class="t-open" title="'+f+' 내려받기" onclick="downloadOne(\''+r.name+'\')">'+f+'<i data-lucide="download" style="width:13px;height:13px"></i></button>');
-  });
-  /* 채점 대상 = 파일이 있으면 마지막(가장 최근) 파일, 없으면 타이핑 */
-  const aiIdx = files.length ? lines.length - 1 : 0;
-  const showTag = lines.length >= 2;
-
-  return '<div class="t-stack">' + lines.map((html, i)=>{
-    const isFile = (r.type === 'text') ? i > 0 : true;
-    return '<div class="t-line">'
-      + '<i class="t-ic" data-lucide="'+(isFile ? 'paperclip' : 'type')+'" title="'+(isFile ? '파일 첨부' : '직접 작성')+'"></i>'
-      + html + (showTag && i === aiIdx ? aiTag() : '')
-      + '</div>';
-  }).join('') + '</div>';
+  return '<div class="t-line"><span class="t-badge t-file"><i data-lucide="paperclip"></i>파일 첨부</span>'
+    + '<button class="t-open" title="'+r.detail+' 내려받기" onclick="downloadOne(\''+r.name+'\')">'+r.detail+'<i data-lucide="download" style="width:13px;height:13px"></i></button></div>';
 }
 
 /* ───────── 표 렌더 ───────── */
@@ -724,10 +691,10 @@ function renderTeacher(){
   tb.innerHTML = '';
 
   let rows = teacherRows.slice();
-  if(focusLogOn && sortMode === 'leaveDesc'){
+  if(sortMode === 'leaveDesc'){
     rows.sort((a,b)=> rowLeaveSec(b) - rowLeaveSec(a) || rowLeaveCount(b) - rowLeaveCount(a) || (a.id > b.id ? 1 : -1));
   }
-  document.getElementById('sortNote').style.display = (focusLogOn && sortMode==='leaveDesc') ? 'block' : 'none';
+  document.getElementById('sortNote').style.display = (sortMode==='leaveDesc') ? 'block' : 'none';
 
   rows.forEach(r=>{
     const isSubmit = r.status!=='미제출';
@@ -737,30 +704,23 @@ function renderTeacher(){
     let detailCell;
     if(!isSubmit){
       /* 제출은 안 했지만 해둔 것이 남아 있는 경우 — 상태는 미제출 그대로 두고 사실만 알린다.
-         타이핑만·파일만·둘 다 모두 같은 '작성 중' 신호로 묶는다 (교사가 챙길 대상이라는 뜻) */
-      const dFiles = r.files || [];
-      if(!r.draft && !dFiles.length){ detailCell = '<span class="t-badge t-none">-</span>'; }
+         '작성 중' 뱃지는 교사가 제출을 챙기게 하는 신호 (2026-08-10 회의 확정) */
+      const dVal = r.draft || r.draftFile;
+      if(!dVal){ detailCell = '<span class="t-badge t-none">-</span>'; }
       else {
-        const dLines = [];
-        if(r.draft){
-          dLines.push('<i class="t-ic" data-lucide="type" title="직접 작성"></i><button class="t-open" title="쓰던 내용 보기" onclick="location.href=\'student_submit_v1_260729.html#closed\'">'+r.draft+'<i data-lucide="external-link" style="width:13px;height:13px"></i></button>');
-        }
-        dFiles.forEach(f=>{
-          dLines.push('<i class="t-ic" data-lucide="paperclip" title="파일 첨부"></i><button class="t-open" title="'+f+' 내려받기" onclick="downloadOne(\''+r.name+'\')">'+f+'<i data-lucide="download" style="width:13px;height:13px"></i></button>');
-        });
-        detailCell = '<div class="t-stack">'
-          + dLines.map((html, i)=> '<div class="t-line">'
-              + (i===0 ? '<span class="t-badge t-draft"><i data-lucide="pencil-line"></i>작성 중</span>' : '<span class="t-draft-pad"></span>')
-              + html + '</div>').join('')
+        detailCell = '<div class="t-line"><span class="t-badge t-draft"><i data-lucide="pencil-line"></i>작성 중</span>'
+          + (r.draft
+              ? '<button class="t-open" title="쓰던 내용 보기" onclick="location.href=\'student_submit_v1_260729.html#closed\'">'+r.draft+'<i data-lucide="external-link" style="width:13px;height:13px"></i></button>'
+              : '<button class="t-open" title="'+r.draftFile+' 내려받기" onclick="downloadOne(\''+r.name+'\')">'+r.draftFile+'<i data-lucide="download" style="width:13px;height:13px"></i></button>')
           + '</div>';
       }
     }
     else { detailCell = submitCell(r); }
 
-    /* 작성 과정 요약 셀 — 열은 항상 두고, 기록이 없으면 - (2026-08-07 올립).
-       켜짐/꺼짐에 따라 열이 생겼다 사라지면 같은 화면이 과제마다 달라 보임 */
+    /* 작성 과정 요약 셀 — 로그는 모든 직접 제출 과제에 상시 수집되지만,
+       화면에는 제출된 뒤에만 보여준다 (2026-08-10 회의 확정: 임시저장 상태는 로그 미노출) */
     let leaveCell;
-    if(!focusLogOn){ leaveCell = '<span class="leave-none" title="이 과제는 작성 과정을 기록하지 않아요. 기록은 평가 설계에서 켤 수 있어요.">-</span>'; }
+    if(!isSubmit){ leaveCell = '<span class="leave-none" title="제출한 뒤에 볼 수 있어요.">-</span>'; }
     else if(!sessions.length){ leaveCell = '<span class="leave-none">-</span>'; }
     else {
       const cnt = rowLeaveCount(r), sec = rowLeaveSec(r);
@@ -823,7 +783,6 @@ function closeProcess(){ document.getElementById('pcModal').classList.remove('sh
 document.addEventListener('keydown', e => { if(e.key === 'Escape'){ closeProcess(); closeColHelp(); } });
 
 function openCase(id){
-  if(!focusLogOn) toggleFocusLog(true);
   renderTeacher();
   openProcess(id);
 }
@@ -844,18 +803,15 @@ window.addEventListener('scroll', closeColHelp, true);
 
 /* ───────── 정렬 ───────── */
 function cycleSort(){
-  /* 기록이 꺼진 과제는 전부 -라 정렬할 것이 없다 — 눌러도 안 되는 걸 누르게 두지 않는다 (2026-08-07) */
-  if(!focusLogOn) return;
   sortMode = (sortMode === 'default') ? 'leaveDesc' : 'default';
   syncSortBtn();
   renderTeacher();
 }
 function syncSortBtn(){
   const b = document.getElementById('btnSort');
-  b.classList.toggle('on', focusLogOn && sortMode==='leaveDesc');
-  b.classList.toggle('off', !focusLogOn);
-  b.title = focusLogOn ? '이탈 시간이 긴 순서로 정렬해요' : '이 과제는 작성 과정을 기록하지 않아 정렬할 수 없어요';
-  b.innerHTML = '작성 과정 <i data-lucide="'+(focusLogOn && sortMode==='leaveDesc' ? 'arrow-down-wide-narrow' : 'arrow-up-down')+'"></i>';
+  b.classList.toggle('on', sortMode==='leaveDesc');
+  b.title = '이탈 시간이 긴 순서로 정렬해요';
+  b.innerHTML = '작성 과정 <i data-lucide="'+(sortMode==='leaveDesc' ? 'arrow-down-wide-narrow' : 'arrow-up-down')+'"></i>';
   lucide.createIcons();
 }
 
@@ -904,15 +860,7 @@ function confirmDel(){
   closeDel();
   toastMsg('과제물 ' + n + '건을 삭제했어요.');
 }
-function toggleFocusLog(on){
-  focusLogOn = on;
-  /* 열·타이틀 칩은 항상 그대로 — 꺼진 과제는 셀이 -로 나올 뿐 (2026-08-07 올립) */
-  document.getElementById('toggleOffNote').style.display = on ? 'none' : 'block';
-  if(!on) sortMode = 'default';   /* 정렬 상태도 초기화 */
-  syncSortBtn();
-  renderTeacher();
-  lucide.createIcons();
-}
+/* toggleFocusLog — 로그가 상시 수집으로 바뀌면서 제거 (2026-08-10 회의) */
 function toggleNav(){
   document.getElementById('icon-sb').classList.toggle('expanded');
   document.body.classList.toggle('nav-expanded');
@@ -951,18 +899,13 @@ go(initHash && document.getElementById('scr-'+initHash) ? initHash : 'teacher-lo
 <script>
 window.MOCK_NAV_FILE  = 'task';
 window.MOCK_NAV_APPLY = {
-  flOn:  function(){ toggleFocusLog(true); },
-  flOff: function(){ toggleFocusLog(false); },
+  flTask: function(){ closeProcess(); },
   flKim:  function(){ openCase('10101'); },
   flPark: function(){ openCase('10103'); },
   flLee:  function(){ openCase('10102'); },
   flJung: function(){ openCase('10105'); },
   flHan:  function(){ openCase('10106'); }
 };
-(function(){
-  var _tf = window.toggleFocusLog;
-  if (typeof _tf === 'function') window.toggleFocusLog = function(v){ _tf.apply(this, arguments); if (window.mockNavSetCurrent) window.mockNavSetCurrent(v ? 'flOn' : 'flOff'); };
-})();
 </script>
-<script src="mock_nav_dw.js?v=260807a"></script></body>
+<script src="mock_nav_dw.js?v=260810a"></script></body>
 </html>

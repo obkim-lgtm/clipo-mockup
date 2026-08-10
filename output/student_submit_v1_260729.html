@@ -312,7 +312,9 @@ body.pdf-mode .sf-copy{ color:#8b8f9c; }
 
     <!-- 이탈 알림은 배너가 아니라 토스트 (2026-08-07 회의) — 복붙 차단 안내와 동일 형태 -->
 
-    <div class="rec-notice">
+    <!-- 교사가 '작성 중 안내 표시'를 끄면 이 블록과 이탈 토스트만 숨는다.
+         시작 전 고지(scr-notice)는 옵션과 무관하게 항상 나간다 (2026-08-10 회의) -->
+    <div class="rec-notice" data-rec-notice>
       <i data-lucide="monitor-check"></i>
       <div>
         <p class="rn-t">직접 쓴 답안인지 확인하기 위해 작성 과정이 기록돼요</p>
@@ -361,7 +363,7 @@ body.pdf-mode .sf-copy{ color:#8b8f9c; }
     <h1 class="page-h1">과제 제출 및 확인</h1>
     <p class="page-sub">과제 내용을 확인하고 직접 제출해 보세요.</p>
 
-    <div class="rec-notice">
+    <div class="rec-notice" data-rec-notice>
       <i data-lucide="monitor-check"></i>
       <div>
         <p class="rn-t">직접 쓴 답안인지 확인하기 위해 작성 과정이 기록돼요</p>
@@ -664,6 +666,16 @@ function showFx(){ return FX_SUBJECTS.indexOf(SUBJECT) > -1; }
 var currentScene = 'notice';
 var leaveStart = null, leaveType = null;
 
+/* 교사 설정 '작성 중 학생에게 기록 안내 표시' — 기본 켜짐 (2026-08-10 회의).
+   꺼도 기록은 그대로 수집되고, 시작 전 고지도 그대로 나간다. 작성 중 안내 블록 + 이탈 토스트만 사라진다. */
+var NOTIFY_ON = true;
+function applyNotify(){
+  document.querySelectorAll('[data-rec-notice]').forEach(function(n){
+    n.style.display = NOTIFY_ON ? '' : 'none';
+  });
+}
+function setNotify(on){ NOTIFY_ON = !!on; applyNotify(); }
+
 /* ───────── 씬 전환 (해시 라우팅) ───────── */
 function go(scene){
   currentScene = scene;
@@ -845,7 +857,7 @@ function onReturn(){
   var dur = Math.round((Date.now() - leaveStart) / 1000);
   /* 복붙 차단 안내와 같은 토스트로 통일 (2026-08-07 회의) — 배너는 화면에 남아 자리를 먹고,
      같은 성격의 알림(하지 말라고 알려주는 것)이 형태가 둘로 갈리면 학생이 다르게 읽음 */
-  if(dur >= 3){
+  if(dur >= 3 && NOTIFY_ON){
     toastMsg('다른 화면에 다녀온 기록이 남았어요 (' + fmtDur(dur) + ')', true);
   }
   leaveStart = null; leaveType = null;
@@ -906,7 +918,8 @@ go(_h && document.getElementById('scr-'+_h) ? _h : 'notice');
 window.MOCK_NAV_FILE  = 'submit';
 window.MOCK_NAV_APPLY = {
   ssNotice:    function(){ go('notice'); },
-  ssWrite:     function(){ go('write'); },
+  ssWrite:     function(){ setNotify(true);  go('write'); },
+  ssWriteNoti: function(){ setNotify(false); go('write'); },
   ssDone:      function(){ go('done'); },
   ssBoth:      function(){ go('both'); },
   ssFileonly:  function(){ go('fileonly'); },
@@ -920,10 +933,15 @@ window.MOCK_NAV_APPLY = {
   var MAP = { notice:'ssNotice', write:'ssWrite', done:'ssDone', both:'ssBoth',
               fileonly:'ssFileonly', preparing:'ssPreparing', closed:'ssClosed', pdf:'ssPdf' };
   var _go = window.go;
-  if (typeof _go === 'function') window.go = function(s){ _go.apply(this, arguments); if (window.mockNavSetCurrent && MAP[s]) window.mockNavSetCurrent(MAP[s]); };
+  if (typeof _go === 'function') window.go = function(s){
+    _go.apply(this, arguments);
+    var r = MAP[s];
+    if (s === 'write' && !window.NOTIFY_ON) r = 'ssWriteNoti';   /* 안내 끔 상태면 그 케이스로 표시 */
+    if (window.mockNavSetCurrent && r) window.mockNavSetCurrent(r);
+  };
   var _so = window.setOpened;
   if (typeof _so === 'function') window.setOpened = function(v){ _so.apply(this, arguments); if (window.mockNavSetCurrent) window.mockNavSetCurrent(v ? 'ssAfter' : 'ssBefore'); };
 })();
 </script>
-<script src="mock_nav_dw.js?v=260807a"></script></body>
+<script src="mock_nav_dw.js?v=260810a"></script></body>
 </html>

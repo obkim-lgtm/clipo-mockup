@@ -84,10 +84,7 @@ body.resizing{ cursor:col-resize; user-select:none; }
 .doc-tab:hover{ color:#e7e9ee; }
 .doc-tab.on{ background:#3a3f4c; color:#fff; }
 .doc-tab i, .doc-tab svg{ width:14px; height:14px; }
-/* AI 채점 대상 태그 (2026-08-07) — 어두운 탭 위라 밝은 보라 */
-.tab-ai{ display:inline-flex; align-items:center; justify-content:center; gap:4px; height:19px; padding:0 7px; margin-left:6px; border-radius:9999px; background:#2f4a8a; color:#cfe0ff; font-size:11px; font-weight:700; line-height:1; white-space:nowrap; }
-.tab-ai i, .tab-ai svg{ width:10px; height:10px; }
-.doc-tab.on .tab-ai{ background:#416bff; color:#fff; }
+/* .tab-ai — AI 채점 대상 뱃지는 미반영 결정으로 제거 (2026-08-10 회의) */
 
 /* ===== 좌측: 툴바 ===== */
 /* .doc-tool — 별도 툴바 단 제거, 도구는 탭 줄 오른쪽(.dt-r)으로 통합 (2026-08-07) */
@@ -322,10 +319,8 @@ body.resizing{ cursor:col-resize; user-select:none; }
       <!-- 탭 줄 + 도구를 한 줄로 (2026-08-07 올립) — 문항 칩이 빠지면서 툴바에 컨트롤 하나만 남아
            별도 단을 유지할 이유가 없어짐. 제출물이 여러 개가 아니라 탭 오른쪽에 여유가 있다. -->
       <div class="doc-tabs" id="docTabs">
-        <!-- AI 채점 대상 태그 — 파일이 있으면 파일이 채점된다(2026-08-07 개발 확인).
-             점수를 의심할 때 무엇이 채점됐는지 여기서 바로 보이게 -->
         <button class="doc-tab on" data-doc="write" onclick="pickDoc('write')"><i data-lucide="type"></i>클리포를 통한 제출</button>
-        <button class="doc-tab" data-doc="file" onclick="pickDoc('file')"><i data-lucide="paperclip"></i>10101_김서윤_활동지.pdf<span class="tab-ai" title="AI 채점 대상이에요. 제출물이 여러 개여도 1개만 채점되고, 파일이 있으면 가장 최근에 올린 파일이 대상이에요."><i data-lucide="sparkles"></i>AI 채점 대상</span></button>
+        <button class="doc-tab" data-doc="file" onclick="pickDoc('file')"><i data-lucide="paperclip"></i>10101_김서윤_활동지.pdf</button>
 
         <!-- 도구: 직접 작성 -->
         <div class="dt-r" id="toolWrite">
@@ -624,7 +619,7 @@ function fontStep(dir){
 /* ═══════════ 작성 과정 팝업 (2026-08-07 회의) ═══════════
    과제물 관리(focus_log_v2)와 같은 컴포넌트. 채점 화면에서도 새 탭 이동 없이 바로 확인.
    데이터는 지금 채점 중인 학생 1명분만 둔다. */
-var focusLogOn = true;
+/* 로그는 상시 수집 — 과제별 on/off 없음 (2026-08-10 회의) */
 var PROC_ROW = {
   id:'10101', name:'김서윤',
   sessions:[
@@ -646,7 +641,7 @@ function hm(base, min){ var p=base.split(':').map(Number); var t=p[0]*60+p[1]+Ma
 function sessMinutes(s){ return s.series.length - 1; }
 function sessEvents(s){ return (s.events||[]).filter(e=>e.type!=='gap'); }
 function sessLeaveSec(s){ return sessEvents(s).reduce((a,e)=>a+e.dur, 0); }
-function rowSessions(r){ return (focusLogOn && !r.teacherUpload && r.sessions) ? r.sessions : []; }
+function rowSessions(r){ return (!r.teacherUpload && r.sessions) ? r.sessions : []; }
 function rowLeaveCount(r){ return rowSessions(r).reduce((a,s)=>a+sessEvents(s).length, 0); }
 function rowLeaveSec(r){ return rowSessions(r).reduce((a,s)=>a+sessLeaveSec(s), 0); }
 function rowHasGap(r){ return rowSessions(r).some(s=>(s.events||[]).some(e=>e.type==='gap')); }
@@ -928,5 +923,5 @@ window.MOCK_NAV_APPLY = {
   if (typeof _sr === 'function') window.setResub = function(v){ _sr.apply(this, arguments); if (window.mockNavSetCurrent) window.mockNavSetCurrent(v ? 'scResubYes' : 'scResubNo'); };
 })();
 </script>
-<script src="mock_nav_dw.js?v=260807a"></script></body>
+<script src="mock_nav_dw.js?v=260810a"></script></body>
 </html>
