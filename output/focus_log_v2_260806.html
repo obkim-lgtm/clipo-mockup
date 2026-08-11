@@ -136,6 +136,8 @@ body.nav-expanded .main-wrap{ padding-left:200px; }
 .tl-sess-meta.none{ color:#9aa0ad; font-weight:500; }
 .tl-chart{ width:100%; height:88px; display:block; border-bottom:1px solid #dde1e8; }
 .tl-axis{ display:flex; justify-content:space-between; font-size:12px; font-weight:500; color:#9aa0ad; }
+/* 세로축 눈금 — 곡선 꼭대기가 몇 자인지 알려주는 최대값 하나 (2026-08-11 줄리) */
+.tl-ymax{ font-size:12px; font-weight:500; color:#9aa0ad; margin-bottom:-4px; }
 
 /* 이벤트 목록 */
 .leave-evt{ display:flex; align-items:center; gap:14px; padding:9px 0; border-bottom:1px solid #eceef2; font-size:15px; }
@@ -146,6 +148,7 @@ body.nav-expanded .main-wrap{ padding-left:200px; }
 .leave-evt-type{ display:inline-flex; align-items:center; gap:7px; color:#c2410c; font-size:14px; font-weight:600; line-height:1; flex-shrink:0; width:92px; }
 .leave-evt-type.gap{ color:#6d7381; }
 .leave-evt-type.submit{ color:#1f7a4d; }
+.leave-evt-type.stop{ color:#8a8f9a; }   /* 이탈이 아니라 구간이 끝난 자리 */
 .leave-evt-dur{ color:#222631; font-weight:600; width:80px; flex-shrink:0; }
 .leave-evt-gain{ font-size:14px; font-weight:500; color:#3b3f4c; }
 .leave-evt-gain.none{ color:#9aa0ad; }   /* 급증 구간이 없었다는 사실 — 값 누락과 구분 */
@@ -645,12 +648,14 @@ function studentBlock(r, sessions, maxVal){
   const endHm = hm(last.start, sessMinutes(last));
   const when = first.date + (last.date !== first.date ? '~'+last.date : '')
     + ' · 총 ' + rowMinutes(r) + '분 작성'
-    + (sessions.length > 1 ? ' · ' + sessions.length + '번에 나눠 씀' : '');
+    + (sessions.length > 1 ? ' · 작성이 ' + sessions.length + '번 끊김' : '');
 
   /* 제출 이력 칩 줄은 없앴다 — 숫자 정보는 모두 아래 작성 로그 표로 모은다 (2026-08-11 줄리).
-     그래프는 색만 담당하고, 시각·시간 같은 값은 표에서 읽는다 */
+     그래프는 색만 담당하고, 시각·시간 같은 값은 표에서 읽는다.
+     세로축 눈금은 최대 글자 수 하나만 — 없으면 곡선 높이가 몇 자인지 못 읽는다 (2026-08-11 줄리) */
   return '<div class="tl-one">'
     + '<div class="tl-sess-hd"><span class="tl-sess-name">'+when+'</span></div>'
+    + '<div class="tl-ymax">'+maxVal.toLocaleString()+'자</div>'
     + studentChart(sessions, maxVal)
     + '<div class="tl-axis"><span>'+first.date+' '+first.start+'</span><span>'+last.date+' '+endHm+'</span></div>'
     + '</div>';
@@ -667,7 +672,19 @@ function evtList(sessions){
   const range = (s, e) => d(s) + hms(s.start, e.at) + ' ~ ' + hms(s.start, e.at, e.dur);
   let rows = '', subN = 0;
 
-  sessions.forEach(s=>{
+  sessions.forEach((s, si)=>{
+    /* 앞 구간이 끝난 자리 — 페이지를 떠나 구간이 끊긴 것. 이탈로는 세지 않지만
+       로그에 아무것도 없으면 교사가 '왜 여기 끊겼지'를 알 수 없다 (2026-08-11 줄리).
+       단, 제출로 끝난 구간은 바로 위 `제출` 행이 이미 그 자리를 설명하므로 넣지 않는다 */
+    if(si > 0 && !sessions[si-1].submitted){
+      const prev = sessions[si-1];
+      rows += '<div class="leave-evt">'
+        + '<span class="leave-evt-time">'+d(prev)+hms(prev.start, sessMinutes(prev))+'</span>'
+        + '<span class="leave-evt-type stop"><i class="lg-swatch" style="background:#fff;border:1px dashed #c7cdd9;"></i>작성 끊김</span>'
+        + '<span class="leave-evt-dur">-</span>'
+        + '<span class="leave-evt-note">페이지를 떠나 여기서 구간이 끝났어요. 다시 들어와 이어 썼습니다.</span>'
+        + '</div>';
+    }
     (s.events||[]).forEach(e=>{
       if(e.type==='gap'){
         rows += '<div class="leave-evt">'
@@ -957,5 +974,5 @@ window.MOCK_NAV_APPLY = {
   flHan:  function(){ resetCaseState(); openCase('10106'); }
 };
 </script>
-<script src="mock_nav_dw.js?v=260811d"></script></body>
+<script src="mock_nav_dw.js?v=260811f"></script></body>
 </html>

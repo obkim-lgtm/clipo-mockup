@@ -148,6 +148,7 @@ body.resizing{ cursor:col-resize; user-select:none; }
 .tl-sess-meta.none{ color:#9aa0ad; font-weight:500; }
 .tl-chart{ width:100%; height:88px; display:block; border-bottom:1px solid #dde1e8; }
 .tl-axis{ display:flex; justify-content:space-between; font-size:12px; font-weight:500; color:#9aa0ad; }
+.tl-ymax{ font-size:12px; font-weight:500; color:#9aa0ad; margin-bottom:-4px; }
 
 /* 이벤트 목록 */
 .leave-evt{ display:flex; align-items:center; gap:14px; padding:9px 0; border-bottom:1px solid #eceef2; font-size:15px; }
@@ -157,6 +158,7 @@ body.resizing{ cursor:col-resize; user-select:none; }
 .leave-evt-type{ display:inline-flex; align-items:center; gap:7px; color:#c2410c; font-size:14px; font-weight:600; line-height:1; flex-shrink:0; width:92px; }
 .leave-evt-type.gap{ color:#6d7381; }
 .leave-evt-type.submit{ color:#1f7a4d; }
+.leave-evt-type.stop{ color:#8a8f9a; }
 .leave-evt-dur{ color:#222631; font-weight:600; width:80px; flex-shrink:0; }
 .evt-head{ font-size:13px; font-weight:600; color:#8a8f9a; padding:4px 0 7px; border-bottom:1px solid #eceef2; }
 .evt-head span{ color:inherit; font-size:inherit; font-weight:inherit; }
@@ -755,11 +757,12 @@ function studentBlock(r, sessions, maxVal){
   const endHm = hm(last.start, sessMinutes(last));
   const when = first.date + (last.date !== first.date ? '~'+last.date : '')
     + ' · 총 ' + rowMinutes(r) + '분 작성'
-    + (sessions.length > 1 ? ' · ' + sessions.length + '번에 나눠 씀' : '');
+    + (sessions.length > 1 ? ' · 작성이 ' + sessions.length + '번 끊김' : '');
 
   /* 제출 이력 칩 줄 폐기 — 숫자 정보는 모두 아래 작성 로그 표로 (2026-08-11 줄리) */
   return '<div class="tl-one">'
     + '<div class="tl-sess-hd"><span class="tl-sess-name">'+when+'</span></div>'
+    + '<div class="tl-ymax">'+maxVal.toLocaleString()+'자</div>'
     + studentChart(sessions, maxVal)
     + '<div class="tl-axis"><span>'+first.date+' '+first.start+'</span><span>'+last.date+' '+endHm+'</span></div>'
     + '</div>';
@@ -772,7 +775,18 @@ function evtList(sessions){
   const range = (s, e) => d(s) + hms(s.start, e.at) + ' ~ ' + hms(s.start, e.at, e.dur);
   let rows = '', subN = 0;
 
-  sessions.forEach(s=>{
+  sessions.forEach((s, si)=>{
+    /* 페이지를 떠나 구간이 끊긴 자리 — 이탈로 세지 않지만 사실은 남긴다 (2026-08-11 줄리).
+       제출로 끝난 구간은 `제출` 행이 이미 설명하므로 넣지 않는다 */
+    if(si > 0 && !sessions[si-1].submitted){
+      const prev = sessions[si-1];
+      rows += '<div class="leave-evt">'
+        + '<span class="leave-evt-time">'+d(prev)+hms(prev.start, sessMinutes(prev))+'</span>'
+        + '<span class="leave-evt-type stop"><i class="lg-swatch" style="background:#fff;border:1px dashed #c7cdd9;"></i>작성 끊김</span>'
+        + '<span class="leave-evt-dur">-</span>'
+        + '<span class="leave-evt-note">페이지를 떠나 여기서 구간이 끝났어요. 다시 들어와 이어 썼습니다.</span>'
+        + '</div>';
+    }
     (s.events||[]).forEach(e=>{
       if(e.type==='gap'){
         rows += '<div class="leave-evt">'
@@ -956,5 +970,5 @@ window.MOCK_NAV_APPLY = {
   if (typeof _sr === 'function') window.setResub = function(v){ _sr.apply(this, arguments); if (window.mockNavSetCurrent) window.mockNavSetCurrent(v ? 'scResubYes' : 'scResubNo'); };
 })();
 </script>
-<script src="mock_nav_dw.js?v=260811d"></script></body>
+<script src="mock_nav_dw.js?v=260811f"></script></body>
 </html>

@@ -279,6 +279,13 @@ body.nav-expanded .main-wrap{ padding-left:200px; }
 .t5-count b{ color:#3151c4; }
 .t5-count-d{ font-size:14px; color:#9aa0ad; margin:0; }
 .t5-empty{ padding:40px 20px; text-align:center; font-size:15px; color:#9aa0ad; margin:0; display:none; }
+/* 데이터 0건 화면 — 기본은 숨김, 내비게이터 케이스에서만 켠다 */
+.h5-zero{ display:none; background:#fff; border:1px solid #dde1e8; border-radius:14px; padding:56px 24px; text-align:center; }
+.h5-zero-ic{ width:64px; height:64px; margin:0 auto 18px; border-radius:50%; background:#f1f3f5; color:#6d7381; display:flex; align-items:center; justify-content:center; }
+#h5ZeroClear .h5-zero-ic{ background:#e6f7ee; color:#1f7a4d; }
+.h5-zero-t{ font-size:20px; font-weight:700; color:#18181b; margin:0 0 8px; }
+.h5-zero-d{ font-size:15px; color:#6d7381; margin:0 0 20px; line-height:1.7; }
+.h5-zero .btn{ margin:0 auto; }
 /* 상태 색 = 내가 뭘 해야 하나. 주황 할 일 · 파랑 볼 것 · 초록 끝냄 · 빨강 놓침 · 회색 아직.
    표 안에서 색은 이 배지 한 축만 진다 — 하위 문구는 전부 무채색(파랑/빨강 부연 금지).
    전에는 파랑이 '안 본 결과'와 '쓰던 글' 두 뜻, 빨강이 '마감 급함'과 '미제출' 두 뜻이라
@@ -1339,7 +1346,7 @@ body.nav-expanded .main-wrap{ padding-left:200px; }
          홈은 5개까지만 보여주고 나머지는 과제 탭으로 보낸다(홈에서 펼치지 않음 —
          "전체는 과제 탭"이라는 역할 분리를 링크로도 학습시킨다). 배지 6 = 홈 노출 대상 전체 수 -->
     <div class="st-sec">
-      <div class="st-sec-hd"><i data-lucide="pencil-line" style="width:20px;height:20px"></i><h2 class="st-sec-t">지금 낼 과제</h2><span class="sec-n">6</span></div>
+      <div class="st-sec-hd"><i data-lucide="pencil-line" style="width:20px;height:20px"></i><h2 class="st-sec-t">지금 낼 과제</h2><span class="sec-n">8</span></div>
       <p class="st-sec-d">마감이 가까운 순서예요. 과제를 내면 이 목록에서 사라져요.</p>
       <div class="todo-list">
         <div class="st-todo urgent" onclick="location.href='student_submit_v1_260729.html#notice'">
@@ -1347,9 +1354,20 @@ body.nav-expanded .main-wrap{ padding-left:200px; }
           <div class="todo-l">
             <p class="todo-cls">생활과 윤리</p>
             <p class="todo-nm">생명 윤리 쟁점 토론 보고서</p>
-            <p class="todo-meta">마감이 지났지만 아직 낼 수 있어요 · 한지영 선생님</p>
+            <p class="todo-meta">늦었지만 아직 낼 수 있어요 · 한지영 선생님</p>
           </div>
           <div class="todo-r"><span class="todo-go">제출하기 <i data-lucide="chevron-right" style="width:16px;height:16px"></i></span></div>
+        </div>
+        <!-- A6: 마감 지남 + 쓰던 글 있음 — 급함(빨간 타일)과 '이어 쓰기'가 겹치는 유일한 조합.
+             과제 탭 표에서는 A4와 표현이 같아지고(표엔 CTA가 없다), 홈 카드에서만 구분된다 -->
+        <div class="st-todo urgent" onclick="location.href='student_submit_v1_260729.html#write'">
+          <div class="st-due hot"><span class="d1">7/27</span><span class="d2">마감 지남</span></div>
+          <div class="todo-l">
+            <p class="todo-cls">세계사</p>
+            <p class="todo-nm">근대 국가 형성 과정 비교</p>
+            <p class="todo-meta">늦었지만 아직 낼 수 있어요 · 문상혁 선생님</p>
+          </div>
+          <div class="todo-r"><span class="todo-go">이어 쓰기 <i data-lucide="chevron-right" style="width:16px;height:16px"></i></span></div>
         </div>
         <div class="st-todo urgent" onclick="location.href='student_submit_v1_260729.html#write'">
           <div class="st-due hot"><span class="d1">오늘</span><span class="d2">16:00 마감</span></div>
@@ -1378,21 +1396,12 @@ body.nav-expanded .main-wrap{ padding-left:200px; }
           </div>
           <div class="todo-r"><span class="todo-go">제출하기 <i data-lucide="chevron-right" style="width:16px;height:16px"></i></span></div>
         </div>
-        <div class="st-todo" onclick="location.href='student_submit_v1_260729.html#notice'">
-          <div class="st-due"><span class="d1">8/7</span><span class="d2">9일 남음</span></div>
-          <div class="todo-l">
-            <p class="todo-cls">확률과 통계</p>
-            <p class="todo-nm">조건부확률 활용 문제 풀이 과정 쓰기</p>
-            <p class="todo-meta">박정호 선생님</p>
-          </div>
-          <div class="todo-r"><span class="todo-go">제출하기 <i data-lucide="chevron-right" style="width:16px;height:16px"></i></span></div>
-        </div>
       </div>
       <!-- 6번째(영어권 문화 · 8/10)는 홈에 그리지 않는다 — 펼치기 대신 과제 탭으로.
            이 버튼은 '낼 과제'에만 있다(2026-08-11 올립) — 두 섹션에 같은 링크를 다는 건 같은 곳으로
            두 번 들여보내는 셈이고, '새로 나온 결과'는 30일 안 안 본 것을 전부 싣기 때문에 감춘 게 없다.
            일관성의 기준은 형태가 아니라 조건 — 감춘 게 있는 섹션에만 '모두 보기'를 둔다 -->
-      <button class="todo-more" onclick="go('task5')">과제에서 6개 모두 보기 <i data-lucide="chevron-right" style="width:16px;height:16px"></i></button>
+      <button class="todo-more" onclick="go('task5')">과제에서 8개 모두 보기 <i data-lucide="chevron-right" style="width:16px;height:16px"></i></button>
     </div>
 
     <!-- 새로 나온 결과 — 공개 후 30일 안 + 아직 안 본 것만. 확인하면 이 목록에서 사라진다.
@@ -1431,6 +1440,23 @@ body.nav-expanded .main-wrap{ padding-left:200px; }
     </div>
 
     </div><!-- /.h5-grid -->
+
+    <!-- 빈 화면 2종 — 데이터가 0이라 위 목록과 동시에 존재할 수 없어 내비게이터 케이스로 전환해 본다.
+         G2(올클리어)와 G1(과제 없음)은 문구가 달라야 한다:
+           G2 = 낼 것도 새 결과도 없다(과제는 있음) → 다 해냈다는 보상
+           G1 = 과제 자체가 0건(신학기) → 기다리면 된다는 안내. 여기서 '할 일이 없어요'라고 하면
+                아무것도 안 한 학생에게 다 한 것 같은 오해를 준다 -->
+    <div class="h5-zero" id="h5ZeroClear">
+      <div class="h5-zero-ic"><i data-lucide="check-check" style="width:30px;height:30px"></i></div>
+      <p class="h5-zero-t">지금 낼 과제가 없어요</p>
+      <p class="h5-zero-d">새로 나온 결과도 모두 확인했어요.<br>지난 과제와 결과는 과제에서 볼 수 있어요.</p>
+      <button class="btn btn-outline" onclick="go('task5')">과제 보러 가기</button>
+    </div>
+    <div class="h5-zero" id="h5ZeroNone">
+      <div class="h5-zero-ic"><i data-lucide="inbox" style="width:30px;height:30px"></i></div>
+      <p class="h5-zero-t">아직 등록된 과제가 없어요</p>
+      <p class="h5-zero-d">선생님이 과제를 내면 여기에 바로 보여요.</p>
+    </div>
     <!-- '곧 시작하는 과제'는 홈에 넣었다가 뺐다(2026-08-11 올립) — 라벨을 다듬다 보니
          "지금은 낼 수 없다"는 정체성이 드러났고, 액션이 하나도 없는 항목은
          '처리하면 사라지는 인박스'인 홈과 상충한다. 과제 탭에는 그대로 있다 (재론 방지) -->
@@ -1524,6 +1550,15 @@ body.nav-expanded .main-wrap{ padding-left:200px; }
             <td>7월 25일(토) 16:00 마감<span class="t-sub hot">늦었지만 아직 낼 수 있어요</span></td>
             <td class="t5-go"><i data-lucide="chevron-right" style="width:18px;height:18px"></i></td>
           </tr>
+          <!-- A6: 마감 지남 + 쓰던 글 있음 — 표에서는 A4와 표현이 같다(표엔 CTA가 없으므로).
+               홈 카드에서만 '이어 쓰기'로 갈린다 -->
+          <tr data-sj="c8" data-st="todo" data-k="근대 국가 형성 과정 비교 세계사 문상혁" onclick="location.href='student_submit_v1_260729.html#write'">
+            <td><span class="b-state todo">제출 가능</span></td>
+            <td><span class="t5-cls">세계사</span><span class="t-sub">문상혁 선생님</span></td>
+            <td class="left"><span class="dot-due"></span>근대 국가 형성 과정 비교</td>
+            <td>7월 27일(월) 16:00 마감<span class="t-sub hot">늦었지만 아직 낼 수 있어요</span></td>
+            <td class="t5-go"><i data-lucide="chevron-right" style="width:18px;height:18px"></i></td>
+          </tr>
           <!-- '쓰던 글이 저장돼 있어요'는 뺐다 — 제출 화면에 들어가면 바로 보이고, 표에서 알 필요는 없다 -->
           <tr data-sj="c2" data-st="todo" data-k="현대 미술의 사회 참여 사례 분석 현대사회와 미술세계 김기남" onclick="location.href='student_submit_v1_260729.html#write'">
             <td><span class="b-state todo">제출 가능</span></td>
@@ -1585,11 +1620,17 @@ body.nav-expanded .main-wrap{ padding-left:200px; }
             <td>7월 27일(월) 공개</td>
             <td class="t5-go"><i data-lucide="chevron-right" style="width:18px;height:18px"></i></td>
           </tr>
-          <!-- 교사 수거형 — 학생이 낸 적이 없다. '제출 없이 채점' 같은 교사 관점 용어는 쓰지 않는다 -->
+          <!-- 교사가 답안을 올린 과제 — 교사 수거형이든, 학생이 종이로 낸 걸 교사가 스캔해 올렸든 동일하게 처리한다.
+               ⚠️ 둘 다 '선생님 혼자 클리포를 쓰는 방식'(CLIPO 원조 사용 방식)이라
+                  결과를 공개하기 전까지는 학생 화면에 아무것도 나타나지 않는다 (§2 노출 원칙).
+                  → 그래서 '제출 완료'에 종이 업로드 행을 두지 않는다. 한 번 뒀다가 뺐다(2026-08-11).
+               공개된 뒤에도 '선생님이 답안을 등록했어요' 같은 부연을 달지 않는다 — 공개한 건 '결과'지
+               '교사가 무엇을 했는지'가 아니고, 학생은 오프라인에서 이미 안다(종이로 냈거나 활동지를 걷어갔거나).
+               결국 다른 결과 행과 표현이 같아진다 -->
           <tr data-sj="c3" data-st="result" data-k="탐구 결과 정리 보고서 융합과학탐구 정도현" onclick="notReady('결과 보기')">
             <td><span class="b-state result">결과 공개</span></td>
             <td><span class="t5-cls">융합과학탐구</span><span class="t-sub">정도현 선생님</span></td>
-            <td class="left"><span class="dot-new"></span>탐구 결과 정리 보고서<span class="t-sub">종이로 낸 답을 선생님이 올려 주셨어요</span></td>
+            <td class="left"><span class="dot-new"></span>탐구 결과 정리 보고서</td>
             <td>7월 26일(일) 공개</td>
             <td class="t5-go"><i data-lucide="chevron-right" style="width:18px;height:18px"></i></td>
           </tr>
@@ -1600,11 +1641,13 @@ body.nav-expanded .main-wrap{ padding-left:200px; }
             <td>7월 14일(화) 공개</td>
             <td class="t5-go"><i data-lucide="chevron-right" style="width:18px;height:18px"></i></td>
           </tr>
-          <!-- 못 냈는데 결과가 공개된 케이스 — 상태는 '결과 공개'(뒤 단계가 이김), 미제출 사실은 하위 문구로 -->
+          <!-- 못 냈는데 결과가 공개된 케이스 — 상태는 '결과 공개'(뒤 단계가 이김).
+               '내지 못했어요'를 적지 않는다(2026-08-11) — §2의 "비공개를 '비공개'라고 적지 않는다(박탈감)"와 같은 자리.
+               학생은 자기가 안 낸 걸 알고 있어 정보가 아니라 낙인이 된다. 다른 결과 행과 표현이 같아진다 -->
           <tr data-sj="c9" data-st="result" data-k="작품 감상문 쓰기 미술 창작 유가은" onclick="notReady('결과 보기')">
             <td><span class="b-state result">결과 공개</span></td>
             <td><span class="t5-cls">미술 창작</span><span class="t-sub">유가은 선생님</span></td>
-            <td class="left">작품 감상문 쓰기<span class="t-sub hot">내지 못했어요</span></td>
+            <td class="left">작품 감상문 쓰기</td>
             <td>6월 30일(화) 공개</td>
             <td class="t5-go"><i data-lucide="chevron-right" style="width:18px;height:18px"></i></td>
           </tr>
@@ -1617,13 +1660,6 @@ body.nav-expanded .main-wrap{ padding-left:200px; }
           </tr>
 
           <!-- ③ 제출 완료 — 냈고 결과는 아직. "선생님 확인 중"이라고 쓰지 않는다(결과 공개는 교사 선택) -->
-          <tr data-sj="c3" data-st="done" data-k="빛의 굴절 탐구 활동지 융합과학탐구 정도현" onclick="notReady('답안 보기')">
-            <td><span class="b-state done">제출 완료</span></td>
-            <td><span class="t5-cls">융합과학탐구</span><span class="t-sub">정도현 선생님</span></td>
-            <td class="left">빛의 굴절 탐구 활동지<span class="t-sub">종이로 낸 답을 선생님이 올려 주셨어요</span></td>
-            <td>7월 16일(수) 제출</td>
-            <td class="t5-go"><i data-lucide="chevron-right" style="width:18px;height:18px"></i></td>
-          </tr>
           <tr data-sj="c1" data-st="done" data-k="매체 자료의 관점 분석하기 언어와 매체 이수민" onclick="location.href='student_submit_v1_260729.html#done'">
             <td><span class="b-state done">제출 완료</span></td>
             <td><span class="t5-cls">언어와 매체</span><span class="t-sub">이수민 선생님</span></td>
@@ -1654,20 +1690,28 @@ body.nav-expanded .main-wrap{ padding-left:200px; }
             <td><span class="b-state wait">시작 전</span></td>
             <td><span class="t5-cls">언어와 매체</span><span class="t-sub">이수민 선생님</span></td>
             <td class="left">매체 비평문 작성</td>
-            <td>8월 12일(수)<span class="t-sub">이날부터 낼 수 있어요</span></td>
+            <td>8월 12일(수) 09:00 제출 시작</td>
             <td></td>
           </tr>
           <tr data-sj="c2" data-st="soon" data-k="공공미술 프로젝트 기획안 현대사회와 미술세계 김기남">
             <td><span class="b-state wait">시작 전</span></td>
             <td><span class="t5-cls">현대사회와 미술세계</span><span class="t-sub">김기남 선생님</span></td>
             <td class="left">공공미술 프로젝트 기획안</td>
-            <td>8월 12일(수)<span class="t-sub">이날부터 낼 수 있어요</span></td>
+            <td>8월 12일(수) 09:00 제출 시작</td>
             <td></td>
           </tr>
 
         </tbody>
       </table>
       <p class="t5-empty" id="t5empty">찾는 과제가 없어요. 다른 이름으로 찾아보세요.</p>
+    </div>
+
+    <!-- G1 — 과제가 0건(신학기). 검색·필터 결과 0건(t5empty)과 다른 화면이다:
+         찾다가 못 찾은 게 아니라 아직 아무것도 없는 상태라 도구 모음까지 감춘다 -->
+    <div class="h5-zero" id="t5ZeroNone">
+      <div class="h5-zero-ic"><i data-lucide="inbox" style="width:30px;height:30px"></i></div>
+      <p class="h5-zero-t">아직 등록된 과제가 없어요</p>
+      <p class="h5-zero-d">선생님이 과제를 내면 여기에 바로 보여요.</p>
     </div>
 
     <footer class="site-footer">
@@ -1744,10 +1788,24 @@ function mpToggle(){
   });
   document.addEventListener('mouseup', function(){ dragging = false; });
 })();
-window.addEventListener('hashchange', function(){
-  var h = location.hash.slice(1);
-  if(h && document.getElementById('scr-'+h)) go(h);
-});
+/* 데이터 0건·검색 결과 없음은 별도 .screen이 아니라 같은 화면의 상태다 —
+   해시는 '<화면>-<케이스>' 로 두고 go() 뒤에 상태를 얹는다.
+   학생 유즈케이스는 하나도 빠짐없이 고유 해시를 갖는다 — 까망이에서 바로 그 케이스로 뛰기 위함 */
+function t5Search(q){ var el = document.getElementById('t5q'); if(el){ el.value = q; t5Apply(); } }
+var CASES = {
+  'home5-zero-clear': function(){ go('home5'); setZero('clear'); },
+  'home5-zero-none' : function(){ go('home5'); setZero('none'); },
+  'task5-zero-none' : function(){ go('task5'); setZero('none'); },
+  'task5-no-result' : function(){ go('task5'); t5Search('수학'); }   /* 더미에 없는 낱말이라 항상 0건 */
+};
+function goHash(h){
+  /* 어떤 케이스로 뛰든 이전 케이스의 잔여 상태(0건·검색어)를 먼저 걷는다 */
+  var reset = function(){ setZero(''); t5Search(''); };
+  if(CASES[h]){ reset(); CASES[h](); history.replaceState(null, '', '#'+h); return true; }
+  if(h && document.getElementById('scr-'+h)){ reset(); go(h); return true; }
+  return false;
+}
+window.addEventListener('hashchange', function(){ goHash(location.hash.slice(1)); });
 
 function fold(id){ document.getElementById(id).classList.toggle('folded'); }
 
@@ -1839,6 +1897,24 @@ function t5Apply(){
 }
 function t5Reset(){ document.getElementById('t5q').value = ''; t5Apply(); }
 
+/* 데이터 0건 케이스 — '' 기본 / 'clear' 홈 올클리어(G2) / 'none' 과제 0건(G1).
+   G1은 홈·과제 탭이 함께 비므로 한 스위치로 두 화면을 동시에 바꾼다 */
+function setZero(kind){
+  kind = kind || '';
+  var show = function(id, on){ var el = document.getElementById(id); if(el) el.style.display = on ? 'block' : 'none'; };
+  var h = document.getElementById('scr-home5'), t = document.getElementById('scr-task5');
+  h.querySelector('.h5-grid').style.display = kind ? 'none' : '';
+  show('h5ZeroClear', kind === 'clear');
+  show('h5ZeroNone',  kind === 'none');
+  /* 과제 탭은 '과제가 0건'일 때만 빈다 — 올클리어는 홈만의 상태다(지난 과제는 표에 그대로 남는다) */
+  var off = kind === 'none' ? 'none' : '';
+  t.querySelector('.filter-bar').style.display = off;
+  t.querySelector('.t5-count-row').style.display = off ? 'none' : 'flex';
+  t.querySelector('.panel').style.display = off;
+  show('t5ZeroNone', kind === 'none');
+  document.body.dataset.zero = kind;
+}
+
 var _tt;
 function toastMsg(m){
   var t = document.getElementById('toast');
@@ -1854,7 +1930,7 @@ function toggleNav(){
 }
 
 var _h = location.hash.slice(1);
-go(_h && document.getElementById('scr-'+_h) ? _h : 'home5');
+if(!goHash(_h)) go('home5');
 /* 시안마다 독립이므로 화면별로 초기 계산 (표시 개수·더 보기 라벨) */
 document.querySelectorAll('.screen').forEach(stApply);
 t5Apply();
@@ -1863,13 +1939,41 @@ t5Apply();
 <!-- ===== 목업 내비게이터(까망이) 연결 — 규칙: docs/mockup-navigator.md ===== -->
 <script>
 window.MOCK_NAV_FILE  = 'home';
+/* 이 파일의 내비게이터는 '학생 홈' 전용이다 (2026-08-11 올립) —
+   교사 그룹(평가 설계·과제물 관리·채점 상세)을 싣지 않고, 교사 쪽은 '과제 설계 목록' 한 줄로만 연결한다.
+   학생 유즈케이스는 전부 고유 해시를 갖는다(아래 CASES 참조) — 까망이에서 바로 그 케이스로 뛴다.
+   기본 목록(mock_nav_dw.js의 GROUPS)은 나머지 4개 파일이 그대로 쓴다 */
+window.MOCK_NAV_GROUPS = [
+  { t:'학생 · 홈',        items:[
+      ['shHome5','홈',{sub:'낼 과제 8 + 새 결과 3'}],
+      ['shHome5Clear','홈 · 지금 할 일 없음',{sub:'G2 · 과제는 있고 다 처리함'}],
+      ['shHome5None','홈 · 과제 0건',{sub:'G1 · 신학기'}]] },
+  { t:'학생 · 과제',      items:[
+      ['shTask5','과제',{sub:'전체 19건 · 검색·필터'}],
+      ['shTask5NoRes','과제 · 검색 결과 없음',{sub:'G3'}],
+      ['shTask5None','과제 · 과제 0건',{sub:'G1 · 도구 모음까지 감춤'}]] },
+  /* 이전 시안(1~4)은 까망이에서만 숨겼다 — 시안 5만 본다(2026-08-11 올립).
+     화면·마크업은 파일에 그대로 있어 해시로 바로 열린다: #current · #new · #student · #cards
+     다시 보이게 하려면 아래 두 줄의 주석만 풀면 된다(지우지 말 것) */
+  // { t:'└ 이전 시안 (비교용)', items:[
+  //     ['shCur','1. 현재 개발 화면',{sub:'표 + 상단 요약'}],
+  //     ['shStu','3. 전면 개편안',{sub:'홈=과제 통합 · 시안 5의 전신'}]] },
+  { t:'학생 · 이어지는 화면', items:[
+      ['ssNotice','과제 제출',{sub:'안내 · 작성 · 완료 · 다시 제출'}]] },
+  { t:'교사 화면',        items:[
+      ['dwList','과제 설계 목록',{sub:'교사 쪽 전체는 그 화면의 내비게이터로'}]] }
+];
 window.MOCK_NAV_APPLY = {
   shStu: function(){ go('student'); },
   shCards: function(){ go('cards'); },
   shNew: function(){ go('new'); },
   shCur: function(){ go('current'); },
-  shHome5: function(){ go('home5'); },
-  shTask5: function(){ go('task5'); }
+  shHome5: function(){ setZero(''); go('home5'); },
+  shTask5: function(){ setZero(''); go('task5'); },
+  shHome5Clear: function(){ goHash('home5-zero-clear'); },
+  shHome5None:  function(){ goHash('home5-zero-none'); },
+  shTask5None:  function(){ goHash('task5-zero-none'); },
+  shTask5NoRes: function(){ goHash('task5-no-result'); }
 };
 (function(){
   var MAP = { student:'shStu', cards:'shCards', 'new':'shNew', current:'shCur', home5:'shHome5', task5:'shTask5' };
@@ -1877,5 +1981,5 @@ window.MOCK_NAV_APPLY = {
   if (typeof _go === 'function') window.go = function(s){ _go.apply(this, arguments); if (window.mockNavSetCurrent && MAP[s]) window.mockNavSetCurrent(MAP[s]); };
 })();
 </script>
-<script src="mock_nav_dw.js?v=260811d"></script></body>
+<script src="mock_nav_dw.js?v=260811f"></script></body>
 </html>

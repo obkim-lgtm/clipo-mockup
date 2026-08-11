@@ -43,6 +43,10 @@
     shCards:     { f:'home',    h:'cards' },
     shHome5:     { f:'home',    h:'home5' },
     shTask5:     { f:'home',    h:'task5' },
+    shHome5Clear:{ f:'home',    h:'home5-zero-clear' },
+    shHome5None: { f:'home',    h:'home5-zero-none' },
+    shTask5None: { f:'home',    h:'task5-zero-none' },
+    shTask5NoRes:{ f:'home',    h:'task5-no-result' },
     ssNotice:    { f:'submit',  h:'notice' },
     ssWrite:     { f:'submit',  h:'write' },
     ssWriteNoti: { f:'submit',  h:'write-noti-off' },
@@ -59,7 +63,10 @@
   /* 전체 화면·케이스를 항상 펼쳐 둔다. 길이는 패널 내부 스크롤로 처리(2026-08-06).
    * 예전에는 해당 화면에 들어가야 케이스가 보였는데, 어떤 케이스가 있는지 자체를 알 수 없어
    * "차트가 없다"처럼 못 찾는 일이 생겼다. */
-  var GROUPS = [
+  /* 파일이 window.MOCK_NAV_GROUPS 를 미리 선언하면 그 파일에서만 목록을 갈아끼운다.
+   * student_home은 '학생 홈' 전용 내비게이터라 교사 그룹을 싣지 않는다 (2026-08-11 올립).
+   * 나머지 파일은 아래 기본 목록을 그대로 쓴다. */
+  var GROUPS = window.MOCK_NAV_GROUPS || [
     { t:'교사 · 평가 설계',        items:[['dwList','과제 목록'],['dwDesign','과제 설계'],['dwQuestions','문항 작성']] },
     /* 채점기준 AI 성공/오류는 별도 그룹으로 두지 않는다 — 문항 작성 화면 안의 [AI 생성] 버튼으로 시연 (2026-08-06 올립) */
     { t:'교사 · 과제물 관리',      items:[['flTask','제출 현황']] },
@@ -71,13 +78,11 @@
         ['flHan','한지우 · 나눠 쓰기',{sub:'이틀에 걸쳐 3번에 나눠 씀'}]] },
     { t:'교사 · 채점 상세',        items:[['scWrite','클리포를 통한 제출'],['scFile','파일 첨부'],['scDeleted','과제물 삭제됨']] },
     { t:'└ 채점 학생 상태',        items:[['scResubNo','채점 중'],['scResubYes','채점 후 재제출함']] },
-    { t:'학생 · 과제 홈 (시안 5종)', items:[
+    { t:'학생 · 과제 홈 (시안 4종)', items:[
         ['shCur','1. 현재 개발 화면 + 대시보드',{sub:'표 유지 · 상단 2칸 요약만 추가'}],
         ['shNew','2. 개선안',{sub:'할 일 기준 재배열 · 오늘 요약 배너'}],
         ['shStu','3. 전면 개편안 · 결과 목록형',{sub:'결과 행 + 점수 · 더 보기 공통'}],
-        ['shCards','4. 전면 개편안 · 결과 카드형',{sub:'결과 카드 그리드 · 수업 필터는 드롭다운'}],
-        ['shHome5','5. 홈·과제 분리 — 홈',{sub:'최신 · 낼 과제 · 새 결과 · 곧 시작'}],
-        ['shTask5','5. 홈·과제 분리 — 과제',{sub:'최신 · 전체 기록 · 목적 순 표 4개'}]] },
+        ['shCards','4. 전면 개편안 · 결과 카드형',{sub:'결과 카드 그리드 · 수업 필터는 드롭다운'}]] },
     { t:'학생 · 제출 주요 플로우', items:[['ssNotice','① 시작 전 안내'],['ssWrite','② 작성'],['ssDone','③ 제출 완료']] },
     { t:'└ 작성 화면 설정',        items:[['ssWriteNoti','기록 안내 표시 끔',{sub:'시작 전 고지는 그대로'}]] },
     { t:'└ 다른 설정으로 낸 과제', items:[['ssBoth','직접 작성 + 파일 제출'],['ssFileonly','파일 제출만'],['ssPreparing','문항 미작성'],['ssClosed','제출 못 한 채 마감']] },
