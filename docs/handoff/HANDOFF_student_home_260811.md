@@ -119,6 +119,7 @@
 - 목업 본체 — `clipo_mockup/output/student_home_v1_260729.html`
 - 내비게이터 스크립트 — `clipo_mockup/output/mock_nav_dw.js` (여러 목업이 공유)
 - 이어지는 화면 — `output/student_submit_v1_260729.html` (학생 제출)
-  ⚠️ 이 파일에 **이전 세션의 미커밋 변경 148줄**이 남아 있다(2026-08-07 회의 관련 토스트 교체). 커밋 여부 미정
+  2026-08-11 `3d93c20` "작성 로그 통합 + 이어 쓴 구간 표기 (줄리·제이콥 제안 반영)"로 커밋됨.
+  `focus_log_v2` · `scoring_direct_write`와 한 묶음이라 작성 로그 쪽 작업은 그 커밋을 볼 것
 - 점수 공개 옵션 근거 — `output/result_student_view_v3_260512.html` 의 `hide-score`
 - 내비게이터 규칙 — `docs/mockup-navigator.md`
