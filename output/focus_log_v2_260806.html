@@ -86,20 +86,14 @@ body.nav-expanded .main-wrap{ padding-left:200px; }
 .b-submit{ display:inline-flex; align-items:center; justify-content:center; height:24px; padding:0 8px; border-radius:6px; background:#dff8eb; color:#27724b; font-size:14px; font-weight:500; line-height:1; white-space:nowrap; }
 .b-absent{ display:inline-flex; align-items:center; justify-content:center; height:24px; padding:0 8px; border-radius:6px; background:#ffebeb; color:#ab303a; font-size:14px; font-weight:500; line-height:1; white-space:nowrap; }
 
-/* ===== 제출 유형 뱃지 (Figma: 직접 작성 / 파일 첨부 / -) ===== */
-.t-badge{ display:inline-flex; align-items:center; justify-content:center; gap:3px; height:20px; padding:0 7px; border-radius:9999px; font-size:12px; font-weight:500; line-height:1; white-space:nowrap; }
-.t-badge i, .t-badge svg{ width:11px; height:11px; }
-.t-text{ background:#e8f1ff; color:#3151c4; }
-.t-file{ background:#f1f3f5; color:#27272a; }
-.t-none{ background:#f1f3f5; color:#27272a; }
-.t-draft{ background:#fff7ed; color:#c2410c; }
-.t-detail{ font-size:15px; font-weight:500; color:#52525b; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-/* 직접 작성 + 파일 첨부를 함께 낸 경우 — 열을 나누지 않고 셀 안에 쌓는다 (2026-08-07) */
+/* 제출물 없음 표시 */
+.t-none{ display:inline-flex; align-items:center; justify-content:center; height:20px; padding:0 7px; border-radius:9999px; font-size:12px; font-weight:500; line-height:1; background:#f1f3f5; color:#27272a; }
 .t-line{ display:inline-flex; align-items:center; gap:6px; min-width:0; }
-/* 직접 작성 답안 열기 */
-.t-open{ background:none; border:none; cursor:pointer; font-family:inherit; font-size:15px; font-weight:500; color:#3151c4; display:inline-flex; align-items:center; justify-content:center; line-height:1; vertical-align:middle; gap:5px; padding:6px 8px; border-radius:4px; white-space:nowrap; }
-.t-open:hover{ background:#e9f2ff; }
-.t-open i, .t-open svg{ width:13px; height:13px; }
+/* 제출 유형은 뱃지 대신 아이콘 하나로 — 누를 것이 없으니 링크색도 쓰지 않는다 (2026-08-11 올립).
+   뱃지 3종이 파랑·회색으로 겹쳐 표가 시끄러웠고, 파란 글씨는 눌리는 것처럼 보였다 */
+.t-ic{ display:inline-flex; align-items:center; justify-content:center; color:#8a8f9a; flex-shrink:0; }
+.t-ic i, .t-ic svg{ width:15px; height:15px; }
+.t-val{ font-size:15px; font-weight:500; color:#18181b; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 
 /* ===== 행 액션 버튼 (Figma: 변경/삭제 · 업로드) ===== */
 .row-btn{ background:transparent; border:none; border-radius:4px; padding:10px 16px; font-size:15px; font-weight:500; color:#18181b; font-family:inherit; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; line-height:1; vertical-align:middle; gap:8px; }
@@ -107,12 +101,12 @@ body.nav-expanded .main-wrap{ padding-left:200px; }
 .row-btn:hover{ background:#f1f3f5; }
 
 /* ===== 작성 과정 요약 셀 ===== */
-.leave-cell-btn{ background:none; border:none; cursor:pointer; font-family:inherit; font-size:15px; font-weight:600; color:#ea580c; display:inline-flex; flex-direction:column; align-items:center; justify-content:center; line-height:1.25; vertical-align:middle; gap:3px; padding:6px 10px; border-radius:4px; white-space:nowrap; }
+/* 한 줄 고정 — 아래 보조 문구를 붙이면 그 행만 높아져 표가 들쭉날쭉해진다 (2026-08-11) */
+.leave-cell-btn{ background:none; border:none; cursor:pointer; font-family:inherit; font-size:15px; font-weight:600; color:#ea580c; display:inline-flex; align-items:center; justify-content:center; line-height:1; vertical-align:middle; padding:6px 10px; border-radius:4px; white-space:nowrap; }
 .leave-cell-btn:hover{ background:#fff7ed; }
 .leave-cell-btn.quiet{ color:#52525b; font-weight:500; }
 .leave-cell-btn.quiet:hover{ background:#f1f3f5; }
 .lc-main{ display:inline-flex; align-items:center; gap:4px; }
-.lc-sub{ font-size:13px; font-weight:500; color:#6d7381; }
 .leave-none{ color:#b3b6bd; font-size:15px; }
 
 /* ===== 작성 과정 상세 (인라인 펼침) ===== */
@@ -319,7 +313,7 @@ body.nav-expanded .main-wrap{ padding-left:200px; }
               <button title="새로고침"><i data-lucide="refresh-cw" style="width:16px;height:16px;"></i></button>
             </div>
           </div>
-          <div class="sbr-desc">10106 한지우, 10107 조민재, 10108 윤하은</div>
+          <div class="sbr-desc" id="missList"></div>
         </div>
 
 
@@ -329,7 +323,7 @@ body.nav-expanded .main-wrap{ padding-left:200px; }
             <div style="display:flex;align-items:center;gap:12px;min-width:0;">
               <!-- '작성 과정 기록 켜짐' 칩 제거 (2026-08-07 올립) — 타이틀 정보량 과다.
                    열이 상시 노출되므로 켜짐/꺼짐은 셀 값(기록 vs -)으로 드러남 -->
-              <h3 style="font-size:18px;font-weight:600;color:#18181b;margin:0;">학생 제출 현황 <span style="font-size:15px;color:#6d7381;font-weight:500;">6/9명 제출</span></h3>
+              <h3 style="font-size:18px;font-weight:600;color:#18181b;margin:0;">학생 제출 현황 <span style="font-size:15px;color:#6d7381;font-weight:500;" id="submitCnt"></span></h3>
             </div>
             <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;">
               <span id="selCount" style="font-size:14px;font-weight:500;color:#6d7381;display:none;">3명 선택</span>
@@ -502,7 +496,8 @@ const teacherRows = [
         events:[] }
     ] },
   { id:'10109', name:'임도윤', status:'제출', date:'07/28 16:10 선생님 제출', type:'file', detail:'10109_임도윤.pdf 외 1', teacherUpload:true },
-  { id:'10106', name:'한지우', status:'미제출', draft:'812자', draftAt:'07/29 09:02 저장',
+  /* 여러 날에 걸쳐 나눠 쓴 케이스 — 세션 3개가 한 타임라인에 이어 붙는다 */
+  { id:'10106', name:'한지우', status:'제출 완료', date:'07/29 09:05 학생 제출', type:'text', detail:'812자',
     sessions:[
       { date:'07/28', start:'15:10', submitted:false,
         series:[0,15,35,55,50,72,95,118,112,135,160,182,178,200,225,248,242,265,290,312,330,330,352,375,398,392,415,438,460,455,478,500,520],
@@ -510,12 +505,11 @@ const teacherRows = [
       { date:'07/28', start:'16:30', submitted:false,
         series:[520,528,545,562,558,578,598,615,610,630,648,665,660,678,690],
         events:[] },
-      { date:'07/29', start:'08:50', submitted:false,
+      { date:'07/29', start:'08:50', submitted:true,
         series:[690,698,715,732,728,748,765,782,778,795,805,808,812],
         events:[ {at:5, type:'탭 전환', dur:22} ] }
     ] },
-  /* 파일만 올려두고 제출 버튼을 안 누른 케이스 (2026-08-07 올립) */
-  { id:'10107', name:'조민재', status:'미제출', draftFile:'10107_조민재_활동지.pdf', draftAt:'07/29 10:15 저장' },
+  { id:'10107', name:'조민재', status:'미제출' },
   { id:'10108', name:'윤하은', status:'미제출' }
 ];
 
@@ -667,8 +661,9 @@ function evtList(sessions){
 /* 제출 일시 셀 — 시각만 남긴다 (2026-08-07 올립). 표 너비 확보.
    '학생 제출 / 선생님 제출'은 지우지 않고 호버 툴팁으로 옮겨, 대리 업로드 여부는 확인 가능하게 */
 function dateCell(r, isSubmit){
-  const raw = isSubmit ? r.date : (r.draftAt || '-');
-  const m = raw.match(/^(.*?)\s*(학생 제출|선생님 제출|저장)$/);
+  /* 미제출은 제출 일시가 없다 — 임시저장 시각을 대신 채우지 않는다 (2026-08-11 올립) */
+  const raw = isSubmit ? r.date : '-';
+  const m = raw.match(/^(.*?)\s*(학생 제출|선생님 제출)$/);
   if(!m) return raw;
   return '<span title="'+m[2]+'">'+m[1]+'</span>';
 }
@@ -677,16 +672,24 @@ function dateCell(r, isSubmit){
    여러 파일 표시·개별 다운로드·AI 채점 대상 뱃지는 모두 미반영으로 결정됐다.
    (과제물 제출을 여러 개 되게 하거나 추후 다른 방향으로 보완) */
 function submitCell(r){
-  if(r.type === 'text'){
-    return '<div class="t-line"><span class="t-badge t-text"><i data-lucide="type"></i>직접 작성</span>'
-      + '<button class="t-open" onclick="location.href=\'student_submit_v1_260729.html#pdf\'">'+r.detail+'<i data-lucide="external-link" style="width:13px;height:13px"></i></button></div>';
-  }
-  return '<div class="t-line"><span class="t-badge t-file"><i data-lucide="paperclip"></i>파일 첨부</span>'
-    + '<button class="t-open" title="'+r.detail+' 내려받기" onclick="downloadOne(\''+r.name+'\')">'+r.detail+'<i data-lucide="download" style="width:13px;height:13px"></i></button></div>';
+  const isText = r.type === 'text';
+  return '<div class="t-line">'
+    + '<span class="t-ic" title="' + (isText ? '직접 작성' : '파일 첨부') + '">'
+    +   '<i data-lucide="' + (isText ? 'type' : 'paperclip') + '"></i></span>'
+    + '<span class="t-val">' + r.detail + '</span></div>';
+}
+
+/* 제출 현황 요약 — 표 데이터에서 뽑는다. 손으로 적어두면 행 상태를 바꿀 때마다 어긋난다 */
+function renderSummary(){
+  const miss = teacherRows.filter(r => r.status === '미제출');
+  document.getElementById('missList').textContent = miss.map(r => r.id + ' ' + r.name).join(', ');
+  document.getElementById('submitCnt').textContent =
+    (teacherRows.length - miss.length) + '/' + teacherRows.length + '명 제출';
 }
 
 /* ───────── 표 렌더 ───────── */
 function renderTeacher(){
+  renderSummary();
   const tb = document.getElementById('teacherTbody');
   tb.innerHTML = '';
 
@@ -702,19 +705,9 @@ function renderTeacher(){
 
     /* 제출 상세 셀 (Figma: 유형 뱃지 + 글자 수/파일명) */
     let detailCell;
-    if(!isSubmit){
-      /* 제출은 안 했지만 해둔 것이 남아 있는 경우 — 상태는 미제출 그대로 두고 사실만 알린다.
-         '작성 중' 뱃지는 교사가 제출을 챙기게 하는 신호 (2026-08-10 회의 확정) */
-      const dVal = r.draft || r.draftFile;
-      if(!dVal){ detailCell = '<span class="t-badge t-none">-</span>'; }
-      else {
-        detailCell = '<div class="t-line"><span class="t-badge t-draft"><i data-lucide="pencil-line"></i>작성 중</span>'
-          + (r.draft
-              ? '<button class="t-open" title="쓰던 내용 보기" onclick="location.href=\'student_submit_v1_260729.html#closed\'">'+r.draft+'<i data-lucide="external-link" style="width:13px;height:13px"></i></button>'
-              : '<button class="t-open" title="'+r.draftFile+' 내려받기" onclick="downloadOne(\''+r.name+'\')">'+r.draftFile+'<i data-lucide="download" style="width:13px;height:13px"></i></button>')
-          + '</div>';
-      }
-    }
+    /* 임시저장은 학생 화면에서 그냥 '미제출'이다 — 교사 화면에 '작성 중'으로 꺼내지 않는다.
+       (2026-08-11 올립: 시스템에 임시저장이라는 상태가 따로 없으므로 없는 개념을 만들지 않는다) */
+    if(!isSubmit){ detailCell = '<span class="t-none">-</span>'; }
     else { detailCell = submitCell(r); }
 
     /* 작성 과정 요약 셀 — 로그는 모든 직접 제출 과제에 상시 수집되지만,
@@ -725,12 +718,11 @@ function renderTeacher(){
     else {
       const cnt = rowLeaveCount(r), sec = rowLeaveSec(r);
       const main = cnt ? '이탈 '+cnt+'회 · '+fmtDur(sec) : '이탈 없음';
-      /* 재제출한 학생만 제출 횟수 병기 — 대부분은 1회라 표기 없음 */
-      const subCnt = submitCount(r);
-      const sub = (subCnt >= 2) ? '<span class="lc-sub">제출 '+subCnt+'회</span>' : '';
+      /* 제출 횟수는 표에 병기하지 않는다 — 재제출한 학생만 행이 두 줄이 되어 표가 들쭉날쭉했고,
+         교사가 이 열에서 볼 신호는 이탈이다. 제출 횟수는 팝업 헤더에 남아 있다 (2026-08-11 올립) */
       leaveCell = '<button class="leave-cell-btn'+(cnt?'':' quiet')+'" onclick="openProcess(\''+r.id+'\')">'
         + '<span class="lc-main">'+main+' <i data-lucide="maximize-2" style="width:15px;height:15px;"></i></span>'
-        + sub + '</button>';
+        + '</button>';
     }
 
     /* 과제물 관리 셀 (Figma: 변경/삭제 · 업로드) */
@@ -839,7 +831,6 @@ function bulkDownload(){
   const n = selectedRows().length;
   toastMsg(n + '명의 과제물을 내려받아요. 직접 작성한 답안은 PDF로 저장돼요.');
 }
-function downloadOne(name){ toastMsg(name + ' 학생의 과제물을 내려받아요.'); }
 
 function bulkDelete(){
   const rows = selectedRows();
@@ -907,5 +898,5 @@ window.MOCK_NAV_APPLY = {
   flHan:  function(){ openCase('10106'); }
 };
 </script>
-<script src="mock_nav_dw.js?v=260810a"></script></body>
+<script src="mock_nav_dw.js?v=260811a"></script></body>
 </html>

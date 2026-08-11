@@ -218,6 +218,26 @@
     .alert-info.warn i, .alert-info.warn svg{ color:#ea580c; }
     .alert-info.warn .ai-txt{ color:#9a5b2e; }
     .alert-info.warn .ai-txt b{ color:#c2410c; font-weight:700; }
+
+    /* ── 작성 과정 기록 ? 팝오버 ──
+       인라인 안내+예시가 첫 화면을 너무 무겁게 해 팝오버로 이동 (2026-08-11 올립).
+       .way가 overflow:hidden이라 absolute는 잘림 → fixed + JS 좌표 (focus_log의 colHelp와 동일 방식) */
+    /* 토글과 ? 를 한 줄 flex로 묶어 세로 중앙을 맞춘다 — inline 배치는 baseline이 걸려 ?가 내려앉음 */
+    .rec-hd{ display:flex; align-items:center; }
+    .rec-help{ display:inline-flex; align-items:center; justify-content:center; line-height:1; vertical-align:middle;
+      width:20px; height:20px; border-radius:50%; border:1px solid #c7cdd9; background:#fff; color:#6d7381;
+      font-size:12px; font-weight:700; font-family:inherit; cursor:pointer; margin-left:8px; flex-shrink:0; }
+    .rec-help:hover{ background:#f1f3f7; color:#3b3f4c; }
+    .rec-pop{ display:none; position:fixed; z-index:2300; width:560px; max-width:calc(100vw - 48px);
+      background:#fff; border:1px solid #dde1e8; border-radius:12px; box-shadow:0 12px 32px rgba(20,24,38,.16);
+      padding:18px 20px 20px; }
+    .rec-pop.show{ display:block; }
+    .rec-pop .rp-hd{ display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:8px; }
+    .rec-pop .rp-tt{ margin:0; font-size:16px; font-weight:700; color:#222631; }
+    .rec-pop .rp-x{ background:none; border:none; cursor:pointer; color:#6d7381; padding:4px; border-radius:6px;
+      display:inline-flex; align-items:center; justify-content:center; line-height:1; vertical-align:middle; }
+    .rec-pop .rp-x:hover{ background:#f1f3f7; }
+    .rec-pop .rp-body{ font-size:14px; color:#3b3f4c; line-height:1.65; }
     /* 잠긴 문항 */
     .qcard.locked{ background:#fbfbfc; }
     .qcard.locked .qta{ background:#f6f7f9; color:#3b3f4c; border-color:#e4e6eb; cursor:default; }
@@ -717,7 +737,6 @@
       <!-- 2. 제출 방식 (재구성: 방식별 블록 분리) -->
       <div class="sub-block">
         <p class="sub-block-title">2. 제출 방식</p>
-        <p class="sec-desc" style="margin:-4px 0 14px;">두 가지를 모두 선택하면 학생이 원하는 방식을 골라 제출합니다.</p>
 
         <!-- 잠금 안내는 영향 필드 앞 -->
         <div class="alert-info warn" id="waysLockNote" style="display:none;margin:0 0 16px;">
@@ -756,40 +775,11 @@
 
               <!-- 작성 과정 기록은 상시 수집이라 교사가 켜고 끄지 않는다 (2026-08-10 회의).
                    교사가 정하는 건 '작성 중 학생에게 안내를 띄울지'뿐 — 잠금 없이 언제든 변경 가능.
-                   시작 전 고지는 이 옵션과 무관하게 항상 노출된다(수집 사실 고지). -->
-              <span class="sw on" id="swRecord" onclick="toggleRecordSw(this)"><span class="sw-track"><span class="sw-knob"></span></span>작성 중 학생에게 기록 안내 표시</span>
-              <p class="sec-desc" style="margin:6px 0 0 50px;">답안을 쓰는 동안 안내를 띄우고, 다른 화면에 다녀오면 알려줘요. 꺼도 작성 시작 전 안내는 그대로 나가요.</p>
-
-              <div id="recDetail" style="margin-left:50px;">
-              <div class="alert-info" style="margin-top:14px;">
-                <i data-lucide="info" style="width:18px;height:18px"></i>
-                <div class="ai-txt">
-                  작성 과정은 <b>모든 직접 작성 과제에 기록</b>되고, <b>과제물 관리</b> 화면에서 학생별로 볼 수 있어요.
-                  <ul class="ai-list">
-                    <li>방문한 사이트와 답안 내용은 저장하지 않아요. 3초보다 짧은 이동이나 스마트폰 같은 다른 기기 사용도 남지 않고요.</li>
-                    <li>시스템은 있었던 일만 남겨요. 부정행위인지는 판단하지 않아요.</li>
-                    <li>기록은 <b>학생이 제출한 뒤</b>에 볼 수 있어요.</li>
-                  </ul>
-                </div>
-              </div>
-
-              <!-- 결과 화면 예시 — 처음 보는 기능이라 무엇을 얻는지 보여준다 (2026-08-06 올립) -->
-              <div style="margin-top:12px;border:1px solid #dde1e8;border-radius:10px;padding:14px 16px;background:#fbfbfc;">
-                <p style="margin:0 0 8px;font-size:14px;font-weight:600;color:#3b3f4c;">과제물 관리에서 학생별로 이렇게 보여요</p>
-                <div style="display:flex;align-items:center;gap:14px;margin-bottom:6px;font-size:12px;font-weight:500;color:#6d7381;">
-                  <span style="display:inline-flex;align-items:center;gap:5px;"><i style="width:14px;height:0;border-top:2px solid #416bff;display:inline-block;"></i>글자 수</span>
-                  <span style="display:inline-flex;align-items:center;gap:5px;"><i style="width:12px;height:9px;border-radius:2px;background:#fff1e6;border:1px solid #f7d3ba;display:inline-block;"></i>다른 화면</span>
-                  <span style="display:inline-flex;align-items:center;gap:5px;"><i style="width:14px;height:0;border-top:2px solid #319d64;display:inline-block;"></i>제출</span>
-                </div>
-                <svg viewBox="0 0 1000 72" preserveAspectRatio="none" style="width:100%;height:64px;display:block;border-bottom:1px solid #dde1e8;">
-                  <rect x="360" y="0" width="60" height="72" fill="#fff1e6"></rect>
-                  <line x1="360" y1="0" x2="360" y2="72" stroke="#f59e6b" stroke-width="1" stroke-dasharray="3 3" vector-effect="non-scaling-stroke"></line>
-                  <path d="M0,72 L0,66 L90,60 L170,56 L250,50 L330,47 L360,46 L420,46 L500,34 L580,30 L650,26 L730,22 L810,18 L890,14 L960,10 L960,72 Z" fill="#416bff" fill-opacity="0.07"></path>
-                  <polyline points="0,66 90,60 170,56 250,50 330,47 360,46 420,46 500,34 580,30 650,26 730,22 810,18 890,14 960,10" fill="none" stroke="#416bff" stroke-width="2" vector-effect="non-scaling-stroke"></polyline>
-                  <line x1="960" y1="0" x2="960" y2="72" stroke="#319d64" stroke-width="2" vector-effect="non-scaling-stroke"></line>
-                </svg>
-                <p style="margin:8px 0 0;font-size:13px;font-weight:500;color:#6d7381;">이탈 1회 · 2분 10초 · 복귀 후 5분간 +312자 · 14:52 제출</p>
-              </div>
+                   시작 전 고지는 이 옵션과 무관하게 항상 노출된다(수집 사실 고지).
+                   기능 안내+결과 예시는 인라인 → ? 팝오버로 이동, 처음 이 영역이 보일 때 1회 자동 오픈 (2026-08-11 올립) -->
+              <div id="recRow">
+                <div class="rec-hd"><span class="sw on" id="swRecord" onclick="toggleRecordSw(this)"><span class="sw-track"><span class="sw-knob"></span></span>작성 화면 이탈 안내 표시</span><button class="rec-help" id="recHelpBtn" onclick="toggleRecHelp(event)" aria-label="작성 과정 기록 설명">?</button></div>
+                <p class="sec-desc" style="margin:6px 0 0 50px;">답안을 쓰는 동안 기록 중이라는 안내를 띄우고, 다른 화면에 다녀오면 학생에게 알려줘요.</p>
               </div>
             </div>
           </div>
@@ -812,22 +802,34 @@
             </div>
             <div>
               <p class="way-sub">최대 제출 파일 수</p>
-              <div class="hstep">
+              <!-- 기본 1개 — 대부분의 과제는 파일 하나면 충분하고, 1개면 '어느 파일이 채점되나' 문제 자체가 안 생긴다 (2026-08-11 올립) -->
+              <div class="hstep" data-max="5">
                 <button onclick="hstep(this,-1)">−</button>
-                <span class="hstep-val" id="max-file">2개</span>
+                <span class="hstep-val" id="max-file">1개</span>
                 <button onclick="hstep(this,1)">+</button>
               </div>
+              <!-- 2개 이상으로 올린 교사에게만 나오는 안내 — 상시 노출이면 배경처럼 읽혀 정작 필요할 때 안 보인다.
+                   파일 수 필드에 딸린 안내라 같은 블록 안에 두고 간격을 좁힌다 -->
+              <div class="alert-info" id="multiFileNote" style="display:none;margin-top:10px;">
+                <i data-lucide="info" style="width:18px;height:18px"></i>
+                <div class="ai-txt">파일을 여러 개 내면 <b>가장 마지막에 올린 파일 1개만 AI 채점</b>돼요.</div>
+              </div>
             </div>
-            <div class="alert-info">
-              <i data-lucide="info" style="width:18px;height:18px"></i>
-              <div class="ai-txt">여러 파일이 업로드된 경우, 최종 제출된 1개의 파일에 대해서만 AI 채점이 가능합니다.<br>PDF와 이미지 파일(JPG, PNG)이 아닌 다른 형태의 파일은 미리보기 및 AI 채점이 불가합니다.</div>
-            </div>
+            <p class="sec-desc" style="margin:0;">PDF와 이미지 파일(JPG, PNG)이 아닌 다른 형태의 파일은 미리보기 및 AI 채점이 불가합니다.</p>
           </div>
         </div>
 
         <div class="alert-info" id="way-none">
           <i data-lucide="circle-alert" style="width:18px;height:18px"></i>
           <div class="ai-txt">제출 방식을 하나 이상 선택해 주세요.</div>
+        </div>
+
+        <!-- 둘 다 켠 경우에만 나오는 안내 — 학생이 두 방식으로 모두 낼 수 있는데 AI 채점은 1건만 된다.
+             way-none과 같은 자리·같은 형태로 두어 '선택 결과를 알려주는 칸'을 하나로 유지 (2026-08-11 올립) -->
+        <div class="alert-info" id="way-both" style="display:none;">
+          <i data-lucide="info" style="width:18px;height:18px"></i>
+          <div class="ai-txt">두 방식을 모두 선택하면 학생은 원하는 방식을 고르거나 둘 다 낼 수 있어요.
+            한 학생이 <b>둘 다 내면 AI 채점은 파일에 실행</b>돼요.</div>
         </div>
       </div>
 
@@ -1026,7 +1028,8 @@
         </div>
       </div>
 
-      <div class="ds-card" onclick="openDesign(0)">
+      <!-- 케이스: 직접 작성 + 파일 제출을 둘 다 켠 과제 → AI 채점 대상 안내 노출 -->
+      <div class="ds-card" onclick="openDesign(0, true, true)">
         <div class="ds-title">학생 업로드 평가</div>
         <div class="ds-meta">
           <span class="ds-meta-txt">26.06.05 수정됨 · 교내 공개</span>
@@ -1225,6 +1228,39 @@
   </div>
 </div>
 
+<!-- 작성 과정 기록 ? 팝오버 — 기능 안내 + 결과 예시. .way overflow:hidden 때문에 body 직속 fixed -->
+<div class="rec-pop" id="recPop" onclick="event.stopPropagation()">
+  <div class="rp-hd">
+    <p class="rp-tt">작성 과정 기록</p>
+    <button class="rp-x" onclick="closeRecHelp()" aria-label="닫기"><i data-lucide="x" style="width:18px;height:18px"></i></button>
+  </div>
+  <div class="rp-body">
+    작성 과정은 <b>모든 직접 작성 과제에 기록</b>되고, <b>과제물 관리</b> 화면에서 학생별로 볼 수 있어요.
+    <ul class="ai-list">
+      <li><b>다른 화면에 다녀온 시각과 머문 시간, 글자 수가 어떻게 늘고 줄었는지</b>가 남아요. 있었던 일만 남길 뿐, 부정행위인지는 판단하지 않아요.</li>
+      <li>방문한 사이트와 답안 내용은 저장하지 않아요. 3초보다 짧은 이동이나 스마트폰 같은 다른 기기 사용도 남지 않고요.</li>
+      <li>기록은 <b>학생이 제출한 뒤</b>에 볼 수 있어요.</li>
+    </ul>
+  </div>
+  <!-- 결과 화면 예시 — 처음 보는 기능이라 무엇을 얻는지 보여준다 (2026-08-06 올립) -->
+  <div style="margin-top:4px;border:1px solid #dde1e8;border-radius:10px;padding:14px 16px;background:#fbfbfc;">
+    <p style="margin:0 0 8px;font-size:14px;font-weight:600;color:#3b3f4c;">과제물 관리에서 학생별로 이렇게 보여요</p>
+    <div style="display:flex;align-items:center;gap:14px;margin-bottom:6px;font-size:12px;font-weight:500;color:#6d7381;">
+      <span style="display:inline-flex;align-items:center;gap:5px;"><i style="width:14px;height:0;border-top:2px solid #416bff;display:inline-block;"></i>글자 수</span>
+      <span style="display:inline-flex;align-items:center;gap:5px;"><i style="width:12px;height:9px;border-radius:2px;background:#fff1e6;border:1px solid #f7d3ba;display:inline-block;"></i>다른 화면</span>
+      <span style="display:inline-flex;align-items:center;gap:5px;"><i style="width:14px;height:0;border-top:2px solid #319d64;display:inline-block;"></i>제출</span>
+    </div>
+    <svg viewBox="0 0 1000 72" preserveAspectRatio="none" style="width:100%;height:64px;display:block;border-bottom:1px solid #dde1e8;">
+      <rect x="360" y="0" width="60" height="72" fill="#fff1e6"></rect>
+      <line x1="360" y1="0" x2="360" y2="72" stroke="#f59e6b" stroke-width="1" stroke-dasharray="3 3" vector-effect="non-scaling-stroke"></line>
+      <path d="M0,72 L0,66 L90,60 L170,56 L250,50 L330,47 L360,46 L420,46 L500,34 L580,30 L650,26 L730,22 L810,18 L890,14 L960,10 L960,72 Z" fill="#416bff" fill-opacity="0.07"></path>
+      <polyline points="0,66 90,60 170,56 250,50 330,47 360,46 420,46 500,34 580,30 650,26 730,22 810,18 890,14 960,10" fill="none" stroke="#416bff" stroke-width="2" vector-effect="non-scaling-stroke"></polyline>
+      <line x1="960" y1="0" x2="960" y2="72" stroke="#319d64" stroke-width="2" vector-effect="non-scaling-stroke"></line>
+    </svg>
+    <p style="margin:8px 0 0;font-size:13px;font-weight:500;color:#6d7381;">이탈 1회 · 2분 10초 · 복귀 후 5분간 +312자 · 14:52 제출</p>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
 
 <script>
@@ -1261,6 +1297,14 @@ function hstep(btn, dir){
   var cur  = parseInt(el.textContent.replace(/[^0-9]/g, ''), 10) || min;
   var v    = Math.min(max, Math.max(min, cur + dir * step));
   el.textContent = v.toLocaleString() + unit;
+  if(el.id === 'max-file') syncMultiFileNote();
+}
+/* 최대 제출 파일 수가 2개 이상일 때만 '어느 파일이 채점되나' 안내를 띄운다 */
+function syncMultiFileNote(){
+  var el = document.getElementById('max-file');
+  var n  = parseInt(el.textContent.replace(/[^0-9]/g, ''), 10) || 1;
+  document.getElementById('multiFileNote').style.display = n > 1 ? '' : 'none';
+  lucide.createIcons();
 }
 function pickPeriod(el){
   document.querySelectorAll('#student-submit-sec .rad[data-period]').forEach(function(r){r.classList.remove('on');});
@@ -1642,8 +1686,8 @@ function setSubmitted(n){
   if(n > 0){
     if(QUESTIONS.length === 0){ QUESTIONS = Q_SAMPLE.slice(); Q_LIMITS = QUESTIONS.map(function(){ return Q_LIMIT_DEFAULT; }); }
     document.getElementById('way-write').classList.add('on');
-    document.getElementById('way-none').style.display = 'none';
   }
+  syncWayNotes();
   renderQuestions();
   updateSummary();
   applyWayLock();
@@ -1663,15 +1707,17 @@ function applyDesignState(submitted, opt){
   Q_SNAP = null; L_SNAP = null;
 
   document.getElementById('way-write').classList.toggle('on', writeOn);
-  document.getElementById('way-file').classList.remove('on');
-  document.getElementById('way-none').style.display = writeOn ? 'none' : '';
+  document.getElementById('way-file').classList.toggle('on', !!opt.fileOn);
+  document.getElementById('max-file').textContent = (opt.maxFile || 1) + '개';
+  syncMultiFileNote();
+  syncWayNotes();
 
   renderQuestions();
   updateSummary();
   applyWayLock();
 }
-function openDesign(submitted, withQ){
-  applyDesignState(submitted, { withQ: withQ !== false });
+function openDesign(submitted, withQ, fileOn){
+  applyDesignState(submitted, { withQ: withQ !== false, fileOn: !!fileOn });
   go('design');
 }
 /* 새 평가 — 아무것도 선택되지 않은 빈 설계로 시작 */
@@ -1741,9 +1787,16 @@ function toggleWay(k){
     return;
   }
   document.getElementById('way-'+k).classList.toggle('on');
-  var none = !document.getElementById('way-write').classList.contains('on')
-          && !document.getElementById('way-file').classList.contains('on');
-  document.getElementById('way-none').style.display = none ? '' : 'none';
+  syncWayNotes();
+}
+
+/* 선택 조합에 따라 아래 안내 한 칸을 바꿔 끼운다 — 0개=선택 요청, 2개=AI 채점 대상 안내 */
+function syncWayNotes(){
+  var w = document.getElementById('way-write').classList.contains('on');
+  var f = document.getElementById('way-file').classList.contains('on');
+  document.getElementById('way-none').style.display = (!w && !f) ? '' : 'none';
+  document.getElementById('way-both').style.display = (w && f)   ? '' : 'none';
+  lucide.createIcons();
 }
 
 /* 작성 과정 기록 — 기본 꺼짐. 잠금 시점은 '답안 화면을 연 학생이 생긴 때'
@@ -1757,9 +1810,61 @@ function toggleWay(k){
 function toggleRecordSw(el){
   el.classList.toggle('on');
   toastMsg(el.classList.contains('on')
-    ? '작성 중 안내를 표시해요. 학생이 답안을 쓰는 동안 기록 중임을 알려줍니다.'
-    : '작성 중 안내를 표시하지 않아요. 작성 시작 전 안내는 그대로 나갑니다.');
+    ? '이탈 안내를 표시해요. 학생이 답안을 쓰는 동안 기록 중임을 알려줍니다.'
+    : '이탈 안내를 표시하지 않아요. 기록과 작성 시작 전 안내는 그대로입니다.');
 }
+
+/* ── 작성 과정 기록 ? 팝오버 ──
+   기능 안내+결과 예시를 인라인 대신 여기에 담는다 (2026-08-11 올립 — 첫 화면이 너무 복잡).
+   처음 이 옵션이 화면에 보이는 순간 1회 자동으로 열어 기능을 인지시킨다.
+   실서비스는 계정당 1회 노출 상정 — 목업은 데모 반복을 위해 페이지 로드마다 1회 */
+function placeRecPop(){
+  var btn = document.getElementById('recHelpBtn');
+  var pop = document.getElementById('recPop');
+  var r = btn.getBoundingClientRect();
+  var w = Math.min(560, window.innerWidth - 48);
+  var left = Math.max(24, Math.min(r.left - 12, window.innerWidth - w - 24));
+  pop.style.left = left + 'px';
+  var top = r.bottom + 10;
+  pop.style.top = top + 'px';
+  /* 아래 공간이 모자라면 버튼 위로 */
+  var h = pop.offsetHeight;
+  if(top + h > window.innerHeight - 16 && r.top - h - 10 > 16) pop.style.top = (r.top - h - 10) + 'px';
+}
+function openRecHelp(){
+  var pop = document.getElementById('recPop');
+  pop.classList.add('show');
+  placeRecPop();
+  lucide.createIcons();
+}
+function closeRecHelp(){ document.getElementById('recPop').classList.remove('show'); }
+function toggleRecHelp(e){
+  if(e) e.stopPropagation();
+  var pop = document.getElementById('recPop');
+  pop.classList.contains('show') ? closeRecHelp() : openRecHelp();
+}
+document.addEventListener('click', function(e){
+  var pop = document.getElementById('recPop');
+  if(pop.classList.contains('show') && !pop.contains(e.target) && !e.target.closest('.rec-help')) closeRecHelp();
+});
+window.addEventListener('scroll', function(){
+  if(document.getElementById('recPop').classList.contains('show')) placeRecPop();
+}, true);
+var REC_POP_SEEN = false;
+(function(){
+  var row = document.getElementById('recRow');
+  if(!row || !('IntersectionObserver' in window)) return;
+  var io = new IntersectionObserver(function(ents){
+    ents.forEach(function(en){
+      if(en.isIntersecting && !REC_POP_SEEN){
+        REC_POP_SEEN = true;
+        openRecHelp();
+        io.disconnect();
+      }
+    });
+  }, { threshold: 0.6 });
+  io.observe(row);
+})();
 
 /* 제출이 들어오면 방식과 작성 과정 기록을 잠근다 (나머지 세부 설정은 계속 조절 가능) */
 function applyWayLock(){
@@ -2025,5 +2130,5 @@ window.MOCK_NAV_APPLY = {
   if (typeof _go === 'function') window.go = function(s){ _go.apply(this, arguments); if (window.mockNavSetCurrent && MAP[s]) window.mockNavSetCurrent(MAP[s]); };
 })();
 </script>
-<script src="mock_nav_dw.js?v=260810a"></script></body>
+<script src="mock_nav_dw.js?v=260811a"></script></body>
 </html>
