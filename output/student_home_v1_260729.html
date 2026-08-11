@@ -146,8 +146,16 @@ body.nav-expanded .main-wrap{ padding-left:200px; }
 
 /* 수업 필터 칩 — '내 수업' 레일 대체(수업 게시판이 없어 카드가 갈 곳이 없었음).
    칩 숫자 = 그 수업의 '지금 낼 과제' 수. 게시판이 생기면 진입점으로 승격 가능 */
-.st-chips{ display:flex; flex-wrap:wrap; gap:8px; margin:-6px 0 26px; }
-.st-chip{ display:inline-flex; align-items:center; justify-content:center; line-height:1; vertical-align:middle; gap:7px; height:40px; padding:0 16px; border-radius:100px; border:1px solid #d9d9d9; background:#fff; color:#3b3f4c; font-size:15px; font-weight:600; font-family:inherit; cursor:pointer; }
+/* 고교 선택과목은 이름이 길고(예: 현대사회와 미술세계) 과목 수도 10개를 넘는다.
+   감싸기(wrap)로 두면 칩이 3~4줄을 먹어 정작 과제를 가리므로 → 항상 1줄 + 가로 스크롤.
+   말줄임은 쓰지 않는다 — 앞부분이 비슷한 과목끼리 구분이 안 되면 필터를 잘못 고르게 됨 */
+.st-chips-wrap{ position:relative; margin:-6px 0 26px; }
+.st-chips-wrap::after{ content:''; position:absolute; top:0; right:0; width:44px; height:100%; pointer-events:none; background:linear-gradient(to right, rgba(246,247,249,0), #f6f7f9); }
+.st-chips{ display:flex; flex-wrap:nowrap; gap:8px; overflow-x:auto; padding-bottom:8px; scroll-behavior:smooth; }
+.st-chips::-webkit-scrollbar{ height:6px; }
+.st-chips::-webkit-scrollbar-thumb{ background:#dde1e8; border-radius:100px; }
+.st-chips::-webkit-scrollbar-track{ background:transparent; }
+.st-chip{ display:inline-flex; align-items:center; justify-content:center; line-height:1; vertical-align:middle; gap:7px; height:40px; padding:0 16px; border-radius:100px; border:1px solid #d9d9d9; background:#fff; color:#3b3f4c; font-size:15px; font-weight:600; font-family:inherit; cursor:pointer; flex-shrink:0; white-space:nowrap; }
 .st-chip:hover{ border-color:#b3b3b3; }
 .st-chip.on{ background:#416bff; border-color:#416bff; color:#fff; }
 .st-chip .c{ font-size:13px; font-weight:700; background:#f1f3f5; color:#6d7381; border-radius:100px; height:22px; min-width:22px; padding:0 7px; display:inline-flex; align-items:center; justify-content:center; line-height:1; }
@@ -768,14 +776,14 @@ body.nav-expanded .main-wrap{ padding-left:200px; }
 
     <!-- 수업 필터 — 페이지 전체(낼 과제·제출 끝·결과·곧 시작)에 걸린다.
          숫자 = 그 수업의 '지금 낼 과제' 수 (레일이 주던 수업별 현황을 여기서 대체) -->
-    <div class="st-chips">
+    <div class="st-chips-wrap"><div class="st-chips">
       <button class="st-chip on" data-f="all" onclick="stFilter('all')">전체 수업 <span class="c">7</span></button>
       <button class="st-chip" data-f="kor" onclick="stFilter('kor')">국어 <span class="c">2</span></button>
       <button class="st-chip" data-f="soc" onclick="stFilter('soc')">사회 <span class="c">2</span></button>
       <button class="st-chip" data-f="sci" onclick="stFilter('sci')">과학 <span class="c">1</span></button>
       <button class="st-chip" data-f="mat" onclick="stFilter('mat')">수학 <span class="c">1</span></button>
       <button class="st-chip" data-f="eng" onclick="stFilter('eng')">영어 <span class="c">1</span></button>
-    </div>
+    </div></div>
 
     <div>
       <div>

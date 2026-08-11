@@ -222,12 +222,9 @@
     /* ── 작성 과정 기록 ? 팝오버 ──
        인라인 안내+예시가 첫 화면을 너무 무겁게 해 팝오버로 이동 (2026-08-11 올립).
        .way가 overflow:hidden이라 absolute는 잘림 → fixed + JS 좌표 (focus_log의 colHelp와 동일 방식) */
-    /* 기능 제목과 ? 를 한 줄 flex로 묶어 세로 중앙을 맞춘다 — inline 배치는 baseline이 걸려 ?가 내려앉음 */
-    .rec-hd{ display:flex; align-items:center; }
-    .rec-tt{ margin:0; font-size:15px; font-weight:600; color:#3b3f4c; }
-    /* 들여쓰지 않는다 — 위 토글(복붙 금지)과 스위치 왼쪽 선이 어긋남.
-       하위 설정이라는 관계는 제목+사실 문장이 위에 있는 것으로 충분히 읽힘 */
-    .rec-sub{ padding-left:0; }
+    /* 기록 사실 줄 — 카드 설명(way-dc)과 같은 톤. flex로 만들면 <b> 앞뒤 공백이 사라져 인라인 유지,
+       ?는 vertical-align:middle(자체 스타일)로 맞춤 */
+    .rec-note{ margin-top:2px; }
     .rec-help{ display:inline-flex; align-items:center; justify-content:center; line-height:1; vertical-align:middle;
       width:20px; height:20px; border-radius:50%; border:1px solid #c7cdd9; background:#fff; color:#6d7381;
       font-size:12px; font-weight:700; font-family:inherit; cursor:pointer; margin-left:8px; flex-shrink:0; }
@@ -755,6 +752,9 @@
             <div>
               <p class="way-tt">클리포에서 직접 작성 <span class="way-lock"><i data-lucide="lock" style="width:12px;height:12px"></i>바꿀 수 없음</span></p>
               <p class="way-dc">학생이 클리포 화면에서 문항을 보고 답을 작성합니다.</p>
+              <!-- 기록 사실은 설정이 아니라 이 제출 방식의 속성 → 카드 설명 자리로 (2026-08-11 올립 위계 정리).
+                   ?는 여기 붙는다. 작성 환경에는 교사가 조절하는 토글만 남긴다 -->
+              <p class="way-dc rec-note" id="recNote">직접 쓴 답안인지 확인할 수 있게 <b>작성 과정이 자동으로 기록</b>돼요.<button class="rec-help" id="recHelpBtn" onclick="toggleRecHelp(event)" aria-label="작성 과정 기록 설명">?</button></p>
             </div>
           </div>
           <div class="way-body">
@@ -778,19 +778,11 @@
               </div>
 
               <!-- 작성 과정 기록은 상시 수집이라 교사가 켜고 끄지 않는다 (2026-08-10 회의).
-                   교사가 정하는 건 '작성 중 학생에게 안내를 띄울지'뿐 — 잠금 없이 언제든 변경 가능.
-                   시작 전 고지는 이 옵션과 무관하게 항상 노출된다(수집 사실 고지).
-                   기능 안내+결과 예시는 인라인 → ? 팝오버로 이동, 처음 이 영역이 보일 때 1회 자동 오픈 (2026-08-11 올립) -->
-              <!-- ?는 토글이 아니라 '작성 과정 기록'이라는 기능 자체에 붙인다.
-                   토글 옆에 두었더니 '이걸 켜야 기록이 시작된다'로 읽혔음 (2026-08-11 제이콥).
-                   기능 사실을 먼저 두고 토글을 그 아래 하위 설정으로 들여쓴다 -->
-              <div id="recRow">
-                <div class="rec-hd"><p class="rec-tt">작성 과정 기록</p><button class="rec-help" id="recHelpBtn" onclick="toggleRecHelp(event)" aria-label="작성 과정 기록 설명">?</button></div>
-                <p class="sec-desc" style="margin:4px 0 12px;">모든 직접 작성 과제에 <b>자동으로 기록</b>돼요. 켜고 끄는 설정은 없어요.</p>
-                <div class="rec-sub">
-                  <span class="sw on" id="swRecord" onclick="toggleRecordSw(this)"><span class="sw-track"><span class="sw-knob"></span></span>학생에게 이탈 안내 표시</span>
-                  <p class="sec-desc" style="margin:6px 0 0 50px;">학생 작성 화면에 기록 중이라는 안내를 띄우고, 학생이 다른 화면에 다녀오면 알려줘요. 선생님이 보는 기록에는 영향이 없어요.</p>
-                </div>
+                   기록 사실·?는 위 카드 설명(rec-note)에 있고, 여기는 교사가 조절하는 토글 2개가 같은 위계로 나란히.
+                   이탈 안내 토글 옆에 ?를 두면 '켜야 기록된다'로 읽혔던 이력 (2026-08-11 제이콥) -->
+              <div>
+                <span class="sw on" id="swRecord" onclick="toggleRecordSw(this)"><span class="sw-track"><span class="sw-knob"></span></span>학생에게 이탈 안내 표시</span>
+                <p class="sec-desc" style="margin:6px 0 0 50px;">학생 작성 화면에 기록 중이라는 안내를 띄우고, 학생이 다른 화면에 다녀오면 알려줘요. 선생님이 보는 기록에는 영향이 없어요.</p>
               </div>
             </div>
           </div>
@@ -1246,7 +1238,7 @@
     <button class="rp-x" onclick="closeRecHelp()" aria-label="닫기"><i data-lucide="x" style="width:18px;height:18px"></i></button>
   </div>
   <div class="rp-body">
-    <b>모든 직접 작성 과제에 자동으로 기록돼요.</b> 켜고 끄는 설정은 없고, <b>과제물 관리</b> 화면에서 학생별로 볼 수 있어요.
+    <b>모든 직접 작성 과제에 자동으로 기록돼요.</b> <b>과제물 관리</b> 화면에서 학생별로 볼 수 있어요.
     <ul class="ai-list">
       <li><b>다른 화면에 다녀온 시각과 머문 시간, 글자 수가 어떻게 늘고 줄었는지</b>가 남아요. 있었던 일만 남길 뿐, 부정행위인지는 판단하지 않아요.</li>
       <li>방문한 사이트와 답안 내용은 저장하지 않아요. 3초보다 짧은 이동이나 스마트폰 같은 다른 기기 사용도 남지 않고요.</li>
@@ -1799,6 +1791,11 @@ function toggleWay(k){
   }
   document.getElementById('way-'+k).classList.toggle('on');
   syncWayNotes();
+  /* 앵커가 이미 화면에 있는 채로 체크되면 IO가 다시 안 울림 → 여기서 1회 자동 오픈 */
+  if(k === 'write' && document.getElementById('way-write').classList.contains('on') && !REC_POP_SEEN){
+    REC_POP_SEEN = true;
+    openRecHelp();
+  }
 }
 
 /* 선택 조합에 따라 아래 안내 한 칸을 바꿔 끼운다 — 0개=선택 요청, 2개=AI 채점 대상 안내 */
@@ -1810,12 +1807,6 @@ function syncWayNotes(){
   lucide.createIcons();
 }
 
-/* 작성 과정 기록 — 기본 꺼짐. 잠금 시점은 '답안 화면을 연 학생이 생긴 때'
-   (2026-08-07 제이콥 지적으로 첫 제출 → 첫 접속으로 앞당김).
-   제출 1건 기준이면 학생이 이미 쓰는 도중에 교사가 켤 수 있는데, 그 학생 브라우저는
-   화면을 열 때의 '꺼짐'을 들고 있어 새로고침 전까지 기록이 통째로 빈다.
-   접속이 생기기 전까지만 바꾸게 하면 그 상황이 아예 안 생기고, 프론트 실시간 통지도 불필요.
-   ※ 제출 시작 시각 기준은 폐기 — 무기한 과제는 생성 즉시 시작이라 켤 기회가 없어짐 */
 /* 학생 안내 표시 옵션 — 기록 자체는 상시 수집이라 잠금이 없다 (2026-08-10 회의).
    언제든 바꿀 수 있고, 학생 브라우저가 낡은 값을 들고 있어도 수집에는 영향이 없다. */
 function toggleRecordSw(el){
@@ -1862,22 +1853,25 @@ window.addEventListener('scroll', function(){
   if(document.getElementById('recPop').classList.contains('show')) placeRecPop();
 }, true);
 var REC_POP_SEEN = false;
+/* 앵커(rec-note)는 카드 접힘과 무관하게 늘 보이므로,
+   직접 작성이 체크된 상태에서 보일 때만 자동 오픈 — 안 쓰는 방식 설명을 불쑥 띄우지 않는다 */
 (function(){
-  var row = document.getElementById('recRow');
-  if(!row || !('IntersectionObserver' in window)) return;
+  var note = document.getElementById('recNote');
+  if(!note || !('IntersectionObserver' in window)) return;
   var io = new IntersectionObserver(function(ents){
     ents.forEach(function(en){
-      if(en.isIntersecting && !REC_POP_SEEN){
+      if(en.isIntersecting && !REC_POP_SEEN
+         && document.getElementById('way-write').classList.contains('on')){
         REC_POP_SEEN = true;
         openRecHelp();
         io.disconnect();
       }
     });
   }, { threshold: 0.6 });
-  io.observe(row);
+  io.observe(note);
 })();
 
-/* 제출이 들어오면 방식과 작성 과정 기록을 잠근다 (나머지 세부 설정은 계속 조절 가능) */
+/* 제출이 들어오면 제출 방식만 잠근다 (세부 설정·학생 안내 표시는 계속 조절 가능) */
 function applyWayLock(){
   var locked = SUBMITTED > 0;
   document.getElementById('waysLockNote').style.display = locked ? 'flex' : 'none';
