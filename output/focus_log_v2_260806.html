@@ -937,14 +937,25 @@ go(initHash && document.getElementById('scr-'+initHash) ? initHash : 'teacher-lo
 <!-- ===== 목업 내비게이터(까망이) 연결 — 규칙: docs/mockup-navigator.md ===== -->
 <script>
 window.MOCK_NAV_FILE  = 'task';
+/* 케이스를 옮길 때마다 화면을 기본 상태로 되돌린다 — 앞 케이스에서 켠 정렬·도움말 팝오버가
+   남아 캡처에 끼어들던 문제 (2026-08-11 stale 점검) */
+function resetCaseState(){
+  closeProcess();
+  closeColHelp();
+  sortMode = 'default';
+  document.querySelectorAll('.row-chk').forEach(function(c){ c.checked = false; });
+  const all = document.getElementById('chkAll'); if(all) all.checked = false;
+  renderTeacher();
+  if(window.updateSel) updateSel();
+}
 window.MOCK_NAV_APPLY = {
-  flTask: function(){ closeProcess(); },
-  flKim:  function(){ openCase('10101'); },
-  flPark: function(){ openCase('10103'); },
-  flLee:  function(){ openCase('10102'); },
-  flJung: function(){ openCase('10105'); },
-  flHan:  function(){ openCase('10106'); }
+  flTask: function(){ resetCaseState(); },
+  flKim:  function(){ resetCaseState(); openCase('10101'); },
+  flPark: function(){ resetCaseState(); openCase('10103'); },
+  flLee:  function(){ resetCaseState(); openCase('10102'); },
+  flJung: function(){ resetCaseState(); openCase('10105'); },
+  flHan:  function(){ resetCaseState(); openCase('10106'); }
 };
 </script>
-<script src="mock_nav_dw.js?v=260811a"></script></body>
+<script src="mock_nav_dw.js?v=260811d"></script></body>
 </html>

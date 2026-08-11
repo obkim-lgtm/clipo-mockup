@@ -932,18 +932,24 @@ go(_h && document.getElementById('scr-'+_h) ? _h : 'notice');
 <!-- ===== 목업 내비게이터(까망이) 연결 — 규칙: docs/mockup-navigator.md ===== -->
 <script>
 window.MOCK_NAV_FILE  = 'submit';
+/* 케이스를 옮기면 쌓인 이탈 누적을 지운다 — 시연하다 이탈이 잡히면 그 값이 다른 케이스까지
+   따라와 캡처에 남던 문제 (2026-08-11 stale 점검) */
+function resetLeave(){
+  LEAVE_COUNT = 0; LEAVE_SEC = 0; leaveStart = null; leaveType = null;
+  document.querySelectorAll('[data-rec-notice]').forEach(function(n){ n.classList.remove('show'); });
+}
 window.MOCK_NAV_APPLY = {
-  ssNotice:    function(){ go('notice'); },
-  ssWrite:     function(){ setNotify(true);  go('write'); },
-  ssWriteNoti: function(){ setNotify(false); go('write'); },
-  ssDone:      function(){ go('done'); },
-  ssBoth:      function(){ go('both'); },
-  ssFileonly:  function(){ go('fileonly'); },
-  ssPreparing: function(){ go('preparing'); },
-  ssClosed:    function(){ go('closed'); },
-  ssBefore:    function(){ go('done'); setOpened(false); },
-  ssAfter:     function(){ go('done'); setOpened(true); },
-  ssPdf:       function(){ go('pdf'); }
+  ssNotice:    function(){ resetLeave(); go('notice'); },
+  ssWrite:     function(){ resetLeave(); setNotify(true);  go('write'); },
+  ssWriteNoti: function(){ resetLeave(); setNotify(false); go('write'); },
+  ssDone:      function(){ resetLeave(); go('done'); },
+  ssBoth:      function(){ resetLeave(); go('both'); },
+  ssFileonly:  function(){ resetLeave(); go('fileonly'); },
+  ssPreparing: function(){ resetLeave(); go('preparing'); },
+  ssClosed:    function(){ resetLeave(); go('closed'); },
+  ssBefore:    function(){ resetLeave(); go('done'); setOpened(false); },
+  ssAfter:     function(){ resetLeave(); go('done'); setOpened(true); },
+  ssPdf:       function(){ resetLeave(); go('pdf'); }
 };
 (function(){
   var MAP = { notice:'ssNotice', write:'ssWrite', done:'ssDone', both:'ssBoth',
@@ -959,5 +965,5 @@ window.MOCK_NAV_APPLY = {
   if (typeof _so === 'function') window.setOpened = function(v){ _so.apply(this, arguments); if (window.mockNavSetCurrent) window.mockNavSetCurrent(v ? 'ssAfter' : 'ssBefore'); };
 })();
 </script>
-<script src="mock_nav_dw.js?v=260811a"></script></body>
+<script src="mock_nav_dw.js?v=260811d"></script></body>
 </html>

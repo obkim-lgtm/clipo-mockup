@@ -939,12 +939,14 @@ lucide.createIcons();
 <!-- ===== 목업 내비게이터(까망이) 연결 — 규칙: docs/mockup-navigator.md ===== -->
 <script>
 window.MOCK_NAV_FILE  = 'scoring';
+/* 케이스 전환 시 작성 과정 팝업을 닫는다 — 열어둔 채 다른 케이스로 가면 그대로 남아
+   캡처에 끼어들던 문제 (2026-08-11 stale 점검) */
 window.MOCK_NAV_APPLY = {
-  scWrite:    function(){ pickDoc('write'); },
-  scFile:     function(){ pickDoc('file'); },
-  scDeleted:  function(){ pickDoc('deleted'); },
-  scResubNo:  function(){ setResub(false); },
-  scResubYes: function(){ setResub(true); }
+  scWrite:    function(){ closeProcess(); pickDoc('write'); },
+  scFile:     function(){ closeProcess(); pickDoc('file'); },
+  scDeleted:  function(){ closeProcess(); pickDoc('deleted'); },
+  scResubNo:  function(){ closeProcess(); setResub(false); },
+  scResubYes: function(){ closeProcess(); setResub(true); }
 };
 (function(){
   var MAP = { write:'scWrite', file:'scFile', deleted:'scDeleted' };
@@ -954,5 +956,5 @@ window.MOCK_NAV_APPLY = {
   if (typeof _sr === 'function') window.setResub = function(v){ _sr.apply(this, arguments); if (window.mockNavSetCurrent) window.mockNavSetCurrent(v ? 'scResubYes' : 'scResubNo'); };
 })();
 </script>
-<script src="mock_nav_dw.js?v=260811a"></script></body>
+<script src="mock_nav_dw.js?v=260811d"></script></body>
 </html>
