@@ -47,6 +47,7 @@
     shHome5None: { f:'home',    h:'home5-zero-none' },
     shTask5None: { f:'home',    h:'task5-zero-none' },
     shTask5NoRes:{ f:'home',    h:'task5-no-result' },
+    shHome5High: { f:'home',    h:'home5-high' },
     ssNotice:    { f:'submit',  h:'notice' },
     ssWrite:     { f:'submit',  h:'write' },
     ssWriteNoti: { f:'submit',  h:'write-noti-off' },

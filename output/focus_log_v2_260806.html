@@ -383,8 +383,8 @@ body.nav-expanded .main-wrap{ padding-left:200px; }
 <div id="colHelp">
   <p class="ch-t">작성 과정</p>
   <ul>
-    <li>답안을 쓰는 동안 다른 화면으로 이동한 시각·머문 시간과 글자 수 변화예요.</li>
-    <li>방문한 사이트와 답안 내용은 저장하지 않아요. 3초보다 짧은 이동이나 스마트폰 같은 다른 기기 사용도 남지 않고요.</li>
+    <li>답안을 쓰는 동안 <b>다른 화면에 다녀온 시각과 머문 시간</b>, 글자 수가 어떻게 늘고 줄었는지가 남아요.</li>
+    <li>방문한 사이트와 답안 내용은 저장하지 않아요. 스마트폰 같은 다른 기기를 쓴 것도 알 수 없고요.</li>
     <li>시스템은 있었던 일만 남겨요. 부정행위인지는 판단하지 않아요.</li>
   </ul>
 </div>
@@ -408,7 +408,8 @@ body.nav-expanded .main-wrap{ padding-left:200px; }
     <div class="md-body">
       <div class="md-ic"><i data-lucide="trash-2"></i></div>
       <p class="md-t"><span id="delCount">3명</span>의 과제물을 삭제할까요?</p>
-      <p class="md-d">삭제한 과제물은 <b>되돌릴 수 없어요.</b><br>이미 매긴 점수와 피드백은 그대로 남지만, 채점 근거가 된 답안은 볼 수 없게 돼요.</p>
+      <!-- 작성 과정은 과제물에 딸린 기록이라 함께 사라진다 — 안 적어두면 교사가 모르고 지움 (2026-08-11) -->
+      <p class="md-d">삭제한 과제물은 <b>되돌릴 수 없어요.</b><br>이미 매긴 점수와 피드백은 그대로 남지만, 채점 근거가 된 답안과 <b>작성 과정 기록</b>은 볼 수 없게 돼요.</p>
       <div class="md-names" id="delNames"></div>
     </div>
     <div class="md-ft">
@@ -495,11 +496,35 @@ const teacherRows = [
         series:[0,10,26,40,38,52,70,88,100,98,115,132,140,142,158,175,190,186,200,null,null,null,228,245,262,258,275,292,305,320,318,335,352,368,380,378,395,412,428,440,438,455,470,485,498,510,520,532,542],
         events:[ {at:12, type:'화면 안 보임', dur:32, burstSec:40}, {at:19, type:'gap', dur:180}, {at:33, type:'포커스 벗어남', dur:15, burstSec:45} ] }
     ] },
-  { id:'10103', name:'박지민', status:'제출', date:'07/28 14:55 학생 제출', type:'text', detail:'388자',
+  /* ── 박지민 = 어노테이션용 전 케이스 집합 (2026-08-11 올립) ──
+     화면에 나올 수 있는 모든 상황을 한 학생에 몰아 담았다. 어노테이션 상세를 쓸 때
+     이 케이스 하나만 열면 모든 표기를 설명할 수 있게 하는 것이 목적.
+       구간1 · 이탈 4종(짧은 것 포함) · 급증 있음/없음 · 글자 수 감소 · 네트워크 공백 · 제출
+       구간2 · 30분 방치(총 작성 시간에서 제외) · 저장 전 종료로 끝이 공백 → 작성 끊김
+       구간3 · 이어 쓰고 재제출
+     ※ series는 1분 간격. 값이 그대로면 안 쓴 시간, 줄어들면 지운 것 */
+  { id:'10103', name:'박지민', status:'제출', date:'07/29 09:54 학생 제출', type:'text', detail:'512자',
     sessions:[
+      /* 구간 1 — 이탈이 잦고, 돌아올 때마다 계단식으로 뛴다 */
       { name:'작성', date:'07/28', start:'14:00', submitted:true,
-        series:[0,0,6,10,10,10,62,70,74,78,78,80,130,138,142,146,150,154,154,156,200,206,210,214,214,216,258,262,266,270,274,274,276,318,322,326,330,334,338,342,342,344,372,376,378,380,382,383,384,385,386,386,387,387,388,388],
-        events:[ {at:3, type:'화면 안 보임', dur:74, burstSec:20}, {at:10, type:'화면 안 보임', dur:41, burstSec:15}, {at:18, type:'포커스 벗어남', dur:12, burstSec:30}, {at:24, type:'화면 안 보임', dur:58, burstSec:18}, {at:31, type:'화면 안 보임', dur:38, burstSec:20}, {at:40, type:'포커스 벗어남', dur:29, burstSec:25} ] }
+        series:[0,0,6,10,10,10,62,70,74,78,78,80,130,138,142,146,150,154,154,156,200,206,210,214,214,216,258,262,266,270,274,274,276,318,322,326,330,334,338,342,336,330,372,376,378,380,382,383,384,385,386,386,387,387,388,388],
+        events:[
+          {at:3,  type:'화면 안 보임',  dur:2},                    /* 3초 미만도 기록 — 임계값 폐기 */
+          {at:10, type:'화면 안 보임',  dur:41, burstSec:15},      /* 돌아온 직후 급증 */
+          {at:18, type:'포커스 벗어남', dur:12, burstSec:30},      /* 종류 ② */
+          {at:24, type:'화면 안 보임',  dur:58, burstSec:18},
+          {at:31, type:'gap',          dur:180},                  /* 네트워크 끊김 */
+          {at:40, type:'포커스 벗어남', dur:29}                    /* 돌아왔지만 이어 쓴 구간 없음 */
+        ] },
+      /* 구간 2 — 열어두고 30분 넘게 방치했고, 저장 전에 창을 닫아 끝이 비었다 */
+      { name:'작성', date:'07/28', start:'16:30', submitted:false,
+        series:[388,392,398,404,404,404,404,404,404,404,404,404,404,404,404,404,404,404,404,404,404,404,404,404,404,404,404,404,404,404,404,404,404,404,404,404,410,418,null,null,null],
+        events:[ {at:36, type:'화면 안 보임', dur:35, burstSec:20},
+                 {at:38, type:'gap', dur:180} ] },   /* 저장 전에 닫혀 못 올라간 구간 */
+      /* 구간 3 — 다음 날 다시 들어와 이어 쓰고 재제출 */
+      { name:'작성', date:'07/29', start:'09:40', submitted:true,
+        series:[418,426,440,452,448,462,478,492,488,500,506,510,512,512,512],
+        events:[ {at:4, type:'포커스 벗어남', dur:52, burstSec:25} ] }
     ] },
   /* 파일 최대 5개 케이스 — 셀이 얼마나 길어지는지 확인용 */
   { id:'10104', name:'최유진', status:'제출', date:'07/28 14:51 학생 제출', type:'file', detail:'10104_최유진.pdf' },
@@ -533,6 +558,23 @@ let sortMode = 'default';   /* default | leaveDesc */
 
 /* ───────── 파생값 (모두 series·events에서 계산) ───────── */
 function sessMinutes(s){ return s.series.length - 1; }
+/* 총 작성 시간에서 빼는 구간 — 30분 이상 글자 수가 그대로면 '쓰고 있던 시간'으로 세지 않는다
+   (2026-08-11 제이콥). 구간을 끊는 게 아니라 계산에서만 빼는 것 */
+const IDLE_MIN = 30;
+function sessIdleMinutes(s){
+  let idle = 0, runStart = 0;
+  for(let i = 1; i < s.series.length; i++){
+    const same = s.series[i] !== null && s.series[i-1] !== null && s.series[i] === s.series[i-1];
+    if(same) continue;
+    const run = (i-1) - runStart;
+    if(run >= IDLE_MIN) idle += run;
+    runStart = i;
+  }
+  const tail = (s.series.length-1) - runStart;
+  if(tail >= IDLE_MIN) idle += tail;
+  return idle;
+}
+function sessWriteMinutes(s){ return sessMinutes(s) - sessIdleMinutes(s); }
 function sessEvents(s){ return (s.events||[]).filter(e=>e.type!=='gap'); }
 function sessLeaveSec(s){ return sessEvents(s).reduce((a,e)=>a+e.dur, 0); }
 function rowSessions(r){ return (!r.teacherUpload && r.sessions) ? r.sessions : []; }
@@ -581,7 +623,8 @@ function burstAfter(s, e){
 
 /* ───────── 학생당 타임라인 1개 (2026-08-06 확정) ─────────
    과제물이 학생당 1개이므로 회차 개념 없음. 제출·재제출은 타임라인 위의 마커. */
-function rowMinutes(r){ return rowSessions(r).reduce((a,s)=>a+sessMinutes(s),0); }
+function rowMinutes(r){ return rowSessions(r).reduce((a,s)=>a+sessWriteMinutes(s),0); }
+function rowIdleMinutes(r){ return rowSessions(r).reduce((a,s)=>a+sessIdleMinutes(s),0); }
 function submitCount(r){ return rowSessions(r).filter(s=>s.submitted).length; }
 
 /* ───────── 타임라인 차트 (글자 수 곡선 + 이탈 구간 + 제출 마커) ─────────
@@ -691,7 +734,7 @@ function evtList(sessions){
           + '<span class="leave-evt-time">'+range(s, e)+'</span>'
           + '<span class="leave-evt-type gap"><i class="lg-swatch" style="background:#eef0f3;border:1px solid #dde1e8;"></i>기록 공백</span>'
           + '<span class="leave-evt-dur">'+fmtDur(e.dur)+'</span>'
-          + '<span class="leave-evt-note">네트워크 연결이 끊겨 기록하지 못한 구간이에요.</span>'
+          + '<span class="leave-evt-note">이 구간은 기록이 남지 않았어요. 원인은 알 수 없어요.</span>'
           + '</div>';
       } else {
         const g = burstAfter(s, e);
@@ -974,5 +1017,5 @@ window.MOCK_NAV_APPLY = {
   flHan:  function(){ resetCaseState(); openCase('10106'); }
 };
 </script>
-<script src="mock_nav_dw.js?v=260811g"></script></body>
+<script src="mock_nav_dw.js?v=260811h"></script></body>
 </html>
