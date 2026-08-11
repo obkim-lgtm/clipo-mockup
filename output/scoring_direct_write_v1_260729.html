@@ -140,7 +140,7 @@ body.resizing{ cursor:col-resize; user-select:none; }
    재제출은 블록이 늘어나는 게 아니라 같은 타임라인 위에 제출 마커가 하나 더 찍히는 것.
    나눠 쓴 구간(차시·이어쓰기)은 한 차트 안에서 끊어 그린다. */
 .tl-one{ display:flex; flex-direction:column; gap:6px; width:100%; }
-.tl-submits{ display:flex; align-items:center; gap:16px; flex-wrap:wrap; }
+/* .tl-submits · .tl-end — 제출 칩 줄 폐기, 작성 로그 표로 이동 (2026-08-11 줄리) */
 .tl-sess-hd{ display:flex; align-items:baseline; gap:8px; flex-wrap:wrap; }
 .tl-sess-name{ font-size:14px; font-weight:600; color:#222631; }
 .tl-sess-when{ font-size:13px; font-weight:500; color:#6d7381; }
@@ -148,21 +148,20 @@ body.resizing{ cursor:col-resize; user-select:none; }
 .tl-sess-meta.none{ color:#9aa0ad; font-weight:500; }
 .tl-chart{ width:100%; height:88px; display:block; border-bottom:1px solid #dde1e8; }
 .tl-axis{ display:flex; justify-content:space-between; font-size:12px; font-weight:500; color:#9aa0ad; }
-.tl-end{ display:inline-flex; align-items:center; gap:5px; font-size:13px; font-weight:600; color:#27724b; }
-.tl-end.draft{ color:#c2410c; }
-.tl-end i, .tl-end svg{ width:13px; height:13px; }
 
 /* 이벤트 목록 */
 .leave-evt{ display:flex; align-items:center; gap:14px; padding:9px 0; border-bottom:1px solid #eceef2; font-size:15px; }
 .leave-evt:last-of-type{ border-bottom:none; }
-.leave-evt-time{ color:#3b3f4c; font-weight:600; width:64px; flex-shrink:0; }
+.leave-evt-time{ color:#3b3f4c; font-weight:600; width:200px; flex-shrink:0; }
 /* 알약 뱃지 → 범례 색 조각. 버튼처럼 보이던 문제 해소 (2026-08-11 올립, 과제물 관리와 동일) */
 .leave-evt-type{ display:inline-flex; align-items:center; gap:7px; color:#c2410c; font-size:14px; font-weight:600; line-height:1; flex-shrink:0; width:92px; }
 .leave-evt-type.gap{ color:#6d7381; }
+.leave-evt-type.submit{ color:#1f7a4d; }
 .leave-evt-dur{ color:#222631; font-weight:600; width:80px; flex-shrink:0; }
 .evt-head{ font-size:13px; font-weight:600; color:#8a8f9a; padding:4px 0 7px; border-bottom:1px solid #eceef2; }
 .evt-head span{ color:inherit; font-size:inherit; font-weight:inherit; }
 .leave-evt-gain{ font-size:14px; font-weight:500; color:#3b3f4c; }
+.leave-evt-gain.none{ color:#9aa0ad; }   /* 급증 구간이 없었다는 사실 — 값 누락과 구분 */
 .leave-evt-gain b{ font-weight:700; color:#222631; }
 .leave-evt-note{ font-size:13px; font-weight:500; color:#6d7381; }
 .ld-evt-wrap{ margin-top:16px; border-top:1px solid #eceef2; padding-top:4px; }
@@ -628,7 +627,7 @@ var PROC_ROW = {
   sessions:[
     { date:'07/28', start:'14:00', submitted:true,
       series:[0,8,24,41,55,55,70,96,118,130,126,145,168,190,190,205,232,255,248,270,295,318,318,335,360,382,400,395,415,440,462,470,470,488,510,533,528,550,572,595,610,610,632,655,670,665,688,710,730,748,762,772,780],
-      events:[ {at:31, type:'화면 안 보임', dur:45} ] },
+      events:[ {at:31, type:'화면 안 보임', dur:45, burstSec:35} ] },
     { date:'07/29', start:'09:10', submitted:true,
       series:[780,782,790,788,800,815,812,828,840],
       events:[] },
@@ -657,15 +656,34 @@ function seriesAt(series, i){
   return 0;
 }
 /* 이탈에서 돌아온 뒤 window분 동안 늘어난 글자 수 */
-const GAIN_WINDOW = 5;
-function gainAfter(s, e){
+/* 시:분:초 — 제이콥 예시 형식(14:31:00 ~ 14:31:45)에 맞춰 초까지 표기 */
+function hms(start, mins, addSec){
+  const [h0, m0] = start.split(':').map(Number);
+  const total = h0*3600 + m0*60 + Math.round(mins*60) + (addSec || 0);
+  const h = Math.floor(total/3600) % 24, m = Math.floor(total/60) % 60, s = total % 60;
+  return String(h).padStart(2,'0')+':'+String(m).padStart(2,'0')+':'+String(s).padStart(2,'0');
+}
+
+/* 돌아온 뒤 '쉬지 않고 이어 쓴 구간' — 고정 5분 창 폐기 (2026-08-11 제이콥 제안).
+   과제물 관리와 동일 로직. 자세한 주석은 focus_log_v2 참고 */
+const BURST_MIN = 20;   /* 분당 증가량이 이 아래로 떨어지면 구간을 닫는다 */
+function burstAfter(s, e){
   const back = e.at + e.dur/60;
   const last = s.series.length-1;
   if(back >= last) return null;
-  const end = Math.min(back + GAIN_WINDOW, last);
-  const mins = Math.round((end - back)*10)/10;
-  if(mins <= 0) return null;
-  return { gain: seriesAt(s.series, end) - seriesAt(s.series, back), mins: Math.round(mins) };
+  const from = Math.ceil(back + 0.001);
+  /* 복귀한 분에 걸쳐 있으면 곡선의 상승이 다음 표본에 찍힌다 — 두 칸까지 시작점을 찾는다 */
+  let j = -1;
+  for(let i = from; i <= Math.min(from + 1, last); i++){
+    if(s.series[i] === null || s.series[i-1] === null) continue;
+    if(s.series[i] - s.series[i-1] >= BURST_MIN){ j = i; break; }
+  }
+  if(j < 0) return null;
+  let end = j;
+  while(end + 1 <= last && s.series[end+1] !== null && s.series[end+1] - s.series[end] >= BURST_MIN) end++;
+  const gain = s.series[end] - s.series[j-1];
+  const sec  = e.burstSec || Math.round((end - (j-1)) * 60);
+  return { gain: gain, sec: sec };
 }
 
 /* ───────── 학생당 타임라인 1개 (2026-08-06 확정) ─────────
@@ -699,8 +717,8 @@ function studentChart(sessions, maxVal){
       if(e.type==='gap'){
         out += '<rect x="'+x1+'" y="0" width="'+w+'" height="'+H+'" fill="#eef0f3"><title>'+hm(s.start, e.at)+' 기록 공백 · '+fmtDur(e.dur)+'</title></rect>';
       } else {
-        const g = gainAfter(s, e);
-        const tip = hm(s.start, e.at)+' 다른 화면 · '+fmtDur(e.dur) + (g ? ' · 복귀 후 '+g.mins+'분간 +'+g.gain+'자' : '');
+        const g = burstAfter(s, e);
+        const tip = hm(s.start, e.at)+' 다른 화면 · '+fmtDur(e.dur) + (g ? ' · 돌아온 뒤 '+fmtDur(g.sec)+'간 +'+g.gain+'자' : '');
         out += '<rect x="'+x1+'" y="0" width="'+w+'" height="'+H+'" fill="#fff1e6"><title>'+tip+'</title></rect>';
         out += '<line x1="'+x1+'" y1="0" x2="'+x1+'" y2="'+H+'" stroke="#f59e6b" stroke-width="1" stroke-dasharray="3 3" vector-effect="non-scaling-stroke"/>';
       }
@@ -739,44 +757,49 @@ function studentBlock(r, sessions, maxVal){
     + ' · 총 ' + rowMinutes(r) + '분 작성'
     + (sessions.length > 1 ? ' · ' + sessions.length + '번에 나눠 씀' : '');
 
-  /* 제출 이력 한 줄 — 마커와 1:1 대응 */
-  const subs = sessions.filter(s=>s.submitted);
-  let submits = subs.map(function(s, i){
-    return '<span class="tl-end"><i data-lucide="check-circle-2"></i>'+s.date+' '+hm(s.start, sessMinutes(s))+' '+(i>0?'재제출':'제출')+'</span>';
-  }).join('');
-  if(!last.submitted){
-    submits += '<span class="tl-end draft"><i data-lucide="pencil-line"></i>'+last.date+' '+endHm+' 저장 · 아직 제출 안 함</span>';
-  }
-
+  /* 제출 이력 칩 줄 폐기 — 숫자 정보는 모두 아래 작성 로그 표로 (2026-08-11 줄리) */
   return '<div class="tl-one">'
     + '<div class="tl-sess-hd"><span class="tl-sess-name">'+when+'</span></div>'
     + studentChart(sessions, maxVal)
     + '<div class="tl-axis"><span>'+first.date+' '+first.start+'</span><span>'+last.date+' '+endHm+'</span></div>'
-    + '<div class="tl-submits">'+submits+'</div>'
     + '</div>';
 }
 
+/* 작성 로그 — 이탈·기록 공백·제출을 한 줄기 시간순으로 (과제물 관리와 동일 컴포넌트) */
 function evtList(sessions){
-  let rows = '';
+  const multiDay = sessions.some(s => s.date !== sessions[0].date);
+  const d = s => (multiDay ? s.date + ' ' : '');
+  const range = (s, e) => d(s) + hms(s.start, e.at) + ' ~ ' + hms(s.start, e.at, e.dur);
+  let rows = '', subN = 0;
+
   sessions.forEach(s=>{
     (s.events||[]).forEach(e=>{
       if(e.type==='gap'){
         rows += '<div class="leave-evt">'
-          + '<span class="leave-evt-time">'+hm(s.start, e.at)+'</span>'
+          + '<span class="leave-evt-time">'+range(s, e)+'</span>'
           + '<span class="leave-evt-type gap"><i class="lg-swatch" style="background:#eef0f3;border:1px solid #dde1e8;"></i>기록 공백</span>'
           + '<span class="leave-evt-dur">'+fmtDur(e.dur)+'</span>'
           + '<span class="leave-evt-note">네트워크 연결이 끊겨 기록하지 못한 구간이에요.</span>'
           + '</div>';
       } else {
-        const g = gainAfter(s, e);
+        const g = burstAfter(s, e);
         rows += '<div class="leave-evt">'
-          + '<span class="leave-evt-time">'+hm(s.start, e.at)+'</span>'
+          + '<span class="leave-evt-time">'+range(s, e)+'</span>'
           + '<span class="leave-evt-type" title="'+e.type+'"><i class="lg-swatch" style="background:#fff1e6;border:1px solid #f7d3ba;"></i>다른 화면</span>'
           + '<span class="leave-evt-dur">'+fmtDur(e.dur)+'</span>'
-          + (g ? '<span class="leave-evt-gain"><b>'+(g.gain>=0?'+':'')+g.gain+'자</b></span>' : '')
+          + (g ? '<span class="leave-evt-gain">'+fmtDur(g.sec)+'간 <b>'+(g.gain>=0?'+':'')+g.gain+'자</b></span>' : '<span class="leave-evt-gain none">없음</span>')
           + '</div>';
       }
     });
+    if(s.submitted){
+      subN += 1;
+      rows += '<div class="leave-evt">'
+        + '<span class="leave-evt-time">'+d(s)+hms(s.start, sessMinutes(s))+'</span>'
+        + '<span class="leave-evt-type submit"><i class="lg-line" style="border-top:2px solid #319d64;"></i>'+(subN > 1 ? '재제출' : '제출')+'</span>'
+        + '<span class="leave-evt-dur">-</span>'
+        + '<span class="leave-evt-gain">-</span>'
+        + '</div>';
+    }
   });
   return rows;
 }
@@ -799,8 +822,8 @@ function openProcess(){
     + (evtList(sessions) ? '<div class="ld-evt-wrap">'
         + '<div class="leave-evt evt-head"><span class="leave-evt-time">시각</span>'
         + '<span class="leave-evt-type">구분</span>'
-        + '<span class="leave-evt-dur">머문 시간</span>'
-        + '<span class="leave-evt-gain">돌아온 뒤 5분간 글자 수</span></div>'
+        + '<span class="leave-evt-dur">이탈 시간</span>'
+        + '<span class="leave-evt-gain">돌아온 뒤 이어 쓴 양</span></div>'
         + evtList(sessions) + '</div>' : '');
   document.getElementById('pcModal').classList.add('show');
   lucide.createIcons();

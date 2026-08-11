@@ -121,13 +121,13 @@ body.nav-expanded .main-wrap{ padding-left:200px; }
 .info.warn p{ color:#9a5b2e; }
 
 /* 이동 복귀 배너 */
-/* #leaveBanner — 토스트로 교체 (2026-08-07 회의) */
-
-/* ===== 작성 과정 기록 안내 (메인 급 · 배경+아이콘, 좌측 띠 없음) ===== */
-.rec-notice{ background:#e9f2ff; border-radius:12px; padding:18px 20px; display:flex; align-items:flex-start; gap:14px; margin-bottom:20px; }
-.rec-notice i, .rec-notice svg{ width:24px; height:24px; color:#416bff; flex-shrink:0; margin-top:1px; }
-.rec-notice .rn-t{ font-size:17px; font-weight:700; color:#222631; margin:0 0 4px; line-height:1.5; }
-.rec-notice .rn-d{ font-size:15px; font-weight:500; color:#3b3f4c; margin:0; line-height:1.65; }
+/* ===== 이탈 기록 배너 (다녀왔을 때만 나타나 그대로 남는다 · 좌측 띠 없음) =====
+   상시 파란 배너는 시작 전 고지와 중복이라 폐기 (2026-08-11 올립) */
+.leave-banner{ display:none; background:#fff7ed; border-radius:12px; padding:18px 20px; align-items:flex-start; gap:14px; margin-bottom:20px; }
+.leave-banner.show{ display:flex; }
+.leave-banner i, .leave-banner svg{ width:24px; height:24px; color:#ea580c; flex-shrink:0; margin-top:1px; }
+.leave-banner .lb-t{ font-size:17px; font-weight:700; color:#7c2d12; margin:0 0 4px; line-height:1.5; }
+.leave-banner .lb-d{ font-size:15px; font-weight:500; color:#9a5b2e; margin:0; line-height:1.65; }
 
 /* ===== 하단 액션 ===== */
 .actions{ display:flex; align-items:center; justify-content:flex-end; gap:12px; margin-top:24px; }
@@ -273,14 +273,15 @@ body.pdf-mode .sf-copy{ color:#8b8f9c; }
 
       <div class="task-guide">
         <span class="gl">과제 안내</span>
-        수업 시간에 다룬 사회 변동 사례를 참고해 작성하세요. 문항마다 200자 이상 쓰는 것을 권장합니다. 참고 자료는 아래 파일에서 확인할 수 있어요.
+        <!-- 문항 기능 이전이라 쓸 내용은 과제 안내에 담긴다 — 실제 교사들이 쓰는 방식 -->
+        현대사회의 변동 양상 중 한 가지를 골라, 그 변동이 나타나게 된 원인과 그로 인해 생긴 사회 문제를 서술하세요. 수업 시간에 다룬 사례를 참고해 200자 이상 쓰는 것을 권장합니다. 참고 자료는 아래 파일에서 확인할 수 있어요.
         <div><button class="guide-file" onclick="notReady('첨부 파일 열기')"><i data-lucide="paperclip" style="width:15px;height:15px"></i>사회 변동 참고자료.pdf</button></div>
       </div>
 
       <div class="rules">
         <div class="rule">
           <i data-lucide="list-checks"></i>
-          <p><b>문항 3개에 답을 작성해요.</b><span class="sub">쓰는 동안 내용이 임시로 자동 저장돼요. 다 썼으면 <b>[제출]</b>을 눌러야 선생님께 전달돼요.</span></p>
+          <p><b>과제 안내를 읽고 답안을 작성해요.</b><span class="sub">쓰는 동안 내용이 임시로 자동 저장돼요. 다 썼으면 <b>[제출]</b>을 눌러야 선생님께 전달돼요.</span></p>
         </div>
         <!-- 복붙 금지에도 설명 한 줄 — 앞뒤 항목과 형태를 맞추고, 금지만 남기지 않는다 (2026-08-11 올립).
              학생 관점으로: 왜 막는지가 아니라 무엇을 하면 되는지 -->
@@ -313,15 +314,16 @@ body.pdf-mode .sf-copy{ color:#8b8f9c; }
     <h1 class="page-h1">과제 제출 및 확인</h1>
     <p class="page-sub">과제 내용을 확인하고 직접 제출해 보세요.</p>
 
-    <!-- 이탈 알림은 배너가 아니라 토스트 (2026-08-07 회의) — 복붙 차단 안내와 동일 형태 -->
-
-    <!-- 교사가 '작성 중 안내 표시'를 끄면 이 블록과 이탈 토스트만 숨는다.
-         시작 전 고지(scr-notice)는 옵션과 무관하게 항상 나간다 (2026-08-10 회의) -->
-    <div class="rec-notice" data-rec-notice>
+    <!-- 상시 파란 배너를 걷어냈다 (2026-08-11 올립) — 시작 전 고지와 문장이 같아 중복이었고,
+         늘 떠 있으면 배경이 되어 정작 읽히지 않았다.
+         대신 실제로 다녀왔을 때만 주황 배너가 나타나 그대로 남는다. 토스트는 복귀 직후
+         학생이 화면을 안 보고 있으면 놓치는데, '기록이 남았다'는 사실은 남아 있는 편이 맞다.
+         교사가 '학생에게 이탈 안내 표시'를 끄면 이 배너도 뜨지 않는다. -->
+    <div class="leave-banner" id="leaveBanner" data-rec-notice>
       <i data-lucide="monitor-check"></i>
       <div>
-        <p class="rn-t">직접 쓴 답안인지 확인하기 위해 작성 과정이 기록돼요</p>
-        <p class="rn-d">다른 화면에 다녀온 시각과 머문 시간, 글자 수 변화가 남아요. 어떤 화면을 봤는지는 남지 않아요.</p>
+        <p class="lb-t">다른 화면에 다녀온 기록이 남았어요</p>
+        <p class="lb-d" id="leaveBannerDesc"></p>
       </div>
     </div>
 
@@ -334,7 +336,7 @@ body.pdf-mode .sf-copy{ color:#8b8f9c; }
 
       <div class="task-guide" style="margin-bottom:20px;">
         <span class="gl">과제 안내</span>
-        수업 시간에 다룬 사회 변동 사례를 참고해 작성하세요. 문항마다 200자 이상 쓰는 것을 권장합니다.
+        현대사회의 변동 양상 중 한 가지를 골라, 그 변동이 나타나게 된 원인과 그로 인해 생긴 사회 문제를 서술하세요. 수업 시간에 다룬 사례를 참고해 200자 이상 쓰는 것을 권장합니다.
         <div><button class="guide-file" onclick="notReady('첨부 파일 열기')"><i data-lucide="paperclip" style="width:15px;height:15px"></i>사회 변동 참고자료.pdf</button></div>
       </div>
 
@@ -366,11 +368,11 @@ body.pdf-mode .sf-copy{ color:#8b8f9c; }
     <h1 class="page-h1">과제 제출 및 확인</h1>
     <p class="page-sub">과제 내용을 확인하고 직접 제출해 보세요.</p>
 
-    <div class="rec-notice" data-rec-notice>
+    <div class="leave-banner" id="leaveBannerBoth" data-rec-notice>
       <i data-lucide="monitor-check"></i>
       <div>
-        <p class="rn-t">직접 쓴 답안인지 확인하기 위해 작성 과정이 기록돼요</p>
-        <p class="rn-d">다른 화면에 다녀온 시각과 머문 시간, 글자 수 변화가 남아요. 어떤 화면을 봤는지는 남지 않아요. 파일만 내는 경우에는 기록되지 않아요.</p>
+        <p class="lb-t">다른 화면에 다녀온 기록이 남았어요</p>
+        <p class="lb-d" id="leaveBannerBothDesc"></p>
       </div>
     </div>
 
@@ -534,7 +536,7 @@ body.pdf-mode .sf-copy{ color:#8b8f9c; }
         <div class="done-box">
           <div class="done-row"><span class="done-lb">과제</span><span class="done-vl">사회 변동과 현대사회의 문제 분석</span></div>
           <div class="done-row"><span class="done-lb">제출 시각</span><span class="done-vl">7월 29일(수) 15:24</span></div>
-          <div class="done-row"><span class="done-lb">제출 방법</span><span class="done-vl">직접 작성 · 문항 3개</span></div>
+          <div class="done-row"><span class="done-lb">제출 방법</span><span class="done-vl">클리포에서 직접 작성</span></div>
         </div>
       </div>
     </div>
@@ -619,7 +621,7 @@ body.pdf-mode .sf-copy{ color:#8b8f9c; }
     <div class="mp-cap">주요 플로우 — 직접 작성</div>
     <button class="mp-btn" onclick="location.href='student_home_v1_260729.html'">⓪ 과제 홈<span class="mp-sub">여기서 골라 들어와요</span></button>
     <button class="mp-btn on" data-scene="notice" onclick="go('notice')">① 시작 전 안내<span class="mp-sub">규칙 고지</span></button>
-    <button class="mp-btn" data-scene="write" onclick="go('write')">② 작성<span class="mp-sub">문항 3개 · 이동 감지 실동작</span></button>
+    <button class="mp-btn" data-scene="write" onclick="go('write')">② 작성<span class="mp-sub">통글 1칸 · 이동 감지 실동작</span></button>
     <button class="mp-btn" data-scene="done" onclick="go('done')">③ 제출 완료<span class="mp-sub">답안 확인 · 다시 제출</span></button>
 
     <div class="mp-cap">다른 설정으로 낸 과제</div>
@@ -667,15 +669,31 @@ function showFx(){ return FX_SUBJECTS.indexOf(SUBJECT) > -1; }
 var currentScene = 'notice';
 var leaveStart = null, leaveType = null;
 
-/* 교사 설정 '작성 중 학생에게 기록 안내 표시' — 기본 켜짐 (2026-08-10 회의).
-   꺼도 기록은 그대로 수집되고, 시작 전 고지도 그대로 나간다. 작성 중 안내 블록 + 이탈 토스트만 사라진다. */
+/* 교사 설정 '학생에게 이탈 안내 표시' — 기본 켜짐 (2026-08-10 회의).
+   꺼도 기록은 그대로 수집되고, 시작 전 고지도 그대로 나간다. 이탈 배너만 뜨지 않는다. */
 var NOTIFY_ON = true;
 function applyNotify(){
-  document.querySelectorAll('[data-rec-notice]').forEach(function(n){
-    n.style.display = NOTIFY_ON ? '' : 'none';
-  });
+  if(!NOTIFY_ON){
+    document.querySelectorAll('[data-rec-notice]').forEach(function(n){ n.classList.remove('show'); });
+  } else {
+    renderLeaveBanner();
+  }
 }
 function setNotify(on){ NOTIFY_ON = !!on; applyNotify(); }
+
+/* 이탈 누적 — 한 번이라도 다녀오면 배너가 나타나 그대로 남고, 다시 다녀오면 값만 갱신된다 */
+var LEAVE_COUNT = 0, LEAVE_SEC = 0;
+function renderLeaveBanner(){
+  if(!NOTIFY_ON || !LEAVE_COUNT) return;
+  var txt = '지금까지 ' + LEAVE_COUNT + '회 · ' + fmtDur(LEAVE_SEC)
+    + ' 다녀왔어요. 다녀온 시각과 머문 시간이 선생님께 전달돼요.';
+  ['leaveBanner', 'leaveBannerBoth'].forEach(function(id){
+    var el = document.getElementById(id);
+    if(!el) return;
+    el.querySelector('.lb-d').textContent = txt;
+    el.classList.add('show');
+  });
+}
 
 /* ───────── 씬 전환 (해시 라우팅) ───────── */
 function go(scene){
@@ -685,8 +703,8 @@ function go(scene){
   document.body.classList.toggle('pdf-mode', scene === 'pdf');
   document.querySelectorAll('#mockpick .mp-btn[data-scene]').forEach(function(b){ b.classList.toggle('on', b.getAttribute('data-scene') === scene); });
   if(location.hash !== '#'+scene) history.replaceState(null, '', '#'+scene);
-  if(scene === 'write')  renderQuestions('qList', true);
-  if(scene === 'both')   renderQuestions('qListBoth', false);
+  if(scene === 'write')  renderQuestions('qList', true, false);   /* 통글 1칸 */
+  if(scene === 'both')   renderQuestions('qListBoth', false, true); /* 문항형 시연 */
   if(scene === 'done')   renderAnswers();
   if(scene === 'closed') renderAnswers('draftList');
   if(scene === 'pdf')    renderPdf();
@@ -698,15 +716,17 @@ window.addEventListener('hashchange', function(){
   if(h && document.getElementById('scr-'+h)) go(h);
 });
 
-/* ───────── 문항 렌더 ───────── */
-function renderQuestions(targetId, withProgress){
+/* ───────── 문항 렌더 ─────────
+   MULTI=false 는 이번 배포(문항형 이전) 모습 — 답안 한 칸에 통글로 쓴다.
+   문항형은 `직접 작성 + 파일 제출` 화면에서만 시연한다 (2026-08-11 올립) */
+function renderQuestions(targetId, withProgress, multi){
   var box = document.getElementById(targetId);
   box.innerHTML = '';
-  QUESTIONS.forEach(function(q, i){
+  QUESTIONS.slice(0, multi ? QUESTIONS.length : 1).forEach(function(q, i){
     var d = document.createElement('div');
     d.className = 'q-block';
     d.innerHTML =
-      '<div class="q-hd"><span class="q-no">문항 ' + (i+1) + '</span><p class="q-text"></p></div>'
+      (multi ? '<div class="q-hd"><span class="q-no">문항 ' + (i+1) + '</span><p class="q-text"></p></div>' : '')
       + '<div class="editor">'
       +   '<div class="ed-tool">'
       +     '<button class="ed-btn" onclick="notReady(\'굵게\')"><i data-lucide="bold" style="width:16px;height:16px"></i></button>'
@@ -722,7 +742,7 @@ function renderQuestions(targetId, withProgress){
       +   '<textarea class="ed-ta" placeholder="여기에 답을 쓰세요." maxlength="' + qLimit(i) + '" oninput="onAnswer(' + i + ', this)" onpaste="blockPaste(event)"></textarea>'
       + '</div>'
       + '<div class="q-foot"><span class="q-count"><b class="cnt">0</b> / ' + qLimit(i).toLocaleString() + '자</span><span class="q-empty-mark"><i data-lucide="circle-alert" style="width:14px;height:14px"></i>아직 안 썼어요</span></div>';
-    d.querySelector('.q-text').textContent = q;
+    if(multi) d.querySelector('.q-text').textContent = q;
     var ta = d.querySelector('textarea');
     ta.value = ANSWERS[i] || '';
     d.querySelector('.cnt').textContent = (ANSWERS[i] || '').length;
@@ -756,13 +776,12 @@ function blockPaste(e){
   toastMsg('외부에서 복사한 내용은 붙여넣을 수 없어요.', true);
 }
 
+/* 통글 1칸이라 '몇 개 중 몇 개' 진행률이 성립하지 않는다 — 쓴 글자 수만 알린다 */
 function updateProgress(){
   var note = document.getElementById('progressNote');
   if(!note) return;
-  var done = ANSWERS.filter(function(a){ return a.trim() !== ''; }).length;
-  note.innerHTML = done === QUESTIONS.length
-    ? '문항 <b>' + QUESTIONS.length + '개</b>를 모두 썼어요.'
-    : '<b>' + done + '/' + QUESTIONS.length + '개</b> 작성했어요.';
+  var len = (ANSWERS[0] || '').trim().length;
+  note.innerHTML = len ? '<b>' + len.toLocaleString() + '자</b> 작성했어요.' : '아직 작성하지 않았어요.';
 }
 
 /* ───────── 임시 저장 · 제출 ───────── */
@@ -772,18 +791,16 @@ function tempSave(){
   toastMsg('임시 저장했어요.');
 }
 
-/* 빈 문항이 있어도 제출은 되지만, 한 번 확인받는다 */
+/* 비어 있어도 제출은 되지만, 한 번 확인받는다 */
 function submitTask(){
-  var missing = [];
-  ANSWERS.forEach(function(a, i){ if(a.trim() === '') missing.push(i); });
-  document.querySelectorAll('#qList .q-block').forEach(function(b, i){
-    b.classList.toggle('miss', missing.indexOf(i) > -1);
+  var empty = (ANSWERS[0] || '').trim() === '';
+  document.querySelectorAll('#qList .q-block').forEach(function(b){
+    b.classList.toggle('miss', empty);
   });
   lucide.createIcons();
 
-  if(missing.length){
-    document.getElementById('missNames').textContent =
-      '문항 ' + missing.map(function(i){ return i + 1; }).join(', ') + '번을 아직 안 썼어요';
+  if(empty){
+    document.getElementById('missNames').textContent = '답안을 아직 쓰지 않았어요';
     document.getElementById('missModal').classList.add('show');
     lucide.createIcons();
     return;
@@ -821,45 +838,42 @@ function confirmSubmit(){
 document.addEventListener('keydown', function(e){ if(e.key === 'Escape') closeMiss(); });
 
 /* ───────── 제출한 답안 ───────── */
+/* 제출 완료·마감 화면도 작성 화면과 같은 통글 1칸 */
 function renderAnswers(targetId){
   var box = document.getElementById(targetId || 'ansList');
   box.innerHTML = '';
-  QUESTIONS.forEach(function(q, i){
-    var d = document.createElement('div');
-    d.className = 'ans-view';
-    d.innerHTML = '<p class="ans-q"><span class="n">문항 ' + (i+1) + '.</span> </p><p class="ans-a"></p>';
-    d.querySelector('.ans-q').appendChild(document.createTextNode(q));
-    d.querySelector('.ans-a').textContent = ANSWERS[i] && ANSWERS[i].trim() !== '' ? ANSWERS[i] : '(작성하지 않음)';
-    box.appendChild(d);
-  });
+  var d = document.createElement('div');
+  d.className = 'ans-view';
+  d.innerHTML = '<p class="ans-a"></p>';
+  d.querySelector('.ans-a').textContent = ANSWERS[0] && ANSWERS[0].trim() !== '' ? ANSWERS[0] : '(작성하지 않음)';
+  box.appendChild(d);
 }
 
 /* ───────── PDF ───────── */
 function renderPdf(){
   var box = document.getElementById('pdfBody');
   box.innerHTML = '';
-  QUESTIONS.forEach(function(q, i){
-    var d = document.createElement('div');
-    d.className = 'pp-q';
-    d.innerHTML = '<p class="pp-q-t"></p><p class="pp-q-a"></p>';
-    d.querySelector('.pp-q-t').textContent = '문항 ' + (i+1) + '. ' + q;
-    d.querySelector('.pp-q-a').textContent = ANSWERS[i] && ANSWERS[i].trim() !== '' ? ANSWERS[i] : '(작성하지 않음)';
-    box.appendChild(d);
-  });
+  var d = document.createElement('div');
+  d.className = 'pp-q';
+  d.innerHTML = '<p class="pp-q-a"></p>';
+  d.querySelector('.pp-q-a').textContent = ANSWERS[0] && ANSWERS[0].trim() !== '' ? ANSWERS[0] : '(작성하지 않음)';
+  box.appendChild(d);
 }
 
 /* ───────── 다른 화면 이동 감지 (실제 브라우저 이벤트) ───────── */
 function onLeave(type){
-  if(currentScene !== 'write' || leaveStart) return;
+  if((currentScene !== 'write' && currentScene !== 'both') || leaveStart) return;
   leaveStart = Date.now(); leaveType = type;
 }
 function onReturn(){
   if(!leaveStart) return;
   var dur = Math.round((Date.now() - leaveStart) / 1000);
-  /* 복붙 차단 안내와 같은 토스트로 통일 (2026-08-07 회의) — 배너는 화면에 남아 자리를 먹고,
-     같은 성격의 알림(하지 말라고 알려주는 것)이 형태가 둘로 갈리면 학생이 다르게 읽음 */
-  if(dur >= 3 && NOTIFY_ON){
-    toastMsg('다른 화면에 다녀온 기록이 남았어요 (' + fmtDur(dur) + ')', true);
+  /* 토스트 → 배너로 되돌림 (2026-08-11 올립). 복귀 직후엔 학생 시선이 화면에 없을 수 있어
+     3초 뒤 사라지는 토스트를 놓친다. 복붙 차단(막힌 것)은 즉시 알면 끝이지만
+     이탈(남은 것)은 남아 있는 표시가 사실과 맞다 */
+  if(dur >= 3){
+    LEAVE_COUNT += 1; LEAVE_SEC += dur;
+    renderLeaveBanner();
   }
   leaveStart = null; leaveType = null;
 }

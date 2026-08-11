@@ -128,7 +128,7 @@ body.nav-expanded .main-wrap{ padding-left:200px; }
    재제출은 블록이 늘어나는 게 아니라 같은 타임라인 위에 제출 마커가 하나 더 찍히는 것.
    나눠 쓴 구간(차시·이어쓰기)은 한 차트 안에서 끊어 그린다. */
 .tl-one{ display:flex; flex-direction:column; gap:6px; width:100%; }
-.tl-submits{ display:flex; align-items:center; gap:16px; flex-wrap:wrap; }
+/* .tl-submits · .tl-end — 제출 칩 줄 폐기, 작성 로그 표로 이동 (2026-08-11 줄리) */
 .tl-sess-hd{ display:flex; align-items:baseline; gap:8px; flex-wrap:wrap; }
 .tl-sess-name{ font-size:14px; font-weight:600; color:#222631; }
 .tl-sess-when{ font-size:13px; font-weight:500; color:#6d7381; }
@@ -136,20 +136,19 @@ body.nav-expanded .main-wrap{ padding-left:200px; }
 .tl-sess-meta.none{ color:#9aa0ad; font-weight:500; }
 .tl-chart{ width:100%; height:88px; display:block; border-bottom:1px solid #dde1e8; }
 .tl-axis{ display:flex; justify-content:space-between; font-size:12px; font-weight:500; color:#9aa0ad; }
-.tl-end{ display:inline-flex; align-items:center; gap:5px; font-size:13px; font-weight:600; color:#27724b; }
-.tl-end.draft{ color:#c2410c; }
-.tl-end i, .tl-end svg{ width:13px; height:13px; }
 
 /* 이벤트 목록 */
 .leave-evt{ display:flex; align-items:center; gap:14px; padding:9px 0; border-bottom:1px solid #eceef2; font-size:15px; }
 .leave-evt:last-of-type{ border-bottom:none; }
-.leave-evt-time{ color:#3b3f4c; font-weight:600; width:64px; flex-shrink:0; }
+.leave-evt-time{ color:#3b3f4c; font-weight:600; width:200px; flex-shrink:0; }   /* 시작~끝 범위 · 여러 날이면 날짜까지 */
 /* 알약 뱃지였는데 버튼처럼 보였다 (2026-08-11 올립). 배경·라운드를 걷어내고
    차트 범례와 같은 색 조각을 앞에 둬서, 이 줄이 위 그래프의 어느 띠인지 바로 이어지게 한다 */
 .leave-evt-type{ display:inline-flex; align-items:center; gap:7px; color:#c2410c; font-size:14px; font-weight:600; line-height:1; flex-shrink:0; width:92px; }
 .leave-evt-type.gap{ color:#6d7381; }
+.leave-evt-type.submit{ color:#1f7a4d; }
 .leave-evt-dur{ color:#222631; font-weight:600; width:80px; flex-shrink:0; }
 .leave-evt-gain{ font-size:14px; font-weight:500; color:#3b3f4c; }
+.leave-evt-gain.none{ color:#9aa0ad; }   /* 급증 구간이 없었다는 사실 — 값 누락과 구분 */
 /* 목록 머리글 — 반복되던 '복귀 후 N분간'을 여기 한 번만 둔다 */
 .evt-head{ font-size:13px; font-weight:600; color:#8a8f9a; padding:4px 0 7px; border-bottom:1px solid #eceef2; }
 .evt-head span{ color:inherit; font-size:inherit; font-weight:inherit; }
@@ -479,7 +478,7 @@ const teacherRows = [
     sessions:[
       { date:'07/28', start:'14:00', submitted:true,
         series:[0,8,24,41,55,55,70,96,118,130,126,145,168,190,190,205,232,255,248,270,295,318,318,335,360,382,400,395,415,440,462,470,470,488,510,533,528,550,572,595,610,610,632,655,670,665,688,710,730,748,762,772,780],
-        events:[ {at:31, type:'화면 안 보임', dur:45} ] },
+        events:[ {at:31, type:'화면 안 보임', dur:45, burstSec:35} ] },
       { date:'07/29', start:'09:10', submitted:true,
         series:[780,782,790,788,800,815,812,828,840],
         events:[] },
@@ -491,13 +490,13 @@ const teacherRows = [
     sessions:[
       { name:'작성', date:'07/28', start:'14:00', submitted:true,
         series:[0,10,26,40,38,52,70,88,100,98,115,132,140,142,158,175,190,186,200,null,null,null,228,245,262,258,275,292,305,320,318,335,352,368,380,378,395,412,428,440,438,455,470,485,498,510,520,532,542],
-        events:[ {at:12, type:'화면 안 보임', dur:32}, {at:19, type:'gap', dur:180}, {at:33, type:'포커스 벗어남', dur:15} ] }
+        events:[ {at:12, type:'화면 안 보임', dur:32, burstSec:40}, {at:19, type:'gap', dur:180}, {at:33, type:'포커스 벗어남', dur:15, burstSec:45} ] }
     ] },
   { id:'10103', name:'박지민', status:'제출', date:'07/28 14:55 학생 제출', type:'text', detail:'388자',
     sessions:[
       { name:'작성', date:'07/28', start:'14:00', submitted:true,
         series:[0,0,6,10,10,10,62,70,74,78,78,80,130,138,142,146,150,154,154,156,200,206,210,214,214,216,258,262,266,270,274,274,276,318,322,326,330,334,338,342,342,344,372,376,378,380,382,383,384,385,386,386,387,387,388,388],
-        events:[ {at:3, type:'화면 안 보임', dur:74}, {at:10, type:'화면 안 보임', dur:41}, {at:18, type:'포커스 벗어남', dur:12}, {at:24, type:'화면 안 보임', dur:58}, {at:31, type:'화면 안 보임', dur:38}, {at:40, type:'포커스 벗어남', dur:29} ] }
+        events:[ {at:3, type:'화면 안 보임', dur:74, burstSec:20}, {at:10, type:'화면 안 보임', dur:41, burstSec:15}, {at:18, type:'포커스 벗어남', dur:12, burstSec:30}, {at:24, type:'화면 안 보임', dur:58, burstSec:18}, {at:31, type:'화면 안 보임', dur:38, burstSec:20}, {at:40, type:'포커스 벗어남', dur:29, burstSec:25} ] }
     ] },
   /* 파일 최대 5개 케이스 — 셀이 얼마나 길어지는지 확인용 */
   { id:'10104', name:'최유진', status:'제출', date:'07/28 14:51 학생 제출', type:'file', detail:'10104_최유진.pdf' },
@@ -513,13 +512,13 @@ const teacherRows = [
     sessions:[
       { date:'07/28', start:'15:10', submitted:false,
         series:[0,15,35,55,50,72,95,118,112,135,160,182,178,200,225,248,242,265,290,312,330,330,352,375,398,392,415,438,460,455,478,500,520],
-        events:[ {at:20, type:'화면 안 보임', dur:65} ] },
+        events:[ {at:20, type:'화면 안 보임', dur:65, burstSec:50} ] },
       { date:'07/28', start:'16:30', submitted:false,
         series:[520,528,545,562,558,578,598,615,610,630,648,665,660,678,690],
         events:[] },
       { date:'07/29', start:'08:50', submitted:true,
         series:[690,698,715,732,728,748,765,782,778,795,805,808,812],
-        events:[ {at:5, type:'화면 안 보임', dur:22} ] }
+        events:[ {at:5, type:'화면 안 보임', dur:22, burstSec:55} ] }
     ] },
   { id:'10107', name:'조민재', status:'미제출' },
   { id:'10108', name:'윤하은', status:'미제출' }
@@ -546,15 +545,35 @@ function seriesAt(series, i){
   return 0;
 }
 /* 이탈에서 돌아온 뒤 window분 동안 늘어난 글자 수 */
-const GAIN_WINDOW = 5;
-function gainAfter(s, e){
+/* 시:분:초 — 제이콥 예시 형식(14:31:00 ~ 14:31:45)에 맞춰 초까지 표기 */
+function hms(start, mins, addSec){
+  const [h0, m0] = start.split(':').map(Number);
+  const total = h0*3600 + m0*60 + Math.round(mins*60) + (addSec || 0);
+  const h = Math.floor(total/3600) % 24, m = Math.floor(total/60) % 60, s = total % 60;
+  return String(h).padStart(2,'0')+':'+String(m).padStart(2,'0')+':'+String(s).padStart(2,'0');
+}
+/* 돌아온 뒤 '쉬지 않고 이어 쓴 구간' — 고정 5분 창을 버리고 구간을 데이터에서 잘라낸다
+   (2026-08-11 제이콥 제안). 증가 속도가 기준 아래로 떨어지면 구간을 닫는다.
+   ※ 실제 서비스는 5초 간격 표본이라 구간이 초 단위로 잡힌다. 이 목업의 곡선은 1분 간격이라
+     길이만 e.burstSec(5초 해상도로 봤을 때의 값)으로 대신 표시하고, 글자 수는 곡선에서 계산한다. */
+const BURST_MIN = 20;   /* 분당 증가량이 이 아래로 떨어지면 구간을 닫는다 */
+function burstAfter(s, e){
   const back = e.at + e.dur/60;
   const last = s.series.length-1;
   if(back >= last) return null;
-  const end = Math.min(back + GAIN_WINDOW, last);
-  const mins = Math.round((end - back)*10)/10;
-  if(mins <= 0) return null;
-  return { gain: seriesAt(s.series, end) - seriesAt(s.series, back), mins: Math.round(mins) };
+  const from = Math.ceil(back + 0.001);
+  /* 복귀한 분에 걸쳐 있으면 곡선의 상승이 다음 표본에 찍힌다 — 두 칸까지 시작점을 찾는다 */
+  let j = -1;
+  for(let i = from; i <= Math.min(from + 1, last); i++){
+    if(s.series[i] === null || s.series[i-1] === null) continue;
+    if(s.series[i] - s.series[i-1] >= BURST_MIN){ j = i; break; }
+  }
+  if(j < 0) return null;
+  let end = j;
+  while(end + 1 <= last && s.series[end+1] !== null && s.series[end+1] - s.series[end] >= BURST_MIN) end++;
+  const gain = s.series[end] - s.series[j-1];
+  const sec  = e.burstSec || Math.round((end - (j-1)) * 60);
+  return { gain: gain, sec: sec };
 }
 
 /* ───────── 학생당 타임라인 1개 (2026-08-06 확정) ─────────
@@ -588,8 +607,8 @@ function studentChart(sessions, maxVal){
       if(e.type==='gap'){
         out += '<rect x="'+x1+'" y="0" width="'+w+'" height="'+H+'" fill="#eef0f3"><title>'+hm(s.start, e.at)+' 기록 공백 · '+fmtDur(e.dur)+'</title></rect>';
       } else {
-        const g = gainAfter(s, e);
-        const tip = hm(s.start, e.at)+' 다른 화면 · '+fmtDur(e.dur) + (g ? ' · 복귀 후 '+g.mins+'분간 +'+g.gain+'자' : '');
+        const g = burstAfter(s, e);
+        const tip = hm(s.start, e.at)+' 다른 화면 · '+fmtDur(e.dur) + (g ? ' · 돌아온 뒤 '+fmtDur(g.sec)+'간 +'+g.gain+'자' : '');
         out += '<rect x="'+x1+'" y="0" width="'+w+'" height="'+H+'" fill="#fff1e6"><title>'+tip+'</title></rect>';
         out += '<line x1="'+x1+'" y1="0" x2="'+x1+'" y2="'+H+'" stroke="#f59e6b" stroke-width="1" stroke-dasharray="3 3" vector-effect="non-scaling-stroke"/>';
       }
@@ -628,45 +647,56 @@ function studentBlock(r, sessions, maxVal){
     + ' · 총 ' + rowMinutes(r) + '분 작성'
     + (sessions.length > 1 ? ' · ' + sessions.length + '번에 나눠 씀' : '');
 
-  /* 제출 이력 한 줄 — 마커와 1:1 대응 */
-  const subs = sessions.filter(s=>s.submitted);
-  let submits = subs.map(function(s, i){
-    return '<span class="tl-end"><i data-lucide="check-circle-2"></i>'+s.date+' '+hm(s.start, sessMinutes(s))+' '+(i>0?'재제출':'제출')+'</span>';
-  }).join('');
-  if(!last.submitted){
-    submits += '<span class="tl-end draft"><i data-lucide="pencil-line"></i>'+last.date+' '+endHm+' 저장 · 아직 제출 안 함</span>';
-  }
-
+  /* 제출 이력 칩 줄은 없앴다 — 숫자 정보는 모두 아래 작성 로그 표로 모은다 (2026-08-11 줄리).
+     그래프는 색만 담당하고, 시각·시간 같은 값은 표에서 읽는다 */
   return '<div class="tl-one">'
     + '<div class="tl-sess-hd"><span class="tl-sess-name">'+when+'</span></div>'
     + studentChart(sessions, maxVal)
     + '<div class="tl-axis"><span>'+first.date+' '+first.start+'</span><span>'+last.date+' '+endHm+'</span></div>'
-    + '<div class="tl-submits">'+submits+'</div>'
     + '</div>';
 }
 
+/* 작성 로그 — 이탈·기록 공백·제출을 한 줄기 시간순으로 (2026-08-11 줄리).
+   이탈만 모은 목록이 아니라 '무슨 일이 어떤 순서로 있었나'가 되어야,
+   급증이 제출 앞인지 뒤인지 같은 걸 표를 보고 알 수 있다. */
 function evtList(sessions){
-  let rows = '';
+  /* 여러 날에 걸쳐 썼으면 시각만으로는 순서를 못 읽으니 날짜를 붙인다 */
+  const multiDay = sessions.some(s => s.date !== sessions[0].date);
+  const d = s => (multiDay ? s.date + ' ' : '');
+  /* 이탈은 시작~끝 범위로 (제이콥 예시 형식) */
+  const range = (s, e) => d(s) + hms(s.start, e.at) + ' ~ ' + hms(s.start, e.at, e.dur);
+  let rows = '', subN = 0;
+
   sessions.forEach(s=>{
     (s.events||[]).forEach(e=>{
       if(e.type==='gap'){
         rows += '<div class="leave-evt">'
-          + '<span class="leave-evt-time">'+hm(s.start, e.at)+'</span>'
+          + '<span class="leave-evt-time">'+range(s, e)+'</span>'
           + '<span class="leave-evt-type gap"><i class="lg-swatch" style="background:#eef0f3;border:1px solid #dde1e8;"></i>기록 공백</span>'
           + '<span class="leave-evt-dur">'+fmtDur(e.dur)+'</span>'
           + '<span class="leave-evt-note">네트워크 연결이 끊겨 기록하지 못한 구간이에요.</span>'
           + '</div>';
       } else {
-        const g = gainAfter(s, e);
+        const g = burstAfter(s, e);
         rows += '<div class="leave-evt">'
-          + '<span class="leave-evt-time">'+hm(s.start, e.at)+'</span>'
+          + '<span class="leave-evt-time">'+range(s, e)+'</span>'
           + '<span class="leave-evt-type" title="'+e.type+'"><i class="lg-swatch" style="background:#fff1e6;border:1px solid #f7d3ba;"></i>다른 화면</span>'
           + '<span class="leave-evt-dur">'+fmtDur(e.dur)+'</span>'
-          /* '복귀 후 N분간'은 줄마다 되풀이하지 않고 목록 머리글로 한 번만 (2026-08-11 올립) */
-          + (g ? '<span class="leave-evt-gain"><b>'+(g.gain>=0?'+':'')+g.gain+'자</b></span>' : '')
+          /* 구간 길이가 건마다 달라 숫자만 두면 비교가 안 된다 — 길이와 양을 함께 */
+          + (g ? '<span class="leave-evt-gain">'+fmtDur(g.sec)+'간 <b>'+(g.gain>=0?'+':'')+g.gain+'자</b></span>' : '<span class="leave-evt-gain none">없음</span>')
           + '</div>';
       }
     });
+    /* 제출은 구간의 끝 — 빈 열은 억지로 채우지 않고 '-'로 둔다 */
+    if(s.submitted){
+      subN += 1;
+      rows += '<div class="leave-evt">'
+        + '<span class="leave-evt-time">'+d(s)+hms(s.start, sessMinutes(s))+'</span>'
+        + '<span class="leave-evt-type submit"><i class="lg-line" style="border-top:2px solid #319d64;"></i>'+(subN > 1 ? '재제출' : '제출')+'</span>'
+        + '<span class="leave-evt-dur">-</span>'
+        + '<span class="leave-evt-gain">-</span>'
+        + '</div>';
+    }
   });
   return rows;
 }
@@ -783,8 +813,8 @@ function openProcess(id){
     + (evHtml ? '<div class="ld-evt-wrap">'
         + '<div class="leave-evt evt-head"><span class="leave-evt-time">시각</span>'
         + '<span class="leave-evt-type">구분</span>'
-        + '<span class="leave-evt-dur">머문 시간</span>'
-        + '<span class="leave-evt-gain">돌아온 뒤 5분간 글자 수</span></div>'
+        + '<span class="leave-evt-dur">이탈 시간</span>'
+        + '<span class="leave-evt-gain">돌아온 뒤 이어 쓴 양</span></div>'
         + evHtml + '</div>' : '');
   document.getElementById('pcModal').classList.add('show');
   lucide.createIcons();
