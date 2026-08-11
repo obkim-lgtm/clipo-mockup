@@ -20,6 +20,7 @@
 - 창의적 체험활동 이어받기 → ../context_creative.md · 정책 스펙 → ../creative_activity_policy_spec.md
 - 세특 간편 생성기 이어받기 → ../context_quick_seteuk.md
 - 활동지 AI 탭 이어받기 → ../context_question_tab.md
+- **학생 과제 홈 개편 이어받기(시안 5 제작·노출 정책·필터 구조) → handoff/HANDOFF_student_home_260811.md** (시안 4종은 output/student_home_v1_260729.html 한 파일 안. 정책 동일·UI만 차이)
 - OCR·채점 포팅(HIAI 동일 기획) 스펙 → handoff/HANDOFF_hiai_ocr_scoring_port_260625.md
 - 그 외 인수인계 문서 → handoff/ (교사의날 이벤트·OCR 채점 260615·초등 채점 v2)
 - 내부 검토 문서 → reviews/ (**gitignore 대상 — public repo라 커밋 금지**)
