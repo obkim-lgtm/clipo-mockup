@@ -144,10 +144,15 @@ body.nav-expanded .main-wrap{ padding-left:200px; }
 .leave-evt{ display:flex; align-items:center; gap:14px; padding:9px 0; border-bottom:1px solid #eceef2; font-size:15px; }
 .leave-evt:last-of-type{ border-bottom:none; }
 .leave-evt-time{ color:#3b3f4c; font-weight:600; width:64px; flex-shrink:0; }
-.leave-evt-type{ display:inline-flex; align-items:center; justify-content:center; gap:5px; height:24px; padding:0 9px; border-radius:100px; background:#fff7ed; color:#ea580c; font-size:13px; font-weight:600; line-height:1; flex-shrink:0; }
-.leave-evt-type.gap{ background:#eef0f3; color:#6d7381; }
-.leave-evt-dur{ color:#222631; font-weight:600; }
+/* 알약 뱃지였는데 버튼처럼 보였다 (2026-08-11 올립). 배경·라운드를 걷어내고
+   차트 범례와 같은 색 조각을 앞에 둬서, 이 줄이 위 그래프의 어느 띠인지 바로 이어지게 한다 */
+.leave-evt-type{ display:inline-flex; align-items:center; gap:7px; color:#c2410c; font-size:14px; font-weight:600; line-height:1; flex-shrink:0; width:92px; }
+.leave-evt-type.gap{ color:#6d7381; }
+.leave-evt-dur{ color:#222631; font-weight:600; width:80px; flex-shrink:0; }
 .leave-evt-gain{ font-size:14px; font-weight:500; color:#3b3f4c; }
+/* 목록 머리글 — 반복되던 '복귀 후 N분간'을 여기 한 번만 둔다 */
+.evt-head{ font-size:13px; font-weight:600; color:#8a8f9a; padding:4px 0 7px; border-bottom:1px solid #eceef2; }
+.evt-head span{ color:inherit; font-size:inherit; font-weight:inherit; }
 .leave-evt-gain b{ font-weight:700; color:#222631; }
 .leave-evt-note{ font-size:13px; font-weight:500; color:#6d7381; }
 .ld-evt-wrap{ margin-top:16px; border-top:1px solid #eceef2; padding-top:4px; }
@@ -461,13 +466,20 @@ function toastMsg(msg){
 
 /* ───────── 교사 화면 데이터 ─────────
    sessions[] = 작성 구간. series = 1분 간격 글자 수(정수, null=기록 공백).
-   events[].at = 구간 시작 후 경과 분. 복귀 후 증가량은 series에서 계산한다(수기 입력 금지). */
+   events[].at = 구간 시작 후 경과 분. 복귀 후 증가량은 series에서 계산한다(수기 입력 금지).
+
+   events[].type = 브라우저가 실제로 구분할 수 있는 종류만 쓴다 (2026-08-11 제이콥 확인).
+     '화면 안 보임'   — 페이지가 화면에 보이지 않음 (visibilitychange)
+     '포커스 벗어남'  — 페이지는 보이지만 클리포에 포커스가 없음 (blur)
+     'gap'            — 네트워크 끊김으로 기록하지 못한 구간
+   ※ '탭 전환'·'다른 창 이동'은 폐기 — 브라우저가 알려주지 않는 추론이었음.
+      교사 화면에는 종류를 노출하지 않고 `다른 화면`으로 통일해 보여준다. */
 const teacherRows = [
   { id:'10101', name:'김서윤', status:'제출', date:'07/29 16:25 학생 제출', type:'text', detail:'868자',
     sessions:[
       { date:'07/28', start:'14:00', submitted:true,
         series:[0,8,24,41,55,55,70,96,118,130,126,145,168,190,190,205,232,255,248,270,295,318,318,335,360,382,400,395,415,440,462,470,470,488,510,533,528,550,572,595,610,610,632,655,670,665,688,710,730,748,762,772,780],
-        events:[ {at:31, type:'탭 전환', dur:45} ] },
+        events:[ {at:31, type:'화면 안 보임', dur:45} ] },
       { date:'07/29', start:'09:10', submitted:true,
         series:[780,782,790,788,800,815,812,828,840],
         events:[] },
@@ -479,13 +491,13 @@ const teacherRows = [
     sessions:[
       { name:'작성', date:'07/28', start:'14:00', submitted:true,
         series:[0,10,26,40,38,52,70,88,100,98,115,132,140,142,158,175,190,186,200,null,null,null,228,245,262,258,275,292,305,320,318,335,352,368,380,378,395,412,428,440,438,455,470,485,498,510,520,532,542],
-        events:[ {at:12, type:'탭 전환', dur:32}, {at:19, type:'gap', dur:180}, {at:33, type:'다른 창 이동', dur:15} ] }
+        events:[ {at:12, type:'화면 안 보임', dur:32}, {at:19, type:'gap', dur:180}, {at:33, type:'포커스 벗어남', dur:15} ] }
     ] },
   { id:'10103', name:'박지민', status:'제출', date:'07/28 14:55 학생 제출', type:'text', detail:'388자',
     sessions:[
       { name:'작성', date:'07/28', start:'14:00', submitted:true,
         series:[0,0,6,10,10,10,62,70,74,78,78,80,130,138,142,146,150,154,154,156,200,206,210,214,214,216,258,262,266,270,274,274,276,318,322,326,330,334,338,342,342,344,372,376,378,380,382,383,384,385,386,386,387,387,388,388],
-        events:[ {at:3, type:'탭 전환', dur:74}, {at:10, type:'탭 전환', dur:41}, {at:18, type:'다른 창 이동', dur:12}, {at:24, type:'탭 전환', dur:58}, {at:31, type:'탭 전환', dur:38}, {at:40, type:'다른 창 이동', dur:29} ] }
+        events:[ {at:3, type:'화면 안 보임', dur:74}, {at:10, type:'화면 안 보임', dur:41}, {at:18, type:'포커스 벗어남', dur:12}, {at:24, type:'화면 안 보임', dur:58}, {at:31, type:'화면 안 보임', dur:38}, {at:40, type:'포커스 벗어남', dur:29} ] }
     ] },
   /* 파일 최대 5개 케이스 — 셀이 얼마나 길어지는지 확인용 */
   { id:'10104', name:'최유진', status:'제출', date:'07/28 14:51 학생 제출', type:'file', detail:'10104_최유진.pdf' },
@@ -501,13 +513,13 @@ const teacherRows = [
     sessions:[
       { date:'07/28', start:'15:10', submitted:false,
         series:[0,15,35,55,50,72,95,118,112,135,160,182,178,200,225,248,242,265,290,312,330,330,352,375,398,392,415,438,460,455,478,500,520],
-        events:[ {at:20, type:'탭 전환', dur:65} ] },
+        events:[ {at:20, type:'화면 안 보임', dur:65} ] },
       { date:'07/28', start:'16:30', submitted:false,
         series:[520,528,545,562,558,578,598,615,610,630,648,665,660,678,690],
         events:[] },
       { date:'07/29', start:'08:50', submitted:true,
         series:[690,698,715,732,728,748,765,782,778,795,805,808,812],
-        events:[ {at:5, type:'탭 전환', dur:22} ] }
+        events:[ {at:5, type:'화면 안 보임', dur:22} ] }
     ] },
   { id:'10107', name:'조민재', status:'미제출' },
   { id:'10108', name:'윤하은', status:'미제출' }
@@ -577,7 +589,7 @@ function studentChart(sessions, maxVal){
         out += '<rect x="'+x1+'" y="0" width="'+w+'" height="'+H+'" fill="#eef0f3"><title>'+hm(s.start, e.at)+' 기록 공백 · '+fmtDur(e.dur)+'</title></rect>';
       } else {
         const g = gainAfter(s, e);
-        const tip = hm(s.start, e.at)+' '+e.type+' · '+fmtDur(e.dur) + (g ? ' · 복귀 후 '+g.mins+'분간 +'+g.gain+'자' : '');
+        const tip = hm(s.start, e.at)+' 다른 화면 · '+fmtDur(e.dur) + (g ? ' · 복귀 후 '+g.mins+'분간 +'+g.gain+'자' : '');
         out += '<rect x="'+x1+'" y="0" width="'+w+'" height="'+H+'" fill="#fff1e6"><title>'+tip+'</title></rect>';
         out += '<line x1="'+x1+'" y1="0" x2="'+x1+'" y2="'+H+'" stroke="#f59e6b" stroke-width="1" stroke-dasharray="3 3" vector-effect="non-scaling-stroke"/>';
       }
@@ -640,7 +652,7 @@ function evtList(sessions){
       if(e.type==='gap'){
         rows += '<div class="leave-evt">'
           + '<span class="leave-evt-time">'+hm(s.start, e.at)+'</span>'
-          + '<span class="leave-evt-type gap"><i data-lucide="wifi-off" style="width:13px;height:13px;"></i>기록 공백</span>'
+          + '<span class="leave-evt-type gap"><i class="lg-swatch" style="background:#eef0f3;border:1px solid #dde1e8;"></i>기록 공백</span>'
           + '<span class="leave-evt-dur">'+fmtDur(e.dur)+'</span>'
           + '<span class="leave-evt-note">네트워크 연결이 끊겨 기록하지 못한 구간이에요.</span>'
           + '</div>';
@@ -648,9 +660,10 @@ function evtList(sessions){
         const g = gainAfter(s, e);
         rows += '<div class="leave-evt">'
           + '<span class="leave-evt-time">'+hm(s.start, e.at)+'</span>'
-          + '<span class="leave-evt-type"><i data-lucide="external-link" style="width:13px;height:13px;"></i>'+e.type+'</span>'
+          + '<span class="leave-evt-type" title="'+e.type+'"><i class="lg-swatch" style="background:#fff1e6;border:1px solid #f7d3ba;"></i>다른 화면</span>'
           + '<span class="leave-evt-dur">'+fmtDur(e.dur)+'</span>'
-          + (g ? '<span class="leave-evt-gain">복귀 후 '+g.mins+'분간 <b>'+(g.gain>=0?'+':'')+g.gain+'자</b></span>' : '')
+          /* '복귀 후 N분간'은 줄마다 되풀이하지 않고 목록 머리글로 한 번만 (2026-08-11 올립) */
+          + (g ? '<span class="leave-evt-gain"><b>'+(g.gain>=0?'+':'')+g.gain+'자</b></span>' : '')
           + '</div>';
       }
     });
@@ -767,7 +780,12 @@ function openProcess(id){
       + '<span><i class="lg-line" style="border-top:2px solid #319d64;"></i>제출</span>'
     + '</div>'
     + studentBlock(r, sessions, maxVal)
-    + (evHtml ? '<div class="ld-evt-wrap">'+evHtml+'</div>' : '');
+    + (evHtml ? '<div class="ld-evt-wrap">'
+        + '<div class="leave-evt evt-head"><span class="leave-evt-time">시각</span>'
+        + '<span class="leave-evt-type">구분</span>'
+        + '<span class="leave-evt-dur">머문 시간</span>'
+        + '<span class="leave-evt-gain">돌아온 뒤 5분간 글자 수</span></div>'
+        + evHtml + '</div>' : '');
   document.getElementById('pcModal').classList.add('show');
   lucide.createIcons();
 }

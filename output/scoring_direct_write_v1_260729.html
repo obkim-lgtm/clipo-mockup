@@ -156,9 +156,12 @@ body.resizing{ cursor:col-resize; user-select:none; }
 .leave-evt{ display:flex; align-items:center; gap:14px; padding:9px 0; border-bottom:1px solid #eceef2; font-size:15px; }
 .leave-evt:last-of-type{ border-bottom:none; }
 .leave-evt-time{ color:#3b3f4c; font-weight:600; width:64px; flex-shrink:0; }
-.leave-evt-type{ display:inline-flex; align-items:center; justify-content:center; gap:5px; height:24px; padding:0 9px; border-radius:100px; background:#fff7ed; color:#ea580c; font-size:13px; font-weight:600; line-height:1; flex-shrink:0; }
-.leave-evt-type.gap{ background:#eef0f3; color:#6d7381; }
-.leave-evt-dur{ color:#222631; font-weight:600; }
+/* 알약 뱃지 → 범례 색 조각. 버튼처럼 보이던 문제 해소 (2026-08-11 올립, 과제물 관리와 동일) */
+.leave-evt-type{ display:inline-flex; align-items:center; gap:7px; color:#c2410c; font-size:14px; font-weight:600; line-height:1; flex-shrink:0; width:92px; }
+.leave-evt-type.gap{ color:#6d7381; }
+.leave-evt-dur{ color:#222631; font-weight:600; width:80px; flex-shrink:0; }
+.evt-head{ font-size:13px; font-weight:600; color:#8a8f9a; padding:4px 0 7px; border-bottom:1px solid #eceef2; }
+.evt-head span{ color:inherit; font-size:inherit; font-weight:inherit; }
 .leave-evt-gain{ font-size:14px; font-weight:500; color:#3b3f4c; }
 .leave-evt-gain b{ font-weight:700; color:#222631; }
 .leave-evt-note{ font-size:13px; font-weight:500; color:#6d7381; }
@@ -625,7 +628,7 @@ var PROC_ROW = {
   sessions:[
     { date:'07/28', start:'14:00', submitted:true,
       series:[0,8,24,41,55,55,70,96,118,130,126,145,168,190,190,205,232,255,248,270,295,318,318,335,360,382,400,395,415,440,462,470,470,488,510,533,528,550,572,595,610,610,632,655,670,665,688,710,730,748,762,772,780],
-      events:[ {at:31, type:'탭 전환', dur:45} ] },
+      events:[ {at:31, type:'화면 안 보임', dur:45} ] },
     { date:'07/29', start:'09:10', submitted:true,
       series:[780,782,790,788,800,815,812,828,840],
       events:[] },
@@ -697,7 +700,7 @@ function studentChart(sessions, maxVal){
         out += '<rect x="'+x1+'" y="0" width="'+w+'" height="'+H+'" fill="#eef0f3"><title>'+hm(s.start, e.at)+' 기록 공백 · '+fmtDur(e.dur)+'</title></rect>';
       } else {
         const g = gainAfter(s, e);
-        const tip = hm(s.start, e.at)+' '+e.type+' · '+fmtDur(e.dur) + (g ? ' · 복귀 후 '+g.mins+'분간 +'+g.gain+'자' : '');
+        const tip = hm(s.start, e.at)+' 다른 화면 · '+fmtDur(e.dur) + (g ? ' · 복귀 후 '+g.mins+'분간 +'+g.gain+'자' : '');
         out += '<rect x="'+x1+'" y="0" width="'+w+'" height="'+H+'" fill="#fff1e6"><title>'+tip+'</title></rect>';
         out += '<line x1="'+x1+'" y1="0" x2="'+x1+'" y2="'+H+'" stroke="#f59e6b" stroke-width="1" stroke-dasharray="3 3" vector-effect="non-scaling-stroke"/>';
       }
@@ -760,7 +763,7 @@ function evtList(sessions){
       if(e.type==='gap'){
         rows += '<div class="leave-evt">'
           + '<span class="leave-evt-time">'+hm(s.start, e.at)+'</span>'
-          + '<span class="leave-evt-type gap"><i data-lucide="wifi-off" style="width:13px;height:13px;"></i>기록 공백</span>'
+          + '<span class="leave-evt-type gap"><i class="lg-swatch" style="background:#eef0f3;border:1px solid #dde1e8;"></i>기록 공백</span>'
           + '<span class="leave-evt-dur">'+fmtDur(e.dur)+'</span>'
           + '<span class="leave-evt-note">네트워크 연결이 끊겨 기록하지 못한 구간이에요.</span>'
           + '</div>';
@@ -768,9 +771,9 @@ function evtList(sessions){
         const g = gainAfter(s, e);
         rows += '<div class="leave-evt">'
           + '<span class="leave-evt-time">'+hm(s.start, e.at)+'</span>'
-          + '<span class="leave-evt-type"><i data-lucide="external-link" style="width:13px;height:13px;"></i>'+e.type+'</span>'
+          + '<span class="leave-evt-type" title="'+e.type+'"><i class="lg-swatch" style="background:#fff1e6;border:1px solid #f7d3ba;"></i>다른 화면</span>'
           + '<span class="leave-evt-dur">'+fmtDur(e.dur)+'</span>'
-          + (g ? '<span class="leave-evt-gain">복귀 후 '+g.mins+'분간 <b>'+(g.gain>=0?'+':'')+g.gain+'자</b></span>' : '')
+          + (g ? '<span class="leave-evt-gain"><b>'+(g.gain>=0?'+':'')+g.gain+'자</b></span>' : '')
           + '</div>';
       }
     });
@@ -793,7 +796,12 @@ function openProcess(){
       + '<span><i class="lg-line" style="border-top:2px solid #319d64;"></i>제출</span>'
     + '</div>'
     + studentBlock(r, sessions, maxVal)
-    + (evtList(sessions) ? '<div class="ld-evt-wrap">'+evtList(sessions)+'</div>' : '');
+    + (evtList(sessions) ? '<div class="ld-evt-wrap">'
+        + '<div class="leave-evt evt-head"><span class="leave-evt-time">시각</span>'
+        + '<span class="leave-evt-type">구분</span>'
+        + '<span class="leave-evt-dur">머문 시간</span>'
+        + '<span class="leave-evt-gain">돌아온 뒤 5분간 글자 수</span></div>'
+        + evtList(sessions) + '</div>' : '');
   document.getElementById('pcModal').classList.add('show');
   lucide.createIcons();
 }
