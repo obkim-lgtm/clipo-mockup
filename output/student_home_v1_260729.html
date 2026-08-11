@@ -131,10 +131,14 @@ body.nav-expanded .main-wrap{ padding-left:200px; }
    걷어낸 근거: 숫자 타일 3개는 각 섹션 헤더 숫자와 완전 중복이었고,
    요약 문장("오늘 마감 1개")도 바로 아래 첫 카드의 빨간 마감 타일과 중복이었다.
    타일의 유일한 고유 기능이던 '결과 섹션 바로가기'는 결과를 2번째로 올려 해소 */
-.st-head{ display:flex; align-items:flex-end; gap:16px; margin-bottom:22px; }
+.st-head{ display:flex; align-items:flex-end; gap:12px; margin-bottom:22px; }
 .st-date{ font-size:15px; font-weight:600; color:#3151c4; margin:0 0 6px; }
 .st-greet{ font-size:27px; font-weight:700; color:#18181b; margin:0; line-height:1.35; }
-.st-head .sem-sel{ margin-left:auto; flex-shrink:0; }
+/* 인사 블록이 남은 공간을 먹고 셀렉트들이 오른쪽에 붙는다. 셀렉트가 2개여도 서로 안 밀리게 */
+.st-head > div:first-child{ margin-right:auto; }
+.st-head .sem-sel{ flex-shrink:0; }
+/* 시안 4는 칩 줄이 없어 헤더 바로 아래가 본문이다 — 첫 화면이 답답하지 않게 여백을 조금 더 */
+#scr-cards .st-head{ margin-bottom:30px; }
 
 /* 수업 필터 칩 — '내 수업' 레일 대체(수업 게시판이 없어 카드가 갈 곳이 없었음).
    칩 숫자 = 그 수업의 '지금 낼 과제' 수. 게시판이 생기면 진입점으로 승격 가능 */
@@ -142,8 +146,9 @@ body.nav-expanded .main-wrap{ padding-left:200px; }
    가로 스크롤 54px(단 230px 분량이 화면 밖) / 감싸기 96px(수업 14개까지 2줄 유지) / 드롭다운 42px(열어야 보임).
    42px 아끼자고 "어느 수업에 낼 게 있나"를 감추는 건 손해라 감싸기 채택.
    말줄임도 쓰지 않는다 — 앞부분이 비슷한 과목끼리 구분이 안 되면 필터를 잘못 고르게 됨 */
-.st-chips-wrap{ margin:-6px 0 26px; }
-.st-chips{ display:flex; flex-wrap:wrap; gap:8px; }
+/* 인사말과 칩이 16px로 붙어 있어 상단이 답답했다 → 위 26 / 아래 32, 두 줄 사이도 10px로 (2026-08-11) */
+.st-chips-wrap{ margin:4px 0 32px; }
+.st-chips{ display:flex; flex-wrap:wrap; gap:10px 8px; }
 .st-chip{ display:inline-flex; align-items:center; justify-content:center; line-height:1; vertical-align:middle; gap:7px; height:40px; padding:0 16px; border-radius:100px; border:1px solid #d9d9d9; background:#fff; color:#3b3f4c; font-size:15px; font-weight:600; font-family:inherit; cursor:pointer; flex-shrink:0; white-space:nowrap; }
 .st-chip:hover{ border-color:#b3b3b3; }
 .st-chip.on{ background:#416bff; border-color:#416bff; color:#fff; }
@@ -871,7 +876,7 @@ body.nav-expanded .main-wrap{ padding-left:200px; }
         <!-- 결과 나온 과제 — 학생의 두 번째 목적이라 2번 자리.
              (상태 진행 순으로 두면 액션 없는 '제출이 끝난 과제'가 이 자리를 차지한다) -->
         <div class="st-sec" data-sec="result" id="st-sec-result">
-          <div class="st-sec-hd"><i data-lucide="award" style="width:20px;height:20px"></i><h2 class="st-sec-t">결과 나온 과제</h2><span class="sec-n">7</span></div>
+          <div class="st-sec-hd"><i data-lucide="award" style="width:20px;height:20px"></i><h2 class="st-sec-t">결과 나온 과제</h2><span class="sec-n">6</span></div>
           <p class="st-sec-d">선생님이 공개한 결과예요. 점수는 선생님이 공개한 과제에만 보여요.</p>
           <div class="panel">
             <div class="st-res" data-sj="c1" onclick="notReady('결과 보기')">
@@ -921,13 +926,6 @@ body.nav-expanded .main-wrap{ padding-left:200px; }
                 <p class="st-res-meta">영어권 문화 · 최수현 선생님 · 6월 13일(금) 마감</p>
               </div>
               <span class="st-score">90점</span>
-              <button class="link-btn" onclick="event.stopPropagation();notReady('결과 보기')">결과 보기 <i data-lucide="chevron-right" style="width:15px;height:15px"></i></button>
-            </div>
-            <div class="st-res" data-sj="c2" onclick="notReady('결과 보기')">
-              <div class="st-res-b">
-                <p class="st-res-nm">미술관 관람 보고서</p>
-                <p class="st-res-meta">현대사회와 미술세계 · 김기남 선생님 · 6월 5일(금) 마감</p>
-              </div>
               <button class="link-btn" onclick="event.stopPropagation();notReady('결과 보기')">결과 보기 <i data-lucide="chevron-right" style="width:15px;height:15px"></i></button>
             </div>
             <p class="st-empty">이 수업에는 결과가 나온 과제가 없어요.</p>
@@ -1014,14 +1012,16 @@ body.nav-expanded .main-wrap{ padding-left:200px; }
   </div>
 </div>
 
-</div>
-
 <!-- ═══════════════ 시안 4 — 히어로 제거 + 순서만 변경 (결과는 카드 유지) ═══════════════
      시안 3과 다른 점은 딱 둘: 결과가 카드 그리드다(행 아님) · 결과에 점수를 붙이지 않는다.
      '더 보기'도 낼 과제에만 둔다(시안 3은 전 섹션 공통 규칙) -->
 <div id="scr-cards" class="screen">
   <div class="page-wrap">
 
+    <!-- 수업 필터를 칩이 아니라 헤더 우측 드롭다운으로 (시안 3과 다른 점).
+         칩은 88px 두 줄을 먹으면서 첫 화면에서 가장 강한 요소가 돼 '지금 낼 과제'와 강조가 뒤집혔다.
+         칩 배지가 주던 '어느 수업에 낼 게 있나'는 아래 과제 카드의 수업 배지가 이미 하고 있어 중복.
+         범위가 넓은 것(학기) → 좁은 것(수업) 순으로 나란히 둔다 -->
     <div class="st-head">
       <div>
         <p class="st-date">7월 29일 수요일</p>
@@ -1031,20 +1031,19 @@ body.nav-expanded .main-wrap{ padding-left:200px; }
         <option>2026학년도 1학기</option>
         <option>2026학년도 2학기</option>
       </select>
+      <select class="sem-sel st-classsel" onchange="stFilter(this.value, this)">
+        <option value="all">전체 수업</option>
+        <option value="c1">언어와 매체</option>
+        <option value="c2">현대사회와 미술세계</option>
+        <option value="c6">생활과 윤리</option>
+        <option value="c3">융합과학탐구</option>
+        <option value="c4">확률과 통계</option>
+        <option value="c5">영어권 문화</option>
+        <option value="c7">한국지리</option>
+        <option value="c8">세계사</option>
+        <option value="c9">미술 창작</option>
+      </select>
     </div>
-
-    <div class="st-chips-wrap"><div class="st-chips">
-      <button class="st-chip on" data-f="all" onclick="stFilter('all',this)">전체 수업 <span class="c">7</span></button>
-      <button class="st-chip" data-f="c1" onclick="stFilter('c1',this)">언어와 매체 <span class="c">2</span></button>
-      <button class="st-chip" data-f="c2" onclick="stFilter('c2',this)">현대사회와 미술세계 <span class="c">1</span></button>
-      <button class="st-chip" data-f="c6" onclick="stFilter('c6',this)">생활과 윤리 <span class="c">1</span></button>
-      <button class="st-chip" data-f="c3" onclick="stFilter('c3',this)">융합과학탐구 <span class="c">1</span></button>
-      <button class="st-chip" data-f="c4" onclick="stFilter('c4',this)">확률과 통계 <span class="c">1</span></button>
-      <button class="st-chip" data-f="c5" onclick="stFilter('c5',this)">영어권 문화 <span class="c">1</span></button>
-      <button class="st-chip" data-f="c7" onclick="stFilter('c7',this)">한국지리</button>
-      <button class="st-chip" data-f="c8" onclick="stFilter('c8',this)">세계사</button>
-      <button class="st-chip" data-f="c9" onclick="stFilter('c9',this)">미술 창작</button>
-    </div></div>
 
     <div>
       <div>
@@ -1125,9 +1124,9 @@ body.nav-expanded .main-wrap{ padding-left:200px; }
           <button class="todo-more" onclick="stShowMore(this)">2개 더 보기 <i data-lucide="chevron-down" style="width:16px;height:16px"></i></button>
         </div>
 
-        <!-- 결과 나온 과제 — 카드 그리드 유지 -->
-        <div class="st-sec" data-sec="result">
-          <div class="st-sec-hd"><i data-lucide="award" style="width:20px;height:20px"></i><h2 class="st-sec-t">결과 나온 과제</h2><span class="sec-n">5</span></div>
+        <!-- 결과 나온 과제 — 카드 그리드 유지. '더 보기'를 두지 않는 안이므로 상한도 없다(data-limit="0") -->
+        <div class="st-sec" data-sec="result" data-limit="0">
+          <div class="st-sec-hd"><i data-lucide="award" style="width:20px;height:20px"></i><h2 class="st-sec-t">결과 나온 과제</h2><span class="sec-n">6</span></div>
           <p class="st-sec-d">점수와 선생님 피드백을 볼 수 있어요.</p>
           <div class="st-results">
             <div class="st-rescard" onclick="notReady('결과 보기')">
@@ -1155,6 +1154,11 @@ body.nav-expanded .main-wrap{ padding-left:200px; }
               <div class="st-rescard-top"><span class="sj c9">미술 창작</span><span class="b-state miss">미제출</span></div>
               <p class="st-rescard-nm">작품 감상문 쓰기</p>
               <div class="st-rescard-ft"><span class="st-rescard-meta">6월 20일(금) 마감</span><button class="link-btn" onclick="event.stopPropagation();notReady('결과 보기')">결과 보기 <i data-lucide="chevron-right" style="width:15px;height:15px"></i></button></div>
+            </div>
+            <div class="st-rescard" onclick="notReady('결과 보기')">
+              <div class="st-rescard-top"><span class="sj c5">영어권 문화</span><span class="b-state done">제출 완료</span></div>
+              <p class="st-rescard-nm">영어 발표문 작성</p>
+              <div class="st-rescard-ft"><span class="st-rescard-meta">6월 13일(금) 마감</span><button class="link-btn" onclick="event.stopPropagation();notReady('결과 보기')">결과 보기 <i data-lucide="chevron-right" style="width:15px;height:15px"></i></button></div>
             </div>
           </div>
           <p class="st-empty" style="background:#fff;border:1px solid #dde1e8;border-radius:14px;">이 수업에는 결과가 나온 과제가 없어요.</p>
@@ -1232,6 +1236,9 @@ body.nav-expanded .main-wrap{ padding-left:200px; }
     </footer>
   </div>
 </div>
+
+</div><!-- /.main-wrap — 모든 시안(.screen)은 이 안에 있어야 한다. 밖에 두면 헤더·좌측 NB 오프셋을 못 받고
+       .main-wrap의 min-height:100vh만큼 아래로 밀린다 (2026-08-11 시안 4에서 발생) -->
 
 <div id="toast" class="toast"><i data-lucide="circle-check-big" style="width:20px;height:20px;flex-shrink:0;"></i><span id="toastMsg"></span></div>
 
@@ -1323,18 +1330,24 @@ function stApply(root){
   root.querySelectorAll('.st-chip').forEach(function(c){
     c.classList.toggle('on', c.getAttribute('data-f') === f);
   });
+  /* 칩 대신 드롭다운을 쓰는 시안도 있다 — 어느 쪽이든 현재 값이 맞게 */
+  var sel = root.querySelector('.st-classsel');
+  if(sel && sel.value !== f) sel.value = f;
 
   ST_SECS.forEach(function(key){
     var sec = root.querySelector('.st-sec[data-sec="'+key+'"]');
     if(!sec) return;
+    /* 상한은 섹션별로 둔다 — data-limit="0"이면 전부 표시.
+       '더 보기' 버튼이 없는 섹션에 공통 상한을 걸면 넘친 항목이 영영 안 보인다 */
+    var limit = sec.dataset.limit !== undefined ? +sec.dataset.limit : ST_LIMIT;
     /* 필터를 걸면 '더 보기'로 감추지 않는다 — 추려낸 결과는 다 보여야 함 */
-    var openAll = sec.dataset.open === '1' || f !== 'all';
+    var openAll = sec.dataset.open === '1' || f !== 'all' || limit === 0;
     var matched = 0, shown = 0;
 
     sec.querySelectorAll(ST_ITEM[key]).forEach(function(el){
       if(f !== 'all' && stSubjOf(el) !== f){ el.style.display = 'none'; return; }
       matched++;
-      var visible = openAll || matched <= ST_LIMIT;
+      var visible = openAll || matched <= limit;
       el.style.display = visible ? '' : 'none';
       if(visible) shown++;
     });
@@ -1388,5 +1401,5 @@ window.MOCK_NAV_APPLY = {
   if (typeof _go === 'function') window.go = function(s){ _go.apply(this, arguments); if (window.mockNavSetCurrent && MAP[s]) window.mockNavSetCurrent(MAP[s]); };
 })();
 </script>
-<script src="mock_nav_dw.js?v=260811b"></script></body>
+<script src="mock_nav_dw.js?v=260811c"></script></body>
 </html>
