@@ -102,6 +102,117 @@ body.nav-expanded .main-wrap{ padding-left:200px; }
 .btn-outline:hover{ background:#e9f2ff; }
 .btn-sm{ height:36px; font-size:14px; padding:0 14px; }
 
+/* ===== 상단 대시보드 (현재 화면) — 표는 '결과 공개 여부' 축이라
+       "내가 지금 뭘 내야 하나 / 결과 나온 게 있나"가 안 읽힌다. 그 축만 위에서 요약한다.
+       읽는 블록이므로 그림자 없이 배경+아이콘으로만 구분 (좌측 액센트 띠 금지) ===== */
+.dash{ display:grid; grid-template-columns:1fr 1fr; gap:16px; margin:22px 0 30px; }
+.dash-card{ border-radius:12px; padding:20px 22px; display:flex; gap:14px; align-items:flex-start; }
+.dash-card.todo{ background:#fff7ed; }
+.dash-card.result{ background:#e9f2ff; }
+.dash-ic{ width:40px; height:40px; border-radius:10px; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+.dash-card.todo .dash-ic{ background:#ffe0c2; color:#c2410c; }
+.dash-card.result .dash-ic{ background:#d3e3ff; color:#3151c4; }
+.dash-b{ flex:1; min-width:0; }
+.dash-t{ font-size:18px; font-weight:700; margin:0 0 12px; line-height:1.45; word-break:keep-all; }
+.dash-card.todo .dash-t{ color:#c2410c; }
+.dash-card.result .dash-t{ color:#3151c4; }
+.dash-pick{ background:#fff; border-radius:10px; padding:14px 16px; display:flex; align-items:center; gap:14px; }
+.dash-pick-l{ flex:1; min-width:0; }
+.dash-cap{ font-size:13px; font-weight:600; color:#6d7381; margin:0 0 5px; }
+.dash-nm{ font-size:16px; font-weight:600; color:#222631; margin:0 0 5px; line-height:1.45; word-break:keep-all; }
+.dash-sub{ font-size:14px; color:#6d7381; margin:0; }
+.dash-sub.hot{ color:#ab303a; font-weight:600; }
+.dash-empty{ font-size:15px; color:#6d7381; margin:0; }
+
+/* ===== 전면 개편안 (학생 스타일) =====
+   목표: ① 지금 낼 과제를 바로 찾고 ② 결과 나온 걸 놓치지 않고 ③ 학기·수업 단위에서 안 헤매게.
+   표 대신 카드·체크리스트. 과목 색은 화면 전체에서 동일한 의미로만 사용 ===== */
+.st-hero{ background:linear-gradient(135deg,#e9f2ff 0%,#f7f9ff 60%,#fff 100%); border-radius:16px; padding:26px 28px 24px; margin-bottom:28px; }
+.st-hero-top{ display:flex; align-items:flex-start; gap:16px; }
+.st-date{ font-size:15px; font-weight:600; color:#3151c4; margin:0 0 6px; }
+.st-greet{ font-size:27px; font-weight:700; color:#18181b; margin:0 0 8px; line-height:1.35; }
+.st-hero-sub{ font-size:16px; color:#3b3f4c; margin:0; line-height:1.6; }
+.st-hero-sub b{ color:#ab303a; }
+.st-hero-top .sem-sel{ margin-left:auto; flex-shrink:0; background-color:#fff; }
+.st-stats{ display:grid; grid-template-columns:repeat(3,1fr); gap:14px; margin-top:20px; }
+.st-stat{ background:#fff; border:1px solid transparent; border-radius:12px; padding:14px 18px; display:inline-flex; align-items:center; justify-content:flex-start; line-height:1; vertical-align:middle; gap:14px; cursor:pointer; font-family:inherit; text-align:left; box-shadow:0 2px 4px rgba(0,0,0,.05); transition:border-color .12s; }
+.st-stat:hover{ border-color:#416bff; }
+.st-stat-ic{ width:42px; height:42px; border-radius:11px; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+.st-stat-ic.todo{ background:#ffe9d9; color:#c2410c; }
+.st-stat-ic.wait{ background:#f1f3f5; color:#3b3f4c; }
+.st-stat-ic.result{ background:#d3e3ff; color:#3151c4; }
+.st-stat .n{ font-size:26px; font-weight:700; color:#18181b; }
+.st-stat .l{ font-size:15px; font-weight:600; color:#6d7381; }
+
+.st-cols{ display:grid; grid-template-columns:minmax(0,1fr) 332px; gap:24px; align-items:start; }
+.st-sec{ margin-bottom:30px; }
+.st-sec-hd{ display:flex; align-items:center; gap:9px; margin-bottom:6px; }
+.st-sec-hd i{ color:#416bff; }
+.st-sec-t{ font-size:20px; font-weight:700; color:#18181b; margin:0; }
+.st-sec-d{ font-size:15px; color:#6d7381; margin:0 0 14px; line-height:1.6; }
+
+/* 낼 과제 — 달력 타일 + 체크리스트 카드 */
+.st-todo{ background:#fff; border:1px solid #dde1e8; border-radius:14px; padding:16px 20px 16px 16px; display:flex; align-items:center; gap:16px; cursor:pointer; transition:border-color .12s, box-shadow .12s; }
+.st-todo:hover{ border-color:#416bff; box-shadow:0 2px 8px rgba(65,107,255,.08); }
+.st-todo.urgent{ border-color:#fc9ba2; background:#fffafa; }
+.st-todo.urgent:hover{ border-color:#f2525f; box-shadow:0 2px 8px rgba(242,82,95,.1); }
+.st-due{ width:66px; height:66px; border-radius:12px; background:#f1f3f5; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:3px; flex-shrink:0; }
+.st-due .d1{ font-size:18px; font-weight:700; color:#3b3f4c; line-height:1; }
+.st-due .d2{ font-size:12px; font-weight:600; color:#6d7381; line-height:1; }
+.st-due.hot{ background:#ffebeb; }
+.st-due.hot .d1{ color:#ab303a; }
+.st-due.hot .d2{ color:#c2707a; }
+.st-due.free .d1{ font-size:15px; }
+
+/* 과목 색 — 화면 전체 공통 */
+.sj{ display:inline-flex; align-items:center; justify-content:center; line-height:1; vertical-align:middle; height:26px; padding:0 11px; border-radius:100px; font-size:13px; font-weight:700; flex-shrink:0; white-space:nowrap; }
+.sj.kor{ background:#fff1f2; color:#be3b45; }
+.sj.soc{ background:#fff5e6; color:#b45309; }
+.sj.sci{ background:#e6f7ee; color:#1f7a4d; }
+.sj.mat{ background:#e9f2ff; color:#3151c4; }
+.sj.eng{ background:#f3edff; color:#6d3fd4; }
+
+/* 확인 중 — 가벼운 목록 */
+.st-wait-row{ display:flex; align-items:center; gap:14px; padding:15px 20px; }
+.st-wait-row + .st-wait-row{ border-top:1px solid #eceef2; }
+.st-wait-ic{ width:38px; height:38px; border-radius:10px; background:#f1f3f5; color:#6d7381; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+.st-wait-b{ flex:1; min-width:0; }
+.st-wait-nm{ font-size:16px; font-weight:600; color:#222631; margin:0 0 4px; }
+.st-wait-sub{ font-size:14px; color:#6d7381; margin:0; }
+
+/* 결과 — 카드 그리드 */
+.st-results{ display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+.st-res{ background:#fff; border:1px solid #dde1e8; border-radius:14px; padding:18px 20px; cursor:pointer; display:flex; flex-direction:column; gap:10px; transition:border-color .12s, box-shadow .12s; }
+.st-res:hover{ border-color:#416bff; box-shadow:0 2px 8px rgba(65,107,255,.08); }
+.st-res-top{ display:flex; align-items:center; gap:8px; }
+.st-res-top .b-state{ margin-left:auto; }
+.st-res-nm{ font-size:17px; font-weight:600; color:#222631; margin:0; line-height:1.45; word-break:keep-all; }
+.st-res-ft{ display:flex; align-items:center; justify-content:space-between; margin-top:2px; }
+.st-res-meta{ font-size:14px; color:#6d7381; }
+
+/* 우측 레일 — 내 수업 */
+.st-rail{ display:flex; flex-direction:column; gap:24px; position:sticky; top:82px; }
+.st-rail-card{ background:#fff; border-radius:14px; box-shadow:0 2px 4px rgba(0,0,0,.06), 0 0 1px rgba(34,38,49,.3); padding:8px 10px; }
+.st-rail-hd{ display:flex; align-items:center; gap:8px; padding:12px 10px 8px; }
+.st-rail-t{ font-size:17px; font-weight:700; color:#18181b; margin:0; }
+.st-rail-hd .sec-n{ font-size:15px; }
+.st-class{ display:flex; align-items:center; gap:12px; padding:11px 10px; border-radius:10px; cursor:pointer; }
+.st-class:hover{ background:#f6f7f9; }
+.st-avatar{ width:42px; height:42px; border-radius:12px; display:flex; align-items:center; justify-content:center; font-size:16px; font-weight:700; flex-shrink:0; }
+.st-class-b{ flex:1; min-width:0; }
+.st-class-nm{ font-size:16px; font-weight:600; color:#222631; margin:0 0 3px; }
+.st-class-nm span{ font-size:14px; font-weight:500; color:#6d7381; margin-left:6px; }
+.st-class-meta{ font-size:14px; color:#6d7381; margin:0; }
+.st-class-meta b{ color:#3151c4; font-weight:600; }
+.st-class > i{ color:#9aa0ad; }
+/* 곧 시작하는 과제 */
+.st-soon-row{ display:flex; align-items:center; gap:10px; padding:11px 10px; }
+.st-soon-row + .st-soon-row{ border-top:1px solid #eceef2; }
+.st-soon-b{ flex:1; min-width:0; }
+.st-soon-nm{ font-size:15px; font-weight:600; color:#222631; margin:0 0 3px; line-height:1.4; word-break:keep-all; }
+.st-soon-sub{ font-size:13.5px; color:#6d7381; margin:0; }
+.st-rail-note{ font-size:13.5px; color:#9aa0ad; padding:4px 10px 10px; margin:0; line-height:1.55; }
+
 /* ===== 표 ===== */
 .panel{ background:#fff; border-radius:12px; box-shadow:0 2px 4px rgba(0,0,0,.06), 0 0 1px rgba(34,38,49,.3); overflow:hidden; }
 .tbl{ width:100%; border-collapse:collapse; }
@@ -454,6 +565,40 @@ body.nav-expanded .main-wrap{ padding-left:200px; }
   <div class="page-wrap">
 
     <h1 class="greet">오늘은 7월 29일 수요일<br>김서윤 학생, 안녕하세요!</h1>
+
+    <!-- 대시보드 — 표(결과 공개 여부 축)에서 안 읽히는 "지금 뭘 내야 하나 / 결과 나온 게 있나"만 요약.
+         표 데이터와 숫자 일치: 내지 않은 과제 = 미공개 표의 미제출1 + 제출 없음(마감 없음)1 = 2 -->
+    <div class="dash">
+      <div class="dash-card todo">
+        <div class="dash-ic"><i data-lucide="alarm-clock" style="width:22px;height:22px"></i></div>
+        <div class="dash-b">
+          <p class="dash-t">아직 내지 않은 과제가 2개 있어요</p>
+          <div class="dash-pick">
+            <div class="dash-pick-l">
+              <p class="dash-cap">마감이 가장 가까운 과제</p>
+              <p class="dash-nm">용해와 용액 실험 보고서 작성의 과제</p>
+              <p class="dash-sub">과학 · 8월 5일(수) 12:00까지 · <b>7일 남음</b></p>
+            </div>
+            <button class="btn btn-primary btn-sm" onclick="location.href='student_submit_v1_260729.html#fileonly'"><i data-lucide="pencil-line" style="width:14px;height:14px"></i>제출하기</button>
+          </div>
+        </div>
+      </div>
+      <div class="dash-card result">
+        <div class="dash-ic"><i data-lucide="award" style="width:22px;height:22px"></i></div>
+        <div class="dash-b">
+          <p class="dash-t">결과 나온 과제가 5개 있어요</p>
+          <div class="dash-pick">
+            <div class="dash-pick-l">
+              <p class="dash-cap">가장 최근에 나온 결과</p>
+              <p class="dash-nm">설명하는 글 쓰기</p>
+              <p class="dash-sub">국어 · 이수민 선생님</p>
+            </div>
+            <button class="btn btn-outline btn-sm" onclick="notReady('결과 보기')">결과 보기</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <p class="greet-sub" style="font-size:20px;font-weight:600;color:#18181b;margin-bottom:14px;">2026학년도 과제 현황</p>
 
     <div class="filter-bar">
@@ -605,6 +750,234 @@ body.nav-expanded .main-wrap{ padding-left:200px; }
   </div>
 </div>
 
+<!-- ═══════════════ 전면 개편안 (학생 스타일) ═══════════════ -->
+<div id="scr-student" class="screen">
+  <div class="page-wrap">
+
+    <!-- 히어로 — 인사 + 오늘의 핵심 + 숫자 타일(누르면 해당 섹션으로) -->
+    <div class="st-hero">
+      <div class="st-hero-top">
+        <div>
+          <p class="st-date">7월 29일 수요일</p>
+          <h1 class="st-greet">김서윤 학생, 안녕하세요! 👋</h1>
+          <p class="st-hero-sub"><b>오늘 마감하는 과제가 1개</b> 있어요. 잊지 말고 제출해 주세요.</p>
+        </div>
+        <select class="sem-sel" onchange="notReady('학기 바꾸기')">
+          <option>2026학년도 1학기</option>
+          <option>2026학년도 2학기</option>
+        </select>
+      </div>
+      <div class="st-stats">
+        <button class="st-stat" onclick="stScroll('st-sec-todo')"><span class="st-stat-ic todo"><i data-lucide="pencil-line" style="width:21px;height:21px"></i></span><span class="n">6</span><span class="l">낼 과제</span></button>
+        <button class="st-stat" onclick="stScroll('st-sec-wait')"><span class="st-stat-ic wait"><i data-lucide="hourglass" style="width:21px;height:21px"></i></span><span class="n">2</span><span class="l">선생님 확인 중</span></button>
+        <button class="st-stat" onclick="stScroll('st-sec-result')"><span class="st-stat-ic result"><i data-lucide="award" style="width:21px;height:21px"></i></span><span class="n">5</span><span class="l">결과 나온 과제</span></button>
+      </div>
+    </div>
+
+    <div class="st-cols">
+      <!-- ── 왼쪽: 할 일 → 확인 중 → 결과 ── -->
+      <div>
+
+        <!-- 지금 낼 과제 -->
+        <div class="st-sec" id="st-sec-todo">
+          <div class="st-sec-hd"><i data-lucide="pencil-line" style="width:20px;height:20px"></i><h2 class="st-sec-t">지금 낼 과제</h2><span class="sec-n">6</span></div>
+          <p class="st-sec-d">마감이 가까운 순서예요. 마감이 없는 과제는 맨 아래에 있어요.</p>
+          <div class="todo-list">
+            <div class="st-todo urgent" onclick="location.href='student_submit_v1_260729.html#write'">
+              <div class="st-due hot"><span class="d1">오늘</span><span class="d2">16:00 마감</span></div>
+              <div class="todo-l">
+                <div class="todo-top"><span class="sj soc">사회</span></div>
+                <p class="todo-nm">사회 변동과 현대사회의 문제 분석</p>
+                <p class="todo-meta">김기남 선생님</p>
+              </div>
+              <div class="todo-r">
+                <span class="todo-writing"><i data-lucide="pencil-line" style="width:15px;height:15px"></i>쓰던 중</span>
+                <button class="btn btn-primary" onclick="event.stopPropagation();location.href='student_submit_v1_260729.html#write'">이어 쓰기</button>
+              </div>
+            </div>
+            <div class="st-todo urgent" onclick="location.href='student_submit_v1_260729.html#notice'">
+              <div class="st-due hot"><span class="d1">내일</span><span class="d2">16:00 마감</span></div>
+              <div class="todo-l">
+                <div class="todo-top"><span class="sj kor">국어</span></div>
+                <p class="todo-nm">주장하는 글 쓰기</p>
+                <p class="todo-meta">이수민 선생님</p>
+              </div>
+              <div class="todo-r"><button class="btn btn-primary" onclick="event.stopPropagation();location.href='student_submit_v1_260729.html#notice'">제출</button></div>
+            </div>
+            <div class="st-todo" onclick="location.href='student_submit_v1_260729.html#fileonly'">
+              <div class="st-due"><span class="d1">8/5</span><span class="d2">7일 남음</span></div>
+              <div class="todo-l">
+                <div class="todo-top"><span class="sj sci">과학</span></div>
+                <p class="todo-nm">용해와 용액 실험 보고서</p>
+                <p class="todo-meta">김기남 선생님</p>
+              </div>
+              <div class="todo-r"><button class="btn btn-outline" onclick="event.stopPropagation();location.href='student_submit_v1_260729.html#fileonly'">제출</button></div>
+            </div>
+            <div class="st-todo" onclick="location.href='student_submit_v1_260729.html#notice'">
+              <div class="st-due"><span class="d1">8/7</span><span class="d2">9일 남음</span></div>
+              <div class="todo-l">
+                <div class="todo-top"><span class="sj mat">수학</span></div>
+                <p class="todo-nm">일차함수 활용 문제 풀이 과정 쓰기</p>
+                <p class="todo-meta">박정호 선생님</p>
+              </div>
+              <div class="todo-r"><button class="btn btn-outline" onclick="event.stopPropagation();location.href='student_submit_v1_260729.html#notice'">제출</button></div>
+            </div>
+            <div id="stTodoMore" style="display:none;flex-direction:column;gap:12px;">
+              <div class="st-todo" onclick="location.href='student_submit_v1_260729.html#notice'">
+                <div class="st-due"><span class="d1">8/10</span><span class="d2">12일 남음</span></div>
+                <div class="todo-l">
+                  <div class="todo-top"><span class="sj eng">영어</span></div>
+                  <p class="todo-nm">영어 에세이 — My Future Job</p>
+                  <p class="todo-meta">최수현 선생님</p>
+                </div>
+                <div class="todo-r"><button class="btn btn-outline" onclick="event.stopPropagation();location.href='student_submit_v1_260729.html#notice'">제출</button></div>
+              </div>
+              <div class="st-todo" onclick="location.href='student_submit_v1_260729.html#notice'">
+                <div class="st-due free"><span class="d1">마감</span><span class="d2">없음</span></div>
+                <div class="todo-l">
+                  <div class="todo-top"><span class="sj kor">국어</span></div>
+                  <p class="todo-nm">문학 작품 감상문 쓰기</p>
+                  <p class="todo-meta">언제든 낼 수 있어요 · 이수민 선생님</p>
+                </div>
+                <div class="todo-r"><button class="btn btn-outline" onclick="event.stopPropagation();location.href='student_submit_v1_260729.html#notice'">제출</button></div>
+              </div>
+            </div>
+          </div>
+          <button class="todo-more" id="stTodoMoreBtn" onclick="stShowMore()">2개 더 보기 <i data-lucide="chevron-down" style="width:16px;height:16px"></i></button>
+        </div>
+
+        <!-- 선생님 확인 중 -->
+        <div class="st-sec" id="st-sec-wait">
+          <div class="st-sec-hd"><i data-lucide="hourglass" style="width:20px;height:20px"></i><h2 class="st-sec-t">선생님 확인 중</h2><span class="sec-n">2</span></div>
+          <p class="st-sec-d">제출을 마친 과제예요. 선생님이 확인하면 결과가 나와요.</p>
+          <div class="panel">
+            <div class="st-wait-row">
+              <div class="st-wait-ic"><i data-lucide="file-check-2" style="width:19px;height:19px"></i></div>
+              <div class="st-wait-b">
+                <p class="st-wait-nm">매체 자료 분석하기</p>
+                <p class="st-wait-sub">국어 · 이수민 선생님 · 7월 24일(금)에 제출</p>
+              </div>
+              <button class="link-btn" onclick="location.href='student_submit_v1_260729.html#done'">답안 보기 <i data-lucide="chevron-right" style="width:15px;height:15px"></i></button>
+            </div>
+            <div class="st-wait-row">
+              <div class="st-wait-ic"><i data-lucide="file-check-2" style="width:19px;height:19px"></i></div>
+              <div class="st-wait-b">
+                <p class="st-wait-nm">지역 문제 조사 보고서</p>
+                <p class="st-wait-sub">사회 · 김기남 선생님 · 7월 22일(수)에 제출</p>
+              </div>
+              <button class="link-btn" onclick="location.href='student_submit_v1_260729.html#done'">답안 보기 <i data-lucide="chevron-right" style="width:15px;height:15px"></i></button>
+            </div>
+          </div>
+        </div>
+
+        <!-- 결과 나온 과제 -->
+        <div class="st-sec" id="st-sec-result">
+          <div class="st-sec-hd"><i data-lucide="award" style="width:20px;height:20px"></i><h2 class="st-sec-t">결과 나온 과제</h2><span class="sec-n">5</span></div>
+          <p class="st-sec-d">점수와 선생님 피드백을 볼 수 있어요.</p>
+          <div class="st-results">
+            <div class="st-res" onclick="notReady('결과 보기')">
+              <div class="st-res-top"><span class="sj kor">국어</span><span class="b-state done">제출 완료</span></div>
+              <p class="st-res-nm">설명하는 글 쓰기</p>
+              <div class="st-res-ft"><span class="st-res-meta">7월 18일(금) 마감</span><button class="link-btn" onclick="event.stopPropagation();notReady('결과 보기')">결과 보기 <i data-lucide="chevron-right" style="width:15px;height:15px"></i></button></div>
+            </div>
+            <div class="st-res" onclick="notReady('결과 보기')">
+              <div class="st-res-top"><span class="sj kor">국어</span><span class="b-state done">제출 완료</span></div>
+              <p class="st-res-nm">시 감상하고 표현하기</p>
+              <div class="st-res-ft"><span class="st-res-meta">7월 11일(금) 마감</span><button class="link-btn" onclick="event.stopPropagation();notReady('결과 보기')">결과 보기 <i data-lucide="chevron-right" style="width:15px;height:15px"></i></button></div>
+            </div>
+            <div class="st-res" onclick="notReady('결과 보기')">
+              <div class="st-res-top"><span class="sj soc">사회</span><span class="b-state done">제출 완료</span></div>
+              <p class="st-res-nm">인권 보장과 헌법</p>
+              <div class="st-res-ft"><span class="st-res-meta">7월 4일(금) 마감</span><button class="link-btn" onclick="event.stopPropagation();notReady('결과 보기')">결과 보기 <i data-lucide="chevron-right" style="width:15px;height:15px"></i></button></div>
+            </div>
+            <div class="st-res" onclick="notReady('결과 보기')">
+              <div class="st-res-top"><span class="sj sci">과학</span><span class="b-state wait">제출 없이 채점</span></div>
+              <p class="st-res-nm">물질의 상태 변화 정리</p>
+              <div class="st-res-ft"><span class="st-res-meta">6월 27일(금) 마감</span><button class="link-btn" onclick="event.stopPropagation();notReady('결과 보기')">결과 보기 <i data-lucide="chevron-right" style="width:15px;height:15px"></i></button></div>
+            </div>
+            <div class="st-res" onclick="notReady('결과 보기')">
+              <div class="st-res-top"><span class="sj sci">과학</span><span class="b-state miss">미제출</span></div>
+              <p class="st-res-nm">생태계와 환경 조사</p>
+              <div class="st-res-ft"><span class="st-res-meta">6월 20일(금) 마감</span><button class="link-btn" onclick="event.stopPropagation();notReady('결과 보기')">결과 보기 <i data-lucide="chevron-right" style="width:15px;height:15px"></i></button></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── 오른쪽 레일: 내 수업 · 곧 시작하는 과제 ── -->
+      <div class="st-rail">
+        <div class="st-rail-card">
+          <div class="st-rail-hd"><h2 class="st-rail-t">내 수업</h2><span class="sec-n">5</span></div>
+          <div class="st-class" onclick="notReady('수업 홈')">
+            <span class="st-avatar sj kor" style="border-radius:12px;">국</span>
+            <div class="st-class-b">
+              <p class="st-class-nm">국어 <span>이수민 선생님</span></p>
+              <p class="st-class-meta"><b>낼 과제 2</b> · 결과 2</p>
+            </div>
+            <i data-lucide="chevron-right" style="width:17px;height:17px"></i>
+          </div>
+          <div class="st-class" onclick="notReady('수업 홈')">
+            <span class="st-avatar sj soc" style="border-radius:12px;">사</span>
+            <div class="st-class-b">
+              <p class="st-class-nm">사회 <span>김기남 선생님</span></p>
+              <p class="st-class-meta"><b>낼 과제 1</b> · 결과 1</p>
+            </div>
+            <i data-lucide="chevron-right" style="width:17px;height:17px"></i>
+          </div>
+          <div class="st-class" onclick="notReady('수업 홈')">
+            <span class="st-avatar sj sci" style="border-radius:12px;">과</span>
+            <div class="st-class-b">
+              <p class="st-class-nm">과학 <span>김기남 선생님</span></p>
+              <p class="st-class-meta"><b>낼 과제 1</b> · 결과 2</p>
+            </div>
+            <i data-lucide="chevron-right" style="width:17px;height:17px"></i>
+          </div>
+          <div class="st-class" onclick="notReady('수업 홈')">
+            <span class="st-avatar sj mat" style="border-radius:12px;">수</span>
+            <div class="st-class-b">
+              <p class="st-class-nm">수학 <span>박정호 선생님</span></p>
+              <p class="st-class-meta"><b>낼 과제 1</b></p>
+            </div>
+            <i data-lucide="chevron-right" style="width:17px;height:17px"></i>
+          </div>
+          <div class="st-class" onclick="notReady('수업 홈')">
+            <span class="st-avatar sj eng" style="border-radius:12px;">영</span>
+            <div class="st-class-b">
+              <p class="st-class-nm">영어 <span>최수현 선생님</span></p>
+              <p class="st-class-meta"><b>낼 과제 1</b></p>
+            </div>
+            <i data-lucide="chevron-right" style="width:17px;height:17px"></i>
+          </div>
+          <p class="st-rail-note">수업을 누르면 그 수업의 과제만 모아 볼 수 있어요.</p>
+        </div>
+
+        <div class="st-rail-card">
+          <div class="st-rail-hd"><h2 class="st-rail-t">곧 시작하는 과제</h2><span class="sec-n">2</span></div>
+          <div class="st-soon-row">
+            <div class="st-soon-b">
+              <p class="st-soon-nm">토론하기 활동 정리</p>
+              <p class="st-soon-sub">국어 · 8월 12일(수)부터 낼 수 있어요</p>
+            </div>
+            <span class="b-state soon">시작 전</span>
+          </div>
+          <div class="st-soon-row">
+            <div class="st-soon-b">
+              <p class="st-soon-nm">경제 활동과 선택</p>
+              <p class="st-soon-sub">사회 · 8월 12일(수)부터 낼 수 있어요</p>
+            </div>
+            <span class="b-state soon">시작 전</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <footer class="site-footer">
+      <div class="sf-links"><a href="#" onclick="return false;">회사소개</a><a href="#" onclick="return false;">이용약관</a><a href="#" onclick="return false;">개인정보처리방침</a><a href="#" onclick="return false;">고객센터</a></div>
+      <div class="sf-copy">© 2026. Datadriven Inc. All rights reserved.</div>
+    </footer>
+  </div>
+</div>
+
 </div>
 
 <div id="toast" class="toast"><i data-lucide="circle-check-big" style="width:20px;height:20px;flex-shrink:0;"></i><span id="toastMsg"></span></div>
@@ -614,8 +987,9 @@ body.nav-expanded .main-wrap{ padding-left:200px; }
   <div class="mp-head" onclick="mpToggle()"><span>목업 내비게이터 · 학생 과제 홈 (CLIPO)</span><span id="mpArrow">▾</span></div>
   <div class="mp-body" id="mpBody">
     <div class="mp-cap">과제 홈</div>
-    <button class="mp-btn on" data-scene="new" onclick="go('new')">개선안<span class="mp-sub">할 일 우선</span></button>
-    <button class="mp-btn" data-scene="current" onclick="go('current')">현재 개발 화면<span class="mp-sub">Figma 329-7972</span></button>
+    <button class="mp-btn on" data-scene="student" onclick="go('student')">전면 개편안<span class="mp-sub">학생 스타일 대시보드</span></button>
+    <button class="mp-btn" data-scene="new" onclick="go('new')">개선안<span class="mp-sub">할 일 우선</span></button>
+    <button class="mp-btn" data-scene="current" onclick="go('current')">현재 개발 화면<span class="mp-sub">Figma 329-7972 + 상단 요약</span></button>
     <div class="mp-cap">이어지는 화면</div>
     <button class="mp-btn" onclick="location.href='student_submit_v1_260729.html'">학생 · 과제 제출<span class="mp-sub">안내 · 작성 · 완료</span></button>
     <button class="mp-btn" onclick="location.href='focus_log_v1_260728.html#teacher-log'">교사 · 과제물 관리<span class="mp-sub">제출 현황 · 답안 PDF</span></button>
@@ -669,6 +1043,15 @@ function showMoreTodo(){
   document.getElementById('todoMore').style.display = '';
   document.getElementById('todoMoreBtn').style.display = 'none';
 }
+function stShowMore(){
+  document.getElementById('stTodoMore').style.display = 'flex';
+  document.getElementById('stTodoMoreBtn').style.display = 'none';
+}
+/* 히어로 숫자 타일 → 해당 섹션으로 부드럽게 이동 */
+function stScroll(id){
+  var el = document.getElementById(id);
+  if(el) window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY - 74, behavior:'smooth' });
+}
 
 
 var _tt;
@@ -686,18 +1069,19 @@ function toggleNav(){
 }
 
 var _h = location.hash.slice(1);
-go(_h && document.getElementById('scr-'+_h) ? _h : 'new');
+go(_h && document.getElementById('scr-'+_h) ? _h : 'student');
 </script>
 
 <!-- ===== 목업 내비게이터(까망이) 연결 — 규칙: docs/mockup-navigator.md ===== -->
 <script>
 window.MOCK_NAV_FILE  = 'home';
 window.MOCK_NAV_APPLY = {
+  shStu: function(){ go('student'); },
   shNew: function(){ go('new'); },
   shCur: function(){ go('current'); }
 };
 (function(){
-  var MAP = { 'new':'shNew', current:'shCur' };
+  var MAP = { student:'shStu', 'new':'shNew', current:'shCur' };
   var _go = window.go;
   if (typeof _go === 'function') window.go = function(s){ _go.apply(this, arguments); if (window.mockNavSetCurrent && MAP[s]) window.mockNavSetCurrent(MAP[s]); };
 })();
