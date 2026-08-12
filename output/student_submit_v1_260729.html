@@ -1094,29 +1094,25 @@ if(!goSub(_h)) go('write');
 <script>
 window.MOCK_NAV_FILE  = 'submit';
 window.MOCK_NAV_GROUPS = [
-  /* 학생 홈 과업 전용 (2026-08-12 올립) — 목록 → 제출 → 완료, 학생 여정만 담는다.
-     교사 화면은 이 과업이 아니므로 싣지 않는다(교사 파일의 까망이는 그대로).
-     student_home과 student_submit이 같은 목록을 쓴다 — 화면을 오가도 까망이가 안 바뀌게 */
-  { t:'학생 · 과제 목록',      items:[
+  /* 학생 홈 과업 전용 (2026-08-12 올립) — 화면 셋(홈 / 과제 목록 / 과제 상세)이 최상위,
+     케이스는 그 아래 하위 그룹. 교사 화면은 이 과업이 아니므로 싣지 않는다.
+     말로 설명하면 되는 것(이탈 배너 유무·기록 안내 끔)은 케이스로 만들지 않는다 —
+     목록이 길어지면 정작 봐야 할 화면이 묻힌다.
+     student_home과 student_submit이 같은 목록을 쓴다(화면을 오가도 까망이가 안 바뀌게) */
+  { t:'학생 · 화면',            items:[
       ['shHome6','홈',{sub:'전체 12건 · 상태 칩 + 검색'}],
-      ['shTask6','과제 메뉴',{sub:'내용 동일 · 헤더만 타이틀+설명'}]] },
-  { t:'└ 목록 케이스',         items:[
+      ['shTask6','과제 목록',{sub:'내용 동일 · 헤더만 타이틀+설명'}],
+      ['ssWrite','과제 상세',{sub:'목록에서 과제를 누르면 여기로'}]] },
+  { t:'└ 목록 케이스',          items:[
       ['shHome6NoRes','검색 결과 없음'],
       ['shHome6Zero','과제 0건',{sub:'신학기 · 도구 모음까지 감춤'}]] },
-  { t:'학생 · 과제 제출',      items:[
-      ['ssWrite','① 작성',{sub:'목록에서 과제를 누르면 여기로'}],
-      ['ssDone','② 제출 완료']] },
-  { t:'└ 작성 화면 케이스',    items:[
-      ['ssLeave','다른 화면 다녀옴',{sub:'알림(8초) + 누적 상태'}],
-      ['ssWriteNoti','기록 안내 표시 끔',{sub:'시작 전 고지는 그대로'}]] },
-  { t:'└ 제출 방식별',         items:[
+  { t:'└ 과제 상세 케이스',     items:[
       ['ssBoth','직접 작성 + 파일 제출'],
-      ['ssFileonly','파일 제출만',{sub:'시작 안내 팝업 없음'}],
+      ['ssFileonly','파일 제출만'],
       ['ssPreparing','문항 미작성'],
-      ['ssClosed','제출 못 한 채 마감',{sub:'쓰던 글은 읽기 전용'}]] },
-  { t:'└ 제출 완료 상태',      items:[
-      ['ssBefore','결과 공개 전',{sub:'다시 제출 가능'}],
-      ['ssAfter','결과 공개 후',{sub:'재제출 차단'}],
+      ['ssBefore','제출 완료 · 결과 공개 전',{sub:'다시 제출 가능'}],
+      ['ssAfter','제출 완료 · 결과 공개 후',{sub:'재제출 차단'}],
+      ['ssClosed','제출 못 한 채 마감',{sub:'쓰던 글은 읽기 전용'}],
       ['ssPdf','답안 PDF']] }
 ];
 /* 케이스를 옮기면 쌓인 이탈 누적을 지운다 — 시연하다 이탈이 잡히면 그 값이 다른 케이스까지
@@ -1158,5 +1154,5 @@ window.MOCK_NAV_APPLY = {
   if (typeof _so === 'function') window.setOpened = function(v){ _so.apply(this, arguments); if (window.mockNavSetCurrent) window.mockNavSetCurrent(v ? 'ssAfter' : 'ssBefore'); };
 })();
 </script>
-<script src="mock_nav_dw.js?v=260812g"></script></body>
+<script src="mock_nav_dw.js?v=260812i"></script></body>
 </html>
