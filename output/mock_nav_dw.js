@@ -99,10 +99,12 @@
     //     ['shNew','2. 개선안',{sub:'할 일 기준 재배열 · 오늘 요약 배너'}],
     //     ['shStu','3. 전면 개편안 · 결과 목록형',{sub:'결과 행 + 점수 · 더 보기 공통'}],
     //     ['shCards','4. 전면 개편안 · 결과 카드형',{sub:'결과 카드 그리드 · 수업 필터는 드롭다운'}]] },
-    { t:'학생 · 제출 주요 플로우', items:[['ssWrite','① 작성'],['ssDone','② 제출 완료']] },
-    { t:'└ 작성 화면 케이스',      items:[['ssGuide','시작 안내 팝업',{sub:'과제 최초 진입 · 처음 한 번만'}],['ssLeave','다른 화면 다녀옴',{sub:'알림 + 누적 상태'}]] },
-    { t:'└ 작성 화면 설정',        items:[['ssWriteNoti','기록 안내 표시 끔',{sub:'시작 전 고지는 그대로'}]] },
-    { t:'└ 다른 설정으로 낸 과제', items:[['ssBoth','직접 작성 + 파일 제출'],['ssFileonly','파일 제출만'],['ssPreparing','문항 미작성'],['ssClosed','제출 못 한 채 마감']] },
+    { t:'학생 · 과제 제출',        items:[['ssWrite','① 작성'],['ssDone','② 제출 완료']] },
+    { t:'└ 작성 화면 케이스',      items:[
+        ['ssGuide','시작 안내 팝업',{sub:'과제 최초 진입 · 처음 한 번만'}],
+        ['ssLeave','다른 화면 다녀옴',{sub:'알림(8초) + 누적 상태'}],
+        ['ssWriteNoti','기록 안내 표시 끔',{sub:'시작 전 고지는 그대로'}]] },
+    { t:'└ 다른 설정으로 낸 과제', items:[['ssBoth','직접 작성 + 파일 제출'],['ssFileonly','파일 제출만'],['ssPreparing','문항 미작성'],['ssClosed','제출 못 한 채 마감',{sub:'쓰던 글은 비활성 에디터로'}]] },
     { t:'└ 제출 완료 화면 상태',   items:[['ssBefore','결과 공개 전'],['ssAfter','결과 공개 후'],['ssPdf','답안 PDF']] }
   ];
 
@@ -157,7 +159,7 @@
 
   var wrap = document.createElement('div'); wrap.id = 'mockNav';
   wrap.innerHTML =
-      '<div class="mn-head"><span class="mn-hl"><span class="mn-dot"></span><span class="mn-full">MOCKUP · 학생 직접 작성</span><span class="mn-mini">목업</span></span>'
+      '<div class="mn-head"><span class="mn-hl"><span class="mn-dot"></span><span class="mn-full">MOCKUP · 학생 과제 (시안 6)</span><span class="mn-mini">목업</span></span>'
     + '<button class="mn-caret" aria-label="접기/펼치기">&#9662;</button></div>'
     + '<div class="mn-body" id="mnBody"></div>';
   document.body.appendChild(wrap);

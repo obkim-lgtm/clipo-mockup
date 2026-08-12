@@ -135,7 +135,12 @@ body.nav-expanded .main-wrap{ padding-left:200px; }
    · 알림(.leave-banner) = 다녀온 직후 잠깐. 8초 뒤 스스로 접힌다
    · 상태(.leave-stat)   = 누적 횟수·시간. 글자 수 옆에 늘 있다
    상시 배너는 2026-08-11에 한 번 걷어냈다 — 늘 떠 있으면 배경이 되어 안 읽힌다 */
-.leave-banner{ display:none; background:#fff7ed; border-radius:12px; padding:18px 20px; align-items:flex-start; gap:14px; margin-bottom:20px;
+/* 알림은 화면에 고정한다 — 스크롤을 내려 쓰다가 다녀오면 상단 배너를 아예 못 본다는
+   지적(2026-08-12 회의)에 대한 답. 상시 배너로 굳는 문제는 8초 자동 접힘이 막는다:
+   '늘 떠 있어 배경이 된다'와 '스크롤하면 안 보인다'를 동시에 푸는 유일한 조합 */
+.leave-banner{ display:none; position:sticky; top:70px; z-index:120;
+  background:#fff7ed; border:1px solid #fdd9b5; border-radius:12px; padding:18px 20px; align-items:flex-start; gap:14px; margin-bottom:20px;
+  box-shadow:0 6px 18px rgba(194,65,12,.10);
   transition:opacity .25s ease, transform .25s ease; }
 .leave-banner.show{ display:flex; }
 .leave-banner.fade{ opacity:0; transform:translateY(-6px); }
@@ -255,6 +260,39 @@ body.pdf-mode .sf-copy{ color:#8b8f9c; }
 .toast{ position:fixed; bottom:28px; left:50%; transform:translateX(-50%) translateY(12px); opacity:0; min-width:300px; max-width:520px; padding:15px 22px; border-radius:8px; display:flex; align-items:center; gap:12px; font-size:15px; font-weight:600; box-shadow:0 0 1px #2226314D, 0 4px 12px #00000026; z-index:9999; transition:opacity .2s ease, transform .2s ease; pointer-events:none; background:#319d64; color:#fff; }
 .toast.show{ opacity:1; transform:translateX(-50%) translateY(0); }
 .toast.err{ background:#c8404c; }
+
+
+/* ═══════════ 반응형 (2026-08-12) ═══════════ */
+@media (max-width:1180px){
+  body{ min-width:0; }
+  .page-wrap{ padding:24px 20px 0; }
+}
+@media (max-width:900px){
+  body.nav-expanded .main-wrap{ padding-left:56px; }
+  .icon-sb.expanded{ width:56px; }
+  .icon-sb.expanded .si-label{ opacity:0; }
+  /* 팝업은 화면 폭을 따라간다 — 800px 고정이면 태블릿에서 잘린다 */
+  #guideModal .md{ max-width:none; }
+}
+@media (max-width:760px){
+  .page-wrap{ padding:18px 14px 0; }
+  .page-h1{ font-size:20px; }
+  .card{ padding:20px 16px; }
+  .task-name{ font-size:19px; }
+  .task-top{ flex-wrap:wrap; gap:8px; }
+  /* 이탈 알림은 좁은 화면에서 두 줄이 되므로 헤더 아래 여백을 줄인다 */
+  .leave-banner{ top:64px; padding:14px 16px; }
+  .rule{ align-items:flex-start; }
+  .actions{ flex-direction:column; align-items:stretch; gap:10px; }
+  .actions .btn{ width:100%; }
+  .act-note{ text-align:center; }
+  .ed-ta{ min-height:200px; font-size:16px; padding:14px; }
+  .ed-tool{ overflow-x:auto; flex-wrap:nowrap; scrollbar-width:none; }
+  .ed-tool::-webkit-scrollbar{ display:none; }
+  .md-body{ padding:24px 20px 18px; }
+  .md-ft{ padding:0 20px 22px; }
+  #guideModal .md-ft button{ width:100%; min-width:0; }
+}
 
 /* ===== 푸터 ===== */
 .site-footer{ margin-top:auto; padding:48px 0 40px; display:flex; flex-direction:column; align-items:center; gap:16px; }
@@ -1086,5 +1124,5 @@ window.MOCK_NAV_APPLY = {
   if (typeof _so === 'function') window.setOpened = function(v){ _so.apply(this, arguments); if (window.mockNavSetCurrent) window.mockNavSetCurrent(v ? 'ssAfter' : 'ssBefore'); };
 })();
 </script>
-<script src="mock_nav_dw.js?v=260812d"></script></body>
+<script src="mock_nav_dw.js?v=260812e"></script></body>
 </html>

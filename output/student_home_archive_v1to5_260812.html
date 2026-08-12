@@ -1,0 +1,2330 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<script>window.MOCK_NAV_ENTRY_HASH = location.hash;</script>  <!-- 페이지 초기화가 해시를 덮기 전에 진입 해시 보존 (까망이 딥링크) -->
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/png" href="clipo_favicon.png">
+<title>[아카이브] 학생 과제 홈 시안 1~5 (CLIPO)</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard-gov.min.css">
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<style>
+*{ font-family:'Pretendard GOV',-apple-system,sans-serif; box-sizing:border-box; }
+body{ margin:0; background:#f6f7f9; color:#222631; font-size:16px; min-width:1180px; }
+a{ text-decoration:none; color:inherit; }
+
+/* ===== 헤더 ===== */
+.g-hd{ height:58px; background:#fff; border-bottom:1px solid #dde1e8; display:flex; align-items:center; padding:0 20px 0 9px; position:fixed; top:0; left:0; right:0; z-index:200; }
+.gh-menu-btn{ width:40px; height:40px; border:none; background:none; border-radius:4px; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; color:#3b3f4c; margin-right:9px; line-height:1; }
+.gh-menu-btn:hover{ background:#f6f7f9; }
+.g-hd-r{ margin-left:auto; display:flex; align-items:center; gap:6px; font-size:15px; color:#3151c4; font-weight:500; }
+
+/* ===== 좌측 NB ===== */
+.icon-sb{ width:56px; background:#fff; border-right:1px solid #d9d9d9; position:fixed; top:58px; bottom:0; left:0; display:flex; flex-direction:column; padding:8px 0; z-index:150; transition:width .2s ease; }
+.icon-sb.expanded{ width:200px; }
+.si{ height:40px; display:flex; align-items:center; border-radius:8px; color:#6d7381; cursor:pointer; margin:0 8px 2px; position:relative; padding:0 4px 0 8px; gap:10px; white-space:nowrap; flex-shrink:0; }
+.si:hover{ background:#f1f3f5; }
+.si.active{ background:#e9f2ff; color:#416bff; }
+.si-icon{ width:24px; height:24px; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+.si-label{ font-size:13px; font-weight:500; opacity:0; transition:opacity .1s; overflow:hidden; }
+.icon-sb.expanded .si-label{ opacity:1; }
+.si-tip{ position:absolute; left:48px; top:50%; transform:translateY(-50%); background:#222631; color:#fff; font-size:11px; padding:3px 8px; border-radius:4px; white-space:nowrap; display:none; z-index:300; pointer-events:none; }
+.si:hover .si-tip{ display:block; }
+.icon-sb.expanded .si-tip{ display:none !important; }
+
+.main-wrap{ position:relative; padding-top:58px; padding-left:56px; transition:padding-left .2s; min-height:100vh; }
+body.nav-expanded .main-wrap{ padding-left:200px; }
+.page-wrap{ max-width:1240px; margin:0 auto; padding:28px 32px 0; width:100%; display:flex; flex-direction:column; min-height:calc(100vh - 58px); }
+
+/* ===== 인사 ===== */
+.greet-row{ display:flex; align-items:center; gap:16px; margin-bottom:18px; flex-wrap:wrap; }
+.greet{ font-size:26px; font-weight:600; color:#18181b; margin:0; line-height:1.4; }
+.greet-filters{ margin-left:auto; display:flex; align-items:center; gap:8px; flex-shrink:0; }
+
+/* ===== 오늘 요약 — 읽는 알림 (배경+아이콘, 그림자 없음 = 누르는 것과 구분) ===== */
+.today{ background:#fff7ed; border-radius:12px; padding:18px 22px; display:flex; align-items:center; gap:14px; margin-bottom:30px; }
+.today i{ width:24px; height:24px; color:#ea580c; flex-shrink:0; }
+.today-t{ font-size:18px; font-weight:700; color:#c2410c; margin:0 0 3px; line-height:1.45; }
+.today-d{ font-size:15px; font-weight:500; color:#9a5b2e; margin:0; line-height:1.6; }
+/* 7일로 넓히면 오늘·내일이 묻히므로 급한 건만 따로 (2026-08-07) */
+.today-urgent{ display:inline-flex; align-items:center; justify-content:center; line-height:1; vertical-align:middle; height:24px; padding:0 9px; margin-left:6px; border-radius:6px; background:#c2410c; color:#fff; font-size:14px; font-weight:600; }
+.today.calm{ background:#e9f2ff; }
+.today.calm i{ color:#416bff; }
+.today.calm .today-t{ color:#3151c4; }
+.today.calm .today-d{ color:#3b3f4c; }
+
+/* ===== 필터 (개선안) — 학기·과목 드롭다운, 과목 수가 많아도 안 늘어남 ===== */
+.sem-sel{ height:42px; max-width:200px; border:1px solid #d9d9d9; border-radius:8px; padding:0 38px 0 16px; font-size:15px; font-weight:500; font-family:inherit; color:#222631; background:#fff url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%236d7381' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>") no-repeat right 14px center; appearance:none; cursor:pointer; text-overflow:ellipsis; }
+.sem-sel:hover{ border-color:#b3b3b3; }
+
+/* ===== 학기 탭 + 필터 (현재 화면 재현용) ===== */
+.filter-bar{ background:#fff; border-radius:12px; padding:0 24px; box-shadow:0 2px 4px rgba(0,0,0,.06), 0 0 1px rgba(34,38,49,.3); margin-bottom:24px; }
+.sem-tabs{ display:flex; border-bottom:1px solid #eceef2; }
+.sem-tab{ padding:16px 18px; font-size:16px; font-weight:500; color:#6d7381; border:none; background:none; cursor:pointer; font-family:inherit; border-bottom:3px solid transparent; margin-bottom:-1px; display:inline-flex; align-items:center; justify-content:center; line-height:1; vertical-align:middle; }
+.sem-tab:hover{ color:#222631; }
+.sem-tab.on{ color:#365eef; border-bottom-color:#365eef; }
+.filters{ display:flex; gap:12px; padding:16px 0; }
+.sel{ height:42px; border:1px solid #d9d9d9; border-radius:8px; padding:0 34px 0 14px; font-size:15px; font-family:inherit; color:#222631; background:#fff url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%236d7381' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>") no-repeat right 12px center; appearance:none; cursor:pointer; }
+
+/* ===== 섹션 ===== */
+.sec{ margin-bottom:28px; }
+.sec-hd{ display:flex; align-items:center; gap:10px; margin-bottom:14px; }
+.sec-t{ font-size:20px; font-weight:600; color:#18181b; margin:0; }
+.sec-n{ font-size:16px; font-weight:600; color:#3151c4; }
+.sec-d{ font-size:15px; color:#6d7381; margin:0 0 14px; line-height:1.6; }
+
+/* ===== 지금 낼 과제 카드 ===== */
+.todo-list{ display:flex; flex-direction:column; gap:12px; }
+#todoMore{ display:flex; flex-direction:column; gap:12px; }
+.todo-more{ width:100%; margin-top:12px; height:48px; border:1px solid #dde1e8; border-radius:12px; background:#fff; color:#3b3f4c; font-family:inherit; font-size:15px; font-weight:600; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; line-height:1; vertical-align:middle; gap:6px; }
+.todo-more:hover{ background:#f6f7f9; border-color:#c7cbd3; }
+.todo{ background:#fff; border:1px solid #dde1e8; border-radius:12px; padding:20px 24px; display:flex; align-items:center; gap:20px; cursor:pointer; transition:border-color .12s, box-shadow .12s; }
+.todo:hover{ border-color:#416bff; box-shadow:0 2px 8px rgba(65,107,255,.08); }
+.todo.urgent{ border-color:#fc9ba2; }
+.todo.urgent:hover{ border-color:#f2525f; box-shadow:0 2px 8px rgba(242,82,95,.1); }
+.todo-l{ flex:1; min-width:0; }
+.todo-top{ display:flex; align-items:center; gap:8px; margin-bottom:10px; flex-wrap:wrap; line-height:1; font-size:0; }
+/* 두 배지는 크기·정렬 규칙을 공유하고 색만 달라진다 */
+.b-subject, .b-due{ display:inline-flex; align-items:center; justify-content:center; align-self:center; box-sizing:border-box; height:28px; min-height:28px; padding:0 12px; margin:0; border:0; border-radius:100px; font-size:13px; font-weight:600; line-height:28px; vertical-align:middle; flex-shrink:0; white-space:nowrap; }
+.b-subject{ background:#f1f3f5; color:#3b3f4c; }
+.b-due.today{ background:#ffebeb; color:#ab303a; }
+.b-due.soon{ background:#fff3f4; color:#ab303a; }
+.b-due.later{ background:#f1f3f5; color:#6d7381; }
+.b-due.none{ background:#f6f7f9; color:#9aa0ad; }
+.todo-nm{ font-size:18px; font-weight:600; color:#222631; margin:0 0 6px; line-height:1.45; }
+.todo-meta{ font-size:15px; color:#6d7381; margin:0; }
+.todo-r{ display:flex; align-items:center; gap:14px; flex-shrink:0; }
+.todo-writing{ font-size:14px; font-weight:600; color:#3151c4; display:inline-flex; align-items:center; gap:5px; }
+.btn{ height:42px; border-radius:9999px; font-weight:600; font-size:15px; font-family:inherit; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; line-height:1; vertical-align:middle; gap:6px; padding:0 20px; border:none; }
+.btn-primary{ background:#416bff; color:#fff; }
+.btn-primary:hover{ background:#365eef; }
+.btn-outline{ background:#fff; color:#3151c4; border:1px solid #ccdfff; }
+.btn-outline:hover{ background:#e9f2ff; }
+.btn-sm{ height:36px; font-size:14px; padding:0 14px; }
+
+/* ===== 상단 대시보드 (현재 화면) — 표는 '결과 공개 여부' 축이라
+       "내가 지금 뭘 내야 하나 / 결과 나온 게 있나"가 안 읽힌다. 그 축만 위에서 요약한다.
+       읽는 블록이므로 그림자 없이 배경+아이콘으로만 구분 (좌측 액센트 띠 금지) ===== */
+.dash{ display:grid; grid-template-columns:1fr 1fr; gap:16px; margin:22px 0 30px; }
+.dash-card{ border-radius:12px; padding:20px 22px; display:flex; gap:14px; align-items:flex-start; }
+.dash-card.todo{ background:#fff7ed; }
+.dash-card.result{ background:#e9f2ff; }
+.dash-ic{ width:40px; height:40px; border-radius:10px; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+.dash-card.todo .dash-ic{ background:#ffe0c2; color:#c2410c; }
+.dash-card.result .dash-ic{ background:#d3e3ff; color:#3151c4; }
+.dash-b{ flex:1; min-width:0; }
+.dash-t{ font-size:18px; font-weight:700; margin:0 0 12px; line-height:1.45; word-break:keep-all; }
+.dash-card.todo .dash-t{ color:#c2410c; }
+.dash-card.result .dash-t{ color:#3151c4; }
+.dash-pick{ background:#fff; border-radius:10px; padding:14px 16px; display:flex; align-items:center; gap:14px; }
+.dash-pick-l{ flex:1; min-width:0; }
+.dash-cap{ font-size:13px; font-weight:600; color:#6d7381; margin:0 0 5px; }
+.dash-nm{ font-size:16px; font-weight:600; color:#222631; margin:0 0 5px; line-height:1.45; word-break:keep-all; }
+.dash-sub{ font-size:14px; color:#6d7381; margin:0; }
+.dash-sub.hot{ color:#ab303a; font-weight:600; }
+.dash-empty{ font-size:15px; color:#6d7381; margin:0; }
+
+/* ===== 전면 개편안 (학생 스타일) =====
+   목표: ① 지금 낼 과제를 바로 찾고 ② 결과 나온 걸 놓치지 않고 ③ 학기·수업 단위에서 안 헤매게.
+   표 대신 카드·체크리스트. 과목 색은 화면 전체에서 동일한 의미로만 사용 ===== */
+/* 페이지 헤더 — 히어로(236px, 화면의 34%)를 걷어낸 자리.
+   걷어낸 근거: 숫자 타일 3개는 각 섹션 헤더 숫자와 완전 중복이었고,
+   요약 문장("오늘 마감 1개")도 바로 아래 첫 카드의 빨간 마감 타일과 중복이었다.
+   타일의 유일한 고유 기능이던 '결과 섹션 바로가기'는 결과를 2번째로 올려 해소 */
+.st-head{ display:flex; align-items:flex-end; gap:12px; margin-bottom:22px; }
+.st-date{ font-size:15px; font-weight:600; color:#3151c4; margin:0 0 6px; }
+.st-greet{ font-size:27px; font-weight:700; color:#18181b; margin:0; line-height:1.35; }
+/* 인사 블록이 남은 공간을 먹고 셀렉트들이 오른쪽에 붙는다. 셀렉트가 2개여도 서로 안 밀리게 */
+.st-head > div:first-child{ margin-right:auto; }
+.st-head .sem-sel{ flex-shrink:0; }
+/* 시안 4는 칩 줄이 없어 헤더 바로 아래가 본문이다 — 첫 화면이 답답하지 않게 여백을 조금 더 */
+#scr-cards .st-head{ margin-bottom:30px; }
+
+/* 수업 필터 칩 — '내 수업' 레일 대체(수업 게시판이 없어 카드가 갈 곳이 없었음).
+   칩 숫자 = 그 수업의 '지금 낼 과제' 수. 게시판이 생기면 진입점으로 승격 가능 */
+/* 고교 선택과목은 이름이 길다(예: 현대사회와 미술세계). 처리 방식 3안을 실측해서 감싸기로 결정 —
+   가로 스크롤 54px(단 230px 분량이 화면 밖) / 감싸기 96px(수업 14개까지 2줄 유지) / 드롭다운 42px(열어야 보임).
+   42px 아끼자고 "어느 수업에 낼 게 있나"를 감추는 건 손해라 감싸기 채택.
+   말줄임도 쓰지 않는다 — 앞부분이 비슷한 과목끼리 구분이 안 되면 필터를 잘못 고르게 됨 */
+/* 인사말과 칩이 16px로 붙어 있어 상단이 답답했다 → 위 26 / 아래 32, 두 줄 사이도 10px로 (2026-08-11) */
+.st-chips-wrap{ margin:4px 0 32px; }
+.st-chips{ display:flex; flex-wrap:wrap; gap:10px 8px; }
+.st-chip{ display:inline-flex; align-items:center; justify-content:center; line-height:1; vertical-align:middle; gap:7px; height:40px; padding:0 16px; border-radius:100px; border:1px solid #d9d9d9; background:#fff; color:#3b3f4c; font-size:15px; font-weight:600; font-family:inherit; cursor:pointer; flex-shrink:0; white-space:nowrap; }
+.st-chip:hover{ border-color:#b3b3b3; }
+.st-chip.on{ background:#416bff; border-color:#416bff; color:#fff; }
+.st-chip .c{ font-size:13px; font-weight:700; background:#f1f3f5; color:#6d7381; border-radius:100px; height:22px; min-width:22px; padding:0 7px; display:inline-flex; align-items:center; justify-content:center; line-height:1; }
+.st-chip.on .c{ background:rgba(255,255,255,.22); color:#fff; }
+.st-empty{ padding:18px 20px; font-size:15px; color:#9aa0ad; margin:0; display:none; }
+.st-sec{ margin-bottom:30px; }
+.st-sec-hd{ display:flex; align-items:center; gap:9px; margin-bottom:6px; }
+.st-sec-hd i{ color:#416bff; }
+.st-sec-t{ font-size:20px; font-weight:700; color:#18181b; margin:0; }
+.st-sec-d{ font-size:15px; color:#6d7381; margin:0 0 14px; line-height:1.6; }
+
+/* 낼 과제 — 달력 타일 + 체크리스트 카드 */
+.st-todo{ background:#fff; border:1px solid #dde1e8; border-radius:14px; padding:16px 20px 16px 16px; display:flex; align-items:center; gap:16px; cursor:pointer; transition:border-color .12s, box-shadow .12s; }
+.st-todo:hover{ border-color:#416bff; box-shadow:0 2px 8px rgba(65,107,255,.08); }
+.st-todo.urgent{ border-color:#fc9ba2; background:#fffafa; }
+.st-todo.urgent:hover{ border-color:#f2525f; box-shadow:0 2px 8px rgba(242,82,95,.1); }
+.st-due{ width:66px; height:66px; border-radius:12px; background:#f1f3f5; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:3px; flex-shrink:0; }
+.st-due .d1{ font-size:18px; font-weight:700; color:#3b3f4c; line-height:1; }
+.st-due .d2{ font-size:12px; font-weight:600; color:#6d7381; line-height:1; }
+.st-due.hot{ background:#ffebeb; }
+.st-due.hot .d1{ color:#ab303a; }
+.st-due.hot .d2{ color:#c2707a; }
+.st-due.free .d1{ font-size:15px; }
+
+/* 수업 색 — 화면 전체 공통. 실제로는 팔레트 9색을 수업 순서대로 배정하고 넘치면 순환한다.
+   색은 훑을 때의 구분 보조일 뿐 의미 전달용이 아니므로(수업명이 항상 같이 붙는다) 반복돼도 된다.
+   배정 단위는 '과목'이 아니라 '수업' — 같은 과목 수업이 2개면 서로 다른 색이어야 구분됨 */
+.sj{ display:inline-flex; align-items:center; justify-content:center; line-height:1; vertical-align:middle; height:26px; padding:0 11px; border-radius:100px; font-size:13px; font-weight:700; flex-shrink:0; white-space:nowrap; }
+.sj.c1{ background:#fff1f2; color:#be3b45; }
+.sj.c2{ background:#fff5e6; color:#b45309; }
+.sj.c3{ background:#e6f7ee; color:#1f7a4d; }
+.sj.c4{ background:#e9f2ff; color:#3151c4; }
+.sj.c5{ background:#f3edff; color:#6d3fd4; }
+.sj.c6{ background:#e6f6f8; color:#0f6f80; }
+.sj.c7{ background:#fdedf5; color:#a53a72; }
+.sj.c8{ background:#f5efe6; color:#8a5a2b; }
+.sj.c9{ background:#eef0f4; color:#48546a; }
+
+/* 확인 중 — 가벼운 목록 */
+.st-wait-row{ display:flex; align-items:center; gap:14px; padding:15px 20px; }
+.st-wait-row + .st-wait-row{ border-top:1px solid #eceef2; }
+.st-wait-ic{ width:38px; height:38px; border-radius:10px; background:#f1f3f5; color:#6d7381; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+.st-wait-b{ flex:1; min-width:0; }
+.st-wait-nm{ font-size:16px; font-weight:600; color:#222631; margin:0 0 4px; }
+.st-wait-sub{ font-size:14px; color:#6d7381; margin:0; }
+
+/* 결과 — 행 목록. 카드로 두지 않는 이유: 액션이 '결과 보기' 하나뿐이고,
+   점수는 교사가 공개를 끌 수 있어(result_student_view_v3의 hide-score) 항상 담기지 않는다.
+   → 규칙: 액션이 있는 것만 카드(지금 낼 과제), 보기만 하는 건 행 */
+.st-res{ display:flex; align-items:center; gap:14px; padding:15px 20px; cursor:pointer; }
+.st-res + .st-res{ border-top:1px solid #eceef2; }
+.st-res:hover{ background:#f6f7f9; }
+.st-res-b{ flex:1; min-width:0; }
+.st-res-nm{ font-size:16px; font-weight:600; color:#222631; margin:0 0 4px; line-height:1.45; word-break:keep-all; }
+.st-res-meta{ font-size:14px; color:#6d7381; margin:0; }
+/* 점수는 공개된 건에만 붙는다. 비공개를 '비공개'라고 적지 않는다 — 박탈감만 줌 */
+.st-score{ font-size:17px; font-weight:700; color:#3151c4; flex-shrink:0; }
+
+/* 결과 카드형 — 시안 4 전용(결과만 카드 그리드로 두는 안). 시안 3의 행 목록과 비교용 */
+.st-results{ display:grid; grid-template-columns:repeat(3,1fr); gap:14px; }
+.st-rescard{ background:#fff; border:1px solid #dde1e8; border-radius:14px; padding:18px 20px; cursor:pointer; display:flex; flex-direction:column; gap:10px; transition:border-color .12s, box-shadow .12s; }
+.st-rescard:hover{ border-color:#416bff; box-shadow:0 2px 8px rgba(65,107,255,.08); }
+.st-rescard-top{ display:flex; align-items:center; gap:8px; }
+.st-rescard-top .b-state{ margin-left:auto; }
+.st-rescard-nm{ font-size:17px; font-weight:600; color:#222631; margin:0; line-height:1.45; word-break:keep-all; }
+.st-rescard-ft{ display:flex; align-items:center; justify-content:space-between; margin-top:2px; }
+.st-rescard-meta{ font-size:14px; color:#6d7381; }
+
+/* 곧 시작하는 과제 — 아직 못 내는 과제라 맨 아래, 클릭 없는 읽기 전용 행 */
+.st-soon-row{ display:flex; align-items:center; gap:14px; padding:15px 20px; }
+.st-soon-row + .st-soon-row{ border-top:1px solid #eceef2; }
+.st-soon-b{ flex:1; min-width:0; }
+.st-soon-nm{ font-size:16px; font-weight:600; color:#222631; margin:0 0 4px; line-height:1.4; word-break:keep-all; }
+.st-soon-sub{ font-size:14px; color:#6d7381; margin:0; }
+
+/* ===== 시안 5 — 홈/과제 분리 ===== */
+/* 홈의 '새 결과' 점 — 확인하면 행 자체가 홈에서 사라지므로 점은 항상 안 본 것에만 붙는다.
+   과제 탭에서도 같은 점을 써서 "홈에 떠 있는 게 이것"임을 잇는다 */
+/* 파란 점 = 아직 안 본 결과. 과제 탭에서만 쓴다 —
+   배지 명도(채움형)로 구분해 봤으나 한눈에 안 들어와 점으로 되돌렸다 (2026-08-11 올립).
+   홈 '새로 나온 결과'에는 붙이지 않는다 — 거긴 전 행이 안 본 것이라 점이 정보를 주지 못한다 */
+.dot-new{ display:inline-block; width:7px; height:7px; border-radius:50%; background:#416bff; margin-right:8px; vertical-align:2px; flex-shrink:0; }
+/* 빨간 점 = 곧 마감(지남·오늘·내일). 파란 점과 한 행에 같이 뜰 일이 없다 —
+   상태가 배타적이라('제출 가능'만 빨강, '결과 공개'만 파랑) 규칙이 하나로 유지된다:
+   점 = 이 줄을 봐라, 색 = 그 이유. 표는 왼쪽부터 훑는데 마감 정보는 오른쪽 끝이라 시선이 늦게 닿는 걸 보완 */
+.dot-due{ display:inline-block; width:7px; height:7px; border-radius:50%; background:#e5484d; margin-right:8px; vertical-align:2px; flex-shrink:0; }
+/* 수업은 색 칩이 아니라 텍스트로 (2026-08-11 올립). 표에서는 셀마다 색면이 생겨 시선이 과제명보다
+   수업으로 먼저 가고, 9색을 순환 배정하는 터라 색 자체가 의미를 갖지도 않는다.
+   필터가 읽던 수업 코드는 행/카드의 data-sj로 옮겼다 (stSubjOf 참조) */
+.t5-cls{ font-size:15px; font-weight:600; color:#222631; }
+.todo-cls{ font-size:14px; font-weight:600; color:#6d7381; margin:0 0 6px; }
+/* 홈 2단 (2026-08-11 올립) — 곧 시작 섹션이 빠지면서 홈은 '할 일/새 소식' 두 축만 남았다.
+   좌=행동(낼 과제)·우=확인(새 결과)으로 읽기 순서와 목적 위계를 맞춘다.
+   상하 배치는 결과가 항상 스크롤 아래로 밀려 "새 결과 놓치지 않기"라는 존재 이유를 깎는다.
+   좌측을 조금 넓게(1.25:1) — 카드에 마감 타일+버튼이 들어가 폭이 더 필요 */
+.h5-grid{ display:grid; grid-template-columns:1.25fr 1fr; gap:28px; align-items:start; }
+.h5-grid > .st-sec{ margin-bottom:0; }
+/* 급함 신호 절제 (2026-08-11 올립 A안) — 같은 카드에 빨간 날짜 타일·분홍 배경·분홍 테두리·파란 채움 버튼이
+   겹쳐 4중 인코딩이었고, 5장 중 3장이 분홍이라 강조가 기본값처럼 보였다.
+   배경은 걷고 날짜 타일에 신호를 몰아주되, 테두리는 은은하게 남긴다.
+   제출 버튼도 아웃라인으로 통일 — 급함은 날짜 타일이 이미 말하고 있어 버튼까지 갈릴 이유가 없다.
+   시안 3·4는 비교 대상이라 건드리지 않고 시안 5에만 건다 */
+#scr-home5 .st-todo.urgent{ background:#fff; }
+/* 카드 안에 버튼을 두지 않는다 (2026-08-11 올립) — 카드가 이미 통째로 링크라
+   안쪽 버튼과 클릭 대상이 둘로 읽혔다. 과제 탭 행과 같은 문법(텍스트 + 화살표)으로 통일 */
+.todo-go{ display:inline-flex; align-items:center; justify-content:center; line-height:1; vertical-align:middle; gap:4px; font-size:15px; font-weight:600; color:#3151c4; white-space:nowrap; }
+.todo-go i, .todo-go svg{ display:inline-flex; }
+#scr-home5 .st-todo:hover .todo-go{ color:#2447c9; }
+/* 급한 카드는 날짜 타일·테두리와 같은 빨강으로 맞춰 카드 하나가 한 덩어리로 읽히게 (2026-08-11 올립).
+   타일 글자(.st-due.hot)와 같은 색을 써야 두 요소가 같은 신호로 묶인다 */
+#scr-home5 .st-todo.urgent .todo-go{ color:#ab303a; }
+#scr-home5 .st-todo.urgent:hover .todo-go{ color:#8f2830; }
+
+/* 과제 탭 — 검색 + 상태 배지. 검색을 필터 앞에 두는 이유는 이름을 아는 과제를 찾는 게 가장 빠른 길이라서 */
+.t5-search{ position:relative; display:flex; align-items:center; flex:1; max-width:360px; }
+/* ⚠️ svg까지 잡아야 한다 — Lucide가 <i>를 <svg>로 치환하므로 i만 겨냥하면 초기화 직후
+   절대배치가 풀려 아이콘이 플렉스 항목이 되고 입력창이 카드 밖으로 밀려난다 (2026-08-11) */
+.t5-search > i, .t5-search > svg{ position:absolute; left:14px; width:17px; height:17px; color:#9aa0ad; pointer-events:none; display:inline-flex; flex-shrink:0; }
+.t5-search input{ width:100%; height:42px; border:1px solid #d9d9d9; border-radius:8px; padding:0 38px 0 40px; font-size:15px; font-family:inherit; color:#222631; background:#fff; }
+.t5-search input::placeholder{ color:#9aa0ad; }
+.t5-search input:hover{ border-color:#b3b3b3; }
+.t5-search input:focus{ outline:none; border-color:#416bff; box-shadow:0 0 0 3px rgba(65,107,255,.12); }
+.t5-clear{ position:absolute; right:8px; width:26px; height:26px; border:none; background:none; border-radius:50%; color:#6d7381; cursor:pointer; display:none; align-items:center; justify-content:center; line-height:1; padding:0; }
+.t5-clear:hover{ background:#f1f3f5; }
+.t5-count-row{ display:flex; align-items:baseline; gap:10px; margin:0 0 12px; }
+.t5-count{ font-size:16px; color:#3b3f4c; margin:0; }
+.t5-count b{ color:#3151c4; }
+.t5-count-d{ font-size:14px; color:#9aa0ad; margin:0; }
+.t5-empty{ padding:40px 20px; text-align:center; font-size:15px; color:#9aa0ad; margin:0; display:none; }
+/* 기초 진단 배너 — 2단 그리드 '밖' 아래에 전폭으로.
+   배너는 인박스 항목이 아니라 상시 프로모션이라 할 일과 같은 자리에 두지 않는다
+   (할 일을 다 훑은 뒤에 보이는 자리). 0건 화면에서도 그대로 남는다 — 할 게 없을 때가 오히려 권하기 좋은 자리.
+   ⚠️ 초·중만 노출. 고등은 실사용 0건(2024-1~2026-1 전 학기 0/870~9,689) — 실시율 근거로 학교급 조건을 건다 */
+.h5-banner{ margin-top:28px; background:#f3edff; border-radius:12px; padding:20px 24px; display:flex; align-items:center; gap:16px; }
+.h5-banner-ic{ width:44px; height:44px; border-radius:12px; background:#e4d8ff; color:#6d3fd4; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+.h5-banner-b{ flex:1; min-width:0; }
+.h5-banner-t{ font-size:17px; font-weight:700; color:#4b2ba8; margin:0 0 4px; line-height:1.45; word-break:keep-all; }
+.h5-banner-d{ font-size:15px; color:#6d3fd4; margin:0; line-height:1.6; }
+.btn-purple{ background:#6d3fd4; color:#fff; }
+.btn-purple:hover{ background:#5c31bd; }
+
+/* 과제 메뉴 헤더 — 선생님 화면(task_direct_write)의 페이지 헤더와 같은 구성(타이틀 + 설명).
+   홈과 과제는 내용이 완전히 같고 헤더만 갈린다 — 그래서 화면을 복제하지 않고 헤더만 바꿔 끼운다.
+   ⚠️ 표를 두 벌로 두면 더미가 갈라져 한쪽만 고치는 사고가 난다 */
+.page-h1{ font-size:22px; font-weight:700; color:#18181b; margin:0 0 8px; }
+.page-sub{ font-size:16px; color:#3b3f4c; margin:0 0 24px; line-height:1.55; }
+#h6HeadTask{ display:none; }
+
+/* 시안 6 상태 칩 — 섹션 4분할 대신 개수를 늘 보여주는 자리.
+   칩은 '거르는 도구'라 선택 색을 파랑 하나로 두고, 상태 색(주황·파랑·초록·빨강·회색)은
+   표 안 배지에만 쓴다. 칩까지 상태색으로 칠하면 색이 '고르는 것'과 '상태'를 동시에 뜻하게 된다 */
+.t6-chips{ display:flex; flex-wrap:wrap; gap:8px; margin:0 0 18px; }
+.t6-chips .st-chip{ height:38px; font-size:14px; padding:0 14px; }
+.t6-chips .st-chip .c{ font-size:12px; height:20px; min-width:20px; }
+/* 라벨 앞 색 점 = 표 안 배지와 같은 색. 칩 전체를 상태색으로 칠하지 않는 이유 —
+   칩은 누를 수 있는 컨트롤이라 색이 '선택됨'을 표시해야 하는데, 상태색까지 얹으면
+   색 하나가 두 가지를 뜻하게 된다. 그래서 색은 점이 지고 선택 여부는 배경이 진다 */
+.t6-chips .st-chip::before{ content:''; width:8px; height:8px; border-radius:50%; flex-shrink:0; }
+.t6-chips .st-chip[data-st="all"]::before{ display:none; }
+.t6-chips .st-chip[data-st="todo"]::before{ background:#b45309; }
+.t6-chips .st-chip[data-st="result"]::before{ background:#3151c4; }
+.t6-chips .st-chip[data-st="done"]::before{ background:#27724b; }
+.t6-chips .st-chip[data-st="miss"]::before{ background:#ab303a; }
+.t6-chips .st-chip[data-st="soon"]::before{ background:#9aa0ad; }
+/* 선택 표시를 파란 '채움'에서 '연한 배경 + 테두리'로 — 채우면 그 위의 점 색이 죽는다 */
+.t6-chips .st-chip.on{ background:#eef2ff; border-color:#416bff; color:#3151c4; }
+.t6-chips .st-chip.on .c{ background:#d3e3ff; color:#3151c4; }
+
+/* 데이터 0건 화면 — 기본은 숨김, 내비게이터 케이스에서만 켠다 */
+.h5-zero{ display:none; background:#fff; border:1px solid #dde1e8; border-radius:14px; padding:56px 24px; text-align:center; }
+.h5-zero-ic{ width:64px; height:64px; margin:0 auto 18px; border-radius:50%; background:#f1f3f5; color:#6d7381; display:flex; align-items:center; justify-content:center; }
+#h5ZeroClear .h5-zero-ic{ background:#e6f7ee; color:#1f7a4d; }
+.h5-zero-t{ font-size:20px; font-weight:700; color:#18181b; margin:0 0 8px; }
+.h5-zero-d{ font-size:15px; color:#6d7381; margin:0 0 20px; line-height:1.7; }
+.h5-zero .btn{ margin:0 auto; }
+/* 상태 색 = 내가 뭘 해야 하나. 주황 할 일 · 파랑 볼 것 · 초록 끝냄 · 빨강 놓침 · 회색 아직.
+   표 안에서 색은 이 배지 한 축만 진다 — 하위 문구는 전부 무채색(파랑/빨강 부연 금지).
+   전에는 파랑이 '안 본 결과'와 '쓰던 글' 두 뜻, 빨강이 '마감 급함'과 '미제출' 두 뜻이라
+   색이 무엇을 가리키는지 읽히지 않았다 (2026-08-11) */
+.b-state.todo{ background:#fff3e6; color:#b45309; }
+.b-state.result{ background:#e9f2ff; color:#3151c4; }
+/* 마감이 급한 것(지남·오늘·내일)만 빨강 부연. 여유 있는 건 회색이라 빨강이 흔해지지 않는다 */
+.t-sub.hot{ color:#ab303a; }
+
+/* 행 전체가 상세로 가는 링크 — 셀마다 다른 버튼(제출/결과 보기/답안 보기)을 두면
+   같은 위계인데 형태가 갈린다. 마지막 칸은 화살표 하나로 통일 (2026-08-11 올립).
+   '시작 전'은 상세 진입이 막힌 상태(§2)라 onclick·화살표를 아예 두지 않는다 —
+   못 들어가는 곳에 들어갈 수 있는 표시를 남기지 않는다 */
+/* ⚠️ 표가 늘면 여기 선택자에도 추가할 것 — #t5body에만 걸려 있어 시안 6 표에 호버가 안 붙었다(2026-08-12) */
+#t5body tr[onclick], #t6body tr[onclick]{ cursor:pointer; }
+#t5body tr[onclick]:hover, #t6body tr[onclick]:hover{ background:#f6f7f9; }
+.t5-go{ color:#c7cbd3; }
+.t5-go i, .t5-go svg{ display:inline-flex; vertical-align:middle; }
+#t5body tr[onclick]:hover .t5-go, #t6body tr[onclick]:hover .t5-go{ color:#3151c4; }
+.h5-link{ margin-left:auto; }
+.t5-desc{ font-size:16px; color:#6d7381; margin:0 0 22px; line-height:1.6; }
+#scr-task5 .st-greet{ margin-bottom:6px; }
+
+/* ===== 표 ===== */
+.panel{ background:#fff; border-radius:12px; box-shadow:0 2px 4px rgba(0,0,0,.06), 0 0 1px rgba(34,38,49,.3); overflow:hidden; }
+.tbl{ width:100%; border-collapse:collapse; }
+.tbl th{ background:#f6f7f9; height:46px; font-size:15px; font-weight:500; color:#18181b; padding:4px 12px; text-align:center; border-bottom:1px solid #dde1e8; white-space:nowrap; }
+.tbl td{ font-size:16px; padding:12px; text-align:center; color:#222631; border-bottom:1px solid #eceef2; }
+.tbl tr:last-child td{ border-bottom:none; }
+.tbl td.left{ text-align:left; }
+.t-sub{ font-size:14px; color:#6d7381; display:block; margin-top:2px; }
+.b-state{ display:inline-flex; align-items:center; justify-content:center; height:26px; padding:0 10px; border-radius:6px; font-size:14px; font-weight:500; line-height:1; white-space:nowrap; }
+.b-state.done{ background:#dff8eb; color:#27724b; }
+.b-state.miss{ background:#ffebeb; color:#ab303a; }
+.b-state.wait{ background:#f1f3f5; color:#3b3f4c; }
+.b-state.soon{ background:#e9f2ff; color:#3151c4; }
+.link-btn{ background:none; border:none; cursor:pointer; font-family:inherit; font-size:15px; font-weight:600; color:#3151c4; display:inline-flex; align-items:center; justify-content:center; gap:4px; padding:8px 12px; border-radius:6px; line-height:1; }
+.link-btn:hover{ background:#e9f2ff; }
+
+/* 접기 */
+.fold-hd{ display:flex; align-items:center; gap:8px; cursor:pointer; user-select:none; }
+.fold-ic{ transition:transform .15s; color:#6d7381; display:inline-flex; }
+.sec.folded .fold-ic{ transform:rotate(-90deg); }
+.sec.folded .fold-body{ display:none; }
+
+/* ===== 목업 내비게이터 (화면 밖 · 드래그 가능) ===== */
+#mockpick{ position:fixed; left:24px; bottom:24px; z-index:3000; background:#1F2233; border-radius:14px; padding:8px; box-shadow:0 10px 30px rgba(0,0,0,.35); width:max-content; max-width:330px; cursor:move; user-select:none; }
+#mockpick .mp-head{ font-size:11px; font-weight:700; color:#8A8FB0; letter-spacing:.04em; display:flex; align-items:center; justify-content:space-between; gap:16px; padding:6px 8px; cursor:pointer; }
+#mockpick .mp-body{ display:flex; flex-direction:column; gap:6px; margin-top:6px; }
+#mockpick .mp-cap{ font-size:10px; font-weight:700; color:#6B6F8C; letter-spacing:.05em; padding:7px 8px 2px; }
+#mockpick .mp-btn{ width:100%; text-align:left; white-space:nowrap; padding:9px 12px; border-radius:9px; border:1px solid #3A3F58; background:#2A2E44; color:#C9CCE0; font-size:13px; font-weight:600; font-family:inherit; cursor:pointer; line-height:1.35; }
+#mockpick .mp-btn:hover{ background:#33384f; }
+#mockpick .mp-btn.on{ background:#416bff; color:#fff; border-color:#416bff; }
+#mockpick .mp-sub{ font-size:11px; font-weight:500; color:#8A8FB0; margin-left:8px; }
+#mockpick .mp-btn.on .mp-sub{ color:#D6E2FF; }
+#mockpick .mp-note{ font-size:11px; font-weight:500; color:#8A8FB0; line-height:1.55; padding:6px 8px 4px; max-width:300px; white-space:normal; }
+
+.screen{ display:none; }
+.screen.active{ display:block; }
+
+/* ===== 토스트 ===== */
+.toast{ position:fixed; bottom:28px; left:50%; transform:translateX(-50%) translateY(12px); opacity:0; min-width:300px; max-width:520px; padding:15px 22px; border-radius:8px; display:flex; align-items:center; gap:12px; font-size:15px; font-weight:600; box-shadow:0 0 1px #2226314D, 0 4px 12px #00000026; z-index:9999; transition:opacity .2s ease, transform .2s ease; pointer-events:none; background:#319d64; color:#fff; }
+.toast.show{ opacity:1; transform:translateX(-50%) translateY(0); }
+
+/* ===== 푸터 ===== */
+.site-footer{ margin-top:auto; padding:48px 0 40px; display:flex; flex-direction:column; align-items:center; gap:16px; }
+.sf-links{ display:flex; align-items:center; }
+.sf-links a{ font-size:14px; color:#3b3f4c; padding:0 16px; }
+.sf-links a + a{ border-left:1px solid #dde1e8; }
+.sf-copy{ font-size:14px; color:#9aa0ad; }
+</style>
+</head>
+<body>
+
+<header class="g-hd">
+  <button class="gh-menu-btn" onclick="toggleNav()"><i data-lucide="menu" style="width:20px;height:20px"></i></button>
+  <svg width="76" height="16" viewBox="0 0 76 16" fill="none" xmlns="http://www.w3.org/2000/svg" style="cursor:pointer" onclick="goHash('home5')"><path d="M11.3613 4.03516H4.09668V11.9629H8.88281L8.88086 11.9648H15.6016V16H4.02539C1.80242 15.9998 0 14.223 0 12.0322V3.96777C0 1.77696 1.80242 0.000177874 4.02539 0H15.4561L11.3613 4.03516ZM22.0703 11.9648H33.5781V16H22.002C19.7788 16 17.9756 14.2231 17.9756 12.0322V0H22.0703V11.9648ZM40.0459 16H35.9521V0H40.0459V16ZM54.5381 0C56.4564 0 58.0138 1.53228 58.0186 3.42285L58.0166 3.4248V8.54297C58.014 10.4333 56.4567 11.9648 54.5361 11.9648H46.5107L42.416 16V0H54.5381ZM71.9746 0C74.0086 0.000134956 75.6887 1.49046 75.958 3.42285H76V12.5771H75.958C75.6887 14.5095 74.011 15.9999 71.9746 16H64.4238C62.3897 16 60.7098 14.5096 60.4404 12.5771C60.4145 12.398 60.3984 12.2184 60.3984 12.0322V3.96777C60.3984 3.78159 60.4145 3.60205 60.4404 3.42285C60.7098 1.49037 62.3873 0 64.4238 0H71.9746ZM64.4922 12.5771H71.9062V3.42285H64.4922V12.5771ZM46.5107 3.42285V8.54004H53.9238V3.42285H46.5107Z" fill="#365EEF"/></svg>
+  <div class="g-hd-r">김서윤 학생 <i data-lucide="chevron-down" style="width:16px;height:16px"></i></div>
+</header>
+
+<nav class="icon-sb" id="icon-sb">
+  <!-- 시안 5에서는 NB가 홈↔과제 전환 축이다(해시 라우팅). 시안 1~4에서는 기존처럼 과제=제출 화면 데모 -->
+  <div class="si active" id="si-home" onclick="navHome()"><div class="si-icon"><i data-lucide="home" style="width:20px;height:20px"></i></div><span class="si-label">홈</span><span class="si-tip">홈</span></div>
+  <div class="si" id="si-task" onclick="navTask()"><div class="si-icon"><i data-lucide="file-pen-line" style="width:20px;height:20px"></i></div><span class="si-label">과제</span><span class="si-tip">과제</span></div>
+  <div class="si" onclick="notReady('리포트')"><div class="si-icon"><i data-lucide="bar-chart-2" style="width:20px;height:20px"></i></div><span class="si-label">리포트</span><span class="si-tip">리포트</span></div>
+</nav>
+
+<div class="main-wrap">
+
+<!-- ═══════════════ 개선안 ═══════════════ -->
+<div id="scr-new" class="screen">
+  <div class="page-wrap">
+
+    <div class="greet-row">
+      <h1 class="greet">7월 29일 수요일, 김서윤 학생 안녕하세요!</h1>
+      <div class="greet-filters">
+        <select class="sem-sel" onchange="notReady('학기 바꾸기')">
+          <option>1학기</option>
+          <option>2학기</option>
+        </select>
+        <select class="sem-sel" onchange="notReady('과목 고르기')">
+          <option>전체 과목</option>
+          <option>국어</option>
+          <option>사회</option>
+          <option>과학</option>
+          <option>수학</option>
+          <option>영어</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="today">
+      <i data-lucide="alarm-clock"></i>
+      <div>
+        <!-- 기준 기간 = 오늘부터 앞으로 7일 (2026-08-07 확정).
+             '이번 주(일~토)'가 아닌 이유 — 요일마다 창 길이가 달라져 주 후반에 요약이 비어 보임.
+             7일로 넓히면 숫자가 커져 오늘·내일이 묻히므로 급한 건을 뒤에 따로 붙인다. -->
+        <p class="today-t">이번 주에 내야 할 과제가 3개 있어요 <span class="today-urgent">오늘 마감 1개</span></p>
+        <p class="today-d">아직 내지 않은 과제는 모두 4개예요.</p>
+      </div>
+    </div>
+
+    <!-- 지금 낼 과제 -->
+    <div class="sec">
+      <div class="sec-hd">
+        <h2 class="sec-t">지금 낼 과제</h2>
+        <span class="sec-n">6</span>
+      </div>
+      <p class="sec-d">마감이 가까운 순서예요. 마감을 정하지 않은 과제는 맨 아래에 있어요.</p>
+
+      <div class="todo-list">
+        <div class="todo urgent" onclick="location.href='student_submit_v1_260729.html#write'">
+          <div class="todo-l">
+            <div class="todo-top">
+              <span class="b-subject">사회</span>
+              <span class="b-due today">오늘 마감</span>
+            </div>
+            <p class="todo-nm">사회 변동과 현대사회의 문제 분석</p>
+            <p class="todo-meta">7월 29일(수) 16:00까지 · 김기남 선생님</p>
+          </div>
+          <div class="todo-r">
+            <span class="todo-writing"><i data-lucide="pencil-line" style="width:15px;height:15px"></i>쓰던 중</span>
+            <button class="btn btn-primary" onclick="event.stopPropagation();location.href='student_submit_v1_260729.html#write'">이어 쓰기</button>
+          </div>
+        </div>
+
+        <div class="todo urgent" onclick="location.href='student_submit_v1_260729.html#notice'">
+          <div class="todo-l">
+            <div class="todo-top">
+              <span class="b-subject">국어</span>
+              <span class="b-due soon">내일 마감</span>
+            </div>
+            <p class="todo-nm">주장하는 글 쓰기</p>
+            <p class="todo-meta">7월 30일(목) 16:00까지 · 이수민 선생님</p>
+          </div>
+          <div class="todo-r">
+            <button class="btn btn-primary" onclick="event.stopPropagation();location.href='student_submit_v1_260729.html#notice'">제출</button>
+          </div>
+        </div>
+
+        <div class="todo" onclick="location.href='student_submit_v1_260729.html#fileonly'">
+          <div class="todo-l">
+            <div class="todo-top">
+              <span class="b-subject">과학</span>
+              <span class="b-due later">7일 남음</span>
+            </div>
+            <p class="todo-nm">용해와 용액 실험 보고서</p>
+            <p class="todo-meta">8월 5일(수) 12:00까지 · 김기남 선생님</p>
+          </div>
+          <div class="todo-r">
+            <button class="btn btn-outline" onclick="event.stopPropagation();location.href='student_submit_v1_260729.html#fileonly'">제출</button>
+          </div>
+        </div>
+
+        <div class="todo" onclick="location.href='student_submit_v1_260729.html#notice'">
+          <div class="todo-l">
+            <div class="todo-top">
+              <span class="b-subject">수학</span>
+              <span class="b-due later">9일 남음</span>
+            </div>
+            <p class="todo-nm">일차함수 활용 문제 풀이 과정 쓰기</p>
+            <p class="todo-meta">8월 7일(금) 16:00까지 · 박정호 선생님</p>
+          </div>
+          <div class="todo-r">
+            <button class="btn btn-outline" onclick="event.stopPropagation();location.href='student_submit_v1_260729.html#notice'">제출</button>
+          </div>
+        </div>
+
+        <!-- 5개까지만 펼치고 나머지는 접는다 (2026-08-07 확정).
+             접기는 두지 않음 — 한 번 펼치면 그대로. '지금 낼 과제'는 접으면 잊게 되는 섹션 -->
+        <div id="todoMore" style="display:none;">
+          <div class="todo" onclick="location.href='student_submit_v1_260729.html#notice'">
+            <div class="todo-l">
+              <div class="todo-top">
+                <span class="b-subject">영어</span>
+                <span class="b-due later">12일 남음</span>
+              </div>
+              <p class="todo-nm">영어 에세이 — My Future Job</p>
+              <p class="todo-meta">8월 10일(월) 16:00까지 · 최수현 선생님</p>
+            </div>
+            <div class="todo-r">
+              <button class="btn btn-outline" onclick="event.stopPropagation();location.href='student_submit_v1_260729.html#notice'">제출</button>
+            </div>
+          </div>
+
+          <!-- 마감을 정하지 않은 과제 — 맨 아래 -->
+          <div class="todo" onclick="location.href='student_submit_v1_260729.html#notice'">
+            <div class="todo-l">
+              <div class="todo-top">
+                <span class="b-subject">국어</span>
+                <span class="b-due none">마감 없음</span>
+              </div>
+              <p class="todo-nm">문학 작품 감상문 쓰기</p>
+              <p class="todo-meta">언제든 낼 수 있어요 · 이수민 선생님</p>
+            </div>
+            <div class="todo-r">
+              <button class="btn btn-outline" onclick="event.stopPropagation();location.href='student_submit_v1_260729.html#notice'">제출</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 남은 개수를 적는다 — 몇 개가 숨어 있는지 모르면 안 누르고 넘어감 -->
+      <button class="todo-more" id="todoMoreBtn" onclick="showMoreTodo()">2개 더 보기 <i data-lucide="chevron-down" style="width:16px;height:16px"></i></button>
+    </div>
+
+    <!-- 제출한 과제 -->
+    <div class="sec" id="sec-sent">
+      <div class="sec-hd fold-hd" onclick="fold('sec-sent')">
+        <span class="fold-ic"><i data-lucide="chevron-down" style="width:20px;height:20px"></i></span>
+        <h2 class="sec-t">제출한 과제</h2>
+        <span class="sec-n">2</span>
+      </div>
+      <div class="fold-body">
+      <p class="sec-d">선생님이 확인하고 있어요.</p>
+      <div class="panel">
+        <table class="tbl">
+          <thead><tr>
+            <th style="width:110px;">과목</th>
+            <th class="left">과제</th>
+            <th style="width:190px;">제출한 날</th>
+            <th style="width:130px;">상태</th>
+            <th style="width:130px;"></th>
+          </tr></thead>
+          <tbody>
+            <tr>
+              <td>국어<span class="t-sub">이수민 선생님</span></td>
+              <td class="left">매체 자료 분석하기</td>
+              <td>7월 24일(금) 14:48</td>
+              <td><span class="b-state done">제출 완료</span></td>
+              <td><button class="link-btn" onclick="location.href='student_submit_v1_260729.html#done'">답안 보기 <i data-lucide="chevron-right" style="width:15px;height:15px"></i></button></td>
+            </tr>
+            <tr>
+              <td>사회<span class="t-sub">김기남 선생님</span></td>
+              <td class="left">지역 문제 조사 보고서</td>
+              <td>7월 22일(수) 09:12</td>
+              <td><span class="b-state done">제출 완료</span></td>
+              <td><button class="link-btn" onclick="location.href='student_submit_v1_260729.html#done'">답안 보기 <i data-lucide="chevron-right" style="width:15px;height:15px"></i></button></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      </div>
+    </div>
+
+    <!-- 결과 나온 과제 -->
+    <div class="sec" id="sec-result">
+      <div class="sec-hd fold-hd" onclick="fold('sec-result')">
+        <span class="fold-ic"><i data-lucide="chevron-down" style="width:20px;height:20px"></i></span>
+        <h2 class="sec-t">결과 나온 과제</h2>
+        <span class="sec-n">5</span>
+      </div>
+      <div class="fold-body">
+        <p class="sec-d">점수와 선생님 피드백을 볼 수 있어요. 선생님이 직접 채점한 과제도 여기에 있어요.</p>
+        <div class="panel">
+          <table class="tbl">
+            <thead><tr>
+              <th style="width:110px;">과목</th>
+              <th class="left">과제</th>
+              <th style="width:190px;">마감</th>
+              <th style="width:130px;">상태</th>
+              <th style="width:130px;"></th>
+            </tr></thead>
+            <tbody>
+              <tr>
+                <td>국어<span class="t-sub">이수민 선생님</span></td>
+                <td class="left">설명하는 글 쓰기</td>
+                <td>7월 18일(금) 12:00</td>
+                <td><span class="b-state done">제출 완료</span></td>
+                <td><button class="link-btn" onclick="notReady('결과 보기')">결과 보기 <i data-lucide="chevron-right" style="width:15px;height:15px"></i></button></td>
+              </tr>
+              <tr>
+                <td>국어<span class="t-sub">이수민 선생님</span></td>
+                <td class="left">시 감상하고 표현하기</td>
+                <td>7월 11일(금) 12:00</td>
+                <td><span class="b-state done">제출 완료</span></td>
+                <td><button class="link-btn" onclick="notReady('결과 보기')">결과 보기 <i data-lucide="chevron-right" style="width:15px;height:15px"></i></button></td>
+              </tr>
+              <tr>
+                <td>사회<span class="t-sub">김기남 선생님</span></td>
+                <td class="left">인권 보장과 헌법</td>
+                <td>7월 4일(금) 12:00</td>
+                <td><span class="b-state done">제출 완료</span></td>
+                <td><button class="link-btn" onclick="notReady('결과 보기')">결과 보기 <i data-lucide="chevron-right" style="width:15px;height:15px"></i></button></td>
+              </tr>
+              <tr>
+                <td>과학<span class="t-sub">김기남 선생님</span></td>
+                <td class="left">물질의 상태 변화 정리</td>
+                <td>6월 27일(금) 12:00</td>
+                <td><span class="b-state wait">제출 없이 채점</span></td>
+                <td><button class="link-btn" onclick="notReady('결과 보기')">결과 보기 <i data-lucide="chevron-right" style="width:15px;height:15px"></i></button></td>
+              </tr>
+              <tr>
+                <td>과학<span class="t-sub">김기남 선생님</span></td>
+                <td class="left">생태계와 환경 조사</td>
+                <td>6월 20일(금) 12:00</td>
+                <td><span class="b-state miss">내지 않음</span></td>
+                <td><button class="link-btn" onclick="notReady('결과 보기')">결과 보기 <i data-lucide="chevron-right" style="width:15px;height:15px"></i></button></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- 예정된 과제 -->
+    <div class="sec folded" id="sec-soon">
+      <div class="sec-hd fold-hd" onclick="fold('sec-soon')">
+        <span class="fold-ic"><i data-lucide="chevron-down" style="width:20px;height:20px"></i></span>
+        <h2 class="sec-t">예정된 과제</h2>
+        <span class="sec-n">2</span>
+      </div>
+      <div class="fold-body">
+        <p class="sec-d">아직 제출을 시작하지 않은 과제예요.</p>
+        <div class="panel">
+          <table class="tbl">
+            <thead><tr>
+              <th style="width:110px;">과목</th>
+              <th class="left">과제</th>
+              <th style="width:190px;">제출 시작</th>
+              <th style="width:190px;">마감</th>
+              <th style="width:130px;">상태</th>
+            </tr></thead>
+            <tbody>
+              <tr>
+                <td>국어<span class="t-sub">이수민 선생님</span></td>
+                <td class="left">토론하기 활동 정리</td>
+                <td>8월 12일(수) 09:00</td>
+                <td>8월 19일(수) 12:00</td>
+                <td><span class="b-state soon">시작 전</span></td>
+              </tr>
+              <tr>
+                <td>사회<span class="t-sub">김기남 선생님</span></td>
+                <td class="left">경제 활동과 선택</td>
+                <td>8월 12일(수) 09:00</td>
+                <td>마감 없음</td>
+                <td><span class="b-state soon">시작 전</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <footer class="site-footer">
+      <div class="sf-links"><a href="#" onclick="return false;">회사소개</a><a href="#" onclick="return false;">이용약관</a><a href="#" onclick="return false;">개인정보처리방침</a><a href="#" onclick="return false;">고객센터</a></div>
+      <div class="sf-copy">© 2026. Datadriven Inc. All rights reserved.</div>
+    </footer>
+  </div>
+</div>
+
+<!-- ═══════════════ 현재 화면 (Figma 329-7972 재현) ═══════════════ -->
+<div id="scr-current" class="screen">
+  <div class="page-wrap">
+
+    <h1 class="greet">오늘은 7월 29일 수요일<br>김서윤 학생, 안녕하세요!</h1>
+
+    <!-- 대시보드 — 표(결과 공개 여부 축)에서 안 읽히는 "지금 뭘 내야 하나 / 결과 나온 게 있나"만 요약.
+         표 데이터와 숫자 일치: 내지 않은 과제 = 미공개 표의 미제출1 + 제출 없음(마감 없음)1 = 2 -->
+    <div class="dash">
+      <div class="dash-card todo">
+        <div class="dash-ic"><i data-lucide="alarm-clock" style="width:22px;height:22px"></i></div>
+        <div class="dash-b">
+          <p class="dash-t">아직 내지 않은 과제가 2개 있어요</p>
+          <div class="dash-pick">
+            <div class="dash-pick-l">
+              <p class="dash-cap">마감이 가장 가까운 과제</p>
+              <p class="dash-nm">용해와 용액 실험 보고서 작성의 과제</p>
+              <p class="dash-sub">과학 · 8월 5일(수) 12:00까지 · <b>7일 남음</b></p>
+            </div>
+            <button class="btn btn-primary btn-sm" onclick="location.href='student_submit_v1_260729.html#fileonly'"><i data-lucide="pencil-line" style="width:14px;height:14px"></i>제출하기</button>
+          </div>
+        </div>
+      </div>
+      <div class="dash-card result">
+        <div class="dash-ic"><i data-lucide="award" style="width:22px;height:22px"></i></div>
+        <div class="dash-b">
+          <p class="dash-t">결과 나온 과제가 5개 있어요</p>
+          <div class="dash-pick">
+            <div class="dash-pick-l">
+              <p class="dash-cap">가장 최근에 나온 결과</p>
+              <p class="dash-nm">설명하는 글 쓰기</p>
+              <p class="dash-sub">국어 · 이수민 선생님</p>
+            </div>
+            <button class="btn btn-outline btn-sm" onclick="notReady('결과 보기')">결과 보기</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <p class="greet-sub" style="font-size:20px;font-weight:600;color:#18181b;margin-bottom:14px;">2026학년도 과제 현황</p>
+
+    <div class="filter-bar">
+      <div class="sem-tabs">
+        <button class="sem-tab on">1학기</button>
+        <button class="sem-tab" onclick="notReady('2학기')">2학기</button>
+      </div>
+      <div class="filters">
+        <select class="sel"><option>모든 제출 상황</option></select>
+        <select class="sel"><option>모든 과목</option></select>
+      </div>
+    </div>
+
+    <div class="sec">
+      <div class="sec-hd"><h2 class="sec-t">결과 미공개 과제 (4개)</h2></div>
+      <p class="sec-d">아직 선생님이 과제를 확인하지 않아, 결과가 나오지 않은 과제예요.</p>
+      <div class="panel">
+        <table class="tbl">
+          <thead><tr>
+            <th style="width:110px;">제출 상황</th>
+            <th style="width:120px;">과목</th>
+            <th class="left">과제 정보</th>
+            <th style="width:190px;">날짜</th>
+            <th style="width:140px;">제출하기</th>
+          </tr></thead>
+          <tbody>
+            <tr>
+              <td><span class="b-state miss">미제출</span></td>
+              <td>과학<span class="t-sub">김기남 선생님</span></td>
+              <td class="left">용해와 용액 실험 보고서 작성의 과제</td>
+              <td>8월 5일(수) 12:00<span class="t-sub">7일 남음</span></td>
+              <td><button class="btn btn-primary btn-sm" onclick="location.href='student_submit_v1_260729.html#fileonly'"><i data-lucide="pencil-line" style="width:14px;height:14px"></i>제출하기</button></td>
+            </tr>
+            <tr>
+              <td><span class="b-state done">제출 완료</span></td>
+              <td>국어<span class="t-sub">이수민 선생님</span></td>
+              <td class="left">주장하는 글 쓰기</td>
+              <td>7월 30일(목) 16:00<span class="t-sub" style="color:#ab303a;">내일 마감</span></td>
+              <td><button class="btn btn-primary btn-sm" onclick="location.href='student_submit_v1_260729.html#notice'"><i data-lucide="pencil-line" style="width:14px;height:14px"></i>제출하기</button></td>
+            </tr>
+            <tr>
+              <td><span class="b-state done">제출 완료</span></td>
+              <td>사회<span class="t-sub">김기남 선생님</span></td>
+              <td class="left">사회 변동과 현대사회의 문제 분석</td>
+              <td>7월 29일(수) 16:00<span class="t-sub" style="color:#ab303a;">오늘 마감</span></td>
+              <td><button class="btn btn-primary btn-sm" onclick="location.href='student_submit_v1_260729.html#write'"><i data-lucide="pencil-line" style="width:14px;height:14px"></i>제출하기</button></td>
+            </tr>
+            <tr>
+              <td><span class="b-state wait">제출 없음</span></td>
+              <td>국어<span class="t-sub">이수민 선생님</span></td>
+              <td class="left">문학 작품 감상문 쓰기</td>
+              <td>제출 마감일 없음<span class="t-sub">-</span></td>
+              <td><button class="btn btn-primary btn-sm" onclick="notReady('제출')"><i data-lucide="pencil-line" style="width:14px;height:14px"></i>제출하기</button></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="sec">
+      <div class="sec-hd"><h2 class="sec-t">결과 공개 과제 (5개)</h2></div>
+      <p class="sec-d">선생님이 과제 확인을 마쳐, 점수나 피드백을 볼 수 있는 과제예요.</p>
+      <div class="panel">
+        <table class="tbl">
+          <thead><tr>
+            <th style="width:110px;">제출 상황</th>
+            <th style="width:120px;">과목</th>
+            <th class="left">과제 정보</th>
+            <th style="width:190px;">날짜</th>
+            <th style="width:140px;">결과 보기</th>
+          </tr></thead>
+          <tbody>
+            <tr>
+              <td><span class="b-state done">제출 완료</span></td>
+              <td>국어<span class="t-sub">이수민 선생님</span></td>
+              <td class="left">설명하는 글 쓰기</td>
+              <td>7월 18일(금) 12:00<span class="t-sub">제출 마감일 지남</span></td>
+              <td><button class="link-btn" onclick="notReady('결과 보기')">결과 보기 <i data-lucide="chevron-right" style="width:15px;height:15px"></i></button></td>
+            </tr>
+            <tr>
+              <td><span class="b-state done">제출 완료</span></td>
+              <td>국어<span class="t-sub">이수민 선생님</span></td>
+              <td class="left">시 감상하고 표현하기</td>
+              <td>7월 11일(금) 12:00<span class="t-sub">제출 마감일 지남</span></td>
+              <td><button class="link-btn" onclick="notReady('결과 보기')">결과 보기 <i data-lucide="chevron-right" style="width:15px;height:15px"></i></button></td>
+            </tr>
+            <tr>
+              <td><span class="b-state done">제출 완료</span></td>
+              <td>사회<span class="t-sub">김기남 선생님</span></td>
+              <td class="left">인권 보장과 헌법</td>
+              <td>제출 마감일 없음<span class="t-sub">-</span></td>
+              <td><button class="link-btn" onclick="notReady('결과 보기')">결과 보기 <i data-lucide="chevron-right" style="width:15px;height:15px"></i></button></td>
+            </tr>
+            <tr>
+              <td><span class="b-state wait">제출 없음</span></td>
+              <td>과학<span class="t-sub">김기남 선생님</span></td>
+              <td class="left">물질의 상태 변화 정리</td>
+              <td>6월 27일(금) 12:00<span class="t-sub">제출 마감일 지남</span></td>
+              <td><button class="link-btn" onclick="notReady('결과 보기')">결과 보기 <i data-lucide="chevron-right" style="width:15px;height:15px"></i></button></td>
+            </tr>
+            <tr>
+              <td><span class="b-state miss">미제출</span></td>
+              <td>과학<span class="t-sub">-</span></td>
+              <td class="left">생태계와 환경 조사</td>
+              <td>6월 20일(금) 12:00<span class="t-sub">제출 마감일 지남</span></td>
+              <td><button class="link-btn" onclick="notReady('결과 보기')">결과 보기 <i data-lucide="chevron-right" style="width:15px;height:15px"></i></button></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="sec">
+      <div class="sec-hd"><h2 class="sec-t">진행 예정 과제 (2개)</h2></div>
+      <p class="sec-d">아직 과제 제출이 시작되지 않은 과제예요.</p>
+      <div class="panel">
+        <table class="tbl">
+          <thead><tr>
+            <th style="width:110px;">제출 상황</th>
+            <th style="width:120px;">과목</th>
+            <th class="left">과제 정보</th>
+            <th style="width:190px;">제출 시작일</th>
+            <th style="width:190px;">날짜</th>
+          </tr></thead>
+          <tbody>
+            <tr>
+              <td><span class="b-state soon">시작 전</span></td>
+              <td>국어<span class="t-sub">이수민 선생님</span></td>
+              <td class="left">토론하기 활동 정리</td>
+              <td>8월 12일(수) 09:00</td>
+              <td>8월 19일(수) 12:00<span class="t-sub">7일 남음</span></td>
+            </tr>
+            <tr>
+              <td><span class="b-state soon">시작 전</span></td>
+              <td>사회<span class="t-sub">김기남 선생님</span></td>
+              <td class="left">경제 활동과 선택</td>
+              <td>8월 12일(수) 09:00</td>
+              <td>제출 마감일 없음<span class="t-sub">-</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <footer class="site-footer">
+      <div class="sf-links"><a href="#" onclick="return false;">회사소개</a><a href="#" onclick="return false;">이용약관</a><a href="#" onclick="return false;">개인정보처리방침</a><a href="#" onclick="return false;">고객센터</a></div>
+      <div class="sf-copy">© 2026. Datadriven Inc. All rights reserved.</div>
+    </footer>
+  </div>
+</div>
+
+<!-- ═══════════════ 전면 개편안 (학생 스타일) ═══════════════ -->
+<div id="scr-student" class="screen">
+  <div class="page-wrap">
+
+    <!-- 페이지 헤더 — 날짜(마감 계산의 기준점)·인사·학기만. 요약 문장과 숫자 타일은 아래와 중복이라 걷어냄 -->
+    <div class="st-head">
+      <div>
+        <p class="st-date">7월 29일 수요일</p>
+        <h1 class="st-greet">김서윤 학생, 안녕하세요! 👋</h1>
+      </div>
+      <select class="sem-sel" onchange="notReady('학기 바꾸기')">
+        <option>2026학년도 1학기</option>
+        <option>2026학년도 2학기</option>
+      </select>
+    </div>
+
+    <!-- 수업 필터 — 페이지 전체(낼 과제·제출 끝·결과·곧 시작)에 걸린다.
+         숫자 = 그 수업의 '지금 낼 과제' 수 (레일이 주던 수업별 현황을 여기서 대체) -->
+    <div class="st-chips-wrap"><div class="st-chips">
+      <button class="st-chip on" data-f="all" onclick="stFilter('all',this)">전체 수업 <span class="c">7</span></button>
+      <button class="st-chip" data-f="c1" onclick="stFilter('c1',this)">언어와 매체 <span class="c">2</span></button>
+      <button class="st-chip" data-f="c2" onclick="stFilter('c2',this)">현대사회와 미술세계 <span class="c">1</span></button>
+      <button class="st-chip" data-f="c6" onclick="stFilter('c6',this)">생활과 윤리 <span class="c">1</span></button>
+      <button class="st-chip" data-f="c3" onclick="stFilter('c3',this)">융합과학탐구 <span class="c">1</span></button>
+      <button class="st-chip" data-f="c4" onclick="stFilter('c4',this)">확률과 통계 <span class="c">1</span></button>
+      <button class="st-chip" data-f="c5" onclick="stFilter('c5',this)">영어권 문화 <span class="c">1</span></button>
+      <button class="st-chip" data-f="c7" onclick="stFilter('c7',this)">한국지리</button>
+      <button class="st-chip" data-f="c8" onclick="stFilter('c8',this)">세계사</button>
+      <button class="st-chip" data-f="c9" onclick="stFilter('c9',this)">미술 창작</button>
+    </div></div>
+
+    <div>
+      <div>
+
+        <!-- 지금 낼 과제 -->
+        <div class="st-sec" data-sec="todo" id="st-sec-todo">
+          <div class="st-sec-hd"><i data-lucide="pencil-line" style="width:20px;height:20px"></i><h2 class="st-sec-t">지금 낼 과제</h2><span class="sec-n">7</span></div>
+          <p class="st-sec-d">마감이 가까운 순서예요. 마감이 없는 과제는 맨 아래에 있어요.</p>
+          <div class="todo-list">
+            <!-- 마감 지남 + 마감 후 제출 허용 → 가장 급한 것이므로 맨 위 (정렬 = 남은 시간 오름차순, 지난 건 음수) -->
+            <div class="st-todo urgent" onclick="location.href='student_submit_v1_260729.html#notice'">
+              <div class="st-due hot"><span class="d1">7/25</span><span class="d2">마감 지남</span></div>
+              <div class="todo-l">
+                <div class="todo-top"><span class="sj c6">생활과 윤리</span></div>
+                <p class="todo-nm">생명 윤리 쟁점 토론 보고서</p>
+                <p class="todo-meta">마감이 지났지만 아직 낼 수 있어요 · 한지영 선생님</p>
+              </div>
+              <div class="todo-r"><button class="btn btn-primary" onclick="event.stopPropagation();location.href='student_submit_v1_260729.html#notice'">제출</button></div>
+            </div>
+            <div class="st-todo urgent" onclick="location.href='student_submit_v1_260729.html#write'">
+              <div class="st-due hot"><span class="d1">오늘</span><span class="d2">16:00 마감</span></div>
+              <div class="todo-l">
+                <div class="todo-top"><span class="sj c2">현대사회와 미술세계</span></div>
+                <p class="todo-nm">현대 미술의 사회 참여 사례 분석</p>
+                <p class="todo-meta">김기남 선생님</p>
+              </div>
+              <div class="todo-r">
+                <span class="todo-writing"><i data-lucide="pencil-line" style="width:15px;height:15px"></i>쓰던 중</span>
+                <button class="btn btn-primary" onclick="event.stopPropagation();location.href='student_submit_v1_260729.html#write'">이어 쓰기</button>
+              </div>
+            </div>
+            <div class="st-todo urgent" onclick="location.href='student_submit_v1_260729.html#notice'">
+              <div class="st-due hot"><span class="d1">내일</span><span class="d2">16:00 마감</span></div>
+              <div class="todo-l">
+                <div class="todo-top"><span class="sj c1">언어와 매체</span></div>
+                <p class="todo-nm">매체 언어의 설득 전략 분석</p>
+                <p class="todo-meta">이수민 선생님</p>
+              </div>
+              <div class="todo-r"><button class="btn btn-primary" onclick="event.stopPropagation();location.href='student_submit_v1_260729.html#notice'">제출</button></div>
+            </div>
+            <div class="st-todo" onclick="location.href='student_submit_v1_260729.html#fileonly'">
+              <div class="st-due"><span class="d1">8/5</span><span class="d2">7일 남음</span></div>
+              <div class="todo-l">
+                <div class="todo-top"><span class="sj c3">융합과학탐구</span></div>
+                <p class="todo-nm">탐구 주제 선정과 실험 설계 보고서</p>
+                <p class="todo-meta">정도현 선생님</p>
+              </div>
+              <div class="todo-r"><button class="btn btn-outline" onclick="event.stopPropagation();location.href='student_submit_v1_260729.html#fileonly'">제출</button></div>
+            </div>
+            <div class="st-todo" onclick="location.href='student_submit_v1_260729.html#notice'">
+              <div class="st-due"><span class="d1">8/7</span><span class="d2">9일 남음</span></div>
+              <div class="todo-l">
+                <div class="todo-top"><span class="sj c4">확률과 통계</span></div>
+                <p class="todo-nm">조건부확률 활용 문제 풀이 과정 쓰기</p>
+                <p class="todo-meta">박정호 선생님</p>
+              </div>
+              <div class="todo-r"><button class="btn btn-outline" onclick="event.stopPropagation();location.href='student_submit_v1_260729.html#notice'">제출</button></div>
+            </div>
+            <div class="st-todo" onclick="location.href='student_submit_v1_260729.html#notice'">
+              <div class="st-due"><span class="d1">8/10</span><span class="d2">12일 남음</span></div>
+              <div class="todo-l">
+                <div class="todo-top"><span class="sj c5">영어권 문화</span></div>
+                <p class="todo-nm">영어 에세이 — Culture and Identity</p>
+                <p class="todo-meta">최수현 선생님</p>
+              </div>
+              <div class="todo-r"><button class="btn btn-outline" onclick="event.stopPropagation();location.href='student_submit_v1_260729.html#notice'">제출</button></div>
+            </div>
+            <div class="st-todo" onclick="location.href='student_submit_v1_260729.html#notice'">
+              <div class="st-due free"><span class="d1">마감</span><span class="d2">없음</span></div>
+              <div class="todo-l">
+                <div class="todo-top"><span class="sj c1">언어와 매체</span></div>
+                <p class="todo-nm">문학 작품 비평문 쓰기</p>
+                <p class="todo-meta">언제든 낼 수 있어요 · 이수민 선생님</p>
+              </div>
+              <div class="todo-r"><button class="btn btn-outline" onclick="event.stopPropagation();location.href='student_submit_v1_260729.html#notice'">제출</button></div>
+            </div>
+          </div>
+          <p class="st-empty" style="background:#fff;border:1px solid #dde1e8;border-radius:14px;">이 수업에는 지금 낼 과제가 없어요.</p>
+          <button class="todo-more" onclick="stShowMore(this)">2개 더 보기 <i data-lucide="chevron-down" style="width:16px;height:16px"></i></button>
+        </div>
+
+        <!-- 결과 나온 과제 — 학생의 두 번째 목적이라 2번 자리.
+             (상태 진행 순으로 두면 액션 없는 '제출이 끝난 과제'가 이 자리를 차지한다) -->
+        <div class="st-sec" data-sec="result" id="st-sec-result">
+          <div class="st-sec-hd"><i data-lucide="award" style="width:20px;height:20px"></i><h2 class="st-sec-t">결과 나온 과제</h2><span class="sec-n">6</span></div>
+          <p class="st-sec-d">선생님이 공개한 결과예요. 점수는 선생님이 공개한 과제에만 보여요.</p>
+          <div class="panel">
+            <div class="st-res" data-sj="c1" onclick="notReady('결과 보기')">
+              <div class="st-res-b">
+                <p class="st-res-nm">정보 전달 글쓰기 평가</p>
+                <p class="st-res-meta">언어와 매체 · 이수민 선생님 · 7월 18일(금) 마감</p>
+              </div>
+              <span class="st-score">88점</span>
+              <button class="link-btn" onclick="event.stopPropagation();notReady('결과 보기')">결과 보기 <i data-lucide="chevron-right" style="width:15px;height:15px"></i></button>
+            </div>
+            <!-- 점수 비공개 건 — '비공개'라고 적지 않고 그냥 자리를 비운다 -->
+            <div class="st-res" data-sj="c8" onclick="notReady('결과 보기')">
+              <div class="st-res-b">
+                <p class="st-res-nm">시민혁명의 전개 과정 서술</p>
+                <p class="st-res-meta">세계사 · 문상혁 선생님 · 7월 11일(금) 마감</p>
+              </div>
+              <button class="link-btn" onclick="event.stopPropagation();notReady('결과 보기')">결과 보기 <i data-lucide="chevron-right" style="width:15px;height:15px"></i></button>
+            </div>
+            <div class="st-res" data-sj="c6" onclick="notReady('결과 보기')">
+              <div class="st-res-b">
+                <p class="st-res-nm">직업 윤리 사례 분석</p>
+                <p class="st-res-meta">생활과 윤리 · 한지영 선생님 · 7월 4일(금) 마감</p>
+              </div>
+              <span class="st-score">92점</span>
+              <button class="link-btn" onclick="event.stopPropagation();notReady('결과 보기')">결과 보기 <i data-lucide="chevron-right" style="width:15px;height:15px"></i></button>
+            </div>
+            <!-- 교사 수거형(학생 제출 없음) — 공개 전엔 학생 홈에 없다가 공개 시 여기로 -->
+            <div class="st-res" data-sj="c3" onclick="notReady('결과 보기')">
+              <div class="st-res-b">
+                <p class="st-res-nm">탐구 결과 정리 보고서</p>
+                <p class="st-res-meta">융합과학탐구 · 정도현 선생님 · 선생님이 답안을 등록했어요</p>
+              </div>
+              <span class="st-score">75점</span>
+              <button class="link-btn" onclick="event.stopPropagation();notReady('결과 보기')">결과 보기 <i data-lucide="chevron-right" style="width:15px;height:15px"></i></button>
+            </div>
+            <div class="st-res" data-sj="c9" onclick="notReady('결과 보기')">
+              <div class="st-res-b">
+                <p class="st-res-nm">작품 감상문 쓰기</p>
+                <p class="st-res-meta">미술 창작 · 유가은 선생님 · 6월 20일(금) 마감</p>
+              </div>
+              <span class="b-state miss">미제출</span>
+              <button class="link-btn" onclick="event.stopPropagation();notReady('결과 보기')">결과 보기 <i data-lucide="chevron-right" style="width:15px;height:15px"></i></button>
+            </div>
+            <div class="st-res" data-sj="c5" onclick="notReady('결과 보기')">
+              <div class="st-res-b">
+                <p class="st-res-nm">영어 발표문 작성</p>
+                <p class="st-res-meta">영어권 문화 · 최수현 선생님 · 6월 13일(금) 마감</p>
+              </div>
+              <span class="st-score">90점</span>
+              <button class="link-btn" onclick="event.stopPropagation();notReady('결과 보기')">결과 보기 <i data-lucide="chevron-right" style="width:15px;height:15px"></i></button>
+            </div>
+            <p class="st-empty">이 수업에는 결과가 나온 과제가 없어요.</p>
+          </div>
+          <button class="todo-more" onclick="stShowMore(this)">2개 더 보기 <i data-lucide="chevron-down" style="width:16px;height:16px"></i></button>
+        </div>
+
+        <!-- 제출이 끝난 과제 — 액션이 없는 대기·종료 상태라 결과 다음 -->
+        <div class="st-sec" data-sec="wait" id="st-sec-wait">
+          <!-- '제출한 과제'가 아니라 '제출이 끝난 과제' — 마감 지나 못 낸 과제(미제출)도 담기므로.
+               "확인 중·확인하면 결과가 나와요"라고 쓰지 않는다 — 결과 공개는 선생님 선택이라 안 올 수도 있음(지킬 수 없는 안내 금지) -->
+          <div class="st-sec-hd"><i data-lucide="file-check-2" style="width:20px;height:20px"></i><h2 class="st-sec-t">제출이 끝난 과제</h2><span class="sec-n">4</span></div>
+          <p class="st-sec-d">제출을 마쳤거나 제출 기간이 끝난 과제예요. 결과는 선생님이 공개하면 '결과 나온 과제'에서 볼 수 있어요.</p>
+          <div class="panel">
+            <!-- 종이 제출 케이스 — 선생님이 이 학생 답안을 올린 시점부터 '지금 낼 과제'에서 빠지고 여기로 -->
+            <div class="st-wait-row" data-sj="c3">
+              <div class="st-wait-ic"><i data-lucide="scan-line" style="width:19px;height:19px"></i></div>
+              <div class="st-wait-b">
+                <p class="st-wait-nm">빛의 굴절 탐구 활동지</p>
+                <p class="st-wait-sub">융합과학탐구 · 정도현 선생님 · 종이로 낸 답안을 선생님이 올렸어요</p>
+              </div>
+              <button class="link-btn" onclick="notReady('답안 보기')">답안 보기 <i data-lucide="chevron-right" style="width:15px;height:15px"></i></button>
+            </div>
+            <div class="st-wait-row" data-sj="c1">
+              <div class="st-wait-ic"><i data-lucide="file-check-2" style="width:19px;height:19px"></i></div>
+              <div class="st-wait-b">
+                <p class="st-wait-nm">매체 자료의 관점 분석하기</p>
+                <p class="st-wait-sub">언어와 매체 · 이수민 선생님 · 7월 24일(금)에 제출</p>
+              </div>
+              <button class="link-btn" onclick="location.href='student_submit_v1_260729.html#done'">답안 보기 <i data-lucide="chevron-right" style="width:15px;height:15px"></i></button>
+            </div>
+            <div class="st-wait-row" data-sj="c7">
+              <div class="st-wait-ic"><i data-lucide="file-check-2" style="width:19px;height:19px"></i></div>
+              <div class="st-wait-b">
+                <p class="st-wait-nm">지역 문제 조사 보고서</p>
+                <p class="st-wait-sub">한국지리 · 오세라 선생님 · 7월 22일(수)에 제출</p>
+              </div>
+              <button class="link-btn" onclick="location.href='student_submit_v1_260729.html#done'">답안 보기 <i data-lucide="chevron-right" style="width:15px;height:15px"></i></button>
+            </div>
+            <!-- 마감 지남 + 제출 불가 + 결과 미공개 → 여기서 '미제출'로 표시 (지금 낼 과제에서 빠짐) -->
+            <div class="st-wait-row" data-sj="c4">
+              <div class="st-wait-ic"><i data-lucide="file-x-2" style="width:19px;height:19px"></i></div>
+              <div class="st-wait-b">
+                <p class="st-wait-nm">통계적 추정 서술형 문제</p>
+                <p class="st-wait-sub">확률과 통계 · 박정호 선생님 · 7월 20일(월) 마감</p>
+              </div>
+              <span class="b-state miss">미제출</span>
+            </div>
+            <p class="st-empty">이 수업에는 제출이 끝난 과제가 없어요.</p>
+          </div>
+        </div>
+
+        <!-- 곧 시작하는 과제 — 학생형은 교사가 등록하면 즉시 여기 노출(제출 대기).
+             제출 시작일이 되면 '지금 낼 과제'로 올라간다. 아직 못 내므로 상세 진입 없음.
+             교사 수거형은 결과 공개 전까지 학생 홈 어디에도 안 보임 -->
+        <div class="st-sec" data-sec="soon" id="st-sec-soon">
+          <div class="st-sec-hd"><i data-lucide="calendar-clock" style="width:20px;height:20px"></i><h2 class="st-sec-t">곧 시작하는 과제</h2><span class="sec-n">2</span></div>
+          <p class="st-sec-d">아직 제출이 시작되지 않은 과제예요. 시작하는 날이 되면 '지금 낼 과제'에서 볼 수 있어요.</p>
+          <div class="panel">
+            <div class="st-soon-row" data-sj="c1">
+              <div class="st-soon-b">
+                <p class="st-soon-nm">매체 비평문 작성</p>
+                <p class="st-soon-sub">언어와 매체 · 이수민 선생님 · 8월 12일(수)부터 낼 수 있어요</p>
+              </div>
+              <span class="b-state soon">시작 전</span>
+            </div>
+            <div class="st-soon-row" data-sj="c2">
+              <div class="st-soon-b">
+                <p class="st-soon-nm">공공미술 프로젝트 기획안</p>
+                <p class="st-soon-sub">현대사회와 미술세계 · 김기남 선생님 · 8월 12일(수)부터 낼 수 있어요</p>
+              </div>
+              <span class="b-state soon">시작 전</span>
+            </div>
+            <p class="st-empty">이 수업에는 곧 시작하는 과제가 없어요.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <footer class="site-footer">
+      <div class="sf-links"><a href="#" onclick="return false;">회사소개</a><a href="#" onclick="return false;">이용약관</a><a href="#" onclick="return false;">개인정보처리방침</a><a href="#" onclick="return false;">고객센터</a></div>
+      <div class="sf-copy">© 2026. Datadriven Inc. All rights reserved.</div>
+    </footer>
+  </div>
+</div>
+
+<!-- ═══════════════ 시안 4 — 히어로 제거 + 순서만 변경 (결과는 카드 유지) ═══════════════
+     시안 3과 다른 점은 딱 둘: 결과가 카드 그리드다(행 아님) · 결과에 점수를 붙이지 않는다.
+     '더 보기'도 낼 과제에만 둔다(시안 3은 전 섹션 공통 규칙) -->
+<div id="scr-cards" class="screen">
+  <div class="page-wrap">
+
+    <!-- 수업 필터를 칩이 아니라 헤더 우측 드롭다운으로 (시안 3과 다른 점).
+         칩은 88px 두 줄을 먹으면서 첫 화면에서 가장 강한 요소가 돼 '지금 낼 과제'와 강조가 뒤집혔다.
+         칩 배지가 주던 '어느 수업에 낼 게 있나'는 아래 과제 카드의 수업 배지가 이미 하고 있어 중복.
+         범위가 넓은 것(학기) → 좁은 것(수업) 순으로 나란히 둔다 -->
+    <div class="st-head">
+      <div>
+        <p class="st-date">7월 29일 수요일</p>
+        <h1 class="st-greet">김서윤 학생, 안녕하세요! 👋</h1>
+      </div>
+      <select class="sem-sel" onchange="notReady('학기 바꾸기')">
+        <option>2026학년도 1학기</option>
+        <option>2026학년도 2학기</option>
+      </select>
+      <select class="sem-sel st-classsel" onchange="stFilter(this.value, this)">
+        <option value="all">전체 수업</option>
+        <option value="c1">언어와 매체</option>
+        <option value="c2">현대사회와 미술세계</option>
+        <option value="c6">생활과 윤리</option>
+        <option value="c3">융합과학탐구</option>
+        <option value="c4">확률과 통계</option>
+        <option value="c5">영어권 문화</option>
+        <option value="c7">한국지리</option>
+        <option value="c8">세계사</option>
+        <option value="c9">미술 창작</option>
+      </select>
+    </div>
+
+    <div>
+      <div>
+
+        <!-- 지금 낼 과제 -->
+        <div class="st-sec" data-sec="todo">
+          <div class="st-sec-hd"><i data-lucide="pencil-line" style="width:20px;height:20px"></i><h2 class="st-sec-t">지금 낼 과제</h2><span class="sec-n">7</span></div>
+          <p class="st-sec-d">마감이 가까운 순서예요. 마감이 없는 과제는 맨 아래에 있어요.</p>
+          <div class="todo-list">
+            <div class="st-todo urgent" onclick="location.href='student_submit_v1_260729.html#notice'">
+              <div class="st-due hot"><span class="d1">7/25</span><span class="d2">마감 지남</span></div>
+              <div class="todo-l">
+                <div class="todo-top"><span class="sj c6">생활과 윤리</span></div>
+                <p class="todo-nm">생명 윤리 쟁점 토론 보고서</p>
+                <p class="todo-meta">마감이 지났지만 아직 낼 수 있어요 · 한지영 선생님</p>
+              </div>
+              <div class="todo-r"><button class="btn btn-primary" onclick="event.stopPropagation();location.href='student_submit_v1_260729.html#notice'">제출</button></div>
+            </div>
+            <div class="st-todo urgent" onclick="location.href='student_submit_v1_260729.html#write'">
+              <div class="st-due hot"><span class="d1">오늘</span><span class="d2">16:00 마감</span></div>
+              <div class="todo-l">
+                <div class="todo-top"><span class="sj c2">현대사회와 미술세계</span></div>
+                <p class="todo-nm">현대 미술의 사회 참여 사례 분석</p>
+                <p class="todo-meta">김기남 선생님</p>
+              </div>
+              <div class="todo-r">
+                <span class="todo-writing"><i data-lucide="pencil-line" style="width:15px;height:15px"></i>쓰던 중</span>
+                <button class="btn btn-primary" onclick="event.stopPropagation();location.href='student_submit_v1_260729.html#write'">이어 쓰기</button>
+              </div>
+            </div>
+            <div class="st-todo urgent" onclick="location.href='student_submit_v1_260729.html#notice'">
+              <div class="st-due hot"><span class="d1">내일</span><span class="d2">16:00 마감</span></div>
+              <div class="todo-l">
+                <div class="todo-top"><span class="sj c1">언어와 매체</span></div>
+                <p class="todo-nm">매체 언어의 설득 전략 분석</p>
+                <p class="todo-meta">이수민 선생님</p>
+              </div>
+              <div class="todo-r"><button class="btn btn-primary" onclick="event.stopPropagation();location.href='student_submit_v1_260729.html#notice'">제출</button></div>
+            </div>
+            <div class="st-todo" onclick="location.href='student_submit_v1_260729.html#fileonly'">
+              <div class="st-due"><span class="d1">8/5</span><span class="d2">7일 남음</span></div>
+              <div class="todo-l">
+                <div class="todo-top"><span class="sj c3">융합과학탐구</span></div>
+                <p class="todo-nm">탐구 주제 선정과 실험 설계 보고서</p>
+                <p class="todo-meta">정도현 선생님</p>
+              </div>
+              <div class="todo-r"><button class="btn btn-outline" onclick="event.stopPropagation();location.href='student_submit_v1_260729.html#fileonly'">제출</button></div>
+            </div>
+            <div class="st-todo" onclick="location.href='student_submit_v1_260729.html#notice'">
+              <div class="st-due"><span class="d1">8/7</span><span class="d2">9일 남음</span></div>
+              <div class="todo-l">
+                <div class="todo-top"><span class="sj c4">확률과 통계</span></div>
+                <p class="todo-nm">조건부확률 활용 문제 풀이 과정 쓰기</p>
+                <p class="todo-meta">박정호 선생님</p>
+              </div>
+              <div class="todo-r"><button class="btn btn-outline" onclick="event.stopPropagation();location.href='student_submit_v1_260729.html#notice'">제출</button></div>
+            </div>
+            <div class="st-todo" onclick="location.href='student_submit_v1_260729.html#notice'">
+              <div class="st-due"><span class="d1">8/10</span><span class="d2">12일 남음</span></div>
+              <div class="todo-l">
+                <div class="todo-top"><span class="sj c5">영어권 문화</span></div>
+                <p class="todo-nm">영어 에세이 — Culture and Identity</p>
+                <p class="todo-meta">최수현 선생님</p>
+              </div>
+              <div class="todo-r"><button class="btn btn-outline" onclick="event.stopPropagation();location.href='student_submit_v1_260729.html#notice'">제출</button></div>
+            </div>
+            <div class="st-todo" onclick="location.href='student_submit_v1_260729.html#notice'">
+              <div class="st-due free"><span class="d1">마감</span><span class="d2">없음</span></div>
+              <div class="todo-l">
+                <div class="todo-top"><span class="sj c1">언어와 매체</span></div>
+                <p class="todo-nm">문학 작품 비평문 쓰기</p>
+                <p class="todo-meta">언제든 낼 수 있어요 · 이수민 선생님</p>
+              </div>
+              <div class="todo-r"><button class="btn btn-outline" onclick="event.stopPropagation();location.href='student_submit_v1_260729.html#notice'">제출</button></div>
+            </div>
+          </div>
+          <p class="st-empty" style="background:#fff;border:1px solid #dde1e8;border-radius:14px;">이 수업에는 지금 낼 과제가 없어요.</p>
+          <button class="todo-more" onclick="stShowMore(this)">2개 더 보기 <i data-lucide="chevron-down" style="width:16px;height:16px"></i></button>
+        </div>
+
+        <!-- 결과 나온 과제 — 카드 그리드 유지. '더 보기'를 두지 않는 안이므로 상한도 없다(data-limit="0") -->
+        <div class="st-sec" data-sec="result" data-limit="0">
+          <div class="st-sec-hd"><i data-lucide="award" style="width:20px;height:20px"></i><h2 class="st-sec-t">결과 나온 과제</h2><span class="sec-n">6</span></div>
+          <p class="st-sec-d">점수와 선생님 피드백을 볼 수 있어요.</p>
+          <div class="st-results">
+            <div class="st-rescard" onclick="notReady('결과 보기')">
+              <div class="st-rescard-top"><span class="sj c1">언어와 매체</span><span class="b-state done">제출 완료</span></div>
+              <p class="st-rescard-nm">정보 전달 글쓰기 평가</p>
+              <div class="st-rescard-ft"><span class="st-rescard-meta">7월 18일(금) 마감</span><button class="link-btn" onclick="event.stopPropagation();notReady('결과 보기')">결과 보기 <i data-lucide="chevron-right" style="width:15px;height:15px"></i></button></div>
+            </div>
+            <div class="st-rescard" onclick="notReady('결과 보기')">
+              <div class="st-rescard-top"><span class="sj c8">세계사</span><span class="b-state done">제출 완료</span></div>
+              <p class="st-rescard-nm">시민혁명의 전개 과정 서술</p>
+              <div class="st-rescard-ft"><span class="st-rescard-meta">7월 11일(금) 마감</span><button class="link-btn" onclick="event.stopPropagation();notReady('결과 보기')">결과 보기 <i data-lucide="chevron-right" style="width:15px;height:15px"></i></button></div>
+            </div>
+            <div class="st-rescard" onclick="notReady('결과 보기')">
+              <div class="st-rescard-top"><span class="sj c6">생활과 윤리</span><span class="b-state done">제출 완료</span></div>
+              <p class="st-rescard-nm">직업 윤리 사례 분석</p>
+              <div class="st-rescard-ft"><span class="st-rescard-meta">7월 4일(금) 마감</span><button class="link-btn" onclick="event.stopPropagation();notReady('결과 보기')">결과 보기 <i data-lucide="chevron-right" style="width:15px;height:15px"></i></button></div>
+            </div>
+            <div class="st-rescard" onclick="notReady('결과 보기')">
+              <!-- 교사 수거형(학생 제출 없음) — 공개 전엔 학생 홈에 없다가 공개 시 여기로 -->
+              <div class="st-rescard-top"><span class="sj c3">융합과학탐구</span><span class="b-state wait">선생님 등록</span></div>
+              <p class="st-rescard-nm">탐구 결과 정리 보고서</p>
+              <div class="st-rescard-ft"><span class="st-rescard-meta">6월 27일(금) 마감</span><button class="link-btn" onclick="event.stopPropagation();notReady('결과 보기')">결과 보기 <i data-lucide="chevron-right" style="width:15px;height:15px"></i></button></div>
+            </div>
+            <div class="st-rescard" onclick="notReady('결과 보기')">
+              <div class="st-rescard-top"><span class="sj c9">미술 창작</span><span class="b-state miss">미제출</span></div>
+              <p class="st-rescard-nm">작품 감상문 쓰기</p>
+              <div class="st-rescard-ft"><span class="st-rescard-meta">6월 20일(금) 마감</span><button class="link-btn" onclick="event.stopPropagation();notReady('결과 보기')">결과 보기 <i data-lucide="chevron-right" style="width:15px;height:15px"></i></button></div>
+            </div>
+            <div class="st-rescard" onclick="notReady('결과 보기')">
+              <div class="st-rescard-top"><span class="sj c5">영어권 문화</span><span class="b-state done">제출 완료</span></div>
+              <p class="st-rescard-nm">영어 발표문 작성</p>
+              <div class="st-rescard-ft"><span class="st-rescard-meta">6월 13일(금) 마감</span><button class="link-btn" onclick="event.stopPropagation();notReady('결과 보기')">결과 보기 <i data-lucide="chevron-right" style="width:15px;height:15px"></i></button></div>
+            </div>
+          </div>
+          <p class="st-empty" style="background:#fff;border:1px solid #dde1e8;border-radius:14px;">이 수업에는 결과가 나온 과제가 없어요.</p>
+        </div>
+
+        <!-- 제출이 끝난 과제 -->
+        <div class="st-sec" data-sec="wait">
+          <div class="st-sec-hd"><i data-lucide="file-check-2" style="width:20px;height:20px"></i><h2 class="st-sec-t">제출이 끝난 과제</h2><span class="sec-n">4</span></div>
+          <p class="st-sec-d">제출을 마쳤거나 제출 기간이 끝난 과제예요. 결과는 선생님이 공개하면 '결과 나온 과제'에서 볼 수 있어요.</p>
+          <div class="panel">
+            <div class="st-wait-row" data-sj="c3">
+              <div class="st-wait-ic"><i data-lucide="scan-line" style="width:19px;height:19px"></i></div>
+              <div class="st-wait-b">
+                <p class="st-wait-nm">빛의 굴절 탐구 활동지</p>
+                <p class="st-wait-sub">융합과학탐구 · 정도현 선생님 · 종이로 낸 답안을 선생님이 올렸어요</p>
+              </div>
+              <button class="link-btn" onclick="notReady('답안 보기')">답안 보기 <i data-lucide="chevron-right" style="width:15px;height:15px"></i></button>
+            </div>
+            <div class="st-wait-row" data-sj="c1">
+              <div class="st-wait-ic"><i data-lucide="file-check-2" style="width:19px;height:19px"></i></div>
+              <div class="st-wait-b">
+                <p class="st-wait-nm">매체 자료의 관점 분석하기</p>
+                <p class="st-wait-sub">언어와 매체 · 이수민 선생님 · 7월 24일(금)에 제출</p>
+              </div>
+              <button class="link-btn" onclick="location.href='student_submit_v1_260729.html#done'">답안 보기 <i data-lucide="chevron-right" style="width:15px;height:15px"></i></button>
+            </div>
+            <div class="st-wait-row" data-sj="c7">
+              <div class="st-wait-ic"><i data-lucide="file-check-2" style="width:19px;height:19px"></i></div>
+              <div class="st-wait-b">
+                <p class="st-wait-nm">지역 문제 조사 보고서</p>
+                <p class="st-wait-sub">한국지리 · 오세라 선생님 · 7월 22일(수)에 제출</p>
+              </div>
+              <button class="link-btn" onclick="location.href='student_submit_v1_260729.html#done'">답안 보기 <i data-lucide="chevron-right" style="width:15px;height:15px"></i></button>
+            </div>
+            <div class="st-wait-row" data-sj="c4">
+              <div class="st-wait-ic"><i data-lucide="file-x-2" style="width:19px;height:19px"></i></div>
+              <div class="st-wait-b">
+                <p class="st-wait-nm">통계적 추정 서술형 문제</p>
+                <p class="st-wait-sub">확률과 통계 · 박정호 선생님 · 7월 20일(월) 마감</p>
+              </div>
+              <span class="b-state miss">미제출</span>
+            </div>
+            <p class="st-empty">이 수업에는 제출이 끝난 과제가 없어요.</p>
+          </div>
+        </div>
+
+        <!-- 곧 시작하는 과제 -->
+        <div class="st-sec" data-sec="soon">
+          <div class="st-sec-hd"><i data-lucide="calendar-clock" style="width:20px;height:20px"></i><h2 class="st-sec-t">곧 시작하는 과제</h2><span class="sec-n">2</span></div>
+          <p class="st-sec-d">아직 제출이 시작되지 않은 과제예요. 시작하는 날이 되면 '지금 낼 과제'에서 볼 수 있어요.</p>
+          <div class="panel">
+            <div class="st-soon-row" data-sj="c1">
+              <div class="st-soon-b">
+                <p class="st-soon-nm">매체 비평문 작성</p>
+                <p class="st-soon-sub">언어와 매체 · 이수민 선생님 · 8월 12일(수)부터 낼 수 있어요</p>
+              </div>
+              <span class="b-state soon">시작 전</span>
+            </div>
+            <div class="st-soon-row" data-sj="c2">
+              <div class="st-soon-b">
+                <p class="st-soon-nm">공공미술 프로젝트 기획안</p>
+                <p class="st-soon-sub">현대사회와 미술세계 · 김기남 선생님 · 8월 12일(수)부터 낼 수 있어요</p>
+              </div>
+              <span class="b-state soon">시작 전</span>
+            </div>
+            <p class="st-empty">이 수업에는 곧 시작하는 과제가 없어요.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <footer class="site-footer">
+      <div class="sf-links"><a href="#" onclick="return false;">회사소개</a><a href="#" onclick="return false;">이용약관</a><a href="#" onclick="return false;">개인정보처리방침</a><a href="#" onclick="return false;">고객센터</a></div>
+      <div class="sf-copy">© 2026. Datadriven Inc. All rights reserved.</div>
+    </footer>
+  </div>
+</div>
+
+<!-- ═══════════════ 시안 5 — 홈/과제 분리 · ① 홈 ═══════════════
+     줄리 제안(2026-08-11 회의): 시안 1~4의 "홈=과제 목록 전체" 전제를 폐기한다.
+     홈에 전체 목록을 두면 "지금 낼 과제에서 낸 건 어디로?" 같은 이동·중복 표기 문제가 계속 생기므로,
+     홈 = 지금 나한테 새로운 것만(처리하면 사라지는 인박스) / 과제 탭 = 전체 기록(표).
+     · 홈 노출 기간 = 30일 통일(올립 확정): 마감 없는 과제는 등록 후 30일, 결과는 공개 후 30일(보면 즉시 사라짐)
+     · 필터·학기 축 없음 — 홈은 '지금' 것만 담아 목록이 짧다. 필터와 지난 학기는 과제 탭 몫
+     · data-sec 일부러 없음 — 필터가 없어 stApply 계산 대상이 아니다(시안 3·4와 다른 점). 개수 배지는 하드코딩
+     · 좌측 NB로 홈↔과제를 오간다(해시 라우팅, navHome/navTask) -->
+<div id="scr-home5" class="screen">
+  <div class="page-wrap">
+
+    <div class="st-head">
+      <div>
+        <p class="st-date">7월 29일 수요일</p>
+        <h1 class="st-greet">김서윤 학생, 안녕하세요! 👋</h1>
+      </div>
+    </div>
+
+    <div class="h5-grid">
+
+    <!-- 지금 낼 과제 — 제출하면 즉시 홈에서 사라진다(기록은 과제 탭에 남음).
+         마감 없는 과제 '문학 작품 비평문 쓰기'는 등록 후 30일이 지나 홈에서 빠졌다 — 과제 탭에만 있음.
+         홈은 5개까지만 보여주고 나머지는 과제 탭으로 보낸다(홈에서 펼치지 않음 —
+         "전체는 과제 탭"이라는 역할 분리를 링크로도 학습시킨다). 배지 6 = 홈 노출 대상 전체 수 -->
+    <div class="st-sec">
+      <div class="st-sec-hd"><i data-lucide="pencil-line" style="width:20px;height:20px"></i><h2 class="st-sec-t">지금 낼 과제</h2><span class="sec-n">8</span></div>
+      <p class="st-sec-d">마감이 가까운 순서예요. 과제를 내면 이 목록에서 사라져요.</p>
+      <div class="todo-list">
+        <div class="st-todo urgent" onclick="location.href='student_submit_v1_260729.html#notice'">
+          <div class="st-due hot"><span class="d1">7/25</span><span class="d2">마감 지남</span></div>
+          <div class="todo-l">
+            <p class="todo-cls">생활과 윤리</p>
+            <p class="todo-nm">생명 윤리 쟁점 토론 보고서</p>
+            <p class="todo-meta">늦었지만 아직 낼 수 있어요 · 한지영 선생님</p>
+          </div>
+          <div class="todo-r"><span class="todo-go">제출하기 <i data-lucide="chevron-right" style="width:16px;height:16px"></i></span></div>
+        </div>
+        <!-- A6: 마감 지남 + 쓰던 글 있음 — 급함(빨간 타일)과 '이어 쓰기'가 겹치는 유일한 조합.
+             과제 탭 표에서는 A4와 표현이 같아지고(표엔 CTA가 없다), 홈 카드에서만 구분된다 -->
+        <div class="st-todo urgent" onclick="location.href='student_submit_v1_260729.html#write'">
+          <div class="st-due hot"><span class="d1">7/27</span><span class="d2">마감 지남</span></div>
+          <div class="todo-l">
+            <p class="todo-cls">세계사</p>
+            <p class="todo-nm">근대 국가 형성 과정 비교</p>
+            <p class="todo-meta">늦었지만 아직 낼 수 있어요 · 문상혁 선생님</p>
+          </div>
+          <div class="todo-r"><span class="todo-go">이어 쓰기 <i data-lucide="chevron-right" style="width:16px;height:16px"></i></span></div>
+        </div>
+        <div class="st-todo urgent" onclick="location.href='student_submit_v1_260729.html#write'">
+          <div class="st-due hot"><span class="d1">오늘</span><span class="d2">16:00 마감</span></div>
+          <div class="todo-l">
+            <p class="todo-cls">현대사회와 미술세계</p>
+            <p class="todo-nm">현대 미술의 사회 참여 사례 분석</p>
+            <p class="todo-meta">김기남 선생님</p>
+          </div>
+          <div class="todo-r"><span class="todo-go">이어 쓰기 <i data-lucide="chevron-right" style="width:16px;height:16px"></i></span></div>
+        </div>
+        <div class="st-todo urgent" onclick="location.href='student_submit_v1_260729.html#notice'">
+          <div class="st-due hot"><span class="d1">내일</span><span class="d2">16:00 마감</span></div>
+          <div class="todo-l">
+            <p class="todo-cls">언어와 매체</p>
+            <p class="todo-nm">매체 언어의 설득 전략 분석</p>
+            <p class="todo-meta">이수민 선생님</p>
+          </div>
+          <div class="todo-r"><span class="todo-go">제출하기 <i data-lucide="chevron-right" style="width:16px;height:16px"></i></span></div>
+        </div>
+        <div class="st-todo" onclick="location.href='student_submit_v1_260729.html#fileonly'">
+          <div class="st-due"><span class="d1">8/5</span><span class="d2">7일 남음</span></div>
+          <div class="todo-l">
+            <p class="todo-cls">융합과학탐구</p>
+            <p class="todo-nm">탐구 주제 선정과 실험 설계 보고서</p>
+            <p class="todo-meta">정도현 선생님</p>
+          </div>
+          <div class="todo-r"><span class="todo-go">제출하기 <i data-lucide="chevron-right" style="width:16px;height:16px"></i></span></div>
+        </div>
+      </div>
+      <!-- 6번째(영어권 문화 · 8/10)는 홈에 그리지 않는다 — 펼치기 대신 과제 탭으로.
+           이 버튼은 '낼 과제'에만 있다(2026-08-11 올립) — 두 섹션에 같은 링크를 다는 건 같은 곳으로
+           두 번 들여보내는 셈이고, '새로 나온 결과'는 30일 안 안 본 것을 전부 싣기 때문에 감춘 게 없다.
+           일관성의 기준은 형태가 아니라 조건 — 감춘 게 있는 섹션에만 '모두 보기'를 둔다 -->
+      <button class="todo-more" onclick="go('task5')">과제에서 8개 모두 보기 <i data-lucide="chevron-right" style="width:16px;height:16px"></i></button>
+    </div>
+
+    <!-- 새로 나온 결과 — 공개 후 30일 안 + 아직 안 본 것만. 확인하면 이 목록에서 사라진다.
+         안 봐도 30일이 지나면 사라진다(열람 추적은 개발 확인됨 — 맞춰서 개발 예정).
+         30일 안에 공개된 안 본 결과를 '전부' 싣는다(10개를 넘지 않는다는 전제) — 그래서 '모두 보기' 링크가 없다.
+         이미 본 결과는 좌측 NB의 과제로 들어가면 된다 -->
+    <div class="st-sec">
+      <div class="st-sec-hd"><i data-lucide="award" style="width:20px;height:20px"></i><h2 class="st-sec-t">새로 나온 결과</h2><span class="sec-n">3</span></div>
+      <p class="st-sec-d">아직 안 본 결과예요. 한 번 보고 나면 이 목록에서 사라져요.</p>
+      <!-- 점수는 홈에 싣지 않는다(2026-08-11 올립) — 홈의 역할은 '확인하러 가게' 하는 것이라 점수를 미리 주면
+           확인 동기가 죽고, 점수 비공개 건과의 비대칭(있는 행/없는 행)도 사라진다. 점수는 결과 상세와 과제 탭 몫 -->
+      <div class="panel">
+        <div class="st-res" onclick="notReady('결과 보기')">
+          <div class="st-res-b">
+            <p class="st-res-nm">정보 전달 글쓰기 평가</p>
+            <p class="st-res-meta">언어와 매체 · 이수민 선생님 · 7월 28일에 공개</p>
+          </div>
+          <span class="todo-go">결과 보기 <i data-lucide="chevron-right" style="width:15px;height:15px"></i></span>
+        </div>
+        <div class="st-res" onclick="notReady('결과 보기')">
+          <div class="st-res-b">
+            <p class="st-res-nm">시민혁명의 전개 과정 서술</p>
+            <p class="st-res-meta">세계사 · 문상혁 선생님 · 7월 27일에 공개</p>
+          </div>
+          <span class="todo-go">결과 보기 <i data-lucide="chevron-right" style="width:15px;height:15px"></i></span>
+        </div>
+        <!-- 교사 수거형(학생 제출 없음) — 공개 전엔 학생 홈에 없다가 공개되는 순간 여기 뜬다 (§2 노출 원칙) -->
+        <div class="st-res" onclick="notReady('결과 보기')">
+          <div class="st-res-b">
+            <p class="st-res-nm">탐구 결과 정리 보고서</p>
+            <p class="st-res-meta">융합과학탐구 · 정도현 선생님 · 7월 26일에 공개</p>
+          </div>
+          <span class="todo-go">결과 보기 <i data-lucide="chevron-right" style="width:15px;height:15px"></i></span>
+        </div>
+      </div>
+    </div>
+
+    </div><!-- /.h5-grid -->
+
+    <!-- 빈 화면 2종 — 데이터가 0이라 위 목록과 동시에 존재할 수 없어 내비게이터 케이스로 전환해 본다.
+         G2(올클리어)와 G1(과제 없음)은 문구가 달라야 한다:
+           G2 = 낼 것도 새 결과도 없다(과제는 있음) → 다 해냈다는 보상
+           G1 = 과제 자체가 0건(신학기) → 기다리면 된다는 안내. 여기서 '할 일이 없어요'라고 하면
+                아무것도 안 한 학생에게 다 한 것 같은 오해를 준다 -->
+    <div class="h5-zero" id="h5ZeroClear">
+      <div class="h5-zero-ic"><i data-lucide="check-check" style="width:30px;height:30px"></i></div>
+      <p class="h5-zero-t">지금 낼 과제가 없어요</p>
+      <p class="h5-zero-d">새로 나온 결과도 모두 확인했어요.<br>지난 과제와 결과는 과제에서 볼 수 있어요.</p>
+      <button class="btn btn-outline" onclick="go('task5')">과제 보러 가기</button>
+    </div>
+    <div class="h5-zero" id="h5ZeroNone">
+      <div class="h5-zero-ic"><i data-lucide="inbox" style="width:30px;height:30px"></i></div>
+      <p class="h5-zero-t">아직 등록된 과제가 없어요</p>
+      <p class="h5-zero-d">선생님이 과제를 내면 여기에 바로 보여요.</p>
+    </div>
+
+    <!-- 기초 진단 배너 — 현재 개발 화면에 있는 것을 시안 5로 가져왔다(2026-08-11 올립).
+         걷어낼까 검토했으나 실시율이 초 4~14% · 중 3~10%로 살아 있어 유지.
+         ⚠️ 초·중만 노출하는 건 이미 구현된 현행 동작이다(신규 조건 아님, 2026-08-11 올립 정정).
+         고등은 전 학기 0건 — 까망이 '홈 · 고등학생' 케이스는 그 현행 동작을 보여주는 용도 -->
+    <div class="h5-banner" id="h5Banner">
+      <div class="h5-banner-ic"><i data-lucide="target" style="width:24px;height:24px"></i></div>
+      <div class="h5-banner-b">
+        <p class="h5-banner-t">내 수준이 궁금하다면? 지금 바로 기초 진단을 시작해 보세요!</p>
+        <p class="h5-banner-d">10분이면 지금 내 실력을 확인할 수 있어요.</p>
+      </div>
+      <button class="btn btn-purple" onclick="notReady('수학 진단')">수학 진단 <i data-lucide="chevron-right" style="width:16px;height:16px"></i></button>
+    </div>
+    <!-- '곧 시작하는 과제'는 홈에 넣었다가 뺐다(2026-08-11 올립) — 라벨을 다듬다 보니
+         "지금은 낼 수 없다"는 정체성이 드러났고, 액션이 하나도 없는 항목은
+         '처리하면 사라지는 인박스'인 홈과 상충한다. 과제 탭에는 그대로 있다 (재론 방지) -->
+
+    <footer class="site-footer">
+      <div class="sf-links"><a href="#" onclick="return false;">회사소개</a><a href="#" onclick="return false;">이용약관</a><a href="#" onclick="return false;">개인정보처리방침</a><a href="#" onclick="return false;">고객센터</a></div>
+      <div class="sf-copy">© 2026. Datadriven Inc. All rights reserved.</div>
+    </footer>
+  </div>
+</div>
+
+<!-- ═══════════════ 시안 5 — 홈/과제 분리 · ② 과제 탭 ═══════════════
+     전체 기록 보관소 — 현행 개발 화면의 표 관용구를 유지하되:
+     · 표 축을 '결과 공개 여부'(미공개/공개 2표)에서 학생 목적 순 4섹션으로 — §2 섹션 순서 계승
+     · "아직 선생님이 과제를 확인하지 않아" 문구 제거 — 결과 공개는 교사 선택이라 지킬 수 없는 안내
+     · 제출 상황 필터 없음 — 섹션이 이미 상태 축이라 중복. 수업 필터만 둔다
+     · 모든 섹션 data-limit="0" — 기록 보관소라 전부 표시('더 보기' 없음, §4 주의 참조) -->
+<div id="scr-task5" class="screen">
+  <div class="page-wrap">
+
+    <h1 class="st-greet">과제</h1>
+    <!-- '낸 과제'라고 쓰지 않는다 — 아직 안 낸 과제·못 낸 과제·시작 전 과제도 모두 여기 있어서 사실과 어긋난다.
+         두 축(낼 것 / 결과)을 그대로 말해 주는 게 가장 짧고 정확하다 -->
+    <p class="t5-desc">낼 과제도, 결과가 나온 과제도 모두 여기에 있어요.</p>
+
+    <!-- 도구 모음 — 학기(탭) → 검색 → 수업 → 상태.
+         범위가 넓은 것에서 좁은 것 순. 검색을 필터 앞에 두는 이유는
+         "이름을 아는 과제"를 찾을 때가 가장 빠른 길이기 때문 -->
+    <div class="filter-bar">
+      <div class="sem-tabs">
+        <button class="sem-tab on">1학기</button>
+        <button class="sem-tab" onclick="notReady('2학기')">2학기</button>
+      </div>
+      <div class="filters">
+        <div class="t5-search">
+          <i data-lucide="search" style="width:17px;height:17px"></i>
+          <input id="t5q" type="text" placeholder="과제나 수업 이름으로 찾아보세요" oninput="t5Apply()">
+          <button id="t5clear" class="t5-clear" onclick="t5Reset()" title="지우기"><i data-lucide="x" style="width:15px;height:15px"></i></button>
+        </div>
+        <select class="sel" id="t5cls" onchange="t5Apply()">
+          <option value="all">모든 수업</option>
+          <option value="c1">언어와 매체</option>
+          <option value="c2">현대사회와 미술세계</option>
+          <option value="c6">생활과 윤리</option>
+          <option value="c3">융합과학탐구</option>
+          <option value="c4">확률과 통계</option>
+          <option value="c5">영어권 문화</option>
+          <option value="c7">한국지리</option>
+          <option value="c8">세계사</option>
+          <option value="c9">미술 창작</option>
+        </select>
+        <select class="sel" id="t5st" onchange="t5Apply()">
+          <option value="all">모든 상태</option>
+          <option value="todo">제출 가능</option>
+          <option value="result">결과 공개</option>
+          <option value="done">제출 완료</option>
+          <option value="miss">미제출</option>
+          <option value="soon">시작 전</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- 단일 표 (2026-08-11 올립) — 섹션 4개를 걷어냈다.
+         섹션 분할은 "마감 지남 + 제출 가능은 어느 섹션인가" 같은 분류 규칙을 매번 만들어야 했고,
+         한 과제가 두 섹션에 걸칠 여지(= 중복 노출)가 구조적으로 남아 있었다.
+         상태를 '진행의 가장 최신 지점' 하나로 정의해 배타적으로 만들면 그 문제가 사라진다.
+           제출 가능 → 결과 공개 → 제출 완료 → 미제출 → 시작 전
+         '결과 공개'가 '제출 완료'를 이긴다(뒤 단계가 이김). 그래서 결과 행에서 안 보이게 되는
+         "내가 냈는지"는 과제 정보 셀 하위 문구로 보완한다.
+         색 = 내가 뭘 해야 하나: 주황 할 일 · 파랑 볼 것 · 초록 끝냄 · 빨강 놓침 · 회색 아직 -->
+    <div class="t5-count-row">
+      <p class="t5-count"><b id="t5count">19</b>개</p>
+      <p class="t5-count-d">파란 점은 아직 안 본 결과, 빨간 점은 곧 마감이에요.</p>
+    </div>
+
+    <div class="panel">
+      <table class="tbl">
+        <thead><tr>
+          <th style="width:110px;">상태</th>
+          <th style="width:170px;">수업</th>
+          <th class="left">과제명</th>
+          <th style="width:190px;">날짜</th>
+          <th style="width:56px;"></th>
+        </tr></thead>
+        <tbody id="t5body">
+
+          <!-- ① 제출 가능 — 마감 임박순, 마감 없는 건 맨 뒤. 마감 시간(16:00)은 이 상태에만 붙인다(다른 상태에선 쓸 일이 없다).
+               마감이 급한 건(지남·오늘·내일)만 빨강, 여유 있는 건 회색 -->
+          <tr data-sj="c6" data-st="todo" data-k="생명 윤리 쟁점 토론 보고서 생활과 윤리 한지영" onclick="location.href='student_submit_v1_260729.html#notice'">
+            <td><span class="b-state todo">제출 가능</span></td>
+            <td><span class="t5-cls">생활과 윤리</span><span class="t-sub">한지영 선생님</span></td>
+            <td class="left"><span class="dot-due"></span>생명 윤리 쟁점 토론 보고서</td>
+            <td>7월 25일(토) 16:00 마감<span class="t-sub hot">늦었지만 아직 낼 수 있어요</span></td>
+            <td class="t5-go"><i data-lucide="chevron-right" style="width:18px;height:18px"></i></td>
+          </tr>
+          <!-- A6: 마감 지남 + 쓰던 글 있음 — 표에서는 A4와 표현이 같다(표엔 CTA가 없으므로).
+               홈 카드에서만 '이어 쓰기'로 갈린다 -->
+          <tr data-sj="c8" data-st="todo" data-k="근대 국가 형성 과정 비교 세계사 문상혁" onclick="location.href='student_submit_v1_260729.html#write'">
+            <td><span class="b-state todo">제출 가능</span></td>
+            <td><span class="t5-cls">세계사</span><span class="t-sub">문상혁 선생님</span></td>
+            <td class="left"><span class="dot-due"></span>근대 국가 형성 과정 비교</td>
+            <td>7월 27일(월) 16:00 마감<span class="t-sub hot">늦었지만 아직 낼 수 있어요</span></td>
+            <td class="t5-go"><i data-lucide="chevron-right" style="width:18px;height:18px"></i></td>
+          </tr>
+          <!-- '쓰던 글이 저장돼 있어요'는 뺐다 — 제출 화면에 들어가면 바로 보이고, 표에서 알 필요는 없다 -->
+          <tr data-sj="c2" data-st="todo" data-k="현대 미술의 사회 참여 사례 분석 현대사회와 미술세계 김기남" onclick="location.href='student_submit_v1_260729.html#write'">
+            <td><span class="b-state todo">제출 가능</span></td>
+            <td><span class="t5-cls">현대사회와 미술세계</span><span class="t-sub">김기남 선생님</span></td>
+            <td class="left"><span class="dot-due"></span>현대 미술의 사회 참여 사례 분석</td>
+            <td>7월 29일(수) 16:00 마감<span class="t-sub hot">오늘</span></td>
+            <td class="t5-go"><i data-lucide="chevron-right" style="width:18px;height:18px"></i></td>
+          </tr>
+          <tr data-sj="c1" data-st="todo" data-k="매체 언어의 설득 전략 분석 언어와 매체 이수민" onclick="location.href='student_submit_v1_260729.html#notice'">
+            <td><span class="b-state todo">제출 가능</span></td>
+            <td><span class="t5-cls">언어와 매체</span><span class="t-sub">이수민 선생님</span></td>
+            <td class="left"><span class="dot-due"></span>매체 언어의 설득 전략 분석</td>
+            <td>7월 30일(목) 16:00 마감<span class="t-sub hot">내일</span></td>
+            <td class="t5-go"><i data-lucide="chevron-right" style="width:18px;height:18px"></i></td>
+          </tr>
+          <tr data-sj="c3" data-st="todo" data-k="탐구 주제 선정과 실험 설계 보고서 융합과학탐구 정도현" onclick="location.href='student_submit_v1_260729.html#fileonly'">
+            <td><span class="b-state todo">제출 가능</span></td>
+            <td><span class="t5-cls">융합과학탐구</span><span class="t-sub">정도현 선생님</span></td>
+            <td class="left">탐구 주제 선정과 실험 설계 보고서</td>
+            <td>8월 5일(수) 12:00 마감<span class="t-sub">7일 남음</span></td>
+            <td class="t5-go"><i data-lucide="chevron-right" style="width:18px;height:18px"></i></td>
+          </tr>
+          <tr data-sj="c4" data-st="todo" data-k="조건부확률 활용 문제 풀이 과정 쓰기 확률과 통계 박정호" onclick="location.href='student_submit_v1_260729.html#notice'">
+            <td><span class="b-state todo">제출 가능</span></td>
+            <td><span class="t5-cls">확률과 통계</span><span class="t-sub">박정호 선생님</span></td>
+            <td class="left">조건부확률 활용 문제 풀이 과정 쓰기</td>
+            <td>8월 7일(금) 16:00 마감<span class="t-sub">9일 남음</span></td>
+            <td class="t5-go"><i data-lucide="chevron-right" style="width:18px;height:18px"></i></td>
+          </tr>
+          <tr data-sj="c5" data-st="todo" data-k="영어 에세이 culture and identity 영어권 문화 최수현" onclick="location.href='student_submit_v1_260729.html#notice'">
+            <td><span class="b-state todo">제출 가능</span></td>
+            <td><span class="t5-cls">영어권 문화</span><span class="t-sub">최수현 선생님</span></td>
+            <td class="left">영어 에세이 — Culture and Identity</td>
+            <td>8월 10일(월) 16:00 마감<span class="t-sub">12일 남음</span></td>
+            <td class="t5-go"><i data-lucide="chevron-right" style="width:18px;height:18px"></i></td>
+          </tr>
+          <!-- 마감 없는 과제 — 홈에서는 등록 후 30일이 지나 빠졌지만 여기서는 기한 없이 남는다 -->
+          <tr data-sj="c1" data-st="todo" data-k="문학 작품 비평문 쓰기 언어와 매체 이수민" onclick="location.href='student_submit_v1_260729.html#notice'">
+            <td><span class="b-state todo">제출 가능</span></td>
+            <td><span class="t5-cls">언어와 매체</span><span class="t-sub">이수민 선생님</span></td>
+            <td class="left">문학 작품 비평문 쓰기</td>
+            <td>마감 없음<span class="t-sub">언제든 낼 수 있어요</span></td>
+            <td class="t5-go"><i data-lucide="chevron-right" style="width:18px;height:18px"></i></td>
+          </tr>
+
+          <!-- ② 결과 공개 — 공개일 최신순. 아직 안 본 건 과제명 앞 파란 점.
+               배지 명도(채움형)로 구분해 봤으나 한눈에 안 들어와 점으로 되돌림 (2026-08-11 올립) -->
+          <tr data-sj="c1" data-st="result" data-k="정보 전달 글쓰기 평가 언어와 매체 이수민" onclick="notReady('결과 보기')">
+            <td><span class="b-state result">결과 공개</span></td>
+            <td><span class="t5-cls">언어와 매체</span><span class="t-sub">이수민 선생님</span></td>
+            <td class="left"><span class="dot-new"></span>정보 전달 글쓰기 평가</td>
+            <td>7월 28일(화) 공개</td>
+            <td class="t5-go"><i data-lucide="chevron-right" style="width:18px;height:18px"></i></td>
+          </tr>
+          <tr data-sj="c8" data-st="result" data-k="시민혁명의 전개 과정 서술 세계사 문상혁" onclick="notReady('결과 보기')">
+            <td><span class="b-state result">결과 공개</span></td>
+            <td><span class="t5-cls">세계사</span><span class="t-sub">문상혁 선생님</span></td>
+            <td class="left"><span class="dot-new"></span>시민혁명의 전개 과정 서술</td>
+            <td>7월 27일(월) 공개</td>
+            <td class="t5-go"><i data-lucide="chevron-right" style="width:18px;height:18px"></i></td>
+          </tr>
+          <!-- 교사가 답안을 올린 과제 — 교사 수거형이든, 학생이 종이로 낸 걸 교사가 스캔해 올렸든 동일하게 처리한다.
+               ⚠️ 둘 다 '선생님 혼자 클리포를 쓰는 방식'(CLIPO 원조 사용 방식)이라
+                  결과를 공개하기 전까지는 학생 화면에 아무것도 나타나지 않는다 (§2 노출 원칙).
+                  → 그래서 '제출 완료'에 종이 업로드 행을 두지 않는다. 한 번 뒀다가 뺐다(2026-08-11).
+               공개된 뒤에도 '선생님이 답안을 등록했어요' 같은 부연을 달지 않는다 — 공개한 건 '결과'지
+               '교사가 무엇을 했는지'가 아니고, 학생은 오프라인에서 이미 안다(종이로 냈거나 활동지를 걷어갔거나).
+               결국 다른 결과 행과 표현이 같아진다 -->
+          <tr data-sj="c3" data-st="result" data-k="탐구 결과 정리 보고서 융합과학탐구 정도현" onclick="notReady('결과 보기')">
+            <td><span class="b-state result">결과 공개</span></td>
+            <td><span class="t5-cls">융합과학탐구</span><span class="t-sub">정도현 선생님</span></td>
+            <td class="left"><span class="dot-new"></span>탐구 결과 정리 보고서</td>
+            <td>7월 26일(일) 공개</td>
+            <td class="t5-go"><i data-lucide="chevron-right" style="width:18px;height:18px"></i></td>
+          </tr>
+          <tr data-sj="c6" data-st="result" data-k="직업 윤리 사례 분석 생활과 윤리 한지영" onclick="notReady('결과 보기')">
+            <td><span class="b-state result">결과 공개</span></td>
+            <td><span class="t5-cls">생활과 윤리</span><span class="t-sub">한지영 선생님</span></td>
+            <td class="left">직업 윤리 사례 분석</td>
+            <td>7월 14일(화) 공개</td>
+            <td class="t5-go"><i data-lucide="chevron-right" style="width:18px;height:18px"></i></td>
+          </tr>
+          <!-- 못 냈는데 결과가 공개된 케이스 — 상태는 '결과 공개'(뒤 단계가 이김).
+               '내지 못했어요'를 적지 않는다(2026-08-11) — §2의 "비공개를 '비공개'라고 적지 않는다(박탈감)"와 같은 자리.
+               학생은 자기가 안 낸 걸 알고 있어 정보가 아니라 낙인이 된다. 다른 결과 행과 표현이 같아진다 -->
+          <tr data-sj="c9" data-st="result" data-k="작품 감상문 쓰기 미술 창작 유가은" onclick="notReady('결과 보기')">
+            <td><span class="b-state result">결과 공개</span></td>
+            <td><span class="t5-cls">미술 창작</span><span class="t-sub">유가은 선생님</span></td>
+            <td class="left">작품 감상문 쓰기</td>
+            <td>6월 30일(화) 공개</td>
+            <td class="t5-go"><i data-lucide="chevron-right" style="width:18px;height:18px"></i></td>
+          </tr>
+          <!-- B5: 공개 30일이 지났는데 아직 안 본 결과 — 오늘(7/29) 기준 43일 전 공개.
+               홈 '새로 나온 결과'에서는 30일이 지나 사라졌지만 여기 파란 점은 남는다.
+               점의 정의가 '새 소식'이 아니라 '안 봤다'는 사실이기 때문 (2026-08-11 올립 확정).
+               → 홈 새 결과 3건 vs 표의 파란 점 4건, 그 차이가 곧 이 케이스다 -->
+          <tr data-sj="c5" data-st="result" data-k="영어 발표문 작성 영어권 문화 최수현" onclick="notReady('결과 보기')">
+            <td><span class="b-state result">결과 공개</span></td>
+            <td><span class="t5-cls">영어권 문화</span><span class="t-sub">최수현 선생님</span></td>
+            <td class="left"><span class="dot-new"></span>영어 발표문 작성</td>
+            <td>6월 16일(화) 공개</td>
+            <td class="t5-go"><i data-lucide="chevron-right" style="width:18px;height:18px"></i></td>
+          </tr>
+
+          <!-- ③ 제출 완료 — 냈고 결과는 아직. "선생님 확인 중"이라고 쓰지 않는다(결과 공개는 교사 선택) -->
+          <tr data-sj="c1" data-st="done" data-k="매체 자료의 관점 분석하기 언어와 매체 이수민" onclick="location.href='student_submit_v1_260729.html#done'">
+            <td><span class="b-state done">제출 완료</span></td>
+            <td><span class="t5-cls">언어와 매체</span><span class="t-sub">이수민 선생님</span></td>
+            <td class="left">매체 자료의 관점 분석하기</td>
+            <td>7월 24일(금) 제출</td>
+            <td class="t5-go"><i data-lucide="chevron-right" style="width:18px;height:18px"></i></td>
+          </tr>
+          <tr data-sj="c7" data-st="done" data-k="지역 문제 조사 보고서 한국지리 오세라" onclick="location.href='student_submit_v1_260729.html#done'">
+            <td><span class="b-state done">제출 완료</span></td>
+            <td><span class="t5-cls">한국지리</span><span class="t-sub">오세라 선생님</span></td>
+            <td class="left">지역 문제 조사 보고서</td>
+            <td>7월 22일(수) 제출</td>
+            <td class="t5-go"><i data-lucide="chevron-right" style="width:18px;height:18px"></i></td>
+          </tr>
+
+          <!-- ④ 미제출 — 못 낸 채 마감됐고 결과도 없다. 낼 수는 없어도 과제 내용은 볼 수 있다 -->
+          <tr data-sj="c4" data-st="miss" data-k="통계적 추정 서술형 문제 확률과 통계 박정호" onclick="notReady('과제 보기')">
+            <td><span class="b-state miss">미제출</span></td>
+            <td><span class="t5-cls">확률과 통계</span><span class="t-sub">박정호 선생님</span></td>
+            <td class="left">통계적 추정 서술형 문제</td>
+            <td>7월 20일(월) 마감<span class="t-sub">이제 낼 수 없어요</span></td>
+            <td class="t5-go"><i data-lucide="chevron-right" style="width:18px;height:18px"></i></td>
+          </tr>
+
+          <!-- ⑤ 시작 전 — 제출이 아직 안 열렸다(§2: 상세 진입 불가).
+               그래서 이 두 행만 클릭·호버·화살표가 없다 — 못 들어가는 곳에 들어갈 수 있는 표시를 두지 않는다 -->
+          <tr data-sj="c1" data-st="soon" data-k="매체 비평문 작성 언어와 매체 이수민">
+            <td><span class="b-state wait">시작 전</span></td>
+            <td><span class="t5-cls">언어와 매체</span><span class="t-sub">이수민 선생님</span></td>
+            <td class="left">매체 비평문 작성</td>
+            <td>8월 12일(수) 09:00 제출 시작</td>
+            <td></td>
+          </tr>
+          <tr data-sj="c2" data-st="soon" data-k="공공미술 프로젝트 기획안 현대사회와 미술세계 김기남">
+            <td><span class="b-state wait">시작 전</span></td>
+            <td><span class="t5-cls">현대사회와 미술세계</span><span class="t-sub">김기남 선생님</span></td>
+            <td class="left">공공미술 프로젝트 기획안</td>
+            <td>8월 12일(수) 09:00 제출 시작</td>
+            <td></td>
+          </tr>
+
+        </tbody>
+      </table>
+      <p class="t5-empty" id="t5empty">찾는 과제가 없어요. 다른 이름으로 찾아보세요.</p>
+    </div>
+
+    <!-- G1 — 과제가 0건(신학기). 검색·필터 결과 0건(t5empty)과 다른 화면이다:
+         찾다가 못 찾은 게 아니라 아직 아무것도 없는 상태라 도구 모음까지 감춘다 -->
+    <div class="h5-zero" id="t5ZeroNone">
+      <div class="h5-zero-ic"><i data-lucide="inbox" style="width:30px;height:30px"></i></div>
+      <p class="h5-zero-t">아직 등록된 과제가 없어요</p>
+      <p class="h5-zero-d">선생님이 과제를 내면 여기에 바로 보여요.</p>
+    </div>
+
+    <footer class="site-footer">
+      <div class="sf-links"><a href="#" onclick="return false;">회사소개</a><a href="#" onclick="return false;">이용약관</a><a href="#" onclick="return false;">개인정보처리방침</a><a href="#" onclick="return false;">고객센터</a></div>
+      <div class="sf-copy">© 2026. Datadriven Inc. All rights reserved.</div>
+    </footer>
+  </div>
+</div>
+
+<!-- ═══════════════ 시안 6 — 홈/과제 통합 · 단일 표 + 상태 칩 ═══════════════
+     2026-08-12 회의 확정. 시안 5(홈/과제 분리)는 폐기·아카이브(#home5 · #task5로만 열림).
+     달라진 점 2가지:
+       ① 홈과 과제를 나누지 않는다 — 현재 개발 구조대로 같은 목록을 보여준다.
+          (실제 서비스는 홈·과제 두 메뉴가 있고 내용이 같다. 목업은 홈 기준으로 그렸고,
+           과제 메뉴는 인사말 자리에 '과제' 제목만 들어가는 차이뿐이다)
+       ② 노출 조건 = 교사가 설계할 때 직접 정한다(기본 정보 → 학생 노출).
+          과제물 수집 방법으로 자동 판정하던 방식 폐기 — 교사 의도를 추측하지 않는다.
+          단 결과를 공개하면 '안 보이기'여도 학생 목록에 상시 노출된다.
+     시안 5에서 살린 것 — 단일 표·상태 5종 배타 판정·검색·날짜 규칙·파란 점/빨간 점.
+     새로 넣은 것 — 상태 칩(개수 상시 노출). 섹션 4분할 대신 칩을 쓴 이유는
+     섹션이 분류 규칙을 계속 만들게 하고 한 과제가 두 섹션에 걸칠 여지를 남기기 때문 -->
+<div id="scr-home6" class="screen">
+  <div class="page-wrap">
+
+    <!-- 헤더 2종 — 좌측 NB에서 고른 메뉴에 따라 하나만 보인다. 아래 내용은 완전히 같다 -->
+    <div class="st-head" id="h6HeadHome">
+      <div>
+        <p class="st-date">9월 16일 수요일</p>
+        <h1 class="st-greet">김서윤 학생, 안녕하세요! 👋</h1>
+      </div>
+    </div>
+    <div id="h6HeadTask">
+      <h1 class="page-h1">과제</h1>
+      <!-- 무엇이 있는지(상태)가 아니라 여기서 무엇을 하는지(행동)로 — 낸다 → 결과를 본다 순 -->
+      <p class="page-sub">과제를 내고, 나온 결과도 확인해 보세요.</p>
+    </div>
+
+    <div class="filter-bar">
+      <div class="sem-tabs">
+        <button class="sem-tab" onclick="notReady('1학기')">1학기</button>
+        <button class="sem-tab on">2학기</button>
+      </div>
+      <div class="filters">
+        <div class="t5-search">
+          <i data-lucide="search" style="width:17px;height:17px"></i>
+          <input id="t6q" type="text" placeholder="과제나 수업 이름으로 찾아보세요" oninput="t6Apply()">
+          <button id="t6clear" class="t5-clear" onclick="t6Reset()" title="지우기"><i data-lucide="x" style="width:15px;height:15px"></i></button>
+        </div>
+        <select class="sel" id="t6cls" onchange="t6Apply()">
+          <option value="all">모든 수업</option>
+          <option value="c1">언어와 매체</option>
+          <option value="c2">현대사회와 미술세계</option>
+          <option value="c6">생활과 윤리</option>
+          <option value="c3">융합과학탐구</option>
+          <option value="c4">확률과 통계</option>
+          <option value="c5">영어권 문화</option>
+          <option value="c7">한국지리</option>
+          <option value="c8">세계사</option>
+          <option value="c9">미술 창작</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- 상태 칩 — 개수가 늘 보이는 자리. 섹션 헤더가 주던 "할 일이 몇 개인지"를 여기서 대신한다.
+         칩은 '거르는 도구'라 선택 색을 파랑 하나로 두고, 상태 색은 표 안 배지에만 쓴다(역할 분리).
+         개수는 수업·검색을 반영해 다시 센다 — 수업을 고르면 그 수업 기준 개수가 된다 -->
+    <div class="t6-chips" id="t6chips">
+      <button class="st-chip on" data-st="all" onclick="t6Chip('all')">전체 <span class="c">12</span></button>
+      <button class="st-chip" data-st="todo" onclick="t6Chip('todo')">제출 가능 <span class="c">6</span></button>
+      <button class="st-chip" data-st="result" onclick="t6Chip('result')">결과 공개 <span class="c">3</span></button>
+      <button class="st-chip" data-st="done" onclick="t6Chip('done')">제출 완료 <span class="c">1</span></button>
+      <button class="st-chip" data-st="miss" onclick="t6Chip('miss')">미제출 <span class="c">1</span></button>
+      <button class="st-chip" data-st="soon" onclick="t6Chip('soon')">시작 전 <span class="c">1</span></button>
+    </div>
+
+    <div class="t5-count-row">
+      <p class="t5-count"><b id="t6count">12</b>개</p>
+      <p class="t5-count-d">파란 점은 아직 안 본 결과, 빨간 점은 곧 마감이에요.</p>
+    </div>
+
+    <div class="panel">
+      <table class="tbl">
+        <thead><tr>
+          <th style="width:110px;">상태</th>
+          <th style="width:170px;">수업</th>
+          <th class="left">과제명</th>
+          <th style="width:190px;">날짜</th>
+          <th style="width:56px;"></th>
+        </tr></thead>
+        <tbody id="t6body">
+
+          <!-- ① 제출 가능 — 마감 임박순, 마감 없는 건 맨 뒤. 시각은 이 상태에만 붙인다 -->
+          <tr data-sj="c6" data-st="todo" data-k="생명 윤리 쟁점 토론 보고서 생활과 윤리 한지영" onclick="location.href='student_submit_v1_260729.html#write'">
+            <td><span class="b-state todo">제출 가능</span></td>
+            <td><span class="t5-cls">생활과 윤리</span><span class="t-sub">한지영 선생님</span></td>
+            <td class="left"><span class="dot-due"></span>생명 윤리 쟁점 토론 보고서</td>
+            <td>9월 12일(토) 16:00 마감<span class="t-sub hot">늦었지만 아직 낼 수 있어요</span></td>
+            <td class="t5-go"><i data-lucide="chevron-right" style="width:18px;height:18px"></i></td>
+          </tr>
+          <tr data-sj="c2" data-st="todo" data-k="현대 미술의 사회 참여 사례 분석 현대사회와 미술세계 김기남" onclick="location.href='student_submit_v1_260729.html#write'">
+            <td><span class="b-state todo">제출 가능</span></td>
+            <td><span class="t5-cls">현대사회와 미술세계</span><span class="t-sub">김기남 선생님</span></td>
+            <td class="left"><span class="dot-due"></span>현대 미술의 사회 참여 사례 분석</td>
+            <td>9월 16일(수) 16:00 마감<span class="t-sub hot">오늘</span></td>
+            <td class="t5-go"><i data-lucide="chevron-right" style="width:18px;height:18px"></i></td>
+          </tr>
+          <tr data-sj="c1" data-st="todo" data-k="매체 언어의 설득 전략 분석 언어와 매체 이수민" onclick="location.href='student_submit_v1_260729.html#both'">
+            <td><span class="b-state todo">제출 가능</span></td>
+            <td><span class="t5-cls">언어와 매체</span><span class="t-sub">이수민 선생님</span></td>
+            <td class="left"><span class="dot-due"></span>매체 언어의 설득 전략 분석</td>
+            <td>9월 17일(목) 16:00 마감<span class="t-sub hot">내일</span></td>
+            <td class="t5-go"><i data-lucide="chevron-right" style="width:18px;height:18px"></i></td>
+          </tr>
+          <tr data-sj="c3" data-st="todo" data-k="탐구 주제 선정과 실험 설계 보고서 융합과학탐구 정도현" onclick="location.href='student_submit_v1_260729.html#fileonly'">
+            <td><span class="b-state todo">제출 가능</span></td>
+            <td><span class="t5-cls">융합과학탐구</span><span class="t-sub">정도현 선생님</span></td>
+            <td class="left">탐구 주제 선정과 실험 설계 보고서</td>
+            <td>9월 23일(수) 12:00 마감<span class="t-sub">7일 남음</span></td>
+            <td class="t5-go"><i data-lucide="chevron-right" style="width:18px;height:18px"></i></td>
+          </tr>
+          <tr data-sj="c5" data-st="todo" data-k="영어 에세이 culture and identity 영어권 문화 최수현" onclick="location.href='student_submit_v1_260729.html#preparing'">
+            <td><span class="b-state todo">제출 가능</span></td>
+            <td><span class="t5-cls">영어권 문화</span><span class="t-sub">최수현 선생님</span></td>
+            <td class="left">영어 에세이 — Culture and Identity</td>
+            <td>9월 28일(월) 16:00 마감<span class="t-sub">12일 남음</span></td>
+            <td class="t5-go"><i data-lucide="chevron-right" style="width:18px;height:18px"></i></td>
+          </tr>
+          <tr data-sj="c1" data-st="todo" data-k="문학 작품 비평문 쓰기 언어와 매체 이수민" onclick="location.href='student_submit_v1_260729.html#write'">
+            <td><span class="b-state todo">제출 가능</span></td>
+            <td><span class="t5-cls">언어와 매체</span><span class="t-sub">이수민 선생님</span></td>
+            <td class="left">문학 작품 비평문 쓰기</td>
+            <td>마감 없음<span class="t-sub">언제든 낼 수 있어요</span></td>
+            <td class="t5-go"><i data-lucide="chevron-right" style="width:18px;height:18px"></i></td>
+          </tr>
+
+          <!-- ② 결과 공개 — 공개일 최신순. 파란 점 = 아직 안 본 결과 -->
+          <tr data-sj="c1" data-st="result" data-k="정보 전달 글쓰기 평가 언어와 매체 이수민" onclick="openResult()">
+            <td><span class="b-state result">결과 공개</span></td>
+            <td><span class="t5-cls">언어와 매체</span><span class="t-sub">이수민 선생님</span></td>
+            <td class="left"><span class="dot-new"></span>정보 전달 글쓰기 평가</td>
+            <td>9월 15일(화) 공개</td>
+            <td class="t5-go"><i data-lucide="chevron-right" style="width:18px;height:18px"></i></td>
+          </tr>
+          <tr data-sj="c6" data-st="result" data-k="직업 윤리 사례 분석 생활과 윤리 한지영" onclick="openResult()">
+            <td><span class="b-state result">결과 공개</span></td>
+            <td><span class="t5-cls">생활과 윤리</span><span class="t-sub">한지영 선생님</span></td>
+            <td class="left">직업 윤리 사례 분석</td>
+            <td>9월 10일(목) 공개</td>
+            <td class="t5-go"><i data-lucide="chevron-right" style="width:18px;height:18px"></i></td>
+          </tr>
+          <!-- 못 냈는데 결과가 공개된 케이스 — '내지 못했어요' 같은 부연을 달지 않는다(박탈감) -->
+          <tr data-sj="c9" data-st="result" data-k="작품 감상문 쓰기 미술 창작 유가은" onclick="openResult('&amp;missing=1')">
+            <td><span class="b-state result">결과 공개</span></td>
+            <td><span class="t5-cls">미술 창작</span><span class="t-sub">유가은 선생님</span></td>
+            <td class="left">작품 감상문 쓰기</td>
+            <td>9월 8일(화) 공개</td>
+            <td class="t5-go"><i data-lucide="chevron-right" style="width:18px;height:18px"></i></td>
+          </tr>
+
+          <!-- ③ 제출 완료 — 냈고 결과는 아직. "선생님 확인 중"이라고 쓰지 않는다(결과 공개는 교사 선택) -->
+          <!-- 종이로 낸 답을 교사가 올린 과제 — 교사가 '보이기'로 뒀으므로 결과 공개 전에도 나타난다.
+               시안 5에서는 수집 방법으로 자동 판정해 감췄으나, 시안 6은 교사 설정을 따른다 -->
+          <tr data-sj="c3" data-st="done" data-k="빛의 굴절 탐구 활동지 융합과학탐구 정도현" onclick="location.href='student_submit_v1_260729.html#result-before'">
+            <td><span class="b-state done">제출 완료</span></td>
+            <td><span class="t5-cls">융합과학탐구</span><span class="t-sub">정도현 선생님</span></td>
+            <td class="left">빛의 굴절 탐구 활동지</td>
+            <td>9월 3일(수) 제출</td>
+            <td class="t5-go"><i data-lucide="chevron-right" style="width:18px;height:18px"></i></td>
+          </tr>
+
+          <!-- ④ 미제출 — 못 낸 채 마감됐고 결과도 없다 -->
+          <tr data-sj="c4" data-st="miss" data-k="통계적 추정 서술형 문제 확률과 통계 박정호" onclick="location.href='student_submit_v1_260729.html#closed'">
+            <td><span class="b-state miss">미제출</span></td>
+            <td><span class="t5-cls">확률과 통계</span><span class="t-sub">박정호 선생님</span></td>
+            <td class="left">통계적 추정 서술형 문제</td>
+            <td>9월 7일(월) 마감<span class="t-sub">이제 낼 수 없어요</span></td>
+            <td class="t5-go"><i data-lucide="chevron-right" style="width:18px;height:18px"></i></td>
+          </tr>
+
+          <!-- ⑤ 시작 전 — 상세 진입이 막힌 상태라 이 두 행만 클릭·화살표가 없다 -->
+          <tr data-sj="c1" data-st="soon" data-k="매체 비평문 작성 언어와 매체 이수민">
+            <td><span class="b-state wait">시작 전</span></td>
+            <td><span class="t5-cls">언어와 매체</span><span class="t-sub">이수민 선생님</span></td>
+            <td class="left">매체 비평문 작성</td>
+            <td>9월 30일(수) 09:00 제출 시작</td>
+            <td></td>
+          </tr>
+
+        </tbody>
+      </table>
+      <p class="t5-empty" id="t6empty">찾는 과제가 없어요. 다른 이름으로 찾아보세요.</p>
+    </div>
+
+    <!-- 과제가 0건인 신학기 화면 — 도구 모음까지 감춘다 -->
+    <div class="h5-zero" id="t6ZeroNone">
+      <div class="h5-zero-ic"><i data-lucide="inbox" style="width:30px;height:30px"></i></div>
+      <p class="h5-zero-t">아직 등록된 과제가 없어요</p>
+      <p class="h5-zero-d">선생님이 과제를 내면 여기에 바로 보여요.</p>
+    </div>
+
+    <!-- 기초 진단 배너 — 초·중만 노출(기구현 현행 동작). 목록 아래 전폭, 0건 화면에서도 유지 -->
+    <div class="h5-banner" id="t6Banner">
+      <div class="h5-banner-ic"><i data-lucide="target" style="width:24px;height:24px"></i></div>
+      <div class="h5-banner-b">
+        <p class="h5-banner-t">내 수준이 궁금하다면? 지금 바로 기초 진단을 시작해 보세요!</p>
+        <p class="h5-banner-d">10분이면 지금 내 실력을 확인할 수 있어요.</p>
+      </div>
+      <button class="btn btn-purple" onclick="notReady('수학 진단')">수학 진단 <i data-lucide="chevron-right" style="width:16px;height:16px"></i></button>
+    </div>
+
+    <footer class="site-footer">
+      <div class="sf-links"><a href="#" onclick="return false;">회사소개</a><a href="#" onclick="return false;">이용약관</a><a href="#" onclick="return false;">개인정보처리방침</a><a href="#" onclick="return false;">고객센터</a></div>
+      <div class="sf-copy">© 2026. Datadriven Inc. All rights reserved.</div>
+    </footer>
+  </div>
+</div>
+
+</div><!-- /.main-wrap — 모든 시안(.screen)은 이 안에 있어야 한다. 밖에 두면 헤더·좌측 NB 오프셋을 못 받고
+       .main-wrap의 min-height:100vh만큼 아래로 밀린다 (2026-08-11 시안 4에서 발생) -->
+
+<div id="toast" class="toast"><i data-lucide="circle-check-big" style="width:20px;height:20px;flex-shrink:0;"></i><span id="toastMsg"></span></div>
+
+<!-- 목업 내비게이터 -->
+<div id="mockpick">
+  <div class="mp-head" onclick="mpToggle()"><span>목업 내비게이터 · 학생 과제 홈 (CLIPO)</span><span id="mpArrow">▾</span></div>
+  <div class="mp-body" id="mpBody">
+    <div class="mp-cap">과제 홈 · 시안 4종</div>
+    <button class="mp-btn" data-scene="current" onclick="go('current')">1. 현재 개발 화면 + 대시보드<span class="mp-sub">표 유지 · 상단 2칸 요약만 추가</span></button>
+    <button class="mp-btn" data-scene="new" onclick="go('new')">2. 개선안<span class="mp-sub">할 일 기준 재배열 · 오늘 요약 배너</span></button>
+    <button class="mp-btn on" data-scene="student" onclick="go('student')">3. 전면 개편안 · 결과 목록형<span class="mp-sub">최신 · 결과 행 + 점수 · 더 보기 공통</span></button>
+    <button class="mp-btn" data-scene="cards" onclick="go('cards')">4. 전면 개편안 · 결과 카드형<span class="mp-sub">3과 순서 동일 · 결과만 카드 그리드</span></button>
+    <div class="mp-cap">이어지는 화면</div>
+    <button class="mp-btn" onclick="location.href='student_submit_v1_260729.html'">학생 · 과제 제출<span class="mp-sub">안내 · 작성 · 완료</span></button>
+    <button class="mp-btn" onclick="location.href='focus_log_v1_260728.html#teacher-log'">교사 · 과제물 관리<span class="mp-sub">제출 현황 · 답안 PDF</span></button>
+    <button class="mp-btn" onclick="location.href='scoring_direct_write_v1_260729.html'">교사 · 학생 채점 상세<span class="mp-sub">답안이 문항 단위로 보임</span></button>
+    <div class="mp-note">※ 1·2는 이전 시안, 3·4는 학생 스타일 전면 개편안입니다. 3과 4는 결과 섹션의 표현(행 vs 카드)만 다릅니다.</div>
+  </div>
+</div>
+
+<script>
+function go(scene){
+  document.querySelectorAll('.screen').forEach(function(s){ s.classList.remove('active'); });
+  document.getElementById('scr-'+scene).classList.add('active');
+  document.querySelectorAll('#mockpick .mp-btn[data-scene]').forEach(function(b){ b.classList.toggle('on', b.getAttribute('data-scene') === scene); });
+  /* 시안 5는 홈/과제가 별도 화면이라 NB 활성도 함께 바꾼다 (과제 탭일 때만 '과제' 활성) */
+  var isTask5 = scene === 'task5';
+  document.getElementById('si-home').classList.toggle('active', !isTask5);
+  document.getElementById('si-task').classList.toggle('active', isTask5);
+  if(location.hash !== '#'+scene) history.replaceState(null, '', '#'+scene);
+  window.scrollTo(0,0);
+  lucide.createIcons();
+}
+/* 좌측 NB — 시안 5(home5·task5)에서는 해시 라우팅으로 홈↔과제 전환(다른 파일로 이탈 금지),
+   그 외 시안에서는 기존처럼 과제=제출 화면 데모로 보낸다 */
+function navHome(){
+  var h = location.hash.slice(1);
+  if(h === 'task6' || h.indexOf('home6') === 0){ goHash('home6'); return; }
+  if(h === 'task5') go('home5');
+}
+function navTask(){
+  var h = location.hash.slice(1);
+  /* 시안 6 — 같은 화면에서 헤더만 과제용으로 */
+  if(h === 'task6' || h.indexOf('home6') === 0){ goHash('task6'); return; }
+  if(h === 'home5' || h === 'task5'){ go('task5'); return; }
+  location.href = 'student_submit_v1_260729.html';
+}
+
+function mpToggle(){
+  var b = document.getElementById('mpBody');
+  var hidden = b.style.display === 'none';
+  b.style.display = hidden ? 'flex' : 'none';
+  document.getElementById('mpArrow').textContent = hidden ? '▾' : '▸';
+}
+(function(){
+  var el = document.getElementById('mockpick');
+  var sx, sy, ox, oy, dragging = false;
+  el.addEventListener('mousedown', function(e){
+    if(e.target.closest('button')) return;
+    dragging = true; sx = e.clientX; sy = e.clientY;
+    var r = el.getBoundingClientRect(); ox = r.left; oy = r.top;
+    e.preventDefault();
+  });
+  document.addEventListener('mousemove', function(e){
+    if(!dragging) return;
+    el.style.left = (ox + e.clientX - sx) + 'px';
+    el.style.top  = (oy + e.clientY - sy) + 'px';
+    el.style.right = 'auto'; el.style.bottom = 'auto';
+  });
+  document.addEventListener('mouseup', function(){ dragging = false; });
+})();
+/* 데이터 0건·검색 결과 없음은 별도 .screen이 아니라 같은 화면의 상태다 —
+   해시는 '<화면>-<케이스>' 로 두고 go() 뒤에 상태를 얹는다.
+   학생 유즈케이스는 하나도 빠짐없이 고유 해시를 갖는다 — 까망이에서 바로 그 케이스로 뛰기 위함 */
+function t5Search(q){ var el = document.getElementById('t5q'); if(el){ el.value = q; t5Apply(); } }
+/* ===== 시안 6 — 검색·수업·상태 칩을 한 함수에서 함께 계산 =====
+   칩 개수는 '수업·검색까지 적용한 뒤'의 수다 — 수업을 고르면 그 수업 기준 개수로 다시 센다.
+   상태(t6st)는 개수 계산에서 빼야 한다. 넣으면 고른 칩만 남고 나머지가 0이 된다 */
+var t6st = 'all';
+function t6Search(q){ var el = document.getElementById('t6q'); if(el){ el.value = q; t6Apply(); } }
+function t6Reset(){ t6Search(''); }
+function t6Chip(st){ t6st = st; t6Apply(); }
+function t6Apply(){
+  var qEl = document.getElementById('t6q'); if(!qEl) return;
+  var q = (qEl.value || '').trim().toLowerCase();
+  var cls = document.getElementById('t6cls').value;
+  var cnt = { all:0, todo:0, result:0, done:0, miss:0, soon:0 };
+  var shown = 0;
+  document.querySelectorAll('#t6body tr').forEach(function(tr){
+    var base = (cls === 'all' || tr.dataset.sj === cls)
+            && (!q || (tr.dataset.k || '').toLowerCase().indexOf(q) > -1);
+    if(base){ cnt.all++; cnt[tr.dataset.st]++; }
+    var ok = base && (t6st === 'all' || tr.dataset.st === t6st);
+    tr.style.display = ok ? '' : 'none';
+    if(ok) shown++;
+  });
+  document.querySelectorAll('#t6chips .st-chip').forEach(function(c){
+    var k = c.dataset.st;
+    c.classList.toggle('on', k === t6st);
+    var n = c.querySelector('.c'); if(n) n.textContent = cnt[k];
+  });
+  document.getElementById('t6count').textContent = shown;
+  document.getElementById('t6empty').style.display = shown ? 'none' : 'block';
+  document.getElementById('t6clear').style.display = q ? 'flex' : 'none';
+}
+
+/* 진단 배너는 초·중만 — 고등은 실사용 0건이라 학교급으로 끈다 */
+function setBanner(on){
+  ['h5Banner','t6Banner'].forEach(function(id){ var el = document.getElementById(id); if(el) el.style.display = on ? 'flex' : 'none'; });
+}
+/* 시안 6의 과제 0건 — 도구 모음·표를 감추고 빈 화면을 켠다 */
+function t6Zero(on){
+  var r = document.getElementById('scr-home6'); if(!r) return;
+  var off = on ? 'none' : '';
+  r.querySelector('.filter-bar').style.display = off;
+  r.querySelector('.t6-chips').style.display = on ? 'none' : 'flex';
+  r.querySelector('.t5-count-row').style.display = on ? 'none' : 'flex';
+  r.querySelector('.panel').style.display = off;
+  document.getElementById('t6ZeroNone').style.display = on ? 'block' : 'none';
+}
+/* 결과 보기 — 지금 보고 있는 메뉴(홈/과제)를 넘겨 '이전으로'가 제자리로 돌아오게 한다 */
+function openResult(extra){
+  var from = location.hash.slice(1) === 'task6' ? 'task6' : 'home6';
+  location.href = 'result_student_view_v3_260512.html?from=' + from + (extra || '');
+}
+/* 홈 / 과제는 같은 화면이고 헤더만 갈린다 (2026-08-12 회의 — 화면 분리 안 함) */
+function h6Head(mode){
+  var isTask = mode === 'task';
+  var a = document.getElementById('h6HeadHome'), b = document.getElementById('h6HeadTask');
+  if(a) a.style.display = isTask ? 'none' : 'flex';
+  if(b) b.style.display = isTask ? 'block' : 'none';
+  document.getElementById('si-home').classList.toggle('active', !isTask);
+  document.getElementById('si-task').classList.toggle('active', isTask);
+}
+var CASES = {
+  'task6'           : function(){ go('home6'); h6Head('task'); },
+  'home6-zero-none' : function(){ go('home6'); t6Zero(true); },
+  'home6-no-result' : function(){ go('home6'); t6Search('수학'); },   /* 더미에 없는 낱말이라 항상 0건 */
+  'home6-high'      : function(){ go('home6'); setBanner(false); },
+  /* 아래는 아카이브된 시안 5 케이스 — 까망이에서 숨겼고 해시로만 열린다 */
+  'home5-zero-clear': function(){ go('home5'); setZero('clear'); },
+  'home5-zero-none' : function(){ go('home5'); setZero('none'); },
+  'home5-high'      : function(){ go('home5'); setBanner(false); },
+  'task5-zero-none' : function(){ go('task5'); setZero('none'); },
+  'task5-no-result' : function(){ go('task5'); t5Search('수학'); }
+};
+function goHash(h){
+  /* 어떤 케이스로 뛰든 이전 케이스의 잔여 상태(0건·검색어·배너·칩)를 먼저 걷는다 */
+  var reset = function(){ setZero(''); t5Search(''); setBanner(true); t6Zero(false); t6st = 'all'; t6Search(''); h6Head('home'); };
+  if(CASES[h]){ reset(); CASES[h](); history.replaceState(null, '', '#'+h); return true; }
+  if(h && document.getElementById('scr-'+h)){ reset(); go(h); return true; }
+  return false;
+}
+window.addEventListener('hashchange', function(){ goHash(location.hash.slice(1)); });
+
+function fold(id){ document.getElementById(id).classList.toggle('folded'); }
+
+/* 지금 낼 과제 — 5개까지만 펼치고 나머지는 더 보기로. 접기는 두지 않는다 (2026-08-07) */
+function showMoreTodo(){
+  document.getElementById('todoMore').style.display = '';
+  document.getElementById('todoMoreBtn').style.display = 'none';
+}
+/* 수업 필터 + '5개 + 더 보기'를 한 곳에서 계산한다. 둘 다 같은 항목의 표시 여부를 건드려서,
+   따로 두면 서로 덮어쓴다. 과목 코드는 카드 안 .sj 클래스에서 읽고, 배지가 없는 행은 data-sj로 표기.
+   시안이 여러 개라 화면(.screen) 단위로 독립 동작한다 — 상태는 DOM에 얹어 화면끼리 안 섞이게 */
+var ST_LIMIT = 5;
+var ST_SECS = ['todo','result','wait','soon'];
+/* 시안 5 과제 탭은 표라서 행(tr.t5r-*)이 항목이다 — 행 안의 .sj 칩에서 수업 코드를 읽는다 */
+var ST_ITEM = { todo:'.st-todo, .t5r-todo', result:'.st-res, .st-rescard, .t5r-result', wait:'.st-wait-row, .t5r-wait', soon:'.st-soon-row, .t5r-soon' };
+
+function stSubjOf(el){
+  var s = el.querySelector('.sj');
+  if(s){ var m = s.className.match(/(^|\s)(c[1-9])(\s|$)/); if(m) return m[2]; }
+  return el.getAttribute('data-sj') || '';
+}
+function stShowMore(btn){
+  btn.closest('.st-sec').dataset.open = '1';
+  stApply(btn.closest('.screen'));
+}
+function stFilter(f, btn){
+  var root = btn.closest('.screen');
+  root.dataset.f = f;
+  stApply(root);
+}
+function stApply(root){
+  var f = root.dataset.f || 'all';
+  root.querySelectorAll('.st-chip').forEach(function(c){
+    c.classList.toggle('on', c.getAttribute('data-f') === f);
+  });
+  /* 칩 대신 드롭다운을 쓰는 시안도 있다 — 어느 쪽이든 현재 값이 맞게 */
+  var sel = root.querySelector('.st-classsel');
+  if(sel && sel.value !== f) sel.value = f;
+
+  ST_SECS.forEach(function(key){
+    var sec = root.querySelector('.st-sec[data-sec="'+key+'"]');
+    if(!sec) return;
+    /* 상한은 섹션별로 둔다 — data-limit="0"이면 전부 표시.
+       '더 보기' 버튼이 없는 섹션에 공통 상한을 걸면 넘친 항목이 영영 안 보인다 */
+    var limit = sec.dataset.limit !== undefined ? +sec.dataset.limit : ST_LIMIT;
+    /* 필터를 걸면 '더 보기'로 감추지 않는다 — 추려낸 결과는 다 보여야 함 */
+    var openAll = sec.dataset.open === '1' || f !== 'all' || limit === 0;
+    var matched = 0, shown = 0;
+
+    sec.querySelectorAll(ST_ITEM[key]).forEach(function(el){
+      if(f !== 'all' && stSubjOf(el) !== f){ el.style.display = 'none'; return; }
+      matched++;
+      var visible = openAll || matched <= limit;
+      el.style.display = visible ? '' : 'none';
+      if(visible) shown++;
+    });
+
+    sec.querySelector('.sec-n').textContent = matched;
+    var em = sec.querySelector('.st-empty');
+    if(em) em.style.display = matched ? 'none' : 'block';
+
+    var btn = sec.querySelector('.todo-more');
+    if(btn){
+      var rest = matched - shown;
+      btn.style.display = rest > 0 ? '' : 'none';
+      btn.firstChild.nodeValue = rest + '개 더 보기 ';
+    }
+  });
+}
+
+
+/* 과제 탭 — 검색·수업·상태를 한 함수에서 함께 계산한다(따로 두면 서로의 표시 여부를 덮어쓴다).
+   섹션이 없으므로 stApply와 무관하게 독립 동작 */
+function t5Apply(){
+  var q   = (document.getElementById('t5q').value || '').trim().toLowerCase();
+  var cls = document.getElementById('t5cls').value;
+  var st  = document.getElementById('t5st').value;
+  var n = 0;
+  document.querySelectorAll('#t5body tr').forEach(function(tr){
+    var ok = (cls === 'all' || tr.dataset.sj === cls)
+          && (st  === 'all' || tr.dataset.st === st)
+          && (!q || (tr.dataset.k || '').toLowerCase().indexOf(q) > -1);
+    tr.style.display = ok ? '' : 'none';
+    if(ok) n++;
+  });
+  document.getElementById('t5count').textContent = n;
+  document.getElementById('t5empty').style.display = n ? 'none' : 'block';
+  document.getElementById('t5clear').style.display = q ? 'flex' : 'none';
+}
+function t5Reset(){ document.getElementById('t5q').value = ''; t5Apply(); }
+
+/* 데이터 0건 케이스 — '' 기본 / 'clear' 홈 올클리어(G2) / 'none' 과제 0건(G1).
+   G1은 홈·과제 탭이 함께 비므로 한 스위치로 두 화면을 동시에 바꾼다 */
+function setZero(kind){
+  kind = kind || '';
+  var show = function(id, on){ var el = document.getElementById(id); if(el) el.style.display = on ? 'block' : 'none'; };
+  var h = document.getElementById('scr-home5'), t = document.getElementById('scr-task5');
+  h.querySelector('.h5-grid').style.display = kind ? 'none' : '';
+  show('h5ZeroClear', kind === 'clear');
+  show('h5ZeroNone',  kind === 'none');
+  /* 과제 탭은 '과제가 0건'일 때만 빈다 — 올클리어는 홈만의 상태다(지난 과제는 표에 그대로 남는다) */
+  var off = kind === 'none' ? 'none' : '';
+  t.querySelector('.filter-bar').style.display = off;
+  t.querySelector('.t5-count-row').style.display = off ? 'none' : 'flex';
+  t.querySelector('.panel').style.display = off;
+  show('t5ZeroNone', kind === 'none');
+  document.body.dataset.zero = kind;
+}
+
+var _tt;
+function toastMsg(m){
+  var t = document.getElementById('toast');
+  document.getElementById('toastMsg').textContent = m;
+  t.classList.add('show');
+  clearTimeout(_tt);
+  _tt = setTimeout(function(){ t.classList.remove('show'); }, 2200);
+}
+function notReady(n){ toastMsg((n || '해당 기능') + '은(는) 이 목업에 포함되지 않았어요.'); }
+function toggleNav(){
+  document.getElementById('icon-sb').classList.toggle('expanded');
+  document.body.classList.toggle('nav-expanded');
+}
+
+var _h = location.hash.slice(1);
+if(!goHash(_h)) go('current');
+/* 시안마다 독립이므로 화면별로 초기 계산 (표시 개수·더 보기 라벨) */
+document.querySelectorAll('.screen').forEach(stApply);
+t5Apply();
+t6Apply();
+</script>
+
+<!-- ===== 목업 내비게이터(까망이) 연결 — 규칙: docs/mockup-navigator.md ===== -->
+<script>
+window.MOCK_NAV_FILE  = 'home';
+/* 이 파일의 내비게이터는 '학생 홈' 전용이다 (2026-08-11 올립) —
+   교사 그룹(평가 설계·과제물 관리·채점 상세)을 싣지 않고, 교사 쪽은 '과제 설계 목록' 한 줄로만 연결한다.
+   학생 유즈케이스는 전부 고유 해시를 갖는다(아래 CASES 참조) — 까망이에서 바로 그 케이스로 뛴다.
+   기본 목록(mock_nav_dw.js의 GROUPS)은 나머지 4개 파일이 그대로 쓴다 */
+window.MOCK_NAV_GROUPS = [
+  /* 아카이브 전용 — 폐기한 시안 1~5를 모아 둔다. 확정본(시안 6)은 student_home_v1_260729.html
+     2026-08-12에 분리. 내년에 다시 볼 수 있게 남긴 것이며 유지보수하지 않는다 */
+  { t:'시안 1~4 (초기 검토)', items:[
+      ['shCur','1. 현재 개발 화면 + 대시보드'],
+      ['shNew','2. 개선안',{sub:'할 일 기준 재배열'}],
+      ['shStu','3. 전면 개편안 · 결과 목록형'],
+      ['shCards','4. 전면 개편안 · 결과 카드형']] },
+  { t:'시안 5 (홈/과제 분리)', items:[
+      ['shHome5','홈',{sub:'낼 과제 + 새 결과 2단'}],
+      ['shTask5','과제',{sub:'단일 표 + 검색·필터'}]] },
+  { t:'└ 시안 5 케이스', items:[
+      ['shHome5Clear','홈 · 할 일 없음'],
+      ['shHome5None','홈 · 과제 0건'],
+      ['shHome5High','홈 · 고등학생'],
+      ['shTask5NoRes','과제 · 검색 0건'],
+      ['shTask5None','과제 · 과제 0건']] },
+  { t:'확정본으로 이동', items:[['shHome6','시안 6 · 과제 목록',{sub:'student_home_v1_260729.html'}]] }
+];
+window.MOCK_NAV_APPLY = {
+  shStu: function(){ go('student'); },
+  shCards: function(){ go('cards'); },
+  shNew: function(){ go('new'); },
+  shCur: function(){ go('current'); },
+  shHome5: function(){ setZero(''); go('home5'); },
+  shTask5: function(){ setZero(''); go('task5'); },
+  shHome5Clear: function(){ goHash('home5-zero-clear'); },
+  shHome5None:  function(){ goHash('home5-zero-none'); },
+  shTask5None:  function(){ goHash('task5-zero-none'); },
+  shHome6:      function(){ location.href = 'student_home_v1_260729.html#home6'; },
+  shTask6:      function(){ goHash('task6'); },
+  shHome6Zero:  function(){ goHash('home6-zero-none'); },
+  shHome6NoRes: function(){ goHash('home6-no-result'); },
+  shHome6High:  function(){ goHash('home6-high'); },
+  shTask5NoRes: function(){ goHash('task5-no-result'); },
+  shHome5High:  function(){ goHash('home5-high'); }
+};
+(function(){
+  var MAP = { student:'shStu', cards:'shCards', 'new':'shNew', current:'shCur', home5:'shHome5', task5:'shTask5', home6:'shHome6' };
+  /* task6은 별도 .screen이 아니라 home6의 헤더 상태다 — go()가 아니라 goHash()로만 진입한다 */
+  var _go = window.go;
+  if (typeof _go === 'function') window.go = function(s){ _go.apply(this, arguments); if (window.mockNavSetCurrent && MAP[s]) window.mockNavSetCurrent(MAP[s]); };
+})();
+</script>
+<script src="mock_nav_dw.js?v=260812e"></script></body>
+</html>
