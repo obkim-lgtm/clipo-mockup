@@ -304,6 +304,19 @@ body.nav-expanded .main-wrap{ padding-left:200px; }
 .t6-chips{ display:flex; flex-wrap:wrap; gap:8px; margin:0 0 18px; }
 .t6-chips .st-chip{ height:38px; font-size:14px; padding:0 14px; }
 .t6-chips .st-chip .c{ font-size:12px; height:20px; min-width:20px; }
+/* 라벨 앞 색 점 = 표 안 배지와 같은 색. 칩 전체를 상태색으로 칠하지 않는 이유 —
+   칩은 누를 수 있는 컨트롤이라 색이 '선택됨'을 표시해야 하는데, 상태색까지 얹으면
+   색 하나가 두 가지를 뜻하게 된다. 그래서 색은 점이 지고 선택 여부는 배경이 진다 */
+.t6-chips .st-chip::before{ content:''; width:8px; height:8px; border-radius:50%; flex-shrink:0; }
+.t6-chips .st-chip[data-st="all"]::before{ display:none; }
+.t6-chips .st-chip[data-st="todo"]::before{ background:#b45309; }
+.t6-chips .st-chip[data-st="result"]::before{ background:#3151c4; }
+.t6-chips .st-chip[data-st="done"]::before{ background:#27724b; }
+.t6-chips .st-chip[data-st="miss"]::before{ background:#ab303a; }
+.t6-chips .st-chip[data-st="soon"]::before{ background:#9aa0ad; }
+/* 선택 표시를 파란 '채움'에서 '연한 배경 + 테두리'로 — 채우면 그 위의 점 색이 죽는다 */
+.t6-chips .st-chip.on{ background:#eef2ff; border-color:#416bff; color:#3151c4; }
+.t6-chips .st-chip.on .c{ background:#d3e3ff; color:#3151c4; }
 
 /* 데이터 0건 화면 — 기본은 숨김, 내비게이터 케이스에서만 켠다 */
 .h5-zero{ display:none; background:#fff; border:1px solid #dde1e8; border-radius:14px; padding:56px 24px; text-align:center; }
@@ -1785,19 +1798,20 @@ body.nav-expanded .main-wrap{ padding-left:200px; }
     <!-- 헤더 2종 — 좌측 NB에서 고른 메뉴에 따라 하나만 보인다. 아래 내용은 완전히 같다 -->
     <div class="st-head" id="h6HeadHome">
       <div>
-        <p class="st-date">7월 29일 수요일</p>
+        <p class="st-date">9월 16일 수요일</p>
         <h1 class="st-greet">김서윤 학생, 안녕하세요! 👋</h1>
       </div>
     </div>
     <div id="h6HeadTask">
       <h1 class="page-h1">과제</h1>
-      <p class="page-sub">낼 과제도, 결과가 나온 과제도 모두 여기에 있어요.</p>
+      <!-- 무엇이 있는지(상태)가 아니라 여기서 무엇을 하는지(행동)로 — 낸다 → 결과를 본다 순 -->
+      <p class="page-sub">과제를 내고, 나온 결과도 확인해 보세요.</p>
     </div>
 
     <div class="filter-bar">
       <div class="sem-tabs">
-        <button class="sem-tab on">1학기</button>
-        <button class="sem-tab" onclick="notReady('2학기')">2학기</button>
+        <button class="sem-tab" onclick="notReady('1학기')">1학기</button>
+        <button class="sem-tab on">2학기</button>
       </div>
       <div class="filters">
         <div class="t5-search">
@@ -1824,16 +1838,16 @@ body.nav-expanded .main-wrap{ padding-left:200px; }
          칩은 '거르는 도구'라 선택 색을 파랑 하나로 두고, 상태 색은 표 안 배지에만 쓴다(역할 분리).
          개수는 수업·검색을 반영해 다시 센다 — 수업을 고르면 그 수업 기준 개수가 된다 -->
     <div class="t6-chips" id="t6chips">
-      <button class="st-chip on" data-st="all" onclick="t6Chip('all')">전체 <span class="c">20</span></button>
-      <button class="st-chip" data-st="todo" onclick="t6Chip('todo')">제출 가능 <span class="c">8</span></button>
-      <button class="st-chip" data-st="result" onclick="t6Chip('result')">결과 공개 <span class="c">6</span></button>
-      <button class="st-chip" data-st="done" onclick="t6Chip('done')">제출 완료 <span class="c">3</span></button>
+      <button class="st-chip on" data-st="all" onclick="t6Chip('all')">전체 <span class="c">12</span></button>
+      <button class="st-chip" data-st="todo" onclick="t6Chip('todo')">제출 가능 <span class="c">6</span></button>
+      <button class="st-chip" data-st="result" onclick="t6Chip('result')">결과 공개 <span class="c">3</span></button>
+      <button class="st-chip" data-st="done" onclick="t6Chip('done')">제출 완료 <span class="c">1</span></button>
       <button class="st-chip" data-st="miss" onclick="t6Chip('miss')">미제출 <span class="c">1</span></button>
-      <button class="st-chip" data-st="soon" onclick="t6Chip('soon')">시작 전 <span class="c">2</span></button>
+      <button class="st-chip" data-st="soon" onclick="t6Chip('soon')">시작 전 <span class="c">1</span></button>
     </div>
 
     <div class="t5-count-row">
-      <p class="t5-count"><b id="t6count">20</b>개</p>
+      <p class="t5-count"><b id="t6count">12</b>개</p>
       <p class="t5-count-d">파란 점은 아직 안 본 결과, 빨간 점은 곧 마감이에요.</p>
     </div>
 
@@ -1849,56 +1863,42 @@ body.nav-expanded .main-wrap{ padding-left:200px; }
         <tbody id="t6body">
 
           <!-- ① 제출 가능 — 마감 임박순, 마감 없는 건 맨 뒤. 시각은 이 상태에만 붙인다 -->
-          <tr data-sj="c6" data-st="todo" data-k="생명 윤리 쟁점 토론 보고서 생활과 윤리 한지영" onclick="location.href='student_submit_v1_260729.html#notice'">
+          <tr data-sj="c6" data-st="todo" data-k="생명 윤리 쟁점 토론 보고서 생활과 윤리 한지영" onclick="location.href='student_submit_v1_260729.html#write'">
             <td><span class="b-state todo">제출 가능</span></td>
             <td><span class="t5-cls">생활과 윤리</span><span class="t-sub">한지영 선생님</span></td>
             <td class="left"><span class="dot-due"></span>생명 윤리 쟁점 토론 보고서</td>
-            <td>7월 25일(토) 16:00 마감<span class="t-sub hot">늦었지만 아직 낼 수 있어요</span></td>
-            <td class="t5-go"><i data-lucide="chevron-right" style="width:18px;height:18px"></i></td>
-          </tr>
-          <tr data-sj="c8" data-st="todo" data-k="근대 국가 형성 과정 비교 세계사 문상혁" onclick="location.href='student_submit_v1_260729.html#write'">
-            <td><span class="b-state todo">제출 가능</span></td>
-            <td><span class="t5-cls">세계사</span><span class="t-sub">문상혁 선생님</span></td>
-            <td class="left"><span class="dot-due"></span>근대 국가 형성 과정 비교</td>
-            <td>7월 27일(월) 16:00 마감<span class="t-sub hot">늦었지만 아직 낼 수 있어요</span></td>
+            <td>9월 12일(토) 16:00 마감<span class="t-sub hot">늦었지만 아직 낼 수 있어요</span></td>
             <td class="t5-go"><i data-lucide="chevron-right" style="width:18px;height:18px"></i></td>
           </tr>
           <tr data-sj="c2" data-st="todo" data-k="현대 미술의 사회 참여 사례 분석 현대사회와 미술세계 김기남" onclick="location.href='student_submit_v1_260729.html#write'">
             <td><span class="b-state todo">제출 가능</span></td>
             <td><span class="t5-cls">현대사회와 미술세계</span><span class="t-sub">김기남 선생님</span></td>
             <td class="left"><span class="dot-due"></span>현대 미술의 사회 참여 사례 분석</td>
-            <td>7월 29일(수) 16:00 마감<span class="t-sub hot">오늘</span></td>
+            <td>9월 16일(수) 16:00 마감<span class="t-sub hot">오늘</span></td>
             <td class="t5-go"><i data-lucide="chevron-right" style="width:18px;height:18px"></i></td>
           </tr>
-          <tr data-sj="c1" data-st="todo" data-k="매체 언어의 설득 전략 분석 언어와 매체 이수민" onclick="location.href='student_submit_v1_260729.html#notice'">
+          <tr data-sj="c1" data-st="todo" data-k="매체 언어의 설득 전략 분석 언어와 매체 이수민" onclick="location.href='student_submit_v1_260729.html#both'">
             <td><span class="b-state todo">제출 가능</span></td>
             <td><span class="t5-cls">언어와 매체</span><span class="t-sub">이수민 선생님</span></td>
             <td class="left"><span class="dot-due"></span>매체 언어의 설득 전략 분석</td>
-            <td>7월 30일(목) 16:00 마감<span class="t-sub hot">내일</span></td>
+            <td>9월 17일(목) 16:00 마감<span class="t-sub hot">내일</span></td>
             <td class="t5-go"><i data-lucide="chevron-right" style="width:18px;height:18px"></i></td>
           </tr>
           <tr data-sj="c3" data-st="todo" data-k="탐구 주제 선정과 실험 설계 보고서 융합과학탐구 정도현" onclick="location.href='student_submit_v1_260729.html#fileonly'">
             <td><span class="b-state todo">제출 가능</span></td>
             <td><span class="t5-cls">융합과학탐구</span><span class="t-sub">정도현 선생님</span></td>
             <td class="left">탐구 주제 선정과 실험 설계 보고서</td>
-            <td>8월 5일(수) 12:00 마감<span class="t-sub">7일 남음</span></td>
+            <td>9월 23일(수) 12:00 마감<span class="t-sub">7일 남음</span></td>
             <td class="t5-go"><i data-lucide="chevron-right" style="width:18px;height:18px"></i></td>
           </tr>
-          <tr data-sj="c4" data-st="todo" data-k="조건부확률 활용 문제 풀이 과정 쓰기 확률과 통계 박정호" onclick="location.href='student_submit_v1_260729.html#notice'">
-            <td><span class="b-state todo">제출 가능</span></td>
-            <td><span class="t5-cls">확률과 통계</span><span class="t-sub">박정호 선생님</span></td>
-            <td class="left">조건부확률 활용 문제 풀이 과정 쓰기</td>
-            <td>8월 7일(금) 16:00 마감<span class="t-sub">9일 남음</span></td>
-            <td class="t5-go"><i data-lucide="chevron-right" style="width:18px;height:18px"></i></td>
-          </tr>
-          <tr data-sj="c5" data-st="todo" data-k="영어 에세이 culture and identity 영어권 문화 최수현" onclick="location.href='student_submit_v1_260729.html#notice'">
+          <tr data-sj="c5" data-st="todo" data-k="영어 에세이 culture and identity 영어권 문화 최수현" onclick="location.href='student_submit_v1_260729.html#preparing'">
             <td><span class="b-state todo">제출 가능</span></td>
             <td><span class="t5-cls">영어권 문화</span><span class="t-sub">최수현 선생님</span></td>
             <td class="left">영어 에세이 — Culture and Identity</td>
-            <td>8월 10일(월) 16:00 마감<span class="t-sub">12일 남음</span></td>
+            <td>9월 28일(월) 16:00 마감<span class="t-sub">12일 남음</span></td>
             <td class="t5-go"><i data-lucide="chevron-right" style="width:18px;height:18px"></i></td>
           </tr>
-          <tr data-sj="c1" data-st="todo" data-k="문학 작품 비평문 쓰기 언어와 매체 이수민" onclick="location.href='student_submit_v1_260729.html#notice'">
+          <tr data-sj="c1" data-st="todo" data-k="문학 작품 비평문 쓰기 언어와 매체 이수민" onclick="location.href='student_submit_v1_260729.html#write'">
             <td><span class="b-state todo">제출 가능</span></td>
             <td><span class="t5-cls">언어와 매체</span><span class="t-sub">이수민 선생님</span></td>
             <td class="left">문학 작품 비평문 쓰기</td>
@@ -1907,84 +1907,46 @@ body.nav-expanded .main-wrap{ padding-left:200px; }
           </tr>
 
           <!-- ② 결과 공개 — 공개일 최신순. 파란 점 = 아직 안 본 결과 -->
-          <tr data-sj="c1" data-st="result" data-k="정보 전달 글쓰기 평가 언어와 매체 이수민" onclick="notReady('결과 보기')">
+          <tr data-sj="c1" data-st="result" data-k="정보 전달 글쓰기 평가 언어와 매체 이수민" onclick="openResult()">
             <td><span class="b-state result">결과 공개</span></td>
             <td><span class="t5-cls">언어와 매체</span><span class="t-sub">이수민 선생님</span></td>
             <td class="left"><span class="dot-new"></span>정보 전달 글쓰기 평가</td>
-            <td>7월 28일(화) 공개</td>
+            <td>9월 15일(화) 공개</td>
             <td class="t5-go"><i data-lucide="chevron-right" style="width:18px;height:18px"></i></td>
           </tr>
-          <tr data-sj="c8" data-st="result" data-k="시민혁명의 전개 과정 서술 세계사 문상혁" onclick="notReady('결과 보기')">
-            <td><span class="b-state result">결과 공개</span></td>
-            <td><span class="t5-cls">세계사</span><span class="t-sub">문상혁 선생님</span></td>
-            <td class="left"><span class="dot-new"></span>시민혁명의 전개 과정 서술</td>
-            <td>7월 27일(월) 공개</td>
-            <td class="t5-go"><i data-lucide="chevron-right" style="width:18px;height:18px"></i></td>
-          </tr>
-          <!-- 교사가 '안 보이기'로 둔 과제 — 결과를 공개하는 순간 학생 목록에 나타난다.
-               학생 화면에서는 다른 결과 행과 구분되지 않는다(왜 여기 있는지 설명하지 않는다) -->
-          <tr data-sj="c3" data-st="result" data-k="탐구 결과 정리 보고서 융합과학탐구 정도현" onclick="notReady('결과 보기')">
-            <td><span class="b-state result">결과 공개</span></td>
-            <td><span class="t5-cls">융합과학탐구</span><span class="t-sub">정도현 선생님</span></td>
-            <td class="left"><span class="dot-new"></span>탐구 결과 정리 보고서</td>
-            <td>7월 26일(일) 공개</td>
-            <td class="t5-go"><i data-lucide="chevron-right" style="width:18px;height:18px"></i></td>
-          </tr>
-          <tr data-sj="c6" data-st="result" data-k="직업 윤리 사례 분석 생활과 윤리 한지영" onclick="notReady('결과 보기')">
+          <tr data-sj="c6" data-st="result" data-k="직업 윤리 사례 분석 생활과 윤리 한지영" onclick="openResult()">
             <td><span class="b-state result">결과 공개</span></td>
             <td><span class="t5-cls">생활과 윤리</span><span class="t-sub">한지영 선생님</span></td>
             <td class="left">직업 윤리 사례 분석</td>
-            <td>7월 14일(화) 공개</td>
+            <td>9월 10일(목) 공개</td>
             <td class="t5-go"><i data-lucide="chevron-right" style="width:18px;height:18px"></i></td>
           </tr>
           <!-- 못 냈는데 결과가 공개된 케이스 — '내지 못했어요' 같은 부연을 달지 않는다(박탈감) -->
-          <tr data-sj="c9" data-st="result" data-k="작품 감상문 쓰기 미술 창작 유가은" onclick="notReady('결과 보기')">
+          <tr data-sj="c9" data-st="result" data-k="작품 감상문 쓰기 미술 창작 유가은" onclick="openResult('&amp;missing=1')">
             <td><span class="b-state result">결과 공개</span></td>
             <td><span class="t5-cls">미술 창작</span><span class="t-sub">유가은 선생님</span></td>
             <td class="left">작품 감상문 쓰기</td>
-            <td>6월 30일(화) 공개</td>
-            <td class="t5-go"><i data-lucide="chevron-right" style="width:18px;height:18px"></i></td>
-          </tr>
-          <!-- 공개 30일이 지났는데 아직 안 본 결과 — 점의 정의가 '새 소식'이 아니라 '안 봤다'는 사실이라 점이 남는다 -->
-          <tr data-sj="c5" data-st="result" data-k="영어 발표문 작성 영어권 문화 최수현" onclick="notReady('결과 보기')">
-            <td><span class="b-state result">결과 공개</span></td>
-            <td><span class="t5-cls">영어권 문화</span><span class="t-sub">최수현 선생님</span></td>
-            <td class="left"><span class="dot-new"></span>영어 발표문 작성</td>
-            <td>6월 16일(화) 공개</td>
+            <td>9월 8일(화) 공개</td>
             <td class="t5-go"><i data-lucide="chevron-right" style="width:18px;height:18px"></i></td>
           </tr>
 
           <!-- ③ 제출 완료 — 냈고 결과는 아직. "선생님 확인 중"이라고 쓰지 않는다(결과 공개는 교사 선택) -->
           <!-- 종이로 낸 답을 교사가 올린 과제 — 교사가 '보이기'로 뒀으므로 결과 공개 전에도 나타난다.
                시안 5에서는 수집 방법으로 자동 판정해 감췄으나, 시안 6은 교사 설정을 따른다 -->
-          <tr data-sj="c3" data-st="done" data-k="빛의 굴절 탐구 활동지 융합과학탐구 정도현" onclick="notReady('답안 보기')">
+          <tr data-sj="c3" data-st="done" data-k="빛의 굴절 탐구 활동지 융합과학탐구 정도현" onclick="location.href='student_submit_v1_260729.html#result-before'">
             <td><span class="b-state done">제출 완료</span></td>
             <td><span class="t5-cls">융합과학탐구</span><span class="t-sub">정도현 선생님</span></td>
             <td class="left">빛의 굴절 탐구 활동지</td>
-            <td>7월 16일(수) 제출</td>
-            <td class="t5-go"><i data-lucide="chevron-right" style="width:18px;height:18px"></i></td>
-          </tr>
-          <tr data-sj="c1" data-st="done" data-k="매체 자료의 관점 분석하기 언어와 매체 이수민" onclick="location.href='student_submit_v1_260729.html#done'">
-            <td><span class="b-state done">제출 완료</span></td>
-            <td><span class="t5-cls">언어와 매체</span><span class="t-sub">이수민 선생님</span></td>
-            <td class="left">매체 자료의 관점 분석하기</td>
-            <td>7월 24일(금) 제출</td>
-            <td class="t5-go"><i data-lucide="chevron-right" style="width:18px;height:18px"></i></td>
-          </tr>
-          <tr data-sj="c7" data-st="done" data-k="지역 문제 조사 보고서 한국지리 오세라" onclick="location.href='student_submit_v1_260729.html#done'">
-            <td><span class="b-state done">제출 완료</span></td>
-            <td><span class="t5-cls">한국지리</span><span class="t-sub">오세라 선생님</span></td>
-            <td class="left">지역 문제 조사 보고서</td>
-            <td>7월 22일(수) 제출</td>
+            <td>9월 3일(수) 제출</td>
             <td class="t5-go"><i data-lucide="chevron-right" style="width:18px;height:18px"></i></td>
           </tr>
 
           <!-- ④ 미제출 — 못 낸 채 마감됐고 결과도 없다 -->
-          <tr data-sj="c4" data-st="miss" data-k="통계적 추정 서술형 문제 확률과 통계 박정호" onclick="notReady('과제 보기')">
+          <tr data-sj="c4" data-st="miss" data-k="통계적 추정 서술형 문제 확률과 통계 박정호" onclick="location.href='student_submit_v1_260729.html#closed'">
             <td><span class="b-state miss">미제출</span></td>
             <td><span class="t5-cls">확률과 통계</span><span class="t-sub">박정호 선생님</span></td>
             <td class="left">통계적 추정 서술형 문제</td>
-            <td>7월 20일(월) 마감<span class="t-sub">이제 낼 수 없어요</span></td>
+            <td>9월 7일(월) 마감<span class="t-sub">이제 낼 수 없어요</span></td>
             <td class="t5-go"><i data-lucide="chevron-right" style="width:18px;height:18px"></i></td>
           </tr>
 
@@ -1993,14 +1955,7 @@ body.nav-expanded .main-wrap{ padding-left:200px; }
             <td><span class="b-state wait">시작 전</span></td>
             <td><span class="t5-cls">언어와 매체</span><span class="t-sub">이수민 선생님</span></td>
             <td class="left">매체 비평문 작성</td>
-            <td>8월 12일(수) 09:00 제출 시작</td>
-            <td></td>
-          </tr>
-          <tr data-sj="c2" data-st="soon" data-k="공공미술 프로젝트 기획안 현대사회와 미술세계 김기남">
-            <td><span class="b-state wait">시작 전</span></td>
-            <td><span class="t5-cls">현대사회와 미술세계</span><span class="t-sub">김기남 선생님</span></td>
-            <td class="left">공공미술 프로젝트 기획안</td>
-            <td>8월 12일(수) 09:00 제출 시작</td>
+            <td>9월 30일(수) 09:00 제출 시작</td>
             <td></td>
           </tr>
 
@@ -2154,6 +2109,11 @@ function t6Zero(on){
   r.querySelector('.t5-count-row').style.display = on ? 'none' : 'flex';
   r.querySelector('.panel').style.display = off;
   document.getElementById('t6ZeroNone').style.display = on ? 'block' : 'none';
+}
+/* 결과 보기 — 지금 보고 있는 메뉴(홈/과제)를 넘겨 '이전으로'가 제자리로 돌아오게 한다 */
+function openResult(extra){
+  var from = location.hash.slice(1) === 'task6' ? 'task6' : 'home6';
+  location.href = 'result_student_view_v3_260512.html?from=' + from + (extra || '');
 }
 /* 홈 / 과제는 같은 화면이고 헤더만 갈린다 (2026-08-12 회의 — 화면 분리 안 함) */
 function h6Head(mode){
@@ -2342,7 +2302,7 @@ window.MOCK_NAV_GROUPS = [
   //     ['shCur','1. 현재 개발 화면',{sub:'표 + 상단 요약'}],
   //     ['shStu','3. 전면 개편안',{sub:'홈=과제 통합 · 시안 5의 전신'}]] },
   { t:'학생 · 이어지는 화면', items:[
-      ['ssNotice','과제 제출',{sub:'안내 · 작성 · 완료 · 다시 제출'}]] },
+      ['ssWrite','과제 제출',{sub:'작성 · 완료 · 다시 제출'}]] },
   { t:'교사 화면',        items:[
       ['dwList','과제 설계 목록',{sub:'교사 쪽 전체는 그 화면의 내비게이터로'}]] }
 ];
@@ -2371,5 +2331,5 @@ window.MOCK_NAV_APPLY = {
   if (typeof _go === 'function') window.go = function(s){ _go.apply(this, arguments); if (window.mockNavSetCurrent && MAP[s]) window.mockNavSetCurrent(MAP[s]); };
 })();
 </script>
-<script src="mock_nav_dw.js?v=260812b"></script></body>
+<script src="mock_nav_dw.js?v=260812c"></script></body>
 </html>

@@ -329,7 +329,7 @@ body.missing-mode [data-share="inst-card"]{display:none}
     <!-- 인사 헤더 -->
     <div class="greeting">
       <div class="greeting-left">
-        <button class="btn-back" onclick="location.href='class_scoring_detail_v1_260512.html'">
+        <button class="btn-back" id="btnBack" onclick="location.href='class_scoring_detail_v1_260512.html'">
           <i data-lucide="chevron-left" style="width:18px;height:18px"></i>이전으로
         </button>
         <div class="activity-meta">
@@ -721,6 +721,13 @@ body.missing-mode [data-share="inst-card"]{display:none}
     }
     if(p.get('missing') === '1'){
       document.body.classList.add('missing-mode');
+    }
+    /* 학생 과제 목록에서 들어온 경우 '이전으로'가 목록으로 돌아가야 한다 —
+       기본값(교사 채점 상세)은 교사가 이 화면을 미리보기로 열 때의 경로다 (2026-08-12) */
+    var from = p.get('from');
+    if(from){
+      var bb = document.getElementById('btnBack');
+      if(bb) bb.setAttribute('onclick', "location.href='student_home_v1_260729.html#" + from + "'");
     }
   })();
 
