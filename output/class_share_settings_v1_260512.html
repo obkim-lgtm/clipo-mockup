@@ -158,6 +158,8 @@ body{background:#f6f7f9;color:#222631;min-height:100vh}
 .alert-info-text{font-size:14px;color:#3b3f4c;line-height:1.6}
 .alert-info-text strong{color:#3151c4;font-weight:700}
 .modal-body p{font-size:14px;color:#3b3f4c;line-height:1.55;margin:0}
+.confirm-note{display:flex;gap:9px;align-items:flex-start;background:#f2f5ff;border-radius:10px;padding:12px 14px;color:#365eef}
+.confirm-note p{font-size:14px;color:#3b3f4c;line-height:1.55;margin:0}
 .checkbox-row-modal{display:inline-flex;align-items:center;gap:8px;cursor:pointer;user-select:none;padding:4px 0}
 .checkbox-row-modal .box{width:18px;height:18px;border:2px solid #dde1e8;border-radius:4px;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;background:#fff;color:#fff;transition:all .12s}
 .checkbox-row-modal.checked .box{background:#365eef;border-color:#365eef}
@@ -431,6 +433,29 @@ body{background:#f6f7f9;color:#222631;min-height:100vh}
 })();
 </script>
 
+<!-- 학생 화면 노출 전환 확인 모달
+     '학생 화면 안 보이기'로 설계된 과제를 공개할 때만 뜬다. 시스템이 몰래 설정을 뒤집지 않고
+     선생님이 직접 바꾸도록 한 번 묻는다 (2026-08-12 다나 제안) -->
+<div class="modal-overlay" id="stuVisModal" onclick="if(event.target===this)closeStuVisModal()">
+  <div class="modal" style="max-width:460px">
+    <div class="modal-hd">
+      <span class="modal-title">학생 화면 노출을 '보이기'로 바꿀까요?</span>
+      <button class="modal-close" onclick="closeStuVisModal()"><i data-lucide="x" style="width:18px;height:18px"></i></button>
+    </div>
+    <div class="modal-body">
+      <p>이 과제는 <strong>학생 과제 목록에 보이지 않도록</strong> 설정돼 있어요. 결과를 공개해도 학생이 과제를 찾지 못해 점수를 확인할 수 없어요.</p>
+      <div class="confirm-note">
+        <i data-lucide="info" style="width:17px;height:17px;flex-shrink:0"></i>
+        <p>확인을 누르면 평가 설계의 <strong>[학생 화면 노출]</strong>이 '보이기'로 바뀌고, 결과가 곧바로 공개돼요.</p>
+      </div>
+    </div>
+    <div class="modal-ft">
+      <button class="btn-modal-cancel" onclick="closeStuVisModal()">취소</button>
+      <button class="btn-modal-save" onclick="confirmStuVis()">보이기로 바꾸고 공개</button>
+    </div>
+  </div>
+</div>
+
 <div class="toast" id="toast">
   <i id="toastIcon" data-lucide="circle-check-big" style="width:18px;height:18px;flex-shrink:0"></i>
   <span id="toastMsg"></span>
@@ -593,9 +618,30 @@ document.addEventListener('DOMContentLoaded', function(){
   if(prevIframe){ prevIframe.addEventListener('load', sendPreviewOpts); }
 });
 
+/* 평가 설계의 [학생 화면 노출] 값. 기본은 '안 보이기'(확인 모달이 뜨는 케이스).
+   이미 '보이기'인 과제를 보려면 #stu-visible 로 진입 */
+var STU_HIDDEN = location.hash !== '#stu-visible';
+
 function saveShareSettings(){
+  if(STU_HIDDEN){ openStuVisModal(); return; }
+  doSaveShareSettings(false);
+}
+function openStuVisModal(){
+  document.getElementById('stuVisModal').classList.add('show');
+  if(window.lucide) lucide.createIcons();
+}
+function closeStuVisModal(){
+  document.getElementById('stuVisModal').classList.remove('show');
+}
+function confirmStuVis(){
+  STU_HIDDEN = false;
+  closeStuVisModal();
+  doSaveShareSettings(true);
+}
+function doSaveShareSettings(flipped){
   var selected = STUDENTS.filter(function(s){ return s.selectable && s.checked; }).length;
-  showToast('success', selected + '명에게 공개 설정이 저장됐어요. 학생들이 바로 결과를 확인할 수 있어요.');
+  showToast('success', selected + '명에게 공개 설정이 저장됐어요. '
+    + (flipped ? '학생 과제 목록에도 이 과제가 표시돼요.' : '학생들이 바로 결과를 확인할 수 있어요.'));
   setTimeout(function(){
     location.href = 'class_scoring_detail_v1_260512.html';
   }, 1500);
