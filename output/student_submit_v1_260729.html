@@ -138,7 +138,8 @@ body.nav-expanded .main-wrap{ padding-left:200px; }
 /* 알림은 화면에 고정한다 — 스크롤을 내려 쓰다가 다녀오면 상단 배너를 아예 못 본다는
    지적(2026-08-12 회의)에 대한 답. 상시 배너로 굳는 문제는 8초 자동 접힘이 막는다:
    '늘 떠 있어 배경이 된다'와 '스크롤하면 안 보인다'를 동시에 푸는 유일한 조합 */
-.leave-banner{ display:none; position:sticky; top:70px; z-index:120;
+/* top = 헤더 높이(58px) + 8px — 헤더 바로 아래에 붙어야 스크롤을 내려도 눈에 걸린다 (2026-08-12 올립) */
+.leave-banner{ display:none; position:sticky; top:66px; z-index:120;
   background:#f4f5f7; border:1px solid #e3e5ea; border-radius:10px; padding:11px 16px; align-items:center; gap:10px; margin-bottom:20px;
   transition:background .25s ease, border-color .25s ease, padding .25s ease; }
 .leave-banner.show{ display:flex; }
@@ -756,7 +757,7 @@ function renderLeaveBar(alert){
       : '다른 화면 ' + LEAVE_COUNT + '회 · ' + fmtDur(LEAVE_SEC) + ' 기록됨';
     el.querySelector('.lb-d').textContent =
       '방금 ' + fmtDur(LEAVE_LAST) + ' 다녀왔어요. 지금까지 ' + LEAVE_COUNT + '회 · '
-      + fmtDur(LEAVE_SEC) + '이 선생님께 전달돼요.';
+      + fmtDur(LEAVE_SEC) + ' 기록됐고, 선생님께 전달돼요.';
     el.hidden = false;
     el.classList.add('show');
     el.classList.toggle('alert', !!alert);
@@ -986,7 +987,7 @@ function renderPdf(){
 /* 시연용 이탈 1회 — 실제 감지 경로(onLeave/onReturn)와 같은 결과를 만든다 */
 function simulateLeave(sec){
   LEAVE_COUNT += 1; LEAVE_SEC += sec; LEAVE_LAST = sec;
-  renderLeaveBanner(); renderLeaveStat(true);
+  renderLeaveBar(true);   /* 알림·상태가 한 줄이라 한 번만 부른다 (두 번 부르면 알림이 곧바로 덮임) */
 }
 
 /* ───────── 다른 화면 이동 감지 (실제 브라우저 이벤트) ───────── */
@@ -1002,8 +1003,7 @@ function onReturn(){
      이탈(남은 것)은 남아 있는 표시가 사실과 맞다 */
   if(dur >= 3){
     LEAVE_COUNT += 1; LEAVE_SEC += dur; LEAVE_LAST = dur;
-    renderLeaveBanner();      /* 알림 — 8초 뒤 스스로 접힘 */
-    renderLeaveStat(true);    /* 상태 — 늘어난 값을 잠깐 강조 */
+    renderLeaveBar(true);     /* 부푼 상태로 8초, 그 뒤 누적 한 줄로 돌아감 */
   }
   leaveStart = null; leaveType = null;
 }
