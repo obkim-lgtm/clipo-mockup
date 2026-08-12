@@ -78,6 +78,13 @@
     .fld-label{ display:block; font-size:14px; font-weight:500; color:#6d7381; margin:0 0 8px; }
     .fld-label.mt{ margin-top:22px; }
     .fld-help{ font-size:14px; color:#6d7381; margin:10px 0 0; line-height:1.6; }
+    /* '안 보이기'를 고른 순간에만 뜨는 안내 — 고르기 전에 미리 겁주지 않고,
+       고른 뒤 '그런데 언제 보이지?'가 생기는 자리에서 답한다 (2026-08-12 다나·줄리 우려) */
+    .fld-note{ display:none; margin-top:12px; background:#fff7ed; border-radius:10px; padding:14px 16px; gap:10px; align-items:flex-start; }
+    .fld-note.show{ display:flex; }
+    .fld-note i, .fld-note svg{ width:19px; height:19px; color:#ea580c; flex-shrink:0; margin-top:1px; }
+    .fld-note p{ margin:0; font-size:14px; color:#7c2d12; line-height:1.65; }
+    .fld-note b{ font-weight:700; }
     .rad{ display:inline-flex; align-items:center; gap:8px; cursor:pointer; font-size:16px; color:#222631; }
     .rad .ring{ width:20px; height:20px; border-radius:50%; border:1.5px solid #c7cbd3; background:#fff; flex-shrink:0; }
     .rad.on .ring{ border:6.5px solid #416bff; }
@@ -565,10 +572,14 @@
            ⚠️ 결과를 공개하면 '안 보이기'여도 학생 목록에 나타난다 — 점수는 학생이 봐야 하므로 -->
       <label class="fld-label mt">학생 화면 노출</label>
       <div class="radio-line labeled">
-        <span class="rad on" onclick="pickRadio(this)"><span class="ring"></span>보이기</span>
-        <span class="rad" onclick="pickRadio(this)"><span class="ring"></span>안 보이기</span>
+        <span class="rad on" onclick="pickRadio(this); setStuVis(true)"><span class="ring"></span>보이기</span>
+        <span class="rad" onclick="pickRadio(this); setStuVis(false)"><span class="ring"></span>안 보이기</span>
       </div>
-      <p class="fld-help">학생 과제 목록에 이 과제가 보여요. 결과를 공개하면 '안 보이기'로 두어도 나타나요.</p>
+      <p class="fld-help">학생 과제 목록에 이 과제가 보여요.</p>
+      <div class="fld-note" id="stuVisNote">
+        <i data-lucide="info"></i>
+        <p><b>채점 결과를 공개하면 이 설정이 '보이기'로 바뀝니다.</b><br>점수는 학생이 확인해야 하므로, 결과를 공개하는 시점에 학생 과제 목록에 나타납니다.</p>
+      </div>
     </div>
 
     <!-- 성취기준 -->
@@ -1295,6 +1306,14 @@ function notReady(n){ toastMsg((n||'해당 화면')+' 은(는) 아직 준비 중
 function goDesignList(){ location.href='task_ocr_v3_260623.html#design'; }
 
 // 라디오(라인)
+/* 학생 화면 노출 — '안 보이기'일 때만 안내를 띄운다.
+   결과 공개가 설정을 이기는 게 아니라 '설정이 바뀐다'로 정리했다 —
+   교사가 설계 화면을 다시 봤을 때 화면과 실제가 어긋나지 않게 (2026-08-12 줄리 제안) */
+function setStuVis(on){
+  var n = document.getElementById('stuVisNote');
+  if(n) n.classList.toggle('show', !on);
+  if(window.lucide) lucide.createIcons();
+}
 function pickRadio(el){ var line=el.closest('.radio-line'); line.querySelectorAll('.rad').forEach(function(r){r.classList.remove('on');}); el.classList.add('on'); }
 
 // 업로드 방법 카드 → 학생 선택 시 제출 방법 설정 섹션 노출
