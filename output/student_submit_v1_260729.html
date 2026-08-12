@@ -797,6 +797,10 @@ function maybeGuide(scene){
 /* ───────── 씬 전환 (해시 라우팅) ───────── */
 function go(scene){
   currentScene = scene;
+  /* 화면을 옮기면 시작 안내 팝업은 닫는다 — 까망이로 다른 케이스에 가도 팝업이 남던 버그(2026-08-12).
+     ssGuide처럼 일부러 여는 경로는 go() 뒤에 openGuide()를 다시 부르므로 영향 없다 */
+  var gm = document.getElementById('guideModal');
+  if(gm) gm.classList.remove('show');
   document.querySelectorAll('.screen').forEach(function(s){ s.classList.remove('active'); });
   document.getElementById('scr-'+scene).classList.add('active');
   document.body.classList.toggle('pdf-mode', scene === 'pdf');
@@ -1098,13 +1102,11 @@ window.MOCK_NAV_GROUPS = [
       ['shTask6','과제 메뉴',{sub:'내용 동일 · 헤더만 타이틀+설명'}]] },
   { t:'└ 목록 케이스',         items:[
       ['shHome6NoRes','검색 결과 없음'],
-      ['shHome6Zero','과제 0건',{sub:'신학기 · 도구 모음까지 감춤'}],
-      ['shHome6High','고등학생',{sub:'진단 배너 없음(현행 동작)'}]] },
+      ['shHome6Zero','과제 0건',{sub:'신학기 · 도구 모음까지 감춤'}]] },
   { t:'학생 · 과제 제출',      items:[
       ['ssWrite','① 작성',{sub:'목록에서 과제를 누르면 여기로'}],
       ['ssDone','② 제출 완료']] },
   { t:'└ 작성 화면 케이스',    items:[
-      ['ssGuide','시작 안내 팝업',{sub:'직접 작성 과제 최초 진입 · 1회'}],
       ['ssLeave','다른 화면 다녀옴',{sub:'알림(8초) + 누적 상태'}],
       ['ssWriteNoti','기록 안내 표시 끔',{sub:'시작 전 고지는 그대로'}]] },
   { t:'└ 제출 방식별',         items:[
@@ -1126,7 +1128,11 @@ function resetLeave(){
   document.querySelectorAll('[data-rec-notice]').forEach(function(n){ n.classList.remove('show'); });
 }
 window.MOCK_NAV_APPLY = {
+  /* ⚠️ 까망이는 replaceState로 해시만 바꾼다 — hashchange가 안 떠서 CASES가 실행되지 않는다.
+     그러니 케이스마다 여기에 핸들러가 있어야 한다. 빠지면 '눌러도 아무 일 없음'이 된다 (2026-08-12) */
   ssGuide:     function(){ resetLeave(); guideSeen = false; go('write'); openGuide(); },
+  ssLeave:     function(){ resetLeave(); guideSeen = true; go('write');
+                 simulateLeave(6); simulateLeave(11); clearTimeout(leaveHideTimer); },
   ssWrite:     function(){ resetLeave(); setNotify(true);  guideSeen = true; go('write'); },
   ssWriteNoti: function(){ resetLeave(); guideSeen = true; setNotify(false); go('write'); },
   ssDone:      function(){ resetLeave(); guideSeen = true; go('done'); },
@@ -1152,5 +1158,5 @@ window.MOCK_NAV_APPLY = {
   if (typeof _so === 'function') window.setOpened = function(v){ _so.apply(this, arguments); if (window.mockNavSetCurrent) window.mockNavSetCurrent(v ? 'ssAfter' : 'ssBefore'); };
 })();
 </script>
-<script src="mock_nav_dw.js?v=260812f"></script></body>
+<script src="mock_nav_dw.js?v=260812g"></script></body>
 </html>
