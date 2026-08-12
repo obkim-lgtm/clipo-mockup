@@ -48,6 +48,10 @@
     shTask5None: { f:'home',    h:'task5-zero-none' },
     shTask5NoRes:{ f:'home',    h:'task5-no-result' },
     shHome5High: { f:'home',    h:'home5-high' },
+    shHome6:     { f:'home',    h:'home6' },
+    shHome6Zero: { f:'home',    h:'home6-zero-none' },
+    shHome6NoRes:{ f:'home',    h:'home6-no-result' },
+    shHome6High: { f:'home',    h:'home6-high' },
     ssNotice:    { f:'submit',  h:'notice' },
     ssWrite:     { f:'submit',  h:'write' },
     ssWriteNoti: { f:'submit',  h:'write-noti-off' },
@@ -86,8 +90,7 @@
        해시로 열린다: #current · #new · #student · #cards
        다시 보이게 하려면 아래 주석 네 줄만 풀 것 — 지우지 말 것 */
     { t:'학생 · 과제 홈', items:[
-        ['shHome5','홈',{sub:'낼 과제 + 새 결과 2단'}],
-        ['shTask5','과제',{sub:'단일 표 + 검색·필터'}]] },
+        ['shHome6','과제 목록',{sub:'시안 6 · 단일 표 + 상태 칩'}]] },
     // { t:'└ 이전 시안 (비교용)', items:[
     //     ['shCur','1. 현재 개발 화면 + 대시보드',{sub:'표 유지 · 상단 2칸 요약만 추가'}],
     //     ['shNew','2. 개선안',{sub:'할 일 기준 재배열 · 오늘 요약 배너'}],

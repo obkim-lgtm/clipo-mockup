@@ -73,6 +73,11 @@
 
     /* radio (line) */
     .radio-line{ display:flex; gap:24px; margin-top:14px; }
+    /* 라벨이 붙은 라디오 줄 — 라벨이 이미 간격을 만들어 위 여백을 없앤다 */
+    .radio-line.labeled{ margin-top:0; }
+    .fld-label{ display:block; font-size:14px; font-weight:500; color:#6d7381; margin:0 0 8px; }
+    .fld-label.mt{ margin-top:22px; }
+    .fld-help{ font-size:14px; color:#6d7381; margin:10px 0 0; line-height:1.6; }
     .rad{ display:inline-flex; align-items:center; gap:8px; cursor:pointer; font-size:16px; color:#222631; }
     .rad .ring{ width:20px; height:20px; border-radius:50%; border:1.5px solid #c7cbd3; background:#fff; flex-shrink:0; }
     .rad.on .ring{ border:6.5px solid #416bff; }
@@ -543,11 +548,24 @@
     <!-- 기본 정보 -->
     <div class="sec">
       <div class="sec-hd"><span class="sec-title">기본 정보</span></div>
+      <label class="fld-label">수행평가(과제)명</label>
       <input class="inp" placeholder="평가(과제)명을 입력해 주세요.">
-      <div class="radio-line">
+      <!-- '교내 공개'에도 라벨을 붙였다 — 아래 '학생 노출'과 같은 위계인데 한쪽만 라벨이 없으면
+           두 라디오가 한 덩어리로 읽힌다. 두 설정은 대상이 다르다: 교내 공개=동료 교사 / 학생 노출=학생 -->
+      <label class="fld-label mt">교내 공개</label>
+      <div class="radio-line labeled">
         <span class="rad on" onclick="pickRadio(this)"><span class="ring"></span>교내 공개</span>
         <span class="rad" onclick="pickRadio(this)"><span class="ring"></span>비공개</span>
       </div>
+      <!-- 학생 노출 (2026-08-12 회의 확정) — 학생 과제 목록에 이 과제를 보일지 교사가 직접 정한다.
+           기존에는 과제물 수집 방법으로 자동 판정하려 했으나, 교사 의도를 추측하는 대신 명시 설정으로 바꿈.
+           ⚠️ 결과를 공개하면 '안 보이기'여도 학생 목록에 나타난다 — 점수는 학생이 봐야 하므로 -->
+      <label class="fld-label mt">학생 노출</label>
+      <div class="radio-line labeled">
+        <span class="rad on" onclick="pickRadio(this)"><span class="ring"></span>보이기</span>
+        <span class="rad" onclick="pickRadio(this)"><span class="ring"></span>안 보이기</span>
+      </div>
+      <p class="fld-help">결과를 공개하면 '안 보이기'로 두어도 학생 과제 목록에 나타나요.</p>
     </div>
 
     <!-- 성취기준 -->
@@ -2139,5 +2157,5 @@ window.MOCK_NAV_APPLY = {
   if (typeof _go === 'function') window.go = function(s){ _go.apply(this, arguments); if (window.mockNavSetCurrent && MAP[s]) window.mockNavSetCurrent(MAP[s]); };
 })();
 </script>
-<script src="mock_nav_dw.js?v=260811h"></script></body>
+<script src="mock_nav_dw.js?v=260812a"></script></body>
 </html>
