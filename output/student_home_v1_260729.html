@@ -291,6 +291,13 @@ body.nav-expanded .main-wrap{ padding-left:200px; }
 .btn-purple{ background:#6d3fd4; color:#fff; }
 .btn-purple:hover{ background:#5c31bd; }
 
+/* 과제 메뉴 헤더 — 선생님 화면(task_direct_write)의 페이지 헤더와 같은 구성(타이틀 + 설명).
+   홈과 과제는 내용이 완전히 같고 헤더만 갈린다 — 그래서 화면을 복제하지 않고 헤더만 바꿔 끼운다.
+   ⚠️ 표를 두 벌로 두면 더미가 갈라져 한쪽만 고치는 사고가 난다 */
+.page-h1{ font-size:22px; font-weight:700; color:#18181b; margin:0 0 8px; }
+.page-sub{ font-size:16px; color:#3b3f4c; margin:0 0 24px; line-height:1.55; }
+#h6HeadTask{ display:none; }
+
 /* 시안 6 상태 칩 — 섹션 4분할 대신 개수를 늘 보여주는 자리.
    칩은 '거르는 도구'라 선택 색을 파랑 하나로 두고, 상태 색(주황·파랑·초록·빨강·회색)은
    표 안 배지에만 쓴다. 칩까지 상태색으로 칠하면 색이 '고르는 것'과 '상태'를 동시에 뜻하게 된다 */
@@ -1774,11 +1781,16 @@ body.nav-expanded .main-wrap{ padding-left:200px; }
 <div id="scr-home6" class="screen">
   <div class="page-wrap">
 
-    <div class="st-head">
+    <!-- 헤더 2종 — 좌측 NB에서 고른 메뉴에 따라 하나만 보인다. 아래 내용은 완전히 같다 -->
+    <div class="st-head" id="h6HeadHome">
       <div>
         <p class="st-date">7월 29일 수요일</p>
         <h1 class="st-greet">김서윤 학생, 안녕하세요! 👋</h1>
       </div>
+    </div>
+    <div id="h6HeadTask">
+      <h1 class="page-h1">과제</h1>
+      <p class="page-sub">낼 과제도, 결과가 나온 과제도 모두 여기에 있어요.</p>
     </div>
 
     <div class="filter-bar">
@@ -2057,14 +2069,17 @@ function go(scene){
 }
 /* 좌측 NB — 시안 5(home5·task5)에서는 해시 라우팅으로 홈↔과제 전환(다른 파일로 이탈 금지),
    그 외 시안에서는 기존처럼 과제=제출 화면 데모로 보낸다 */
-function navHome(){ var h = location.hash.slice(1);
-  if(h.indexOf('home6') === 0) return;              /* 이미 홈 */
+function navHome(){
+  var h = location.hash.slice(1);
+  if(h === 'task6' || h.indexOf('home6') === 0){ goHash('home6'); return; }
   if(h === 'task5') go('home5');
-  else if(h.indexOf('home6') === 0 || !h) go('home6'); }
+}
 function navTask(){
   var h = location.hash.slice(1);
-  if(h === 'home5' || h === 'task5') go('task5');
-  else location.href = 'student_submit_v1_260729.html';
+  /* 시안 6 — 같은 화면에서 헤더만 과제용으로 */
+  if(h === 'task6' || h.indexOf('home6') === 0){ goHash('task6'); return; }
+  if(h === 'home5' || h === 'task5'){ go('task5'); return; }
+  location.href = 'student_submit_v1_260729.html';
 }
 
 function mpToggle(){
@@ -2139,7 +2154,17 @@ function t6Zero(on){
   r.querySelector('.panel').style.display = off;
   document.getElementById('t6ZeroNone').style.display = on ? 'block' : 'none';
 }
+/* 홈 / 과제는 같은 화면이고 헤더만 갈린다 (2026-08-12 회의 — 화면 분리 안 함) */
+function h6Head(mode){
+  var isTask = mode === 'task';
+  var a = document.getElementById('h6HeadHome'), b = document.getElementById('h6HeadTask');
+  if(a) a.style.display = isTask ? 'none' : 'flex';
+  if(b) b.style.display = isTask ? 'block' : 'none';
+  document.getElementById('si-home').classList.toggle('active', !isTask);
+  document.getElementById('si-task').classList.toggle('active', isTask);
+}
 var CASES = {
+  'task6'           : function(){ go('home6'); h6Head('task'); },
   'home6-zero-none' : function(){ go('home6'); t6Zero(true); },
   'home6-no-result' : function(){ go('home6'); t6Search('수학'); },   /* 더미에 없는 낱말이라 항상 0건 */
   'home6-high'      : function(){ go('home6'); setBanner(false); },
@@ -2152,7 +2177,7 @@ var CASES = {
 };
 function goHash(h){
   /* 어떤 케이스로 뛰든 이전 케이스의 잔여 상태(0건·검색어·배너·칩)를 먼저 걷는다 */
-  var reset = function(){ setZero(''); t5Search(''); setBanner(true); t6Zero(false); t6st = 'all'; t6Search(''); };
+  var reset = function(){ setZero(''); t5Search(''); setBanner(true); t6Zero(false); t6st = 'all'; t6Search(''); h6Head('home'); };
   if(CASES[h]){ reset(); CASES[h](); history.replaceState(null, '', '#'+h); return true; }
   if(h && document.getElementById('scr-'+h)){ reset(); go(h); return true; }
   return false;
@@ -2298,7 +2323,8 @@ window.MOCK_NAV_FILE  = 'home';
    기본 목록(mock_nav_dw.js의 GROUPS)은 나머지 4개 파일이 그대로 쓴다 */
 window.MOCK_NAV_GROUPS = [
   { t:'학생 · 과제 목록',  items:[
-      ['shHome6','기본',{sub:'전체 20건 · 상태 칩 + 검색'}],
+      ['shHome6','홈',{sub:'전체 20건 · 상태 칩 + 검색'}],
+      ['shTask6','과제 메뉴',{sub:'내용 동일 · 헤더만 타이틀+설명'}],
       ['shHome6NoRes','검색 결과 없음',{sub:'찾는 과제가 없을 때'}],
       ['shHome6Zero','과제 0건',{sub:'신학기 · 도구 모음까지 감춤'}],
       ['shHome6High','고등학생',{sub:'진단 배너 없음(현행 동작)'}]] },
@@ -2330,6 +2356,7 @@ window.MOCK_NAV_APPLY = {
   shHome5None:  function(){ goHash('home5-zero-none'); },
   shTask5None:  function(){ goHash('task5-zero-none'); },
   shHome6:      function(){ goHash('home6'); },
+  shTask6:      function(){ goHash('task6'); },
   shHome6Zero:  function(){ goHash('home6-zero-none'); },
   shHome6NoRes: function(){ goHash('home6-no-result'); },
   shHome6High:  function(){ goHash('home6-high'); },
@@ -2338,9 +2365,10 @@ window.MOCK_NAV_APPLY = {
 };
 (function(){
   var MAP = { student:'shStu', cards:'shCards', 'new':'shNew', current:'shCur', home5:'shHome5', task5:'shTask5', home6:'shHome6' };
+  /* task6은 별도 .screen이 아니라 home6의 헤더 상태다 — go()가 아니라 goHash()로만 진입한다 */
   var _go = window.go;
   if (typeof _go === 'function') window.go = function(s){ _go.apply(this, arguments); if (window.mockNavSetCurrent && MAP[s]) window.mockNavSetCurrent(MAP[s]); };
 })();
 </script>
-<script src="mock_nav_dw.js?v=260812a"></script></body>
+<script src="mock_nav_dw.js?v=260812b"></script></body>
 </html>
