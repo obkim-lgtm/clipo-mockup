@@ -138,14 +138,19 @@ body.nav-expanded .main-wrap{ padding-left:200px; }
 /* 알림은 화면에 고정한다 — 스크롤을 내려 쓰다가 다녀오면 상단 배너를 아예 못 본다는
    지적(2026-08-12 회의)에 대한 답. 상시 배너로 굳는 문제는 8초 자동 접힘이 막는다:
    '늘 떠 있어 배경이 된다'와 '스크롤하면 안 보인다'를 동시에 푸는 유일한 조합 */
-/* top = 헤더 높이(58px) + 8px — 헤더 바로 아래에 붙어야 스크롤을 내려도 눈에 걸린다 (2026-08-12 올립) */
-.leave-banner{ display:none; position:sticky; top:66px; z-index:120;
-  background:#f4f5f7; border:1px solid #e3e5ea; border-radius:10px; padding:11px 16px; align-items:center; gap:10px; margin-bottom:20px;
-  transition:background .25s ease, border-color .25s ease, padding .25s ease; }
-.leave-banner.show{ display:flex; }
+/* 헤더 바로 아래 붙는 상단바 (2026-08-12 올립) — 카드가 아니라 화면 폭을 가로지르는 바.
+   .screen 직속이라 좌측 NB를 뺀 폭을 그대로 쓰고, 안쪽 .lb-in이 본문(1240px)에 맞춰 정렬된다.
+   top=58px = 헤더 높이. 스크롤을 내려도 헤더 바로 밑에 붙는다 */
+.leave-banner{ display:none; position:sticky; top:58px; z-index:120;
+  background:#f4f5f7; border-bottom:1px solid #e3e5ea;
+  transition:background .25s ease, border-color .25s ease; }
+.leave-banner.show{ display:block; }
+.leave-banner .lb-in{ max-width:1240px; margin:0 auto; padding:11px 32px;
+  display:flex; align-items:center; gap:10px; transition:padding .25s ease; }
 /* 이탈 직후 8초만 부푼다 — 평소엔 조용한 한 줄, 그 순간만 눈에 걸리게 */
-.leave-banner.alert{ background:#fff7ed; border-color:#fdd9b5; padding:16px; align-items:flex-start;
+.leave-banner.alert{ background:#fff7ed; border-bottom-color:#fdd9b5;
   box-shadow:0 6px 18px rgba(194,65,12,.10); }
+.leave-banner.alert .lb-in{ padding-top:16px; padding-bottom:16px; align-items:flex-start; }
 /* 누적 상태 — 조용하지만 항상. 값이 늘어난 순간에만 잠깐 강조해 '하나 늘었다'가 읽히게 */
 .leave-stat{ display:inline-flex; align-items:center; gap:6px; font-size:14px; color:#6d7381; margin-left:auto; }
 .leave-stat i, .leave-stat svg{ width:15px; height:15px; flex-shrink:0; }
@@ -334,23 +339,23 @@ body.pdf-mode .sf-copy{ color:#8b8f9c; }
 
 <!-- ═══════════════ ② 작성 (직접 작성만) ═══════════════ -->
 <div id="scr-write" class="screen">
-  <div class="page-wrap">
-    <button class="back-link" onclick="location.href='student_home_v1_260729.html'"><i data-lucide="chevron-left" style="width:18px;height:18px"></i>이전으로</button>
-    <h1 class="page-h1">과제 제출 및 확인</h1>
-    <p class="page-sub">과제 내용을 확인하고 직접 제출해 보세요.</p>
-
-    <!-- 상시 파란 배너를 걷어냈다 (2026-08-11 올립) — 시작 전 고지와 문장이 같아 중복이었고,
-         늘 떠 있으면 배경이 되어 정작 읽히지 않았다.
-         대신 실제로 다녀왔을 때만 주황 배너가 나타나 그대로 남는다. 토스트는 복귀 직후
-         학생이 화면을 안 보고 있으면 놓치는데, '기록이 남았다'는 사실은 남아 있는 편이 맞다.
-         교사가 '학생에게 이탈 안내 표시'를 끄면 이 배너도 뜨지 않는다. -->
-    <div class="leave-banner" id="leaveBanner" data-rec-notice>
+  <!-- 이탈 상단바는 page-wrap 바깥에 둔다 (2026-08-12 올립) — 안에 두면 본문 폭(1240px)에
+       갇혀 카드처럼 보인다. .screen 직속이라야 좌측 NB를 뺀 화면 폭을 그대로 가로지른다.
+       교사가 '학생에게 이탈 안내 표시'를 끄면 이 바도 뜨지 않는다. -->
+  <div class="leave-banner" id="leaveBanner" data-rec-notice>
+    <div class="lb-in">
       <i data-lucide="monitor-check"></i>
       <div>
         <p class="lb-t">다른 화면에 다녀온 기록이 남았어요</p>
         <p class="lb-d" id="leaveBannerDesc"></p>
       </div>
     </div>
+  </div>
+
+  <div class="page-wrap">
+    <button class="back-link" onclick="location.href='student_home_v1_260729.html'"><i data-lucide="chevron-left" style="width:18px;height:18px"></i>이전으로</button>
+    <h1 class="page-h1">과제 제출 및 확인</h1>
+    <p class="page-sub">과제 내용을 확인하고 직접 제출해 보세요.</p>
 
     <div class="card">
       <div class="task-top">
@@ -388,18 +393,20 @@ body.pdf-mode .sf-copy{ color:#8b8f9c; }
 
 <!-- ═══════════════ ③ 작성 + 파일 제출 (둘 다 허용) ═══════════════ -->
 <div id="scr-both" class="screen">
-  <div class="page-wrap">
-    <button class="back-link" onclick="location.href='student_home_v1_260729.html'"><i data-lucide="chevron-left" style="width:18px;height:18px"></i>이전으로</button>
-    <h1 class="page-h1">과제 제출 및 확인</h1>
-    <p class="page-sub">과제 내용을 확인하고 직접 제출해 보세요.</p>
-
-    <div class="leave-banner" id="leaveBannerBoth" data-rec-notice>
+  <div class="leave-banner" id="leaveBannerBoth" data-rec-notice>
+    <div class="lb-in">
       <i data-lucide="monitor-check"></i>
       <div>
         <p class="lb-t">다른 화면에 다녀온 기록이 남았어요</p>
         <p class="lb-d" id="leaveBannerBothDesc"></p>
       </div>
     </div>
+  </div>
+
+  <div class="page-wrap">
+    <button class="back-link" onclick="location.href='student_home_v1_260729.html'"><i data-lucide="chevron-left" style="width:18px;height:18px"></i>이전으로</button>
+    <h1 class="page-h1">과제 제출 및 확인</h1>
+    <p class="page-sub">과제 내용을 확인하고 직접 제출해 보세요.</p>
 
     <div class="card">
       <div class="task-top">
