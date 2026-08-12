@@ -564,8 +564,8 @@ body.pdf-mode .sf-copy{ color:#8b8f9c; }
     <div class="card">
       <h3 class="card-title">제출한 답안</h3>
       <div id="ansList"></div>
+      <!-- 결과 공개 후에도 재제출을 막지 않는다 (2026-08-12 올립) — 차단 문구·버튼 숨김 폐기 -->
       <div class="actions">
-        <span class="act-note" id="openedNote" style="display:none;">결과가 공개된 뒤에는 다시 제출할 수 없어요.</span>
         <button class="btn btn-outline" id="btnResubmit" onclick="go('write')"><i data-lucide="pencil-line" style="width:16px;height:16px"></i>다시 제출</button>
         <button class="btn btn-primary" id="btnToList" onclick="location.href='student_home_v1_260729.html'">과제 목록으로</button>
         <button class="btn btn-primary" id="btnToResult" style="display:none;" onclick="notReady('결과 보기')">결과 보기 <i data-lucide="chevron-right" style="width:16px;height:16px"></i></button>
@@ -910,13 +910,11 @@ function submitTask(){
   }
   go('done');
 }
-/* 결과가 공개되면 재제출을 막는다 — 점수를 보고 답을 고치는 일이 없게 */
+/* 결과 공개 여부는 '결과 보기' 버튼 유무만 바꾼다 — 재제출은 막지 않음 (2026-08-12 올립) */
 function setOpened(on){
   document.getElementById('doneDesc').textContent = on
-    ? '선생님이 결과를 공개했어요. 이제 답안을 바꿀 수 없어요.'
+    ? '선생님이 결과를 공개했어요. 마감 전까지는 다시 제출할 수도 있어요.'
     : '마감 전까지는 다시 제출할 수 있어요. 다시 제출하면 마지막에 낸 답안으로 바뀌어요.';
-  document.getElementById('openedNote').style.display = on ? 'inline' : 'none';
-  document.getElementById('btnResubmit').style.display = on ? 'none' : '';
   document.getElementById('btnToList').style.display   = on ? 'none' : '';
   document.getElementById('btnToResult').style.display = on ? '' : 'none';
   document.querySelectorAll('#mockpick .mp-btn[data-opened]').forEach(function(b){
@@ -1154,5 +1152,5 @@ window.MOCK_NAV_APPLY = {
   if (typeof _so === 'function') window.setOpened = function(v){ _so.apply(this, arguments); if (window.mockNavSetCurrent) window.mockNavSetCurrent(v ? 'ssAfter' : 'ssBefore'); };
 })();
 </script>
-<script src="mock_nav_dw.js?v=260812i"></script></body>
+<script src="mock_nav_dw.js?v=260812j"></script></body>
 </html>

@@ -24,6 +24,7 @@
     dwList:      { f:'design',  h:'list' },
     dwDesign:    { f:'design',  h:'design' },
     dwQuestions: { f:'design',  h:'questions' },
+    dwRecHelp:   { f:'design',  h:'rec-help' },
     rubOk:       { f:'design',  h:'rubric-ok' },
     rubErr:      { f:'design',  h:'rubric-error' },
     flTask:      { f:'task',    h:'teacher-log' },
@@ -74,7 +75,8 @@
    * student_home은 '학생 홈' 전용 내비게이터라 교사 그룹을 싣지 않는다 (2026-08-11 올립).
    * 나머지 파일은 아래 기본 목록을 그대로 쓴다. */
   var GROUPS = window.MOCK_NAV_GROUPS || [
-    { t:'교사 · 평가 설계',        items:[['dwList','과제 목록'],['dwDesign','과제 설계'],['dwQuestions','문항 작성']] },
+    { t:'교사 · 평가 설계',        items:[['dwList','과제 목록'],['dwDesign','과제 설계'],['dwQuestions','문항 작성'],
+        ['dwRecHelp','기록 안내 팝업',{sub:'작성 과정 기록 ? 팝오버 열림'}]] },
     /* 채점기준 AI 성공/오류는 별도 그룹으로 두지 않는다 — 문항 작성 화면 안의 [AI 생성] 버튼으로 시연 (2026-08-06 올립) */
     { t:'교사 · 과제물 관리',      items:[['flTask','제출 현황']] },
     /* '작성 과정 케이스' 5종은 까망이에서 숨겼다 (2026-08-11 올립) —

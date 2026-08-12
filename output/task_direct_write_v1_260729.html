@@ -573,8 +573,8 @@
            ⚠️ 결과를 공개할 때 '비공개'면 확인 모달로 물어보고 '공개'로 바꾼다 — 시스템이 몰래 뒤집지 않는다 -->
       <label class="fld-label mt">학생 공개</label>
       <div class="radio-line labeled">
-        <span class="rad on" onclick="pickRadio(this); setStuVis(true)"><span class="ring"></span>공개</span>
-        <span class="rad" onclick="pickRadio(this); setStuVis(false)"><span class="ring"></span>비공개</span>
+        <span class="rad on" id="radStuOn"  onclick="pickStuVis(this, true)"><span class="ring"></span>공개</span>
+        <span class="rad"    id="radStuOff" onclick="pickStuVis(this, false)"><span class="ring"></span>비공개</span>
       </div>
       <p class="fld-help">학생 과제 목록에 이 과제가 보여요.</p>
       <div class="fld-note" id="stuVisNote">
@@ -1127,6 +1127,25 @@
   </div>
 </div>
 
+<!-- 학생 공개를 되돌릴 때의 확인 — 결과가 이미 공개된 과제에서 '비공개'를 고른 순간에만 뜬다.
+     반대 방향(비공개 → 공개, 결과 공개 화면)과 짝을 맞춘 것. 한쪽만 묻고 한쪽은 조용히 하면
+     같은 축에 규칙이 둘이 된다. 학생에게는 따로 알리지 않는다 — 시스템은 교사가 왜 내렸는지 모르고,
+     학생이 할 수 있는 행동도 없다. 사유 설명은 교사 몫 (2026-08-12 확정) -->
+<div class="pv-ov" id="stuHideGuard" onclick="if(event.target===this) closeStuHideGuard()">
+  <div style="background:#fff;border-radius:14px;width:100%;max-width:460px;box-shadow:0 20px 50px rgba(0,0,0,.25);padding:32px 32px 28px;">
+    <p style="font-size:20px;font-weight:700;color:#222631;margin:0 0 10px;line-height:1.45;">학생 공개를 '비공개'로 바꿀까요?</p>
+    <p style="font-size:16px;color:#3b3f4c;margin:0 0 16px;line-height:1.7;">이 과제는 채점 결과가 공개돼 있어요. 비공개로 바꾸면 <b>학생이 점수와 피드백을 더 볼 수 없어요.</b></p>
+    <div style="display:flex;gap:9px;align-items:flex-start;background:#f2f5ff;border-radius:10px;padding:13px 15px;margin:0 0 24px;color:#365eef;">
+      <i data-lucide="info" style="width:17px;height:17px;flex-shrink:0;margin-top:2px"></i>
+      <p style="font-size:15px;color:#3b3f4c;margin:0;line-height:1.6;">이미 <b>12명</b>이 결과를 확인했어요.</p>
+    </div>
+    <div style="display:flex;gap:10px;">
+      <button class="btn btn-outline btn-lg" style="flex:1;" onclick="closeStuHideGuard()">취소</button>
+      <button class="btn btn-primary btn-lg" style="flex:1;" onclick="stuHideConfirm()">비공개로 바꾸기</button>
+    </div>
+  </div>
+</div>
+
 <!-- 학생 화면 미리보기 모달 — 이번 범위 제외, 다음 제공 (2026-08-07 올립). 진입점과 함께 제거 -->
 
 <!-- 수식 입력 팝업 -->
@@ -1310,10 +1329,46 @@ function goDesignList(){ location.href='task_ocr_v3_260623.html#design'; }
 /* 학생 공개 — '비공개'일 때만 안내를 띄운다.
    결과 공개가 설정을 이기는 게 아니라 '확인 후 설정이 바뀐다'로 정리했다 —
    교사가 설계 화면을 다시 봤을 때 화면과 실제가 어긋나지 않게 (2026-08-12 다나 제안) */
+var RESULT_PUBLISHED = false;   /* 이 과제의 채점 결과가 이미 공개됐는지. #design-published 로 진입하면 true */
+var STU_VIS = true;
+
+/* 안내 문구는 결과 공개 여부에 따라 다르다 — 아직 공개 전이면 '앞으로 무슨 일이 생기는지',
+   이미 공개됐으면 '지금 무슨 일이 벌어져 있는지'를 말해야 한다 */
 function setStuVis(on){
   var n = document.getElementById('stuVisNote');
-  if(n) n.classList.toggle('show', !on);
+  if(n){
+    n.classList.toggle('show', !on);
+    var p = n.querySelector('p');
+    if(p) p.innerHTML = RESULT_PUBLISHED
+      ? "<b>지금 학생은 점수와 피드백을 볼 수 없어요.</b><br>다시 '공개'로 바꾸면 바로 다시 보여요."
+      : "<b>채점 결과를 공개할 때 '공개'로 바꿀지 확인해요.</b><br>점수는 학생이 직접 확인해야 하므로, 결과를 공개하는 시점에 목록에 표시할지 한 번 더 여쭤봐요.";
+  }
   if(window.lucide) lucide.createIcons();
+}
+
+/* 결과가 공개된 과제에서 '비공개'를 고르면 먼저 묻는다. 취소하면 라디오는 손대지 않았으므로
+   되돌릴 것이 없다 — 먼저 바꿔놓고 되돌리면 화면이 한 번 깜박인다 */
+function pickStuVis(el, on){
+  if(!on && RESULT_PUBLISHED && STU_VIS){ openStuHideGuard(); return; }
+  pickRadio(el); STU_VIS = on; setStuVis(on);
+}
+function openStuHideGuard(){
+  document.getElementById('stuHideGuard').classList.add('show');
+  if(window.lucide) lucide.createIcons();
+}
+function closeStuHideGuard(){
+  document.getElementById('stuHideGuard').classList.remove('show');
+}
+function stuHideConfirm(){
+  closeStuHideGuard();
+  pickRadio(document.getElementById('radStuOff'));
+  STU_VIS = false; setStuVis(false);
+  toastMsg('학생 공개를 비공개로 바꿨어요. 저장해야 반영돼요.');
+}
+/* 데모용 — 결과가 이미 공개된 과제를 편집하는 상황 */
+function setResultPublished(on){
+  RESULT_PUBLISHED = !!on;
+  setStuVis(STU_VIS);
 }
 function pickRadio(el){ var line=el.closest('.radio-line'); line.querySelectorAll('.rad').forEach(function(r){r.classList.remove('on');}); el.classList.add('on'); }
 
@@ -1823,10 +1878,14 @@ function qGuardSave(){
 function goDesign(){ updateSummary(); go('design'); }
 /* 원본의 goDesignList는 옛 목록 파일로 이탈 → 이 파일 안의 목록 씬으로 재정의 */
 function goDesignList(){ renderList(); go('list'); }
-window.addEventListener('hashchange', function(){
-  var h = location.hash.slice(1);
-  if(h && document.getElementById('scr-'+h)) go(h);
-});
+/* #design-published = 채점 결과가 이미 공개된 과제를 편집하는 상황.
+   씬은 design 그대로고 상태만 다르다 — 화면을 하나 더 만들 일이 아니다 */
+function goHashDW(h){
+  if(h === 'design-published'){ setResultPublished(true); goDesign(); return true; }
+  if(h && document.getElementById('scr-'+h)){ setResultPublished(false); go(h); return true; }
+  return false;
+}
+window.addEventListener('hashchange', function(){ goHashDW(location.hash.slice(1)); });
 
 /* ── 제출 방식 토글 ── */
 function toggleWay(k){
@@ -1836,11 +1895,6 @@ function toggleWay(k){
   }
   document.getElementById('way-'+k).classList.toggle('on');
   syncWayNotes();
-  /* 앵커가 이미 화면에 있는 채로 체크되면 IO가 다시 안 울림 → 여기서 1회 자동 오픈 */
-  if(k === 'write' && document.getElementById('way-write').classList.contains('on') && !REC_POP_SEEN){
-    REC_POP_SEEN = true;
-    openRecHelp();
-  }
 }
 
 /* 선택 조합에 따라 아래 안내 한 칸을 바꿔 끼운다 — 0개=선택 요청, 2개=AI 채점 대상 안내 */
@@ -1863,8 +1917,8 @@ function toggleRecordSw(el){
 
 /* ── 작성 과정 기록 ? 팝오버 ──
    기능 안내+결과 예시를 인라인 대신 여기에 담는다 (2026-08-11 올립 — 첫 화면이 너무 복잡).
-   처음 이 옵션이 화면에 보이는 순간 1회 자동으로 열어 기능을 인지시킨다.
-   실서비스는 계정당 1회 노출 상정 — 목업은 데모 반복을 위해 페이지 로드마다 1회 */
+   자동 오픈은 폐기 — IO 감지와 스크롤 재배치가 겹쳐 깜박였다 (2026-08-12 올립).
+   ? 클릭으로만 열고, 시연용 진입은 까망이 '기록 안내 팝업' 항목으로 */
 function placeRecPop(){
   var btn = document.getElementById('recHelpBtn');
   var pop = document.getElementById('recPop');
@@ -1897,24 +1951,13 @@ document.addEventListener('click', function(e){
 window.addEventListener('scroll', function(){
   if(document.getElementById('recPop').classList.contains('show')) placeRecPop();
 }, true);
-var REC_POP_SEEN = false;
-/* 앵커(rec-note)는 카드 접힘과 무관하게 늘 보이므로,
-   직접 작성이 체크된 상태에서 보일 때만 자동 오픈 — 안 쓰는 방식 설명을 불쑥 띄우지 않는다 */
-(function(){
-  var note = document.getElementById('recNote');
-  if(!note || !('IntersectionObserver' in window)) return;
-  var io = new IntersectionObserver(function(ents){
-    ents.forEach(function(en){
-      if(en.isIntersecting && !REC_POP_SEEN
-         && document.getElementById('way-write').classList.contains('on')){
-        REC_POP_SEEN = true;
-        openRecHelp();
-        io.disconnect();
-      }
-    });
-  }, { threshold: 0.6 });
-  io.observe(note);
-})();
+/* 까망이 진입용 — 설계 화면을 열고 기록 안내 팝오버까지 펼친다 */
+function showRecHelpCase(){
+  applyDesignState(0, { withQ:true });
+  go('design');
+  document.getElementById('recNote').scrollIntoView({ block:'center' });
+  setTimeout(openRecHelp, 150);   /* 스크롤이 자리 잡은 뒤 위치 계산 */
+}
 
 /* 제출이 들어오면 제출 방식만 잠근다 (세부 설정·학생 안내 표시는 계속 조절 가능) */
 function applyWayLock(){
@@ -2156,8 +2199,7 @@ window.addEventListener('DOMContentLoaded', function(){
 renderQuestions();
 updateSummary();
 window.addEventListener('DOMContentLoaded', function(){
-  var h = location.hash.slice(1);
-  go(h && document.getElementById('scr-'+h) ? h : 'list');
+  if(!goHashDW(location.hash.slice(1))) go('list');
 });
 </script>
 
@@ -2171,6 +2213,7 @@ window.MOCK_NAV_APPLY = {
   dwList:      function(){ goDesignList(); },
   dwDesign:    function(){ goDesign(); },
   dwQuestions: function(){ goQuestions(); },
+  dwRecHelp:   function(){ showRecHelpCase(); },
   rubOk:       function(){ goQuestions(); setRubDemo('success', document.querySelector('#rubDemoToggle .seg button:nth-child(1)')); },
   rubErr:      function(){ goQuestions(); setRubDemo('error',   document.querySelector('#rubDemoToggle .seg button:nth-child(2)')); }
 };
@@ -2180,5 +2223,5 @@ window.MOCK_NAV_APPLY = {
   if (typeof _go === 'function') window.go = function(s){ _go.apply(this, arguments); if (window.mockNavSetCurrent && MAP[s]) window.mockNavSetCurrent(MAP[s]); };
 })();
 </script>
-<script src="mock_nav_dw.js?v=260812i"></script></body>
+<script src="mock_nav_dw.js?v=260812j"></script></body>
 </html>
