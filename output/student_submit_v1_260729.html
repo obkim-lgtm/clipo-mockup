@@ -88,6 +88,13 @@ body.nav-expanded .main-wrap{ padding-left:200px; }
 .ed-btn:hover{ background:#eceef2; color:#222631; }
 .ed-div{ width:1px; height:18px; background:#e4e6eb; margin:0 5px; }
 .ed-ta{ width:100%; min-height:150px; border:none; padding:16px 18px; font-size:16px; font-family:inherit; line-height:1.75; color:#222631; resize:vertical; outline:none; display:block; }
+/* 입력이 막힌 에디터 — 마감돼 더 쓸 수 없는 상태. 텍스트로만 두면 '여기가 쓰던 자리'라는 게
+   안 드러나서 에디터 모습 그대로 두되 눌리지 않게 한다 (2026-08-12 요청) */
+.editor.is-disabled{ background:#f6f7f9; border-color:#e4e6eb; }
+.editor.is-disabled .ed-tool{ background:#f1f3f5; border-bottom-color:#e4e6eb; }
+.editor.is-disabled .ed-btn{ color:#c7cbd3; cursor:not-allowed; }
+.editor.is-disabled .ed-ta{ background:transparent; color:#3b3f4c; cursor:not-allowed; resize:none; }
+.editor.is-disabled .ed-ta::placeholder{ color:#9aa0ad; }
 .ed-ta::placeholder{ color:#9aa0ad; }
 .q-foot{ display:flex; align-items:center; justify-content:space-between; margin-top:10px; }
 .q-count{ font-size:14px; color:#6d7381; }
@@ -714,6 +721,7 @@ function renderLeaveBanner(){
     var el = document.getElementById(id);
     if(!el) return;
     el.querySelector('.lb-d').textContent = txt;
+    el.hidden = false;          /* 기록 안내를 껐다 켠 뒤에도 다시 뜨도록 */
     el.classList.remove('fade');
     el.classList.add('show');
   });
@@ -744,7 +752,8 @@ function closeGuide(){
 }
 function maybeGuide(scene){
   if(guideSeen) return;
-  if(scene === 'write' || scene === 'both' || scene === 'fileonly') openGuide();
+  /* 파일 제출만인 과제는 제외 — 붙여넣기 금지·작성 과정 기록은 직접 작성에만 해당한다 (2026-08-12 올립) */
+  if(scene === 'write' || scene === 'both') openGuide();
 }
 
 /* ───────── 씬 전환 (해시 라우팅) ───────── */
@@ -758,7 +767,7 @@ function go(scene){
   if(scene === 'write')  { renderQuestions('qList', true, false); renderLeaveStat(false); }   /* 통글 1칸 */
   if(scene === 'both')   { renderQuestions('qListBoth', false, true); renderLeaveStat(false); } /* 문항형 시연 */
   if(scene === 'done')   renderAnswers();
-  if(scene === 'closed') renderAnswers('draftList');
+  if(scene === 'closed') renderDraft('draftList');
   if(scene === 'pdf')    renderPdf();
   window.scrollTo(0,0);
   lucide.createIcons();
@@ -901,6 +910,32 @@ function renderAnswers(targetId){
   box.appendChild(d);
 }
 
+/* 마감돼 제출하지 못한 임시저장 글 — 쓰던 자리를 그대로 보여주되 입력만 막는다 */
+function renderDraft(targetId){
+  var box = document.getElementById(targetId);
+  if(!box) return;
+  box.innerHTML = '';
+  var txt = ANSWERS[0] || '';
+  var d = document.createElement('div');
+  d.className = 'q-block';
+  d.innerHTML =
+      '<div class="editor is-disabled">'
+    +   '<div class="ed-tool">'
+    +     '<button class="ed-btn" disabled><i data-lucide="bold" style="width:16px;height:16px"></i></button>'
+    +     '<button class="ed-btn" disabled><i data-lucide="italic" style="width:16px;height:16px"></i></button>'
+    +     '<button class="ed-btn" disabled><i data-lucide="underline" style="width:16px;height:16px"></i></button>'
+    +     '<span class="ed-div"></span>'
+    +     '<button class="ed-btn" disabled><i data-lucide="list" style="width:16px;height:16px"></i></button>'
+    +     '<button class="ed-btn" disabled><i data-lucide="list-ordered" style="width:16px;height:16px"></i></button>'
+    +   '</div>'
+    +   '<textarea class="ed-ta" disabled placeholder="쓰던 내용이 없어요."></textarea>'
+    + '</div>'
+    + '<div class="q-foot"><span class="q-count"><b>' + txt.length.toLocaleString() + '</b>자</span></div>';
+  d.querySelector('textarea').value = txt;
+  box.appendChild(d);
+  lucide.createIcons();
+}
+
 /* ───────── PDF ───────── */
 function renderPdf(){
   var box = document.getElementById('pdfBody');
@@ -910,6 +945,12 @@ function renderPdf(){
   d.innerHTML = '<p class="pp-q-a"></p>';
   d.querySelector('.pp-q-a').textContent = ANSWERS[0] && ANSWERS[0].trim() !== '' ? ANSWERS[0] : '(작성하지 않음)';
   box.appendChild(d);
+}
+
+/* 시연용 이탈 1회 — 실제 감지 경로(onLeave/onReturn)와 같은 결과를 만든다 */
+function simulateLeave(sec){
+  LEAVE_COUNT += 1; LEAVE_SEC += sec; LEAVE_LAST = sec;
+  renderLeaveBanner(); renderLeaveStat(true);
 }
 
 /* ───────── 다른 화면 이동 감지 (실제 브라우저 이벤트) ───────── */
@@ -931,9 +972,12 @@ function onReturn(){
   leaveStart = null; leaveType = null;
 }
 /* 브라우저가 실제로 구분해 주는 종류만 쓴다 — '탭 전환'·'다른 창 이동'은 알 수 없는 추론 (2026-08-11 제이콥) */
+/* ⚠️ blur/focus에 !document.hidden 가드를 두지 말 것 — 임베드된 미리보기 창에서는
+   document.hidden이 true로 고정돼 가드에 걸려 감지가 통째로 죽는다 (2026-08-12 확인).
+   중복 집계는 onLeave의 leaveStart 가드가 이미 막는다 */
 document.addEventListener('visibilitychange', function(){ document.hidden ? onLeave('화면 안 보임') : onReturn(); });
-window.addEventListener('blur',  function(){ if(!document.hidden) onLeave('포커스 벗어남'); });
-window.addEventListener('focus', function(){ if(!document.hidden) onReturn(); });
+window.addEventListener('blur',  function(){ onLeave('포커스 벗어남'); });
+window.addEventListener('focus', function(){ onReturn(); });
 function fmtDur(s){ return s >= 60 ? Math.floor(s/60) + '분' + (s%60 ? ' ' + s%60 + '초' : '') : s + '초'; }
 
 /* ───────── 공통 ───────── */
@@ -983,6 +1027,11 @@ function mpToggle(){
    딥링크로 직접 들어오면 안 먹어서(2026-08-12) 이 파일이 직접 해석하도록 옮겼다 */
 var SUB_CASES = {
   'guide':          function(){ guideSeen = false; go('write'); openGuide(); },
+  /* 시연용 — 미리보기 창처럼 브라우저 이벤트가 안 잡히는 환경에서도 이탈 신호를 볼 수 있게 */
+  'leave':          function(){ go('write'); simulateLeave(6); simulateLeave(11);
+                      /* 시연에서는 배너를 남긴다 — 8초 뒤 접히면 열어봤을 때 이미 없다.
+                         실제 동작은 8초 뒤 스스로 접히는 것 */
+                      clearTimeout(leaveHideTimer); },
   'result-before':  function(){ go('done'); setOpened(false); },
   'result-after':   function(){ go('done'); setOpened(true); },
   'write-noti-off': function(){ setNotify(false); go('write'); }
@@ -1037,5 +1086,5 @@ window.MOCK_NAV_APPLY = {
   if (typeof _so === 'function') window.setOpened = function(v){ _so.apply(this, arguments); if (window.mockNavSetCurrent) window.mockNavSetCurrent(v ? 'ssAfter' : 'ssBefore'); };
 })();
 </script>
-<script src="mock_nav_dw.js?v=260812c"></script></body>
+<script src="mock_nav_dw.js?v=260812d"></script></body>
 </html>
