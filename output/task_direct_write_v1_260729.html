@@ -78,7 +78,7 @@
     .fld-label{ display:block; font-size:14px; font-weight:500; color:#6d7381; margin:0 0 8px; }
     .fld-label.mt{ margin-top:22px; }
     .fld-help{ font-size:14px; color:#6d7381; margin:10px 0 0; line-height:1.6; }
-    /* '안 보이기'를 고른 순간에만 뜨는 안내 — 고르기 전에 미리 겁주지 않고,
+    /* '비공개'를 고른 순간에만 뜨는 안내 — 고르기 전에 미리 겁주지 않고,
        고른 뒤 '그런데 언제 보이지?'가 생기는 자리에서 답한다 (2026-08-12 다나·줄리 우려) */
     .fld-note{ display:none; margin-top:12px; background:#fff7ed; border-radius:10px; padding:14px 16px; gap:10px; align-items:flex-start; }
     .fld-note.show{ display:flex; }
@@ -557,28 +557,29 @@
       <div class="sec-hd"><span class="sec-title">기본 정보</span></div>
       <label class="fld-label">수행평가(과제)명</label>
       <input class="inp" placeholder="평가(과제)명을 입력해 주세요.">
-      <!-- 두 설정은 대상이 다르다: 교내 교사 공유=동료 교사 / 학생 화면 노출=학생.
+      <!-- 두 설정은 대상이 다르다: 교내 교사 공유=동료 교사 / 학생 공개=학생.
            라벨을 6자로 맞춰 나란히 읽히게 했고(라벨 평행성), 각 항목에 도움말을 한 줄씩 붙였다 —
            라벨만으로는 '무슨 일이 일어나는지'가 안 담긴다.
-           '교내 공개'는 옵션 라벨과 같은 말이라 중복이었고, 실제 의미(설계를 복사해 쓸 수 있게 함)도 안 드러났다 -->
+           '교내 공개'는 옵션 라벨과 같은 말이라 중복이었고, 실제 의미(설계를 복사해 쓸 수 있게 함)도 안 드러났다.
+           옵션 값은 두 항목 모두 공개/비공개로 통일 — '보이기/안 보이기'는 동사형이라 위와 어긋났다 (2026-08-12) -->
       <label class="fld-label mt">교내 교사 공유</label>
       <div class="radio-line labeled">
         <span class="rad on" onclick="pickRadio(this)"><span class="ring"></span>공개</span>
         <span class="rad" onclick="pickRadio(this)"><span class="ring"></span>비공개</span>
       </div>
       <p class="fld-help">같은 학교 선생님이 이 평가 설계를 복사해서 쓸 수 있어요.</p>
-      <!-- 학생 화면 노출 (2026-08-12 회의 확정) — 학생 과제 목록에 이 과제를 보일지 교사가 직접 정한다.
+      <!-- 학생 공개 (2026-08-12 회의 확정) — 학생 과제 목록에 이 과제를 보일지 교사가 직접 정한다.
            기존에는 과제물 수집 방법으로 자동 판정하려 했으나, 교사 의도를 추측하는 대신 명시 설정으로 바꿈.
-           ⚠️ 결과를 공개하면 '안 보이기'여도 학생 목록에 나타난다 — 점수는 학생이 봐야 하므로 -->
-      <label class="fld-label mt">학생 화면 노출</label>
+           ⚠️ 결과를 공개할 때 '비공개'면 확인 모달로 물어보고 '공개'로 바꾼다 — 시스템이 몰래 뒤집지 않는다 -->
+      <label class="fld-label mt">학생 공개</label>
       <div class="radio-line labeled">
-        <span class="rad on" onclick="pickRadio(this); setStuVis(true)"><span class="ring"></span>보이기</span>
-        <span class="rad" onclick="pickRadio(this); setStuVis(false)"><span class="ring"></span>안 보이기</span>
+        <span class="rad on" onclick="pickRadio(this); setStuVis(true)"><span class="ring"></span>공개</span>
+        <span class="rad" onclick="pickRadio(this); setStuVis(false)"><span class="ring"></span>비공개</span>
       </div>
       <p class="fld-help">학생 과제 목록에 이 과제가 보여요.</p>
       <div class="fld-note" id="stuVisNote">
         <i data-lucide="info"></i>
-        <p><b>채점 결과를 공개할 때 '보이기'로 바꿀지 확인해요.</b><br>점수는 학생이 직접 확인해야 하므로, 결과를 공개하는 시점에 목록에 표시할지 한 번 더 여쭤봐요.</p>
+        <p><b>채점 결과를 공개할 때 '공개'로 바꿀지 확인해요.</b><br>점수는 학생이 직접 확인해야 하므로, 결과를 공개하는 시점에 목록에 표시할지 한 번 더 여쭤봐요.</p>
       </div>
     </div>
 
@@ -1306,9 +1307,9 @@ function notReady(n){ toastMsg((n||'해당 화면')+' 은(는) 아직 준비 중
 function goDesignList(){ location.href='task_ocr_v3_260623.html#design'; }
 
 // 라디오(라인)
-/* 학생 화면 노출 — '안 보이기'일 때만 안내를 띄운다.
-   결과 공개가 설정을 이기는 게 아니라 '설정이 바뀐다'로 정리했다 —
-   교사가 설계 화면을 다시 봤을 때 화면과 실제가 어긋나지 않게 (2026-08-12 줄리 제안) */
+/* 학생 공개 — '비공개'일 때만 안내를 띄운다.
+   결과 공개가 설정을 이기는 게 아니라 '확인 후 설정이 바뀐다'로 정리했다 —
+   교사가 설계 화면을 다시 봤을 때 화면과 실제가 어긋나지 않게 (2026-08-12 다나 제안) */
 function setStuVis(on){
   var n = document.getElementById('stuVisNote');
   if(n) n.classList.toggle('show', !on);
