@@ -747,7 +747,10 @@ function genRow(id, name, opt){
      기록 끊김 = 표본이 올라오지 않는 동안 (원인은 모름)
      멈춤      = 글자 수가 2분 이상 그대로 (왜인지는 판단하지 않음)
    ※ 목업이라 5초마다 수업 시간이 1분씩 흐른다. 실제는 5초 표본 그대로. */
-const CLASS_START = '14:00', CLASS_MIN = 50, TICK_MS = 5000;
+/* 교시·수업 길이는 시스템이 모른다 - 과제가 아는 것은 마감 시각뿐이다 (2026-08-19 올립).
+   MON_START는 교사가 이 화면을 연 시각, DEADLINE_MIN은 그때부터 마감까지 남은 분. */
+const MON_START = '14:00', DEADLINE_MIN = 50, TICK_MS = 5000;
+const CLASS_START = MON_START, CLASS_MIN = DEADLINE_MIN;
 const LIVE_LABEL = {
   write:'작성 중', idle:'멈춤', away:'다른 화면', gap:'기록 끊김',
   submitted:'제출 완료', none:'미시작', nolog:'기록 없음'
@@ -849,8 +852,9 @@ function liveSubText(st, k){
 function renderLive(){
   if(!live) return;
   document.getElementById('mClock').textContent = hm(CLASS_START, live.min);
+  const leftMin = DEADLINE_MIN - live.min;
   document.getElementById('mElapsed').textContent =
-    (live.min >= CLASS_MIN ? '수업 끝' : '시작 후 ' + live.min + '분') + ' · ' + CLASS_MIN + '분 수업';
+    '마감 ' + hm(MON_START, DEADLINE_MIN) + ' · ' + (leftMin > 0 ? leftMin + '분 남음' : '마감됨');
 
   const cnt = { write:0, idle:0, away:0, gap:0, submitted:0, none:0, nolog:0 };
   let cards = '';
@@ -868,14 +872,14 @@ function renderLive(){
   });
   document.getElementById('mGrid').innerHTML = cards;
 
-  /* 지금 볼 것부터 왼쪽에 — 개입이 필요한 순서다 */
-  const order = [['away','#ea580c'], ['gap','#9aa0ad'], ['idle','#8a8f9a'], ['write','#319d64'],
-                 ['submitted','#416bff'], ['none','#c7cbd3'], ['nolog','#dde1e8']];
-  document.getElementById('mChips').innerHTML = order.map(function(o){
-    const k = o[0];
-    return '<span class="mchip' + (k === 'away' && cnt[k] ? ' hot' : '') + '">'
-      + '<i class="mc-dot" style="background:' + o[1] + '"></i>' + LIVE_LABEL[k] + ' <b>' + cnt[k] + '</b></span>';
-  }).join('');
+  /* 지금 개입할 곳 하나 + 어디까지 왔나 하나. 나머지 상태는 카드 배지에 이미 있으므로
+     여기서 또 세지 않는다 (2026-08-19 올립 - 정보량 과다). */
+  const away = cnt.away, total = live.students.length;
+  document.getElementById('mChips').innerHTML =
+      '<span class="mchip' + (away ? ' hot' : '') + '">'
+    +   '<i class="mc-dot" style="background:' + (away ? '#ea580c' : '#c7cbd3') + '"></i>'
+    +   '다른 화면 <b>' + away + '</b></span>'
+    + '<span class="mchip">제출 <b>' + cnt.submitted + '</b> / ' + total + '</span>';
   lucide.createIcons();
 }
 
