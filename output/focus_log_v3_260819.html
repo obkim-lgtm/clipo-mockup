@@ -1,0 +1,1422 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<script>window.MOCK_NAV_ENTRY_HASH = location.hash;</script>  <!-- 페이지 초기화가 해시를 덮기 전에 진입 해시 보존 (까망이 딥링크) -->
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" type="image/png" href="clipo_favicon.png">
+<title>작성 과정 기록 · 실시간 모니터링 — 컨셉 목업 (CLIPO)</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard-gov.min.css">
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<style>
+*{ font-family:'Pretendard GOV',-apple-system,sans-serif; box-sizing:border-box; }
+body{ margin:0; background:#f6f7f9; color:#222631; font-size:16px; min-width:1280px; }
+a{ text-decoration:none; color:inherit; }
+
+/* ===== Global Header (CLIPO 표준) ===== */
+.g-hd { height: 58px; background: #fff; border-bottom: 1px solid #dde1e8; display: flex; align-items: center; padding: 0 20px 0 9px; position: fixed; top: 0; left: 0; right: 0; z-index: 200; }
+.gh-menu-btn { width:40px; height:40px; border:none; background:none; border-radius:4px; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; color:#3b3f4c; margin-right:9px; line-height:1; }
+.gh-menu-btn:hover { background:#f6f7f9; }
+.g-hd-r { margin-left: auto; display: flex; align-items: center; gap: 16px; font-size: 15px; color: #18181b; }
+.hd-plan { display: flex; align-items: center; gap: 8px; }
+.plan-badge { display: inline-flex; align-items: center; height: 20px; background: #e9f2ff; border: 1px solid #ccdfff; color: #3151c4; font-size: 12px; font-weight: 500; padding: 0 6px; border-radius: 6px; line-height: 1; }
+.credit-wrap { display: flex; align-items: center; gap: 8px; font-size: 15px; font-weight: 500; color: #18181b; }
+.user-btn { display: inline-flex; align-items: center; justify-content: center; gap: 4px; height: 36px; padding: 0 12px; border: 1px solid #c7cbd3; border-radius: 9999px; background: none; font-size: 14px; color: #27272a; cursor: pointer; line-height: 1; font-weight: 500; }
+
+/* ===== Sidebar (CLIPO 표준 icon-sb) ===== */
+.icon-sb { width: 56px; background: #fff; border-right: 1px solid #d9d9d9; position: fixed; top: 58px; bottom: 0; left: 0; display: flex; flex-direction: column; padding: 8px 0; z-index: 150; transition: width .2s ease; }
+.icon-sb.expanded { width: 200px; }
+.si { height: 40px; display: flex; align-items: center; border-radius: 8px; color: #6d7381; cursor: pointer; margin: 0 8px 2px; position: relative; padding: 0 4px 0 8px; gap: 10px; white-space: nowrap; flex-shrink: 0; }
+.si:hover { background: #f1f3f5; }
+.si.active { background: #e9f2ff; color: #416bff; }
+.si-icon { width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.si-label { font-size: 13px; font-weight: 500; opacity: 0; transition: opacity .1s; overflow: hidden; }
+.icon-sb.expanded .si-label { opacity: 1; }
+.si-tip { position: absolute; left: 48px; top: 50%; transform: translateY(-50%); background: #222631; color: #fff; font-size: 11px; padding: 3px 8px; border-radius: 4px; white-space: nowrap; display: none; z-index: 300; pointer-events: none; }
+.si:hover .si-tip { display: block; }
+.icon-sb.expanded .si-tip { display: none !important; }
+.nav-bottom { margin-top: auto; width: 100%; }
+.nav-div { height: 1px; background: #f1f3f5; margin: 4px 8px; }
+
+/* ===== Layout ===== */
+.main-wrap{ position:relative; padding-top:58px; padding-left:56px; transition:padding-left .2s; min-height:100vh; background:#f6f7f9; }
+body.nav-expanded .main-wrap{ padding-left:200px; }
+
+/* ===== 상단 탭 밴드 (Figma 295-7609: 직접 제출 화면 탭 구성) ===== */
+.tab-band{ background:white; border-bottom:1px solid #dde1e8; }
+.tab-band-inner{ max-width:1240px; margin:0 auto; padding:0 32px; display:flex; }
+.sub-tab{ padding:16px 20px; font-size:16px; font-weight:500; color:#3b3f4c; border:none; background:none; cursor:pointer; font-family:inherit; border-bottom:3px solid transparent; margin-bottom:-1px; display:inline-flex; align-items:center; justify-content:center; line-height:1; vertical-align:middle; }
+.sub-tab:hover{ color:#222631; }
+.sub-tab.on{ color:#365eef; border-bottom:3px solid #365eef; }
+
+.page-wrap{ max-width:1240px; margin:0 auto; padding:0 32px; width:100%; }
+#scr-teacher-log.active{ display:flex; flex-direction:column; min-height:calc(100vh - 58px); }
+#scr-teacher-log .page-wrap{ flex:1; display:flex; flex-direction:column; }
+
+/* ===== 페이지 헤더 (Figma: Header title_basic) ===== */
+.back-link{ display:inline-flex; align-items:center; justify-content:center; line-height:1; vertical-align:middle; gap:4px; font-size:15px; font-weight:500; color:#18181b; background:none; border:none; cursor:pointer; font-family:inherit; padding:0; align-self:flex-start; }
+.back-link:hover{ color:#365eef; }
+.page-h1{ font-size:20px; font-weight:600; color:#18181b; margin:0; line-height:1.25; }
+.page-sub{ font-size:14px; font-weight:500; color:#18181b; margin:0; line-height:1.55; }
+.pill-primary{ background:#365eef; color:white; height:40px; border-radius:9999px; border:none; padding:0 16px; font-size:15px; font-weight:500; font-family:inherit; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; line-height:1; vertical-align:middle; gap:8px; }
+.pill-primary:hover{ opacity:.9; }
+
+/* ===== 미제출 학생 State_Box (Figma) ===== */
+.state-box-red{ background:#fff3f4; border:1px solid #fc9ba2; border-radius:12px; box-shadow:0 2px 4px rgba(0,0,0,.1), 0 0 1px rgba(34,38,49,.3); padding:20px; display:flex; flex-direction:column; gap:12px; width:100%; }
+.sbr-title-row{ display:flex; align-items:center; gap:12px; }
+.sbr-title{ display:flex; align-items:center; gap:8px; flex:1; min-width:0; font-size:16px; font-weight:600; color:#ab303a; }
+.sbr-title i, .sbr-title svg{ width:16px; height:16px; color:#ab303a; flex-shrink:0; }
+.sbr-recent{ display:flex; align-items:center; gap:12px; font-size:14px; color:#18181b; }
+.sbr-recent button{ background:none; border:none; cursor:pointer; padding:0; display:inline-flex; align-items:center; color:#18181b; }
+.sbr-desc{ padding-left:20px; font-size:15px; color:#18181b; line-height:1.55; }
+
+/* ===== 카드 (Figma: panel) ===== */
+.ev-card{ background:white; border-radius:12px; padding:24px; box-shadow:0 2px 4px rgba(0,0,0,.1), 0 0 1px rgba(34,38,49,.3); display:flex; flex-direction:column; gap:20px; }
+
+/* ===== 테이블 (Figma: Select_student — 컨테이너 보더 + radius 8) ===== */
+.tbl-wrap{ border:1px solid #dde1e8; border-radius:8px; overflow:hidden; width:100%; }
+.tbl2{ width:100%; border-collapse:collapse; }
+.tbl2 th{ background:#f6f7f9; height:44px; font-size:15px; font-weight:500; color:#18181b; padding:4px 12px; text-align:center; border-bottom:1px solid #dde1e8; white-space:nowrap; }
+.tbl2 td{ font-size:16px; padding:8px 12px; text-align:center; color:#18181b; border-bottom:1px solid #dde1e8; height:48px; }
+.tbl2 tr:last-child td{ border-bottom:none; }
+.tbl2 td.td-date{ font-size:15px; font-weight:500; color:#52525b; white-space:nowrap; }
+.chk{ width:20px; height:20px; border:1.5px solid #c7cbd3; border-radius:2px; accent-color:#365eef; cursor:pointer; vertical-align:middle; }
+
+/* ===== 상태 뱃지 (Figma: Badge_제출상태_학생 — 사각 6px) ===== */
+.b-submit{ display:inline-flex; align-items:center; justify-content:center; height:24px; padding:0 8px; border-radius:6px; background:#dff8eb; color:#27724b; font-size:14px; font-weight:500; line-height:1; white-space:nowrap; }
+.b-absent{ display:inline-flex; align-items:center; justify-content:center; height:24px; padding:0 8px; border-radius:6px; background:#ffebeb; color:#ab303a; font-size:14px; font-weight:500; line-height:1; white-space:nowrap; }
+
+/* 제출물 없음 표시 */
+.t-none{ display:inline-flex; align-items:center; justify-content:center; height:20px; padding:0 7px; border-radius:9999px; font-size:12px; font-weight:500; line-height:1; background:#f1f3f5; color:#27272a; }
+.t-line{ display:inline-flex; align-items:center; gap:6px; min-width:0; }
+/* 제출 유형은 뱃지 대신 아이콘 하나로 — 누를 것이 없으니 링크색도 쓰지 않는다 (2026-08-11 올립).
+   뱃지 3종이 파랑·회색으로 겹쳐 표가 시끄러웠고, 파란 글씨는 눌리는 것처럼 보였다 */
+.t-ic{ display:inline-flex; align-items:center; justify-content:center; color:#8a8f9a; flex-shrink:0; }
+.t-ic i, .t-ic svg{ width:15px; height:15px; }
+.t-val{ font-size:15px; font-weight:500; color:#18181b; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+
+/* ===== 행 액션 버튼 (Figma: 변경/삭제 · 업로드) ===== */
+.row-btn{ background:transparent; border:none; border-radius:4px; padding:10px 16px; font-size:15px; font-weight:500; color:#18181b; font-family:inherit; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; line-height:1; vertical-align:middle; gap:8px; }
+.row-btn i, .row-btn svg{ width:20px; height:20px; }
+.row-btn:hover{ background:#f1f3f5; }
+
+/* ===== 작성 과정 요약 셀 ===== */
+/* 한 줄 고정 — 아래 보조 문구를 붙이면 그 행만 높아져 표가 들쭉날쭉해진다 (2026-08-11) */
+.leave-cell-btn{ background:none; border:none; cursor:pointer; font-family:inherit; font-size:15px; font-weight:600; color:#ea580c; display:inline-flex; align-items:center; justify-content:center; line-height:1; vertical-align:middle; padding:6px 10px; border-radius:4px; white-space:nowrap; }
+.leave-cell-btn:hover{ background:#fff7ed; }
+.leave-cell-btn.quiet{ color:#52525b; font-weight:500; }
+.leave-cell-btn.quiet:hover{ background:#f1f3f5; }
+.lc-main{ display:inline-flex; align-items:center; gap:4px; }
+.leave-none{ color:#b3b6bd; font-size:15px; }
+
+/* ===== 작성 과정 상세 (인라인 펼침) ===== */
+/* 작성 과정 팝업 (2026-08-07 회의 — 행 펼침에서 전환) */
+.pc{ background:#fff; border-radius:14px; width:100%; max-width:1080px; max-height:88vh; box-shadow:0 20px 50px rgba(0,0,0,.25); display:flex; flex-direction:column; overflow:hidden; }
+.pc-hd{ display:flex; align-items:flex-start; gap:16px; padding:24px 28px 18px; border-bottom:1px solid #dde1e8; flex-shrink:0; }
+.pc-t{ font-size:19px; font-weight:700; color:#18181b; margin:0 0 6px; line-height:1.35; }
+.pc-s{ font-size:14px; font-weight:500; color:#6d7381; margin:0; line-height:1.5; }
+.pc-x{ margin-left:auto; width:36px; height:36px; border:none; background:none; border-radius:8px; color:#6d7381; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; flex-shrink:0; }
+.pc-x:hover{ background:#f1f3f5; }
+.pc-bd{ flex:1; min-height:0; overflow-y:auto; padding:20px 28px 28px; text-align:left; }
+.ld-title{ margin:0 0 4px; font-size:15px; font-weight:600; color:#3b3f4c; }
+.ld-legend{ display:flex; align-items:center; gap:16px; margin:0 0 14px; font-size:13px; font-weight:500; color:#6d7381; }
+.ld-legend span{ display:inline-flex; align-items:center; gap:6px; }
+.lg-swatch{ width:14px; height:10px; border-radius:2px; display:inline-block; }
+.lg-line{ width:16px; height:0; border-top:2px solid #416bff; display:inline-block; }
+
+/* 타임라인 — 과제물이 학생당 1개이므로 타임라인도 학생당 1개다 (2026-08-06 확정).
+   재제출은 블록이 늘어나는 게 아니라 같은 타임라인 위에 제출 마커가 하나 더 찍히는 것.
+   나눠 쓴 구간(차시·이어쓰기)은 한 차트 안에서 끊어 그린다. */
+.tl-one{ display:flex; flex-direction:column; gap:6px; width:100%; }
+/* .tl-submits · .tl-end — 제출 칩 줄 폐기, 작성 로그 표로 이동 (2026-08-11 줄리) */
+.tl-sess-hd{ display:flex; align-items:baseline; gap:8px; flex-wrap:wrap; }
+.tl-sess-name{ font-size:14px; font-weight:600; color:#222631; }
+.tl-sess-when{ font-size:13px; font-weight:500; color:#6d7381; }
+.tl-sess-meta{ margin-left:auto; font-size:13px; font-weight:600; color:#ea580c; white-space:nowrap; }
+.tl-sess-meta.none{ color:#9aa0ad; font-weight:500; }
+.tl-chart{ width:100%; height:88px; display:block; border-bottom:1px solid #dde1e8; }
+.tl-axis{ display:flex; justify-content:space-between; font-size:12px; font-weight:500; color:#9aa0ad; }
+/* 세로축 눈금 — 곡선 꼭대기가 몇 자인지 알려주는 최대값 하나 (2026-08-11 줄리) */
+.tl-ymax{ font-size:12px; font-weight:500; color:#9aa0ad; margin-bottom:-4px; }
+
+/* 이벤트 목록 */
+.leave-evt{ display:flex; align-items:center; gap:14px; padding:9px 0; border-bottom:1px solid #eceef2; font-size:15px; }
+.leave-evt:last-of-type{ border-bottom:none; }
+.leave-evt-time{ color:#3b3f4c; font-weight:600; width:200px; flex-shrink:0; }   /* 시작~끝 범위 · 여러 날이면 날짜까지 */
+/* 알약 뱃지였는데 버튼처럼 보였다 (2026-08-11 올립). 배경·라운드를 걷어내고
+   차트 범례와 같은 색 조각을 앞에 둬서, 이 줄이 위 그래프의 어느 띠인지 바로 이어지게 한다 */
+.leave-evt-type{ display:inline-flex; align-items:center; gap:7px; color:#c2410c; font-size:14px; font-weight:600; line-height:1; flex-shrink:0; width:92px; }
+.leave-evt-type.gap{ color:#6d7381; }
+.leave-evt-type.submit{ color:#1f7a4d; }
+.leave-evt-type.stop{ color:#8a8f9a; }   /* 이탈이 아니라 구간이 끝난 자리 */
+.leave-evt-dur{ color:#222631; font-weight:600; width:80px; flex-shrink:0; }
+.leave-evt-gain{ font-size:14px; font-weight:500; color:#3b3f4c; }
+.leave-evt-gain.none{ color:#9aa0ad; }   /* 급증 구간이 없었다는 사실 — 값 누락과 구분 */
+/* 목록 머리글 — 반복되던 '복귀 후 N분간'을 여기 한 번만 둔다 */
+.evt-head{ font-size:13px; font-weight:600; color:#8a8f9a; padding:4px 0 7px; border-bottom:1px solid #eceef2; }
+.evt-head span{ color:inherit; font-size:inherit; font-weight:inherit; }
+.leave-evt-gain b{ font-weight:700; color:#222631; }
+.leave-evt-note{ font-size:13px; font-weight:500; color:#6d7381; }
+.ld-evt-wrap{ margin-top:16px; border-top:1px solid #eceef2; padding-top:4px; }
+/* 수집 규칙 안내(3초 미만·미저장 등)는 펼침에 상시 노출하지 않는다 — 평가 설계에서 한 번 설명 (2026-08-06 올립) */
+
+/* ===== 안내 박스 (배경+아이콘) ===== */
+.info-box{ background:#e9f2ff; border-radius:10px; padding:14px 16px; display:flex; align-items:flex-start; gap:10px; }
+.info-box i, .info-box svg{ width:20px; height:20px; color:#416bff; flex-shrink:0; margin-top:2px; }
+.info-box p{ margin:0; font-size:15px; color:#3b3f4c; line-height:1.65; font-weight:500; }
+
+/* ===== 일괄 액션 버튼 (개발 화면 기준) ===== */
+.bulk-btn{ height:40px; padding:0 16px; border:1px solid #d9d9d9; background:#fff; color:#3b3f4c; border-radius:8px; font-size:15px; font-weight:500; font-family:inherit; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; line-height:1; vertical-align:middle; gap:8px; white-space:nowrap; }
+.bulk-btn i, .bulk-btn svg{ width:16px; height:16px; }
+.bulk-btn:hover:not(:disabled){ background:#f6f7f9; border-color:#b3b3b3; }
+.bulk-btn:disabled{ color:#b3b6bd; border-color:#e4e6eb; cursor:not-allowed; }
+.bulk-btn.del{ color:#ab303a; border-color:#fc9ba2; }
+.bulk-btn.del:hover:not(:disabled){ background:#fff3f4; border-color:#f2525f; }
+.bulk-btn.del:disabled{ color:#b3b6bd; border-color:#e4e6eb; }
+
+/* ===== 기록 상태 표시 (읽기 전용 — 설정은 평가 설계에서) ===== */
+.rec-state{ display:inline-flex; align-items:center; gap:6px; height:28px; padding:0 12px; border-radius:100px; background:#eef0f3; color:#3b3f4c; font-size:13px; font-weight:600; line-height:1; white-space:nowrap; flex-shrink:0; }
+.rec-state i, .rec-state svg{ width:14px; height:14px; color:#6d7381; }
+.rec-state.off{ color:#9aa0ad; }
+.rec-state.off i{ color:#b3b6bd; }
+
+.btn{ height:40px; border-radius:4px; font-weight:600; font-size:15px; font-family:inherit; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; line-height:1; vertical-align:middle; gap:8px; padding:0 16px; border:none; transition:opacity .15s; }
+.btn-primary{ background:#416bff; color:white; }
+.btn-primary:hover{ background:#365eef; }
+
+/* ===== 푸터 ===== */
+.site-footer{ margin-top:auto; padding:48px 0 40px; display:flex; flex-direction:column; align-items:center; gap:16px; }
+.sf-links{ display:flex; align-items:center; }
+.sf-links a{ font-size:14px; color:#3b3f4c; padding:0 16px; }
+.sf-links a + a{ border-left:1px solid #dde1e8; }
+.sf-copy{ font-size:14px; color:#9aa0ad; }
+
+/* ===== 토스트 ===== */
+.toast{ position:fixed; bottom:28px; left:50%; transform:translateX(-50%) translateY(12px); opacity:0; min-width:320px; max-width:480px; padding:14px 22px 14px 16px; border-radius:4px; display:flex; align-items:center; gap:12px; font-size:15px; font-weight:600; box-shadow:0 0 1px #2226314D, 0 4px 12px #00000026; z-index:9999; transition:opacity .2s ease, transform .2s ease; pointer-events:none; background:#319d64; color:white; }
+.toast.show{ opacity:1; transform:translateX(-50%) translateY(0); }
+
+/* 열 제목 도움말 + 정렬 */
+/* 열 설명 팝오버 (2026-08-07) — 표 래퍼가 overflow:hidden이라 body 기준 fixed로 띄운다 */
+.th-help-btn{ background:none; border:none; padding:2px; cursor:pointer; color:#9aa0ad; display:inline-flex; align-items:center; justify-content:center; line-height:1; border-radius:4px; }
+.th-help-btn:hover{ color:#6d7381; background:#eceef2; }
+#colHelp{ display:none; position:fixed; z-index:3000; width:330px; background:#fff; border:1px solid #dde1e8; border-radius:10px; box-shadow:0 8px 24px rgba(0,0,0,.14); padding:16px 18px; text-align:left; }
+#colHelp.show{ display:block; }
+#colHelp .ch-t{ font-size:15px; font-weight:600; color:#222631; margin:0 0 8px; line-height:1.5; }
+#colHelp ul{ margin:0; padding-left:18px; }
+#colHelp li{ font-size:14px; font-weight:500; color:#3b3f4c; line-height:1.65; margin-bottom:5px; }
+#colHelp li:last-child{ margin-bottom:0; }
+
+.th-help{ display:inline-flex; align-items:center; justify-content:center; gap:5px; line-height:1; }
+.th-help i, .th-help svg{ width:15px; height:15px; color:#9aa0ad; cursor:help; }
+.th-help:hover i, .th-help:hover svg{ color:#6d7381; }
+.th-sort{ background:none; border:none; font-family:inherit; font-size:15px; font-weight:500; color:#18181b; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; gap:4px; line-height:1; padding:4px 6px; border-radius:4px; }
+.th-sort:hover{ background:#eceef2; }
+.th-sort i, .th-sort svg{ width:15px; height:15px; color:#9aa0ad; }
+.th-sort.on{ color:#365eef; }
+.th-sort.off{ color:#b3b6bd; cursor:default; }
+.th-sort.off:hover{ background:none; }
+.th-sort.off i, .th-sort.off svg{ color:#c7cbd3; }
+.th-sort.on i, .th-sort.on svg{ color:#365eef; }
+
+/* ===== 삭제 확인 모달 ===== */
+.md-ov{ display:none; position:fixed; inset:0; background:rgba(34,38,49,.45); z-index:2500; align-items:center; justify-content:center; padding:40px 20px; }
+.md-ov.show{ display:flex; }
+.md{ background:#fff; border-radius:14px; width:100%; max-width:480px; box-shadow:0 20px 50px rgba(0,0,0,.25); overflow:hidden; }
+.md-body{ padding:32px 32px 24px; text-align:center; }
+.md-ic{ width:56px; height:56px; border-radius:50%; background:#fff3f4; color:#ab303a; display:inline-flex; align-items:center; justify-content:center; margin-bottom:18px; }
+.md-ic i, .md-ic svg{ width:26px; height:26px; }
+.md-t{ font-size:20px; font-weight:700; color:#222631; margin:0 0 10px; line-height:1.45; }
+.md-d{ font-size:16px; color:#3b3f4c; margin:0; line-height:1.7; }
+.md-d b{ color:#ab303a; font-weight:600; }
+.md-names{ background:#f6f7f9; border-radius:8px; padding:12px 16px; margin-top:16px; font-size:15px; color:#3b3f4c; line-height:1.6; text-align:left; }
+.md-ft{ display:flex; gap:10px; padding:0 32px 28px; }
+.md-ft button{ flex:1; height:48px; border-radius:8px; font-size:16px; font-weight:600; font-family:inherit; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; line-height:1; vertical-align:middle; }
+.md-cancel{ border:1px solid #d9d9d9; background:#fff; color:#3b3f4c; }
+.md-cancel:hover{ background:#f6f7f9; }
+.md-ok{ border:none; background:#c8404c; color:#fff; }
+.md-ok:hover{ background:#ab303a; }
+
+/* ===== 목업 내비게이터 ===== */
+#mockpick{ position:fixed; left:24px; bottom:24px; z-index:3000; background:#1F2233; border-radius:14px; padding:8px; box-shadow:0 10px 30px rgba(0,0,0,.35); width:max-content; max-width:380px; cursor:move; user-select:none; }
+#mockpick .mp-head{ font-size:11px; font-weight:700; color:#8A8FB0; letter-spacing:.04em; display:flex; align-items:center; justify-content:space-between; gap:16px; padding:6px 8px; cursor:pointer; }
+#mockpick .mp-body{ display:flex; flex-direction:column; gap:6px; margin-top:6px; }
+#mockpick .mp-cap{ font-size:10px; font-weight:700; color:#6B6F8C; letter-spacing:.05em; padding:7px 8px 2px; }
+#mockpick .mp-btn{ width:100%; text-align:left; white-space:nowrap; padding:9px 12px; border-radius:9px; border:1px solid #3A3F58; background:#2A2E44; color:#C9CCE0; font-size:13px; font-weight:600; font-family:inherit; cursor:pointer; line-height:1.35; }
+#mockpick .mp-btn:hover{ background:#33384f; }
+#mockpick .mp-btn.on{ background:#416bff; color:#fff; border-color:#416bff; }
+#mockpick .mp-sub{ font-size:11px; font-weight:500; color:#8A8FB0; margin-left:8px; }
+#mockpick .mp-btn.on .mp-sub{ color:#D6E2FF; }
+#mockpick .mp-note{ font-size:11px; font-weight:500; color:#8A8FB0; line-height:1.55; padding:6px 8px 4px; max-width:330px; white-space:normal; }
+
+
+/* ===== 실시간 모니터링 (2026-08-19) =====
+   사후 로그와 같은 신호를 수업 중에 보여주는 화면. 화면 미러링은 하지 않는다 —
+   시스템이 아는 것은 '벗어났다'(visibilitychange·blur)와 '글자 수가 늘었나' 둘뿐이고,
+   왜 그랬는지는 판단하지 않는다. */
+#scr-monitor.active{ display:flex; flex-direction:column; min-height:calc(100vh - 58px); }
+#scr-monitor .page-wrap{ flex:1; display:flex; flex-direction:column; }
+.pill-outline{ background:#fff; color:#3b3f4c; height:40px; border-radius:9999px; border:1px solid #c7cbd3; padding:0 16px; font-size:15px; font-weight:500; font-family:inherit; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; line-height:1; vertical-align:middle; gap:8px; }
+.pill-outline:hover{ background:#f6f7f9; border-color:#b3b3b3; }
+/* 살아있는 화면이라는 표시 — 점 하나로만. 문구로 또 말하지 않는다 */
+.live-dot{ width:8px; height:8px; border-radius:50%; background:#fff; flex-shrink:0; animation:livePulse 1.6s ease-in-out infinite; }
+.live-dot.on-light{ background:#319d64; }
+@keyframes livePulse{ 0%,100%{ opacity:1; } 50%{ opacity:.25; } }
+
+/* 상단 바 — 수업 시계 · 상태 요약 · 갱신 제어 */
+.mbar{ background:#fff; border-radius:12px; box-shadow:0 2px 4px rgba(0,0,0,.1), 0 0 1px rgba(34,38,49,.3); padding:16px 20px; display:flex; align-items:center; gap:20px; flex-wrap:wrap; }
+.mb-clock{ display:flex; flex-direction:column; gap:3px; flex-shrink:0; }
+.mb-time{ font-size:22px; font-weight:700; color:#18181b; line-height:1.1; font-variant-numeric:tabular-nums; }
+.mb-elapsed{ font-size:13px; font-weight:500; color:#6d7381; }
+.mb-chips{ display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+.mchip{ display:inline-flex; align-items:center; justify-content:center; gap:6px; height:32px; padding:0 12px; border-radius:9999px; background:#f1f3f5; color:#3b3f4c; font-size:14px; font-weight:600; line-height:1; white-space:nowrap; }
+.mchip b{ font-weight:700; font-variant-numeric:tabular-nums; }
+.mchip .mc-dot{ width:8px; height:8px; border-radius:50%; flex-shrink:0; }
+/* 지금 개입할 곳 하나만 색을 쓴다 — 나머지가 같이 물들면 눈에 걸리는 게 없어진다 */
+.mchip.hot{ background:#fff1e6; color:#c2410c; }
+.mb-ctrl{ margin-left:auto; display:flex; align-items:center; gap:10px; flex-shrink:0; }
+.mb-note{ font-size:13px; font-weight:500; color:#8a8f9a; white-space:nowrap; }
+
+/* 5열 그리드 — 한 반이 한 화면에 들어오는 것이 이 화면의 전부다 */
+.mgrid{ display:grid; grid-template-columns:repeat(5, minmax(0,1fr)); gap:12px; }
+.mcard{ background:#fff; border:1px solid #dde1e8; border-radius:12px; padding:14px 14px 12px; font-family:inherit; text-align:left; cursor:pointer; display:flex; flex-direction:column; gap:9px; min-height:122px; transition:border-color .15s, background .15s, box-shadow .15s; }
+.mcard:hover{ border-color:#b3b6bd; box-shadow:0 2px 8px rgba(0,0,0,.06); }
+.mc-top{ display:flex; align-items:center; gap:8px; }
+.mc-name{ font-size:16px; font-weight:600; color:#18181b; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.mc-id{ font-size:12px; font-weight:500; color:#9aa0ad; flex-shrink:0; margin-left:auto; font-variant-numeric:tabular-nums; }
+.mc-badge{ display:inline-flex; align-items:center; justify-content:center; gap:5px; height:22px; padding:0 8px; border-radius:6px; font-size:13px; font-weight:600; line-height:1; white-space:nowrap; background:#f1f3f5; color:#52525b; align-self:flex-start; }
+.mc-num{ font-size:26px; font-weight:700; color:#18181b; line-height:1; font-variant-numeric:tabular-nums; display:flex; align-items:baseline; gap:3px; }
+.mc-num span{ font-size:14px; font-weight:500; color:#6d7381; }
+.mc-sub{ font-size:13px; font-weight:500; color:#6d7381; line-height:1.4; margin-top:auto; }
+
+/* 상태별 — 개입이 필요한 '다른 화면'만 카드째 물들이고, 나머지는 뱃지 색으로만 구분한다.
+   카드 자리는 절대 바뀌지 않는다(학번 순 고정) — 자리가 움직이면 교사가 학생을 못 찾는다 */
+.mcard.st-away{ border-color:#f7b98a; background:#fffaf5; }
+.mcard.st-away .mc-badge{ background:#fff1e6; color:#c2410c; }
+.mcard.st-write .mc-badge{ background:#dff8eb; color:#27724b; }
+.mcard.st-idle .mc-badge{ background:#f1f3f5; color:#52525b; }
+.mcard.st-gap .mc-badge{ background:#eef0f3; color:#6d7381; }
+.mcard.st-submitted{ background:#fafbfc; }
+.mcard.st-submitted .mc-badge{ background:#e9f2ff; color:#3151c4; }
+.mcard.st-submitted .mc-num{ color:#6d7381; }
+.mcard.st-none .mc-name, .mcard.st-nolog .mc-name{ color:#6d7381; }
+.mcard.st-none .mc-num, .mcard.st-nolog .mc-num{ color:#c7cbd3; }
+.mcard.st-none .mc-badge, .mcard.st-nolog .mc-badge{ background:#f6f7f9; color:#9aa0ad; }
+.mcard.st-nolog{ cursor:default; }
+.mcard.st-nolog:hover{ border-color:#dde1e8; box-shadow:none; }
+
+.screen{ display:none; }
+.screen.active{ display:block; }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════ 교사 — 과제 제출 현황(직접 제출 · Figma 295-7609 기준 + 작성 과정 열) ═══════════════ -->
+<div id="scr-teacher-log" class="screen">
+
+  <header class="g-hd">
+    <button class="gh-menu-btn" onclick="toggleNav()"><i data-lucide="panel-left-open" style="width:20px;height:20px"></i></button>
+    <svg width="76" height="16" viewBox="0 0 76 16" fill="none" xmlns="http://www.w3.org/2000/svg" style="cursor:pointer"><path d="M11.3613 4.03516H4.09668V11.9629H8.88281L8.88086 11.9648H15.6016V16H4.02539C1.80242 15.9998 0 14.223 0 12.0322V3.96777C0 1.77696 1.80242 0.000177874 4.02539 0H15.4561L11.3613 4.03516ZM22.0703 11.9648H33.5781V16H22.002C19.7788 16 17.9756 14.2231 17.9756 12.0322V0H22.0703V11.9648ZM40.0459 16H35.9521V0H40.0459V16ZM54.5381 0C56.4564 0 58.0138 1.53228 58.0186 3.42285L58.0166 3.4248V8.54297C58.014 10.4333 56.4567 11.9648 54.5361 11.9648H46.5107L42.416 16V0H54.5381ZM71.9746 0C74.0086 0.000134956 75.6887 1.49046 75.958 3.42285H76V12.5771H75.958C75.6887 14.5095 74.011 15.9999 71.9746 16H64.4238C62.3897 16 60.7098 14.5096 60.4404 12.5771C60.4145 12.398 60.3984 12.2184 60.3984 12.0322V3.96777C60.3984 3.78159 60.4145 3.60205 60.4404 3.42285C60.7098 1.49037 62.3873 0 64.4238 0H71.9746ZM64.4922 12.5771H71.9062V3.42285H64.4922V12.5771ZM46.5107 3.42285V8.54004H53.9238V3.42285H46.5107Z" fill="#365EEF"/></svg>
+    <div class="g-hd-r">
+      <div class="hd-plan">
+        <span class="plan-badge">학교 유료</span>
+        <span style="font-size:15px;font-weight:500;color:#18181b">D-180</span>
+      </div>
+      <div class="credit-wrap"><i data-lucide="bot" style="width:20px;height:20px;color:#416bff"></i><span>200 크레딧</span></div>
+      <button class="user-btn">최대표 선생님(대표교사) <i data-lucide="chevron-down" style="width:16px;height:16px"></i></button>
+    </div>
+  </header>
+
+  <nav class="icon-sb" id="icon-sb">
+    <div class="si"><div class="si-icon"><i data-lucide="home" style="width:20px;height:20px"></i></div><span class="si-label">홈</span><span class="si-tip">홈</span></div>
+    <div class="si"><div class="si-icon"><i data-lucide="scissors" style="width:20px;height:20px"></i></div><span class="si-label">평가 준비</span><span class="si-tip">평가 준비</span></div>
+    <div class="si active"><div class="si-icon"><i data-lucide="layout-grid" style="width:20px;height:20px"></i></div><span class="si-label">수업</span><span class="si-tip">수업</span></div>
+    <div class="si"><div class="si-icon"><i data-lucide="notebook-pen" style="width:20px;height:20px"></i></div><span class="si-label">창의적 체험활동 <span style="font-size:10px;background:#416bff;color:#fff;padding:1px 5px;border-radius:3px;margin-left:2px">Beta</span></span><span class="si-tip">창의적 체험활동</span></div>
+    <div class="si"><div class="si-icon"><i data-lucide="zap" style="width:20px;height:20px"></i></div><span class="si-label">세특 간편 생성기</span><span class="si-tip">세특 간편 생성기</span></div>
+    <div class="si"><div class="si-icon"><i data-lucide="smile" style="width:20px;height:20px"></i></div><span class="si-label">행동특성 및 종합기록</span><span class="si-tip">행동특성 및 종합기록</span></div>
+    <div class="si"><div class="si-icon"><i data-lucide="bar-chart-2" style="width:20px;height:20px"></i></div><span class="si-label">리포트</span><span class="si-tip">리포트</span></div>
+    <div class="si"><div class="si-icon"><i data-lucide="building-2" style="width:20px;height:20px"></i></div><span class="si-label">학교 설정</span><span class="si-tip">학교 설정</span></div>
+    <div class="nav-bottom">
+      <div class="nav-div"></div>
+      <div class="si"><div class="si-icon"><i data-lucide="file-down" style="width:20px;height:20px"></i></div><span class="si-label">매뉴얼 다운로드</span><span class="si-tip">매뉴얼 다운로드</span></div>
+      <div class="si"><div class="si-icon"><i data-lucide="credit-card" style="width:20px;height:20px"></i></div><span class="si-label">요금제</span><span class="si-tip">요금제</span></div>
+      <div class="si"><div class="si-icon"><i data-lucide="help-circle" style="width:20px;height:20px"></i></div><span class="si-label">고객센터</span><span class="si-tip">고객센터</span></div>
+    </div>
+  </nav>
+
+  <div class="main-wrap">
+    <div class="tab-band">
+      <div class="tab-band-inner">
+        <button class="sub-tab">수업 홈</button>
+        <button class="sub-tab">수행평가 설계</button>
+        <button class="sub-tab on">과제물 관리</button>
+        <button class="sub-tab">수행평가 채점</button>
+        <button class="sub-tab">세부능력 및 특기사항 지원</button>
+      </div>
+    </div>
+    <div class="page-wrap">
+
+      <!-- 페이지 헤더 (Figma: Header title_basic) -->
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:16px;padding:20px 0;">
+        <div style="display:flex;flex-direction:column;gap:8px;min-width:0;">
+          <button class="back-link"><i data-lucide="chevron-left" style="width:18px;height:18px;"></i>이전으로</button>
+          <h1 class="page-h1">1학년 1반 과제 제출 현황</h1>
+          <p class="page-sub">주장하는 글 쓰기 과제 제출 현황을 확인하고 파일을 직접 업로드 할 수 있습니다.</p>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;">
+          <!-- 수업 중에 눌러야 하는 버튼이라 목록 위 첫 자리에 둔다 (2026-08-19 올립).
+               사후 로그(작성 과정 열)와 같은 신호를 '아직 진행 중'인 상태로 보는 곳 -->
+          <button class="pill-primary" onclick="openMonitor(0)"><span class="live-dot"></span>실시간 모니터링</button>
+          <button class="pill-outline" onclick="notReady('학급 일괄 업로드')"><i data-lucide="upload" style="width:20px;height:20px;"></i>학급 일괄 업로드</button>
+        </div>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:20px;">
+
+        <!-- 미제출 학생 State_Box (기존 화면 요소) -->
+        <div class="state-box-red">
+          <div class="sbr-title-row">
+            <div class="sbr-title"><i data-lucide="circle-alert"></i>미제출 학생</div>
+            <div class="sbr-recent">
+              <span>07/29 16:30:00 기준</span>
+              <button title="새로고침"><i data-lucide="refresh-cw" style="width:16px;height:16px;"></i></button>
+            </div>
+          </div>
+          <div class="sbr-desc" id="missList"></div>
+        </div>
+
+
+        <!-- 학생 제출 현황 카드 -->
+        <div class="ev-card">
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;">
+            <div style="display:flex;align-items:center;gap:12px;min-width:0;">
+              <!-- '작성 과정 기록 켜짐' 칩 제거 (2026-08-07 올립) — 타이틀 정보량 과다.
+                   열이 상시 노출되므로 켜짐/꺼짐은 셀 값(기록 vs -)으로 드러남 -->
+              <h3 style="font-size:18px;font-weight:600;color:#18181b;margin:0;">학생 제출 현황 <span style="font-size:15px;color:#6d7381;font-weight:500;" id="submitCnt"></span></h3>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px;flex-shrink:0;">
+              <span id="selCount" style="font-size:14px;font-weight:500;color:#6d7381;display:none;">3명 선택</span>
+              <button class="bulk-btn" id="btnBulkDown" disabled onclick="bulkDownload()"><i data-lucide="download" style="width:16px;height:16px"></i>과제물 다운로드</button>
+              <button class="bulk-btn del" id="btnBulkDel" disabled onclick="bulkDelete()"><i data-lucide="trash-2" style="width:16px;height:16px"></i>과제물 삭제</button>
+            </div>
+          </div>
+
+          <div class="tbl-wrap">
+            <table class="tbl2">
+              <thead><tr>
+                <th style="width:68px;"><input type="checkbox" class="chk" id="chkAll" onchange="toggleAll(this)"></th>
+                <th style="width:98px;">학번</th>
+                <th style="width:98px;">이름</th>
+                <th style="width:98px;">상태</th>
+                <th style="width:132px;">최근 제출 일시</th>
+                <!-- '제출 상세' → '제출물' (2026-08-07 올립) — 뱃지가 빠지고 값만 남아
+                     '자세히 보는 곳'이 아니라 '학생이 낸 것'을 가리키는 이름이 맞음 -->
+                <th>제출물</th>
+                <th style="width:186px;" id="thLeave">
+                  <span class="th-help" style="gap:2px;">
+                    <button class="th-sort" id="btnSort" onclick="cycleSort()">작성 과정 <i data-lucide="arrow-up-down" id="sortIcon"></i></button>
+                    <!-- title 속성은 호버로만 떠서 눌러도 반응이 없었다 → 클릭 팝오버로 (2026-08-07 올립) -->
+                    <button class="th-help-btn" onclick="toggleColHelp(this)" aria-label="작성 과정 설명"><i data-lucide="help-circle" style="width:15px;height:15px"></i></button>
+                  </span>
+                </th>
+                <th style="width:168px;">과제물 관리</th>
+              </tr></thead>
+              <tbody id="teacherTbody"></tbody>
+            </table>
+          </div>
+
+          <p id="sortNote" style="display:none;margin:-6px 0 0;font-size:14px;font-weight:500;color:#6d7381;">다른 화면에 머문 시간이 긴 순서로 정렬했어요. 순서는 참고용이고, 많고 적음이 곧 판정은 아니에요.</p>
+        </div>
+      </div>
+    </div>
+
+    <footer class="site-footer">
+      <div class="sf-links"><a href="#" onclick="return false;">회사소개</a><a href="#" onclick="return false;">이용약관</a><a href="#" onclick="return false;">개인정보처리방침</a><a href="#" onclick="return false;">고객센터</a></div>
+      <div class="sf-copy">© 2026. Datadriven Inc. All rights reserved.</div>
+    </footer>
+  </div>
+</div>
+
+
+<!-- ═══════════════ 교사 — 실시간 모니터링 (2026-08-19) ═══════════════ -->
+<div id="scr-monitor" class="screen">
+
+  <header class="g-hd">
+    <button class="gh-menu-btn" onclick="toggleNav()"><i data-lucide="panel-left-open" style="width:20px;height:20px"></i></button>
+    <svg width="76" height="16" viewBox="0 0 76 16" fill="none" xmlns="http://www.w3.org/2000/svg" style="cursor:pointer"><path d="M11.3613 4.03516H4.09668V11.9629H8.88281L8.88086 11.9648H15.6016V16H4.02539C1.80242 15.9998 0 14.223 0 12.0322V3.96777C0 1.77696 1.80242 0.000177874 4.02539 0H15.4561L11.3613 4.03516ZM22.0703 11.9648H33.5781V16H22.002C19.7788 16 17.9756 14.2231 17.9756 12.0322V0H22.0703V11.9648ZM40.0459 16H35.9521V0H40.0459V16ZM54.5381 0C56.4564 0 58.0138 1.53228 58.0186 3.42285L58.0166 3.4248V8.54297C58.014 10.4333 56.4567 11.9648 54.5361 11.9648H46.5107L42.416 16V0H54.5381ZM71.9746 0C74.0086 0.000134956 75.6887 1.49046 75.958 3.42285H76V12.5771H75.958C75.6887 14.5095 74.011 15.9999 71.9746 16H64.4238C62.3897 16 60.7098 14.5096 60.4404 12.5771C60.4145 12.398 60.3984 12.2184 60.3984 12.0322V3.96777C60.3984 3.78159 60.4145 3.60205 60.4404 3.42285C60.7098 1.49037 62.3873 0 64.4238 0H71.9746ZM64.4922 12.5771H71.9062V3.42285H64.4922V12.5771ZM46.5107 3.42285V8.54004H53.9238V3.42285H46.5107Z" fill="#365EEF"/></svg>
+    <div class="g-hd-r">
+      <div class="hd-plan">
+        <span class="plan-badge">학교 유료</span>
+        <span style="font-size:15px;font-weight:500;color:#18181b">D-180</span>
+      </div>
+      <div class="credit-wrap"><i data-lucide="bot" style="width:20px;height:20px;color:#416bff"></i><span>200 크레딧</span></div>
+      <button class="user-btn">최대표 선생님(대표교사) <i data-lucide="chevron-down" style="width:16px;height:16px"></i></button>
+    </div>
+  </header>
+
+  <nav class="icon-sb" id="icon-sb2">
+    <div class="si"><div class="si-icon"><i data-lucide="home" style="width:20px;height:20px"></i></div><span class="si-label">홈</span><span class="si-tip">홈</span></div>
+    <div class="si"><div class="si-icon"><i data-lucide="scissors" style="width:20px;height:20px"></i></div><span class="si-label">평가 준비</span><span class="si-tip">평가 준비</span></div>
+    <div class="si active"><div class="si-icon"><i data-lucide="layout-grid" style="width:20px;height:20px"></i></div><span class="si-label">수업</span><span class="si-tip">수업</span></div>
+    <div class="si"><div class="si-icon"><i data-lucide="notebook-pen" style="width:20px;height:20px"></i></div><span class="si-label">창의적 체험활동 <span style="font-size:10px;background:#416bff;color:#fff;padding:1px 5px;border-radius:3px;margin-left:2px">Beta</span></span><span class="si-tip">창의적 체험활동</span></div>
+    <div class="si"><div class="si-icon"><i data-lucide="zap" style="width:20px;height:20px"></i></div><span class="si-label">세특 간편 생성기</span><span class="si-tip">세특 간편 생성기</span></div>
+    <div class="si"><div class="si-icon"><i data-lucide="smile" style="width:20px;height:20px"></i></div><span class="si-label">행동특성 및 종합기록</span><span class="si-tip">행동특성 및 종합기록</span></div>
+    <div class="si"><div class="si-icon"><i data-lucide="bar-chart-2" style="width:20px;height:20px"></i></div><span class="si-label">리포트</span><span class="si-tip">리포트</span></div>
+    <div class="si"><div class="si-icon"><i data-lucide="building-2" style="width:20px;height:20px"></i></div><span class="si-label">학교 설정</span><span class="si-tip">학교 설정</span></div>
+    <div class="nav-bottom">
+      <div class="nav-div"></div>
+      <div class="si"><div class="si-icon"><i data-lucide="file-down" style="width:20px;height:20px"></i></div><span class="si-label">매뉴얼 다운로드</span><span class="si-tip">매뉴얼 다운로드</span></div>
+      <div class="si"><div class="si-icon"><i data-lucide="credit-card" style="width:20px;height:20px"></i></div><span class="si-label">요금제</span><span class="si-tip">요금제</span></div>
+      <div class="si"><div class="si-icon"><i data-lucide="help-circle" style="width:20px;height:20px"></i></div><span class="si-label">고객센터</span><span class="si-tip">고객센터</span></div>
+    </div>
+  </nav>
+
+  <div class="main-wrap">
+    <div class="tab-band">
+      <div class="tab-band-inner">
+        <button class="sub-tab">수업 홈</button>
+        <button class="sub-tab">수행평가 설계</button>
+        <button class="sub-tab on">과제물 관리</button>
+        <button class="sub-tab">수행평가 채점</button>
+        <button class="sub-tab">세부능력 및 특기사항 지원</button>
+      </div>
+    </div>
+    <div class="page-wrap">
+
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:16px;padding:20px 0;">
+        <div style="display:flex;flex-direction:column;gap:8px;min-width:0;">
+          <button class="back-link" onclick="go('teacher-log')"><i data-lucide="chevron-left" style="width:18px;height:18px;"></i>제출 현황으로</button>
+          <h1 class="page-h1">1학년 1반 실시간 모니터링</h1>
+          <p class="page-sub">주장하는 글 쓰기 과제를 쓰는 동안, 지금 누가 어디에 있는지 확인할 수 있습니다.</p>
+        </div>
+      </div>
+
+      <div style="display:flex;flex-direction:column;gap:16px;padding-bottom:8px;">
+
+        <!-- 안내는 조작·목록보다 앞에 둔다 — 무엇을 볼 수 있고 없는지 먼저 읽히게 -->
+        <div class="info-box">
+          <i data-lucide="info"></i>
+          <p>학생 화면을 보여주지는 않아요. <b>클리포를 벗어났는지</b>와 <b>글자 수가 늘고 있는지</b>만 알 수 있어요. 방문한 사이트와 답안 내용, 다른 기기를 쓴 것은 알 수 없어요.</p>
+        </div>
+
+        <div class="mbar">
+          <div class="mb-clock">
+            <span class="mb-time" id="mClock">14:00</span>
+            <span class="mb-elapsed" id="mElapsed">시작 후 0분 · 50분 수업</span>
+          </div>
+          <div class="mb-chips" id="mChips"></div>
+          <div class="mb-ctrl">
+            <span class="mb-note">5초마다 갱신</span>
+            <button class="pill-outline" id="mPause" onclick="toggleLive()"><i data-lucide="pause" style="width:18px;height:18px;"></i>멈춤</button>
+          </div>
+        </div>
+
+        <div class="mgrid" id="mGrid"></div>
+
+        <p style="margin:0;font-size:14px;font-weight:500;color:#8a8f9a;">카드를 누르면 그 학생이 지금까지 쓴 과정을 볼 수 있어요.</p>
+      </div>
+    </div>
+
+    <footer class="site-footer">
+      <div class="sf-links"><a href="#" onclick="return false;">회사소개</a><a href="#" onclick="return false;">이용약관</a><a href="#" onclick="return false;">개인정보처리방침</a><a href="#" onclick="return false;">고객센터</a></div>
+      <div class="sf-copy">© 2026. Datadriven Inc. All rights reserved.</div>
+    </footer>
+  </div>
+</div>
+
+<!-- 토스트 -->
+<div id="toast" class="toast"><i data-lucide="circle-check-big" style="width:20px;height:20px;color:white;flex-shrink:0;"></i><span id="toastMsg"></span></div>
+
+<!-- 삭제 확인 모달 -->
+<!-- 작성 과정 열 설명 팝오버 — 문구는 평가 설계 안내와 같은 내용으로 맞춘다 -->
+<div id="colHelp">
+  <p class="ch-t">작성 과정</p>
+  <ul>
+    <li>답안을 쓰는 동안 <b>다른 화면에 다녀온 시각과 머문 시간</b>, 글자 수가 어떻게 늘고 줄었는지가 남아요.</li>
+    <li>방문한 사이트와 답안 내용은 저장하지 않아요. 스마트폰 같은 다른 기기를 쓴 것도 알 수 없고요.</li>
+    <li>시스템은 있었던 일만 남겨요. 부정행위인지는 판단하지 않아요.</li>
+  </ul>
+</div>
+
+<!-- 작성 과정 팝업 — 타임라인은 가로가 넓어야 읽혀서 넓은 모달로 (2026-08-07 회의) -->
+<div class="md-ov" id="pcModal" onclick="if(event.target===this) closeProcess()">
+  <div class="pc">
+    <div class="pc-hd">
+      <div>
+        <p class="pc-t" id="pcTitle">10101 김서윤 · 작성 과정</p>
+        <p class="pc-s" id="pcSum"></p>
+      </div>
+      <button class="pc-x" onclick="closeProcess()" title="닫기"><i data-lucide="x" style="width:20px;height:20px"></i></button>
+    </div>
+    <div class="pc-bd" id="pcBody"></div>
+  </div>
+</div>
+
+<div class="md-ov" id="delModal" onclick="if(event.target===this) closeDel()">
+  <div class="md">
+    <div class="md-body">
+      <div class="md-ic"><i data-lucide="trash-2"></i></div>
+      <p class="md-t"><span id="delCount">3명</span>의 과제물을 삭제할까요?</p>
+      <!-- 작성 과정은 과제물에 딸린 기록이라 함께 사라진다 — 안 적어두면 교사가 모르고 지움 (2026-08-11) -->
+      <p class="md-d">삭제한 과제물은 <b>되돌릴 수 없어요.</b><br>이미 매긴 점수와 피드백은 그대로 남지만, 채점 근거가 된 답안과 <b>작성 과정 기록</b>은 볼 수 없게 돼요.</p>
+      <div class="md-names" id="delNames"></div>
+    </div>
+    <div class="md-ft">
+      <button class="md-cancel" onclick="closeDel()">취소</button>
+      <button class="md-ok" onclick="confirmDel()">삭제</button>
+    </div>
+  </div>
+</div>
+
+<!-- 목업 내비게이터 -->
+<div id="mockpick">
+  <div class="mp-head" onclick="mpToggle(event)"><span>목업 내비게이터 · 작성 과정 기록 (CLIPO)</span><span id="mpArrow">▾</span></div>
+  <div class="mp-body" id="mpBody">
+    <div class="mp-cap">과제 설정 (평가 설계에서 정함)</div>
+
+    <div class="mp-cap">눈여겨볼 케이스</div>
+    <button class="mp-btn" onclick="openCase('10101')">김서윤 · 재제출<span class="mp-sub">작성 구간 2개 · 누적 보존</span></button>
+    <button class="mp-btn" onclick="openCase('10103')">박지민 · 이탈 잦음<span class="mp-sub">이탈 후 계단식 급증</span></button>
+    <button class="mp-btn" onclick="openCase('10102')">이준호 · 기록 공백<span class="mp-sub">네트워크 끊김 구간</span></button>
+    <button class="mp-btn" onclick="openCase('10105')">정현우 · 이탈 없음<span class="mp-sub">멈춤·삭제가 남은 곡선</span></button>
+    <button class="mp-btn" onclick="openCase('10106')">한지우 · 작성 3회<span class="mp-sub">미제출 · 구간 3개는 세로 배치</span></button>
+
+    <div class="mp-cap">이어지는 화면</div>
+    <button class="mp-btn" onclick="location.href='student_submit_v1_260729.html'">학생 · 과제 제출<span class="mp-sub">문항형 · 이동 감지 실동작</span></button>
+    <button class="mp-btn" onclick="location.href='task_direct_write_v1_260729.html'">교사 · 평가 설계<span class="mp-sub">제출 방식 · 문항 작성</span></button>
+
+    <div class="mp-note">※ 기록 단위는 <b style="color:#C9CCE0;">작성 구간</b>(답안 화면을 열어 닫을 때까지)이라, 재제출·이어쓰기는 구간이 하나 더 붙습니다. 구간은 누적 보존되고 목록 요약은 전체 합산이에요. 켜고 끄는 건 <b style="color:#C9CCE0;">평가 설계</b>에서만 정하고, 첫 제출이 들어오면 잠깁니다. 채점 화면에는 진입점을 두지 않아요(점수 편향 방지).</div>
+  </div>
+</div>
+
+<script>
+/* ───────── 씬 전환 (해시 라우팅) ───────── */
+function go(scene){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById('scr-'+scene).classList.add('active');
+  if(location.hash !== '#'+scene) history.replaceState(null,'','#'+scene);
+  if(scene==='teacher-log') renderTeacher();
+  if(scene==='monitor'){ startLive(); } else { stopLive(); }
+  window.scrollTo(0,0);
+  lucide.createIcons();
+}
+window.addEventListener('hashchange', ()=>{ const h=location.hash.slice(1); if(h && document.getElementById('scr-'+h)) go(h); });
+function fmtDur(s){ return s>=60 ? Math.floor(s/60)+'분'+(s%60? ' '+s%60+'초':'') : s+'초'; }
+function hm(base, min){ const p=base.split(':').map(Number); const t=p[0]*60+p[1]+Math.round(min); return String(Math.floor(t/60)).padStart(2,'0')+':'+String(t%60).padStart(2,'0'); }
+
+function notReady(name){
+  const t = document.getElementById('toast');
+  document.getElementById('toastMsg').textContent = name+'은(는) 이 목업에 포함되지 않았어요.';
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), 2000);
+}
+function toastMsg(msg){
+  const t = document.getElementById('toast');
+  document.getElementById('toastMsg').textContent = msg;
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'), 2200);
+}
+
+/* ───────── 교사 화면 데이터 ─────────
+   sessions[] = 작성 구간. series = 1분 간격 글자 수(정수, null=기록 공백).
+   events[].at = 구간 시작 후 경과 분. 복귀 후 증가량은 series에서 계산한다(수기 입력 금지).
+
+   events[].type = 브라우저가 실제로 구분할 수 있는 종류만 쓴다 (2026-08-11 제이콥 확인).
+     '화면 안 보임'   — 페이지가 화면에 보이지 않음 (visibilitychange)
+     '포커스 벗어남'  — 페이지는 보이지만 클리포에 포커스가 없음 (blur)
+     'gap'            — 네트워크 끊김으로 기록하지 못한 구간
+   ※ '탭 전환'·'다른 창 이동'은 폐기 — 브라우저가 알려주지 않는 추론이었음.
+      교사 화면에는 종류를 노출하지 않고 `다른 화면`으로 통일해 보여준다. */
+const teacherRows = [
+  { id:'10101', name:'김서윤', status:'제출', date:'07/29 16:25 학생 제출', type:'text', detail:'868자',
+    sessions:[
+      { date:'07/28', start:'14:00', submitted:true,
+        series:[0,8,24,41,55,55,70,96,118,130,126,145,168,190,190,205,232,255,248,270,295,318,318,335,360,382,400,395,415,440,462,470,470,488,510,533,528,550,572,595,610,610,632,655,670,665,688,710,730,748,762,772,780],
+        events:[ {at:31, type:'화면 안 보임', dur:45, burstSec:35} ] },
+      { date:'07/29', start:'09:10', submitted:true,
+        series:[780,782,790,788,800,815,812,828,840],
+        events:[] },
+      { date:'07/29', start:'16:20', submitted:true,
+        series:[840,841,848,856,861,868],
+        events:[] }
+    ] },
+  { id:'10102', name:'이준호', status:'제출', date:'07/28 14:48 학생 제출', type:'text', detail:'542자',
+    sessions:[
+      { name:'작성', date:'07/28', start:'14:00', submitted:true,
+        series:[0,10,26,40,38,52,70,88,100,98,115,132,140,142,158,175,190,186,200,null,null,null,228,245,262,258,275,292,305,320,318,335,352,368,380,378,395,412,428,440,438,455,470,485,498,510,520,532,542],
+        events:[ {at:12, type:'화면 안 보임', dur:32, burstSec:40}, {at:19, type:'gap', dur:180}, {at:33, type:'포커스 벗어남', dur:15, burstSec:45} ] }
+    ] },
+  /* ── 박지민 = 어노테이션용 전 케이스 집합 (2026-08-11 올립) ──
+     화면에 나올 수 있는 모든 상황을 한 학생에 몰아 담았다. 어노테이션 상세를 쓸 때
+     이 케이스 하나만 열면 모든 표기를 설명할 수 있게 하는 것이 목적.
+       구간1 · 이탈 4종(짧은 것 포함) · 급증 있음/없음 · 글자 수 감소 · 네트워크 공백 · 제출
+       구간2 · 30분 방치(총 작성 시간에서 제외) · 저장 전 종료로 끝이 공백 → 작성 끊김
+       구간3 · 이어 쓰고 재제출
+     ※ series는 1분 간격. 값이 그대로면 안 쓴 시간, 줄어들면 지운 것 */
+  { id:'10103', name:'박지민', status:'제출', date:'07/29 09:54 학생 제출', type:'text', detail:'512자',
+    sessions:[
+      /* 구간 1 — 이탈이 잦고, 돌아올 때마다 계단식으로 뛴다 */
+      { name:'작성', date:'07/28', start:'14:00', submitted:true,
+        series:[0,0,6,10,10,10,62,70,74,78,78,80,130,138,142,146,150,154,154,156,200,206,210,214,214,216,258,262,266,270,274,274,276,318,322,326,330,334,338,342,336,330,372,376,378,380,382,383,384,385,386,386,387,387,388,388],
+        events:[
+          {at:3,  type:'화면 안 보임',  dur:2},                    /* 3초 미만도 기록 — 임계값 폐기 */
+          {at:10, type:'화면 안 보임',  dur:41, burstSec:15},      /* 돌아온 직후 급증 */
+          {at:18, type:'포커스 벗어남', dur:12, burstSec:30},      /* 종류 ② */
+          {at:24, type:'화면 안 보임',  dur:58, burstSec:18},
+          {at:31, type:'gap',          dur:180},                  /* 네트워크 끊김 */
+          {at:40, type:'포커스 벗어남', dur:29}                    /* 돌아왔지만 이어 쓴 구간 없음 */
+        ] },
+      /* 구간 2 — 열어두고 30분 넘게 방치했고, 저장 전에 창을 닫아 끝이 비었다 */
+      { name:'작성', date:'07/28', start:'16:30', submitted:false,
+        series:[388,392,398,404,404,404,404,404,404,404,404,404,404,404,404,404,404,404,404,404,404,404,404,404,404,404,404,404,404,404,404,404,404,404,404,404,410,418,null,null,null],
+        events:[ {at:36, type:'화면 안 보임', dur:35, burstSec:20},
+                 {at:38, type:'gap', dur:180} ] },   /* 저장 전에 닫혀 못 올라간 구간 */
+      /* 구간 3 — 다음 날 다시 들어와 이어 쓰고 재제출 */
+      { name:'작성', date:'07/29', start:'09:40', submitted:true,
+        series:[418,426,440,452,448,462,478,492,488,500,506,510,512,512,512],
+        events:[ {at:4, type:'포커스 벗어남', dur:52, burstSec:25} ] }
+    ] },
+  /* 파일 최대 5개 케이스 — 셀이 얼마나 길어지는지 확인용 */
+  { id:'10104', name:'최유진', status:'제출', date:'07/28 14:51 학생 제출', type:'file', detail:'10104_최유진.pdf' },
+  { id:'10105', name:'정현우', status:'제출', date:'07/28 14:44 학생 제출', type:'text', detail:'634자',
+    sessions:[
+      { name:'작성', date:'07/28', start:'14:00', submitted:true,
+        series:[0,12,30,48,44,60,80,100,96,115,135,155,150,170,190,210,205,225,245,262,258,278,298,315,310,330,350,368,362,382,402,420,415,435,455,472,468,488,508,525,540,558,578,606,634],
+        events:[] }
+    ] },
+  { id:'10109', name:'임도윤', status:'제출', date:'07/28 16:10 선생님 제출', type:'file', detail:'10109_임도윤.pdf 외 1', teacherUpload:true },
+  /* 여러 날에 걸쳐 나눠 쓴 케이스 — 세션 3개가 한 타임라인에 이어 붙는다 */
+  { id:'10106', name:'한지우', status:'제출 완료', date:'07/29 09:05 학생 제출', type:'text', detail:'812자',
+    sessions:[
+      { date:'07/28', start:'15:10', submitted:false,
+        series:[0,15,35,55,50,72,95,118,112,135,160,182,178,200,225,248,242,265,290,312,330,330,352,375,398,392,415,438,460,455,478,500,520],
+        events:[ {at:20, type:'화면 안 보임', dur:65, burstSec:50} ] },
+      { date:'07/28', start:'16:30', submitted:false,
+        series:[520,528,545,562,558,578,598,615,610,630,648,665,660,678,690],
+        events:[] },
+      { date:'07/29', start:'08:50', submitted:true,
+        series:[690,698,715,732,728,748,765,782,778,795,805,808,812],
+        events:[ {at:5, type:'화면 안 보임', dur:22, burstSec:55} ] }
+    ] },
+  { id:'10107', name:'조민재', status:'미제출' },
+  { id:'10108', name:'윤하은', status:'미제출' }
+];
+
+/* ───────── 학급 인원 채우기 (2026-08-19) ─────────
+   위 9명은 케이스별로 손으로 쓴 데이터라 그대로 둔다. 5열 그리드에 한 반이 들어오는지
+   보려면 실제 학급 규모가 필요해 뒤에 15명을 붙인다. 데이터 모양은 위와 같고
+   곡선만 학번에서 뽑은 값으로 만든다(열 때마다 같은 결과). */
+function lcg(seed){ let s = seed % 2147483647; if(s <= 0) s += 2147483646;
+  return function(){ s = s * 16807 % 2147483647; return (s-1)/2147483646; }; }
+
+function genRow(id, name, opt){
+  opt = opt || {};
+  if(opt.miss) return { id:id, name:name, status:'미제출' };
+  const rnd = lcg(parseInt(id,10) * 7);
+  const mins = 34 + Math.floor(rnd()*14);
+  const rate = 11 + Math.floor(rnd()*9);
+  const series = [0]; let v = 0;
+  for(let i=1;i<=mins;i++){
+    const r = rnd();
+    if(r < .12) v += 0;                              /* 손을 멈춘 분 */
+    else if(r < .18) v -= Math.floor(rnd()*8);       /* 지운 분 */
+    else v += Math.round(rate * (.6 + rnd()*.9));
+    series.push(Math.max(0, v));
+  }
+  const events = [];
+  const n = (opt.leaves != null) ? opt.leaves : Math.floor(rnd()*3);
+  for(let k=0;k<n;k++){
+    events.push({ at: 4 + Math.floor(rnd()*(mins-8)),
+                  type: rnd() < .6 ? '화면 안 보임' : '포커스 벗어남',
+                  dur: 8 + Math.floor(rnd()*70) });
+  }
+  events.sort(function(a,b){ return a.at - b.at; });
+  return { id:id, name:name, status:'제출', date:'07/28 ' + hm('14:00', mins) + ' 학생 제출',
+    type:'text', detail: series[series.length-1] + '자',
+    sessions:[{ name:'작성', date:'07/28', start:'14:00', submitted:true, series:series, events:events }] };
+}
+[ ['10110','강민서'], ['10111','고은우'], ['10112','권나윤'], ['10113','김태준'],
+  ['10114','노시현'], ['10115','문예린',{leaves:3}], ['10116','배준서'], ['10117','신아영'],
+  ['10118','오지호',{miss:true}], ['10119','유하람'], ['10120','장서연'], ['10121','전도현'],
+  ['10122','정예준',{leaves:4}], ['10123','차하은'], ['10124','홍시우',{miss:true}]
+].forEach(function(a){ teacherRows.push(genRow(a[0], a[1], a[2])); });
+
+/* ───────── 실시간 모니터링 (2026-08-19) ─────────
+   사후 로그와 같은 신호를 '아직 끝나지 않은' 상태로 보여준다. 화면 미러링은 없다.
+   상태는 시스템이 실제로 아는 것에서만 나온다:
+     다른 화면 = visibilitychange·blur 가 살아 있는 동안
+     기록 끊김 = 표본이 올라오지 않는 동안 (원인은 모름)
+     멈춤      = 글자 수가 2분 이상 그대로 (왜인지는 판단하지 않음)
+   ※ 목업이라 5초마다 수업 시간이 1분씩 흐른다. 실제는 5초 표본 그대로. */
+const CLASS_START = '14:00', CLASS_MIN = 50, TICK_MS = 5000;
+const LIVE_LABEL = {
+  write:'작성 중', idle:'멈춤', away:'다른 화면', gap:'기록 끊김',
+  submitted:'제출 완료', none:'미시작', nolog:'기록 없음'
+};
+let live = null, liveTimer = null, livePaused = false;
+
+function initLive(startAt){
+  live = { min:0, students: teacherRows.map(function(r){
+    return {
+      id:r.id, name:r.name,
+      rate: 9 + (parseInt(r.id,10) % 11),
+      /* 파일로 낸 학생만 작성 기록이 없다. r.status(제출/미제출)는 수업이 끝난 뒤의 값이라
+         수업 중 화면에서는 쓰지 않는다 - 지금은 모두가 쓰고 있는 중이다 (2026-08-19) */
+      hasLog: !(r.type === 'file' || r.teacherUpload),
+      rnd: lcg(parseInt(r.id,10) * 13 + 5),
+      state:'none', series:[0], events:[], back:0, submitAt:null
+    };
+  }) };
+  for(let i=0;i<(startAt||0);i++) stepLive();
+}
+
+function stepLive(){
+  if(!live || live.min >= CLASS_MIN) return;
+  live.min += 1;
+  const m = live.min;
+  live.students.forEach(function(st){
+    if(!st.hasLog) return;
+    const last = liveChars(st);
+    if(st.state === 'submitted'){ st.series.push(last); return; }
+    const rnd = st.rnd;
+
+    if(st.state === 'none'){                       /* 아직 답안 화면을 안 열었다 */
+      if(rnd() < .72) st.state = 'write';
+      st.series.push(last);
+      return;
+    }
+    if(st.state === 'away' || st.state === 'gap'){
+      const e = st.events[st.events.length-1];
+      e.dur += 60;
+      st.series.push(st.state === 'gap' ? null : last);
+      if(rnd() < (st.state === 'gap' ? .5 : .42)){ e.open = false; st.state = 'write'; st.back = m; }
+      return;
+    }
+
+    /* 작성 중 */
+    const r = rnd();
+    if(m >= 30 && r < .10){ st.state = 'submitted'; st.submitAt = m; st.series.push(last); return; }
+    if(r < .13){
+      st.state = 'away';
+      st.events.push({ at:m, type: rnd() < .6 ? '화면 안 보임' : '포커스 벗어남', dur:60, open:true });
+      st.series.push(last); return;
+    }
+    if(r < .155){
+      st.state = 'gap';
+      st.events.push({ at:m, type:'gap', dur:60, open:true });
+      st.series.push(null); return;
+    }
+    if(r < .30){ st.series.push(last); return; }   /* 손이 멈춘 분 */
+    const boost = (st.back && m - st.back <= 2) ? 2.1 : 1;   /* 돌아온 직후는 이어 쓰는 양이 많다 */
+    st.series.push(last + Math.round(st.rate * boost * (.6 + rnd()*.9)));
+  });
+}
+
+function liveChars(st){
+  for(let i = st.series.length-1; i >= 0; i--){ if(st.series[i] !== null) return st.series[i]; }
+  return 0;
+}
+function liveState(st){
+  if(!st.hasLog) return 'nolog';
+  if(st.state !== 'write') return st.state;
+  const s = st.series; let same = 0;
+  for(let i = s.length-1; i > 0; i--){
+    if(s[i] !== null && s[i] === s[i-1]) same++; else break;
+  }
+  return same >= 2 ? 'idle' : 'write';
+}
+function liveOpenMin(st){
+  const e = st.events[st.events.length-1];
+  return (e && e.open) ? Math.max(1, Math.round(e.dur/60)) : 0;
+}
+function liveSubText(st, k){
+  const s = st.series;
+  if(k === 'nolog')     return '파일로 낸 과제예요';
+  if(k === 'none')      return '아직 답안 화면을 안 열었어요';
+  if(k === 'submitted') return hm(CLASS_START, st.submitAt) + ' 제출';
+  if(k === 'away')      return liveOpenMin(st) + '분째';
+  if(k === 'gap')       return liveOpenMin(st) + '분째 · 원인은 알 수 없어요';
+  if(k === 'idle'){
+    let same = 0;
+    for(let i = s.length-1; i > 0; i--){ if(s[i] !== null && s[i] === s[i-1]) same++; else break; }
+    return same + '분째 그대로';
+  }
+  const a = s[s.length-1], b = s[s.length-2];
+  const d = (a !== null && b != null) ? a - b : 0;
+  /* '+0자'는 늘었다는 말처럼 읽힌다 - 안 늘었으면 안 늘었다고 쓴다 */
+  return d === 0 ? '1분째 그대로' : '1분 동안 ' + (d > 0 ? '+' : '') + d + '자';
+}
+
+function renderLive(){
+  if(!live) return;
+  document.getElementById('mClock').textContent = hm(CLASS_START, live.min);
+  document.getElementById('mElapsed').textContent =
+    (live.min >= CLASS_MIN ? '수업 끝' : '시작 후 ' + live.min + '분') + ' · ' + CLASS_MIN + '분 수업';
+
+  const cnt = { write:0, idle:0, away:0, gap:0, submitted:0, none:0, nolog:0 };
+  let cards = '';
+  live.students.forEach(function(st){
+    const k = liveState(st);
+    cnt[k]++;
+    const chars = st.hasLog ? liveChars(st) : null;
+    cards += '<button class="mcard st-' + k + '" onclick="openLive(&#39;' + st.id + '&#39;)">'
+      + '<div class="mc-top"><span class="mc-name">' + st.name + '</span>'
+      +   '<span class="mc-id">' + st.id + '</span></div>'
+      + '<span class="mc-badge">' + LIVE_LABEL[k] + '</span>'
+      + '<div class="mc-num">' + (chars === null ? '–' : chars.toLocaleString()) + '<span>자</span></div>'
+      + '<div class="mc-sub">' + liveSubText(st, k) + '</div>'
+      + '</button>';
+  });
+  document.getElementById('mGrid').innerHTML = cards;
+
+  /* 지금 볼 것부터 왼쪽에 — 개입이 필요한 순서다 */
+  const order = [['away','#ea580c'], ['gap','#9aa0ad'], ['idle','#8a8f9a'], ['write','#319d64'],
+                 ['submitted','#416bff'], ['none','#c7cbd3'], ['nolog','#dde1e8']];
+  document.getElementById('mChips').innerHTML = order.map(function(o){
+    const k = o[0];
+    return '<span class="mchip' + (k === 'away' && cnt[k] ? ' hot' : '') + '">'
+      + '<i class="mc-dot" style="background:' + o[1] + '"></i>' + LIVE_LABEL[k] + ' <b>' + cnt[k] + '</b></span>';
+  }).join('');
+  lucide.createIcons();
+}
+
+function startLive(){
+  if(!live) initLive(0);
+  renderLive();
+  stopTimer();
+  if(!livePaused) liveTimer = setInterval(function(){
+    if(live.min >= CLASS_MIN){ stopTimer(); renderLive(); return; }
+    stepLive(); renderLive();
+  }, TICK_MS);
+  syncPauseBtn();
+}
+function stopTimer(){ if(liveTimer){ clearInterval(liveTimer); liveTimer = null; } }
+function stopLive(){ stopTimer(); }
+function toggleLive(){ livePaused = !livePaused; startLive(); }
+function syncPauseBtn(){
+  const b = document.getElementById('mPause');
+  if(!b) return;
+  b.innerHTML = '<i data-lucide="' + (livePaused ? 'play' : 'pause') + '" style="width:18px;height:18px;"></i>'
+    + (livePaused ? '이어보기' : '멈춤');
+  lucide.createIcons();
+}
+/* 화면 진입 — startAt 만큼 수업이 지난 상태에서 시작한다 (케이스 시연용) */
+function openMonitor(startAt){
+  livePaused = false;
+  initLive(startAt || 0);
+  go('monitor');
+}
+
+/* 카드 → 지금까지의 작성 과정. 사후 로그와 같은 컴포넌트를 그대로 쓴다 */
+function openLive(id){
+  const st = live.students.find(function(x){ return x.id === id; });
+  if(!st) return;
+  if(!st.hasLog){ toastMsg(st.name + ' 학생은 파일로 낸 과제라 작성 기록이 없어요.'); return; }
+  if(st.series.filter(function(v){ return v !== null; }).length < 2){
+    toastMsg(st.name + ' 학생은 아직 답안 화면을 열지 않았어요.'); return;
+  }
+  const sessions = [{ name:'작성', date:'07/28', start:CLASS_START,
+    submitted: st.state === 'submitted', series: st.series, events: st.events }];
+  const row = { id:st.id, name:st.name, sessions:sessions };
+  const vals = st.series.filter(function(v){ return v !== null; });
+  const maxVal = Math.max.apply(null, vals);
+  const leaves = st.events.filter(function(e){ return e.type !== 'gap'; });
+  const cnt = leaves.length;
+  const sec = leaves.reduce(function(a,e){ return a + e.dur; }, 0);
+
+  document.getElementById('pcTitle').textContent = st.id + ' ' + st.name + ' · 작성 과정';
+  document.getElementById('pcSum').textContent =
+    (st.state === 'submitted' ? '제출 완료' : '작성 중')
+    + ' · ' + (cnt ? '이탈 ' + cnt + '회 · ' + fmtDur(sec) : '이탈 없음')
+    + ' · ' + hm(CLASS_START, live.min) + ' 기준';
+  document.getElementById('pcBody').innerHTML =
+      '<div class="ld-legend">'
+      + '<span><i class="lg-line"></i>글자 수</span>'
+      + '<span><i class="lg-swatch" style="background:#fff1e6;border:1px solid #f7d3ba;"></i>다른 화면</span>'
+      + '<span><i class="lg-swatch" style="background:#eef0f3;border:1px solid #dde1e8;"></i>기록 공백</span>'
+      + '<span><i class="lg-line" style="border-top:2px solid #319d64;"></i>제출</span>'
+    + '</div>'
+    + studentBlock(row, sessions, maxVal)
+    + '<div class="ld-evt-wrap">'
+      + '<div class="leave-evt evt-head"><span class="leave-evt-time">시각</span>'
+      + '<span class="leave-evt-type">구분</span>'
+      + '<span class="leave-evt-dur">이탈 시간</span>'
+      + '<span class="leave-evt-gain">돌아온 뒤 이어 쓴 양</span></div>'
+      + (evtList(sessions) || '<div class="leave-evt"><span class="leave-evt-note">아직 남은 일이 없어요.</span></div>')
+    + '</div>';
+  document.getElementById('pcModal').classList.add('show');
+  lucide.createIcons();
+}
+
+/* 로그는 모든 직접 제출 과제에 상시 수집 (2026-08-10 회의) — 과제별 on/off 없음 */
+/* openRow — 팝업으로 전환하며 제거 (2026-08-07) */
+let sortMode = 'default';   /* default | leaveDesc */
+
+/* ───────── 파생값 (모두 series·events에서 계산) ───────── */
+function sessMinutes(s){ return s.series.length - 1; }
+/* 총 작성 시간에서 빼는 구간 — 30분 이상 글자 수가 그대로면 '쓰고 있던 시간'으로 세지 않는다
+   (2026-08-11 제이콥). 구간을 끊는 게 아니라 계산에서만 빼는 것 */
+const IDLE_MIN = 30;
+function sessIdleMinutes(s){
+  let idle = 0, runStart = 0;
+  for(let i = 1; i < s.series.length; i++){
+    const same = s.series[i] !== null && s.series[i-1] !== null && s.series[i] === s.series[i-1];
+    if(same) continue;
+    const run = (i-1) - runStart;
+    if(run >= IDLE_MIN) idle += run;
+    runStart = i;
+  }
+  const tail = (s.series.length-1) - runStart;
+  if(tail >= IDLE_MIN) idle += tail;
+  return idle;
+}
+function sessWriteMinutes(s){ return sessMinutes(s) - sessIdleMinutes(s); }
+function sessEvents(s){ return (s.events||[]).filter(e=>e.type!=='gap'); }
+function sessLeaveSec(s){ return sessEvents(s).reduce((a,e)=>a+e.dur, 0); }
+function rowSessions(r){ return (!r.teacherUpload && r.sessions) ? r.sessions : []; }
+function rowLeaveCount(r){ return rowSessions(r).reduce((a,s)=>a+sessEvents(s).length, 0); }
+function rowLeaveSec(r){ return rowSessions(r).reduce((a,s)=>a+sessLeaveSec(s), 0); }
+function rowHasGap(r){ return rowSessions(r).some(s=>(s.events||[]).some(e=>e.type==='gap')); }
+
+/* series에서 값 읽기 — 기록 공백(null)은 뒤로 걸어가며 가장 가까운 값을 쓴다 */
+function seriesAt(series, i){
+  i = Math.max(0, Math.min(series.length-1, Math.round(i)));
+  for(let k=i; k<series.length; k++){ if(series[k]!==null) return series[k]; }
+  for(let k=i; k>=0; k--){ if(series[k]!==null) return series[k]; }
+  return 0;
+}
+/* 이탈에서 돌아온 뒤 window분 동안 늘어난 글자 수 */
+/* 시:분:초 — 제이콥 예시 형식(14:31:00 ~ 14:31:45)에 맞춰 초까지 표기 */
+function hms(start, mins, addSec){
+  const [h0, m0] = start.split(':').map(Number);
+  const total = h0*3600 + m0*60 + Math.round(mins*60) + (addSec || 0);
+  const h = Math.floor(total/3600) % 24, m = Math.floor(total/60) % 60, s = total % 60;
+  return String(h).padStart(2,'0')+':'+String(m).padStart(2,'0')+':'+String(s).padStart(2,'0');
+}
+/* 돌아온 뒤 '쉬지 않고 이어 쓴 구간' — 고정 5분 창을 버리고 구간을 데이터에서 잘라낸다
+   (2026-08-11 제이콥 제안). 증가 속도가 기준 아래로 떨어지면 구간을 닫는다.
+   ※ 실제 서비스는 5초 간격 표본이라 구간이 초 단위로 잡힌다. 이 목업의 곡선은 1분 간격이라
+     길이만 e.burstSec(5초 해상도로 봤을 때의 값)으로 대신 표시하고, 글자 수는 곡선에서 계산한다. */
+const BURST_MIN = 20;   /* 분당 증가량이 이 아래로 떨어지면 구간을 닫는다 */
+function burstAfter(s, e){
+  const back = e.at + e.dur/60;
+  const last = s.series.length-1;
+  if(back >= last) return null;
+  const from = Math.ceil(back + 0.001);
+  /* 복귀한 분에 걸쳐 있으면 곡선의 상승이 다음 표본에 찍힌다 — 두 칸까지 시작점을 찾는다 */
+  let j = -1;
+  for(let i = from; i <= Math.min(from + 1, last); i++){
+    if(s.series[i] === null || s.series[i-1] === null) continue;
+    if(s.series[i] - s.series[i-1] >= BURST_MIN){ j = i; break; }
+  }
+  if(j < 0) return null;
+  let end = j;
+  while(end + 1 <= last && s.series[end+1] !== null && s.series[end+1] - s.series[end] >= BURST_MIN) end++;
+  const gain = s.series[end] - s.series[j-1];
+  const sec  = e.burstSec || Math.round((end - (j-1)) * 60);
+  return { gain: gain, sec: sec };
+}
+
+/* ───────── 학생당 타임라인 1개 (2026-08-06 확정) ─────────
+   과제물이 학생당 1개이므로 회차 개념 없음. 제출·재제출은 타임라인 위의 마커. */
+function rowMinutes(r){ return rowSessions(r).reduce((a,s)=>a+sessWriteMinutes(s),0); }
+function rowIdleMinutes(r){ return rowSessions(r).reduce((a,s)=>a+sessIdleMinutes(s),0); }
+function submitCount(r){ return rowSessions(r).filter(s=>s.submitted).length; }
+
+/* ───────── 타임라인 차트 (글자 수 곡선 + 이탈 구간 + 제출 마커) ─────────
+   나눠 쓴 구간을 한 차트에 이어 붙이되, 안 쓴 시간(구간 경계)은 끊어 그린다 */
+function studentChart(sessions, maxVal){
+  const W = 1000, H = 88, PAD = 6, GAP = 18;
+  const total = Math.max(1, sessions.reduce((a,s)=>a+sessMinutes(s),0));
+  const usable = W - GAP * (sessions.length - 1);
+  const y = v => H - PAD - (maxVal===0 ? 0 : (v/maxVal) * (H - PAD*2 - 4));
+  let out = '', xoff = 0;
+
+  sessions.forEach(function(s, si){
+    const N = Math.max(1, sessMinutes(s));
+    const sw = (N/total) * usable;
+    const x = m => xoff + (m/N) * sw;
+
+    /* 구간 경계 = 안 쓴 시간 (임시저장 후 나감·다음 차시에 이어 씀) */
+    if(si > 0){
+      out += '<line x1="'+(xoff - GAP/2)+'" y1="4" x2="'+(xoff - GAP/2)+'" y2="'+(H-4)+'" stroke="#c7cbd3" stroke-width="1.5" stroke-dasharray="4 4" vector-effect="non-scaling-stroke"><title>'+s.date+' '+s.start+'에 이어 씀</title></line>';
+    }
+
+    /* 이탈·공백 구간 음영 */
+    (s.events||[]).forEach(e=>{
+      const x1 = x(e.at), x2 = x(Math.min(N, e.at + e.dur/60));
+      const w = Math.max(3, x2-x1);
+      if(e.type==='gap'){
+        out += '<rect x="'+x1+'" y="0" width="'+w+'" height="'+H+'" fill="#eef0f3"><title>'+hm(s.start, e.at)+' 기록 공백 · '+fmtDur(e.dur)+'</title></rect>';
+      } else {
+        const g = burstAfter(s, e);
+        const tip = hm(s.start, e.at)+' 다른 화면 · '+fmtDur(e.dur) + (g ? ' · 돌아온 뒤 '+fmtDur(g.sec)+'간 +'+g.gain+'자' : '');
+        out += '<rect x="'+x1+'" y="0" width="'+w+'" height="'+H+'" fill="#fff1e6"><title>'+tip+'</title></rect>';
+        out += '<line x1="'+x1+'" y1="0" x2="'+x1+'" y2="'+H+'" stroke="#f59e6b" stroke-width="1" stroke-dasharray="3 3" vector-effect="non-scaling-stroke"/>';
+      }
+    });
+
+    /* 글자 수 곡선 — 기록 공백에서 끊어 그린다 */
+    let segs = [], cur = [];
+    s.series.forEach((v,i)=>{
+      if(v===null){ if(cur.length) segs.push(cur); cur=[]; return; }
+      cur.push([x(i), y(v)]);
+    });
+    if(cur.length) segs.push(cur);
+    segs.forEach(seg=>{
+      if(seg.length > 1){
+        const area = 'M'+seg[0][0]+','+H+' L'+seg.map(p=>p[0]+','+p[1]).join(' L')+' L'+seg[seg.length-1][0]+','+H+' Z';
+        out += '<path d="'+area+'" fill="#416bff" fill-opacity="0.07"/>';
+      }
+      out += '<polyline points="'+seg.map(p=>p[0]+','+p[1]).join(' ')+'" fill="none" stroke="#416bff" stroke-width="2" stroke-linejoin="round" stroke-linecap="round" vector-effect="non-scaling-stroke"/>';
+    });
+
+    /* 제출 마커 — 제출로 끝난 구간의 끝 지점 */
+    if(s.submitted){
+      out += '<line x1="'+(xoff + sw)+'" y1="0" x2="'+(xoff + sw)+'" y2="'+H+'" stroke="#319d64" stroke-width="2" vector-effect="non-scaling-stroke"><title>'+s.date+' '+hm(s.start, N)+' 제출</title></line>';
+    }
+
+    xoff += sw + GAP;
+  });
+
+  return '<svg class="tl-chart" viewBox="0 0 '+W+' '+H+'" preserveAspectRatio="none">'+out+'</svg>';
+}
+
+function studentBlock(r, sessions, maxVal){
+  const first = sessions[0], last = sessions[sessions.length-1];
+  const endHm = hm(last.start, sessMinutes(last));
+  const when = first.date + (last.date !== first.date ? '~'+last.date : '')
+    + ' · 총 ' + rowMinutes(r) + '분 작성'
+    + (sessions.length > 1 ? ' · 작성이 ' + sessions.length + '번 끊김' : '');
+
+  /* 제출 이력 칩 줄은 없앴다 — 숫자 정보는 모두 아래 작성 로그 표로 모은다 (2026-08-11 줄리).
+     그래프는 색만 담당하고, 시각·시간 같은 값은 표에서 읽는다.
+     세로축 눈금은 최대 글자 수 하나만 — 없으면 곡선 높이가 몇 자인지 못 읽는다 (2026-08-11 줄리) */
+  return '<div class="tl-one">'
+    + '<div class="tl-sess-hd"><span class="tl-sess-name">'+when+'</span></div>'
+    + '<div class="tl-ymax">'+maxVal.toLocaleString()+'자</div>'
+    + studentChart(sessions, maxVal)
+    + '<div class="tl-axis"><span>'+first.date+' '+first.start+'</span><span>'+last.date+' '+endHm+'</span></div>'
+    + '</div>';
+}
+
+/* 작성 로그 — 이탈·기록 공백·제출을 한 줄기 시간순으로 (2026-08-11 줄리).
+   이탈만 모은 목록이 아니라 '무슨 일이 어떤 순서로 있었나'가 되어야,
+   급증이 제출 앞인지 뒤인지 같은 걸 표를 보고 알 수 있다. */
+function evtList(sessions){
+  /* 여러 날에 걸쳐 썼으면 시각만으로는 순서를 못 읽으니 날짜를 붙인다 */
+  const multiDay = sessions.some(s => s.date !== sessions[0].date);
+  const d = s => (multiDay ? s.date + ' ' : '');
+  /* 이탈은 시작~끝 범위로 (제이콥 예시 형식) */
+  /* 실시간 화면에서는 아직 끝나지 않은 이탈이 있다 - 끝 시각을 지어내지 않는다 */
+  const range = (s, e) => e.open
+    ? d(s) + hms(s.start, e.at) + ' ~ 진행 중'
+    : d(s) + hms(s.start, e.at) + ' ~ ' + hms(s.start, e.at, e.dur);
+  let rows = '', subN = 0;
+
+  sessions.forEach((s, si)=>{
+    /* 앞 구간이 끝난 자리 — 페이지를 떠나 구간이 끊긴 것. 이탈로는 세지 않지만
+       로그에 아무것도 없으면 교사가 '왜 여기 끊겼지'를 알 수 없다 (2026-08-11 줄리).
+       단, 제출로 끝난 구간은 바로 위 `제출` 행이 이미 그 자리를 설명하므로 넣지 않는다 */
+    if(si > 0 && !sessions[si-1].submitted){
+      const prev = sessions[si-1];
+      rows += '<div class="leave-evt">'
+        + '<span class="leave-evt-time">'+d(prev)+hms(prev.start, sessMinutes(prev))+'</span>'
+        + '<span class="leave-evt-type stop"><i class="lg-swatch" style="background:#fff;border:1px dashed #c7cdd9;"></i>작성 끊김</span>'
+        + '<span class="leave-evt-dur">-</span>'
+        + '<span class="leave-evt-note">페이지를 떠나 여기서 구간이 끝났어요. 다시 들어와 이어 썼습니다.</span>'
+        + '</div>';
+    }
+    (s.events||[]).forEach(e=>{
+      if(e.type==='gap'){
+        rows += '<div class="leave-evt">'
+          + '<span class="leave-evt-time">'+range(s, e)+'</span>'
+          + '<span class="leave-evt-type gap"><i class="lg-swatch" style="background:#eef0f3;border:1px solid #dde1e8;"></i>기록 공백</span>'
+          + '<span class="leave-evt-dur">'+fmtDur(e.dur)+'</span>'
+          + '<span class="leave-evt-note">' + (e.open ? '아직 기록이 다시 올라오지 않았어요.' : '이 구간은 기록이 남지 않았어요. 원인은 알 수 없어요.') + '</span>'
+          + '</div>';
+      } else {
+        const g = burstAfter(s, e);
+        rows += '<div class="leave-evt">'
+          + '<span class="leave-evt-time">'+range(s, e)+'</span>'
+          + '<span class="leave-evt-type" title="'+e.type+'"><i class="lg-swatch" style="background:#fff1e6;border:1px solid #f7d3ba;"></i>다른 화면</span>'
+          + '<span class="leave-evt-dur">'+fmtDur(e.dur)+'</span>'
+          /* 구간 길이가 건마다 달라 숫자만 두면 비교가 안 된다 — 길이와 양을 함께 */
+          + (e.open ? '<span class="leave-evt-gain none">아직 안 돌아왔어요</span>'
+              : g ? '<span class="leave-evt-gain">'+fmtDur(g.sec)+'간 <b>'+(g.gain>=0?'+':'')+g.gain+'자</b></span>'
+                  : '<span class="leave-evt-gain none">없음</span>')
+          + '</div>';
+      }
+    });
+    /* 제출은 구간의 끝 — 빈 열은 억지로 채우지 않고 '-'로 둔다 */
+    if(s.submitted){
+      subN += 1;
+      rows += '<div class="leave-evt">'
+        + '<span class="leave-evt-time">'+d(s)+hms(s.start, sessMinutes(s))+'</span>'
+        + '<span class="leave-evt-type submit"><i class="lg-line" style="border-top:2px solid #319d64;"></i>'+(subN > 1 ? '재제출' : '제출')+'</span>'
+        + '<span class="leave-evt-dur">-</span>'
+        + '<span class="leave-evt-gain">-</span>'
+        + '</div>';
+    }
+  });
+  return rows;
+}
+
+/* 제출 일시 셀 — 시각만 남긴다 (2026-08-07 올립). 표 너비 확보.
+   '학생 제출 / 선생님 제출'은 지우지 않고 호버 툴팁으로 옮겨, 대리 업로드 여부는 확인 가능하게 */
+function dateCell(r, isSubmit){
+  /* 미제출은 제출 일시가 없다 — 임시저장 시각을 대신 채우지 않는다 (2026-08-11 올립) */
+  const raw = isSubmit ? r.date : '-';
+  const m = raw.match(/^(.*?)\s*(학생 제출|선생님 제출)$/);
+  if(!m) return raw;
+  return '<span title="'+m[2]+'">'+m[1]+'</span>';
+}
+
+/* 제출물 셀 (2026-08-10 회의로 원복) — 제출물 1건만 표시.
+   여러 파일 표시·개별 다운로드·AI 채점 대상 뱃지는 모두 미반영으로 결정됐다.
+   (과제물 제출을 여러 개 되게 하거나 추후 다른 방향으로 보완) */
+function submitCell(r){
+  const isText = r.type === 'text';
+  return '<div class="t-line">'
+    + '<span class="t-ic" title="' + (isText ? '직접 작성' : '파일 첨부') + '">'
+    +   '<i data-lucide="' + (isText ? 'type' : 'paperclip') + '"></i></span>'
+    + '<span class="t-val">' + r.detail + '</span></div>';
+}
+
+/* 제출 현황 요약 — 표 데이터에서 뽑는다. 손으로 적어두면 행 상태를 바꿀 때마다 어긋난다 */
+function renderSummary(){
+  const miss = teacherRows.filter(r => r.status === '미제출');
+  document.getElementById('missList').textContent = miss.map(r => r.id + ' ' + r.name).join(', ');
+  document.getElementById('submitCnt').textContent =
+    (teacherRows.length - miss.length) + '/' + teacherRows.length + '명 제출';
+}
+
+/* ───────── 표 렌더 ───────── */
+function renderTeacher(){
+  renderSummary();
+  const tb = document.getElementById('teacherTbody');
+  tb.innerHTML = '';
+
+  let rows = teacherRows.slice();
+  if(sortMode === 'leaveDesc'){
+    rows.sort((a,b)=> rowLeaveSec(b) - rowLeaveSec(a) || rowLeaveCount(b) - rowLeaveCount(a) || (a.id > b.id ? 1 : -1));
+  }
+  document.getElementById('sortNote').style.display = (sortMode==='leaveDesc') ? 'block' : 'none';
+
+  rows.forEach(r=>{
+    const isSubmit = r.status!=='미제출';
+    const sessions = rowSessions(r);
+
+    /* 제출 상세 셀 (Figma: 유형 뱃지 + 글자 수/파일명) */
+    let detailCell;
+    /* 임시저장은 학생 화면에서 그냥 '미제출'이다 — 교사 화면에 '작성 중'으로 꺼내지 않는다.
+       (2026-08-11 올립: 시스템에 임시저장이라는 상태가 따로 없으므로 없는 개념을 만들지 않는다) */
+    if(!isSubmit){ detailCell = '<span class="t-none">-</span>'; }
+    else { detailCell = submitCell(r); }
+
+    /* 작성 과정 요약 셀 — 로그는 모든 직접 제출 과제에 상시 수집되지만,
+       화면에는 제출된 뒤에만 보여준다 (2026-08-10 회의 확정: 임시저장 상태는 로그 미노출) */
+    let leaveCell;
+    if(!isSubmit){ leaveCell = '<span class="leave-none" title="제출한 뒤에 볼 수 있어요.">-</span>'; }
+    else if(!sessions.length){ leaveCell = '<span class="leave-none">-</span>'; }
+    else {
+      const cnt = rowLeaveCount(r), sec = rowLeaveSec(r);
+      const main = cnt ? '이탈 '+cnt+'회 · '+fmtDur(sec) : '이탈 없음';
+      /* 제출 횟수는 표에 병기하지 않는다 — 재제출한 학생만 행이 두 줄이 되어 표가 들쭉날쭉했고,
+         교사가 이 열에서 볼 신호는 이탈이다. 제출 횟수는 팝업 헤더에 남아 있다 (2026-08-11 올립) */
+      leaveCell = '<button class="leave-cell-btn'+(cnt?'':' quiet')+'" onclick="openProcess(\''+r.id+'\')">'
+        + '<span class="lc-main">'+main+' <i data-lucide="maximize-2" style="width:15px;height:15px;"></i></span>'
+        + '</button>';
+    }
+
+    /* 과제물 관리 셀 (Figma: 변경/삭제 · 업로드) */
+    const manageCell = isSubmit
+      ? '<button class="row-btn" onclick="notReady(\'변경/삭제\')"><i data-lucide="rotate-ccw"></i>변경/삭제</button>'
+      : '<button class="row-btn" onclick="notReady(\'업로드\')"><i data-lucide="upload"></i>업로드</button>';
+
+    const tr = document.createElement('tr');
+    tr.innerHTML = '<td><input type="checkbox" class="chk row-chk"' + (isSubmit ? '' : ' disabled title="제출한 과제물이 없어요"') + ' onchange="updateSel()"></td>'
+      + '<td>'+r.id+'</td><td>'+r.name+'</td>'
+      + '<td>'+(isSubmit?'<span class="b-submit">제출 완료</span>':'<span class="b-absent">미제출</span>')+'</td>'
+      + '<td class="td-date">'+dateCell(r, isSubmit)+'</td>'
+      + '<td>'+detailCell+'</td>'
+      + '<td>'+leaveCell+'</td>'
+      + '<td>'+manageCell+'</td>';
+    tb.appendChild(tr);
+
+  });
+  updateSel();
+  lucide.createIcons();
+}
+
+/* ───────── 작성 과정 팝업 (2026-08-07 회의) ─────────
+   행 펼침(아코디언)에서 팝업으로 전환 — 타임라인은 가로가 넓어야 읽히고,
+   과제물 관리·채점 화면 양쪽에서 같은 컴포넌트로 띄울 수 있어야 함 */
+function openProcess(id){
+  const r = teacherRows.find(x => x.id === id);
+  const sessions = rowSessions(r);
+  if(!r || !sessions.length) return;
+  const maxVal = Math.max.apply(null, sessions.flatMap(s=>s.series.filter(v=>v!==null)));
+  const evHtml = evtList(sessions);
+  const cnt = rowLeaveCount(r), sec = rowLeaveSec(r);
+
+  document.getElementById('pcTitle').textContent = r.id + ' ' + r.name + ' · 작성 과정';
+  document.getElementById('pcSum').textContent = (cnt ? '이탈 '+cnt+'회 · '+fmtDur(sec) : '이탈 없음')
+    + ' · 총 ' + rowMinutes(r) + '분 작성' + (submitCount(r) >= 2 ? ' · 제출 '+submitCount(r)+'회' : '');
+  document.getElementById('pcBody').innerHTML =
+      '<div class="ld-legend">'
+      + '<span><i class="lg-line"></i>글자 수</span>'
+      + '<span><i class="lg-swatch" style="background:#fff1e6;border:1px solid #f7d3ba;"></i>다른 화면</span>'
+      + '<span><i class="lg-swatch" style="background:#eef0f3;border:1px solid #dde1e8;"></i>기록 공백</span>'
+      + '<span><i class="lg-line" style="border-top:2px solid #319d64;"></i>제출</span>'
+    + '</div>'
+    + studentBlock(r, sessions, maxVal)
+    + (evHtml ? '<div class="ld-evt-wrap">'
+        + '<div class="leave-evt evt-head"><span class="leave-evt-time">시각</span>'
+        + '<span class="leave-evt-type">구분</span>'
+        + '<span class="leave-evt-dur">이탈 시간</span>'
+        + '<span class="leave-evt-gain">돌아온 뒤 이어 쓴 양</span></div>'
+        + evHtml + '</div>' : '');
+  document.getElementById('pcModal').classList.add('show');
+  lucide.createIcons();
+}
+function closeProcess(){ document.getElementById('pcModal').classList.remove('show'); }
+document.addEventListener('keydown', e => { if(e.key === 'Escape'){ closeProcess(); closeColHelp(); } });
+
+function openCase(id){
+  renderTeacher();
+  openProcess(id);
+}
+
+/* ───────── 열 설명 팝오버 ───────── */
+function toggleColHelp(btn){
+  const pop = document.getElementById('colHelp');
+  if(pop.classList.contains('show')){ pop.classList.remove('show'); return; }
+  const r = btn.getBoundingClientRect();
+  /* 열이 오른쪽에 있어 왼쪽으로 흘리고, 화면 밖으로 나가지 않게 잡는다 */
+  pop.style.top  = (r.bottom + 8) + 'px';
+  pop.style.left = Math.max(12, Math.min(r.right - 330, window.innerWidth - 342)) + 'px';
+  pop.classList.add('show');
+}
+function closeColHelp(){ document.getElementById('colHelp').classList.remove('show'); }
+document.addEventListener('click', e => { if(!e.target.closest('.th-help-btn') && !e.target.closest('#colHelp')) closeColHelp(); });
+window.addEventListener('scroll', closeColHelp, true);
+
+/* ───────── 정렬 ───────── */
+function cycleSort(){
+  sortMode = (sortMode === 'default') ? 'leaveDesc' : 'default';
+  syncSortBtn();
+  renderTeacher();
+}
+function syncSortBtn(){
+  const b = document.getElementById('btnSort');
+  b.classList.toggle('on', sortMode==='leaveDesc');
+  b.title = '이탈 시간이 긴 순서로 정렬해요';
+  b.innerHTML = '작성 과정 <i data-lucide="'+(sortMode==='leaveDesc' ? 'arrow-down-wide-narrow' : 'arrow-up-down')+'"></i>';
+  lucide.createIcons();
+}
+
+/* ───────── 일괄 다운로드 / 삭제 ───────── */
+function selectedRows(){
+  return Array.prototype.slice.call(document.querySelectorAll('#teacherTbody .row-chk:checked'));
+}
+function updateSel(){
+  const n = selectedRows().length;
+  const all = document.querySelectorAll('#teacherTbody .row-chk:not(:disabled)').length;
+  document.getElementById('btnBulkDown').disabled = n === 0;
+  document.getElementById('btnBulkDel').disabled = n === 0;
+  const cnt = document.getElementById('selCount');
+  cnt.style.display = n ? 'inline' : 'none';
+  cnt.textContent = n + '명 선택';
+  const head = document.getElementById('chkAll');
+  head.checked = n > 0 && n === all;
+  head.indeterminate = n > 0 && n < all;
+}
+function toggleAll(el){
+  document.querySelectorAll('#teacherTbody .row-chk:not(:disabled)').forEach(function(c){ c.checked = el.checked; });
+  updateSel();
+}
+function bulkDownload(){
+  const n = selectedRows().length;
+  toastMsg(n + '명의 과제물을 내려받아요. 직접 작성한 답안은 PDF로 저장돼요.');
+}
+
+function bulkDelete(){
+  const rows = selectedRows();
+  const names = rows.map(function(c){
+    const tds = c.closest('tr').querySelectorAll('td');
+    return tds[1].textContent + ' ' + tds[2].textContent;
+  });
+  document.getElementById('delCount').textContent = names.length + '명';
+  document.getElementById('delNames').textContent = names.length <= 3
+    ? names.join(', ')
+    : names.slice(0,3).join(', ') + ' 외 ' + (names.length - 3) + '명';
+  document.getElementById('delModal').classList.add('show');
+  lucide.createIcons();
+}
+function closeDel(){ document.getElementById('delModal').classList.remove('show'); }
+function confirmDel(){
+  const n = selectedRows().length;
+  closeDel();
+  toastMsg('과제물 ' + n + '건을 삭제했어요.');
+}
+/* toggleFocusLog — 로그가 상시 수집으로 바뀌면서 제거 (2026-08-10 회의) */
+function toggleNav(){
+  /* 화면이 둘이라 사이드바도 둘 - 같이 접고 편다 */
+  document.querySelectorAll('.icon-sb').forEach(function(n){ n.classList.toggle('expanded'); });
+  document.body.classList.toggle('nav-expanded');
+}
+
+/* ───────── 내비게이터 접기 + 드래그 ───────── */
+function mpToggle(e){
+  const b = document.getElementById('mpBody');
+  const hidden = b.style.display==='none';
+  b.style.display = hidden ? 'flex' : 'none';
+  document.getElementById('mpArrow').textContent = hidden ? '▾' : '▸';
+}
+(function(){
+  const el = document.getElementById('mockpick');
+  let sx, sy, ox, oy, dragging=false;
+  el.addEventListener('mousedown', e=>{
+    if(e.target.closest('button')) return;
+    dragging=true; sx=e.clientX; sy=e.clientY;
+    const r=el.getBoundingClientRect(); ox=r.left; oy=r.top;
+    e.preventDefault();
+  });
+  document.addEventListener('mousemove', e=>{
+    if(!dragging) return;
+    el.style.left=(ox+e.clientX-sx)+'px'; el.style.top=(oy+e.clientY-sy)+'px';
+    el.style.bottom='auto'; el.style.right='auto';
+  });
+  document.addEventListener('mouseup', ()=>{ dragging=false; });
+})();
+
+/* ───────── 초기화 ───────── */
+const initHash = location.hash.slice(1);
+go(initHash && document.getElementById('scr-'+initHash) ? initHash : 'teacher-log');
+</script>
+
+<!-- ===== 목업 내비게이터(까망이) 연결 — 규칙: docs/mockup-navigator.md ===== -->
+<script>
+window.MOCK_NAV_FILE  = 'task';
+/* 케이스를 옮길 때마다 화면을 기본 상태로 되돌린다 — 앞 케이스에서 켠 정렬·도움말 팝오버가
+   남아 캡처에 끼어들던 문제 (2026-08-11 stale 점검) */
+function resetCaseState(){
+  closeProcess();
+  closeColHelp();
+  sortMode = 'default';
+  document.querySelectorAll('.row-chk').forEach(function(c){ c.checked = false; });
+  const all = document.getElementById('chkAll'); if(all) all.checked = false;
+  renderTeacher();
+  if(window.updateSel) updateSel();
+}
+window.MOCK_NAV_APPLY = {
+  flTask: function(){ resetCaseState(); },
+  flKim:  function(){ resetCaseState(); openCase('10101'); },
+  flPark: function(){ resetCaseState(); openCase('10103'); },
+  flLee:  function(){ resetCaseState(); openCase('10102'); },
+  flJung: function(){ resetCaseState(); openCase('10105'); },
+  flHan:  function(){ resetCaseState(); openCase('10106'); }
+};
+</script>
+<script src="mock_nav_dw.js?v=260812j"></script></body>
+</html>
