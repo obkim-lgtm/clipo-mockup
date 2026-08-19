@@ -278,15 +278,18 @@ body.nav-expanded .main-wrap{ padding-left:200px; }
 
 /* 5열 그리드 — 한 반이 한 화면에 들어오는 것이 이 화면의 전부다 */
 .mgrid{ display:grid; grid-template-columns:repeat(5, minmax(0,1fr)); gap:12px; }
-.mcard{ background:#fff; border:1px solid #dde1e8; border-radius:12px; padding:14px 14px 12px; font-family:inherit; text-align:left; cursor:pointer; display:flex; flex-direction:column; gap:9px; min-height:122px; transition:border-color .15s, background .15s, box-shadow .15s; }
+.mcard{ background:#fff; border:1px solid #dde1e8; border-radius:12px; padding:14px; font-family:inherit; text-align:left; cursor:pointer; display:flex; flex-direction:column; gap:8px; min-height:104px; transition:border-color .15s, background .15s, box-shadow .15s; }
 .mcard:hover{ border-color:#b3b6bd; box-shadow:0 2px 8px rgba(0,0,0,.06); }
 .mc-top{ display:flex; align-items:center; gap:8px; }
 .mc-name{ font-size:16px; font-weight:600; color:#18181b; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
 .mc-id{ font-size:12px; font-weight:500; color:#9aa0ad; flex-shrink:0; margin-left:auto; font-variant-numeric:tabular-nums; }
-.mc-badge{ display:inline-flex; align-items:center; justify-content:center; gap:5px; height:22px; padding:0 8px; border-radius:6px; font-size:13px; font-weight:600; line-height:1; white-space:nowrap; background:#f1f3f5; color:#52525b; align-self:flex-start; }
-.mc-num{ font-size:26px; font-weight:700; color:#18181b; line-height:1; font-variant-numeric:tabular-nums; display:flex; align-items:baseline; gap:3px; }
-.mc-num span{ font-size:14px; font-weight:500; color:#6d7381; }
-.mc-sub{ font-size:13px; font-weight:500; color:#6d7381; line-height:1.4; margin-top:auto; }
+.mc-badge{ display:inline-flex; align-items:center; justify-content:center; gap:5px; height:22px; padding:0 8px; border-radius:6px; font-size:13px; font-weight:600; line-height:1; white-space:nowrap; background:#f1f3f5; color:#52525b; flex-shrink:0; }
+/* 상태와 '얼마나 됐나'는 붙어 읽혀야 한다 - 배지 옆 한 줄로 */
+.mc-state{ display:flex; align-items:center; gap:7px; flex-wrap:wrap; }
+.mc-sub{ font-size:13px; font-weight:500; color:#6d7381; line-height:1.4; }
+/* 글자 수는 큰 숫자에서 내렸다 (2026-08-19 올립) - 이 화면의 목적은 부정행위 예방이지
+   누가 많이 썼나가 아니다. 제일 큰 글자가 말하는 것이 화면의 목적이 되어버린다 */
+.mc-chars{ font-size:14px; font-weight:500; color:#8a8f9a; line-height:1; margin-top:auto; font-variant-numeric:tabular-nums; }
 
 /* 상태별 — 개입이 필요한 '다른 화면'만 카드째 물들이고, 나머지는 뱃지 색으로만 구분한다.
    카드 자리는 절대 바뀌지 않는다(학번 순 고정) — 자리가 움직이면 교사가 학생을 못 찾는다 */
@@ -300,9 +303,7 @@ body.nav-expanded .main-wrap{ padding-left:200px; }
 .mcard.st-gap .mc-badge{ background:#eef0f3; color:#6d7381; }
 .mcard.st-submitted{ background:#fafbfc; }
 .mcard.st-submitted .mc-badge{ background:#e9f2ff; color:#3151c4; }
-.mcard.st-submitted .mc-num{ color:#6d7381; }
 .mcard.st-none .mc-name, .mcard.st-nolog .mc-name{ color:#6d7381; }
-.mcard.st-none .mc-num, .mcard.st-nolog .mc-num{ color:#c7cbd3; }
 .mcard.st-none .mc-badge, .mcard.st-nolog .mc-badge{ background:#f6f7f9; color:#9aa0ad; }
 .mcard.st-nolog{ cursor:default; }
 .mcard.st-nolog:hover{ border-color:#dde1e8; box-shadow:none; }
@@ -489,7 +490,10 @@ body.nav-expanded .main-wrap{ padding-left:200px; }
         <div style="display:flex;flex-direction:column;gap:8px;min-width:0;">
           <button class="back-link" onclick="go('teacher-log')"><i data-lucide="chevron-left" style="width:18px;height:18px;"></i>제출 현황으로</button>
           <h1 class="page-h1">1학년 1반 실시간 모니터링</h1>
-          <p class="page-sub">주장하는 글 쓰기 과제를 쓰는 동안, 지금 누가 어디에 있는지 확인할 수 있습니다.</p>
+          <!-- '누가 어디에 있는지'는 위치를 쫓는 것처럼 읽히는데 위치는 알 수 없다 (2026-08-19 올립).
+               이 화면의 목적은 시험 중 부정행위 예방이고, 사후 로그와 다른 점은 '그 자리에서'다.
+               무엇을 알 수 있고 없는지는 아래 안내 박스가 맡으므로 여기서 또 말하지 않는다 -->
+          <p class="page-sub">주장하는 글 쓰기 과제가 진행되는 동안, 답안 화면을 벗어난 학생을 그 자리에서 확인할 수 있습니다.</p>
         </div>
       </div>
 
@@ -840,7 +844,7 @@ function liveSubText(st, k){
   if(k === 'none')      return '아직 답안 화면을 안 열었어요';
   if(k === 'submitted') return hm(CLASS_START, st.submitAt) + ' 제출';
   if(k === 'away')      return liveOpenMin(st) + '분째';
-  if(k === 'gap')       return liveOpenMin(st) + '분째 · 원인은 알 수 없어요';
+  if(k === 'gap')       return liveOpenMin(st) + '분째';
   if(k === 'idle'){
     let same = 0;
     for(let i = s.length-1; i > 0; i--){ if(s[i] !== null && s[i] === s[i-1]) same++; else break; }
@@ -848,8 +852,9 @@ function liveSubText(st, k){
   }
   const a = s[s.length-1], b = s[s.length-2];
   const d = (a !== null && b != null) ? a - b : 0;
-  /* '+0자'는 늘었다는 말처럼 읽힌다 - 안 늘었으면 안 늘었다고 쓴다 */
-  return d === 0 ? '1분째 그대로' : '1분 동안 ' + (d > 0 ? '+' : '') + d + '자';
+  /* 잠깐 멈춘 1분은 아직 할 말이 없다 - 배지가 '작성 중'인데 '그대로'를 붙이면 서로 부딪힌다.
+     2분부터는 '멈춤' 배지가 받는다 */
+  return d === 0 ? '' : '1분 동안 ' + (d > 0 ? '+' : '') + d + '자';
 }
 
 function renderLive(){
@@ -864,13 +869,14 @@ function renderLive(){
   live.students.forEach(function(st){
     const k = liveState(st);
     cnt[k]++;
-    const chars = st.hasLog ? liveChars(st) : null;
+    const sub = liveSubText(st, k);
+    const showChars = st.hasLog && k !== 'none';
     cards += '<button class="mcard st-' + k + '" onclick="openLive(&#39;' + st.id + '&#39;)">'
       + '<div class="mc-top"><span class="mc-name">' + st.name + '</span>'
       +   '<span class="mc-id">' + st.id + '</span></div>'
-      + '<span class="mc-badge">' + LIVE_LABEL[k] + '</span>'
-      + '<div class="mc-num">' + (chars === null ? '–' : chars.toLocaleString()) + '<span>자</span></div>'
-      + '<div class="mc-sub">' + liveSubText(st, k) + '</div>'
+      + '<div class="mc-state"><span class="mc-badge">' + LIVE_LABEL[k] + '</span>'
+      +   (sub ? '<span class="mc-sub">' + sub + '</span>' : '') + '</div>'
+      + (showChars ? '<div class="mc-chars">' + liveChars(st).toLocaleString() + '자</div>' : '')
       + '</button>';
   });
   document.getElementById('mGrid').innerHTML = cards;
