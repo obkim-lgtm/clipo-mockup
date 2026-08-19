@@ -57,7 +57,6 @@
     ssGuide:     { f:'submit',  h:'guide' },
     ssLeave:     { f:'submit',  h:'leave' },
     ssWrite:     { f:'submit',  h:'write' },
-    ssWriteNoti: { f:'submit',  h:'write-noti-off' },
     ssDone:      { f:'submit',  h:'done' },
     ssBoth:      { f:'submit',  h:'both' },
     ssFileonly:  { f:'submit',  h:'fileonly' },
@@ -105,7 +104,6 @@
     { t:'└ 작성 화면 케이스',      items:[
         ['ssGuide','시작 안내 팝업',{sub:'과제 최초 진입 · 처음 한 번만'}],
         ['ssLeave','다른 화면 다녀옴',{sub:'알림(8초) + 누적 상태'}],
-        ['ssWriteNoti','기록 안내 표시 끔',{sub:'시작 전 고지는 그대로'}]] },
     { t:'└ 다른 설정으로 낸 과제', items:[['ssBoth','직접 작성 + 파일 제출'],['ssFileonly','파일 제출만'],['ssPreparing','문항 미작성'],['ssClosed','제출 못 한 채 마감',{sub:'쓰던 글은 비활성 에디터로'}]] },
     { t:'└ 제출 완료 화면 상태',   items:[['ssBefore','결과 공개 전'],['ssAfter','결과 공개 후'],['ssPdf','답안 PDF']] }
   ];

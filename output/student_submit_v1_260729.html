@@ -341,7 +341,7 @@ body.pdf-mode .sf-copy{ color:#8b8f9c; }
 <div id="scr-write" class="screen">
   <!-- 이탈 상단바는 page-wrap 바깥에 둔다 (2026-08-12 올립) — 안에 두면 본문 폭(1240px)에
        갇혀 카드처럼 보인다. .screen 직속이라야 좌측 NB를 뺀 화면 폭을 그대로 가로지른다.
-       교사가 '학생에게 이탈 안내 표시'를 끄면 이 바도 뜨지 않는다. -->
+       모든 직접 작성 과제에 항상 나간다 — 교사 스위치는 2026-08-13에 폐기. -->
   <div class="leave-banner" id="leaveBanner" data-rec-notice>
     <div class="lb-in">
       <i data-lucide="monitor-check"></i>
@@ -733,17 +733,8 @@ function showFx(){ return FX_SUBJECTS.indexOf(SUBJECT) > -1; }
 var currentScene = 'write';
 var leaveStart = null, leaveType = null;
 
-/* 교사 설정 '학생에게 이탈 안내 표시' — 기본 켜짐 (2026-08-10 회의).
-   꺼도 기록은 그대로 수집되고, 시작 전 고지도 그대로 나간다. 이탈 배너만 뜨지 않는다. */
-var NOTIFY_ON = true;
-function applyNotify(){
-  if(!NOTIFY_ON){
-    document.querySelectorAll('[data-rec-notice]').forEach(function(n){ n.classList.remove('show'); n.hidden = true; });
-  } else {
-    renderLeaveStat(false);
-  }
-}
-function setNotify(on){ NOTIFY_ON = !!on; applyNotify(); }
+/* 학생 안내는 항상 나간다 (2026-08-13 결정) — 기능이 모든 직접 작성 과제에
+   일괄 적용되면서 교사 스위치가 폐기됐다. 고지·이탈 바 모두 상시 */
 
 /* 이탈 누적 — 알림(잠깐)과 상태(상시)를 나눠 표시한다 (2026-08-12 회의 피드백) */
 var LEAVE_COUNT = 0, LEAVE_SEC = 0, LEAVE_LAST = 0, leaveHideTimer = null;
@@ -758,7 +749,7 @@ function renderLeaveBar(alert){
   ['leaveBanner', 'leaveBannerBoth'].forEach(function(id){
     var el = document.getElementById(id);
     if(!el) return;
-    if(!NOTIFY_ON || !LEAVE_COUNT){ el.classList.remove('show','alert'); return; }
+    if(!LEAVE_COUNT){ el.classList.remove('show','alert'); return; }
     el.querySelector('.lb-t').textContent = alert
       ? '다른 화면에 다녀온 기록이 남았어요'
       : '다른 화면 ' + LEAVE_COUNT + '회 · ' + fmtDur(LEAVE_SEC) + ' 기록됨';
@@ -1076,8 +1067,7 @@ var SUB_CASES = {
                          실제 동작은 8초 뒤 스스로 접히는 것 */
                       clearTimeout(leaveHideTimer); },
   'result-before':  function(){ go('done'); setOpened(false); },
-  'result-after':   function(){ go('done'); setOpened(true); },
-  'write-noti-off': function(){ setNotify(false); go('write'); }
+  'result-after':   function(){ go('done'); setOpened(true); }
 };
 function goSub(h){
   /* 케이스를 지목해 들어오면 안내 팝업을 띄우지 않는다 — 확인하러 온 화면을 가리지 않게.
@@ -1131,8 +1121,7 @@ window.MOCK_NAV_APPLY = {
   ssGuide:     function(){ resetLeave(); guideSeen = false; go('write'); openGuide(); },
   ssLeave:     function(){ resetLeave(); guideSeen = true; go('write');
                  simulateLeave(6); simulateLeave(11); clearTimeout(leaveHideTimer); },
-  ssWrite:     function(){ resetLeave(); setNotify(true);  guideSeen = true; go('write'); },
-  ssWriteNoti: function(){ resetLeave(); guideSeen = true; setNotify(false); go('write'); },
+  ssWrite:     function(){ resetLeave(); guideSeen = true; go('write'); },
   ssDone:      function(){ resetLeave(); guideSeen = true; go('done'); },
   ssBoth:      function(){ resetLeave(); guideSeen = true; go('both'); },
   ssFileonly:  function(){ resetLeave(); guideSeen = true; go('fileonly'); },
@@ -1149,7 +1138,6 @@ window.MOCK_NAV_APPLY = {
   if (typeof _go === 'function') window.go = function(s){
     _go.apply(this, arguments);
     var r = MAP[s];
-    if (s === 'write' && !window.NOTIFY_ON) r = 'ssWriteNoti';   /* 안내 끔 상태면 그 케이스로 표시 */
     if (window.mockNavSetCurrent && r) window.mockNavSetCurrent(r);
   };
   var _so = window.setOpened;

@@ -550,7 +550,7 @@
       <div class="sec-hd"><span class="sec-title">기본 정보</span></div>
       <label class="fld-label">수행평가(과제)명</label>
       <input class="inp" placeholder="평가(과제)명을 입력해 주세요.">
-      <!-- '학생 공개' 설정은 넣었다가 뺐다 (2026-08-12 최종) — 노출 조건은 교사 설정이 아니라
+      <!-- '학생 공개' 설정은 넣었다가 뺐다 (2026-08-19 회의 확정) — 노출 조건은 교사 설정이 아니라
            과제물 수집 방법으로 판정한다: 학생 직접 제출형은 만들면 목록에 나오고(시작 전 → 제출 가능),
            교사 업로드·과제물 없이 채점은 결과 공개 시에만 나온다. 설정·확인 모달 전부 폐기 -->
       <label class="fld-label mt">교내 교사 공유</label>
@@ -788,13 +788,9 @@
                 <p class="sec-desc" style="margin:6px 0 0 50px;">외부에서 복사한 내용을 학생이 답안에 붙여넣을 수 없어요.</p>
               </div>
 
-              <!-- 작성 과정 기록은 상시 수집이라 교사가 켜고 끄지 않는다 (2026-08-10 회의).
-                   기록 사실·?는 위 카드 설명(rec-note)에 있고, 여기는 교사가 조절하는 토글 2개가 같은 위계로 나란히.
-                   이탈 안내 토글 옆에 ?를 두면 '켜야 기록된다'로 읽혔던 이력 (2026-08-11 제이콥) -->
-              <div>
-                <span class="sw on" id="swRecord" onclick="toggleRecordSw(this)"><span class="sw-track"><span class="sw-knob"></span></span>학생에게 이탈 안내 표시</span>
-                <p class="sec-desc" style="margin:6px 0 0 50px;">학생 작성 화면에 기록 중이라는 안내를 띄우고, 학생이 다른 화면에 다녀오면 알려줘요. 선생님이 보는 기록에는 영향이 없어요.</p>
-              </div>
+              <!-- '학생에게 이탈 안내 표시' 스위치는 폐기 (2026-08-13 결정) —
+                   기능이 모든 직접 작성 과제에 일괄 적용되면서 교사 설정 자체가 사라졌다.
+                   학생 안내도 항상 나간다. 기록 사실·?는 위 카드 설명(rec-note)이 담당 -->
             </div>
           </div>
         </div>
@@ -1723,9 +1719,7 @@ function applyDesignState(submitted, opt){
   document.getElementById('way-write').classList.toggle('on', writeOn);
   document.getElementById('way-file').classList.toggle('on', !!opt.fileOn);
   document.getElementById('max-file').textContent = (opt.maxFile || 1) + '개';
-  /* 작성 환경 토글도 기본값으로 되돌린다 — 앞 카드에서 꺼둔 상태가 남아
-     다른 과제를 열었는데 꺼져 있는 것처럼 보이는 사고 (2026-08-11 stale 점검) */
-  document.getElementById('swRecord').classList.add('on');
+  /* 작성 환경 토글은 기본값으로 되돌린다 — 앞 카드에서 꺼둔 상태가 남는 사고 방지 (2026-08-11) */
   document.querySelector('#way-write .way-body .sw').classList.add('on');
   syncMultiFileNote();
   syncWayNotes();
@@ -1817,15 +1811,6 @@ function syncWayNotes(){
   lucide.createIcons();
 }
 
-/* 학생 안내 표시 옵션 — 기록 자체는 상시 수집이라 잠금이 없다 (2026-08-10 회의).
-   언제든 바꿀 수 있고, 학생 브라우저가 낡은 값을 들고 있어도 수집에는 영향이 없다. */
-function toggleRecordSw(el){
-  el.classList.toggle('on');
-  toastMsg(el.classList.contains('on')
-    ? '이탈 안내를 표시해요. 학생이 답안을 쓰는 동안 기록 중임을 알려줍니다.'
-    : '이탈 안내를 표시하지 않아요. 기록과 작성 시작 전 안내는 그대로입니다.');
-}
-
 /* ── 작성 과정 기록 ? 팝오버 ──
    기능 안내+결과 예시를 인라인 대신 여기에 담는다 (2026-08-11 올립 — 첫 화면이 너무 복잡).
    자동 오픈은 폐기 — IO 감지와 스크롤 재배치가 겹쳐 깜박였다 (2026-08-12 올립).
@@ -1870,14 +1855,13 @@ function showRecHelpCase(){
   setTimeout(openRecHelp, 150);   /* 스크롤이 자리 잡은 뒤 위치 계산 */
 }
 
-/* 제출이 들어오면 제출 방식만 잠근다 (세부 설정·학생 안내 표시는 계속 조절 가능) */
+/* 제출이 들어오면 제출 방식만 잠근다 (세부 설정은 계속 조절 가능) */
 function applyWayLock(){
   var locked = SUBMITTED > 0;
   document.getElementById('waysLockNote').style.display = locked ? 'flex' : 'none';
   document.getElementById('waysLockCnt').textContent = SUBMITTED;
   document.getElementById('way-write').classList.toggle('locked', locked);
   document.getElementById('way-file').classList.toggle('locked', locked);
-  /* 학생 안내 표시 옵션은 잠기지 않는다 — 기록이 상시 수집이라 시점 문제가 없다 (2026-08-10 회의) */
   lucide.createIcons();
 }
 
