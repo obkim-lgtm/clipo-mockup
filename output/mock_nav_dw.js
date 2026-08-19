@@ -13,7 +13,7 @@
 (function(){
   var FILES = {
     design:  'task_direct_write_v1_260729.html',
-    task:    'focus_log_v2_260806.html',
+    task:    'focus_log_v3_260819.html',   /* 최종본. v1(260728)·v2(260806)는 기존 시안 — 까망이 제거됨(2026-08-19) */
     scoring: 'scoring_direct_write_v1_260729.html',
     home:    'student_home_v1_260729.html',
     submit:  'student_submit_v1_260729.html'
