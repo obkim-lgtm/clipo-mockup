@@ -550,26 +550,15 @@
       <div class="sec-hd"><span class="sec-title">기본 정보</span></div>
       <label class="fld-label">수행평가(과제)명</label>
       <input class="inp" placeholder="평가(과제)명을 입력해 주세요.">
-      <!-- 두 설정은 대상이 다르다: 교내 교사 공유=동료 교사 / 학생 공개=학생.
-           라벨을 6자로 맞춰 나란히 읽히게 했고(라벨 평행성), 각 항목에 도움말을 한 줄씩 붙였다 —
-           라벨만으로는 '무슨 일이 일어나는지'가 안 담긴다.
-           '교내 공개'는 옵션 라벨과 같은 말이라 중복이었고, 실제 의미(설계를 복사해 쓸 수 있게 함)도 안 드러났다.
-           옵션 값은 두 항목 모두 공개/비공개로 통일 — '보이기/안 보이기'는 동사형이라 위와 어긋났다 (2026-08-12) -->
+      <!-- '학생 공개' 설정은 넣었다가 뺐다 (2026-08-12 최종) — 노출 조건은 교사 설정이 아니라
+           과제물 수집 방법으로 판정한다: 학생 직접 제출형은 만들면 목록에 나오고(시작 전 → 제출 가능),
+           교사 업로드·과제물 없이 채점은 결과 공개 시에만 나온다. 설정·확인 모달 전부 폐기 -->
       <label class="fld-label mt">교내 교사 공유</label>
       <div class="radio-line labeled">
         <span class="rad on" onclick="pickRadio(this)"><span class="ring"></span>공개</span>
         <span class="rad" onclick="pickRadio(this)"><span class="ring"></span>비공개</span>
       </div>
       <p class="fld-help">같은 학교 선생님이 이 평가 설계를 복사해서 쓸 수 있어요.</p>
-      <!-- 학생 공개 (2026-08-12 회의 확정) — 학생 과제 목록에 이 과제를 보일지 교사가 직접 정한다.
-           기존에는 과제물 수집 방법으로 자동 판정하려 했으나, 교사 의도를 추측하는 대신 명시 설정으로 바꿈.
-           ⚠️ 결과를 공개할 때 '비공개'면 확인 모달로 물어보고 '공개'로 바꾼다 — 시스템이 몰래 뒤집지 않는다 -->
-      <label class="fld-label mt">학생 공개</label>
-      <div class="radio-line labeled">
-        <span class="rad on" id="radStuOn"  onclick="pickStuVis(this, true)"><span class="ring"></span>공개</span>
-        <span class="rad"    id="radStuOff" onclick="pickStuVis(this, false)"><span class="ring"></span>비공개</span>
-      </div>
-      <p class="fld-help">학생 과제 목록에 이 과제가 보여요.</p>
     </div>
 
     <!-- 성취기준 -->
@@ -1116,25 +1105,6 @@
   </div>
 </div>
 
-<!-- 학생 공개를 되돌릴 때의 확인 — 결과가 이미 공개된 과제에서 '비공개'를 고른 순간에만 뜬다.
-     반대 방향(비공개 → 공개, 결과 공개 화면)과 짝을 맞춘 것. 한쪽만 묻고 한쪽은 조용히 하면
-     같은 축에 규칙이 둘이 된다. 학생에게는 따로 알리지 않는다 — 시스템은 교사가 왜 내렸는지 모르고,
-     학생이 할 수 있는 행동도 없다. 사유 설명은 교사 몫 (2026-08-12 확정) -->
-<div class="pv-ov" id="stuHideGuard" onclick="if(event.target===this) closeStuHideGuard()">
-  <div style="background:#fff;border-radius:14px;width:100%;max-width:460px;box-shadow:0 20px 50px rgba(0,0,0,.25);padding:32px 32px 28px;">
-    <p style="font-size:20px;font-weight:700;color:#222631;margin:0 0 10px;line-height:1.45;">학생 공개를 '비공개'로 바꿀까요?</p>
-    <p style="font-size:16px;color:#3b3f4c;margin:0 0 16px;line-height:1.7;">이 과제는 채점 결과가 공개돼 있어요. 비공개로 바꾸면 <b>학생이 점수와 피드백을 더 볼 수 없어요.</b></p>
-    <div style="display:flex;gap:9px;align-items:flex-start;background:#f2f5ff;border-radius:10px;padding:13px 15px;margin:0 0 24px;color:#365eef;">
-      <i data-lucide="info" style="width:17px;height:17px;flex-shrink:0;margin-top:2px"></i>
-      <p style="font-size:15px;color:#3b3f4c;margin:0;line-height:1.6;">이미 <b>12명</b>이 결과를 확인했어요.</p>
-    </div>
-    <div style="display:flex;gap:10px;">
-      <button class="btn btn-outline btn-lg" style="flex:1;" onclick="closeStuHideGuard()">취소</button>
-      <button class="btn btn-primary btn-lg" style="flex:1;" onclick="stuHideConfirm()">비공개로 바꾸기</button>
-    </div>
-  </div>
-</div>
-
 <!-- 학생 화면 미리보기 모달 — 이번 범위 제외, 다음 제공 (2026-08-07 올립). 진입점과 함께 제거 -->
 
 <!-- 수식 입력 팝업 -->
@@ -1315,37 +1285,6 @@ function notReady(n){ toastMsg((n||'해당 화면')+' 은(는) 아직 준비 중
 function goDesignList(){ location.href='task_ocr_v3_260623.html#design'; }
 
 // 라디오(라인)
-/* 학생 공개 — '비공개'일 때만 안내를 띄운다.
-   결과 공개가 설정을 이기는 게 아니라 '확인 후 설정이 바뀐다'로 정리했다 —
-   교사가 설계 화면을 다시 봤을 때 화면과 실제가 어긋나지 않게 (2026-08-12 다나 제안) */
-var RESULT_PUBLISHED = false;   /* 이 과제의 채점 결과가 이미 공개됐는지. #design-published 로 진입하면 true */
-var STU_VIS = true;
-
-/* 선택에 따라 바뀌는 안내는 두지 않는다 — 읽혀야 하는 순간(결과 공개 / 공개된 결과 내림)은
-   전부 팝업이 잡고 있어서, 여기에 또 쓰면 같은 말이 두 번이 된다. 도움말은 '공개가 무슨 뜻인지'
-   한 줄로 고정 (2026-08-12 올립). 주황 박스는 아무 일도 안 일어나는 상태에 경고색을 써서 폐기 */
-
-/* 결과가 공개된 과제에서 '비공개'를 고르면 먼저 묻는다. 취소하면 라디오는 손대지 않았으므로
-   되돌릴 것이 없다 — 먼저 바꿔놓고 되돌리면 화면이 한 번 깜박인다 */
-function pickStuVis(el, on){
-  if(!on && RESULT_PUBLISHED && STU_VIS){ openStuHideGuard(); return; }
-  pickRadio(el); STU_VIS = on;
-}
-function openStuHideGuard(){
-  document.getElementById('stuHideGuard').classList.add('show');
-  if(window.lucide) lucide.createIcons();
-}
-function closeStuHideGuard(){
-  document.getElementById('stuHideGuard').classList.remove('show');
-}
-function stuHideConfirm(){
-  closeStuHideGuard();
-  pickRadio(document.getElementById('radStuOff'));
-  STU_VIS = false;
-  toastMsg('학생 공개를 비공개로 바꿨어요. 저장해야 반영돼요.');
-}
-/* 데모용 — 결과가 이미 공개된 과제를 편집하는 상황 */
-function setResultPublished(on){ RESULT_PUBLISHED = !!on; }
 function pickRadio(el){ var line=el.closest('.radio-line'); line.querySelectorAll('.rad').forEach(function(r){r.classList.remove('on');}); el.classList.add('on'); }
 
 // 업로드 방법 카드 → 학생 선택 시 제출 방법 설정 섹션 노출
@@ -1854,14 +1793,10 @@ function qGuardSave(){
 function goDesign(){ updateSummary(); go('design'); }
 /* 원본의 goDesignList는 옛 목록 파일로 이탈 → 이 파일 안의 목록 씬으로 재정의 */
 function goDesignList(){ renderList(); go('list'); }
-/* #design-published = 채점 결과가 이미 공개된 과제를 편집하는 상황.
-   씬은 design 그대로고 상태만 다르다 — 화면을 하나 더 만들 일이 아니다 */
-function goHashDW(h){
-  if(h === 'design-published'){ setResultPublished(true); goDesign(); return true; }
-  if(h && document.getElementById('scr-'+h)){ setResultPublished(false); go(h); return true; }
-  return false;
-}
-window.addEventListener('hashchange', function(){ goHashDW(location.hash.slice(1)); });
+window.addEventListener('hashchange', function(){
+  var h = location.hash.slice(1);
+  if(h && document.getElementById('scr-'+h)) go(h);
+});
 
 /* ── 제출 방식 토글 ── */
 function toggleWay(k){
@@ -2175,7 +2110,8 @@ window.addEventListener('DOMContentLoaded', function(){
 renderQuestions();
 updateSummary();
 window.addEventListener('DOMContentLoaded', function(){
-  if(!goHashDW(location.hash.slice(1))) go('list');
+  var h = location.hash.slice(1);
+  go(h && document.getElementById('scr-'+h) ? h : 'list');
 });
 </script>
 
