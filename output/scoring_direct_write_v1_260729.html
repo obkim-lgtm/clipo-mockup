@@ -650,7 +650,7 @@ function rowLeaveCount(r){ return rowSessions(r).reduce((a,s)=>a+sessEvents(s).l
 function rowLeaveSec(r){ return rowSessions(r).reduce((a,s)=>a+sessLeaveSec(s), 0); }
 function rowHasGap(r){ return rowSessions(r).some(s=>(s.events||[]).some(e=>e.type==='gap')); }
 
-/* series에서 값 읽기 — 기록 공백(null)은 뒤로 걸어가며 가장 가까운 값을 쓴다 */
+/* series에서 값 읽기 — 기록 없음(null)은 뒤로 걸어가며 가장 가까운 값을 쓴다 */
 function seriesAt(series, i){
   i = Math.max(0, Math.min(series.length-1, Math.round(i)));
   for(let k=i; k<series.length; k++){ if(series[k]!==null) return series[k]; }
@@ -717,7 +717,7 @@ function studentChart(sessions, maxVal){
       const x1 = x(e.at), x2 = x(Math.min(N, e.at + e.dur/60));
       const w = Math.max(3, x2-x1);
       if(e.type==='gap'){
-        out += '<rect x="'+x1+'" y="0" width="'+w+'" height="'+H+'" fill="#eef0f3"><title>'+hm(s.start, e.at)+' 기록 공백 · '+fmtDur(e.dur)+'</title></rect>';
+        out += '<rect x="'+x1+'" y="0" width="'+w+'" height="'+H+'" fill="#eef0f3"><title>'+hm(s.start, e.at)+' 기록 없음 · '+fmtDur(e.dur)+'</title></rect>';
       } else {
         const g = burstAfter(s, e);
         const tip = hm(s.start, e.at)+' 다른 화면 · '+fmtDur(e.dur) + (g ? ' · 돌아온 뒤 '+fmtDur(g.sec)+'간 +'+g.gain+'자' : '');
@@ -726,7 +726,7 @@ function studentChart(sessions, maxVal){
       }
     });
 
-    /* 글자 수 곡선 — 기록 공백에서 끊어 그린다 */
+    /* 글자 수 곡선 — 기록 없음 구간에서 끊어 그린다 */
     let segs = [], cur = [];
     s.series.forEach((v,i)=>{
       if(v===null){ if(cur.length) segs.push(cur); cur=[]; return; }
@@ -768,7 +768,7 @@ function studentBlock(r, sessions, maxVal){
     + '</div>';
 }
 
-/* 작성 로그 — 이탈·기록 공백·제출을 한 줄기 시간순으로 (과제물 관리와 동일 컴포넌트) */
+/* 작성 로그 — 이탈·기록 없음·제출을 한 줄기 시간순으로 (과제물 관리와 동일 컴포넌트) */
 function evtList(sessions){
   const multiDay = sessions.some(s => s.date !== sessions[0].date);
   const d = s => (multiDay ? s.date + ' ' : '');
@@ -776,24 +776,24 @@ function evtList(sessions){
   let rows = '', subN = 0;
 
   sessions.forEach((s, si)=>{
-    /* 페이지를 떠나 구간이 끊긴 자리 — 이탈로 세지 않지만 사실은 남긴다 (2026-08-11 줄리).
-       제출로 끝난 구간은 `제출` 행이 이미 설명하므로 넣지 않는다 */
+    /* 구간 사이 = 기록 없음 행. 원인(이탈·강제 종료·유실)은 서버가 구분할 수 없어
+       단정하지 않는다 (2026-08-19 제이콥). 제출로 끝난 구간은 `제출` 행이 이미 설명 */
     if(si > 0 && !sessions[si-1].submitted){
       const prev = sessions[si-1];
       rows += '<div class="leave-evt">'
-        + '<span class="leave-evt-time">'+d(prev)+hms(prev.start, sessMinutes(prev))+'</span>'
-        + '<span class="leave-evt-type stop"><i class="lg-swatch" style="background:#fff;border:1px dashed #c7cdd9;"></i>작성 끊김</span>'
+        + '<span class="leave-evt-time">'+d(prev)+hms(prev.start, sessMinutes(prev))+' ~ '+d(s)+s.start+':00</span>'
+        + '<span class="leave-evt-type gap"><i class="lg-swatch" style="background:#eef0f3;border:1px solid #dde1e8;"></i>기록 없음</span>'
         + '<span class="leave-evt-dur">-</span>'
-        + '<span class="leave-evt-note">페이지를 떠나 여기서 구간이 끝났어요. 다시 들어와 이어 썼습니다.</span>'
+        + '<span class="leave-evt-note">이 사이는 기록이 없어요. 마지막 저장 뒤에 쓴 내용은 남지 않았을 수 있어요.</span>'
         + '</div>';
     }
     (s.events||[]).forEach(e=>{
       if(e.type==='gap'){
         rows += '<div class="leave-evt">'
           + '<span class="leave-evt-time">'+range(s, e)+'</span>'
-          + '<span class="leave-evt-type gap"><i class="lg-swatch" style="background:#eef0f3;border:1px solid #dde1e8;"></i>기록 공백</span>'
+          + '<span class="leave-evt-type gap"><i class="lg-swatch" style="background:#eef0f3;border:1px solid #dde1e8;"></i>기록 없음</span>'
           + '<span class="leave-evt-dur">'+fmtDur(e.dur)+'</span>'
-          + '<span class="leave-evt-note">이 구간은 기록이 남지 않았어요. 원인은 알 수 없어요.</span>'
+          + '<span class="leave-evt-note">이 사이는 기록이 없어요.</span>'
           + '</div>';
       } else {
         const g = burstAfter(s, e);
@@ -829,7 +829,7 @@ function openProcess(){
       '<div class="ld-legend">'
       + '<span><i class="lg-line"></i>글자 수</span>'
       + '<span><i class="lg-swatch" style="background:#fff1e6;border:1px solid #f7d3ba;"></i>다른 화면</span>'
-      + '<span><i class="lg-swatch" style="background:#eef0f3;border:1px solid #dde1e8;"></i>기록 공백</span>'
+      + '<span><i class="lg-swatch" style="background:#eef0f3;border:1px solid #dde1e8;"></i>기록 없음</span>'
       + '<span><i class="lg-line" style="border-top:2px solid #319d64;"></i>제출</span>'
     + '</div>'
     + studentBlock(r, sessions, maxVal)
