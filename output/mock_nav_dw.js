@@ -64,7 +64,9 @@
     ssClosed:    { f:'submit',  h:'closed' },
     ssBefore:    { f:'submit',  h:'result-before' },
     ssAfter:     { f:'submit',  h:'result-after' },
-    ssPdf:       { f:'submit',  h:'pdf' }
+    ssPdf:       { f:'submit',  h:'pdf' },
+    ssAttachPv:  { f:'submit',  h:'attach-preview' },
+    ssAttachDl:  { f:'submit',  h:'attach-download' }
   };
 
   /* 전체 화면·케이스를 항상 펼쳐 둔다. 길이는 패널 내부 스크롤로 처리(2026-08-06).
@@ -103,7 +105,9 @@
     { t:'학생 · 과제 제출',        items:[['ssWrite','① 작성'],['ssDone','② 제출 완료']] },
     { t:'└ 작성 화면 케이스',      items:[
         ['ssGuide','시작 안내 팝업',{sub:'과제 최초 진입 · 처음 한 번만'}],
-        ['ssLeave','다른 화면 다녀옴',{sub:'알림(8초) + 누적 상태'}]] },
+        ['ssLeave','다른 화면 다녀옴',{sub:'알림(8초) + 누적 상태'}],
+        ['ssAttachPv','첨부 PDF 열기',{sub:'팝업 미리보기 · 이탈 아님'}],
+        ['ssAttachDl','첨부 한글 열기',{sub:'다운로드 · 이탈 1회'}]] },
     { t:'└ 다른 설정으로 낸 과제', items:[['ssBoth','직접 작성 + 파일 제출'],['ssFileonly','파일 제출만'],['ssPreparing','문항 미작성'],['ssClosed','제출 못 한 채 마감',{sub:'쓰던 글은 비활성 에디터로'}]] },
     { t:'└ 제출 완료 화면 상태',   items:[['ssBefore','결과 공개 전'],['ssAfter','결과 공개 후'],['ssPdf','답안 PDF']] }
   ];

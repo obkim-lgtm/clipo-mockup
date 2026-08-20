@@ -55,7 +55,13 @@ body.nav-expanded .main-wrap{ padding-left:200px; }
 .task-name{ font-size:24px; font-weight:700; color:#222631; margin:0 0 10px; line-height:1.35; }
 .task-guide{ background:#f6f7f9; border-radius:10px; padding:16px 18px; font-size:16px; color:#3b3f4c; line-height:1.7; }
 .task-guide .gl{ font-size:14px; font-weight:600; color:#6d7381; display:block; margin-bottom:6px; }
+.guide-files{ display:flex; flex-wrap:wrap; gap:8px; }
 .guide-file{ display:inline-flex; align-items:center; gap:6px; margin-top:10px; font-size:15px; font-weight:500; color:#3151c4; background:#fff; border:1px solid #ccdfff; border-radius:8px; padding:8px 12px; cursor:pointer; font-family:inherit; line-height:1; }
+/* 첨부 미리보기 팝업 — 학생이 작성 화면을 벗어나지 않게 여기서 연다 */
+#fileModal .md{ max-width:820px; }
+.fp-hd{ display:flex; align-items:center; gap:8px; padding:20px 24px 14px; border-bottom:1px solid #eceef2; }
+.fp-hd .fp-nm{ font-size:16px; font-weight:600; color:#222631; }
+.fp-page{ margin:20px 24px; background:#f4f5f7; border:1px solid #e3e5ea; border-radius:10px; height:340px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:10px; color:#6d7381; font-size:15px; }
 .guide-file:hover{ background:#e9f2ff; }
 
 /* ===== 상태 칩 줄 ===== */
@@ -367,7 +373,13 @@ body.pdf-mode .sf-copy{ color:#8b8f9c; }
       <div class="task-guide" style="margin-bottom:20px;">
         <span class="gl">과제 안내</span>
         현대사회의 변동 양상 중 한 가지를 골라, 그 변동이 나타나게 된 원인과 그로 인해 생긴 사회 문제를 서술하세요. 수업 시간에 다룬 사례를 참고해 200자 이상 쓰는 것을 권장합니다.
-        <div><button class="guide-file" onclick="notReady('첨부 파일 열기')"><i data-lucide="paperclip" style="width:15px;height:15px"></i>사회 변동 참고자료.pdf</button></div>
+        <!-- 첨부 2종으로 두 경로를 함께 보인다 (2026-08-20) — PDF·이미지는 팝업 미리보기라
+             화면을 벗어나지 않고, 한글 등은 내려받아 열게 되어 이탈 1회로 기록된다.
+             버튼 생김새는 같다. 학생에게 "이걸 열면 기록된다"고 미리 겁주면 과제 자료를 안 보게 된다 -->
+        <div class="guide-files">
+          <button class="guide-file" onclick="openAttachment('사회 변동 참고자료.pdf')"><i data-lucide="paperclip" style="width:15px;height:15px"></i>사회 변동 참고자료.pdf</button>
+          <button class="guide-file" onclick="openAttachment('활동지 양식.hwp')"><i data-lucide="paperclip" style="width:15px;height:15px"></i>활동지 양식.hwp</button>
+        </div>
       </div>
 
       <div class="chip-row">
@@ -635,6 +647,22 @@ body.pdf-mode .sf-copy{ color:#8b8f9c; }
 <!-- 시작 안내 팝업 (2026-08-12 회의) — 폐기한 안내 화면의 규칙 3종을 여기로 옮겼다.
      과제 최초 진입 때만 뜬다 — 매번 뜨면 과업을 막는 팝업이 되어 곧 안 읽고 닫게 된다.
      닫기 버튼 하나만 둔다: 취소할 행동이 아니라 읽고 시작하는 안내라 선택지가 필요 없다 -->
+<div class="md-ov" id="fileModal" onclick="if(event.target===this) closeFilePreview()">
+  <div class="md">
+    <div class="fp-hd">
+      <i data-lucide="paperclip" style="width:18px;height:18px;color:#6d7381;"></i>
+      <span class="fp-nm" id="fpName">첨부 파일</span>
+    </div>
+    <div class="fp-page">
+      <i data-lucide="file-text" style="width:34px;height:34px;"></i>
+      <span>미리보기 영역 (목업)</span>
+    </div>
+    <div class="md-ft">
+      <button class="md-cancel" onclick="closeFilePreview()">닫기</button>
+    </div>
+  </div>
+</div>
+
 <div class="md-ov" id="guideModal" onclick="if(event.target===this) closeGuide()">
   <div class="md">
     <div class="md-body" style="text-align:left;">
@@ -780,6 +808,28 @@ function openGuide(){
 }
 function closeGuide(){
   var el = document.getElementById('guideModal');
+  if(el) el.classList.remove('show');
+}
+
+/* ───────── 과제 첨부 열기 (2026-08-20 확정) ─────────
+   미리보기가 되는 형식은 팝업으로 열어 작성 화면을 벗어나지 않게 한다 → 이탈 아님.
+   그 외 형식은 내려받아 열 수밖에 없어 이탈 1회로 기록된다.
+   교사 쪽 평가 설계에 'PDF·이미지 권장' 안내를 두어 이 상황 자체를 줄인다 */
+var PREVIEWABLE = ['pdf', 'png', 'jpg', 'jpeg', 'gif', 'webp'];
+function openAttachment(name){
+  var ext = (name.split('.').pop() || '').toLowerCase();
+  if(PREVIEWABLE.indexOf(ext) >= 0){
+    var nm = document.getElementById('fpName');
+    if(nm) nm.textContent = name;
+    var el = document.getElementById('fileModal');
+    if(el){ el.classList.add('show'); lucide.createIcons(); }
+  } else {
+    toastMsg(name + ' 을(를) 내려받았어요');
+    simulateLeave(6);
+  }
+}
+function closeFilePreview(){
+  var el = document.getElementById('fileModal');
   if(el) el.classList.remove('show');
 }
 function maybeGuide(scene){
@@ -1095,6 +1145,8 @@ window.MOCK_NAV_GROUPS = [
   { t:'└ 과제 상세 케이스',     items:[
       ['ssWrite','작성 중',{sub:'목록에서 과제를 누르면 여기로'}],
       ['ssLeave','이탈했다 돌아옴',{sub:'이탈 기록 배너가 뜬 상태'}],
+      ['ssAttachPv','첨부 PDF 열기',{sub:'팝업 미리보기 · 이탈 아님'}],
+      ['ssAttachDl','첨부 한글 열기',{sub:'다운로드 · 이탈 1회'}],
       ['ssBoth','직접 작성 + 파일 제출'],
       ['ssFileonly','파일 제출만'],
       ['ssPreparing','문항 미작성'],
@@ -1110,6 +1162,7 @@ function resetLeave(){
   clearTimeout(leaveHideTimer);
   document.querySelectorAll('.leave-stat').forEach(function(el){ el.hidden = true; });
   document.querySelectorAll('[data-rec-notice]').forEach(function(n){ n.classList.remove('show'); });
+  closeFilePreview();
 }
 window.MOCK_NAV_APPLY = {
   /* ⚠️ 까망이는 replaceState로 해시만 바꾼다 — hashchange가 안 떠서 CASES가 실행되지 않는다.
@@ -1125,7 +1178,10 @@ window.MOCK_NAV_APPLY = {
   ssClosed:    function(){ resetLeave(); go('closed'); },
   ssBefore:    function(){ resetLeave(); go('done'); setOpened(false); },
   ssAfter:     function(){ resetLeave(); go('done'); setOpened(true); },
-  ssPdf:       function(){ resetLeave(); go('pdf'); }
+  ssPdf:       function(){ resetLeave(); go('pdf'); },
+  ssAttachPv:  function(){ resetLeave(); go('write'); closeGuide(); openAttachment('사회 변동 참고자료.pdf'); },
+  ssAttachDl:  function(){ resetLeave(); go('write'); closeGuide();
+                 openAttachment('활동지 양식.hwp'); clearTimeout(leaveHideTimer); }
 };
 (function(){
   var MAP = { write:'ssWrite', done:'ssDone', both:'ssBoth',
@@ -1140,5 +1196,5 @@ window.MOCK_NAV_APPLY = {
   if (typeof _so === 'function') window.setOpened = function(v){ _so.apply(this, arguments); if (window.mockNavSetCurrent) window.mockNavSetCurrent(v ? 'ssAfter' : 'ssBefore'); };
 })();
 </script>
-<script src="mock_nav_dw.js?v=260819a"></script></body>
+<script src="mock_nav_dw.js?v=260820a"></script></body>
 </html>
