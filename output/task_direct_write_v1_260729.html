@@ -744,9 +744,11 @@
         <p class="sub-block-title">1. 과제 안내 (선택)</p>
         <textarea class="inp" style="height:auto;min-height:80px;padding:12px 14px;resize:vertical;" placeholder="준비물, 분량, 유의사항처럼 과제 전체에 해당하는 안내를 입력해 주세요. 학생이 답할 문항은 아래 제출 방식에서 따로 작성합니다."></textarea>
         <!-- 형식 안내는 파일을 고르기 전에 읽어야 의미가 있어 업로드 버튼 앞에 둔다 (2026-08-20).
-             미리보기가 되는 PDF·이미지는 학생 화면에서 팝업으로 열려 이탈로 안 잡히고,
-             그 외 형식은 내려받아 열게 되어 이탈 1회로 기록된다 -->
-        <div class="alert-info" style="margin-top:12px;">
+             단, '클리포에서 직접 작성'을 선택했을 때만 뜬다 — 파일 제출만인 과제는
+             작성 과정 기록 자체가 없어 형식이 이탈에 영향을 주지 않는다 (2026-08-20 제이콥·올립).
+             로그에 '과제 파일 열람으로 시작' 구분을 넣는 안은 폐기 — 파일 여는 척하고
+             딴짓하는 어뷰징 통로가 된다 (제이콥). 안내로 상황 자체를 줄이는 쪽으로 간다 -->
+        <div class="alert-info" id="attachFmtNote" style="margin-top:12px;display:none;">
           <i data-lucide="info" style="width:18px;height:18px;color:#416bff;flex-shrink:0;"></i>
           <div class="ai-txt"><b>PDF·이미지 권장</b> — 한글·워드 등은 내려받아 열게 되어, 학생이 다른 화면에 다녀온 것으로 기록돼요.</div>
         </div>
@@ -1809,12 +1811,15 @@ function toggleWay(k){
   syncWayNotes();
 }
 
-/* 선택 조합에 따라 아래 안내 한 칸을 바꿔 끼운다 — 0개=선택 요청, 2개=AI 채점 대상 안내 */
+/* 선택 조합에 따라 안내를 바꿔 끼운다 — 0개=선택 요청, 2개=AI 채점 대상,
+   직접 작성 포함=과제 안내 첨부 형식 안내 */
 function syncWayNotes(){
   var w = document.getElementById('way-write').classList.contains('on');
   var f = document.getElementById('way-file').classList.contains('on');
   document.getElementById('way-none').style.display = (!w && !f) ? '' : 'none';
   document.getElementById('way-both').style.display = (w && f)   ? '' : 'none';
+  /* 첨부 형식 안내는 직접 작성일 때만 — 파일 제출만인 과제엔 이탈 기록이 없다 */
+  document.getElementById('attachFmtNote').style.display = w ? '' : 'none';
   lucide.createIcons();
 }
 
