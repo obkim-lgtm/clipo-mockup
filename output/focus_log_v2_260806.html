@@ -352,7 +352,7 @@ body.nav-expanded .main-wrap{ padding-left:200px; }
                 <th>제출물</th>
                 <th style="width:186px;" id="thLeave">
                   <span class="th-help" style="gap:2px;">
-                    <button class="th-sort" id="btnSort" onclick="cycleSort()">작성 과정 <i data-lucide="arrow-up-down" id="sortIcon"></i></button>
+                    작성 과정
                     <!-- title 속성은 호버로만 떠서 눌러도 반응이 없었다 → 클릭 팝오버로 (2026-08-07 올립) -->
                     <button class="th-help-btn" onclick="toggleColHelp(this)" aria-label="작성 과정 설명"><i data-lucide="help-circle" style="width:15px;height:15px"></i></button>
                   </span>
@@ -363,7 +363,6 @@ body.nav-expanded .main-wrap{ padding-left:200px; }
             </table>
           </div>
 
-          <p id="sortNote" style="display:none;margin:-6px 0 0;font-size:14px;font-weight:500;color:#6d7381;">다른 화면에 머문 시간이 긴 순서로 정렬했어요. 순서는 참고용이고, 많고 적음이 곧 판정은 아니에요.</p>
         </div>
       </div>
     </div>
@@ -553,7 +552,6 @@ const teacherRows = [
 
 /* 로그는 모든 직접 제출 과제에 상시 수집 (2026-08-10 회의) — 과제별 on/off 없음 */
 /* openRow — 팝업으로 전환하며 제거 (2026-08-07) */
-let sortMode = 'default';   /* default | leaveDesc */
 
 /* ───────── 파생값 (모두 series·events에서 계산) ───────── */
 function sessMinutes(s){ return s.series.length - 1; }
@@ -795,11 +793,7 @@ function renderTeacher(){
   const tb = document.getElementById('teacherTbody');
   tb.innerHTML = '';
 
-  let rows = teacherRows.slice();
-  if(sortMode === 'leaveDesc'){
-    rows.sort((a,b)=> rowLeaveSec(b) - rowLeaveSec(a) || rowLeaveCount(b) - rowLeaveCount(a) || (a.id > b.id ? 1 : -1));
-  }
-  document.getElementById('sortNote').style.display = (sortMode==='leaveDesc') ? 'block' : 'none';
+  const rows = teacherRows.slice();
 
   rows.forEach(r=>{
     const isSubmit = r.status!=='미제출';
@@ -818,8 +812,9 @@ function renderTeacher(){
     if(!isSubmit){ leaveCell = '<span class="leave-none" title="제출한 뒤에 볼 수 있어요.">-</span>'; }
     else if(!sessions.length){ leaveCell = '<span class="leave-none">-</span>'; }
     else {
-      const cnt = rowLeaveCount(r), sec = rowLeaveSec(r);
-      const main = cnt ? '이탈 '+cnt+'회 · '+fmtDur(sec) : '이탈 없음';
+      /* 횟수만 — 누적 시간은 상세 팝업이 담당한다 (2026-08-20 줄리 제안·올립 합의) */
+      const cnt = rowLeaveCount(r);
+      const main = cnt ? '이탈 '+cnt+'회' : '이탈 없음';
       /* 제출 횟수는 표에 병기하지 않는다 — 재제출한 학생만 행이 두 줄이 되어 표가 들쭉날쭉했고,
          교사가 이 열에서 볼 신호는 이탈이다. 제출 횟수는 팝업 헤더에 남아 있다 (2026-08-11 올립) */
       leaveCell = '<button class="leave-cell-btn'+(cnt?'':' quiet')+'" onclick="openProcess(\''+r.id+'\')">'
@@ -900,19 +895,8 @@ function closeColHelp(){ document.getElementById('colHelp').classList.remove('sh
 document.addEventListener('click', e => { if(!e.target.closest('.th-help-btn') && !e.target.closest('#colHelp')) closeColHelp(); });
 window.addEventListener('scroll', closeColHelp, true);
 
-/* ───────── 정렬 ───────── */
-function cycleSort(){
-  sortMode = (sortMode === 'default') ? 'leaveDesc' : 'default';
-  syncSortBtn();
-  renderTeacher();
-}
-function syncSortBtn(){
-  const b = document.getElementById('btnSort');
-  b.classList.toggle('on', sortMode==='leaveDesc');
-  b.title = '이탈 시간이 긴 순서로 정렬해요';
-  b.innerHTML = '작성 과정 <i data-lucide="'+(sortMode==='leaveDesc' ? 'arrow-down-wide-narrow' : 'arrow-up-down')+'"></i>';
-  lucide.createIcons();
-}
+/* 정렬은 제거됐다 (2026-08-20 줄리 제안·올립 합의) — 피그마에 없고, 많고 적음을 줄로
+   세우는 것 자체가 판정처럼 읽힌다. 열은 이탈 횟수 표시와 상세 진입만 담당한다 */
 
 /* ───────── 일괄 다운로드 / 삭제 ───────── */
 function selectedRows(){
@@ -1001,7 +985,6 @@ window.MOCK_NAV_FILE  = 'task';
 function resetCaseState(){
   closeProcess();
   closeColHelp();
-  sortMode = 'default';
   document.querySelectorAll('.row-chk').forEach(function(c){ c.checked = false; });
   const all = document.getElementById('chkAll'); if(all) all.checked = false;
   renderTeacher();
