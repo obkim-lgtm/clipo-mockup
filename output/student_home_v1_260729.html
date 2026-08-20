@@ -58,7 +58,6 @@ body.nav-expanded .main-wrap{ padding-left:200px; }
 .sem-sel:hover{ border-color:#b3b3b3; }
 
 /* ===== 학기 탭 + 필터 (현재 화면 재현용) ===== */
-.filter-bar{ background:#fff; border-radius:12px; padding:0 24px; box-shadow:0 2px 4px rgba(0,0,0,.06), 0 0 1px rgba(34,38,49,.3); margin-bottom:24px; }
 .sem-tabs{ display:flex; border-bottom:1px solid #eceef2; }
 .sem-tab{ padding:16px 18px; font-size:16px; font-weight:500; color:#6d7381; border:none; background:none; cursor:pointer; font-family:inherit; border-bottom:3px solid transparent; margin-bottom:-1px; display:inline-flex; align-items:center; justify-content:center; line-height:1; vertical-align:middle; }
 .sem-tab:hover{ color:#222631; }
@@ -274,10 +273,6 @@ body.nav-expanded .main-wrap{ padding-left:200px; }
 .t5-search input:focus{ outline:none; border-color:#416bff; box-shadow:0 0 0 3px rgba(65,107,255,.12); }
 .t5-clear{ position:absolute; right:8px; width:26px; height:26px; border:none; background:none; border-radius:50%; color:#6d7381; cursor:pointer; display:none; align-items:center; justify-content:center; line-height:1; padding:0; }
 .t5-clear:hover{ background:#f1f3f5; }
-.t5-count-row{ display:flex; align-items:baseline; gap:10px; margin:0 0 12px; }
-.t5-count{ font-size:16px; color:#3b3f4c; margin:0; }
-.t5-count b{ color:#3151c4; }
-.t5-count-d{ font-size:14px; color:#9aa0ad; margin:0; }
 .t5-empty{ padding:40px 20px; text-align:center; font-size:15px; color:#9aa0ad; margin:0; display:none; }
 /* 기초 진단 배너 — 2단 그리드 '밖' 아래에 전폭으로.
    배너는 인박스 항목이 아니라 상시 프로모션이라 할 일과 같은 자리에 두지 않는다
@@ -447,7 +442,6 @@ body.nav-expanded .main-wrap{ padding-left:200px; }
   .st-greet{ font-size:22px; }
   .page-h1{ font-size:20px; }
   .page-wrap{ padding:18px 14px 0; }
-  .filter-bar{ padding:0 14px; }
   .sem-tab{ padding:14px 14px; font-size:15px; }
   .yr-title{ font-size:18px; }
   .sem-tab2{ height:48px; font-size:15px; }
@@ -478,7 +472,6 @@ body.nav-expanded .main-wrap{ padding-left:200px; }
 
   .h5-banner{ flex-direction:column; align-items:flex-start; gap:12px; }
   .h5-banner .btn{ width:100%; }
-  .t5-count-row{ flex-wrap:wrap; gap:4px 10px; }
 }
 
 /* ===== 푸터 ===== */
@@ -825,14 +818,16 @@ function setBanner(on){
   var el = document.getElementById('t6Banner'); if(el) el.style.display = on ? 'flex' : 'none';
 }
 /* 시안 6의 과제 0건 — 도구 모음·표를 감추고 빈 화면을 켠다 */
+/* 과제 0건이면 도구 모음까지 감춘다.
+   ⚠️ 여기서 잡는 선택자는 마크업과 함께 갱신할 것 — 하나라도 없으면 초기화가 통째로 죽어 빈 화면이 된다
+   (2026-08-20 줄리 시안 반영 때 .filter-bar·.t5-count-row가 사라지며 실제로 발생) */
 function t6Zero(on){
   var r = document.getElementById('scr-home6'); if(!r) return;
   var off = on ? 'none' : '';
-  r.querySelector('.filter-bar').style.display = off;
-  r.querySelector('.t6-chips').style.display = on ? 'none' : 'flex';
-  r.querySelector('.t5-count-row').style.display = on ? 'none' : 'flex';
-  r.querySelector('.panel').style.display = off;
-  document.getElementById('t6ZeroNone').style.display = on ? 'block' : 'none';
+  ['.sem-tabs2', '.filter-card', '.panel'].forEach(function(sel){
+    var el = r.querySelector(sel); if(el) el.style.display = off;
+  });
+  var z = document.getElementById('t6ZeroNone'); if(z) z.style.display = on ? 'block' : 'none';
 }
 /* 결과 보기 — 지금 보고 있는 메뉴(홈/과제)를 넘겨 '이전으로'가 제자리로 돌아오게 한다 */
 function openResult(extra){
