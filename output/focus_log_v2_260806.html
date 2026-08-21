@@ -426,7 +426,7 @@ body.nav-expanded .main-wrap{ padding-left:200px; }
 
     <div class="mp-cap">눈여겨볼 케이스</div>
     <button class="mp-btn" onclick="openCase('10101')">김서윤 · 재제출<span class="mp-sub">작성 구간 2개 · 누적 보존</span></button>
-    <button class="mp-btn" onclick="openCase('10103')">박지민 · 이탈 잦음<span class="mp-sub">이탈 후 계단식 급증</span></button>
+    <button class="mp-btn" onclick="openCase('10103')">박지민 · 이탈 잦음<span class="mp-sub">돌아온 뒤 작성량 있음/없음</span></button>
     <button class="mp-btn" onclick="openCase('10102')">이준호 · 기록 없음<span class="mp-sub">기록이 비는 구간</span></button>
     <button class="mp-btn" onclick="openCase('10105')">정현우 · 이탈 없음<span class="mp-sub">멈춤·삭제가 남은 곡선</span></button>
     <button class="mp-btn" onclick="openCase('10106')">한지우 · 작성 3회<span class="mp-sub">미제출 · 구간 3개는 세로 배치</span></button>
@@ -435,7 +435,7 @@ body.nav-expanded .main-wrap{ padding-left:200px; }
     <button class="mp-btn" onclick="location.href='student_submit_v1_260729.html'">학생 · 과제 제출<span class="mp-sub">문항형 · 이동 감지 실동작</span></button>
     <button class="mp-btn" onclick="location.href='task_direct_write_v1_260729.html'">교사 · 평가 설계<span class="mp-sub">제출 방식 · 문항 작성</span></button>
 
-    <div class="mp-note">※ 기록 단위는 <b style="color:#C9CCE0;">작성 구간</b>(답안 화면을 열어 닫을 때까지)이라, 재제출·이어쓰기는 구간이 하나 더 붙습니다. 구간은 누적 보존되고 목록 요약은 전체 합산이에요. 켜고 끄는 건 <b style="color:#C9CCE0;">평가 설계</b>에서만 정하고, 첫 제출이 들어오면 잠깁니다. 채점 화면에는 진입점을 두지 않아요(점수 편향 방지).</div>
+    <div class="mp-note">※ 기록 단위는 <b style="color:#C9CCE0;">작성 구간</b>(답안 화면을 열어 닫을 때까지)이라, 재제출·이어쓰기는 구간이 하나 더 붙습니다. 구간은 누적 보존되고 목록 요약은 전체 합산이에요. 교사 설정은 없고 <b style="color:#C9CCE0;">모든 직접 작성 과제에 일괄 적용</b>됩니다. 채점 화면에는 진입점 버튼만 두고 수치는 깔지 않아요(점수 편향 방지).</div>
   </div>
 </div>
 
@@ -499,7 +499,7 @@ const teacherRows = [
      화면에 나올 수 있는 모든 상황을 한 학생에 몰아 담았다. 어노테이션 상세를 쓸 때
      이 케이스 하나만 열면 모든 표기를 설명할 수 있게 하는 것이 목적.
        구간1 · 이탈 4종(짧은 것 포함) · 급증 있음/없음 · 글자 수 감소 · 네트워크 공백 · 제출
-       구간2 · 30분 방치(총 작성 시간에서 제외) · 저장 전 종료로 끝이 빔 → 기록 없음
+       구간2 · 오래 방치(화면에 머문 시간에는 그대로 포함) · 저장 전 종료로 끝이 빔 → 기록 없음
        구간3 · 이어 쓰고 재제출
      ※ series는 1분 간격. 값이 그대로면 안 쓴 시간, 줄어들면 지운 것 */
   { id:'10103', name:'박지민', status:'제출', date:'07/29 09:54 학생 제출', type:'text', detail:'512자',
@@ -515,7 +515,7 @@ const teacherRows = [
           {at:31, type:'gap',          dur:180},                  /* 네트워크 끊김 */
           {at:40, type:'포커스 벗어남', dur:29}                    /* 돌아왔지만 이어 쓴 구간 없음 */
         ] },
-      /* 구간 2 — 열어두고 30분 넘게 방치했고, 저장 전에 창을 닫아 끝이 비었다 */
+      /* 구간 2 — 열어두고 오래 방치했고, 저장 전에 창을 닫아 끝이 비었다 */
       { name:'작성', date:'07/28', start:'16:30', submitted:false,
         series:[388,392,398,404,404,404,404,404,404,404,404,404,404,404,404,404,404,404,404,404,404,404,404,404,404,404,404,404,404,404,404,404,404,404,404,404,410,418],
         events:[ {at:36, type:'화면 안 보임', dur:35, burstSec:20} ] },
@@ -555,23 +555,6 @@ const teacherRows = [
 
 /* ───────── 파생값 (모두 series·events에서 계산) ───────── */
 function sessMinutes(s){ return s.series.length - 1; }
-/* 총 작성 시간에서 빼는 구간 — 30분 이상 글자 수가 그대로면 '쓰고 있던 시간'으로 세지 않는다
-   (2026-08-11 제이콥). 구간을 끊는 게 아니라 계산에서만 빼는 것 */
-const IDLE_MIN = 30;
-function sessIdleMinutes(s){
-  let idle = 0, runStart = 0;
-  for(let i = 1; i < s.series.length; i++){
-    const same = s.series[i] !== null && s.series[i-1] !== null && s.series[i] === s.series[i-1];
-    if(same) continue;
-    const run = (i-1) - runStart;
-    if(run >= IDLE_MIN) idle += run;
-    runStart = i;
-  }
-  const tail = (s.series.length-1) - runStart;
-  if(tail >= IDLE_MIN) idle += tail;
-  return idle;
-}
-function sessWriteMinutes(s){ return sessMinutes(s) - sessIdleMinutes(s); }
 function sessEvents(s){ return (s.events||[]).filter(e=>e.type!=='gap'); }
 function sessLeaveSec(s){ return sessEvents(s).reduce((a,e)=>a+e.dur, 0); }
 function rowSessions(r){ return (!r.teacherUpload && r.sessions) ? r.sessions : []; }
@@ -594,34 +577,26 @@ function hms(start, mins, addSec){
   const h = Math.floor(total/3600) % 24, m = Math.floor(total/60) % 60, s = total % 60;
   return String(h).padStart(2,'0')+':'+String(m).padStart(2,'0')+':'+String(s).padStart(2,'0');
 }
-/* 돌아온 뒤 '쉬지 않고 이어 쓴 구간' — 고정 5분 창을 버리고 구간을 데이터에서 잘라낸다
-   (2026-08-11 제이콥 제안). 증가 속도가 기준 아래로 떨어지면 구간을 닫는다.
-   ※ 실제 서비스는 5초 간격 표본이라 구간이 초 단위로 잡힌다. 이 목업의 곡선은 1분 간격이라
-     길이만 e.burstSec(5초 해상도로 봤을 때의 값)으로 대신 표시하고, 글자 수는 곡선에서 계산한다. */
-const BURST_MIN = 20;   /* 분당 증가량이 이 아래로 떨어지면 구간을 닫는다 */
-function burstAfter(s, e){
+/* 돌아온 뒤 1분간 작성 — 창을 1분으로 고정한다 (2026-08-21 확정).
+   구간을 어디서 자를지("몇 초 멈추면 끊긴 걸로 볼까") 정할 근거가 없어 임계값을 통째로
+   없앴다. 창이 고정이면 분모가 같아 학생 간 비교가 되고, 중간에 멈춘 학생은 값이 낮게
+   나올 뿐이라 오히려 사실에 맞는다. 목업 곡선은 1분 간격이라 복귀 다음 표본이 곧 1분치. */
+function gainAfterReturn(s, e){
   const back = e.at + e.dur/60;
-  const last = s.series.length-1;
+  const last = s.series.length - 1;
   if(back >= last) return null;
-  const from = Math.ceil(back + 0.001);
-  /* 복귀한 분에 걸쳐 있으면 곡선의 상승이 다음 표본에 찍힌다 — 두 칸까지 시작점을 찾는다 */
-  let j = -1;
-  for(let i = from; i <= Math.min(from + 1, last); i++){
-    if(s.series[i] === null || s.series[i-1] === null) continue;
-    if(s.series[i] - s.series[i-1] >= BURST_MIN){ j = i; break; }
-  }
-  if(j < 0) return null;
-  let end = j;
-  while(end + 1 <= last && s.series[end+1] !== null && s.series[end+1] - s.series[end] >= BURST_MIN) end++;
-  const gain = s.series[end] - s.series[j-1];
-  const sec  = e.burstSec || Math.round((end - (j-1)) * 60);
-  return { gain: gain, sec: sec };
+  const a = seriesAt(s.series, back);
+  const b = seriesAt(s.series, Math.min(last, back + 1));
+  const gain = b - a;
+  return gain > 0 ? gain : null;
 }
 
 /* ───────── 학생당 타임라인 1개 (2026-08-06 확정) ─────────
    과제물이 학생당 1개이므로 회차 개념 없음. 제출·재제출은 타임라인 위의 마커. */
-function rowMinutes(r){ return rowSessions(r).reduce((a,s)=>a+sessWriteMinutes(s),0); }
-function rowIdleMinutes(r){ return rowSessions(r).reduce((a,s)=>a+sessIdleMinutes(s),0); }
+/* 화면에 머문 시간 — 구간 시작~끝 그대로. 안 쓴 시간을 빼는 규칙은 폐기했다
+   (2026-08-21): 얼마나 안 쓰면 뺄지 정할 근거가 없어 30분이라는 임의 임계값이
+   필요했고, 계산을 고치는 대신 이름을 사실에 맞췄다 */
+function rowMinutes(r){ return rowSessions(r).reduce((a,s)=>a+sessMinutes(s),0); }
 function submitCount(r){ return rowSessions(r).filter(s=>s.submitted).length; }
 
 /* ───────── 타임라인 차트 (글자 수 곡선 + 이탈 구간 + 제출 마커) ─────────
@@ -650,8 +625,8 @@ function studentChart(sessions, maxVal){
       if(e.type==='gap'){
         out += '<rect x="'+x1+'" y="0" width="'+w+'" height="'+H+'" fill="#eef0f3"><title>'+hm(s.start, e.at)+' 기록 없음 · '+fmtDur(e.dur)+'</title></rect>';
       } else {
-        const g = burstAfter(s, e);
-        const tip = hm(s.start, e.at)+' 다른 화면 · '+fmtDur(e.dur) + (g ? ' · 돌아온 뒤 '+fmtDur(g.sec)+'간 +'+g.gain+'자' : '');
+        const g = gainAfterReturn(s, e);
+        const tip = hm(s.start, e.at)+' 다른 화면 · '+fmtDur(e.dur) + (g ? ' · 돌아온 뒤 1분간 +'+g+'자' : '');
         out += '<rect x="'+x1+'" y="0" width="'+w+'" height="'+H+'" fill="#fff1e6"><title>'+tip+'</title></rect>';
         out += '<line x1="'+x1+'" y1="0" x2="'+x1+'" y2="'+H+'" stroke="#f59e6b" stroke-width="1" stroke-dasharray="3 3" vector-effect="non-scaling-stroke"/>';
       }
@@ -687,7 +662,7 @@ function studentBlock(r, sessions, maxVal){
   const first = sessions[0], last = sessions[sessions.length-1];
   const endHm = hm(last.start, sessMinutes(last));
   const when = first.date + (last.date !== first.date ? '~'+last.date : '')
-    + ' · 총 ' + rowMinutes(r) + '분 작성'
+    + ' · 화면에 머문 시간 ' + rowMinutes(r) + '분'
     + (sessions.length > 1 ? ' · 작성이 ' + sessions.length + '번 끊김' : '');
 
   /* 제출 이력 칩 줄은 없앴다 — 숫자 정보는 모두 아래 작성 로그 표로 모은다 (2026-08-11 줄리).
@@ -734,13 +709,13 @@ function evtList(sessions){
           + '<span class="leave-evt-note">이 사이는 기록이 없어요.</span>'
           + '</div>';
       } else {
-        const g = burstAfter(s, e);
+        const g = gainAfterReturn(s, e);
         rows += '<div class="leave-evt">'
           + '<span class="leave-evt-time">'+range(s, e)+'</span>'
           + '<span class="leave-evt-type" title="'+e.type+'"><i class="lg-swatch" style="background:#fff1e6;border:1px solid #f7d3ba;"></i>다른 화면</span>'
           + '<span class="leave-evt-dur">'+fmtDur(e.dur)+'</span>'
           /* 구간 길이가 건마다 달라 숫자만 두면 비교가 안 된다 — 길이와 양을 함께 */
-          + (g ? '<span class="leave-evt-gain">'+fmtDur(g.sec)+'간 <b>'+(g.gain>=0?'+':'')+g.gain+'자</b></span>' : '<span class="leave-evt-gain none">없음</span>')
+          + (g ? '<span class="leave-evt-gain"><b>+'+g+'자</b></span>' : '<span class="leave-evt-gain none">없음</span>')
           + '</div>';
       }
     });
@@ -855,7 +830,7 @@ function openProcess(id){
 
   document.getElementById('pcTitle').textContent = r.id + ' ' + r.name + ' · 작성 과정';
   document.getElementById('pcSum').textContent = (cnt ? '이탈 '+cnt+'회 · '+fmtDur(sec) : '이탈 없음')
-    + ' · 총 ' + rowMinutes(r) + '분 작성' + (submitCount(r) >= 2 ? ' · 제출 '+submitCount(r)+'회' : '');
+    + ' · 화면에 머문 시간 ' + rowMinutes(r) + '분' + (submitCount(r) >= 2 ? ' · 제출 '+submitCount(r)+'회' : '');
   document.getElementById('pcBody').innerHTML =
       '<div class="ld-legend">'
       + '<span><i class="lg-line"></i>글자 수</span>'
@@ -868,7 +843,7 @@ function openProcess(id){
         + '<div class="leave-evt evt-head"><span class="leave-evt-time">시각</span>'
         + '<span class="leave-evt-type">구분</span>'
         + '<span class="leave-evt-dur">이탈 시간</span>'
-        + '<span class="leave-evt-gain">화면 이탈 후 작성</span></div>'
+        + '<span class="leave-evt-gain">돌아온 뒤 1분간 작성</span></div>'
         + evHtml + '</div>' : '');
   document.getElementById('pcModal').classList.add('show');
   lucide.createIcons();
