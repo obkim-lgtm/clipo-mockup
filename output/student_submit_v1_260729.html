@@ -136,41 +136,22 @@ body.nav-expanded .main-wrap{ padding-left:200px; }
 /* 이동 복귀 배너 */
 /* ===== 이탈 기록 배너 (다녀왔을 때만 나타나 그대로 남는다 · 좌측 띠 없음) =====
    상시 파란 배너는 시작 전 고지와 중복이라 폐기 (2026-08-11 올립) */
-/* 이탈 신호는 '알림'과 '상태'를 나눈다 (2026-08-12 회의 피드백) —
-   한 덩어리로 두면 sticky로 굳혀야 하나/사라지게 하나가 안 풀린다.
-   · 알림(.leave-banner) = 다녀온 직후 잠깐. 8초 뒤 스스로 접힌다
-   · 상태(.leave-stat)   = 누적 횟수·시간. 글자 수 옆에 늘 있다
-   상시 배너는 2026-08-11에 한 번 걷어냈다 — 늘 떠 있으면 배경이 되어 안 읽힌다 */
-/* 알림은 화면에 고정한다 — 스크롤을 내려 쓰다가 다녀오면 상단 배너를 아예 못 본다는
-   지적(2026-08-12 회의)에 대한 답. 상시 배너로 굳는 문제는 8초 자동 접힘이 막는다:
-   '늘 떠 있어 배경이 된다'와 '스크롤하면 안 보인다'를 동시에 푸는 유일한 조합 */
-/* 헤더 바로 아래 붙는 상단바 (2026-08-12 올립) — 카드가 아니라 화면 폭을 가로지르는 바.
+/* 기록 바 — 피그마 1317:26913 (2026-08-21). 회색 평소 / 주황 8초 부풀림 2단계를
+   단일 상태 한 줄로 바꿨다. 팝업에서 "확인했어요, 시작할게요"를 누른 순간부터 계속 떠 있고,
+   왼쪽은 무엇이 기록됐나, 오른쪽은 시작부터 지금까지의 측정 시간을 센다.
    .screen 직속이라 좌측 NB를 뺀 폭을 그대로 쓰고, 안쪽 .lb-in이 본문(1240px)에 맞춰 정렬된다.
-   top=58px = 헤더 높이. 스크롤을 내려도 헤더 바로 밑에 붙는다 */
+   top=58px = 헤더 높이 — 스크롤을 내려도 헤더 바로 밑에 붙는다 */
 .leave-banner{ display:none; position:sticky; top:58px; z-index:120;
-  background:#f4f5f7; border-bottom:1px solid #e3e5ea;
-  transition:background .25s ease, border-color .25s ease; }
+  background:#fff7ed; border-top:1px solid #fed7aa; border-bottom:1px solid #fed7aa; }
 .leave-banner.show{ display:block; }
-.leave-banner .lb-in{ max-width:1240px; margin:0 auto; padding:11px 32px;
-  display:flex; align-items:center; gap:10px; transition:padding .25s ease; }
-/* 이탈 직후 8초만 부푼다 — 평소엔 조용한 한 줄, 그 순간만 눈에 걸리게 */
-.leave-banner.alert{ background:#fff7ed; border-bottom-color:#fdd9b5;
-  box-shadow:0 6px 18px rgba(194,65,12,.10); }
-.leave-banner.alert .lb-in{ padding-top:16px; padding-bottom:16px; align-items:flex-start; }
-/* 누적 상태 — 조용하지만 항상. 값이 늘어난 순간에만 잠깐 강조해 '하나 늘었다'가 읽히게 */
-.leave-stat{ display:inline-flex; align-items:center; gap:6px; font-size:14px; color:#6d7381; margin-left:auto; }
-.leave-stat i, .leave-stat svg{ width:15px; height:15px; flex-shrink:0; }
-.leave-stat b{ font-weight:700; color:#3b3f4c; }
-.leave-stat.bump{ color:#c2410c; }
-.leave-stat.bump b{ color:#c2410c; }
-.leave-stat[hidden]{ display:none; }
-.leave-banner i, .leave-banner svg{ width:18px; height:18px; color:#8a8f9a; flex-shrink:0; transition:color .25s ease; }
-.leave-banner.alert i, .leave-banner.alert svg{ width:24px; height:24px; color:#ea580c; margin-top:1px; }
-/* 평소 = 누적 한 줄. 이탈 순간 = 제목 + 방금 다녀온 시간 */
-.leave-banner .lb-t{ font-size:15px; font-weight:600; color:#3b3f4c; margin:0; line-height:1.5; }
-.leave-banner.alert .lb-t{ font-size:17px; font-weight:700; color:#7c2d12; margin:0 0 4px; }
-.leave-banner .lb-d{ display:none; font-size:15px; font-weight:500; color:#9a5b2e; margin:0; line-height:1.65; }
-.leave-banner.alert .lb-d{ display:block; }
+.leave-banner .lb-in{ max-width:1240px; margin:0 auto; padding:0 32px; min-height:47px;
+  display:flex; align-items:center; gap:8px; }
+.leave-banner i, .leave-banner svg{ width:18px; height:18px; color:#92310a; flex-shrink:0; }
+.leave-banner .lb-t{ font-size:15px; font-weight:600; color:#92310a; margin:0; line-height:1.5; }
+/* 측정 시간 — 오른쪽 끝. tabular-nums가 없으면 숫자 폭이 초마다 달라져 글자가 떨린다 */
+.leave-banner .lb-time{ margin-left:auto; display:inline-flex; align-items:center; gap:6px;
+  font-size:15px; font-weight:600; color:#92310a; flex-shrink:0; }
+.leave-banner .lb-time b{ font-weight:700; font-variant-numeric:tabular-nums; }
 
 /* ===== 하단 액션 ===== */
 .actions{ display:flex; align-items:center; justify-content:flex-end; gap:12px; margin-top:24px; }
@@ -255,6 +236,8 @@ body.pdf-mode .sf-copy{ color:#8b8f9c; }
 .md-d{ font-size:16px; color:#3b3f4c; margin:0; line-height:1.7; }
 .md-names{ background:#f6f7f9; border-radius:8px; padding:12px 16px; margin-top:16px; font-size:15px; font-weight:600; color:#c2410c; line-height:1.6; }
 .md-ft{ display:flex; gap:10px; padding:0 32px 28px; }
+/* 버튼 바로 위 한 줄 — 규칙 4개가 '무엇이'를 말하고 이 줄이 '언제부터'를 못 박는다 */
+#guideModal .md-start{ text-align:center; font-size:15px; font-weight:500; color:#6d7381; margin:20px 0 0; line-height:1.6; }
 .md-ft button{ flex:1; height:48px; border-radius:9999px; font-size:16px; font-weight:600; font-family:inherit; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; line-height:1; vertical-align:middle; }
 .md-cancel{ border:1px solid #d9d9d9; background:#fff; color:#3b3f4c; }
 .md-cancel:hover{ background:#f6f7f9; }
@@ -297,8 +280,9 @@ body.pdf-mode .sf-copy{ color:#8b8f9c; }
   .card{ padding:20px 16px; }
   .task-name{ font-size:19px; }
   .task-top{ flex-wrap:wrap; gap:8px; }
-  /* 이탈 알림은 좁은 화면에서 두 줄이 되므로 헤더 아래 여백을 줄인다 */
-  .leave-banner{ top:64px; padding:14px 16px; }
+  .leave-banner{ top:64px; }
+  .leave-banner .lb-in{ padding:8px 16px; flex-wrap:wrap; }
+  .leave-banner .lb-time{ margin-left:26px; }
   .rule{ align-items:flex-start; }
   .actions{ flex-direction:column; align-items:stretch; gap:10px; }
   .actions .btn{ width:100%; }
@@ -350,11 +334,9 @@ body.pdf-mode .sf-copy{ color:#8b8f9c; }
        모든 직접 작성 과제에 항상 나간다 — 교사 스위치는 2026-08-13에 폐기. -->
   <div class="leave-banner" id="leaveBanner" data-rec-notice>
     <div class="lb-in">
-      <i data-lucide="monitor-check"></i>
-      <div>
-        <p class="lb-t">다른 화면에 다녀온 기록이 남았어요</p>
-        <p class="lb-d" id="leaveBannerDesc"></p>
-      </div>
+      <i data-lucide="circle-alert"></i>
+      <p class="lb-t"></p>
+      <span class="lb-time"><i data-lucide="timer"></i><b class="lb-clock">0:00</b></span>
     </div>
   </div>
 
@@ -407,11 +389,9 @@ body.pdf-mode .sf-copy{ color:#8b8f9c; }
 <div id="scr-both" class="screen">
   <div class="leave-banner" id="leaveBannerBoth" data-rec-notice>
     <div class="lb-in">
-      <i data-lucide="monitor-check"></i>
-      <div>
-        <p class="lb-t">다른 화면에 다녀온 기록이 남았어요</p>
-        <p class="lb-d" id="leaveBannerBothDesc"></p>
-      </div>
+      <i data-lucide="circle-alert"></i>
+      <p class="lb-t"></p>
+      <span class="lb-time"><i data-lucide="timer"></i><b class="lb-clock">0:00</b></span>
     </div>
   </div>
 
@@ -667,27 +647,43 @@ body.pdf-mode .sf-copy{ color:#8b8f9c; }
   <div class="md">
     <div class="md-body" style="text-align:left;">
       <p class="md-t" style="text-align:center;">과제를 시작하기 전에 확인해 주세요</p>
+      <!-- 순서 = 학생이 겪는 시간 흐름 (2026-08-21 올립) — 어떻게 쓰나 → 저장은 어떻게 되나
+           → 그동안 무엇이 기록되나 → 다시 내도 남나. 앞 둘이 '네가 할 일', 뒤 둘이 '기록되는 것'.
+           기록 항목을 가운데 몰아두면 감시 얘기만 튀어나와 딱딱해진다.
+           ②와 ③을 '저장돼요 / 기록돼요'로 대구를 만들어, 감시가 툭 끼어들지 않고 이어지게 한다 -->
       <div class="rules" style="margin-top:18px;">
+        <!-- 금지가 아니라 무엇을 하면 되는지로 연다 (2026-08-11 올립).
+             ⚠️ '자료를 봐도 괜찮다' 류의 문장은 넣지 말 것 (2026-08-21) — 위축을 막으려다
+             오히려 나가서 찾아보라고 권하는 말이 된다. 화면 안에서 쓰라는 쪽으로만 -->
         <div class="rule">
-          <i data-lucide="list-checks"></i>
-          <p><b>과제 안내를 읽고 답안을 작성해요.</b><span class="sub">쓰는 동안 내용이 임시로 자동 저장돼요. 다 썼으면 <b>[제출]</b>을 눌러야 선생님께 전달돼요.</span></p>
+          <i data-lucide="pencil-line"></i>
+          <p><b>과제 안내를 읽고, 자기 생각을 자기 말로 써요.</b><span class="sub">외부에서 복사한 내용은 붙여넣을 수 없어요. <b>떠오른 생각을 그대로 문장으로</b> 옮기면 돼요.</span></p>
         </div>
-        <!-- 복붙 금지에도 설명 한 줄 — 앞뒤 항목과 형태를 맞추고, 금지만 남기지 않는다 (2026-08-11 올립).
-             학생 관점으로: 왜 막는지가 아니라 무엇을 하면 되는지 -->
         <div class="rule">
-          <i data-lucide="clipboard-x"></i>
-          <p><b>외부에서 복사한 내용은 붙여넣을 수 없어요.</b><span class="sub">스스로 생각한 내용을 자기 말로 써 보세요.</span></p>
+          <i data-lucide="save"></i>
+          <p><b>쓰는 동안 내용은 자동으로 저장돼요.</b><span class="sub">다 썼으면 <b>[제출]</b>을 눌러야 선생님께 전달돼요.</span></p>
         </div>
+        <!-- '어떤 화면을 봤는지는 안 남는다'는 학생에게 말하지 않는다 (2026-08-11 올립) —
+             안심하고 봐도 된다는 신호가 되어 억제 효과를 스스로 깎는다.
+             화면 축소·탭 전환을 콕 집는다 (2026-08-21) — '다른 화면'만 적으면
+             창을 줄여 옆에 띄우는 건 안 걸린다고 읽는다 -->
         <div class="rule">
           <i data-lucide="monitor-check"></i>
-          <!-- '어떤 화면을 봤는지는 안 남는다'는 학생에게 말하지 않는다 (2026-08-11 올립) —
-               안심하고 봐도 된다는 신호가 되어 억제 효과를 스스로 깎는다. 교사 화면 설명에는 유지 -->
-          <p><b>직접 쓴 답안인지 확인하기 위해 작성 과정이 기록돼요.</b><span class="sub">다른 화면에 다녀온 시각과 머문 시간, 글자 수 변화가 남아요.</span></p>
+          <p><b>쓰는 동안 작성 과정도 함께 기록돼요.</b><span class="sub">다른 탭이나 창으로 옮기거나 화면을 작게 만들면, <b>그 시각과 머문 시간이 남아요.</b> 글자 수가 늘고 준 것도요.</span></p>
+        </div>
+        <!-- 재제출로 기록이 리셋된다고 오해하면 '대충 내고 다시 내기' 우회로가 열린다.
+             교사 화면은 모든 구간을 누적 보존하므로 학생에게도 같은 사실을 알린다 -->
+        <div class="rule">
+          <i data-lucide="history"></i>
+          <p><b>다시 제출해도 앞의 기록은 남아 있어요.</b><span class="sub">고쳐서 한 번 더 내도, 처음 쓸 때부터의 기록이 그대로 이어져요.</span></p>
         </div>
       </div>
+      <p class="md-start">확인을 누르면 <b>지금부터 작성 과정이 기록돼요.</b></p>
     </div>
+    <!-- 버튼이 곧 "지금부터 시작"이 되게 한다 (2026-08-21 올립) — 확인만 하고 끝나는
+         느낌이면 다음 화면에서 스톱워치가 켜지는 것과 이어지지 않는다 -->
     <div class="md-ft">
-      <button class="md-ok" onclick="closeGuide()">확인했어요</button>
+      <button class="md-ok" onclick="closeGuide()">확인했어요, 시작할게요</button>
     </div>
   </div>
 </div>
@@ -776,30 +772,44 @@ var LEAVE_COUNT = 0, LEAVE_SEC = 0, LEAVE_LAST = 0, leaveHideTimer = null;
      이탈 직후  = 같은 줄이 8초간 주황으로 부풀며 방금 다녀온 시간을 덧붙임
      이탈 0회   = 줄 자체가 없음 (아무 일도 없었는데 자리를 먹지 않는다)
    누적값은 제출해도 지우지 않는다 — 리셋되면 '내면 없어진다'로 학습해 억제가 무너진다 */
-function renderLeaveBar(alert){
+/* 시작 안내 팝업을 닫는 순간부터 바가 스톱워치로 뜬다 (2026-08-21 최종 회의) —
+   '확인했어요'가 곧 "지금부터 기록 시작"이라는 감각을 주기 위함. 이탈 0회여도
+   기록 중이라는 사실은 보인다. 이탈이 생기면 같은 줄에 누적이 덧붙는다 */
+var REC_START = null, recTick = null;
+function startRecording(){
+  if(REC_START === null){
+    REC_START = Date.now();
+    recTick = setInterval(renderLeaveBar, 1000);
+  }
+  renderLeaveBar();
+}
+function fmtClock(sec){
+  var h = Math.floor(sec/3600), m = Math.floor(sec%3600/60), s2 = sec%60;
+  var mm = (h && m<10 ? '0' : '') + m, ss = (s2<10 ? '0' : '') + s2;
+  return (h ? h + ':' : '') + mm + ':' + ss;
+}
+function renderLeaveBar(){
+  var rec = REC_START !== null ? Math.floor((Date.now()-REC_START)/1000) : null;
   ['leaveBanner', 'leaveBannerBoth'].forEach(function(id){
     var el = document.getElementById(id);
     if(!el) return;
-    if(!LEAVE_COUNT){ el.classList.remove('show','alert'); return; }
-    el.querySelector('.lb-t').textContent = alert
-      ? '다른 화면에 다녀온 기록이 남았어요'
-      : '다른 화면 ' + LEAVE_COUNT + '회 · ' + fmtDur(LEAVE_SEC) + ' 기록됨';
-    el.querySelector('.lb-d').textContent =
-      '방금 ' + fmtDur(LEAVE_LAST) + ' 다녀왔어요. 지금까지 ' + LEAVE_COUNT + '회 · '
-      + fmtDur(LEAVE_SEC) + ' 기록됐고, 선생님께 전달돼요.';
+    if(!LEAVE_COUNT && rec === null){ el.classList.remove('show'); return; }
+    /* 왼쪽 = 무엇이 기록됐나. 이탈 0회여도 기록 중이라는 사실은 보인다 */
+    el.querySelector('.lb-t').textContent = LEAVE_COUNT
+      ? '다른 화면에 다녀온 기록이 남았어요. (총 ' + LEAVE_COUNT + '회 · 누적 ' + fmtDur(LEAVE_SEC) + ')'
+      : '작성 과정을 기록하고 있어요.';
+    /* 오른쪽 = 시작부터 지금까지의 측정 시간 */
+    var c = el.querySelector('.lb-clock');
+    if(c) c.textContent = fmtClock(rec === null ? 0 : rec);
     el.hidden = false;
     el.classList.add('show');
-    el.classList.toggle('alert', !!alert);
   });
-  if(alert){
-    clearTimeout(leaveHideTimer);
-    leaveHideTimer = setTimeout(function(){ renderLeaveBar(false); }, 8000);
-  }
 }
-/* 이름을 바꾸면 호출부를 다 고쳐야 해서 기존 이름은 얇은 껍데기로 남긴다 */
-function renderLeaveStat(bump){ renderLeaveBar(false); }
-function renderLeaveBanner(){ renderLeaveBar(true); }
-function hideLeaveBanner(){ renderLeaveBar(false); }
+/* 이름을 바꾸면 호출부를 다 고쳐야 해서 기존 이름은 얇은 껍데기로 남긴다.
+   8초 자동 접힘은 폐기 — 피그마가 단일 상태 한 줄이라 접을 것이 없다 (2026-08-21) */
+function renderLeaveStat(bump){ renderLeaveBar(); }
+function renderLeaveBanner(){ renderLeaveBar(); }
+function hideLeaveBanner(){ renderLeaveBar(); }
 
 /* ───────── 시작 안내 팝업 ─────────
    과제 최초 진입 때만 뜬다. 실제로는 '학생 × 과제' 단위로 본 적 있는지 기록해야 하고,
@@ -812,6 +822,7 @@ function openGuide(){
 function closeGuide(){
   var el = document.getElementById('guideModal');
   if(el) el.classList.remove('show');
+  startRecording();   /* 확인했어요 = 지금부터 기록 시작 (2026-08-21) */
 }
 
 /* ───────── 과제 첨부 열기 (2026-08-20 확정) ─────────
@@ -852,8 +863,10 @@ function go(scene){
   document.body.classList.toggle('pdf-mode', scene === 'pdf');
   document.querySelectorAll('#mockpick .mp-btn[data-scene]').forEach(function(b){ b.classList.toggle('on', b.getAttribute('data-scene') === scene); });
   if(location.hash !== '#'+scene) history.replaceState(null, '', '#'+scene);
-  if(scene === 'write')  { renderQuestions('qList', true, false); renderLeaveStat(false); }   /* 통글 1칸 */
-  if(scene === 'both')   { renderQuestions('qListBoth', false, true); renderLeaveStat(false); } /* 문항형 시연 */
+  /* 작성 화면에 있으면 기록 중이다 — 시작을 팝업 닫기에만 걸어두면 까망이로 바로 들어온
+     케이스에서 바가 없다. startRecording()은 이미 돌고 있으면 아무것도 안 한다 (2026-08-21) */
+  if(scene === 'write')  { renderQuestions('qList', true, false); startRecording(); }   /* 통글 1칸 */
+  if(scene === 'both')   { renderQuestions('qListBoth', false, true); startRecording(); } /* 문항형 시연 */
   if(scene === 'done')   renderAnswers();
   if(scene === 'closed') renderDraft('draftList');
   if(scene === 'pdf')    renderPdf();
@@ -1036,7 +1049,7 @@ function renderPdf(){
 /* 시연용 이탈 1회 — 실제 감지 경로(onLeave/onReturn)와 같은 결과를 만든다 */
 function simulateLeave(sec){
   LEAVE_COUNT += 1; LEAVE_SEC += sec; LEAVE_LAST = sec;
-  renderLeaveBar(true);   /* 알림·상태가 한 줄이라 한 번만 부른다 (두 번 부르면 알림이 곧바로 덮임) */
+  renderLeaveBar();   /* 알림·상태가 한 줄이라 한 번만 부른다 (두 번 부르면 알림이 곧바로 덮임) */
 }
 
 /* ───────── 다른 화면 이동 감지 (실제 브라우저 이벤트) ───────── */
@@ -1052,7 +1065,7 @@ function onReturn(){
      이탈(남은 것)은 남아 있는 표시가 사실과 맞다 */
   if(dur >= 3){
     LEAVE_COUNT += 1; LEAVE_SEC += dur; LEAVE_LAST = dur;
-    renderLeaveBar(true);     /* 부푼 상태로 8초, 그 뒤 누적 한 줄로 돌아감 */
+    renderLeaveBar();     /* 부푼 상태로 8초, 그 뒤 누적 한 줄로 돌아감 */
   }
   leaveStart = null; leaveType = null;
 }
@@ -1163,6 +1176,7 @@ window.MOCK_NAV_GROUPS = [
 function resetLeave(){
   LEAVE_COUNT = 0; LEAVE_SEC = 0; LEAVE_LAST = 0; leaveStart = null; leaveType = null;
   clearTimeout(leaveHideTimer);
+  clearInterval(recTick); recTick = null; REC_START = null;
   document.querySelectorAll('.leave-stat').forEach(function(el){ el.hidden = true; });
   document.querySelectorAll('[data-rec-notice]').forEach(function(n){ n.classList.remove('show'); });
   closeFilePreview();
