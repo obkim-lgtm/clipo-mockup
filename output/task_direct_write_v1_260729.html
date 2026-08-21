@@ -2016,6 +2016,7 @@ function updateSummary(){
   if(filled.length === 0){
     box.classList.add('empty');
     txt.textContent = '작성한 문항 없음';
+    prev.style.display = '';
     prev.textContent = '문항을 작성해야 학생이 답을 쓸 수 있습니다.';
     btn.className = 'btn btn-primary btn-sm';
     btn.innerHTML = '<i data-lucide="pencil-line" style="width:15px;height:15px"></i>문항 작성';
@@ -2023,7 +2024,10 @@ function updateSummary(){
     box.classList.remove('empty');
     txt.textContent = '문항 ' + QUESTIONS.length + '개'
       + (SUBMITTED > 0 ? ' · 제출 ' + SUBMITTED + '명' : '');
-    prev.textContent = '1. ' + filled[0];
+    /* 문항 본문 미리보기는 넣지 않는다 (2026-08-21 올립).
+       첫 문항만 잘려 보여 정보 가치가 없고, 문항 길이에 따라 요약 상자 높이가 흔들린다 */
+    prev.style.display = 'none';
+    prev.textContent = '';
     btn.className = 'btn btn-outline btn-sm';
     btn.innerHTML = SUBMITTED > 0
       ? '<i data-lucide="lock" style="width:15px;height:15px"></i>문항 보기'
