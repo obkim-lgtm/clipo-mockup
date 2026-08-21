@@ -536,15 +536,15 @@ body.pdf-mode .sf-copy{ color:#8b8f9c; }
         <p class="done-d" id="doneDesc">마감 전까지는 다시 제출할 수 있어요. 다시 제출하면 마지막에 낸 답안으로 바뀌어요.</p>
 
         <div class="done-box">
-          <div class="done-row"><span class="done-lb">과제</span><span class="done-vl">사회 변동과 현대사회의 문제 분석</span></div>
-          <div class="done-row"><span class="done-lb">제출 시각</span><span class="done-vl">7월 29일(수) 15:24</span></div>
-          <div class="done-row"><span class="done-lb">제출 방법</span><span class="done-vl">클리포에서 직접 작성</span></div>
+          <div class="done-row"><span class="done-lb">과제</span><span class="done-vl" id="doneTask">사회 변동과 현대사회의 문제 분석</span></div>
+          <div class="done-row"><span class="done-lb">제출 시각</span><span class="done-vl" id="doneAt">7월 29일(수) 15:24</span></div>
+          <div class="done-row"><span class="done-lb">제출 방법</span><span class="done-vl" id="doneWay">클리포에서 직접 작성</span></div>
         </div>
       </div>
     </div>
 
     <div class="card">
-      <h3 class="card-title">제출한 답안</h3>
+      <h3 class="card-title" id="ansTitle">제출한 답안</h3>
       <div id="ansList"></div>
       <!-- 결과 공개 후에도 재제출을 막지 않는다 (2026-08-12 올립) — 차단 문구·버튼 숨김 폐기 -->
       <div class="actions">
@@ -844,7 +844,7 @@ function go(scene){
   if(location.hash !== '#'+scene) history.replaceState(null, '', '#'+scene);
   if(scene === 'write')  renderQuestions('qList', true, false);      /* 통글 1칸 */
   if(scene === 'both')   renderQuestions('qListBoth', false, true);  /* 문항형 시연 */
-  if(scene === 'done')   renderAnswers();
+  if(scene === 'done')   setDoneFile(false);
   if(scene === 'closed') renderDraft('draftList');
   if(scene === 'pdf')    renderPdf();
   window.scrollTo(0,0);
@@ -986,6 +986,34 @@ function renderAnswers(targetId){
   box.appendChild(d);
 }
 
+/* 파일로 낸 답안 — 작성 답안 대신 파일 한 줄. 교사가 대신 올린 경우도 이 모양이다
+   (교사는 학생 대신 타이핑하지 않으므로 대신 제출은 언제나 파일이다 · 2026-08-21 올립 지적) */
+function renderFileAnswer(targetId){
+  var box = document.getElementById(targetId || 'ansList');
+  if(!box) return;
+  box.innerHTML =
+      '<div class="file-row">'
+    +   '<i data-lucide="file-text" class="fi"></i>'
+    +   '<span class="file-nm">지형조사보고서_10101_김서윤.pdf</span>'
+    +   '<span class="file-sz">1.8MB</span>'
+    + '</div>';
+  if(window.lucide) lucide.createIcons();
+}
+
+/* 제출 완료 화면을 '파일 제출' 버전으로 — 제출 방법·답안 표현이 함께 바뀐다.
+   과제명·시각도 목록 10번 행과 맞춘다 */
+function setDoneFile(on){
+  var way = document.getElementById('doneWay');
+  var tt  = document.getElementById('ansTitle');
+  var task= document.getElementById('doneTask');
+  var at  = document.getElementById('doneAt');
+  if(way)  way.textContent  = on ? '파일 제출' : '클리포에서 직접 작성';
+  if(tt)   tt.textContent   = on ? '제출한 파일' : '제출한 답안';
+  if(task) task.textContent = on ? '우리 지역 지형 조사 보고서' : '사회 변동과 현대사회의 문제 분석';
+  if(at)   at.textContent   = on ? '9월 5일(금) 15:20' : '7월 29일(수) 15:24';
+  if(on) renderFileAnswer(); else renderAnswers();
+}
+
 /* 마감돼 제출하지 못한 임시저장 글 — 쓰던 자리를 그대로 보여주되 입력만 막는다 */
 function renderDraft(targetId){
   var box = document.getElementById(targetId);
@@ -1112,7 +1140,9 @@ var SUB_CASES = {
                          실제 동작은 8초 뒤 스스로 접히는 것 */
                       },
   'result-before':  function(){ go('done'); setOpened(false); },
-  'result-after':   function(){ go('done'); setOpened(true); }
+  'result-after':   function(){ go('done'); setOpened(true); },
+  /* 학생 답안을 교사가 대신 올린 경우 — 파일 제출이라 답안 자리에 파일이 뜬다 (다나 발견 케이스) */
+  'result-file':    function(){ go('done'); setOpened(false); setDoneFile(true); }
 };
 function goSub(h){
   if(SUB_CASES[h]){ SUB_CASES[h](); history.replaceState(null, '', '#'+h); return true; }
@@ -1148,6 +1178,7 @@ window.MOCK_NAV_GROUPS = [
       ['ssFileonly','파일 제출만'],
       ['ssPreparing','문항 미작성'],
       ['ssBefore','제출 완료 · 결과 공개 전',{sub:'다시 제출 가능'}],
+      ['ssFile','제출 완료 · 교사가 대신 올림',{sub:'파일 제출로 표시'}],
       ['ssAfter','제출 완료 · 결과 공개 후',{sub:'다시 제출도 가능'}],
       ['ssClosed','제출 못 한 채 마감',{sub:'쓰던 글은 읽기 전용'}],
       ['ssPdf','답안 PDF']] }
@@ -1173,6 +1204,7 @@ window.MOCK_NAV_APPLY = {
   ssPreparing: function(){ resetLeave(); go('preparing'); },
   ssClosed:    function(){ resetLeave(); go('closed'); },
   ssBefore:    function(){ resetLeave(); go('done'); setOpened(false); },
+  ssFile:      function(){ resetLeave(); go('done'); setOpened(false); setDoneFile(true); },
   ssAfter:     function(){ resetLeave(); go('done'); setOpened(true); },
   ssPdf:       function(){ resetLeave(); go('pdf'); },
   ssAttachPv:  function(){ resetLeave(); go('write'); closeGuide(); openAttachment('사회 변동 참고자료.pdf'); },

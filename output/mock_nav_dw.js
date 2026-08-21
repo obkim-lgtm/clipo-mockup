@@ -62,6 +62,7 @@
     ssPreparing: { f:'submit',  h:'preparing' },
     ssClosed:    { f:'submit',  h:'closed' },
     ssBefore:    { f:'submit',  h:'result-before' },
+    ssFile:      { f:'submit',  h:'result-file' },
     ssAfter:     { f:'submit',  h:'result-after' },
     ssPdf:       { f:'submit',  h:'pdf' },
     ssCoverAway: { f:'submit',  h:'cover-away' },
