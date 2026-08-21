@@ -124,6 +124,13 @@ body.nav-expanded .main-wrap{ padding-left:200px; }
 .file-sz{ font-size:14px; color:#6d7381; flex-shrink:0; }
 .file-x{ width:34px; height:34px; border:none; background:none; border-radius:6px; color:#6d7381; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; line-height:1; flex-shrink:0; }
 .file-x:hover{ background:#fff3f4; color:#ab303a; }
+/* 제출한 파일 — 내려받기용. 행 전체가 눌리고 호버로 그 사실을 알린다 (2026-08-21 올립) */
+.file-row.dl{ width:100%; text-align:left; background:#fff; font-family:inherit; cursor:pointer; transition:border-color .12s, background .12s; }
+.file-row.dl:hover{ border-color:#416bff; background:#f7f9ff; }
+.file-row.dl:hover .file-nm{ color:#2a4bc4; text-decoration:underline; }
+.file-row.dl:hover .file-dl{ color:#365eef; }
+.file-row.dl:focus-visible{ outline:2px solid #416bff; outline-offset:2px; }
+.file-dl{ width:20px; height:20px; color:#9aa0ad; flex-shrink:0; }
 
 /* ===== 안내 박스 ===== */
 .info{ background:#e9f2ff; border-radius:10px; padding:16px 18px; display:flex; align-items:flex-start; gap:10px; }
@@ -548,7 +555,7 @@ body.pdf-mode .sf-copy{ color:#8b8f9c; }
       <div id="ansList"></div>
       <!-- 결과 공개 후에도 재제출을 막지 않는다 (2026-08-12 올립) — 차단 문구·버튼 숨김 폐기 -->
       <div class="actions">
-        <button class="btn btn-outline" id="btnResubmit" onclick="go('write')"><i data-lucide="pencil-line" style="width:16px;height:16px"></i>다시 제출</button>
+        <button class="btn btn-outline" id="btnResubmit" onclick="resubmit()"><i data-lucide="pencil-line" style="width:16px;height:16px"></i>다시 제출</button>
         <button class="btn btn-primary" id="btnToList" onclick="location.href='student_home_v1_260729.html'">과제 목록으로</button>
         <button class="btn btn-primary" id="btnToResult" style="display:none;" onclick="notReady('결과 보기')">결과 보기 <i data-lucide="chevron-right" style="width:16px;height:16px"></i></button>
       </div>
@@ -991,18 +998,35 @@ function renderAnswers(targetId){
 function renderFileAnswer(targetId){
   var box = document.getElementById(targetId || 'ansList');
   if(!box) return;
-  box.innerHTML =
-      '<div class="file-row">'
-    +   '<i data-lucide="file-text" class="fi"></i>'
-    +   '<span class="file-nm">지형조사보고서_10101_김서윤.pdf</span>'
-    +   '<span class="file-sz">1.8MB</span>'
-    + '</div>';
+  var name = '지형조사보고서_10101_김서윤.pdf';
+  box.innerHTML = '';
+  var b = document.createElement('button');
+  b.type = 'button';
+  b.className = 'file-row dl';
+  b.title = '내려받기';
+  b.innerHTML = '<i data-lucide="file-text" class="fi"></i>'
+              + '<span class="file-nm"></span>'
+              + '<span class="file-sz">1.8MB</span>'
+              + '<i data-lucide="download" class="file-dl"></i>';
+  b.querySelector('.file-nm').textContent = name;
+  b.addEventListener('click', function(){ downloadSubmitted(name); });
+  box.appendChild(b);
   if(window.lucide) lucide.createIcons();
 }
+
+/* 지금 제출 완료 화면이 파일 버전인지. '다시 제출'이 어디로 갈지를 가른다 */
+var DONE_FILE = false;
+/* 다시 제출 — 냈던 방식 그대로. 파일로 낸 과제를 작성 화면으로 보내면
+   학생이 낼 수 없는 자리에 떨어진다 (2026-08-21 올립 지적) */
+function resubmit(){ go(DONE_FILE ? 'fileonly' : 'write'); }
+
+/* 낸 파일 내려받기 — 목업이라 실제 저장은 없고 토스트로 대신한다 */
+function downloadSubmitted(name){ toastMsg(name + ' 내려받기를 시작했어요.'); }
 
 /* 제출 완료 화면을 '파일 제출' 버전으로 — 제출 방법·답안 표현이 함께 바뀐다.
    과제명·시각도 목록 10번 행과 맞춘다 */
 function setDoneFile(on){
+  DONE_FILE = !!on;
   var way = document.getElementById('doneWay');
   var tt  = document.getElementById('ansTitle');
   var task= document.getElementById('doneTask');
