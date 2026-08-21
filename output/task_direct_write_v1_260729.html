@@ -413,7 +413,7 @@
     /* 삭제 잠김 — 버튼은 남기되 눌러도 안 지워지고 사유를 알려준다 (2026-08-07) */
     .qi-btn.del.is-locked{ color:#b3b6bd; }
     .qi-btn.del.is-locked:hover{ background:#f1f3f5; color:#6d7381; }
-    .qta{ width:100%; min-height:96px; border:1px solid #d9d9d9; border-radius:8px; padding:14px 16px; font-size:16px; font-family:inherit; line-height:1.7; color:#222631; resize:vertical; outline:none; }
+    .qta{ width:100%; min-height:96px; border:1px solid #d9d9d9; border-radius:8px; padding:14px 16px; font-size:16px; font-family:inherit; line-height:1.7; color:#222631; resize:none; overflow:hidden; outline:none; } /* 내부 스크롤 대신 내용만큼 늘어남 (2026-08-21 올립) */
     .qta:focus{ border-color:#416bff; box-shadow:0 0 0 2px rgba(65,107,255,.12); }
     .qta::placeholder{ color:#9aa0ad; }
     .q-empty{ border:1px dashed #c7cbd3; border-radius:10px; padding:44px 20px; text-align:center; background:#fff; margin-bottom:12px; }
@@ -921,7 +921,7 @@
       </div>
 
       <div class="qdw-bd">
-        <p class="sec-desc">학생이 클리포 화면에서 보고 답할 문항이에요. 추가한 순서대로 학생에게 보이고 <b style="font-weight:600;">순서는 나중에 바꿀 수 없으니</b> 물어볼 차례대로 추가해 주세요. 자료나 이미지는 설계의 <b style="font-weight:600;">과제 안내</b>에 첨부합니다.</p>
+        <p class="sec-desc">학생이 클리포 화면에서 보고 답할 문항을 작성해 주세요. 자료나 이미지는 설계의 <b style="font-weight:600;">과제 안내</b>에 첨부해 주세요.</p>
 
         <!-- 잠금 안내는 영향 필드 앞 -->
         <div class="alert-info warn" id="lockNote" style="display:none;">
@@ -1910,7 +1910,7 @@ function renderQuestions(){
       +   '<button class="qi-btn del' + (locked ? ' is-locked' : '') + '" title="' + (locked ? '제출한 학생이 있어 지울 수 없어요' : '삭제') + '" onclick="delQ('+i+')"><i data-lucide="' + (locked ? 'lock' : 'trash-2') + '" style="width:18px;height:18px"></i></button>'
       + '</div>'
       + '</div>'
-      + '<textarea class="qta" placeholder="학생에게 보일 문항을 입력해 주세요." oninput="onQInput('+i+', this.value)"></textarea>'
+      + '<textarea class="qta" rows="1" placeholder="학생에게 보일 문항을 입력해 주세요." oninput="onQInput('+i+', this.value); qtaGrow(this)"></textarea>'
       /* 문항별 최대 글자 수 — 수식 입력과 같은 줄(오른쪽)에 둬서 카드 높이를 늘리지 않는다 */
       + '<div class="ans-tool">'
       +   (showFx() ? '<button class="fx-btn" onclick="openFx(this)"><i data-lucide="sigma" style="width:14px;height:14px"></i>수식 입력</button>' : '')
@@ -1926,6 +1926,7 @@ function renderQuestions(){
       + '</div>';
     d.querySelector('textarea').value = q;
     list.appendChild(d);
+    qtaGrow(d.querySelector('textarea'));   /* 기존 내용도 접힘 없이 펼쳐 보이게 */
   });
   document.getElementById('q-count').textContent = QUESTIONS.length;
   lucide.createIcons();
@@ -1961,6 +1962,7 @@ function fxInsertToTarget(){
   var tas = Array.prototype.slice.call(document.querySelectorAll('#q-list .qta'));
   var idx = tas.indexOf(_fxTarget);
   if(idx > -1) QUESTIONS[idx] = _fxTarget.value;
+  qtaGrow(_fxTarget);
   closeFx();
   toastMsg('수식을 문항에 넣었어요.');
 }
@@ -1969,6 +1971,11 @@ document.addEventListener('keydown', function(e){ if(e.key === 'Escape'){ closeF
 
 
 function onQInput(i, v){ QUESTIONS[i] = v; }
+/* 문항 입력창 자동 높이 — 내부 스크롤 없이 내용만큼 늘어남 (2026-08-21 올립) */
+function qtaGrow(ta){
+  ta.style.height = 'auto';
+  ta.style.height = Math.max(96, ta.scrollHeight + 2) + 'px';
+}
 
 /* 문항별 최대 글자 수 — 기본 500자, ±100자 스텝, 직접 입력 가능 (100~5,000) */
 var Q_LIMIT_MIN = 100, Q_LIMIT_MAX = 5000, Q_LIMIT_STEP = 100;
