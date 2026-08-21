@@ -151,7 +151,7 @@ body.nav-expanded .main-wrap{ padding-left:200px; }
 .leave-evt-type.stop{ color:#8a8f9a; }   /* 이탈이 아니라 구간이 끝난 자리 */
 .leave-evt-dur{ color:#222631; font-weight:600; width:80px; flex-shrink:0; }
 .leave-evt-gain{ font-size:14px; font-weight:500; color:#3b3f4c; }
-.leave-evt-gain.none{ color:#9aa0ad; }   /* 급증 구간이 없었다는 사실 — 값 누락과 구분 */
+.leave-evt-gain.none{ color:#9aa0ad; }   /* 돌아온 뒤 1분간 안 썼다는 사실 — 값 누락과 구분 */
 /* 목록 머리글 — 반복되던 '복귀 후 N분간'을 여기 한 번만 둔다 */
 .evt-head{ font-size:13px; font-weight:600; color:#8a8f9a; padding:4px 0 7px; border-bottom:1px solid #eceef2; }
 .evt-head span{ color:inherit; font-size:inherit; font-weight:inherit; }
@@ -498,7 +498,7 @@ const teacherRows = [
   /* ── 박지민 = 어노테이션용 전 케이스 집합 (2026-08-11 올립) ──
      화면에 나올 수 있는 모든 상황을 한 학생에 몰아 담았다. 어노테이션 상세를 쓸 때
      이 케이스 하나만 열면 모든 표기를 설명할 수 있게 하는 것이 목적.
-       구간1 · 이탈 4종(짧은 것 포함) · 급증 있음/없음 · 글자 수 감소 · 네트워크 공백 · 제출
+       구간1 · 이탈 4종(짧은 것 포함) · 돌아온 뒤 작성 있음/없음 · 글자 수 감소 · 네트워크 공백 · 제출
        구간2 · 오래 방치(화면에 머문 시간에는 그대로 포함) · 저장 전 종료로 끝이 빔 → 기록 없음
        구간3 · 이어 쓰고 재제출
      ※ series는 1분 간격. 값이 그대로면 안 쓴 시간, 줄어들면 지운 것 */
@@ -509,7 +509,7 @@ const teacherRows = [
         series:[0,0,6,10,10,10,62,70,74,78,78,80,130,138,142,146,150,154,154,156,200,206,210,214,214,216,258,262,266,270,274,274,276,318,322,326,330,334,338,342,336,330,372,376,378,380,382,383,384,385,386,386,387,387,388,388],
         events:[
           {at:3,  type:'화면 안 보임',  dur:2},                    /* 3초 미만도 기록 — 임계값 폐기 */
-          {at:10, type:'화면 안 보임',  dur:41, burstSec:15},      /* 돌아온 직후 급증 */
+          {at:10, type:'화면 안 보임',  dur:41, burstSec:15},      /* 돌아온 직후 많이 씀 */
           {at:18, type:'포커스 벗어남', dur:12, burstSec:30},      /* 종류 ② */
           {at:24, type:'화면 안 보임',  dur:58, burstSec:18},
           {at:31, type:'gap',          dur:180},                  /* 네트워크 끊김 */
@@ -678,7 +678,7 @@ function studentBlock(r, sessions, maxVal){
 
 /* 작성 로그 — 이탈·기록 없음·제출을 한 줄기 시간순으로 (2026-08-11 줄리).
    이탈만 모은 목록이 아니라 '무슨 일이 어떤 순서로 있었나'가 되어야,
-   급증이 제출 앞인지 뒤인지 같은 걸 표를 보고 알 수 있다. */
+   작성량이 제출 앞인지 뒤인지 같은 걸 표를 보고 알 수 있다. */
 function evtList(sessions){
   /* 여러 날에 걸쳐 썼으면 시각만으로는 순서를 못 읽으니 날짜를 붙인다 */
   const multiDay = sessions.some(s => s.date !== sessions[0].date);
