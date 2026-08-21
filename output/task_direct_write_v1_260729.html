@@ -921,7 +921,7 @@
       </div>
 
       <div class="qdw-bd">
-        <p class="sec-desc">학생이 클리포 화면에서 보고 답할 문항이에요. 작성한 순서대로 학생에게 보이며, 자료나 이미지는 설계의 <b style="font-weight:600;">과제 안내</b>에 첨부합니다.</p>
+        <p class="sec-desc">학생이 클리포 화면에서 보고 답할 문항이에요. 추가한 순서대로 학생에게 보이고 <b style="font-weight:600;">순서는 나중에 바꿀 수 없으니</b> 물어볼 차례대로 추가해 주세요. 자료나 이미지는 설계의 <b style="font-weight:600;">과제 안내</b>에 첨부합니다.</p>
 
         <!-- 잠금 안내는 영향 필드 앞 -->
         <div class="alert-info warn" id="lockNote" style="display:none;">
@@ -1881,6 +1881,9 @@ function applyWayLock(){
 }
 
 /* ── 문항 렌더 ── */
+/* 순서 변경(위·아래 이동)은 제공하지 않는다 (2026-08-21 올립).
+   제출이 들어온 뒤 순서를 바꾸면 이미 받은 답안·채점 화면·PDF가 함께 흔들려
+   수정 규칙이 복잡해진다. 문항은 추가한 순서로 고정하고, 추가는 항상 맨 아래에 붙는다 */
 function renderQuestions(){
   var list = document.getElementById('q-list');
   var locked = SUBMITTED > 0;
@@ -1903,8 +1906,6 @@ function renderQuestions(){
     d.innerHTML = '<div class="qcard-hd">'
       + '<span class="qcard-no">문항 ' + (i+1) + '</span>'
       + '<div class="qcard-tools">'
-      +   '<button class="qi-btn" title="위로 이동" onclick="moveQ('+i+',-1)"' + (i===0 ? ' disabled' : '') + '><i data-lucide="chevron-up" style="width:18px;height:18px"></i></button>'
-      +   '<button class="qi-btn" title="아래로 이동" onclick="moveQ('+i+',1)"' + (i===QUESTIONS.length-1 ? ' disabled' : '') + '><i data-lucide="chevron-down" style="width:18px;height:18px"></i></button>'
       /* 삭제만 잠근다 — 잠금 상태에서도 버튼은 남기고 누르면 사유를 알려준다 */
       +   '<button class="qi-btn del' + (locked ? ' is-locked' : '') + '" title="' + (locked ? '제출한 학생이 있어 지울 수 없어요' : '삭제') + '" onclick="delQ('+i+')"><i data-lucide="' + (locked ? 'lock' : 'trash-2') + '" style="width:18px;height:18px"></i></button>'
       + '</div>'
@@ -2003,13 +2004,6 @@ function delQ(i){
     return;
   }
   QUESTIONS.splice(i,1); Q_LIMITS.splice(i,1); renderQuestions();
-}
-function moveQ(i, dir){
-  var j = i + dir;
-  if(j < 0 || j >= QUESTIONS.length) return;
-  var tmp = QUESTIONS[i]; QUESTIONS[i] = QUESTIONS[j]; QUESTIONS[j] = tmp;
-  var tl = qLimit(i); Q_LIMITS[i] = qLimit(j); Q_LIMITS[j] = tl;
-  renderQuestions();
 }
 
 /* ── 설계 화면 문항 요약 ── */
