@@ -156,7 +156,7 @@ body.resizing{ cursor:col-resize; user-select:none; }
 .leave-evt-time{ color:#3b3f4c; font-weight:600; width:268px; flex-shrink:0; white-space:nowrap; }   /* 여러 날 범위(07/28 15:42:00 ~ 07/28 16:30:00)가 두 줄로 접히지 않을 폭 (2026-08-21) */
 /* 알약 뱃지 → 범례 색 조각. 버튼처럼 보이던 문제 해소 (2026-08-11 올립, 과제물 관리와 동일) */
 .leave-evt-type{ display:inline-flex; align-items:center; gap:7px; color:#c2410c; font-size:14px; font-weight:600; line-height:1; flex-shrink:0; width:104px; white-space:nowrap; }   /* 라벨이 두 줄로 접히지 않을 폭 (2026-08-21) */
-.leave-evt-type.gap{ color:#6d7381; }
+.leave-evt-type.gap{ color:#ab303a; }   /* 경고 성격 — 다른 화면(주황)보다 무겁게 (2026-08-21 올립) */
 .leave-evt-type.submit{ color:#1f7a4d; }
 .leave-evt-type.stop{ color:#8a8f9a; }
 .leave-evt-dur{ color:#222631; font-weight:600; width:80px; flex-shrink:0; }
@@ -648,11 +648,17 @@ var PROC_ROW = {
       events:[] }
   ]
 };
-function fmtDur(s){ return s>=60 ? Math.floor(s/60)+'분'+(s%60? ' '+s%60+'초':'') : s+'초'; }
+function fmtDur(s){
+  if(s < 60) return s+'초';
+  const m = Math.floor(s/60);
+  if(m < 60) return m+'분'+(s%60 ? ' '+s%60+'초' : '');
+  return Math.floor(m/60)+'시간'+(m%60 ? ' '+m%60+'분' : '');   /* 과제 이탈은 몇 시간이 되기도 한다 */
+}
 function hm(base, min){ var p=base.split(':').map(Number); var t=p[0]*60+p[1]+Math.round(min); return String(Math.floor(t/60)).padStart(2,'0')+':'+String(t%60).padStart(2,'0'); }
 
 /* ───────── 파생값 (모두 series·events에서 계산) ───────── */
 function sessMinutes(s){ return s.series.length - 1; }
+function toMin(hhmm){ const p = hhmm.split(':').map(Number); return p[0]*60 + p[1]; }
 function sessEvents(s){ return (s.events||[]).filter(e=>e.type!=='gap'); }
 function sessLeaveSec(s){ return sessEvents(s).reduce((a,e)=>a+e.dur, 0); }
 function rowSessions(r){ return (!r.teacherUpload && r.sessions) ? r.sessions : []; }
@@ -708,9 +714,9 @@ function studentChart(sessions, maxVal){
       const x1 = x(e.at), x2 = x(Math.min(N, e.at + e.dur/60));
       const w = Math.max(3, x2-x1);
       if(e.type==='gap'){
-        out += '<rect x="'+x1+'" y="0" width="'+w+'" height="'+H+'" fill="#eef0f3"><title>'+hm(s.start, e.at)+' 기록 끊김 · '+fmtDur(e.dur)+'</title></rect>';
+        out += '<rect x="'+x1+'" y="0" width="'+w+'" height="'+H+'" fill="#ffebeb"><title>'+hm(s.start, e.at)+' 과제 이탈 · '+fmtDur(e.dur)+'</title></rect>';
       } else {
-        const tip = hm(s.start, e.at)+' 화면 이탈 · '+fmtDur(e.dur);
+        const tip = hm(s.start, e.at)+' 다른 화면 · '+fmtDur(e.dur);
         out += '<rect x="'+x1+'" y="0" width="'+w+'" height="'+H+'" fill="#fff1e6"><title>'+tip+'</title></rect>';
         out += '<line x1="'+x1+'" y1="0" x2="'+x1+'" y2="'+H+'" stroke="#f59e6b" stroke-width="1" stroke-dasharray="3 3" vector-effect="non-scaling-stroke"/>';
       }
@@ -770,24 +776,29 @@ function evtList(sessions){
        단정하지 않는다 (2026-08-19 제이콥). 제출로 끝난 구간은 `제출` 행이 이미 설명 */
     if(si > 0 && !sessions[si-1].submitted){
       const prev = sessions[si-1];
+      /* 벗어나 있던 시간도 잰다 (2026-08-21 제이콥 — "연결이 끊겼던 시간을 측정").
+         날짜가 바뀌면 하루를 더해 음수가 나오지 않게 한다 */
+      const endMin = toMin(prev.start) + sessMinutes(prev);
+      let gapMin = toMin(s.start) - endMin;
+      if(gapMin < 0) gapMin += 24*60;
       rows += '<div class="leave-evt">'
         + '<span class="leave-evt-time">'+d(prev)+hms(prev.start, sessMinutes(prev))+' ~ '+d(s)+s.start+':00</span>'
-        + '<span class="leave-evt-type gap"><i class="lg-swatch" style="background:#eef0f3;border:1px solid #dde1e8;"></i>기록 끊김</span>'
-        + '<span class="leave-evt-dur">-</span>'
+        + '<span class="leave-evt-type gap"><i class="lg-swatch" style="background:#ffebeb;border:1px solid #f5c2c7;"></i>과제 이탈</span>'
+        + '<span class="leave-evt-dur">'+fmtDur(gapMin*60)+'</span>'
         + '</div>';
     }
     (s.events||[]).forEach(e=>{
       if(e.type==='gap'){
         rows += '<div class="leave-evt">'
           + '<span class="leave-evt-time">'+range(s, e)+'</span>'
-          + '<span class="leave-evt-type gap"><i class="lg-swatch" style="background:#eef0f3;border:1px solid #dde1e8;"></i>기록 끊김</span>'
+          + '<span class="leave-evt-type gap"><i class="lg-swatch" style="background:#ffebeb;border:1px solid #f5c2c7;"></i>과제 이탈</span>'
           + '<span class="leave-evt-dur">'+fmtDur(e.dur)+'</span>'
           + '<span class="leave-evt-note"></span>'
           + '</div>';
       } else {
         rows += '<div class="leave-evt">'
           + '<span class="leave-evt-time">'+range(s, e)+'</span>'
-          + '<span class="leave-evt-type" title="'+e.type+'"><i class="lg-swatch" style="background:#fff1e6;border:1px solid #f7d3ba;"></i>화면 이탈</span>'
+          + '<span class="leave-evt-type" title="'+e.type+'"><i class="lg-swatch" style="background:#fff1e6;border:1px solid #f7d3ba;"></i>다른 화면</span>'
           + '<span class="leave-evt-dur">'+fmtDur(e.dur)+'</span>'
           + '</div>';
       }
@@ -814,15 +825,15 @@ function openProcess(){
   document.getElementById('pcBody').innerHTML =
       '<div class="ld-legend">'
       + '<span><i class="lg-line"></i>글자 수</span>'
-      + '<span><i class="lg-swatch" style="background:#fff1e6;border:1px solid #f7d3ba;"></i>화면 이탈</span>'
-      + '<span><i class="lg-swatch" style="background:#eef0f3;border:1px solid #dde1e8;"></i>기록 끊김</span>'
+      + '<span><i class="lg-swatch" style="background:#fff1e6;border:1px solid #f7d3ba;"></i>다른 화면</span>'
+      + '<span><i class="lg-swatch" style="background:#ffebeb;border:1px solid #f5c2c7;"></i>과제 이탈</span>'
       + '<span><i class="lg-line" style="border-top:2px solid #319d64;"></i>제출</span>'
     + '</div>'
     + studentBlock(r, sessions, maxVal)
     + (evtList(sessions) ? '<div class="ld-evt-wrap">'
         + '<div class="evt-guide"><i data-lucide="info"></i><div class="eg-body">'
-        + '<p><b>화면 이탈</b> — 탭을 옮기거나 화면을 작게 만든 것. 얼마나 다녀왔는지 남아요.</p>'
-        + '<p><b>기록 끊김</b> — 작성 화면을 닫으면 그때부터 기록이 멈춰요. 다시 들어올 때까지 얼마나 지났는지만 남아요.</p>'
+        + '<p><b>다른 화면</b> — 과제는 열어둔 채 최소화하거나, 창 크기를 바꾸거나, 다른 탭을 봤을 때예요.</p>'
+        + '<p><b>과제 이탈</b> — 다른 페이지로 이동하거나 클리포를 닫는 등, 과제 작성을 벗어나 있던 시간이에요. 연결이 끊긴 경우도 포함돼요.</p>'
         + '<p class="eg-last">이 사이에 <b>다른 것을 보고 왔을 수 있어요.</b> 무엇을 봤는지는 남지 않으니, 답안 내용과 함께 살펴봐 주세요.</p>'
         + '</div></div>'
         + '<div class="leave-evt evt-head"><span class="leave-evt-time">시각</span>'
@@ -960,5 +971,5 @@ window.MOCK_NAV_APPLY = {
   if (typeof _sr === 'function') window.setResub = function(v){ _sr.apply(this, arguments); if (window.mockNavSetCurrent) window.mockNavSetCurrent(v ? 'scResubYes' : 'scResubNo'); };
 })();
 </script>
-<script src="mock_nav_dw.js?v=260820a"></script></body>
+<script src="mock_nav_dw.js?v=260821a"></script></body>
 </html>

@@ -55,7 +55,6 @@
     shHome6NoRes:{ f:'home',    h:'home6-no-result' },
     shHome6High: { f:'home',    h:'home6-high' },
     ssGuide:     { f:'submit',  h:'guide' },
-    ssLeave:     { f:'submit',  h:'leave' },
     ssWrite:     { f:'submit',  h:'write' },
     ssDone:      { f:'submit',  h:'done' },
     ssBoth:      { f:'submit',  h:'both' },
@@ -65,6 +64,8 @@
     ssBefore:    { f:'submit',  h:'result-before' },
     ssAfter:     { f:'submit',  h:'result-after' },
     ssPdf:       { f:'submit',  h:'pdf' },
+    ssCoverAway: { f:'submit',  h:'cover-away' },
+    ssCoverBack: { f:'submit',  h:'cover-back' },
     ssAttachPv:  { f:'submit',  h:'attach-preview' },
     ssAttachDl:  { f:'submit',  h:'attach-download' }
   };
@@ -105,7 +106,8 @@
     { t:'학생 · 과제 제출',        items:[['ssWrite','① 작성'],['ssDone','② 제출 완료']] },
     { t:'└ 작성 화면 케이스',      items:[
         ['ssGuide','시작 안내 팝업',{sub:'과제 최초 진입 · 처음 한 번만'}],
-        ['ssLeave','다른 화면 다녀옴',{sub:'알림(8초) + 누적 상태'}],
+        ['ssCoverAway','화면 벗어난 동안',{sub:'덮개 유지 — 옆에 띄우고 베끼기 차단'}],
+        ['ssCoverBack','돌아온 직후 3초',{sub:'덮은 채 다녀온 시간 알림'}],
         ['ssAttachPv','첨부 PDF 열기',{sub:'팝업 미리보기 · 이탈 아님'}],
         ['ssAttachDl','첨부 한글 열기',{sub:'다운로드 · 이탈 1회'}]] },
     { t:'└ 다른 설정으로 낸 과제', items:[['ssBoth','직접 작성 + 파일 제출'],['ssFileonly','파일 제출만'],['ssPreparing','문항 미작성'],['ssClosed','제출 못 한 채 마감',{sub:'쓰던 글은 비활성 에디터로'}]] },
