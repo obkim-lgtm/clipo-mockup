@@ -172,28 +172,12 @@
     .rm-field{ display:flex; flex-direction:column; gap:12px; }
     .rm-field-hd{ display:flex; align-items:center; justify-content:space-between; gap:8px; }
     .rm-label{ font-size:16px; font-weight:600; color:#222631; display:inline-flex; align-items:center; gap:6px; }
-    .rm-date{ font-size:14px; color:#6d7381; }
-    .rm-model{ display:flex; flex-direction:column; padding:14px 16px; border-radius:10px; background:#f6f9ff; border:1px solid #cdddff; }
-    .rm-model-head{ display:flex; gap:12px; align-items:center; width:100%; background:none; border:none; padding:0; cursor:pointer; font-family:inherit; }
-    .rm-model-badge{ flex-shrink:0; width:34px; height:34px; border-radius:8px; background:#4068ef; color:#fff; display:flex; align-items:center; justify-content:center; font-size:13px; font-weight:700; }
-    .rm-model-name{ font-size:15px; font-weight:600; color:#222631; margin-bottom:2px; }
-    .rm-model-desc{ font-size:13px; color:#6d7381; line-height:1.5; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-    .rm-model-toggle{ flex-shrink:0; display:inline-flex; align-items:center; gap:3px; font-size:13px; font-weight:600; color:#416bff; white-space:nowrap; }
-    .rm-model-toggle i{ width:15px; height:15px; }
-    .rm-model-detail{ display:flex; flex-direction:column; gap:12px; margin-top:14px; }
-    .rm-model-div{ height:1px; background:#dbe5fb; }
-    .rm-model-feats{ display:flex; flex-direction:column; gap:6px; margin:0; padding:0; list-style:none; }
-    .rm-model-feats li{ display:flex; gap:8px; font-size:15px; color:#3b3f4c; line-height:1.5; }
-    .rm-model-feats li::before{ content:'-'; flex-shrink:0; color:#6d7381; }
-    .rm-model-tip{ font-size:14px; color:#3b3f4c; line-height:1.5; }
-    .rm-model-btn{ align-self:flex-start; display:inline-flex; align-items:center; justify-content:center; line-height:1; gap:6px; height:36px; padding:0 14px; border-radius:6px; border:1px solid #c7cbd3; background:#fff; font-family:inherit; font-size:14px; font-weight:500; color:#3b3f4c; cursor:pointer; }
-    .rm-model-btn:hover{ border-color:#416bff; color:#416bff; }
-    .rm-note{ font-size:14px; color:#6d7381; line-height:1.5; }
     .rm-slider-bar{ position:relative; height:10px; border-radius:100px; background:#dde1e8; cursor:pointer; margin:6px 10px 0; }
     .rm-slider-fill{ position:absolute; left:0; top:0; bottom:0; background:#416bff; border-radius:100px; }
     .rm-slider-dot{ position:absolute; top:50%; width:8px; height:8px; border-radius:50%; transform:translate(-50%,-50%); }
     .rm-slider-thumb{ position:absolute; top:50%; width:24px; height:24px; border-radius:50%; background:#fff; border:2px solid #416bff; transform:translate(-50%,-50%); box-shadow:0 1px 4px rgba(0,0,0,.18); transition:left .15s; }
-    .rm-slider-marks{ display:flex; justify-content:space-between; margin-top:12px; font-size:16px; color:#222631; }
+    .rm-slider-marks{ display:flex; justify-content:space-between; margin-top:12px; font-size:16px; color:#222631; line-height:1.35; }
+    .rm-slider-marks small{ font-size:13px; }
     .rm-slider-marks span{ cursor:pointer; }
     .rm-radio{ display:flex; align-items:center; gap:12px; cursor:pointer; padding:4px 0; }
     .rm-radio .ring{ width:22px; height:22px; border-radius:50%; border:1.5px solid #c7cbd3; background:#fff; flex-shrink:0; }
@@ -1752,9 +1736,9 @@
   </div>
 </div>
 
-<!-- ===== AI 채점 실행 모달 (1/2): 채점 모델·채점 수준·학생 피드백 구성 ===== -->
+<!-- ===== AI 채점 실행 모달 (1/2): 인식 확인 시점·점수 수준·학생 피드백 구성 ===== -->
 <div id="runModal1" class="rm-overlay" onclick="if(event.target===this) closeRmModal('runModal1')">
-  <div class="rm-modal" style="height:620px;">
+  <div class="rm-modal" style="max-height:min(620px,90vh);">
     <div class="rm-hd">
       <div class="rm-title">AI 채점 실행 (1/2)</div>
       <button class="rm-close" onclick="closeRmModal('runModal1')"><i data-lucide="x" style="width:20px;height:20px"></i></button>
@@ -1762,7 +1746,7 @@
     <div class="rm-body">
       <!-- 채점 방식 — 교사 선택지 (2026-08-26 복원: 바로 채점 기본 / 인식 먼저는 옵트인) -->
       <div class="rm-field" id="rmMethodField">
-        <span class="rm-label">채점 방식</span>
+        <span class="rm-label">인식 결과 확인 시점</span>
         <p style="font-size:14px;color:#6d7381;margin:2px 0 8px;line-height:1.5;">바로 채점해도 인식 결과는 채점 후 학생 화면에서 확인·수정할 수 있어요.</p>
         <div class="rm-seg" role="radiogroup">
           <button type="button" class="rm-seg-opt on" id="rmMethodDirect" onclick="rmSetMethod('direct')">
@@ -1777,33 +1761,6 @@
           </button>
         </div>
       </div>
-      <div class="rm-field">
-        <div class="rm-field-hd">
-          <span class="rm-label">채점 모델</span>
-          <span class="rm-date">2026-05-20 업데이트</span>
-        </div>
-        <div class="rm-model">
-          <button type="button" class="rm-model-head" onclick="toggleModelDetail()">
-            <div class="rm-model-badge">3.2</div>
-            <div style="flex:1;min-width:0;text-align:left;">
-              <div class="rm-model-name">채점 모델 v3.2</div>
-              <div class="rm-model-desc">수식·서술형 답안 인식과 채점 정확도를 개선한 모델이에요.</div>
-            </div>
-            <span class="rm-model-toggle" id="rmModelToggle">자세히 <i data-lucide="chevron-down"></i></span>
-          </button>
-          <div class="rm-model-detail" id="rmModelDetail" style="display:none;">
-            <div class="rm-model-div"></div>
-            <ul class="rm-model-feats">
-              <li>수학, 과학, 정보 과목의 채점 정확도를 개선했어요.</li>
-              <li>손글씨·이미지 답안의 인식률을 높였어요.</li>
-              <li>지시문과 학생 답안을 더 정확히 구분해요.</li>
-            </ul>
-            <div class="rm-model-tip">※ 채점 예시는 아래 버튼을 클릭하시면 확인 가능합니다.</div>
-            <button class="rm-model-btn" onclick="showToast('채점 활용 예시는 이 목업에서 제공하지 않습니다.','info')">채점 활용 예시보기 <i data-lucide="external-link" style="width:14px;height:14px"></i></button>
-          </div>
-        </div>
-        <div class="rm-note">* 항상 가장 좋은 성능으로 채점해드리기 위해, 여러 채점 모델을 하나로 통합했어요.</div>
-      </div>
       <!-- AI 점수 수준 (HIAI 동일: 점수 자체를 조절) -->
       <div class="rm-field">
         <span class="rm-label">AI 점수 수준</span>
@@ -1816,9 +1773,9 @@
             <div class="rm-slider-thumb" id="rm-slider-thumb" style="left:50%;"></div>
           </div>
           <div class="rm-slider-marks">
-            <span onclick="rmSetLevel(0)">더 낮은 점수</span>
-            <span onclick="rmSetLevel(50)" style="margin-left:14px;">기본 점수</span>
-            <span onclick="rmSetLevel(100)">더 높은 점수</span>
+            <span onclick="rmSetLevel(0)">더 낮은 점수<br><small style="color:#9ea3ad;font-weight:500;">(엄격하게)</small></span>
+            <span onclick="rmSetLevel(50)" style="margin-left:14px;text-align:center;">기본 점수<br><small style="color:#9ea3ad;font-weight:500;">(비슷하게)</small></span>
+            <span onclick="rmSetLevel(100)" style="text-align:right;">더 높은 점수<br><small style="color:#9ea3ad;font-weight:500;">(관대하게)</small></span>
           </div>
         </div>
       </div>
@@ -3250,15 +3207,6 @@ function rmSetMethod(m) {
   lucide.createIcons();
 }
 
-// 채점 모델 정보 접기/펼치기 (기본 접힘 — 점진적 공개)
-function toggleModelDetail() {
-  var d = document.getElementById('rmModelDetail');
-  var t = document.getElementById('rmModelToggle');
-  var open = d.style.display === 'none';
-  d.style.display = open ? 'flex' : 'none';
-  if (t) t.innerHTML = open ? '접기 <i data-lucide="chevron-up"></i>' : '자세히 <i data-lucide="chevron-down"></i>';
-  lucide.createIcons();
-}
 // 2/2 학생 선택 화면 준비 (단일 경로 — 채점 실행 전용)
 function applyRunModalMode() {
   var title = document.getElementById('rm2-title');
