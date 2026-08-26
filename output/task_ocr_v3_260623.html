@@ -1804,6 +1804,10 @@
       <button class="rm-close" onclick="closeRmModal('runModal2')"><i data-lucide="x" style="width:20px;height:20px"></i></button>
     </div>
     <div class="rm-body">
+      <div class="rm-field" style="margin-bottom:10px;">
+        <span class="rm-label" id="rm2-list-title">채점할 학생 선택</span>
+        <p style="font-size:14px;color:#6d7381;margin:2px 0 0;line-height:1.5;" id="rm2-list-sub">채점하지 않을 학생은 체크를 해제하세요.</p>
+      </div>
       <div class="rm-tbl-wrap">
         <table class="rm-tbl">
           <thead>
@@ -3211,6 +3215,11 @@ function rmSetMethod(m) {
 function applyRunModalMode() {
   var title = document.getElementById('rm2-title');
   if (title) title.textContent = 'AI 채점 실행 (2/2)';
+  // 표 제목 — 1/2에서 고른 방식에 맞춤 (현행: 확인하고 채점은 전체 인식이라 2/2를 거치지 않음)
+  var lt = document.getElementById('rm2-list-title');
+  if (lt) lt.textContent = (typeof rmMethod !== 'undefined' && rmMethod === 'ocr') ? '인식할 학생 선택' : '채점할 학생 선택';
+  var ls = document.getElementById('rm2-list-sub');
+  if (ls) ls.textContent = (typeof rmMethod !== 'undefined' && rmMethod === 'ocr') ? '인식하지 않을 학생은 체크를 해제하세요.' : '채점하지 않을 학생은 체크를 해제하세요.';
   lucide.createIcons();
   renderRunStudents();
 }
