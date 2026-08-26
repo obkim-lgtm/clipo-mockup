@@ -1760,6 +1760,23 @@
       <button class="rm-close" onclick="closeRmModal('runModal1')"><i data-lucide="x" style="width:20px;height:20px"></i></button>
     </div>
     <div class="rm-body">
+      <!-- 채점 방식 — 교사 선택지 (2026-08-26 복원: 바로 채점 기본 / 인식 먼저는 옵트인) -->
+      <div class="rm-field" id="rmMethodField">
+        <span class="rm-label">채점 방식</span>
+        <p style="font-size:14px;color:#6d7381;margin:2px 0 8px;line-height:1.5;">바로 채점해도 인식 결과는 채점 후 학생 화면에서 확인·수정할 수 있어요.</p>
+        <div class="rm-seg" role="radiogroup">
+          <button type="button" class="rm-seg-opt on" id="rmMethodDirect" onclick="rmSetMethod('direct')">
+            <i data-lucide="wand-sparkles"></i>
+            <span class="rm-seg-tit">바로 채점</span>
+            <span class="rm-seg-desc">인식과 채점을 한 번에</span>
+          </button>
+          <button type="button" class="rm-seg-opt" id="rmMethodOcr" onclick="rmSetMethod('ocr')">
+            <i data-lucide="scan-text"></i>
+            <span class="rm-seg-tit">인식 먼저 확인하고 채점</span>
+            <span class="rm-seg-desc">인식 결과를 먼저 점검해 재채점 크레딧 절약</span>
+          </button>
+        </div>
+      </div>
       <div class="rm-field">
         <div class="rm-field-hd">
           <span class="rm-label">채점 모델</span>
@@ -3215,7 +3232,23 @@ function openRmModal(id) { document.getElementById(id).classList.add('open'); lu
 function closeRmModal(id) { document.getElementById(id).classList.remove('open'); }
 // 채점 목록 학급 행의 'AI 채점' 칸 — 실행 후 '채점 중' 스피너를 그 자리에 표시
 var runCtxCell = null;
-function openRunModal(btn) { runCtxCell = (btn && btn.closest) ? btn.closest('td') : null; openRmModal('runModal1'); }
+function openRunModal(btn) { runCtxCell = (btn && btn.closest) ? btn.closest('td') : null; rmSetMethod('direct'); openRmModal('runModal1'); }
+
+// ── 채점 방식 (2026-08-26 복원) — 바로 채점 기본 / 인식 먼저는 옵트인.
+// 단순화 유지: 인식은 무과금·전체 학생 대상이라 학생 선택 단계를 거치지 않는다.
+var rmMethod = 'direct';
+function rmSetMethod(m) {
+  rmMethod = m;
+  var d = document.getElementById('rmMethodDirect');
+  var o = document.getElementById('rmMethodOcr');
+  if (d) d.classList.toggle('on', m === 'direct');
+  if (o) o.classList.toggle('on', m === 'ocr');
+  var next = document.getElementById('rm1-next');
+  if (next) next.innerHTML = (m === 'ocr')
+    ? '전체 학생 과제물 인식 <i data-lucide="scan-text" style="width:18px;height:18px"></i>'
+    : '다음으로 <i data-lucide="chevron-right" style="width:18px;height:18px"></i>';
+  lucide.createIcons();
+}
 
 // 채점 모델 정보 접기/펼치기 (기본 접힘 — 점진적 공개)
 function toggleModelDetail() {
@@ -3252,6 +3285,12 @@ function rmSelectFb(el) {
   el.classList.add('selected');
 }
 function rmNext() {
+  if (rmMethod === 'ocr') {
+    // 인식 먼저: 무과금·전체 학생 — 학생 선택(2/2) 없이 바로 시작
+    closeRmModal('runModal1');
+    showToast('14명 과제물 인식을 시작했어요. 크레딧은 차감되지 않아요. 인식 결과는 학생 채점 상세에서 확인할 수 있어요.', 'success');
+    return;
+  }
   if (!document.querySelector('#rm-fb-list .rm-radio.selected')) {
     showToast('학생 피드백 구성을 선택해 주세요.', 'info');
     return;
