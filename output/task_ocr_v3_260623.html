@@ -1740,7 +1740,7 @@
 <div id="runModal1" class="rm-overlay" onclick="if(event.target===this) closeRmModal('runModal1')">
   <div class="rm-modal" style="max-height:min(620px,90vh);">
     <div class="rm-hd">
-      <div class="rm-title">AI 채점 실행 (1/2)</div>
+      <div class="rm-title">AI 채점 실행</div>
       <button class="rm-close" onclick="closeRmModal('runModal1')"><i data-lucide="x" style="width:20px;height:20px"></i></button>
     </div>
     <div class="rm-body">
@@ -1752,15 +1752,16 @@
           <button type="button" class="rm-seg-opt on" id="rmMethodDirect" onclick="rmSetMethod('direct')">
             <i data-lucide="wand-sparkles"></i>
             <span class="rm-seg-tit">바로 채점</span>
-            <span class="rm-seg-desc">인식과 채점을 한 번에 해요</span>
+            <span class="rm-seg-desc">답안 인식과 채점을 동시에 진행</span>
           </button>
           <button type="button" class="rm-seg-opt" id="rmMethodOcr" onclick="rmSetMethod('ocr')">
             <i data-lucide="scan-text"></i>
             <span class="rm-seg-tit">확인하고 채점</span>
-            <span class="rm-seg-desc">AI가 잘 읽었는지 보고 채점해요 · 재채점 크레딧 절약</span>
+            <span class="rm-seg-desc">답안 인식 결과 확인 후 채점 진행</span>
           </button>
         </div>
       </div>
+      <div id="rm-score-fields" style="display:flex;flex-direction:column;gap:22px;">
       <!-- AI 점수 수준 (HIAI 동일: 점수 자체를 조절) -->
       <div class="rm-field">
         <span class="rm-label">AI 점수 수준</span>
@@ -1789,49 +1790,36 @@
           <div class="rm-radio" onclick="rmSelectFb(this)"><div class="ring"></div><div class="lbl">선생님이 직접 작성</div></div>
         </div>
       </div>
+      </div>
+      <!-- 학생 선택 (방식에 따라 채점/인식 대상) -->
+      <div class="rm-field" style="gap:0;">
+        <span class="rm-label" id="rm2-list-title">채점할 학생 선택</span>
+        <p style="font-size:14px;color:#6d7381;margin:2px 0 10px;line-height:1.5;" id="rm2-list-sub">채점하지 않을 학생은 체크를 해제하세요.</p>
+        <div class="rm-tbl-wrap">
+          <table class="rm-tbl">
+            <thead>
+              <tr>
+                <th style="width:64px;"><input type="checkbox" class="rm-chk" id="rm-chk-all" onchange="rmToggleAll(this)"></th>
+                <th style="width:100px;">학번</th>
+                <th>이름</th>
+                <th style="width:110px;" id="rm2-col-a">AI 채점</th>
+                <th style="width:120px;" id="rm2-col-b">선생님 채점</th>
+              </tr>
+            </thead>
+            <tbody id="rm-student-tbody"></tbody>
+          </table>
+        </div>
+        <div id="rm2-credit" style="display:flex;margin-top:12px;align-items:center;font-size:14px;color:#3b3f4c;">
+          <span>AI 크레딧 <strong id="rm2-credit-n">0</strong>개 차감<span id="rm2-credit-sub" style="color:#6d7381;"></span></span>
+        </div>
+      </div>
     </div>
     <div class="rm-ft">
-      <button class="btn btn-primary" id="rm1-next" onclick="rmNext()">다음으로 <i data-lucide="chevron-right" style="width:18px;height:18px"></i></button>
+      <button class="btn btn-primary" id="rm-exec-btn" onclick="rmExecPrimary()"><i data-lucide="wand-sparkles" style="width:16px;height:16px"></i>AI 채점 실행 · <span id="rm-exec-count">0</span></button>
     </div>
   </div>
 </div>
 
-<!-- ===== AI 채점 실행 모달 (2/2): 학생 선택 ===== -->
-<div id="runModal2" class="rm-overlay" onclick="if(event.target===this) closeRmModal('runModal2')">
-  <div class="rm-modal" style="height:620px;">
-    <div class="rm-hd">
-      <div class="rm-title" id="rm2-title">AI 채점 실행 (2/2)</div>
-      <button class="rm-close" onclick="closeRmModal('runModal2')"><i data-lucide="x" style="width:20px;height:20px"></i></button>
-    </div>
-    <div class="rm-body">
-      <div class="rm-field" style="margin-bottom:10px;">
-        <span class="rm-label" id="rm2-list-title">채점할 학생 선택</span>
-        <p style="font-size:14px;color:#6d7381;margin:2px 0 0;line-height:1.5;" id="rm2-list-sub">채점하지 않을 학생은 체크를 해제하세요.</p>
-      </div>
-      <div class="rm-tbl-wrap">
-        <table class="rm-tbl">
-          <thead>
-            <tr>
-              <th style="width:64px;"><input type="checkbox" class="rm-chk" id="rm-chk-all" onchange="rmToggleAll(this)"></th>
-              <th style="width:100px;">학번</th>
-              <th>이름</th>
-              <th style="width:110px;" id="rm2-col-a">AI 채점</th>
-              <th style="width:120px;" id="rm2-col-b">선생님 채점</th>
-            </tr>
-          </thead>
-          <tbody id="rm-student-tbody"></tbody>
-        </table>
-      </div>
-      <div id="rm2-credit" style="display:flex;margin-top:12px;align-items:center;font-size:14px;color:#3b3f4c;">
-        <span>AI 크레딧 <strong id="rm2-credit-n">0</strong>개 차감<span id="rm2-credit-sub" style="color:#6d7381;"></span></span>
-      </div>
-    </div>
-    <div class="rm-ft" style="justify-content:space-between;">
-      <button class="btn btn-outline" onclick="rmBack()"><i data-lucide="chevron-left" style="width:16px;height:16px"></i>이전으로</button>
-      <button class="btn btn-primary" id="rm-exec-btn" onclick="rmExec()"><i data-lucide="wand-sparkles" style="width:16px;height:16px"></i>AI 채점 실행 · <span id="rm-exec-count">0</span></button>
-    </div>
-  </div>
-</div>
 
 <script>
 // ── 사이드바 토글 ──
@@ -3204,25 +3192,43 @@ function rmSetMethod(m) {
   var o = document.getElementById('rmMethodOcr');
   if (d) d.classList.toggle('on', m === 'direct');
   if (o) o.classList.toggle('on', m === 'ocr');
-  var next = document.getElementById('rm1-next');
-  if (next) next.innerHTML = (m === 'ocr')
-    ? '전체 학생 과제물 인식 <i data-lucide="scan-text" style="width:18px;height:18px"></i>'
-    : '다음으로 <i data-lucide="chevron-right" style="width:18px;height:18px"></i>';
+  var ocr = (m === 'ocr');
+  // 바로 채점일 때만: 점수 수준·피드백 구성 (인식만 할 땐 채점 설정이 아직 필요 없음)
+  var sf = document.getElementById('rm-score-fields');
+  if (sf) sf.style.display = ocr ? 'none' : 'flex';
+  // 학생 선택 제목·컬럼
+  var lt = document.getElementById('rm2-list-title');
+  if (lt) lt.textContent = ocr ? '인식할 학생 선택' : '채점할 학생 선택';
+  var ls = document.getElementById('rm2-list-sub');
+  if (ls) ls.textContent = ocr ? '인식하지 않을 학생은 체크를 해제하세요.' : '채점하지 않을 학생은 체크를 해제하세요.';
+  var colA = document.getElementById('rm2-col-a');
+  var colB = document.getElementById('rm2-col-b');
+  if (colA) { colA.textContent = ocr ? '제출 방식' : 'AI 채점'; colA.style.width = ocr ? '200px' : '110px'; }
+  if (colB) colB.style.display = ocr ? 'none' : '';
+  // CTA
+  var btn = document.getElementById('rm-exec-btn');
+  if (btn) btn.innerHTML = ocr
+    ? '<i data-lucide="scan-text" style="width:16px;height:16px"></i>선택 학생 과제물 인식 · <span id="rm-exec-count">0</span>'
+    : '<i data-lucide="wand-sparkles" style="width:16px;height:16px"></i>AI 채점 실행 · <span id="rm-exec-count">0</span>';
+  renderRunStudents();
   lucide.createIcons();
+}
+// CTA — 방식에 따라 채점 실행 / 과제물 인식 시작
+function rmExecPrimary() {
+  var picked = RUN_STUDENTS.filter(function(s){ return !rmIsDisabled(s) && s.checked; });
+  if (picked.length === 0) return;
+  if (rmMethod === 'ocr') {
+    closeRmModal('runModal1');
+    showToast(picked.length + '명 과제물 인식을 시작했어요. 크레딧은 차감되지 않아요. 인식 결과는 학생 채점 상세에서 확인할 수 있어요.', 'success');
+    return;
+  }
+  if (!document.querySelector('#rm-fb-list .rm-radio.selected')) {
+    showToast('학생 피드백 구성을 선택해 주세요.', 'info');
+    return;
+  }
+  rmExec();
 }
 
-// 2/2 학생 선택 화면 준비 (단일 경로 — 채점 실행 전용)
-function applyRunModalMode() {
-  var title = document.getElementById('rm2-title');
-  if (title) title.textContent = 'AI 채점 실행 (2/2)';
-  // 표 제목 — 1/2에서 고른 방식에 맞춤 (현행: 확인하고 채점은 전체 인식이라 2/2를 거치지 않음)
-  var lt = document.getElementById('rm2-list-title');
-  if (lt) lt.textContent = (typeof rmMethod !== 'undefined' && rmMethod === 'ocr') ? '인식할 학생 선택' : '채점할 학생 선택';
-  var ls = document.getElementById('rm2-list-sub');
-  if (ls) ls.textContent = (typeof rmMethod !== 'undefined' && rmMethod === 'ocr') ? '인식하지 않을 학생은 체크를 해제하세요.' : '채점하지 않을 학생은 체크를 해제하세요.';
-  lucide.createIcons();
-  renderRunStudents();
-}
 function rmSelectedCount() {
   return RUN_STUDENTS.filter(function(s){ return !rmIsDisabled(s) && s.checked; }).length;
 }
@@ -3240,25 +3246,6 @@ function rmSliderClick(e) {
 function rmSelectFb(el) {
   document.querySelectorAll('#rm-fb-list .rm-radio').forEach(function(r){ r.classList.remove('selected'); });
   el.classList.add('selected');
-}
-function rmNext() {
-  if (rmMethod === 'ocr') {
-    // 인식 먼저: 무과금·전체 학생 — 학생 선택(2/2) 없이 바로 시작
-    closeRmModal('runModal1');
-    showToast('14명 과제물 인식을 시작했어요. 크레딧은 차감되지 않아요. 인식 결과는 학생 채점 상세에서 확인할 수 있어요.', 'success');
-    return;
-  }
-  if (!document.querySelector('#rm-fb-list .rm-radio.selected')) {
-    showToast('학생 피드백 구성을 선택해 주세요.', 'info');
-    return;
-  }
-  closeRmModal('runModal1');
-  applyRunModalMode();
-  openRmModal('runModal2');
-}
-function rmBack() {
-  closeRmModal('runModal2');
-  openRmModal('runModal1');
 }
 
 // 명단 = OCR 상세(STUDENTS_B1)·채점 상세(STUDENT_LIST)와 동일한 김서윤 14명 세트. typing 5명(정현우·한지우·임도윤·김도현·노유찬) 일치.
@@ -3281,6 +3268,7 @@ var RUN_STUDENTS = [
 // 채점 대상 제외 규칙 — AI가 채점할 수 없거나(미제출·인식 실패·정확도 낮음),
 // 교사가 직접 채점하기로 한 학생. 모두 크레딧 차감 대상에서 빠진다.
 function rmIsDisabled(s) {
+  if (rmMethod === 'ocr') return !!(s.absent || s.method === 'typing'); // 인식: 직접 입력은 읽을 필요 없음. 인식 실패는 재인식 대상이라 선택 가능
   return !!(s.absent || s.ocrfail || s.lowacc || s.selfGrade);
 }
 // 채점 불가 사유 — 라벨에 'OCR' 접두어를 붙이지 않는다
@@ -3295,6 +3283,13 @@ function rmTeacherBadge(t) {
   if (t === '완료') return '<span class="rm-tag green">완료</span>';
   if (t === '확인 필요') return '<span class="rm-tag red">확인 필요</span>';
   return '<span style="color:#6d7381;">미채점</span>'; // 미채점 = 담백 회색 텍스트(바탕 상태)
+}
+// 인식 모드 컬럼: 제출 방식 (파일 / 직접 입력 / 미제출)
+function rmMethodCell(s) {
+  if (s.absent) return '<span style="color:#b3b6bd;white-space:nowrap;">미제출</span>';
+  if (s.method === 'typing') return '<span style="color:#6d7381;white-space:nowrap;">직접 입력 · 인식 불필요</span>';
+  if (s.ocrfail) return '<span style="white-space:nowrap;color:#222631;">파일 <span style="color:#c3c7cf;">·</span> <span class="rm-tag red" style="vertical-align:middle;">인식 실패</span></span>';
+  return '<span style="color:#222631;white-space:nowrap;">파일</span>';
 }
 function rmAiCell(s) {
   var reason = rmBlockReason(s);
@@ -3312,8 +3307,8 @@ function renderRunStudents() {
       + '<td><input type="checkbox" class="rm-chk" ' + (disabled ? 'disabled' : (s.checked ? 'checked' : '')) + ' onchange="rmToggle(' + i + ', this.checked)"></td>'
       + '<td>' + s.id + '</td>'
       + '<td>' + s.name + '</td>'
-      + '<td>' + rmAiCell(s) + '</td>'
-      + '<td>' + rmTeacherBadge(s.t) + '</td>'
+      + '<td>' + (rmMethod === 'ocr' ? rmMethodCell(s) : rmAiCell(s)) + '</td>'
+      + (rmMethod === 'ocr' ? '' : '<td>' + rmTeacherBadge(s.t) + '</td>')
       + '</tr>';
   });
   tbody.innerHTML = html;
@@ -3337,15 +3332,15 @@ function rmUpdateCount() {
   var btn = document.getElementById('rm-exec-btn');
   if (btn) { btn.disabled = n === 0; btn.style.opacity = n === 0 ? '.5' : '1'; btn.style.cursor = n === 0 ? 'not-allowed' : 'pointer'; }
   // 크레딧 = AI 채점 1회당 학생 1명 1개. 인식은 차감하지 않는다.
-  var cn = document.getElementById('rm2-credit-n');
-  if (cn) cn.textContent = n;
-  var cs = document.getElementById('rm2-credit-sub');
-  if (cs) cs.textContent = ' · 학생 1명당 1개예요';
+  var credit = document.getElementById('rm2-credit');
+  if (credit) credit.innerHTML = (rmMethod === 'ocr')
+    ? '<span style="color:#6d7381;">인식은 크레딧이 차감되지 않아요.</span>'
+    : '<span>AI 크레딧 <strong>' + n + '</strong>개 차감<span style="color:#6d7381;"> · 학생 1명당 1개예요</span></span>';
 }
 function rmExec() {
   var n = RUN_STUDENTS.filter(function(s){ return !rmIsDisabled(s) && s.checked; }).length;
   if (n === 0) return;
-  closeRmModal('runModal2');
+  closeRmModal('runModal1');
   showToast(n + '명의 AI 채점을 시작합니다. 완료되면 결과 확인에서 볼 수 있어요.', 'success');
   // 채점 목록 학급 칸 → '채점 중' 스피너 (데모: 잠시 후 재실행 가능)
   if (runCtxCell) {
