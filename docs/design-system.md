@@ -140,7 +140,7 @@
 - **연결 규약**: 로고·홈 아이콘 → `home_v1`, NB 수업 → `co_teacher_review`, 창체 → `creative_activity_list_v6`, 세특 → `quick_seteuk_dev_list`. 탭은 해시 라우팅(`#design`/`#scoring`).
 - 신규 화면은 이 세트 중 가장 가까운 파일을 복제해 시작하고, 미구현 메뉴는 `notReady()` 토스트로 처리.
 - 이 목록에 없는 신규 개발 화면이 추가되면 표에 한 줄 추가해 갱신한다.
-- **과제물 양식 업로드는 (활동지 탭 정식 도입 전까진) 과제물 관리 소관** ⚠️2026-06-24 뒤집힘: 활동지 탭 정식 도입이 늦어져, 2026-06-17에 활동지 탭으로 이관했던 빈 양식(=과제물 양식) 업로드를 **과제물 관리로 되가져옴**. 라벨은 `과제물 양식`(페이지 단어 통일, '답안 양식'·'빈 양식' 아님). 3개 OCR 시안에 동일 세트 추가 완료: `task_ocr_review_v2`(시안1 단계형)/`task_ocr_inline_v1`(시안2)/`task_ocr_v3`(시안3 하이브리드). 구성 = ①각 평가 카드 헤더(과제 제출 QR 옆)에 `과제물 양식` 버튼+상태칩(미등록/공통 등록/반별 N개) ②탭 밴드 아래 풀너비 안내바(`.form-promo`, `다시 보지 않기`) ③등록 페이지(`screen-form`): 적용범위 공통/반별 토글 → 빈 문제지 업로드 → 인식 결과 인라인 편집(`.fmrg-*`, 문항별 지시문, 학생 이름·답란 제외) → 등록. 활동지·채점 배너도 같은 풀너비 바로 통일. **활동지 탭 정식 도입 시 이관 재검토.** (구버전 `task_ocr_review_v1`·`scoring_diagnosis_v1`은 미적용 — 스킵.) **⚠️2026-07-06: 시안3(하이브리드) 최종 확정 → 시안1(`task_ocr_review_v1`/`task_ocr_review_v2_260612`)·시안2(`task_ocr_inline_v1`)·시안4(`task_ocr_v4_260702`+`scoring_elementary_v4_260702`)는 `output/_archive_ocr/`로 이동. 유지 화면(evaluation_design_v4·question_tab_v1·eval_plan_detail_v1·class_scoring_detail_v1·scoring_list_v1)의 링크와 이 포인터는 모두 `task_ocr_v3_260623`로 리포인트 완료. 현행 OCR 작업 세트 = `task_ocr_v3` + `scoring_elementary_v3` + `class_scoring_detail_v3`.**
+- **과제물 양식(빈 문제지) 업로드는 과제물 관리에서 제외** — 2026-08-26 확정: **설계 쪽에서 푼다.** `task_ocr_v3`의 양식 등록 화면·버튼·프로모 배너를 전부 제거함. 과제물 관리는 제출 관리만 담당.
 
 ## 용어·권한 스펙 (문구 작성 시 기준) — 2026-08-09 확정
 
