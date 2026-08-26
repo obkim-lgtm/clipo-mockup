@@ -1558,7 +1558,7 @@
           <i data-lucide="scan-text" style="width:18px;height:18px;color:#416bff;"></i>
           <span style="font-size:16px;font-weight:600;color:#222631;">과제물 인식 결과</span>
         </div>
-        <label style="display:inline-flex;align-items:center;gap:7px;font-size:14px;color:#3b3f4c;cursor:pointer;user-select:none;white-space:nowrap;">
+        <label id="ocr-b-answers-only-label" style="display:inline-flex;align-items:center;gap:7px;font-size:14px;color:#3b3f4c;cursor:pointer;user-select:none;white-space:nowrap;">
           <input type="checkbox" id="ocr-b-answers-only" onchange="renderOCRView_B()" style="width:16px;height:16px;accent-color:#416bff;cursor:pointer;">학생 풀이와 답만 보기
         </label>
       </div>
@@ -3770,6 +3770,9 @@ function renderOCRView_B() {
   var students = STUDENTS_B1;
   var student = students[currentOcrBStudentIdx];
   if (!student) return;
+  // 결과가 없는 케이스(인식 실패·정확도 낮음)엔 '학생 풀이와 답만 보기'가 무의미 → 숨김
+  var _aoLabel = document.getElementById('ocr-b-answers-only-label');
+  if (_aoLabel) _aoLabel.style.display = (student.ocrStatus === 'failed' || student.ocrStatus === 'lowAccuracy') ? 'none' : 'inline-flex';
   // 학생 이동 시에도 URL이 따라가게 (이 화면이 떠 있을 때만)
   if (document.getElementById('screen-ocr-b').classList.contains('active')) setOcrHash('screen-ocr-b');
 
@@ -4119,9 +4122,12 @@ function renderOcrBText(student) {
     html += '</div>';
 
     html += '<div id="q-fold-' + qi + '">';
-    // ── 문항 요약 ──
-    html += '<div class="ocr-q-summary" style="padding:14px 16px 0;font-size:16px;color:#6d7381;line-height:1.6;">' + q.desc + '</div>';
-    html += '<div style="border-top:1px solid #eceef2;margin:14px 16px 0;"></div>';
+    // ── 문항 요약 — '학생 풀이와 답만 보기' 체크 시 숨김 ──
+    var answersOnly = !!(document.getElementById('ocr-b-answers-only') && document.getElementById('ocr-b-answers-only').checked);
+    if (!answersOnly) {
+      html += '<div class="ocr-q-summary" style="padding:14px 16px 0;font-size:16px;color:#6d7381;line-height:1.6;">' + q.desc + '</div>';
+      html += '<div style="border-top:1px solid #eceef2;margin:14px 16px 0;"></div>';
+    }
 
     // ── 풀이/답 섹션 (클릭해 인라인 수정) — key: 답 = qi, 풀이 = qi+'-sol' ──
     var ansSection = function(key, title, origText2, chipHtml2) {
@@ -4172,11 +4178,6 @@ function renderOcrBText(student) {
     html += '</div>'; // 접기 본문
     html += '</div>'; // 카드
   });
-
-  // 하단: 다시 인식 — 인식 결과가 미덥지 않을 때 이 학생 과제물 전체 재인식
-  html += '<div style="display:flex;align-items:center;margin-top:16px;">'
-    + '<button onclick="ocrBReRecognize()" style="display:inline-flex;align-items:center;justify-content:center;line-height:1;gap:6px;height:40px;padding:0 16px;background:#fff7ed;border:1px solid #fdba74;border-radius:8px;color:#ea580c;font-family:inherit;font-size:15px;font-weight:700;cursor:pointer;">'
-    + '<i data-lucide="rotate-ccw" style="width:16px;height:16px;"></i>다시 인식</button></div>';
 
   panel.innerHTML = html;
   lucide.createIcons();
