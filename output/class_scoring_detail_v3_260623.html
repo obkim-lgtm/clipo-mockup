@@ -594,7 +594,7 @@ var STUDENTS = [
   {id:'10107', name:'조민재', aiStatus:'채점 완료', aiScore:33, finalScore:33, status:'완료', statusCls:'done', link:'scoring_elementary_v3_260623.html'},
   {id:'10108', name:'윤하은', aiStatus:'채점 완료', aiScore:33, finalScore:33, status:'완료', statusCls:'done', link:'scoring_elementary_v3_260623.html'},
   {id:'10109', name:'임도윤', aiStatus:'-', aiScore:'-', finalScore:'-', status:'미채점', statusCls:'none', link:'scoring_elementary_v3_260623.html'},
-  {id:'10110', name:'신예린', aiStatus:'-', aiScore:'-', finalScore:'-', status:'미채점', statusCls:'none', link:'scoring_elementary_v3_260623.html'},
+  {id:'10110', name:'신예린', aiStatus:'인식 완료', ocrDone:true, aiScore:'-', finalScore:'-', status:'미채점', statusCls:'none', link:'scoring_elementary_v3_260623.html'},
   {id:'10111', name:'김도현', aiStatus:'-', aiScore:'-', finalScore:'-', status:'미채점', statusCls:'none', link:'scoring_elementary_v3_260623.html'},
   {id:'10112', name:'송하림', aiStatus:'채점 완료', aiScore:33, finalScore:33, status:'완료', statusCls:'done', link:'scoring_elementary_v3_260623.html'},
   {id:'10113', name:'노유찬', aiStatus:'-', aiScore:'-', finalScore:'-', status:'미채점', statusCls:'none', link:'scoring_elementary_v3_260623.html'},
@@ -652,6 +652,7 @@ function renderTable(){
     var finalCell = s.finalScore === '-' ? '<span class="muted">-</span>' : s.finalScore;
     var aiStatusHtml = (s.ocrFail || s.scoreFail) ? '<span class="status-badge fail">'+s.aiStatus+'</span>'
       : s.ocrReview ? '<a href="task_ocr_v3_260623.html#ocr-b='+s.id+'" style="display:inline-flex;align-items:center;gap:4px;color:#ea580c;font-weight:600;text-decoration:none;"><i data-lucide="scan-text" style="width:13px;height:13px;"></i>'+s.aiStatus+'</a>'
+      : s.ocrDone ? '<a href="task_ocr_v3_260623.html#ocr-b='+s.id+'" style="display:inline-flex;align-items:center;gap:4px;color:#6d7381;font-weight:500;text-decoration:none;"><i data-lucide="scan-text" style="width:13px;height:13px;"></i>인식 완료</a>'
       : s.aiStatus;
     var rescoreInline = (s.scoreFail || s.stale)
       ? '<button class="btn-rescore-text" onclick="rescoreStudent(\''+s.id+'\',\''+s.name+'\')"><i data-lucide="rotate-cw" style="width:13px;height:13px"></i>다시 채점</button>'
