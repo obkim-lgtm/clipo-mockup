@@ -404,7 +404,11 @@
 
     .qcard{ background:#fff; border:1px solid #d9d9d9; border-radius:10px; padding:20px; display:flex; flex-direction:column; gap:14px; margin-bottom:12px; }
     .qcard-hd{ display:flex; align-items:center; gap:10px; }
-    .qcard-no{ display:inline-flex; align-items:center; justify-content:center; height:28px; padding:0 12px; border-radius:100px; background:#e9f2ff; color:#3151c4; font-size:15px; font-weight:600; line-height:1; flex-shrink:0; }
+    .qcard-no{ display:inline-flex; align-items:center; justify-content:center; gap:6px; height:28px; padding:0 8px 0 12px; border-radius:100px; background:#e9f2ff; color:#3151c4; font-size:15px; font-weight:600; line-height:1; flex-shrink:0; }
+    /* 문항 번호는 교사가 직접 쓴다 — 1-1, 가 처럼 시험지 표기를 그대로 (2026-08-25 회의) */
+    .qno-in{ width:56px; height:22px; border:1px solid #bfd0ff; border-radius:5px; background:#fff; color:#3151c4; font-size:14px; font-weight:600; font-family:inherit; text-align:center; padding:0 4px; }
+    .qno-in:focus{ outline:2px solid #416bff; outline-offset:-2px; }
+    .qprev-wrap{ margin-top:16px; }
     .qcard-tools{ margin-left:auto; display:flex; align-items:center; gap:2px; }
     .qi-btn{ width:36px; height:36px; border:none; background:none; border-radius:6px; cursor:pointer; color:#6d7381; display:inline-flex; align-items:center; justify-content:center; line-height:1; }
     .qi-btn:hover{ background:#f1f3f5; color:#222631; }
@@ -761,7 +765,7 @@
 
         <!-- 잠금 안내는 영향 필드 앞 -->
         <div class="alert-info warn" id="waysLockNote" style="display:none;margin:0 0 16px;">
-          <i data-lucide="lock" style="width:18px;height:18px"></i>
+          <i data-lucide="info" style="width:18px;height:18px"></i>
           <div class="ai-txt"><b>이미 제출한 학생이 <span id="waysLockCnt">3</span>명 있어 제출 방식은 바꿀 수 없어요.</b><br>방식을 끄면 이미 받은 답안이 갈 곳이 없어집니다. 글자 수·파일 수·작성 환경은 바꿀 수 있고, <b>바꾼 설정은 이후 제출부터 적용</b>돼요.</div>
         </div>
 
@@ -926,7 +930,7 @@
         <!-- 잠금 안내는 영향 필드 앞 -->
         <div class="alert-info warn" id="lockNote" style="display:none;">
           <i data-lucide="lock" style="width:18px;height:18px"></i>
-          <div class="ai-txt"><b>이미 제출한 학생이 <span id="lockCnt">3</span>명 있어 문항을 지울 수 없어요.</b><br>문항을 지우면 먼저 낸 학생의 답안이 갈 곳을 잃습니다. 내용 수정과 문항 추가는 할 수 있고, <b>바뀐 내용은 이후 제출부터 적용</b>돼요.</div>
+          <div class="ai-txt"><b>이미 제출한 학생이 <span id="lockCnt">3</span>명 있어요.</b><br>문항을 지워도 <b>학생이 쓴 답안은 지워지지 않아요.</b> 학생 화면에만 남고 선생님 채점 화면에는 보이지 않습니다. 추가한 문항은 먼저 낸 학생에게 빈 답안으로 남아요.</div>
         </div>
 
         <div class="sec-hd" style="margin-top:18px;">
@@ -937,6 +941,16 @@
         <div id="q-list"></div>
 
         <button class="btn btn-add" id="btnAddQ" onclick="addQuestion()"><i data-lucide="plus" style="width:16px;height:16px"></i>문항 추가</button>
+
+        <!-- 학생 화면 미리보기 — 드로워 안에 두고 입력할 때마다 갱신 (2026-08-25 회의).
+             08-07에 모달로 뺐다가 드로워에 가려 못 쓰던 것을 자리만 바꿔 되살림 -->
+        <div class="qprev-wrap">
+          <button class="btn btn-outline btn-sm" id="qprevBtn" onclick="toggleQPrev()"><i data-lucide="eye" style="width:15px;height:15px"></i>학생 화면 미리보기</button>
+          <div class="qprev" id="qprevWrap" style="display:none;margin-top:12px;">
+            <p class="qprev-hd"><i data-lucide="eye" style="width:15px;height:15px"></i>학생에게 이렇게 보여요</p>
+            <div id="qprevList"></div>
+          </div>
+        </div>
       </div>
 
       <div class="qdw-ft">
@@ -1110,7 +1124,17 @@
   </div>
 </div>
 
-<!-- 학생 화면 미리보기 모달 — 이번 범위 제외, 다음 제공 (2026-08-07 올립). 진입점과 함께 제거 -->
+<!-- 문항 삭제 확인 — 제출한 학생이 있을 때만 (2026-08-25 회의) -->
+<div class="pv-ov" id="qDelGuard" onclick="if(event.target===this) closeQDel()">
+  <div style="background:#fff;border-radius:14px;width:100%;max-width:440px;box-shadow:0 20px 50px rgba(0,0,0,.25);padding:32px 32px 28px;">
+    <p style="font-size:20px;font-weight:700;color:#222631;margin:0 0 10px;line-height:1.45;">이 문항을 지울까요?</p>
+    <p style="font-size:16px;color:#3b3f4c;margin:0 0 24px;line-height:1.7;">이미 제출한 학생이 <b id="qDelCnt">3</b>명 있어요.<br><b>학생이 쓴 답안은 지워지지 않아요.</b> 학생 화면에만 남고, 선생님 채점 화면에는 보이지 않습니다.</p>
+    <div style="display:flex;gap:10px;">
+      <button class="btn btn-outline btn-lg" style="flex:1;" onclick="closeQDel()">취소</button>
+      <button class="btn btn-primary btn-lg" style="flex:1;" onclick="confirmQDel()">삭제</button>
+    </div>
+  </div>
+</div>
 
 <!-- 수식 입력 팝업 -->
 <div class="pv-ov" id="fxModal" onclick="if(event.target===this) closeFx()">
@@ -1691,6 +1715,17 @@ var Q_MAX = 20;
 var Q_LIMIT_DEFAULT = 500;
 var Q_LIMITS = [];
 
+/* 문항 번호 — 자동 매김이 아니라 교사가 직접 쓰는 값 (2026-08-25 회의).
+   실제 시험지가 `1-1`, `가` 같은 표기를 쓰므로 형식을 강제하지 않는다.
+   중복·건너뜀도 막지 않는다 — 화면 순서는 배열 순서를 따른다 */
+var Q_NOS = [];
+function qNo(i){ return (Q_NOS[i] !== undefined && Q_NOS[i] !== '') ? Q_NOS[i] : String(i+1); }
+function syncQNos(){
+  for(var i = 0; i < QUESTIONS.length; i++){ if(Q_NOS[i] === undefined) Q_NOS[i] = String(i+1); }
+  Q_NOS.length = QUESTIONS.length;
+}
+function qNoSet(i, input){ Q_NOS[i] = input.value.trim(); renderQPrev(); }
+
 /* 수식 입력은 수학·과학·기타 과목에서만 (2026-08-07 회의) — 학생 제출 화면과 같은 룰 */
 var SUBJECT = '사회';
 var FX_SUBJECTS = ['수학', '과학', '기타'];
@@ -1706,7 +1741,11 @@ function setSubmitted(n){
   SUBMITTED = n;
   /* 제출이 들어왔다는 건 설계가 저장되고 직접 작성이 켜진 상태라는 뜻 */
   if(n > 0){
-    if(QUESTIONS.length === 0){ QUESTIONS = Q_SAMPLE.slice(); Q_LIMITS = QUESTIONS.map(function(){ return Q_LIMIT_DEFAULT; }); }
+    if(QUESTIONS.length === 0){
+      QUESTIONS = Q_SAMPLE.slice();
+      Q_LIMITS  = QUESTIONS.map(function(){ return Q_LIMIT_DEFAULT; });
+      Q_NOS     = QUESTIONS.map(function(q, i){ return String(i+1); });
+    }
     document.getElementById('way-write').classList.add('on');
   }
   syncWayNotes();
@@ -1726,7 +1765,9 @@ function applyDesignState(submitted, opt){
   SUBMITTED = submitted;
   QUESTIONS = withQ ? Q_SAMPLE.slice() : [];
   Q_LIMITS  = QUESTIONS.map(function(){ return Q_LIMIT_DEFAULT; });
-  Q_SNAP = null; L_SNAP = null;
+  /* 번호도 함께 기본값으로 — 앞서 연 과제의 번호가 따라오면 안 된다 (2026-08-26) */
+  Q_NOS     = QUESTIONS.map(function(q, i){ return String(i+1); });
+  Q_SNAP = null; L_SNAP = null; N_SNAP = null;
 
   document.getElementById('way-write').classList.toggle('on', writeOn);
   document.getElementById('way-file').classList.toggle('on', !!opt.fileOn);
@@ -1772,13 +1813,13 @@ function go(scene){
 }
 /* 문항 화면 진입 시 스냅샷 — 저장 없이 나가면 이 상태로 되돌린다.
    입력이 QUESTIONS에 즉시 반영되는 구조라, 스냅샷이 없으면 [취소]가 취소가 아니게 됨 (2026-08-07) */
-var Q_SNAP = null, L_SNAP = null;
+var Q_SNAP = null, L_SNAP = null, N_SNAP = null;
 function goQuestions(){
-  Q_SNAP = QUESTIONS.slice(); L_SNAP = Q_LIMITS.slice();
+  Q_SNAP = QUESTIONS.slice(); L_SNAP = Q_LIMITS.slice(); N_SNAP = Q_NOS.slice();
   renderQuestions(); go('questions');
 }
 function qDirty(){
-  return Q_SNAP !== null && (JSON.stringify(QUESTIONS) !== JSON.stringify(Q_SNAP) || JSON.stringify(Q_LIMITS) !== JSON.stringify(L_SNAP));
+  return Q_SNAP !== null && (JSON.stringify(QUESTIONS) !== JSON.stringify(Q_SNAP) || JSON.stringify(Q_LIMITS) !== JSON.stringify(L_SNAP) || JSON.stringify(Q_NOS) !== JSON.stringify(N_SNAP));
 }
 /* 문항 화면에서 나가기 — 저장 안 한 변경이 있으면 가드 */
 function leaveQuestions(){
@@ -1788,7 +1829,7 @@ function leaveQuestions(){
 }
 function qGuardStay(){ document.getElementById('qGuard').classList.remove('show'); }
 function qGuardDiscard(){
-  QUESTIONS = Q_SNAP.slice(); Q_LIMITS = L_SNAP.slice();
+  QUESTIONS = Q_SNAP.slice(); Q_LIMITS = L_SNAP.slice(); Q_NOS = N_SNAP.slice();
   document.getElementById('qGuard').classList.remove('show');
   goDesign();
 }
@@ -1810,7 +1851,13 @@ function toggleWay(k){
     toastMsg('이미 제출한 학생이 있어 제출 방식은 바꿀 수 없어요.');
     return;
   }
-  document.getElementById('way-'+k).classList.toggle('on');
+  var el = document.getElementById('way-'+k);
+  el.classList.toggle('on');
+  /* 직접 작성을 켜면 문항 1개가 바로 생긴다 — 문항 0개 상태를 두지 않는다 (2026-08-25 회의) */
+  if(k === 'write' && el.classList.contains('on') && QUESTIONS.length === 0){
+    QUESTIONS.push(''); Q_LIMITS.push(Q_LIMIT_DEFAULT); Q_NOS.push('1');
+    renderQuestions(); updateSummary();
+  }
   syncWayNotes();
 }
 
@@ -1887,6 +1934,7 @@ function applyWayLock(){
 function renderQuestions(){
   var list = document.getElementById('q-list');
   var locked = SUBMITTED > 0;
+  syncQNos();
   list.innerHTML = '';
 
   /* 제출이 들어와도 내용 수정·문항 추가는 열어두고 삭제만 막는다 (2026-08-07 회의).
@@ -1904,7 +1952,7 @@ function renderQuestions(){
     var d = document.createElement('div');
     d.className = 'qcard';
     d.innerHTML = '<div class="qcard-hd">'
-      + '<span class="qcard-no">문항 ' + (i+1) + '</span>'
+      + '<span class="qcard-no">문항 <input class="qno-in" type="text" value="" onchange="qNoSet(' + i + ',this)" onblur="qNoSet(' + i + ',this)" aria-label="문항 번호"></span>'
       + '<div class="qcard-tools">'
       /* 삭제만 잠근다 — 잠금 상태에서도 버튼은 남기고 누르면 사유를 알려준다 */
       +   '<button class="qi-btn del' + (locked ? ' is-locked' : '') + '" title="' + (locked ? '제출한 학생이 있어 지울 수 없어요' : '삭제') + '" onclick="delQ('+i+')"><i data-lucide="' + (locked ? 'lock' : 'trash-2') + '" style="width:18px;height:18px"></i></button>'
@@ -1915,7 +1963,7 @@ function renderQuestions(){
       + '<div class="ans-tool">'
       +   (showFx() ? '<button class="fx-btn" onclick="openFx(this)"><i data-lucide="sigma" style="width:14px;height:14px"></i>수식 입력</button>' : '')
       +   '<div class="qlim">'
-      +     '<span class="qlim-lb">답안 최대 글자 수</span>'
+      +     '<span class="qlim-lb">권장 글자 수</span>'
       +     '<div class="qlim-ctl">'
       +       '<button title="100자 줄이기" onclick="qLimStep(' + i + ',-1)">−</button>'
       +       '<input class="qlim-in" type="text" inputmode="numeric" value="' + qLimit(i).toLocaleString() + '" onchange="qLimSet(' + i + ',this)" onblur="qLimSet(' + i + ',this)">'
@@ -1924,6 +1972,7 @@ function renderQuestions(){
       +     '</div>'
       +   '</div>'
       + '</div>';
+    d.querySelector('.qno-in').value = qNo(i);
     d.querySelector('textarea').value = q;
     list.appendChild(d);
     qtaGrow(d.querySelector('textarea'));   /* 기존 내용도 접힘 없이 펼쳐 보이게 */
@@ -1970,7 +2019,39 @@ function fxInsertToTarget(){
 document.addEventListener('keydown', function(e){ if(e.key === 'Escape'){ closeFx(); } });
 
 
-function onQInput(i, v){ QUESTIONS[i] = v; }
+function onQInput(i, v){ QUESTIONS[i] = v; renderQPrev(); }
+
+/* ── 학생 화면 미리보기 ──
+   교사가 쓰는 동안 학생이 보게 될 모습을 그대로 보여준다. 입력할 때마다 다시 그린다 */
+function toggleQPrev(){
+  var box = document.getElementById('qprevWrap');
+  var on  = box.style.display === 'none';
+  box.style.display = on ? 'block' : 'none';
+  document.getElementById('qprevBtn').classList.toggle('on', on);
+  if(on) renderQPrev();
+}
+function renderQPrev(){
+  var wrap = document.getElementById('qprevWrap');
+  if(!wrap || wrap.style.display === 'none') return;
+  var box = document.getElementById('qprevList');
+  box.innerHTML = '';
+  if(QUESTIONS.length === 0){
+    box.innerHTML = '<div class="qprev-q"><p>문항을 추가하면 여기에 보여요.</p></div>';
+    return;
+  }
+  QUESTIONS.forEach(function(q, i){
+    var d = document.createElement('div');
+    d.className = 'qprev-q';
+    d.innerHTML = '<p><b></b> <span class="qpt"></span></p>'
+                + '<div class="qprev-ans">여기에 답을 쓰세요.</div>'
+                + '<p class="qprev-cnt"></p>';
+    d.querySelector('b').textContent = '문항 ' + qNo(i) + '.';
+    d.querySelector('.qpt').textContent = q.trim() === '' ? '(문항 내용 없음)' : q;
+    d.querySelector('.qprev-cnt').textContent = '0 / 권장 ' + qLimit(i).toLocaleString() + '자';
+    box.appendChild(d);
+  });
+  if(window.lucide) lucide.createIcons();
+}
 /* 문항 입력창 자동 높이 — 내부 스크롤 없이 내용만큼 늘어남 (2026-08-21 올립) */
 function qtaGrow(ta){
   ta.style.height = 'auto';
@@ -1989,28 +2070,46 @@ function qLimStep(i, dir){
   Q_LIMITS[i] = qLimClamp(qLimit(i) + dir * Q_LIMIT_STEP);
   var card = document.querySelectorAll('#q-list .qcard')[i];
   if(card) card.querySelector('.qlim-in').value = Q_LIMITS[i].toLocaleString();
+  renderQPrev();
 }
 function qLimSet(i, input){
   var v = qLimClamp(parseInt(String(input.value).replace(/[^0-9]/g, ''), 10));
   Q_LIMITS[i] = v;
   input.value = v.toLocaleString();
+  renderQPrev();
 }
 
 function addQuestion(){
   if(QUESTIONS.length >= Q_MAX){ toastMsg('문항은 최대 ' + Q_MAX + '개까지 추가할 수 있어요.'); return; }
   QUESTIONS.push('');
   Q_LIMITS.push(Q_LIMIT_DEFAULT);
+  Q_NOS.push(String(QUESTIONS.length));
   renderQuestions();
   var tas = document.querySelectorAll('#q-list .qta');
   if(tas.length){ tas[tas.length-1].focus(); tas[tas.length-1].scrollIntoView({behavior:'smooth', block:'center'}); }
 }
+/* 삭제는 막지 않는다 — 제출한 학생이 있으면 한 번 확인만 받는다 (2026-08-25 회의).
+   학생이 쓴 답안은 지우지 않고 학생 화면에만 남기므로 자료가 유실되지 않는다 */
+var _delIdx = null;
 function delQ(i){
-  /* 제출이 들어온 뒤에는 삭제만 막는다 (2026-08-07 회의) */
   if(SUBMITTED > 0){
-    toastMsg('제출한 학생이 ' + SUBMITTED + '명 있어 문항을 지울 수 없어요. 내용 수정과 문항 추가는 할 수 있어요.');
+    _delIdx = i;
+    document.getElementById('qDelCnt').textContent = SUBMITTED;
+    document.getElementById('qDelGuard').classList.add('show');
     return;
   }
-  QUESTIONS.splice(i,1); Q_LIMITS.splice(i,1); renderQuestions();
+  doDelQ(i);
+}
+function doDelQ(i){
+  QUESTIONS.splice(i,1); Q_LIMITS.splice(i,1); Q_NOS.splice(i,1);
+  renderQuestions(); updateSummary();
+}
+function closeQDel(){ _delIdx = null; document.getElementById('qDelGuard').classList.remove('show'); }
+function confirmQDel(){
+  var i = _delIdx;
+  document.getElementById('qDelGuard').classList.remove('show');
+  _delIdx = null;
+  if(i !== null){ doDelQ(i); toastMsg('문항을 지웠어요. 학생이 쓴 답안은 학생 화면에 남아요.'); }
 }
 
 /* ── 설계 화면 문항 요약 ── */
@@ -2049,7 +2148,7 @@ function saveQuestions(){
   var empty = QUESTIONS.filter(function(q){ return q.trim() === ''; }).length;
   if(empty > 0){ toastMsg('내용이 비어 있는 문항이 ' + empty + '개 있어요. 채우거나 삭제해 주세요.'); return; }
   updateSummary();
-  Q_SNAP = QUESTIONS.slice(); L_SNAP = Q_LIMITS.slice();   /* 저장됨 = 더 이상 미저장 변경 없음 */
+  Q_SNAP = QUESTIONS.slice(); L_SNAP = Q_LIMITS.slice(); N_SNAP = Q_NOS.slice();   /* 저장됨 = 더 이상 미저장 변경 없음 */
   toastMsg('문항 ' + QUESTIONS.length + '개를 저장했습니다.');
   setTimeout(function(){ go('design'); }, 900);
 }
