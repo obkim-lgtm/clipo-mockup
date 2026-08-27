@@ -309,6 +309,64 @@ body.nav-expanded .main-wrap{ padding-left:200px; }
   .gh-menu-btn{width:40px;height:40px}
   .page-title{font-size:17px}
 }
+    /* ── AI 채점 실행 모달 (task_ocr_v3 이식, 2026-08-26) ── */
+    .btn{ height:40px; border-radius:4px; font-weight:600; font-size:15px; font-family:inherit; cursor:pointer; display:inline-flex; align-items:center; gap:8px; padding:0 16px; border:none; transition:opacity .15s; }
+    .btn:hover{ opacity:.88; }
+    .btn-primary{ background:#416bff; color:white; }
+    .btn-outline{ background:white; color:#3b3f4c; border:1px solid #d9d9d9; }
+    .rm-overlay{ display:none; position:fixed; inset:0; background:rgba(0,0,0,.45); z-index:1600; align-items:center; justify-content:center; padding:24px; }
+    .rm-overlay.open{ display:flex; }
+    .rm-modal{ background:#fff; border-radius:12px; width:680px; max-width:calc(100vw - 48px); box-shadow:0 20px 60px rgba(0,0,0,.25); max-height:calc(100vh - 48px); display:flex; flex-direction:column; }
+    .rm-hd{ position:relative; padding:24px 24px 16px; flex-shrink:0; }
+    .rm-title{ font-size:20px; font-weight:600; color:#222631; line-height:1.25; }
+    .rm-close{ position:absolute; top:16px; right:16px; width:36px; height:36px; border:0; background:none; border-radius:6px; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; line-height:1; color:#6d7381; }
+    .rm-close:hover{ background:#f1f3f5; }
+    .rm-body{ padding:0 24px 8px; display:flex; flex-direction:column; gap:22px; overflow:auto; }
+    .rm-ft{ padding:14px 24px 20px; display:flex; justify-content:flex-end; gap:10px; flex-shrink:0; }
+    .rm-field{ display:flex; flex-direction:column; gap:12px; }
+    .rm-field-hd{ display:flex; align-items:center; justify-content:space-between; gap:8px; }
+    .rm-label{ font-size:16px; font-weight:600; color:#222631; display:inline-flex; align-items:center; gap:6px; }
+    .rm-help{ font-size:14px; color:#6d7381; line-height:1.5; margin:-8px 0 0; } /* 라벨 바로 아래 설명 — 여백은 여기서만 관리 */
+    .rm-qtip{ position:relative; display:inline-flex; align-items:center; cursor:help; }
+    .rm-qtip > i, .rm-qtip > svg{ width:18px; height:18px; color:#6d7381; }
+    .rm-qtip .rm-qtip-box{ display:none; position:absolute; left:50%; transform:translateX(-50%); bottom:calc(100% + 8px); width:280px; background:#fff; border:1px solid #e4e7ee; border-radius:8px; box-shadow:0 6px 20px rgba(0,0,0,.12); padding:10px 12px; font-size:14px; font-weight:400; color:#3b3f4c; line-height:1.55; z-index:30; }
+    .rm-qtip:hover .rm-qtip-box{ display:block; }
+    .rm-slider-bar{ position:relative; height:10px; border-radius:100px; background:#dde1e8; cursor:pointer; margin:6px 10px 0; }
+    .rm-slider-fill{ position:absolute; left:0; top:0; bottom:0; background:#416bff; border-radius:100px; }
+    .rm-slider-dot{ position:absolute; top:50%; width:8px; height:8px; border-radius:50%; transform:translate(-50%,-50%); }
+    .rm-slider-thumb{ position:absolute; top:50%; width:24px; height:24px; border-radius:50%; background:#fff; border:2px solid #416bff; transform:translate(-50%,-50%); box-shadow:0 1px 4px rgba(0,0,0,.18); transition:left .15s; }
+    .rm-slider-marks{ display:flex; justify-content:space-between; margin-top:12px; font-size:16px; color:#222631; line-height:1.35; }
+    .rm-slider-marks small{ font-size:13px; }
+    .rm-slider-marks span{ cursor:pointer; }
+    .rm-radio{ display:flex; align-items:center; gap:12px; cursor:pointer; padding:4px 0; }
+    .rm-radio .ring{ width:22px; height:22px; border-radius:50%; border:1.5px solid #c7cbd3; background:#fff; flex-shrink:0; }
+    .rm-radio.selected .ring{ border:7px solid #416bff; }
+    .rm-radio .lbl{ font-size:16px; color:#222631; }
+    .rm-seg{ display:flex; gap:10px; }
+    .rm-seg-opt{ flex:1; display:flex; flex-direction:column; align-items:flex-start; gap:3px; padding:14px 16px; border:1.5px solid #e3e6eb; border-radius:10px; background:#fff; cursor:pointer; font-family:inherit; text-align:left; transition:border-color .12s, background .12s; }
+    .rm-seg-opt > i{ width:20px; height:20px; color:#6d7381; margin-bottom:2px; }
+    .rm-seg-tit{ font-size:15px; font-weight:600; color:#222631; line-height:1.3; }
+    .rm-seg-desc{ font-size:13px; color:#6d7381; line-height:1.45; }
+    .rm-seg-opt.on{ border-color:#416bff; background:#f5f8ff; }
+    .rm-seg-opt.on > i{ color:#416bff; }
+    .rm-seg-opt.on .rm-seg-tit{ color:#365eef; }
+    .rm-tbl-wrap{ border:1px solid #dde1e8; border-radius:8px; overflow:auto; flex:1; min-height:0; }
+    .rm-tbl{ width:100%; border-collapse:separate; border-spacing:0; }
+    .rm-tbl th{ background:#f6f7f9; height:42px; font-size:14px; font-weight:600; color:#222631; text-align:center; border-bottom:1px solid #dde1e8; position:sticky; top:0; z-index:1; }
+    .rm-tbl td{ height:46px; font-size:15px; text-align:center; color:#222631; border-bottom:1px solid #eceef2; }
+    .rm-tbl tr:last-child td{ border-bottom:none; }
+    .rm-tbl tr.sel td{ background:#f4f8ff; }
+    .rm-tbl tr.dis td{ color:#b3b6bd; }
+    .rm-chk{ width:18px; height:18px; accent-color:#416bff; cursor:pointer; vertical-align:middle; }
+    .rm-chk:disabled{ cursor:not-allowed; opacity:.5; }
+    .rm-tag{ display:inline-flex; align-items:center; justify-content:center; height:22px; padding:0 10px; border-radius:100px; font-size:12px; font-weight:700; line-height:1; white-space:nowrap; }
+    .rm-tag.green{ background:#eefcf4; color:#319d64; }
+    .rm-tag.orange{ background:#fff7ed; color:#ea580c; }
+    .rm-tag.red{ background:#fef2f2; color:#f2525f; }
+    .rm-tag.gray{ background:#eef0f3; color:#6d7381; }
+    .rm-modal.wide{ width:672px; }
+    .rm-sub{ font-size:14px; color:#6d7381; margin-top:6px; line-height:1.5; }
+    .rm-ft .credit-note{ margin-right:auto; align-self:center; font-size:13px; color:#6d7381; display:inline-flex; align-items:center; gap:5px; }
 </style>
 </head>
 <body>
@@ -369,7 +427,7 @@ body.nav-expanded .main-wrap{ padding-left:200px; }
           <i data-lucide="chevron-left" style="width:18px;height:18px"></i>이전으로
         </button>
         <h1 class="page-title">1학년 1반 채점 현황</h1>
-        <p class="page-desc">AI 채점 결과를 확인하고 점수를 확정하세요. 수정이 필요한 학생은 개별 조정할 수 있어요.</p>
+        <p class="page-desc">1학년 1반의 채점 진행 상황입니다.</p>
       </div>
       <button class="btn-download">
         <i data-lucide="download" style="width:18px;height:18px"></i>채점 결과 다운로드
@@ -382,7 +440,7 @@ body.nav-expanded .main-wrap{ padding-left:200px; }
         <div class="step-card-head">
           <span class="step-card-num">1단계. AI 채점</span>
         </div>
-        <p class="step-card-desc">학급 단위의 AI 채점을 실행합니다.</p>
+        <p class="step-card-desc">학급 단위 AI 채점을 실행합니다. 인식 결과를 먼저 확인할 수도 있어요.</p>
         <button class="step-btn primary" onclick="runBulkAi()">
           <i data-lucide="wand-sparkles" style="width:16px;height:16px"></i>AI 채점 시작하기
         </button>
@@ -412,7 +470,6 @@ body.nav-expanded .main-wrap{ padding-left:200px; }
       <div class="table-card-hd">
         <div class="table-card-hd-left">
           <h2 class="table-card-title">학생 채점 현황</h2>
-          <p class="table-card-desc">AI 채점을 실행하고, 채점 결과를 참고하여 선생님이 최종 채점을 진행합니다.</p>
         </div>
         <div class="table-card-actions">
           <button class="btn-table-action" onclick="resetAll()">
@@ -420,9 +477,6 @@ body.nav-expanded .main-wrap{ padding-left:200px; }
           </button>
           <button class="btn-table-action" onclick="bulkEditScores()">
             <i data-lucide="edit-3" style="width:14px;height:14px"></i>점수 일괄 수정
-          </button>
-          <button class="btn-table-action primary" onclick="viewAiResults()">
-            <i data-lucide="bar-chart-2" style="width:14px;height:14px"></i>AI 채점 결과 확인
           </button>
         </div>
       </div>
@@ -446,6 +500,86 @@ body.nav-expanded .main-wrap{ padding-left:200px; }
 </main>
 
 <!-- 학급 결과 공개 방법 선택 모달 -->
+<!-- ===== AI 채점 실행 모달 (1/2): 인식 확인 시점·점수 수준·학생 피드백 구성 ===== -->
+<div id="runModal1" class="rm-overlay" onclick="if(event.target===this) closeRmModal('runModal1')">
+  <div class="rm-modal" style="max-height:min(620px,90vh);">
+    <div class="rm-hd">
+      <div class="rm-title">AI 채점 실행</div>
+      <button class="rm-close" onclick="closeRmModal('runModal1')"><i data-lucide="x" style="width:20px;height:20px"></i></button>
+    </div>
+    <div class="rm-body">
+      <!-- 채점 방식 — 교사 선택지 (2026-08-26 복원: 바로 채점 기본 / 인식 먼저는 옵트인) -->
+      <div class="rm-field" id="rmMethodField">
+        <span class="rm-label">답안 인식 확인</span>
+        <p class="rm-help">AI는 과제물의 글씨를 읽어(인식) 채점해요. 인식 결과를 채점 전에 확인할지 선택하세요.</p>
+        <div class="rm-seg" role="radiogroup">
+          <button type="button" class="rm-seg-opt on" id="rmMethodDirect" onclick="rmSetMethod('direct')">
+            <i data-lucide="wand-sparkles"></i>
+            <span class="rm-seg-tit">바로 채점</span>
+            <span class="rm-seg-desc">답안 인식과 채점을 동시에 진행</span>
+          </button>
+          <button type="button" class="rm-seg-opt" id="rmMethodOcr" onclick="rmSetMethod('ocr')">
+            <i data-lucide="scan-text"></i>
+            <span class="rm-seg-tit">확인하고 채점</span>
+            <span class="rm-seg-desc">답안 인식 결과 확인 후 채점 진행</span>
+          </button>
+        </div>
+      </div>
+      <div id="rm-score-fields" style="display:flex;flex-direction:column;gap:22px;">
+      <!-- AI 점수 수준 (HIAI 동일: 점수 자체를 조절) -->
+      <div class="rm-field">
+        <span class="rm-label">AI 점수 수준 <span class="rm-qtip"><i data-lucide="circle-help"></i><span class="rm-qtip-box">AI가 매길 점수를 조절합니다. 점수에 맞춰 피드백 내용도 함께 바뀝니다.</span></span></span>
+        <div>
+          <div class="rm-slider-bar" id="rm-slider" onclick="rmSliderClick(event)">
+            <div class="rm-slider-fill" id="rm-slider-fill" style="width:50%;"></div>
+            <div class="rm-slider-dot" style="left:1.5%;background:#416bff;"></div>
+            <div class="rm-slider-dot" style="left:98.5%;background:#c7cbd3;"></div>
+            <div class="rm-slider-thumb" id="rm-slider-thumb" style="left:50%;"></div>
+          </div>
+          <div class="rm-slider-marks">
+            <span onclick="rmSetLevel(0)">더 낮은 점수<br><small style="color:#9ea3ad;font-weight:500;">(엄격하게)</small></span>
+            <span onclick="rmSetLevel(50)" style="margin-left:14px;text-align:center;">기본 점수<br><small style="color:#9ea3ad;font-weight:500;">(비슷하게)</small></span>
+            <span onclick="rmSetLevel(100)" style="text-align:right;">더 높은 점수<br><small style="color:#9ea3ad;font-weight:500;">(관대하게)</small></span>
+          </div>
+        </div>
+      </div>
+      <!-- 학생 피드백 구성 -->
+      <div class="rm-field">
+        <span class="rm-label">학생 피드백 구성 <i data-lucide="circle-help" style="width:18px;height:18px;color:#6d7381;"></i></span>
+        <div id="rm-fb-list" style="display:flex;flex-direction:column;gap:8px;">
+          <div class="rm-radio" onclick="rmSelectFb(this)"><div class="ring"></div><div class="lbl">자동 구성 : AI 채점 근거</div></div>
+          <div class="rm-radio" onclick="rmSelectFb(this)"><div class="ring"></div><div class="lbl">자동 구성 : AI 피드백</div></div>
+          <div class="rm-radio selected" onclick="rmSelectFb(this)"><div class="ring"></div><div class="lbl">자동 구성 : AI 채점 근거 + AI 피드백</div></div>
+          <div class="rm-radio" onclick="rmSelectFb(this)"><div class="ring"></div><div class="lbl">선생님이 직접 작성</div></div>
+        </div>
+      </div>
+      </div>
+      <!-- 학생 선택 (방식에 따라 채점/인식 대상) -->
+      <div class="rm-field">
+        <span class="rm-label" id="rm2-list-title">채점할 학생 선택</span>
+        <div class="rm-tbl-wrap">
+          <table class="rm-tbl">
+            <thead>
+              <tr>
+                <th style="width:64px;"><input type="checkbox" class="rm-chk" id="rm-chk-all" onchange="rmToggleAll(this)"></th>
+                <th style="width:100px;">학번</th>
+                <th>이름</th>
+                <th style="width:110px;" id="rm2-col-a">AI 채점</th>
+                <th style="width:120px;" id="rm2-col-b">선생님 채점</th>
+              </tr>
+            </thead>
+            <tbody id="rm-student-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+    <div class="rm-ft" style="justify-content:space-between;align-items:center;border-top:1px solid #eceef2;">
+      <div id="rm2-credit" style="display:flex;align-items:center;font-size:14px;color:#3b3f4c;"></div>
+      <button class="btn btn-primary" id="rm-exec-btn" onclick="rmExecPrimary()"><i data-lucide="wand-sparkles" style="width:16px;height:16px"></i>AI 채점 실행 · <span id="rm-exec-count">0</span></button>
+    </div>
+  </div>
+</div>
+
 <div class="modal-overlay" id="bulkMethodModal" onclick="if(event.target===this)closeBulkMethodModal()">
   <div class="modal">
     <div class="modal-hd">
@@ -481,97 +615,6 @@ body.nav-expanded .main-wrap{ padding-left:200px; }
 </div>
 
 <!-- AI 채점 실행 모달 (2-step) — 학급 단위 -->
-<div class="modal-overlay" id="bulkAiModal" onclick="if(event.target===this)closeBulkAiModal()">
-  <div class="modal bulk-ai-modal">
-    <!-- Step 1: 채점 옵션 -->
-    <div class="modal-step" id="bulkAiStep1">
-      <div class="modal-hd">
-        <span class="modal-title">AI 채점 실행 (1/2)</span>
-        <button class="modal-close" onclick="closeBulkAiModal()"><i data-lucide="x" style="width:18px;height:18px"></i></button>
-      </div>
-      <div class="modal-body">
-        <div class="model-section" id="bulkAiModelSection">
-          <div class="model-summary" onclick="toggleModelCard()">
-            <div class="model-badge-mini">3.2</div>
-            <span class="model-summary-title">채점 모델 v3.2</span>
-            <span class="model-summary-date">2026-05-20 업데이트</span>
-            <i data-lucide="chevron-down" class="model-chevron" style="width:16px;height:16px"></i>
-          </div>
-          <div class="model-detail" style="display:none">
-            <span class="model-desc">수식·그래프·서술형 답안 인식과 채점 정확도를 개선한 AI 모델입니다.</span>
-            <ul class="model-feats">
-              <li>수학, 과학, 정보 과목의 채점 정확도를 개선했어요.</li>
-              <li>손글씨·이미지 답안의 인식률을 높였어요.</li>
-              <li>지시문과 학생 답안을 더 정확히 구분해요.</li>
-            </ul>
-            <a class="model-link-btn" href="#" target="_blank" rel="noopener" onclick="event.preventDefault();showToast('success','채점 활용 예시 페이지로 이동합니다.')">채점 활용 예시보기 <i data-lucide="external-link" style="width:11px;height:11px"></i></a>
-          </div>
-        </div>
-        <div class="field">
-          <span class="field-lbl">점수 수준</span>
-          <div class="scoring-level-desc">채점요소별 점수를 얼마나 높게 또는 낮게 줄지 정해요. 점수에 맞춰 피드백도 함께 조절돼요.</div>
-          <div class="scoring-level">
-            <input type="range" class="scoring-level-slider" id="bulkAiLevelSlider" min="0" max="2" step="1" value="1" oninput="updateBulkAiLevelLabels()">
-            <div class="scoring-level-labels" id="bulkAiLevelLabels">
-              <span>점수 높게</span>
-              <span class="active">표준</span>
-              <span>점수 낮게</span>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="modal-ft">
-        <span class="credit-notice">
-          <i data-lucide="bot" style="width:14px;height:14px"></i>
-          AI 크레딧 <strong><span id="bulkAiCreditCount1">0</span>개</strong> 사용
-          <span class="credit-notice-sub">· 잔여 900개</span>
-          <span class="credit-tooltip-wrap" onclick="this.classList.toggle('show');event.stopPropagation()">
-            <i data-lucide="help-circle" class="credit-help" style="width:13px;height:13px"></i>
-            <span class="credit-tooltip">선택한 학생 수만큼 크레딧이 사용돼요. 네트워크 오류 등으로 실행이 실패한 경우, 사용한 크레딧은 자동으로 반환돼요.</span>
-          </span>
-        </span>
-        <div class="modal-actions">
-          <button class="btn-modal-cancel" onclick="closeBulkAiModal()">취소</button>
-          <button class="btn-modal-save" onclick="bulkAiNextStep()">다음으로<i data-lucide="arrow-right" style="width:14px;height:14px"></i></button>
-        </div>
-      </div>
-    </div>
-    <!-- Step 2: 학생 선택 -->
-    <div class="modal-step" id="bulkAiStep2" style="display:none">
-      <div class="modal-hd">
-        <span class="modal-title">AI 채점 실행 (2/2)</span>
-        <button class="modal-close" onclick="closeBulkAiModal()"><i data-lucide="x" style="width:18px;height:18px"></i></button>
-      </div>
-      <div class="modal-body bulk-students">
-        <div class="bulk-ai-table-scroll">
-          <table class="bulk-ai-table">
-            <thead>
-              <tr>
-                <th><label class="checkbox-row" id="bulkAiHeaderCheckbox" onclick="toggleAllBulkAiStudents()"><span class="checkbox-box"><i data-lucide="check" style="width:12px;height:12px"></i></span></label></th>
-                <th>학번</th>
-                <th>이름</th>
-                <th class="col-result">AI 채점</th>
-                <th class="col-status">선생님 채점 결과</th>
-              </tr>
-            </thead>
-            <tbody id="bulkAiStudentTable"></tbody>
-          </table>
-        </div>
-      </div>
-      <div class="modal-ft">
-        <button class="btn-modal-cancel" onclick="bulkAiPrevStep()"><i data-lucide="arrow-left" style="width:14px;height:14px"></i>이전으로</button>
-        <div class="modal-actions">
-          <span class="credit-notice">
-            <i data-lucide="bot" style="width:14px;height:14px"></i>
-            AI 크레딧 <strong><span id="bulkAiCreditCount2">0</span>개</strong> 사용
-            <span class="credit-notice-sub">· 잔여 900개</span>
-          </span>
-          <button class="btn-modal-save" onclick="confirmBulkAi()"><i data-lucide="wand-sparkles" style="width:14px;height:14px"></i>AI 채점 실행</button>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
   </main>
 </div><!-- /main-wrap -->
 
@@ -648,6 +691,161 @@ function updateSortHeaderIcons(){
 }
 
 
+
+/* ═══ AI 채점 실행 모달 (task_ocr_v3 이식 — 채점 목록과 단일 모달 공유) ═══ */
+function openRmModal(id) { document.getElementById(id).classList.add('open'); lucide.createIcons(); }
+function closeRmModal(id) { document.getElementById(id).classList.remove('open'); }
+var rmMethod = 'direct';
+function rmSetMethod(m) {
+  rmMethod = m;
+  var d = document.getElementById('rmMethodDirect');
+  var o = document.getElementById('rmMethodOcr');
+  if (d) d.classList.toggle('on', m === 'direct');
+  if (o) o.classList.toggle('on', m === 'ocr');
+  var ocr = (m === 'ocr');
+  // 바로 채점일 때만: 점수 수준·피드백 구성 (인식만 할 땐 채점 설정이 아직 필요 없음)
+  var sf = document.getElementById('rm-score-fields');
+  if (sf) sf.style.display = ocr ? 'none' : 'flex';
+  // 학생 선택 제목·컬럼
+  var lt = document.getElementById('rm2-list-title');
+  if (lt) lt.textContent = ocr ? '인식할 학생 선택' : '채점할 학생 선택';
+  var colA = document.getElementById('rm2-col-a');
+  var colB = document.getElementById('rm2-col-b');
+  if (colA) { colA.textContent = ocr ? '제출 방식' : 'AI 채점'; colA.style.width = ocr ? '200px' : '110px'; }
+  if (colB) colB.style.display = ocr ? 'none' : '';
+  // CTA
+  var btn = document.getElementById('rm-exec-btn');
+  if (btn) btn.innerHTML = ocr
+    ? '<i data-lucide="scan-text" style="width:16px;height:16px"></i>과제물 인식 · <span id="rm-exec-count">0</span>'
+    : '<i data-lucide="wand-sparkles" style="width:16px;height:16px"></i>AI 채점 실행 · <span id="rm-exec-count">0</span>';
+  renderRunStudents();
+  lucide.createIcons();
+}
+// CTA — 방식에 따라 채점 실행 / 과제물 인식 시작
+function rmExecPrimary() {
+  var picked = RUN_STUDENTS.filter(function(s){ return !rmIsDisabled(s) && s.checked; });
+  if (picked.length === 0) return;
+  if (rmMethod === 'ocr') {
+    closeRmModal('runModal1');
+    showToast('success', picked.length + '명 과제물 인식을 시작했어요. 크레딧은 차감되지 않아요.');
+    return;
+  }
+  if (!document.querySelector('#rm-fb-list .rm-radio.selected')) {
+    showToast('info', '학생 피드백 구성을 선택해 주세요.');
+    return;
+  }
+  rmExec();
+}
+function rmSetLevel(p) {
+  document.getElementById('rm-slider-fill').style.width = p + '%';
+  document.getElementById('rm-slider-thumb').style.left = p + '%';
+}
+function rmSliderClick(e) {
+  var bar = document.getElementById('rm-slider');
+  var rect = bar.getBoundingClientRect();
+  var ratio = (e.clientX - rect.left) / rect.width;
+  rmSetLevel(ratio < 0.25 ? 0 : (ratio > 0.75 ? 100 : 50));
+}
+function rmSelectFb(el) {
+  document.querySelectorAll('#rm-fb-list .rm-radio').forEach(function(r){ r.classList.remove('selected'); });
+  el.classList.add('selected');
+}
+// 명단 = OCR 상세(STUDENTS_B1)·채점 상세(STUDENT_LIST)와 동일한 김서윤 14명 세트. typing 5명(정현우·한지우·임도윤·김도현·노유찬) 일치.
+var RUN_STUDENTS = [
+  { id:'10101', name:'김서윤', ai:'-',    t:'미채점',   checked:true,  method:'file',   file:'10101_미래시나리오.pdf' },
+  { id:'10102', name:'이준호', ai:'fail', t:'확인 필요', checked:true,  method:'file',   file:'10102_미래시나리오.pdf' }, // 이전 채점 실패 → 재채점 대상
+  { id:'10103', name:'박지민', ai:'-',    t:'미채점',   checked:false, method:'file', file:'10103_미래시나리오.pdf' }, // 이미 인식 완료(사전 인식됨) — 두 모드 공통. 원하면 다시 인식 가능
+  { id:'10104', name:'최유진', ai:'-',    t:'미채점',   checked:true,  method:'file',   file:'10104_미래시나리오.pdf' },
+  { id:'10105', name:'정현우', ai:'-',    t:'미채점',   checked:true,  method:'typing' },
+  { id:'10106', name:'한지우', ai:'-',    t:'미채점',   checked:true,  method:'typing' },
+  { id:'10107', name:'조민재', ai:'-',    t:'완료',     checked:false, method:'file', file:'10107_미래시나리오.pdf' }, // 채점 완료 = 인식 완료
+  { id:'10108', name:'윤하은', ai:'-',    t:'미채점',   checked:true,  method:'file',   file:'10108_미래시나리오.pdf' },
+  { id:'10109', name:'임도윤', ai:'-',    t:'미채점',   checked:true,  method:'typing' },
+  { id:'10110', name:'신예린', ai:'absent', t:'미채점', absent:true,   method:'file',   file:'-' }, // 미제출 → 채점·인식 대상 제외
+  { id:'10111', name:'김도현', ai:'-',    t:'미채점',   checked:true,  method:'typing' },
+  { id:'10112', name:'송하림', ai:'-',    t:'완료',     checked:false, method:'file', file:'10112_미래시나리오.pdf' }, // 채점 완료 = 인식 완료
+  { id:'10113', name:'노유찬', ai:'-',    t:'미채점',   checked:true,  method:'typing' },
+  { id:'10114', name:'백시우', ai:'-',    t:'미채점',   checked:true,  method:'file',   ocrfail:true, file:'10114_미래시나리오.pdf' } // 인식 실패 — 재인식 대상(기본 체크). 바로 채점은 불가(인식 결과 없음)
+];
+// 채점 대상 제외 규칙 — AI가 채점할 수 없거나(미제출·인식 실패·정확도 낮음),
+// 교사가 직접 채점하기로 한 학생. 모두 크레딧 차감 대상에서 빠진다.
+function rmIsDisabled(s) {
+  if (rmMethod === 'ocr') return !!(s.absent || s.method === 'typing'); // 인식: 직접 입력은 읽을 필요 없음. 인식 실패는 재인식 대상이라 선택 가능
+  return !!(s.absent || s.ocrfail || s.lowacc || s.selfGrade);
+}
+// 채점 불가 사유 — 라벨에 'OCR' 접두어를 붙이지 않는다
+function rmBlockReason(s) {
+  if (s.absent)    return '과제 미제출';
+  if (s.ocrfail)   return '인식 실패';
+  if (s.lowacc)    return '정확도 낮음';
+  if (s.selfGrade) return '직접 채점';
+  return '';
+}
+function rmTeacherBadge(t) {
+  if (t === '완료') return '<span class="rm-tag green">완료</span>';
+  if (t === '확인 필요') return '<span class="rm-tag red">확인 필요</span>';
+  return '<span style="color:#6d7381;">미채점</span>'; // 미채점 = 담백 회색 텍스트(바탕 상태)
+}
+// 인식 모드 컬럼: 제출 방식 (파일 / 직접 입력 / 미제출)
+function rmMethodCell(s) {
+  if (s.absent) return '<span style="color:#b3b6bd;white-space:nowrap;">미제출</span>';
+  if (s.method === 'typing') return '<span style="color:#6d7381;white-space:nowrap;">직접 입력 · 인식 불필요</span>';
+  if (s.ocrfail) return '<span style="white-space:nowrap;color:#222631;">파일 <span style="color:#c3c7cf;">·</span> <span class="rm-tag red" style="vertical-align:middle;">인식 실패</span></span>';
+  return '<span style="color:#222631;white-space:nowrap;">파일</span>';
+}
+function rmAiCell(s) {
+  var reason = rmBlockReason(s);
+  if (reason) return '<span style="color:#6d7381;white-space:nowrap;">' + reason + '</span>';
+  if (s.ai === 'fail') return '<span class="rm-tag red">채점 실패</span>';
+  return '<span style="color:#6d7381;">-</span>';
+}
+function renderRunStudents() {
+  var tbody = document.getElementById('rm-student-tbody');
+  var html = '';
+  RUN_STUDENTS.forEach(function(s, i) {
+    var disabled = rmIsDisabled(s);
+    var cls = disabled ? 'dis' : (s.checked ? 'sel' : '');
+    html += '<tr class="' + cls + '">'
+      + '<td><input type="checkbox" class="rm-chk" ' + (disabled ? 'disabled' : (s.checked ? 'checked' : '')) + ' onchange="rmToggle(' + i + ', this.checked)"></td>'
+      + '<td>' + s.id + '</td>'
+      + '<td>' + s.name + '</td>'
+      + '<td>' + (rmMethod === 'ocr' ? rmMethodCell(s) : rmAiCell(s)) + '</td>'
+      + (rmMethod === 'ocr' ? '' : '<td>' + rmTeacherBadge(s.t) + '</td>')
+      + '</tr>';
+  });
+  tbody.innerHTML = html;
+  if (typeof lucide !== 'undefined') lucide.createIcons();
+  rmUpdateCount();
+}
+function rmToggle(i, on) {
+  RUN_STUDENTS[i].checked = on;
+  renderRunStudents();
+}
+function rmToggleAll(el) {
+  RUN_STUDENTS.forEach(function(s){ if (!rmIsDisabled(s)) s.checked = el.checked; });
+  renderRunStudents();
+}
+function rmUpdateCount() {
+  var n = RUN_STUDENTS.filter(function(s){ return !rmIsDisabled(s) && s.checked; }).length;
+  var eligible = RUN_STUDENTS.filter(function(s){ return !rmIsDisabled(s); }).length;
+  document.getElementById('rm-exec-count').textContent = n;
+  var all = document.getElementById('rm-chk-all');
+  if (all) { all.checked = n === eligible; all.indeterminate = n > 0 && n < eligible; }
+  var btn = document.getElementById('rm-exec-btn');
+  if (btn) { btn.disabled = n === 0; btn.style.opacity = n === 0 ? '.5' : '1'; btn.style.cursor = n === 0 ? 'not-allowed' : 'pointer'; }
+  // 크레딧 = AI 채점 1회당 학생 1명 1개. 인식은 차감하지 않는다.
+  var credit = document.getElementById('rm2-credit');
+  if (credit) credit.innerHTML = (rmMethod === 'ocr')
+    ? '<span style="color:#6d7381;">인식은 크레딧이 차감되지 않아요.</span>'
+    : '<span>AI 크레딧 <strong>' + n + '</strong>개가 차감돼요.</span>';
+}
+function rmExec() {
+  var n = RUN_STUDENTS.filter(function(s){ return !rmIsDisabled(s) && s.checked; }).length;
+  if (n === 0) return;
+  closeRmModal('runModal1');
+  showToast('success', n + '명의 AI 채점을 시작합니다. 완료되면 결과 확인에서 볼 수 있어요.');
+}
+
 function finalCellVal(s){
   var v = ''+s.finalScore;
   if (s.stale) v += ' <button class="btn-rescore-text" onclick="rescoreStudent(&#39;'+s.id+'&#39;,&#39;'+s.name+'&#39;)"><i data-lucide="rotate-cw" style="width:13px;height:13px"></i>다시 채점</button>';
@@ -708,18 +906,10 @@ function toggleModelCard(){
 }
 
 function runBulkAi(){
-  // Step 1 초기엔 0명 (의도하지 않은 크레딧 사용 방지) — Step 2 첫 진입 시 전체 선택 디폴트
-  BULK_AI_STATE.selected = new Set();
-  BULK_AI_STATE.step2Initialized = false;
-  // 재실행은 항상 전체 덮어쓰기 (덮어쓰기/이어쓰기 모드 미제공)
-  // 슬라이더 리셋
-  document.getElementById('bulkAiLevelSlider').value = 1;
-  updateBulkAiLevelLabels();
-  // Step 1로 시작
-  showBulkAiStep(1);
-  updateBulkAiCreditCount();
-  document.getElementById('bulkAiModal').classList.add('show');
-  lucide.createIcons();
+  // 채점 목록과 동일한 단일 실행 모달 (바로 채점 / 확인하고 채점)
+  var f=document.getElementById('rmMethodField'); if(f) f.style.display='';
+  rmSetMethod('direct');
+  openRmModal('runModal1');
 }
 
 function showBulkAiStep(n){
