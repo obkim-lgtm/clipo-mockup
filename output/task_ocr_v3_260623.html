@@ -1558,9 +1558,16 @@
           <i data-lucide="scan-text" style="width:18px;height:18px;color:#416bff;"></i>
           <span style="font-size:16px;font-weight:600;color:#222631;">과제물 인식 결과</span>
         </div>
+        <div style="display:flex;align-items:center;gap:16px;">
+        <label id="ocr-b-selfgrade-label" class="q-exclude-toggle" style="gap:7px;" title="켜면 이 학생의 모든 문항을 선생님이 직접 채점해요.">
+          <input type="checkbox" id="ocr-b-selfgrade" onchange="toggleStudentExclude()">
+          <span class="q-exclude-track"><span class="q-exclude-thumb"></span></span>
+          <span class="q-exclude-label">이 학생 직접 채점 (AI 제외)</span>
+        </label>
         <label id="ocr-b-answers-only-label" style="display:inline-flex;align-items:center;gap:7px;font-size:14px;color:#3b3f4c;cursor:pointer;user-select:none;white-space:nowrap;">
           <input type="checkbox" id="ocr-b-answers-only" onchange="renderOCRView_B()" style="width:16px;height:16px;accent-color:#416bff;cursor:pointer;">학생 풀이와 답만 보기
         </label>
+        </div>
       </div>
       <div id="ocr-b-text-panel" style="flex:1;overflow-y:auto;padding:0 20px 20px;"></div>
       <div style="flex-shrink:0;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 20px;border-top:1px solid #eceef2;background:#fafbff;">
@@ -3380,7 +3387,7 @@ function rmBlockReason(s) {
   if (s.absent)    return '과제 미제출';
   if (s.ocrfail)   return '인식 실패';
   if (s.lowacc)    return '정확도 낮음';
-  if (s.selfGrade) return '직접 채점';
+  if (s.selfGrade) return '__SELF__';
   return '';
 }
 function rmTeacherBadge(t) {
@@ -3397,11 +3404,18 @@ function rmMethodCell(s) {
 }
 function rmAiCell(s) {
   var reason = rmBlockReason(s);
+  if (reason === '__SELF__') return '<a href="javascript:void(0)" onclick="jumpToOcrBById(&#39;' + s.id + '&#39;)" style="color:#7c3aed;font-weight:600;white-space:nowrap;text-decoration:none;">직접 채점 · 해제 ›</a>';
   if (reason) return '<span style="color:#6d7381;white-space:nowrap;">' + reason + '</span>';
   if (s.ai === 'fail') return '<span class="rm-tag red">채점 실패</span>';
   return '<span style="color:#6d7381;">-</span>';
 }
+function jumpToOcrBById(id) {
+  var i = STUDENTS_B1.findIndex(function(s){ return s.id === id; });
+  if (i > -1) { closeRmModal('runModal1'); goToOCR_B(i); }
+}
 function renderRunStudents() {
+  // 직접 채점(전 문항 AI 제외) 학생은 채점 대상에서 제외 — 인식 결과 화면 토글에서 파생
+  RUN_STUDENTS.forEach(function(s){ s.selfGrade = (typeof studentAllExcluded === 'function') && studentAllExcluded(s.id); });
   var tbody = document.getElementById('rm-student-tbody');
   var html = '';
   RUN_STUDENTS.forEach(function(s, i) {
@@ -3783,6 +3797,10 @@ function renderOCRView_B() {
   // 인식 실패 = 우리 탓 → 재시도 무과금(케이스 안 버튼이 담당). 유료 '다시 인식(1개)'은 실패 케이스에서 숨김
   var _retry = document.getElementById('ocr-b-retry-btn');
   if (_retry) _retry.style.display = (student.ocrStatus === 'failed') ? 'none' : '';
+  var _sg = document.getElementById('ocr-b-selfgrade-label');
+  if (_sg) _sg.style.display = (student.ocrStatus === 'failed' || student.ocrStatus === 'lowAccuracy') ? 'none' : 'inline-flex';
+  var _sgc = document.getElementById('ocr-b-selfgrade');
+  if (_sgc) _sgc.checked = studentAllExcluded(student.id);
   // 학생 이동 시에도 URL이 따라가게 (이 화면이 떠 있을 때만)
   if (document.getElementById('screen-ocr-b').classList.contains('active')) setOcrHash('screen-ocr-b');
 
@@ -3946,6 +3964,24 @@ function saveOcrB() {
   showToast('저장되었습니다.', 'success');
 }
 
+// ── 학생 단위 직접 채점 (26-08-27) — 새 상태가 아니라 전 문항 제외의 단축키. AI 채점 여부는 문항에서 파생 ──
+function studentAllExcluded(id) {
+  var d = OCR_DATA_B[id]; if (!d || !d.questions || !d.questions.length) return false;
+  var ex = ocrBExcludeMap[id] || {};
+  for (var i = 0; i < d.questions.length; i++) { if (!ex[i]) return false; }
+  return true;
+}
+function toggleStudentExclude() {
+  var st = STUDENTS_B1[currentOcrBStudentIdx]; if (!st) return;
+  var d = OCR_DATA_B[st.id]; if (!d) return;
+  var on = document.getElementById('ocr-b-selfgrade').checked;
+  ocrBExcludeMap[st.id] = {};
+  if (on) { for (var i = 0; i < d.questions.length; i++) ocrBExcludeMap[st.id][i] = true; }
+  try { sessionStorage.setItem('clipo_ocr_exclude', JSON.stringify(ocrBExcludeMap)); } catch(e) {}
+  renderOCRView_B();
+  showToast(on ? st.name + ' 학생의 모든 문항을 선생님이 직접 채점해요. AI 채점에서 제외됩니다.'
+              : st.name + ' 학생이 AI 채점 대상으로 돌아왔어요.', 'info');
+}
 // 직접 채점 (AI 제외) 토글 — 켜면 해당 문항 잠금 + AI 채점 제외, 확인 필요도 해소로 취급
 function toggleQExclude(studentId, qi) {
   if (!ocrBExcludeMap[studentId]) ocrBExcludeMap[studentId] = {};
@@ -4053,8 +4089,8 @@ function renderOcrBText(student) {
       + '<p style="font-size:15px;color:#3b3f4c;line-height:1.7;margin:0;max-width:440px;">일시적인 오류로 인식에 실패했어요. 다시 인식해 주세요.<br>계속 실패하면 과제물 원본을 보고 직접 채점해 주세요.</p>'
       + '<span style="display:inline-flex;align-items:center;gap:5px;font-size:13px;color:#6d7381;"><i data-lucide="info" style="width:13px;height:13px;flex-shrink:0;"></i>이 경우 다시 인식해도 AI 크레딧은 차감되지 않아요.</span>'
       + '<div style="display:flex;gap:10px;justify-content:center;margin-top:4px;">'
-      + '<button onclick="ocrBReRecognize()" class="btn btn-primary"><i data-lucide="rotate-ccw" style="width:16px;height:16px;"></i>다시 인식</button>'
-      + '<button onclick="navStudentB(1)" class="btn btn-outline">다음 학생<i data-lucide="arrow-right" style="width:16px;height:16px;"></i></button>'
+      + '<button onclick="ocrBReupload()" class="btn btn-primary"><i data-lucide="upload" style="width:16px;height:16px;"></i>파일 다시 올리기</button>'
+      + '<button onclick="ocrBReRecognize()" class="btn btn-outline"><i data-lucide="rotate-ccw" style="width:16px;height:16px;"></i>다시 인식</button>'
       + '</div>'
       + '</div>';
     lucide.createIcons();
@@ -4170,8 +4206,7 @@ function renderOcrBText(student) {
         + '<span style="font-size:14px;font-weight:700;color:#3b3f4c;">풀이 (그림/도형/표)</span>'
         + '<span style="display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:600;color:#6d7381;background:#f1f3f5;border-radius:100px;padding:2px 8px;"><i data-lucide="lock" style="width:11px;height:11px;"></i>수정 불가</span>'
         + '</div>'
-        + '<div style="background:#f6f7f9;border-radius:8px;padding:12px 14px;font-size:15px;line-height:1.7;color:#6d7381;">' + q.sol.replace(/
-/g, '<br>') + '</div>';
+        + '<div style="background:#f6f7f9;border-radius:8px;padding:12px 14px;font-size:15px;line-height:1.7;color:#6d7381;">' + q.sol.split(String.fromCharCode(10)).join('<br>') + '</div>';
       html += '<div style="height:16px;"></div>';
     }
     var chipHtml = '';
