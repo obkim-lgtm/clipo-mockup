@@ -738,8 +738,9 @@ function rmExecPrimary() {
   var picked = RUN_STUDENTS.filter(function(s){ return !rmIsDisabled(s) && s.checked; });
   if (picked.length === 0) return;
   if (rmMethod === 'ocr') {
+    picked.forEach(function(st){ st.ocrPre = true; });
     closeRmModal('runModal1');
-    showToast('success', picked.length + '명 과제물 인식을 시작했어요. 크레딧은 차감되지 않아요.');
+    showToast('success', picked.length + '명 과제물 인식을 시작했어요. AI 크레딧 ' + picked.length + '개가 차감됐어요.');
     return;
   }
   if (!document.querySelector('#rm-fb-list .rm-radio.selected')) {
@@ -845,11 +846,17 @@ function rmUpdateCount() {
   if (all) { all.checked = n === eligible; all.indeterminate = n > 0 && n < eligible; }
   var btn = document.getElementById('rm-exec-btn');
   if (btn) { btn.disabled = n === 0; btn.style.opacity = n === 0 ? '.5' : '1'; btn.style.cursor = n === 0 ? 'not-allowed' : 'pointer'; }
-  // 크레딧 = AI 채점 1회당 학생 1명 1개. 인식은 차감하지 않는다.
+  // 크레딧 = 학생당 1개 선차감 (26-08-27 확정): 인식 실행 시 1, 이어지는 채점은 추가 차감 없음
   var credit = document.getElementById('rm2-credit');
-  if (credit) credit.innerHTML = (rmMethod === 'ocr')
-    ? '<span style="color:#6d7381;">인식은 크레딧이 차감되지 않아요.</span>'
-    : '<span>AI 크레딧 <strong>' + n + '</strong>개가 차감돼요.</span>';
+  if (credit) {
+    if (rmMethod === 'ocr') {
+      credit.innerHTML = '<span>AI 크레딧 <strong>' + n + '</strong>개가 차감돼요.</span>';
+    } else {
+      var pre = RUN_STUDENTS.filter(function(s){ return !rmIsDisabled(s) && s.checked && s.ocrPre; }).length;
+      credit.innerHTML = '<span>AI 크레딧 <strong>' + (n - pre) + '</strong>개가 차감돼요.'
+        + (pre > 0 ? '<span style="color:#6d7381;"> 인식 때 차감된 ' + pre + '명은 추가 차감이 없어요.</span>' : '') + '</span>';
+    }
+  }
 }
 function rmExec() {
   var n = RUN_STUDENTS.filter(function(s){ return !rmIsDisabled(s) && s.checked; }).length;
