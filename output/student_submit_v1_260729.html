@@ -528,7 +528,8 @@ body.pdf-mode .sf-copy{ color:#8b8f9c; }
     <div class="card">
       <h3 class="card-title" id="ansTitle">제출한 답안</h3>
       <div id="ansList"></div>
-      <!-- 결과 공개 후에도 재제출을 막지 않는다 (2026-08-12 올립) — 차단 문구·버튼 숨김 폐기 -->
+      <!-- 결과가 공개되면 학생은 그 뒤로 결과 공개 화면만 본다 (2026-08-27 확정 — 다나 케이스 정리).
+           재제출은 불가하므로 [다시 제출]을 숨긴다. 08-12의 '공개 후에도 허용'은 폐기 -->
       <div class="actions">
         <button class="btn btn-outline" id="btnResubmit" onclick="resubmit()"><i data-lucide="pencil-line" style="width:16px;height:16px"></i>다시 제출</button>
         <button class="btn btn-primary" id="btnToList" onclick="location.href='student_home_v1_260729.html'">과제 목록으로</button>
@@ -692,7 +693,7 @@ body.pdf-mode .sf-copy{ color:#8b8f9c; }
 
     <div class="mp-cap">③ 제출 완료 화면 상태</div>
     <button class="mp-btn on" data-opened="no" onclick="setOpened(false)">결과 공개 전<span class="mp-sub">다시 제출 가능</span></button>
-    <button class="mp-btn" data-opened="yes" onclick="setOpened(true)">결과 공개 후<span class="mp-sub">다시 제출도 가능</span></button>
+    <button class="mp-btn" data-opened="yes" onclick="setOpened(true)">결과 공개 후<span class="mp-sub">다시 제출 불가</span></button>
 
     <div class="mp-cap">교사가 보는 것</div>
     <button class="mp-btn" onclick="location.href='focus_log_v2_260806.html#teacher-log'">과제물 관리<span class="mp-sub">제출 현황 · 작성 과정</span></button>
@@ -964,10 +965,12 @@ function submitTask(){
 /* 결과 공개 여부는 '결과 보기' 버튼 유무만 바꾼다 — 재제출은 막지 않음 (2026-08-12 올립) */
 function setOpened(on){
   document.getElementById('doneDesc').textContent = on
-    ? '선생님이 결과를 공개했어요. 마감 전까지는 다시 제출할 수도 있어요.'
+    ? '선생님이 결과를 공개했어요. 결과가 공개된 뒤에는 다시 제출할 수 없어요.'
     : '마감 전까지는 다시 제출할 수 있어요. 다시 제출하면 마지막에 낸 답안으로 바뀌어요.';
   document.getElementById('btnToList').style.display   = on ? 'none' : '';
   document.getElementById('btnToResult').style.display = on ? '' : 'none';
+  /* 결과 공개 뒤에는 재제출 자체가 막힌다 — 버튼을 남겨두면 눌리는 줄 안다 */
+  document.getElementById('btnResubmit').style.display = on ? 'none' : '';
   document.querySelectorAll('#mockpick .mp-btn[data-opened]').forEach(function(b){
     b.classList.toggle('on', (b.getAttribute('data-opened') === 'yes') === on);
   });
@@ -1224,7 +1227,7 @@ window.MOCK_NAV_GROUPS = [
       ['ssFileonly','파일 제출만'],
       ['ssBefore','제출 완료 · 결과 공개 전',{sub:'다시 제출 가능'}],
       ['ssFile','제출 완료 · 교사가 대신 올림',{sub:'파일 제출로 표시'}],
-      ['ssAfter','제출 완료 · 결과 공개 후',{sub:'다시 제출도 가능'}],
+      ['ssAfter','제출 완료 · 결과 공개 후',{sub:'다시 제출 불가'}],
       ['ssClosed','제출 못 한 채 마감',{sub:'쓰던 글은 읽기 전용'}],
       ['ssPdf','답안 PDF']] }
 ];
