@@ -94,6 +94,12 @@ body.nav-expanded .main-wrap{ padding-left:200px; }
 /* 점수 컬럼 정렬 — 아이콘 자리 상시 확보(폭 흔들림 방지) */
 .th-sortable{cursor:pointer;user-select:none;white-space:nowrap}
 .th-sortable:hover{color:#416bff}
+.sort-dd{position:relative;display:inline-flex}
+.sort-dd-menu{display:none;position:absolute;top:calc(100% + 6px);left:0;min-width:160px;background:#fff;border:1px solid #dde1e8;border-radius:8px;box-shadow:0 8px 24px rgba(0,0,0,.12);padding:4px;z-index:80}
+.sort-dd.open .sort-dd-menu{display:block}
+.sort-dd-opt{display:flex;align-items:center;justify-content:space-between;width:100%;background:none;border:none;font-family:inherit;font-size:14px;color:#222631;padding:9px 12px;border-radius:6px;cursor:pointer;text-align:left;line-height:1;white-space:nowrap}
+.sort-dd-opt:hover{background:#f4f7ff}
+.sort-dd-opt.on::after{content:'✓';color:#416bff;font-weight:700;margin-left:14px}
 .sort-ic{display:inline-flex;vertical-align:middle;margin-left:4px;color:#b3b6bd}
 .sort-ic svg{width:14px;height:14px}
 .th-sortable.sorted{color:#416bff}
@@ -473,6 +479,18 @@ body.nav-expanded .main-wrap{ padding-left:200px; }
           <h2 class="table-card-title">학생 채점 현황</h2>
         </div>
         <div class="table-card-actions">
+          <div class="sort-dd" id="sortDd">
+            <button class="btn-table-action" onclick="toggleSortMenu(event)">
+              <i data-lucide="arrow-up-down" style="width:14px;height:14px"></i>정렬 : <span id="sortDdLabel">학번 낮은 순</span>
+            </button>
+            <div class="sort-dd-menu" id="sortDdMenu">
+              <button class="sort-dd-opt" data-mode="id-asc" onclick="setSortMode('id-asc')">학번 낮은 순</button>
+              <button class="sort-dd-opt" data-mode="ai-asc" onclick="setSortMode('ai-asc')">AI 점수 낮은 순</button>
+              <button class="sort-dd-opt" data-mode="ai-desc" onclick="setSortMode('ai-desc')">AI 점수 높은 순</button>
+              <button class="sort-dd-opt" data-mode="final-asc" onclick="setSortMode('final-asc')">최종 점수 낮은 순</button>
+              <button class="sort-dd-opt" data-mode="final-desc" onclick="setSortMode('final-desc')">최종 점수 높은 순</button>
+            </div>
+          </div>
           <button class="btn-table-action" onclick="resetAll()">
             <i data-lucide="rotate-ccw" style="width:14px;height:14px"></i>초기화
           </button>
@@ -488,12 +506,12 @@ body.nav-expanded .main-wrap{ padding-left:200px; }
       <table class="student-table">
         <thead>
           <tr>
-            <th class="col-id th-sortable" onclick="toggleScoreSort('id')">학번<span class="sort-ic" id="sortIcId"><i data-lucide="chevrons-up-down"></i></span></th>
+            <th class="col-id">학번</th>
             <th class="col-name">이름</th>
             <th class="col-ocr">답안 인식</th>
             <th class="col-ai-stat">AI 채점</th>
-            <th class="col-ai-score th-sortable" onclick="toggleScoreSort('aiScore')">AI 점수<span class="sort-ic" id="sortIcAiScore"><i data-lucide="chevrons-up-down"></i></span></th>
-            <th class="col-final th-sortable" onclick="toggleScoreSort('finalScore')">최종 점수<span class="sort-ic" id="sortIcFinalScore"><i data-lucide="chevrons-up-down"></i></span></th>
+            <th class="col-ai-score">AI 점수</th>
+            <th class="col-final">최종 점수</th>
             <th class="col-action">학생 채점</th>
           </tr>
         </thead>
@@ -653,26 +671,26 @@ var STUDENTS = [
   {id:'10114', name:'백시우', aiStatus:'-', ocrFail:true, aiScore:'-', finalScore:'-', status:'미채점', statusCls:'none', link:'scoring_elementary_v3_260623.html'}             // 미채점 + 인식 실패 · 다시 인식 ›
 ];
 
-// ══════ 컬럼 정렬 (점수: 내림→오름→기본 / 학번: 오름→내림→기본) ══════
-var scoreSort = { key: null, dir: null };
-
-function toggleScoreSort(key){
-  var firstDir = key === 'id' ? 'asc' : 'desc';
-  var secondDir = key === 'id' ? 'desc' : 'asc';
-  if(scoreSort.key !== key){ scoreSort.key = key; scoreSort.dir = firstDir; }
-  else if(scoreSort.dir === firstDir){ scoreSort.dir = secondDir; }
-  else { scoreSort.key = null; scoreSort.dir = null; }
+// ══════ 정렬 드롭다운 (개발 시안 1104:21045 — 헤더 클릭 정렬 폐지) ══════
+var sortMode = 'id-asc';
+var SORT_LABELS = { 'id-asc':'학번 낮은 순', 'ai-asc':'AI 점수 낮은 순', 'ai-desc':'AI 점수 높은 순', 'final-asc':'최종 점수 낮은 순', 'final-desc':'최종 점수 높은 순' };
+function toggleSortMenu(e){ e.stopPropagation(); document.getElementById('sortDd').classList.toggle('open'); syncSortMenu(); }
+document.addEventListener('click', function(){ var d=document.getElementById('sortDd'); if(d) d.classList.remove('open'); });
+function syncSortMenu(){
+  document.querySelectorAll('.sort-dd-opt').forEach(function(o){ o.classList.toggle('on', o.dataset.mode === sortMode); });
+  var l=document.getElementById('sortDdLabel'); if(l) l.textContent = SORT_LABELS[sortMode];
+}
+function setSortMode(mode){
+  sortMode = mode;
+  document.getElementById('sortDd').classList.remove('open');
+  syncSortMenu();
   renderTable();
 }
-
 function sortedStudents(){
   var list = STUDENTS.slice();
-  if(!scoreSort.key) return list;
-  var k = scoreSort.key, sign = scoreSort.dir === 'asc' ? 1 : -1;
-  if(k === 'id'){
-    list.sort(function(a, b){ return a.id.localeCompare(b.id) * sign; });
-    return list;
-  }
+  if(sortMode === 'id-asc'){ list.sort(function(a,b){ return a.id.localeCompare(b.id); }); return list; }
+  var k = sortMode.indexOf('ai') === 0 ? 'aiScore' : 'finalScore';
+  var sign = sortMode.slice(-3) === 'asc' ? 1 : -1;
   list.sort(function(a, b){
     var av = a[k], bv = b[k];
     var aNum = (typeof av === 'number'), bNum = (typeof bv === 'number');
@@ -682,17 +700,6 @@ function sortedStudents(){
     return a.id.localeCompare(b.id); // 둘 다 '-'면 학번순 유지
   });
   return list;
-}
-
-function updateSortHeaderIcons(){
-  [['id','sortIcId'],['aiScore','sortIcAiScore'],['finalScore','sortIcFinalScore']].forEach(function(pair){
-    var el = document.getElementById(pair[1]);
-    if(!el) return;
-    var active = scoreSort.key === pair[0];
-    var icon = active ? (scoreSort.dir === 'asc' ? 'arrow-up' : 'arrow-down') : 'chevrons-up-down';
-    el.innerHTML = '<i data-lucide="' + icon + '"></i>';
-    el.closest('th').classList.toggle('sorted', active);
-  });
 }
 
 
@@ -858,7 +865,7 @@ function finalCellVal(s){
 }
 function renderTable(){
   var tbody = document.getElementById('studentTbody');
-  updateSortHeaderIcons();
+  syncSortMenu();
   tbody.innerHTML = sortedStudents().map(function(s){
     // ── 2열 파이프라인 (2026-08-26): 답안 인식 / AI 채점 — 미실시는 '-', 미제출은 인식 칸에 ──
     var ocrCell;
