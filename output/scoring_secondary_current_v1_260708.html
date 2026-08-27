@@ -1735,20 +1735,21 @@ var fromUrl = urlParams.get('from') || '';
 // ══════ 학생 리스트 ══════
 // OCR 상세(task_ocr_v3 STUDENTS_B1)와 명단 통일 — 직접입력(typing)은 OCR 미실행→채점 전
 var STUDENT_LIST = [
-  {id:'10101', name:'김서윤', status:'완료', statusCls:'done', ocrReview:true},
-  {id:'10102', name:'이준호', status:'확인 필요', statusCls:'need', ocrReview:true},
-  {id:'10103', name:'박지민', status:'완료', statusCls:'done'},
-  {id:'10104', name:'최유진', status:'미채점', statusCls:'none'},
-  {id:'10105', name:'정현우', status:'미채점', statusCls:'none', method:'typing'},
-  {id:'10106', name:'한지우', status:'미채점', statusCls:'none', method:'typing'},
-  {id:'10107', name:'조민재', status:'완료', statusCls:'done'},
-  {id:'10108', name:'윤하은', status:'완료', statusCls:'done'},
-  {id:'10109', name:'임도윤', status:'미채점', statusCls:'none', method:'typing'},
-  {id:'10110', name:'신예린', status:'미채점', statusCls:'none'},
-  {id:'10111', name:'김도현', status:'미채점', statusCls:'none', method:'typing'},
-  {id:'10112', name:'송하림', status:'완료', statusCls:'done'},
-  {id:'10113', name:'노유찬', status:'미채점', statusCls:'none', method:'typing'},
-  {id:'10114', name:'백시우', status:'완료', statusCls:'done'}
+  // 케이스 전수 (2026-08-27) — 학급 채점 현황과 동일 정합
+  {id:'10101', name:'김서윤', status:'완료',    statusCls:'done'},                                   // 채점 완료
+  {id:'10102', name:'이준호', status:'미채점',  statusCls:'none', ocrCase:'review'},                 // 인식 확인 필요 (불확실 문항)
+  {id:'10103', name:'박지민', status:'확인 필요', statusCls:'need'},                                 // 채점됨·교사 검토 대기
+  {id:'10104', name:'최유진', status:'미채점',  statusCls:'none', ocrCase:'lowacc'},                 // 인식 정확도 낮음 → 직접 채점
+  {id:'10105', name:'정현우', status:'미채점',  statusCls:'none', method:'typing'},                  // 직접 입력 · 미채점
+  {id:'10106', name:'한지우', status:'완료',    statusCls:'done', method:'typing'},                  // 직접 입력 · 채점 완료
+  {id:'10107', name:'조민재', status:'완료',    statusCls:'done'},                                   // 완료(교사 조정)
+  {id:'10108', name:'윤하은', status:'완료',    statusCls:'done'},
+  {id:'10109', name:'임도윤', status:'미제출',  statusCls:'none'},                                   // 미제출 → 루브릭 AI만
+  {id:'10110', name:'신예린', status:'미채점',  statusCls:'none', ocrCase:'done'},                   // 인식 완료 · 채점 전
+  {id:'10111', name:'김도현', status:'채점 실패', statusCls:'none'},                                 // AI 채점 실패
+  {id:'10112', name:'송하림', status:'완료',    statusCls:'done', stale:true},                       // 완료 + 재채점 권장
+  {id:'10113', name:'노유찬', status:'미채점',  statusCls:'none', method:'typing'},
+  {id:'10114', name:'백시우', status:'미채점',  statusCls:'none', ocrCase:'failed'}                  // 인식 실패 → 직접 채점
 ];
 var BASE_FILE = 'scoring_elementary_rubric_v1_260702.html';
 var currentStudentIdx = STUDENT_LIST.findIndex(function(s){ return s.id === studentId; });
@@ -2980,6 +2981,7 @@ function applyNotSubmittedUI(){
     +'</div>';
   document.getElementById('pane-instruction').innerHTML = emptyHtml;
   document.getElementById('pane-rubric').innerHTML = emptyHtml;
+  highlightRubricAi();
 
   // 보기 토글 숨김
   var vt = document.querySelector('.view-toggle');
@@ -3164,11 +3166,12 @@ function applyNotGradedUI(){
   var emptyHtml = '<div class="empty-state">'
     +'<i data-lucide="sparkles" class="empty-state-icon" style="width:36px;height:36px"></i>'
     +'<div class="empty-state-title">AI 채점을 아직 실행하지 않았어요</div>'
-    +'<div class="empty-state-sub">AI가 점수와 피드백을 자동으로 만들어줘요.</div>'
+    +'<div class="empty-state-sub">AI 채점을 실행하면 과제물을 분석한 채점 근거와 피드백을 볼 수 있어요.</div>'
     +'<button class="empty-state-cta" onclick="rerunAi()"><i data-lucide="wand-sparkles" style="width:16px;height:16px"></i>AI 채점 실행</button>'
     +'</div>';
   document.getElementById('pane-instruction').innerHTML = emptyHtml;
   document.getElementById('pane-rubric').innerHTML = emptyHtml;
+  highlightRubricAi();
 
   // 보기 토글 숨김 (채점 결과가 없으니 토글할 게 없음)
   var vt = document.querySelector('.view-toggle');
@@ -3540,6 +3543,7 @@ function applyFailedUI(){
     +'</div>';
   document.getElementById('pane-instruction').innerHTML = errorHtml;
   document.getElementById('pane-rubric').innerHTML = errorHtml;
+  highlightRubricAi();
 
   // 보기 토글 숨김
   var vt = document.querySelector('.view-toggle');
@@ -3556,6 +3560,53 @@ function applyFailedUI(){
   lucide.createIcons();
 }
 
+// ══════ 루브릭 AI 강조 — 과제물 분석 AI를 못 쓰는 케이스에서 대안 경로임을 알림 ══════
+function highlightRubricAi(){
+  var sec = document.getElementById('rubricAiSection');
+  if(!sec) return;
+  sec.style.boxShadow = '0 0 0 2px rgba(93,38,196,.18)';
+  var t = sec.querySelector('.rubric-empty-text');
+  if(t) t.textContent = '과제물이 없어도 채점기준만으로 피드백을 만들 수 있어요.';
+}
+
+// ══════ 인식(OCR) 케이스별 안내 — 우측 채점 결과와 어긋나지 않게 ══════
+// 공통 원칙: AI 채점이 안 된 케이스에서는 AI 채점 결과/근거/피드백이 절대 노출되지 않는다.
+//           단, 루브릭 기반 AI는 과제물이 없어도 동작하므로 항상 살려 둔다.
+function applyOcrCaseUI(kind){
+  var MAP = {
+    review: { cls:'',      icon:'alert-circle',   title:'인식 결과에 확인이 필요해요',
+              sub:'일부 문항의 판독이 불확실해요. 인식 결과를 확인·수정한 뒤 AI 채점을 실행하세요.',
+              cta:'인식 결과 확인' },
+    lowacc: { cls:'error', icon:'alert-triangle', title:'인식 정확도가 낮아 AI 채점을 할 수 없어요',
+              sub:'과제물 원본을 보고 직접 채점해 주세요. 채점기준으로 피드백은 만들 수 있어요.',
+              cta:'인식 결과 확인' },
+    failed: { cls:'error', icon:'file-x-2',       title:'과제물을 인식하지 못했어요',
+              sub:'AI 채점을 할 수 없어요. 다시 인식하거나 원본을 보고 직접 채점해 주세요.',
+              cta:'인식 화면으로' },
+    done:   { cls:'',      icon:'scan-text',      title:'답안 인식이 끝났어요',
+              sub:'AI 채점을 실행하면 과제물을 분석한 채점 근거와 피드백을 볼 수 있어요.',
+              cta:null }
+  };
+  var c = MAP[kind]; if(!c) return;
+  var id = (typeof _curStudent !== 'undefined' && _curStudent) ? _curStudent.id : '';
+  var href = 'task_ocr_v3_260623.html#ocr-b=' + id;
+  var html = '<div class="empty-state' + (c.cls ? ' ' + c.cls : '') + '">'
+    + '<i data-lucide="' + c.icon + '" class="empty-state-icon" style="width:36px;height:36px"></i>'
+    + '<div class="empty-state-title">' + c.title + '</div>'
+    + '<div class="empty-state-sub">' + c.sub + '</div>'
+    + (c.cta ? '<button class="empty-state-cta" onclick="location.href=&#39;' + href + '&#39;"><i data-lucide="scan-text" style="width:16px;height:16px"></i>' + c.cta + '</button>' : '')
+    + '</div>';
+  var pi = document.getElementById('pane-instruction'); if(pi) pi.innerHTML = html;
+  var pr = document.getElementById('pane-rubric'); if(pr) pr.innerHTML = html;
+  if(kind === 'lowacc' || kind === 'failed') highlightRubricAi();
+  var tv = document.getElementById('totalScoreVal'); if(tv) tv.textContent = '— / 50';
+  document.body.classList.add('before-ai-rerun');
+  var btnApply = document.querySelector('.btn-ai-apply'); if(btnApply) btnApply.style.display = 'none';
+  var vt = document.querySelector('.view-toggle'); if(vt) vt.style.display = 'none';
+  var rerunBtn = document.querySelector('.btn-rerun-text'); if(rerunBtn) rerunBtn.style.display = 'none';
+  if(typeof lucide !== 'undefined') lucide.createIcons();
+}
+
 // ══════ 초기화 ══════
 renderDropdown();
 syncSelectedStudent();
@@ -3568,6 +3619,10 @@ var _isHistory = _curStudent && _curStudent.history === true;
 var _noTranscript = false; // 미채점·채점 실패: OCR 미실행 → 전사 텍스트 없음 (원본만)
 if(_isNotSubmitted){
   applyNotSubmittedUI();
+} else if(_curStudent && _curStudent.ocrCase){
+  applyNotGradedUI();
+  if(_curStudent.ocrCase === 'failed' || _curStudent.ocrCase === 'lowacc') applyViewerNoTranscript();
+  applyOcrCaseUI(_curStudent.ocrCase);
 } else if(_isNotGraded){
   applyNotGradedUI();
   applyViewerNoTranscript();

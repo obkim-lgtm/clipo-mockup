@@ -2144,14 +2144,25 @@ function updateSummary(){
   var txt  = document.getElementById('qsum-cnt-txt');
   var prev = document.getElementById('qsum-prev');
   var btn  = document.getElementById('qsum-btn');
-  var filled = QUESTIONS.filter(function(q){ return q.trim() !== ''; });
-  if(filled.length === 0){
+  var emptyCnt = QUESTIONS.filter(function(q){ return q.trim() === ''; }).length;
+  if(QUESTIONS.length === 0){
     box.classList.add('empty');
     txt.textContent = '작성한 문항 없음';
     prev.style.display = '';
     prev.textContent = '문항을 작성해야 학생이 답을 쓸 수 있습니다.';
     btn.className = 'btn btn-primary btn-sm';
     btn.innerHTML = '<i data-lucide="pencil-line" style="width:15px;height:15px"></i>문항 작성';
+  } else if(emptyCnt > 0){
+    /* 직접 작성을 켜면 빈 문항 1개가 자동 생성된다(2026-08-25 회의) —
+       생성된 사실은 요약에 보이되, 내용이 비면 설계 저장이 막히므로 경고 스타일은 유지 */
+    box.classList.add('empty');
+    txt.textContent = '문항 ' + QUESTIONS.length + '개 · 내용 미입력'
+      + (QUESTIONS.length > 1 ? ' ' + emptyCnt + '개' : '')
+      + (SUBMITTED > 0 ? ' · 제출 ' + SUBMITTED + '명' : '');
+    prev.style.display = '';
+    prev.textContent = '문항 내용을 입력해야 평가 설계를 저장할 수 있습니다.';
+    btn.className = 'btn btn-primary btn-sm';
+    btn.innerHTML = '<i data-lucide="pencil-line" style="width:15px;height:15px"></i>문항 입력';
   } else {
     box.classList.remove('empty');
     txt.textContent = '문항 ' + QUESTIONS.length + '개'
