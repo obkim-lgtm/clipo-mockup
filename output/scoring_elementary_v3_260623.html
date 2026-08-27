@@ -999,7 +999,7 @@ body.vs-hide-topbar .vs-float{display:inline-flex}
         <button id="ve-tab-orig" onclick="switchViewer('orig')" style="height:30px;padding:0 12px;border:none;border-radius:6px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:5px;background:#fff;color:#3b3f4c;"><i data-lucide="file-image" style="width:14px;height:14px"></i>원본 제출물</button>
         <button id="ve-tab-text" onclick="switchViewer('text')" style="height:30px;padding:0 12px;border:none;border-radius:6px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:5px;background:transparent;color:#cfd3da;"><i data-lucide="align-left" style="width:14px;height:14px"></i>인식 결과</button>
       </div>
-      <button id="ocrEditBtn" onclick="openOcrEdit()" style="position:relative;margin-left:auto;height:30px;padding:0 12px;border:1px solid rgba(255,255,255,.3);border-radius:6px;background:transparent;color:#fff;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:5px;"><i data-lucide="scan-text" style="width:14px;height:14px"></i>과제물 인식 결과 수정<span id="ocrEditBtnChip" style="display:none;align-items:center;gap:3px;font-size:11px;font-weight:700;color:#c2410c;background:#fff7ed;border-radius:100px;padding:1px 7px;margin-left:2px;"><i data-lucide="alert-circle" style="width:10px;height:10px;"></i>확인 필요</span></button>
+      <button id="ocrEditBtn" onclick="openOcrEdit()" style="position:relative;margin-left:auto;height:30px;padding:0 12px;border:1px solid rgba(255,255,255,.3);border-radius:6px;background:transparent;color:#fff;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:5px;"><i data-lucide="scan-text" style="width:14px;height:14px"></i>과제물 인식 결과 수정<span id="ocrEditBtnChip" style="display:none;align-items:center;gap:3px;font-size:11px;font-weight:700;color:#c2410c;background:#fff7ed;border-radius:100px;padding:1px 7px;margin-left:2px;"><i data-lucide="alert-circle" style="width:10px;height:10px;"></i>인식 불확실</span></button>
     </div>
     <!-- 원본 제출물 모드 전용 컨트롤 (2번째 줄) -->
     <div id="ve-imgbar" style="display:none;align-items:center;justify-content:center;gap:2px;height:40px;background:#33373f;border-top:1px solid rgba(255,255,255,.08);flex-shrink:0;">
@@ -1052,7 +1052,7 @@ body.vs-hide-topbar .vs-float{display:inline-flex}
             <div class="ocr-read-hd"><span class="badge badge-purple">문항 2</span></div>
             <div class="ocr-read-q">우리 고장의 옛날과 오늘날의 모습이 어떻게 달라졌는지 써 보세요.</div>
             <div class="ocr-read-ans">
-              <div class="ocr-read-ans-title"><span class="lbl">학생 답안</span><span class="rubric-suspect-chip"><i data-lucide="alert-circle" style="width:11px;height:11px;"></i>확인 필요</span></div>
+              <div class="ocr-read-ans-title"><span class="lbl">학생 답안</span><span class="rubric-suspect-chip"><i data-lucide="alert-circle" style="width:11px;height:11px;"></i>인식 불확실</span></div>
               <div class="ocr-read-ans-body"><p>옛날에는 논과 밭이 많았는데 지금은 아파트와 도로가 많이 생겼다. 사람도 더 많아지고 시장도 커졌다.</p></div>
             </div>
             <div class="ocr-alert">
@@ -1322,7 +1322,7 @@ body.vs-hide-topbar .vs-float{display:inline-flex}
           <div style="padding:12px 16px 16px;">
             <div style="display:flex;align-items:center;gap:8px;margin:0 0 8px;">
               <span style="font-size:14px;font-weight:700;color:#3b3f4c;">답</span>
-              <span class="rubric-suspect-chip"><i data-lucide="alert-circle" style="width:11px;height:11px;"></i>확인 필요</span>
+              <span class="rubric-suspect-chip"><i data-lucide="alert-circle" style="width:11px;height:11px;"></i>인식 불확실</span>
               <span style="margin-left:auto;display:inline-flex;align-items:center;gap:6px;">
                 <button id="ocrd-revert-1" disabled onclick="revertOcrd(1)" title="원래 인식 결과로 되돌리기" style="display:inline-flex;align-items:center;justify-content:center;line-height:1;gap:4px;height:26px;padding:0 9px;background:white;border:1px solid #d9d9d9;border-radius:6px;color:#3b3f4c;font-family:inherit;font-size:12px;font-weight:700;cursor:default;opacity:.45;flex-shrink:0;"><i data-lucide="rotate-ccw" style="width:12px;height:12px;"></i>되돌리기</button>
                 <button class="formula-insert-btn" onmousedown="event.preventDefault()" onclick="openFormulaInput('ocrd-ta-1')" title="수식 입력" style="display:inline-flex;align-items:center;justify-content:center;line-height:1;gap:4px;height:26px;padding:0 9px;background:white;border:1px solid #d9d9d9;border-radius:6px;color:#3b3f4c;font-family:inherit;font-size:12px;font-weight:700;cursor:pointer;flex-shrink:0;"><i data-lucide="sigma" style="width:12px;height:12px;"></i>수식</button>
@@ -3105,24 +3105,13 @@ function applyViewerTyping(){
   // 원본 제출물 = A4 종이 위에 타이핑 제출 텍스트 그대로 (스캔 페이지 대체, 1회만 구성)
   var pages = document.getElementById('viewerPages');
   if(pages && !document.getElementById('typingPage')){
-    var doc = '';
-    document.querySelectorAll('#viewerText .ocr-read').forEach(function(r, i){
-      var q = r.querySelector('.ocr-read-q');
-      var ansEl = r.querySelector('.ocr-read-ans');
-      var ansText = '';
-      if(ansEl){
-        var clone = ansEl.cloneNode(true);
-        clone.querySelectorAll('.ocr-read-ans-title, .rubric-suspect-chip, .ocr-alert, .chip-direct').forEach(function(x){ x.remove(); });
-        ansText = clone.textContent.replace(/\s+\n/g,'\n').trim();
-      }
-      doc += '<div style="margin-bottom:26px;">'
-        + '<div style="font-size:15px;font-weight:700;color:#3b3f4c;line-height:1.6;margin-bottom:6px;">' + (i+1) + '. ' + (q ? q.textContent.trim() : '') + '</div>'
-        + '<div style="font-size:16px;color:#222631;line-height:1.9;white-space:pre-wrap;">' + ansText + '</div>'
-        + '</div>';
-    });
+    // 직접 작성 제출 내용 — 디자인 피그마 확정 대기 (올립 26-08-26). 공통 정적 답안 복제(가짜 데이터) 금지.
     pages.innerHTML = '<div class="viewer-page" id="typingPage">'
-      + '<div style="padding:48px 44px;min-height:900px;">'
-      + doc + '</div></div>';
+      + '<div style="padding:48px 44px;min-height:900px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;color:#b3b6bd;">'
+      + '<i data-lucide="keyboard" style="width:40px;height:40px;"></i>'
+      + '<div style="font-size:16px;font-weight:600;color:#6d7381;">직접 작성 제출 내용 나옴</div>'
+      + '<div style="font-size:14px;line-height:1.6;text-align:center;">학생이 문항별로 직접 작성해 제출한 내용이<br>이 자리에 표시됩니다. (화면 디자인 확정 예정)</div>'
+      + '</div></div>';
   }
   // 원본 제출물 뷰 강제 — 마지막 보기 취향(localStorage)은 오염시키지 않음
   var saved=null; try{ saved=localStorage.getItem('clipoViewerMode'); }catch(e){}
@@ -3727,8 +3716,9 @@ function saveSection(ta, gi){
   if (editBadge) editBadge.remove();
   // 원본과 달라지면 '되돌리기' 활성
   setOcrdRevertState(gi, newText.trim() !== (_ocrdOriginals[gi] || '').trim());
-  if (typeof showToast === 'function' && changed) {
-    showToast('success', hadNote ? '수정한 문항의 확인 필요 표시를 해제했어요.' : '저장되었습니다.');
+  // 채점 후 수정은 명시 저장(하단 '수정 저장')이 확정 시점 — blur는 편집 반영만, 저장 토스트 금지 (26-08-27 슬랙 합의)
+  if (typeof showToast === 'function' && changed && hadNote) {
+    showToast('success', '수정한 문항의 인식 불확실 표시를 해제했어요.');
   }
   // 불확실 구간 모두 해소되면 수정 버튼 주황 강조도 해제
   refreshOcrReviewNotice();

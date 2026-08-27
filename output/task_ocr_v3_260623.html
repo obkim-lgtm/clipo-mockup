@@ -4163,9 +4163,15 @@ function renderOcrBText(student) {
     };
 
     html += '<div style="padding:12px 16px 16px;">';
-    // 풀이 (그림/도형/표) — 해당 답안이 있는 문항만
+    // 풀이 (그림/도형/표) — 전사가 아니라 AI의 해석이므로 수정 불가 (26-08-26 확정).
+    // 해석이 틀리면 고치는 게 아니라 '직접 채점 (AI 제외)'가 정확한 처리.
     if (q.sol != null) {
-      html += ansSection(qi + '-sol', '풀이 (그림/도형/표)', q.sol);
+      html += '<div style="display:flex;align-items:center;gap:8px;margin:0 0 8px;">'
+        + '<span style="font-size:14px;font-weight:700;color:#3b3f4c;">풀이 (그림/도형/표)</span>'
+        + '<span style="display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:600;color:#6d7381;background:#f1f3f5;border-radius:100px;padding:2px 8px;"><i data-lucide="lock" style="width:11px;height:11px;"></i>수정 불가</span>'
+        + '</div>'
+        + '<div style="background:#f6f7f9;border-radius:8px;padding:12px 14px;font-size:15px;line-height:1.7;color:#6d7381;">' + q.sol.replace(/
+/g, '<br>') + '</div>';
       html += '<div style="height:16px;"></div>';
     }
     var chipHtml = '';
