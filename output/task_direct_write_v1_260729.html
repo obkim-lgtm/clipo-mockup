@@ -404,10 +404,7 @@
 
     .qcard{ background:#fff; border:1px solid #d9d9d9; border-radius:10px; padding:20px; display:flex; flex-direction:column; gap:14px; margin-bottom:12px; }
     .qcard-hd{ display:flex; align-items:center; gap:10px; }
-    .qcard-no{ display:inline-flex; align-items:center; justify-content:center; gap:6px; height:28px; padding:0 8px 0 12px; border-radius:100px; background:#e9f2ff; color:#3151c4; font-size:15px; font-weight:600; line-height:1; flex-shrink:0; }
-    /* 문항 번호는 교사가 직접 쓴다 — 1-1, 가 처럼 시험지 표기를 그대로 (2026-08-25 회의) */
-    .qno-in{ width:56px; height:22px; border:1px solid #bfd0ff; border-radius:5px; background:#fff; color:#3151c4; font-size:14px; font-weight:600; font-family:inherit; text-align:center; padding:0 4px; }
-    .qno-in:focus{ outline:2px solid #416bff; outline-offset:-2px; }
+    .qcard-no{ display:inline-flex; align-items:center; justify-content:center; height:28px; padding:0 12px; border-radius:100px; background:#e9f2ff; color:#3151c4; font-size:15px; font-weight:600; line-height:1; flex-shrink:0; }
     .qprev-wrap{ margin-top:16px; }
     .qcard-tools{ margin-left:auto; display:flex; align-items:center; gap:2px; }
     .qi-btn{ width:36px; height:36px; border:none; background:none; border-radius:6px; cursor:pointer; color:#6d7381; display:inline-flex; align-items:center; justify-content:center; line-height:1; }
@@ -1727,16 +1724,10 @@ var Q_MAX = 20;
 var Q_LIMIT_DEFAULT = 500;
 var Q_LIMITS = [];
 
-/* 문항 번호 — 자동 매김이 아니라 교사가 직접 쓰는 값 (2026-08-25 회의).
-   실제 시험지가 `1-1`, `가` 같은 표기를 쓰므로 형식을 강제하지 않는다.
-   중복·건너뜀도 막지 않는다 — 화면 순서는 배열 순서를 따른다 */
-var Q_NOS = [];
-function qNo(i){ return (Q_NOS[i] !== undefined && Q_NOS[i] !== '') ? Q_NOS[i] : String(i+1); }
-function syncQNos(){
-  for(var i = 0; i < QUESTIONS.length; i++){ if(Q_NOS[i] === undefined) Q_NOS[i] = String(i+1); }
-  Q_NOS.length = QUESTIONS.length;
-}
-function qNoSet(i, input){ Q_NOS[i] = input.value.trim(); renderQPrev(); }
+/* 문항 번호 입력란은 두지 않는다 (2026-08-27 회의 — 빌·다나 의견, 올립 확정).
+   화면의 `문항 1`, `문항 2`는 덩어리를 구분하는 순서 표시일 뿐이고,
+   `1-1` 같은 실제 시험지 표기는 교사가 문항 내용 안에 직접 적는다.
+   번호를 따로 받으면 문항 개수와 번호가 어긋나 헷갈린다 */
 
 /* 수식 입력은 수학·과학·기타 과목에서만 (2026-08-07 회의) — 학생 제출 화면과 같은 룰 */
 var SUBJECT = '사회';
@@ -1756,7 +1747,6 @@ function setSubmitted(n){
     if(QUESTIONS.length === 0){
       QUESTIONS = Q_SAMPLE.slice();
       Q_LIMITS  = QUESTIONS.map(function(){ return Q_LIMIT_DEFAULT; });
-      Q_NOS     = QUESTIONS.map(function(q, i){ return String(i+1); });
     }
     document.getElementById('way-write').classList.add('on');
   }
@@ -1777,9 +1767,7 @@ function applyDesignState(submitted, opt){
   SUBMITTED = submitted;
   QUESTIONS = withQ ? Q_SAMPLE.slice() : [];
   Q_LIMITS  = QUESTIONS.map(function(){ return Q_LIMIT_DEFAULT; });
-  /* 번호도 함께 기본값으로 — 앞서 연 과제의 번호가 따라오면 안 된다 (2026-08-26) */
-  Q_NOS     = QUESTIONS.map(function(q, i){ return String(i+1); });
-  Q_SNAP = null; L_SNAP = null; N_SNAP = null;
+  Q_SNAP = null; L_SNAP = null;
 
   document.getElementById('way-write').classList.toggle('on', writeOn);
   document.getElementById('way-file').classList.toggle('on', !!opt.fileOn);
@@ -1825,13 +1813,13 @@ function go(scene){
 }
 /* 문항 화면 진입 시 스냅샷 — 저장 없이 나가면 이 상태로 되돌린다.
    입력이 QUESTIONS에 즉시 반영되는 구조라, 스냅샷이 없으면 [취소]가 취소가 아니게 됨 (2026-08-07) */
-var Q_SNAP = null, L_SNAP = null, N_SNAP = null;
+var Q_SNAP = null, L_SNAP = null;
 function goQuestions(){
-  Q_SNAP = QUESTIONS.slice(); L_SNAP = Q_LIMITS.slice(); N_SNAP = Q_NOS.slice();
+  Q_SNAP = QUESTIONS.slice(); L_SNAP = Q_LIMITS.slice();
   renderQuestions(); go('questions');
 }
 function qDirty(){
-  return Q_SNAP !== null && (JSON.stringify(QUESTIONS) !== JSON.stringify(Q_SNAP) || JSON.stringify(Q_LIMITS) !== JSON.stringify(L_SNAP) || JSON.stringify(Q_NOS) !== JSON.stringify(N_SNAP));
+  return Q_SNAP !== null && (JSON.stringify(QUESTIONS) !== JSON.stringify(Q_SNAP) || JSON.stringify(Q_LIMITS) !== JSON.stringify(L_SNAP));
 }
 /* 문항 화면에서 나가기 — 저장 안 한 변경이 있으면 가드 */
 function leaveQuestions(){
@@ -1841,7 +1829,7 @@ function leaveQuestions(){
 }
 function qGuardStay(){ document.getElementById('qGuard').classList.remove('show'); }
 function qGuardDiscard(){
-  QUESTIONS = Q_SNAP.slice(); Q_LIMITS = L_SNAP.slice(); Q_NOS = N_SNAP.slice();
+  QUESTIONS = Q_SNAP.slice(); Q_LIMITS = L_SNAP.slice();
   document.getElementById('qGuard').classList.remove('show');
   goDesign();
 }
@@ -1889,7 +1877,7 @@ function doToggleWay(k){
   el.classList.toggle('on');
   /* 직접 작성을 켜면 문항 1개가 바로 생긴다 — 문항 0개 상태를 두지 않는다 (2026-08-25 회의) */
   if(k === 'write' && el.classList.contains('on') && QUESTIONS.length === 0){
-    QUESTIONS.push(''); Q_LIMITS.push(Q_LIMIT_DEFAULT); Q_NOS.push('1');
+    QUESTIONS.push(''); Q_LIMITS.push(Q_LIMIT_DEFAULT);
     renderQuestions(); updateSummary();
   }
   syncWayNotes();
@@ -1975,7 +1963,6 @@ function applyWayLock(){
 function renderQuestions(){
   var list = document.getElementById('q-list');
   var locked = SUBMITTED > 0;
-  syncQNos();
   list.innerHTML = '';
 
   /* 제출이 들어와도 내용 수정·문항 추가는 열어두고 삭제만 막는다 (2026-08-07 회의).
@@ -1993,7 +1980,7 @@ function renderQuestions(){
     var d = document.createElement('div');
     d.className = 'qcard';
     d.innerHTML = '<div class="qcard-hd">'
-      + '<span class="qcard-no">문항 <input class="qno-in" type="text" value="" onchange="qNoSet(' + i + ',this)" onblur="qNoSet(' + i + ',this)" aria-label="문항 번호"></span>'
+      + '<span class="qcard-no">문항 ' + (i+1) + '</span>'
       + '<div class="qcard-tools">'
       /* 삭제만 잠근다 — 잠금 상태에서도 버튼은 남기고 누르면 사유를 알려준다 */
       +   '<button class="qi-btn del' + (locked ? ' is-locked' : '') + '" title="' + (locked ? '제출한 학생이 있어 지울 수 없어요' : '삭제') + '" onclick="delQ('+i+')"><i data-lucide="' + (locked ? 'lock' : 'trash-2') + '" style="width:18px;height:18px"></i></button>'
@@ -2013,7 +2000,6 @@ function renderQuestions(){
       +     '</div>'
       +   '</div>'
       + '</div>';
-    d.querySelector('.qno-in').value = qNo(i);
     d.querySelector('textarea').value = q;
     list.appendChild(d);
     qtaGrow(d.querySelector('textarea'));   /* 기존 내용도 접힘 없이 펼쳐 보이게 */
@@ -2086,7 +2072,7 @@ function renderQPrev(){
     d.innerHTML = '<p><b></b> <span class="qpt"></span></p>'
                 + '<div class="qprev-ans">여기에 답을 쓰세요.</div>'
                 + '<p class="qprev-cnt"></p>';
-    d.querySelector('b').textContent = '문항 ' + qNo(i) + '.';
+    d.querySelector('b').textContent = '문항 ' + (i+1);
     d.querySelector('.qpt').textContent = q.trim() === '' ? '(문항 내용 없음)' : q;
     d.querySelector('.qprev-cnt').textContent = '0 / 권장 ' + qLimit(i).toLocaleString() + '자';
     box.appendChild(d);
@@ -2124,7 +2110,6 @@ function addQuestion(){
   if(QUESTIONS.length >= Q_MAX){ toastMsg('문항은 최대 ' + Q_MAX + '개까지 추가할 수 있어요.'); return; }
   QUESTIONS.push('');
   Q_LIMITS.push(Q_LIMIT_DEFAULT);
-  Q_NOS.push(String(QUESTIONS.length));
   renderQuestions();
   var tas = document.querySelectorAll('#q-list .qta');
   if(tas.length){ tas[tas.length-1].focus(); tas[tas.length-1].scrollIntoView({behavior:'smooth', block:'center'}); }
@@ -2142,7 +2127,7 @@ function delQ(i){
   doDelQ(i);
 }
 function doDelQ(i){
-  QUESTIONS.splice(i,1); Q_LIMITS.splice(i,1); Q_NOS.splice(i,1);
+  QUESTIONS.splice(i,1); Q_LIMITS.splice(i,1);
   renderQuestions(); updateSummary();
 }
 function closeQDel(){ _delIdx = null; document.getElementById('qDelGuard').classList.remove('show'); }
@@ -2189,14 +2174,15 @@ function saveQuestions(){
   var empty = QUESTIONS.filter(function(q){ return q.trim() === ''; }).length;
   if(empty > 0){ toastMsg('내용이 비어 있는 문항이 ' + empty + '개 있어요. 채우거나 삭제해 주세요.'); return; }
   updateSummary();
-  Q_SNAP = QUESTIONS.slice(); L_SNAP = Q_LIMITS.slice(); N_SNAP = Q_NOS.slice();   /* 저장됨 = 더 이상 미저장 변경 없음 */
+  Q_SNAP = QUESTIONS.slice(); L_SNAP = Q_LIMITS.slice();   /* 저장됨 = 더 이상 미저장 변경 없음 */
   toastMsg('문항 ' + QUESTIONS.length + '개를 저장했습니다.');
   setTimeout(function(){ go('design'); }, 900);
 }
 
 /* ── 설계 저장 ──
-   문항이 없어도 저장된다. 나중에 채울 수 있어야 하므로 막지 않고,
-   목록 카드에 '문항 미작성'을 남겨 계속 눈에 띄게 한다. */
+   문항 내용은 1글자 이상 필수 (2026-08-27 회의 — 다나 제안, 올립 확정).
+   교사가 만든 빈 칸은 교사가 정리한다 — 채점기준·성취기준과 같은 규칙.
+   빈 상태가 허용되는 건 이전된 기존 과제뿐이다 */
 function saveDesign(){
   var card = document.querySelector('.up-card.on');
   var isStudent = card && card.getAttribute('data-method') === 'student';
@@ -2204,12 +2190,16 @@ function saveDesign(){
   var fileOn  = document.getElementById('way-file').classList.contains('on');
   if(isStudent && !writeOn && !fileOn){ toastMsg('제출 방식을 하나 이상 선택해 주세요.'); return; }
 
-  var noQ = isStudent && writeOn && QUESTIONS.filter(function(q){ return q.trim() !== ''; }).length === 0;
+  if(isStudent && writeOn){
+    var emptyQ = QUESTIONS.filter(function(q){ return q.trim() === ''; }).length;
+    if(QUESTIONS.length === 0 || emptyQ > 0){
+      toastMsg('내용이 비어 있는 문항이 있어요. 채우거나 삭제해 주세요.');
+      return;
+    }
+  }
   renderList();
   go('list');
-  toastMsg(noQ
-    ? '저장했어요. 문항을 작성해야 학생이 답을 쓸 수 있어요.'
-    : '평가 설계가 저장되었습니다.');
+  toastMsg('평가 설계가 저장되었습니다.');
 }
 
 /* ── 목록 카드의 '문항 미작성' 표시 ── */
