@@ -101,6 +101,7 @@ body.nav-expanded .main-wrap{ padding-left:200px; }
 .col-id{width:90px}
 .col-name{width:120px;text-align:left;padding-left:20px;font-weight:600}
 .col-ocr{width:170px}
+.col-ai-stat{width:150px}
 .st-chip{display:inline-flex;align-items:center;gap:4px;font-size:12px;font-weight:600;padding:2px 8px;border-radius:100px;text-decoration:none;white-space:nowrap;line-height:1.4}
 .st-chip-red{background:#fef2f2;color:#db3e51}
 .st-chip-orange{background:#fff7ed;color:#ea580c}
@@ -490,7 +491,8 @@ body.nav-expanded .main-wrap{ padding-left:200px; }
             <th class="col-id th-sortable" onclick="toggleScoreSort('id')">학번<span class="sort-ic" id="sortIcId"><i data-lucide="chevrons-up-down"></i></span></th>
             <th class="col-name" style="text-align:left;padding-left:20px">이름</th>
             <th class="col-ocr">답안 인식</th>
-            <th class="col-ai-score th-sortable" onclick="toggleScoreSort('aiScore')">AI 채점<span class="sort-ic" id="sortIcAiScore"><i data-lucide="chevrons-up-down"></i></span></th>
+            <th class="col-ai-stat">AI 채점</th>
+            <th class="col-ai-score th-sortable" onclick="toggleScoreSort('aiScore')">AI 점수<span class="sort-ic" id="sortIcAiScore"><i data-lucide="chevrons-up-down"></i></span></th>
             <th class="col-final th-sortable" onclick="toggleScoreSort('finalScore')">최종 점수<span class="sort-ic" id="sortIcFinalScore"><i data-lucide="chevrons-up-down"></i></span></th>
             <th class="col-action">학생 채점</th>
           </tr>
@@ -866,15 +868,17 @@ function renderTable(){
     else if (s.ocrReview) ocrCell = '<a class="st-chip st-chip-orange" href="task_ocr_v3_260623.html#ocr-b='+s.id+'"><i data-lucide="scan-text" style="width:12px;height:12px;"></i>확인 필요 ›</a>';
     else if (s.ocrDone || s.aiScore !== '-') ocrCell = '<a href="task_ocr_v3_260623.html#ocr-b='+s.id+'" style="color:#3b3f4c;text-decoration:none;">완료</a>';
     else ocrCell = '<span class="muted">-</span>';
-    var scoreCell;
-    if (s.scoreFail) scoreCell = '<a class="st-chip st-chip-red" href="javascript:void(0)" onclick="rescoreStudent(&#39;'+s.id+'&#39;,&#39;'+s.name+'&#39;)"><i data-lucide="rotate-cw" style="width:12px;height:12px;"></i>실패 · 다시 채점 ›</a>';
-    else if (s.aiScore !== '-') scoreCell = '('+s.aiScore+')';
-    else scoreCell = '<span class="muted">-</span>';
+    var aiStatCell;
+    if (s.scoreFail) aiStatCell = '<a class="st-chip st-chip-red" href="javascript:void(0)" onclick="rescoreStudent(&#39;'+s.id+'&#39;,&#39;'+s.name+'&#39;)"><i data-lucide="rotate-cw" style="width:12px;height:12px;"></i>실패 · 다시 채점 ›</a>';
+    else if (s.aiScore !== '-') aiStatCell = '완료';
+    else aiStatCell = '<span class="muted">-</span>';
+    var scoreCell = s.aiScore !== '-' ? '('+s.aiScore+')' : '<span class="muted">-</span>';
     var finalCell = s.finalScore === '-' ? '<span class="muted">-</span>' : finalCellVal(s);
     return '<tr>'
       +'<td class="col-id">'+s.id+'</td>'
       +'<td class="col-name" style="text-align:left;padding-left:20px">'+s.name+'</td>'
       +'<td class="col-ocr">'+ocrCell+'</td>'
+      +'<td class="col-ai-stat">'+aiStatCell+'</td>'
       +'<td class="col-ai-score">'+scoreCell+'</td>'
       +'<td class="col-final">'+finalCell+'</td>'
       +'<td class="col-action"><div class="col-action-group">'
