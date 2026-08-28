@@ -916,30 +916,10 @@ window.MOCK_NAV_FILE  = 'home';
    교사 그룹(평가 설계·과제물 관리·채점 상세)을 싣지 않고, 교사 쪽은 '과제 설계 목록' 한 줄로만 연결한다.
    학생 유즈케이스는 전부 고유 해시를 갖는다(아래 CASES 참조) — 까망이에서 바로 그 케이스로 뛴다.
    기본 목록(mock_nav_dw.js의 GROUPS)은 나머지 4개 파일이 그대로 쓴다 */
-window.MOCK_NAV_GROUPS = [
-  /* 학생 직접 제출 개선(C-2608) 과업 전용 — 2026-08-28 올립 개정.
-     **학생이 겪는 순서로 묶는다** — 받다 / 쓰다 / 내고 나서.
-     홈·과제 목록·이탈 기록(작성 과정 기록)은 이미 실서버에 배포된 화면이라
-     케이스를 세세히 싣지 않는다. 목록이 길어지면 이번에 봐야 할 문항 화면이 묻힌다.
-     student_home과 student_submit이 같은 목록을 쓴다(화면을 오가도 까망이가 안 바뀌게) */
-  { t:'학생 · 과제를 받다', items:[
-      ['shHome6','홈',{sub:'배포됨 · 진입 확인용'}],
-      ['shTask6','과제 목록',{sub:'배포됨 · 진입 확인용'}]] },
-  { t:'학생 · 답을 쓰다', items:[
-      ['ssWrite','문항별로 답 쓰기',{sub:'이번 과업 · 문항 단위 입력'}],
-      ['ssOneQ','문항이 하나인 과제'],
-      ['ssGoneQ','선생님이 문항을 지움',{sub:'내가 쓴 글은 남고 입력만 막힘'}],
-      ['ssBoth','직접 쓰기 + 파일 둘 다 받는 과제'],
-      ['ssFileonly','파일로만 내는 과제'],
-      ['ssGuide','작성 기록 안내 팝업',{sub:'과제 최초 진입 1회 · 기능은 배포됨'}]] },
-  { t:'학생 · 내고 나서', items:[
-      ['ssDone','제출 완료'],
-      ['ssBefore','결과 공개 전',{sub:'다시 낼 수 있음'}],
-      ['ssAfter','결과 공개 후',{sub:'다시 못 냄'}],
-      ['ssFile','선생님이 대신 올려줌'],
-      ['ssClosed','못 낸 채 마감',{sub:'쓰던 글은 읽기만'}],
-      ['ssPdf','답안 PDF']] }
-];
+/* 전용 목록(MOCK_NAV_GROUPS)을 걷어냈다 (2026-08-28 올립) — 학생 화면에서도 교사 탭을 볼 수 있어야 한다.
+   문항형 제출은 교사가 문항을 만들고 학생이 답하는 한 과업이라 두 관점을 오가며 봐야 한다.
+   공용 목록(mock_nav_dw.js)이 교사/학생 두 탭을 모두 싣고 있으므로 그걸 그대로 쓴다.
+   목록을 고칠 일이 있으면 mock_nav_dw.js 한 곳만 고치면 된다 */
 window.MOCK_NAV_APPLY = {
   shHome6:      function(){ goHash('home6'); },
   shTask6:      function(){ goHash('task6'); },
@@ -954,5 +934,5 @@ window.MOCK_NAV_APPLY = {
   if (typeof _go === 'function') window.go = function(s){ _go.apply(this, arguments); if (window.mockNavSetCurrent && MAP[s]) window.mockNavSetCurrent(MAP[s]); };
 })();
 </script>
-<script src="mock_nav_dw.js?v=260828d"></script></body>
+<script src="mock_nav_dw.js?v=260828e"></script></body>
 </html>
