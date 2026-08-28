@@ -148,7 +148,8 @@
 |------|------|
 | 홈 (내 수업) | `output/home_v1_260612.html` |
 | 수업 홈 | `output/co_teacher_review_v1_260611.html` |
-| 평가 설계 목록 / 과제물 관리 / 채점 (시안3 확정본) | `output/task_ocr_v3_260623.html` (`#design` / 기본 / `#scoring`) |
+| 과제물 관리 / 채점 (시안3 확정본) | `output/task_ocr_v3_260623.html` (기본 / `#scoring`) |
+| **평가 설계 목록 + 설계 상세 + 과제 화면 만들기** | `output/task_direct_write_v1_260729.html` (`#list` / `#design` / `#questions`) — 2026-08-28 재설계본. `task_ocr_v3`의 `#design`은 여기로 넘어가고, 그 안의 옛 목록 마크업은 `⛔ 구버전`으로만 남아 있다 |
 | 활동지 (수업 탭 — 업로드·인식·정확도 부스터) | `output/question_tab_v1_260617.html` — 상세 인수인계: `../context_question_tab.md` |
 | 평가(과제) 설계 상세 | `output/evaluation_design_v4_260615.html` |
 | 학급 채점 현황 → 학생 채점 → 결과 공개 | `output/class_scoring_detail_v1_260512.html` |
