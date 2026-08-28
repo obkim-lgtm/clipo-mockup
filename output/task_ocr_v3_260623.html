@@ -1639,20 +1639,9 @@
   </div>
 </div>
 
-<!-- ===== 설계 최초 저장 직후 안내 팝업 (데모: 새로고침 시 노출) ===== -->
-<div id="designSavedModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:1500;align-items:center;justify-content:center;" onclick="closeDesignSavedModal(false)">
-  <div style="background:white;border-radius:12px;width:480px;max-width:90vw;padding:28px;box-shadow:0 0 1px #2226314D, 0 8px 24px #00000026;" onclick="event.stopPropagation()">
-    <div style="width:44px;height:44px;border-radius:100px;background:#eefcf4;display:flex;align-items:center;justify-content:center;margin-bottom:14px;">
-      <i data-lucide="check" style="width:24px;height:24px;color:#1ab864;"></i>
-    </div>
-    <h3 style="font-size:20px;font-weight:600;color:#222631;margin:0 0 8px;">평가 설계가 저장되었습니다</h3>
-    <p style="font-size:16px;color:#3b3f4c;margin:0 0 24px;line-height:1.6;">과제물 관리에서 학생 제출 현황을 확인하고, 과제물을 직접 올릴 수 있어요.</p>
-    <div style="display:flex;justify-content:flex-end;gap:10px;">
-      <button class="btn btn-outline" onclick="closeDesignSavedModal(false)">나중에</button>
-      <button class="btn btn-primary" onclick="closeDesignSavedModal(true)">과제물 관리로 이동</button>
-    </div>
-  </div>
-</div>
+<!-- 설계 최초 저장 직후 안내 팝업(`평가 설계가 저장되었습니다` + 과제물 관리 이동)은 제거 (2026-08-28 올립).
+     저장은 이미 토스트로 알리고 있어 알림이 두 번이었고, 설계 탭에 들어오자마자 화면을 덮어
+     목록을 못 읽게 막았다. 과제물 관리로 가는 길은 탭 밴드에 상시 있으므로 유도도 불필요 -->
 
 <!-- ===== 진단 진입 모달 ===== -->
 <div class="rm-overlay" id="diagEntry">
@@ -3262,15 +3251,9 @@ function submitStudentUpload() {
 }
 
 // ── 평가 설계 목록 ──
-var designPopupShown = false;
 function goDesignList() {
   showScreen('screen-design');
   lucide.createIcons();
-  // 데모: 설계 탭 최초 진입 = 설계 최초 저장 직후 시나리오 → 안내 팝업 1회
-  if (!designPopupShown) {
-    designPopupShown = true;
-    setTimeout(openDesignSavedModal, 600);
-  }
 }
 function toggleCreateMenu(e) {
   e.stopPropagation();
@@ -3480,18 +3463,7 @@ function rmExec() {
   }
 }
 
-// ── 설계 저장 직후 안내 팝업 ──
-function openDesignSavedModal() {
-  var m = document.getElementById('designSavedModal');
-  m.style.display = 'flex';
-  lucide.createIcons();
-}
-function closeDesignSavedModal(goUpload) {
-  document.getElementById('designSavedModal').style.display = 'none';
-  if (goUpload) {
-    showScreen('screen-task');
-  }
-}
+// 설계 저장 직후 안내 팝업 관련 함수(openDesignSavedModal / closeDesignSavedModal)는 팝업과 함께 제거 (2026-08-28 올립)
 
 // ── 개인정보 비식별화 안내: 다시 보지 않기 (일괄·개별 공통) ──
 var DEID_KEY = 'clipo_deid_hide';
