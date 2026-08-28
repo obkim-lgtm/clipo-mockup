@@ -987,10 +987,6 @@ body.vs-hide-topbar .vs-float{display:inline-flex}
       <button class="ctrl-btn" onclick="changeViewerZoom(10)"><i data-lucide="plus" style="width:16px;height:16px"></i></button>
     </div>
     <!-- OCR 인식 불확실 안내 배너 (인식 확인 필요 학생만) -->
-    <div id="ocrReviewNotice" style="display:none;align-items:center;gap:8px;padding:9px 16px;background:#fff7ed;border-top:1px solid #fdba74;flex-shrink:0;">
-      <i data-lucide="alert-triangle" style="width:15px;height:15px;color:#c2410c;flex-shrink:0;"></i>
-      <span style="font-size:13px;color:#9a3412;line-height:1.4;">AI 인식이 <strong>불확실한 구간</strong>이 있어요 — 위 <strong>인식 결과 수정</strong>에서 확인·수정한 뒤 다시 채점해 주세요.</span>
-    </div>
     <div class="viewer-body">
       <div class="viewer-pages" id="viewerPages">
         <div class="viewer-page">
@@ -1038,6 +1034,11 @@ body.vs-hide-topbar .vs-float{display:inline-flex}
 
   <!-- 우측: 채점 패널 -->
   <div class="grading-panel">
+    <div id="ocrReviewNotice" style="display:none;align-items:center;gap:10px;background:#fff7ed;border:1px solid #fdba74;border-radius:10px;padding:12px 16px;margin-bottom:14px;">
+      <i data-lucide="alert-circle" style="width:16px;height:16px;color:#ea580c;flex-shrink:0;"></i>
+      <span style="font-size:14px;color:#3b3f4c;line-height:1.6;flex:1;"><strong style="color:#c2410c;">인식이 불확실한 문항</strong>이 있어요. 답안을 확인·수정한 뒤 다시 채점하면 점수가 더 정확해져요.</span>
+      <button onclick="openOcrEdit()" style="display:inline-flex;align-items:center;justify-content:center;line-height:1;gap:5px;height:32px;padding:0 12px;background:#fff;border:1px solid #fdba74;border-radius:100px;color:#c2410c;font-family:inherit;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap;"><i data-lucide="scan-text" style="width:13px;height:13px;"></i>인식 결과 확인</button>
+    </div>
     <div id="staleBanner" style="display:none;align-items:center;gap:10px;background:#fff7ed;border:1px solid #fed7aa;border-radius:10px;padding:12px 16px;margin-bottom:14px;">
       <i data-lucide="refresh-cw" style="width:16px;height:16px;color:#ea580c;flex-shrink:0;"></i>
       <span style="font-size:14px;color:#3b3f4c;line-height:1.6;flex:1;">과제물 파일이 바뀌었어요. 다시 채점하면 새 파일이 반영돼요.</span>
@@ -1775,6 +1776,7 @@ function syncSelectedStudent(){
   var sh = '';
   if(s.statusCls==='need') sh='<span class="st-status-need">('+s.status+')</span>';
   else if(s.statusCls==='fail') sh='<span class="st-status-fail">('+s.status+')</span>';
+  else if(s.ocrReview) sh='<span style="color:#ea580c;font-weight:700;margin-left:6px;">●</span>';
   else if(s.statusCls==='stale') sh='<span class="st-status-stale">('+s.status+')</span>';
   else if(s.statusCls==='done') sh='<span class="st-status-done">('+s.status+')</span>';
   else if(s.status) sh='<span style="color:#6d7381;font-weight:400;font-size:14px;margin-left:6px">('+s.status+')</span>';
