@@ -77,43 +77,64 @@
   /* 파일이 window.MOCK_NAV_GROUPS 를 미리 선언하면 그 파일에서만 목록을 갈아끼운다.
    * student_home은 '학생 홈' 전용 내비게이터라 교사 그룹을 싣지 않는다 (2026-08-11 올립).
    * 나머지 파일은 아래 기본 목록을 그대로 쓴다. */
+  /* 기본 목록은 교사/학생 탭으로 나눠 싣는다 (2026-08-28 올립) — tab:'t'=교사, 's'=학생.
+   * 탭이 역할을 대신하므로 그룹명의 '교사 ·'/'학생 ·' 접두는 뗐다. */
   var GROUPS = window.MOCK_NAV_GROUPS || [
-    { t:'교사 · 평가 설계',        items:[['dwList','과제 목록'],['dwDesign','과제 설계'],['dwQuestions','문항 작성'],
+    { tab:'t', t:'평가 설계',            items:[['dwList','과제 목록'],['dwDesign','과제 설계'],
+        ['dwQuestions','과제 화면 만들기',{sub:'기간·안내·문항 + 학생 화면'}],
         ['dwRecHelp','기록 안내 팝업',{sub:'작성 과정 기록 ? 팝오버 열림'}]] },
     /* 채점기준 AI 성공/오류는 별도 그룹으로 두지 않는다 — 문항 작성 화면 안의 [AI 생성] 버튼으로 시연 (2026-08-06 올립) */
-    { t:'교사 · 과제물 관리',      items:[['flTask','제출 현황']] },
+    { tab:'t', t:'과제물 관리',          items:[['flTask','제출 현황']] },
     /* '작성 과정 케이스' 5종은 까망이에서 숨겼다 (2026-08-11 올립) —
        제출 현황 화면에서 학생을 고르면 바로 보이므로 목록에 또 둘 필요가 없다.
        되살리려면 아래 주석만 풀 것 — 지우지 말 것 */
-    // { t:'└ 작성 과정 케이스',      items:[
+    // { tab:'t', t:'└ 작성 과정 케이스',      items:[
     //     ['flKim','김서윤 · 재제출',{sub:'타임라인 1개 + 제출 마커 3개'}],
     //     ['flPark','박지민 · 이탈 잦음',{sub:'이탈 후 계단식 급증'}],
     //     ['flLee','이준호 · 기록 공백',{sub:'네트워크 끊김 구간'}],
     //     ['flJung','정현우 · 이탈 없음',{sub:'멈춤·삭제가 남은 곡선'}],
     //     ['flHan','한지우 · 나눠 쓰기',{sub:'이틀에 걸쳐 3번에 나눠 씀'}]] },
-    { t:'교사 · 채점 상세',        items:[['scWrite','클리포를 통한 제출'],['scFile','파일 첨부'],['scDeleted','과제물 삭제됨']] },
-    { t:'└ 채점 학생 상태',        items:[['scResubNo','채점 중'],['scResubYes','채점 후 재제출함']] },
+    { tab:'t', t:'채점 상세',            items:[['scWrite','클리포를 통한 제출'],['scFile','파일 첨부'],['scDeleted','과제물 삭제됨']] },
+    { tab:'t', t:'└ 채점 학생 상태',     items:[['scResubNo','채점 중'],['scResubYes','채점 후 재제출함']] },
     /* 시안 5만 싣는다 (2026-08-11 올립). 시안 1~4는 화면이 파일에 그대로 있어
        해시로 열린다: #current · #new · #student · #cards
        다시 보이게 하려면 아래 주석 네 줄만 풀 것 — 지우지 말 것 */
-    { t:'학생 · 과제 홈', items:[
+    { tab:'s', t:'과제 홈', items:[
         ['shHome6','과제 목록',{sub:'시안 6 · 단일 표 + 상태 칩'}],
         ['shTask6','과제 메뉴',{sub:'내용 동일 · 헤더만 다름'}]] },
-    // { t:'└ 이전 시안 (비교용)', items:[
+    // { tab:'s', t:'└ 이전 시안 (비교용)', items:[
     //     ['shCur','1. 현재 개발 화면 + 대시보드',{sub:'표 유지 · 상단 2칸 요약만 추가'}],
     //     ['shNew','2. 개선안',{sub:'할 일 기준 재배열 · 오늘 요약 배너'}],
     //     ['shStu','3. 전면 개편안 · 결과 목록형',{sub:'결과 행 + 점수 · 더 보기 공통'}],
     //     ['shCards','4. 전면 개편안 · 결과 카드형',{sub:'결과 카드 그리드 · 수업 필터는 드롭다운'}]] },
-    { t:'학생 · 과제 제출',        items:[['ssWrite','① 작성'],['ssDone','② 제출 완료']] },
-    { t:'└ 작성 화면 케이스',      items:[
+    { tab:'s', t:'과제 제출',            items:[['ssWrite','① 작성'],['ssDone','② 제출 완료']] },
+    { tab:'s', t:'└ 작성 화면 케이스',   items:[
         ['ssGuide','시작 안내 팝업',{sub:'과제 최초 진입 · 처음 한 번만'}],
         ['ssCoverAway','화면 벗어난 동안',{sub:'덮개 유지 — 옆에 띄우고 베끼기 차단'}],
         ['ssCoverBack','돌아온 직후 3초',{sub:'덮은 채 다녀온 시간 알림'}],
         ['ssAttachPv','첨부 PDF 열기',{sub:'팝업 미리보기 · 이탈 아님'}],
         ['ssAttachDl','첨부 한글 열기',{sub:'다운로드 · 이탈 1회'}]] },
-    { t:'└ 다른 설정으로 낸 과제', items:[['ssBoth','직접 작성 + 파일 제출'],['ssFileonly','파일 제출만'],['ssPreparing','문항 미작성'],['ssClosed','제출 못 한 채 마감',{sub:'쓰던 글은 비활성 에디터로'}]] },
-    { t:'└ 제출 완료 화면 상태',   items:[['ssBefore','결과 공개 전'],['ssAfter','결과 공개 후'],['ssPdf','답안 PDF']] }
+    { tab:'s', t:'└ 다른 설정으로 낸 과제', items:[['ssBoth','직접 작성 + 파일 제출'],['ssFileonly','파일 제출만'],['ssPreparing','문항 미작성'],['ssClosed','제출 못 한 채 마감',{sub:'쓰던 글은 비활성 에디터로'}]] },
+    { tab:'s', t:'└ 제출 완료 화면 상태', items:[['ssBefore','결과 공개 전'],['ssAfter','결과 공개 후'],['ssPdf','답안 PDF']] }
   ];
+
+  /* 파일이 갈아끼운 목록(student_home 등)엔 tab이 없을 수 있다 — 그룹명으로 추정.
+   * '└' 하위 그룹은 직전 그룹을 따른다. 한쪽 탭뿐이면 탭바 자체를 숨긴다. */
+  (function(){
+    var last = 's';
+    GROUPS.forEach(function(g){
+      if (!g.tab) {
+        if (g.t.indexOf('교사') === 0) g.tab = 't';
+        else if (g.t.indexOf('학생') === 0) g.tab = 's';
+        else if (g.t.charAt(0) === '└') g.tab = last;
+        else g.tab = 's';
+      }
+      last = g.tab;
+    });
+  })();
+  var HAS = { t:false, s:false };
+  GROUPS.forEach(function(g){ HAS[g.tab] = true; });
+  var SHOW_TABS = HAS.t && HAS.s;
 
   var ME    = window.MOCK_NAV_FILE || '';
   var APPLY = window.MOCK_NAV_APPLY || {};
@@ -139,6 +160,11 @@
     + '#mockNav .mn-dot{width:10px;height:10px;border-radius:50%;background:#416bff;box-shadow:0 0 0 3px rgba(65,107,255,.25);flex-shrink:0;}'
     + '#mockNav .mn-mini{display:none;}'
     + '#mockNav .mn-caret{background:none;border:none;color:#8A8FB0;cursor:pointer;font-size:12px;padding:2px 4px;line-height:1;transition:transform .15s;}'
+    /* 교사/학생 탭 — 활성은 색+밑줄만 바꾼다(굵기 고정, 들썩임 방지) */
+    + '#mockNav .mn-tabs{display:flex;flex-shrink:0;border-bottom:1px solid #333a52;margin:0 2px 6px;}'
+    + '#mockNav .mn-tab{flex:1;background:none;border:none;border-bottom:2px solid transparent;margin-bottom:-1px;padding:7px 0;font-size:12px;font-weight:800;letter-spacing:.04em;color:#6b7192;cursor:pointer;font-family:inherit;line-height:1;}'
+    + '#mockNav .mn-tab:hover{color:#C9CCE0;}'
+    + '#mockNav .mn-tab.on{color:#fff;border-bottom-color:#416bff;}'
     + '#mockNav .mn-body{display:flex;flex-direction:column;gap:4px;flex:1 1 auto;min-height:0;overflow-y:auto;overflow-x:hidden;padding-right:4px;scrollbar-width:thin;scrollbar-color:#4a5170 transparent;overscroll-behavior:contain;}'
     + '#mockNav .mn-body::-webkit-scrollbar{width:6px;}'
     + '#mockNav .mn-body::-webkit-scrollbar-track{background:transparent;}'
@@ -152,6 +178,7 @@
     + '#mockNav .mn-btn.on .mn-sub{color:#D6E2FF;}'
     + '#mockNav.mn-collapsed{width:auto;max-height:none;}'
     + '#mockNav.mn-collapsed .mn-body{display:none;}'
+    + '#mockNav.mn-collapsed .mn-tabs{display:none;}'
     + '#mockNav.mn-collapsed .mn-full{display:none;}'
     + '#mockNav.mn-collapsed .mn-mini{display:inline;}'
     + '#mockNav.mn-collapsed .mn-caret{transform:rotate(180deg);}'
@@ -164,18 +191,49 @@
     if (el && el.parentNode) el.parentNode.removeChild(el);
   });
 
+  /* 현재 탭 — 파일 간에도 유지. 진입 딥링크가 있으면 그 화면의 탭이 이긴다 */
+  var TAB = 't';
+  try { TAB = localStorage.getItem('clipoMockNavTab') || 't'; } catch(e){}
+  if (!HAS[TAB]) TAB = HAS.t ? 't' : 's';
+
+  function tabOfRoute(r){
+    for (var i = 0; i < GROUPS.length; i++) {
+      for (var j = 0; j < GROUPS[i].items.length; j++) {
+        if (GROUPS[i].items[j][0] === r) return GROUPS[i].tab;
+      }
+    }
+    return '';
+  }
+
   var wrap = document.createElement('div'); wrap.id = 'mockNav';
   wrap.innerHTML =
       '<div class="mn-head"><span class="mn-hl"><span class="mn-dot"></span><span class="mn-full">MOCKUP · 학생 과제 (시안 6)</span><span class="mn-mini">목업</span></span>'
     + '<button class="mn-caret" aria-label="접기/펼치기">&#9662;</button></div>'
+    + (SHOW_TABS ? '<div class="mn-tabs"><button class="mn-tab" data-t="t">교사</button><button class="mn-tab" data-t="s">학생</button></div>' : '')
     + '<div class="mn-body" id="mnBody"></div>';
   document.body.appendChild(wrap);
   var bodyEl = wrap.querySelector('#mnBody');
 
+  if (SHOW_TABS) {
+    wrap.querySelectorAll('.mn-tab').forEach(function(b){
+      b.addEventListener('click', function(e){
+        e.stopPropagation();
+        if (TAB === b.dataset.t) return;
+        TAB = b.dataset.t;
+        try { localStorage.setItem('clipoMockNavTab', TAB); } catch(e2){}
+        render();
+        bodyEl.scrollTop = 0;   /* 다른 목록이므로 위에서부터 */
+      });
+    });
+  }
+
   function render(){
     var keep = bodyEl.scrollTop;   /* 케이스 전환 재렌더 시 스크롤 유지 */
+    if (SHOW_TABS) {
+      wrap.querySelectorAll('.mn-tab').forEach(function(b){ b.classList.toggle('on', b.dataset.t === TAB); });
+    }
     var rows = '';
-    GROUPS.filter(function(g){ return !g.showOn || g.showOn.indexOf(CUR) > -1; }).forEach(function(g){
+    GROUPS.filter(function(g){ return (!SHOW_TABS || g.tab === TAB) && (!g.showOn || g.showOn.indexOf(CUR) > -1); }).forEach(function(g){
       var items = g.items.filter(function(it){ return !(it[2] && it[2].hideOnCur && it[2].hideOnCur.indexOf(CUR) > -1); });
       if (!items.length) return;
       rows += '<div class="mn-group">' + g.t + '</div>';
@@ -209,7 +267,12 @@
     }
   }
 
-  function setCurrent(r){ CUR = r; render(); }
+  function setCurrent(r){
+    CUR = r;
+    var tb = tabOfRoute(r);   /* 현재 화면이 속한 탭으로 따라간다 (딥링크 진입 포함) */
+    if (tb && tb !== TAB) { TAB = tb; try { localStorage.setItem('clipoMockNavTab', TAB); } catch(e){} }
+    render();
+  }
   window.mockNavSetCurrent = setCurrent;
 
   /* 진입 시 딥링크 적용.

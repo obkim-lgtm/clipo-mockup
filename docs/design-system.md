@@ -114,6 +114,26 @@
 - HTML에서: `<i data-lucide="icon-name"></i>` + `lucide.createIcons()` 호출
 - 새로운 아이콘 라이브러리 추가 금지
 
+## 안내 문구 위계 — 박스 vs 보조 문구 (2026-08-28 올립 확정)
+
+**색 박스는 "막는 것·되돌릴 수 없는 것"에만 쓴다.** 그냥 알려주는 말은 보조 문구로 낮춘다.
+파란 인포 박스를 안내마다 붙이면 화면이 경고판이 되고, 정작 봐야 할 잠금·경고가 묻힌다.
+
+**세 단이다.** 상시 설명 / 조건부 안내 / 경고·잠금.
+
+| 단 | 성격 | 표현 | 예 |
+|---|---|---|---|
+| ① 상시 설명 | 늘 그 자리에 있는 필드 설명 | `.sec-desc` 14px `#6d7381`, 아이콘·박스 없음 | `채점기준은 최대 15개까지 입력 가능합니다` |
+| ② **조건부 안내** | 조건이 맞을 때만 나타남. 동작 방식을 알려줄 뿐 막지는 않음 | **`.note`** — 박스 없음 + `info` 아이콘 16px `#416bff` + 텍스트 14px `#3b3f4c`, 핵심 어구 `<b>` `#222631` | `둘 다 내면 AI 채점은 파일에 실행돼요` · `가장 마지막에 올린 파일 1개만 AI 채점돼요` · `PDF·이미지 권장` · `제출 방식을 하나 이상 선택해 주세요` |
+| ③ 경고·잠금 | 되돌릴 수 없거나 지금 동작을 제한함 | `.alert-info warn` 박스(주황 배경 + 아이콘) | `이미 제출한 학생이 3명 있어요` · 문항 삭제 잠금 |
+
+- **②를 ①로 쓰지 말 것** — 조건부로 뜨는 안내를 회색 보조 문구로 두면 상시 설명과 똑같아 보여 눈이 걸러낸다(2026-08-28 올립이 실제로 지적). 나타났다는 사실이 보여야 한다.
+- **②를 ③으로 쓰지 말 것** — 파란 인포 박스를 안내마다 붙이면 화면이 경고판이 되고 정작 봐야 할 잠금·경고가 묻힌다.
+- ②와 ③을 가르는 기준 한 줄: **"이걸 못 보고 지나가면 되돌릴 수 없는 일이 생기나?"**
+- 파란 인포 박스(`.alert-info` 기본형)는 쓰지 않는다 — ②가 그 자리를 대신한다.
+- 좌측 컬러 액센트 띠 금지는 그대로 유지(배경 + 아이콘만). 메모리 `feedback_no_left_accent_bar`.
+- 적용 예: `task_direct_write_v1_260729.html` — `way-none`·`way-both`·`multiFileNote`·`attachFmtNote`가 `.note`, `waysLockNote`·`lockNote`만 warn 박스.
+
 ## 컴포넌트 참조
 피그마 `Components` 페이지 기준 (아이스박스 제외). 목업 작업 시 아래 컴포넌트명 활용:
 `Input` · `Radio` · `Radio Card` · `Menu` · `File Upload` · `Switch` · `Pagination` · `Tag` · `Accordion` · `Separator` · `ToggleTip/ToolTip` · `Toast` · `Popover` · `Pin_Input` · `Alert` · `Progress` · `Slider` · `Spinner` · `Contents` · `Button` · `Checkbox` · `Badge` · `Icon Button` · `Close Button` · `Textarea` · `Link` · `Select` · `Steps` · `Combobox` · `Checkbox Card` · `Field` · `Tabs` · `Skeleton` · `Password_Input` · `Number Input`
