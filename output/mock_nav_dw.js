@@ -23,7 +23,6 @@
   var ROUTES = {
     dwList:      { f:'design',  h:'list' },
     dwDesign:    { f:'design',  h:'design' },
-    dwQuestions: { f:'design',  h:'questions' },
     dwRecHelp:   { f:'design',  h:'rec-help' },
     rubOk:       { f:'design',  h:'rubric-ok' },
     rubErr:      { f:'design',  h:'rubric-error' },
@@ -80,8 +79,8 @@
   /* 기본 목록은 교사/학생 탭으로 나눠 싣는다 (2026-08-28 올립) — tab:'t'=교사, 's'=학생.
    * 탭이 역할을 대신하므로 그룹명의 '교사 ·'/'학생 ·' 접두는 뗐다. */
   var GROUPS = window.MOCK_NAV_GROUPS || [
-    { tab:'t', t:'평가 설계',            items:[['dwList','과제 목록'],['dwDesign','과제 설계'],
-        ['dwQuestions','과제 화면 만들기',{sub:'기간·안내·문항 + 학생 화면'}],
+    /* 문항은 설계 안 인라인이라 별도 화면이 없다 — dwQuestions 제거 (2026-08-28 회의) */
+    { tab:'t', t:'평가 설계',            items:[['dwList','과제 목록'],['dwDesign','과제 설계',{sub:'제출 방식·문항·기간'}],
         ['dwRecHelp','기록 안내 팝업',{sub:'작성 과정 기록 ? 팝오버 열림'}]] },
     /* 채점기준 AI 성공/오류는 별도 그룹으로 두지 않는다 — 문항 작성 화면 안의 [AI 생성] 버튼으로 시연 (2026-08-06 올립) */
     { tab:'t', t:'과제물 관리',          items:[['flTask','제출 현황']] },
