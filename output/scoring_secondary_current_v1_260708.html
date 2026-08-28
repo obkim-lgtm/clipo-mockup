@@ -1372,37 +1372,6 @@ body.vs-hide-topbar .vs-float{display:inline-flex}
         <i data-lucide="circle-check-big" class="modal-info-icon" style="width:16px;height:16px"></i>
         <div class="modal-info-text">이전 실행이 네트워크 오류로 실패해서 <strong>사용한 크레딧 1개는 이미 반환</strong>됐어요. 이번 다시 채점에는 새 크레딧 1개를 사용해요.</div>
       </div>
-      <div class="field" id="indivMethodField">
-        <span class="field-lbl">채점 방식</span>
-        <div style="display:flex;gap:8px;margin-top:8px;">
-          <button type="button" id="indivMethodDirect" onclick="setIndivMethod('direct')" style="flex:1;display:flex;flex-direction:column;align-items:flex-start;gap:2px;padding:12px 14px;border:1.5px solid #416bff;border-radius:10px;background:#f5f8ff;color:#365eef;cursor:pointer;font-family:inherit;text-align:left;">
-            <span style="font-size:15px;font-weight:600;">바로 채점</span>
-            <span style="font-size:12px;color:#6d7381;">인식과 채점을 한 번에</span>
-          </button>
-          <button type="button" id="indivMethodOcr" onclick="setIndivMethod('ocr')" style="flex:1;display:flex;flex-direction:column;align-items:flex-start;gap:2px;padding:12px 14px;border:1.5px solid #e3e6eb;border-radius:10px;background:#fff;color:#222631;cursor:pointer;font-family:inherit;text-align:left;">
-            <span style="font-size:15px;font-weight:600;">OCR 먼저 확인</span>
-            <span style="font-size:12px;color:#6d7381;">인식 결과를 보고 채점</span>
-          </button>
-        </div>
-        <div id="indivMethodTypingNote" style="display:none;font-size:13px;color:#6d7381;margin-top:8px;">직접 입력으로 낸 답안은 인식 결과가 없어 바로 채점만 가능해요.</div>
-      </div>
-      <div class="model-section" id="rerunModelSection">
-        <div class="model-summary" onclick="toggleRerunModelCard()">
-          <div class="model-badge-mini">3.2</div>
-          <span class="model-summary-title">채점 모델 v3.2</span>
-          <span class="model-summary-date">2026-05-20 업데이트</span>
-          <i data-lucide="chevron-down" class="model-chevron" style="width:16px;height:16px"></i>
-        </div>
-        <div class="model-detail" style="display:none">
-          <span class="model-desc">수식·그래프·서술형 답안 인식과 채점 정확도를 개선한 AI 모델입니다.</span>
-          <ul class="model-feats">
-            <li>수학, 과학, 정보 과목의 채점 정확도를 개선했어요.</li>
-            <li>손글씨·이미지 답안의 OCR 인식률을 높였어요.</li>
-            <li>지시문과 학생 답안을 더 정확히 구분해요.</li>
-          </ul>
-          <a class="model-link-btn" href="#" target="_blank" rel="noopener" onclick="event.preventDefault();showToast('success','채점 활용 예시 페이지로 이동합니다.')">채점 활용 예시보기 <i data-lucide="external-link" style="width:11px;height:11px"></i></a>
-        </div>
-      </div>
       <div class="field">
         <span class="field-lbl">점수 수준</span>
         <div class="scoring-level-desc" id="scoringLevelDesc">채점요소별 점수를 얼마나 높게 또는 낮게 줄지 정해요. 점수에 맞춰 피드백도 함께 조절돼요.</div>
@@ -1413,6 +1382,15 @@ body.vs-hide-topbar .vs-float{display:inline-flex}
             <span class="active">표준</span>
             <span>점수 낮게</span>
           </div>
+        </div>
+      </div>
+      <div class="field">
+        <span class="field-lbl">학생 피드백 구성</span>
+        <div class="modal-radio-group" id="rerunFbGroup">
+          <label class="modal-radio-item" onclick="selectRerunFb(this)"><span class="radio-ring"></span><span class="modal-radio-content"><span class="modal-radio-text">자동 구성 : AI 채점 근거</span></span></label>
+          <label class="modal-radio-item" onclick="selectRerunFb(this)"><span class="radio-ring"></span><span class="modal-radio-content"><span class="modal-radio-text">자동 구성 : AI 피드백</span></span></label>
+          <label class="modal-radio-item selected" onclick="selectRerunFb(this)"><span class="radio-ring checked"></span><span class="modal-radio-content"><span class="modal-radio-text">자동 구성 : AI 채점 근거 + AI 피드백</span></span></label>
+          <label class="modal-radio-item" onclick="selectRerunFb(this)"><span class="radio-ring"></span><span class="modal-radio-content"><span class="modal-radio-text">선생님이 직접 작성</span></span></label>
         </div>
       </div>
       <div class="modal-warning" id="rerunWarning" style="display:none">
@@ -2273,14 +2251,6 @@ function saveInstructionEdit(){
 }
 
 // ══════ 다시 채점 ══════
-function toggleRerunModelCard(){
-  var section = document.getElementById('rerunModelSection');
-  if(!section) return;
-  var detail = section.querySelector('.model-detail');
-  var isCollapsed = detail.style.display === 'none';
-  detail.style.display = isCollapsed ? 'flex' : 'none';
-  section.classList.toggle('expanded', isCollapsed);
-}
 var RERUN_LEVEL_KEY = 'clipo_last_scoring_level';
 var SCORING_LEVEL_LABELS_FIRST = ['점수 높게','표준','점수 낮게'];
 var SCORING_LEVEL_LABELS_RERUN = ['직전보다 높게','직전과 비슷','직전보다 낮게'];
@@ -2320,14 +2290,6 @@ function rerunAi(){
   // 채점 실패 학생은 이전 크레딧이 반환됐다는 안심 배너 노출
   var refundBanner = document.getElementById('rerunRefundNotice');
   if(refundBanner) refundBanner.style.display = (studentName === '채점실패') ? 'flex' : 'none';
-  // V3: 채점 방식 초기화 — 직접입력 학생은 OCR 먼저 옵션 숨김
-  var isTyping = _curStudent && _curStudent.method === 'typing';
-  var ocrOpt = document.getElementById('indivMethodOcr');
-  if(ocrOpt) ocrOpt.style.display = isTyping ? 'none' : '';
-  var typingNote = document.getElementById('indivMethodTypingNote');
-  if(typingNote) typingNote.style.display = isTyping ? 'block' : 'none';
-  indivGradeMethod = 'direct';
-  setIndivMethod('direct');
   document.getElementById('rerunConfirmModal').classList.add('show');
 }
 function updateRerunWarning(){
@@ -2341,41 +2303,15 @@ function updateRerunWarning(){
   document.getElementById('rerunWarning').style.display = hasDirty ? 'flex' : 'none';
 }
 function closeRerunConfirm(){ document.getElementById('rerunConfirmModal').classList.remove('show'); }
-// ── V3: 개별 채점 방식 분기 (바로 채점 / OCR 먼저 확인) ──
-var indivGradeMethod = 'direct';
-function styleIndivOpt(id, on){
-  var el = document.getElementById(id); if(!el) return;
-  el.style.borderColor = on ? '#416bff' : '#e3e6eb';
-  el.style.background = on ? '#f5f8ff' : '#fff';
-  var tit = el.querySelector('span'); if(tit) tit.style.color = on ? '#365eef' : '#222631';
-}
-function setIndivMethod(m){
-  if(m === 'ocr' && _curStudent && _curStudent.method === 'typing') return; // 직접입력은 OCR 먼저 불가
-  indivGradeMethod = m;
-  styleIndivOpt('indivMethodDirect', m === 'direct');
-  styleIndivOpt('indivMethodOcr', m === 'ocr');
-  var btn = document.querySelector('#rerunConfirmModal .btn-modal-save');
-  if(btn) btn.innerHTML = (m === 'ocr')
-    ? '<i data-lucide="scan-text" style="width:14px;height:14px"></i>인식 결과 확인'
-    : '<i data-lucide="wand-sparkles" style="width:14px;height:14px"></i>채점 실행';
-  if(typeof lucide !== 'undefined') lucide.createIcons();
-}
-// 전사 텍스트 탭 다시 활성 (OCR 먼저: 채점 전에 인식 결과 노출)
-function enableTranscript(){
-  _noTranscript = false;
-  var tabText = document.getElementById('ve-tab-text');
-  if(tabText){ tabText.style.opacity = ''; tabText.style.cursor = 'pointer'; tabText.title = ''; }
-  var ocrBtn = document.getElementById('ocrEditBtn');
-  if(ocrBtn){ ocrBtn.style.opacity = ''; ocrBtn.style.cursor = 'pointer'; ocrBtn.title = ''; }
-}
-function gradeMethodOcrFirst(){
-  closeRerunConfirm();
-  enableTranscript();
-  if(typeof switchViewer === 'function') switchViewer('text');
-  showToast('success','인식 결과를 먼저 확인한 뒤 채점을 실행하세요.');
+function selectRerunFb(el){
+  var items = document.querySelectorAll('#rerunFbGroup .modal-radio-item');
+  for(var i=0;i<items.length;i++){
+    var on = items[i] === el;
+    items[i].classList.toggle('selected', on);
+    items[i].querySelector('.radio-ring').classList.toggle('checked', on);
+  }
 }
 function confirmRerun(){
-  if(indivGradeMethod === 'ocr'){ gradeMethodOcrFirst(); return; }
   var level = parseInt(document.getElementById('scoringLevelSlider').value,10);
   localStorage.setItem(RERUN_LEVEL_KEY, level);
   closeRerunConfirm();
