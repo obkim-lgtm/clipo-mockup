@@ -138,6 +138,7 @@ body.nav-expanded .main-wrap{ padding-left:200px; }
 .btn-detail.disabled:hover{color:#c2c7d0}
 .btn-rescore{display:inline-flex;align-items:center;justify-content:center;gap:4px;height:30px;padding:0 12px;border-radius:8px;background:#eef3ff;border:1px solid #dce6ff;color:#3151c4;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;line-height:1}
 .btn-rescore:hover{background:#e0eaff;border-color:#a3c3ff}
+.st-chip-wrap{display:inline-flex;align-items:center;justify-content:center;gap:8px;white-space:nowrap}
 .btn-rescore-text{display:inline-flex;align-items:center;gap:3px;font-size:13px;font-weight:600;color:#3151c4;background:none;border:none;cursor:pointer;padding:0;line-height:1;font-family:inherit;white-space:nowrap}
 .btn-rescore-text:hover{color:#365eef;text-decoration:underline}
 
@@ -679,10 +680,10 @@ var STUDENTS = [
   {id:'10108', name:'윤하은', aiStatus:'채점 완료', aiScore:33, finalScore:33, status:'완료', statusCls:'done', link:'scoring_secondary_v1_260708.html'},                      // 완료
   {id:'10109', name:'임도윤', method:'typing', aiStatus:'-', aiScore:'-', finalScore:'-', status:'미제출', statusCls:'none', link:'scoring_secondary_v1_260708.html'},          // 미제출
   {id:'10110', name:'신예린', aiStatus:'-', aiScore:'-', finalScore:'-', status:'미채점', statusCls:'none', link:'scoring_secondary_v1_260708.html'},            // 미채점 + 인식 완료 ›
-  {id:'10111', name:'김도현', method:'typing', aiStatus:'-', scoreFail:true, aiScore:'-', finalScore:'-', status:'미채점', statusCls:'none', link:'scoring_secondary_v1_260708.html'},          // 미채점 + 채점 실패 · 다시 채점 ›
+  {id:'10111', name:'김도현', ocrDone:true, aiStatus:'-', scoreFail:true, aiScore:'-', finalScore:'-', status:'미채점', statusCls:'none', link:'scoring_secondary_v1_260708.html'},          // 인식 완료 + 채점 실패 (인식은 됐는데 채점만 실패)
   {id:'10112', name:'송하림', aiStatus:'채점 완료', aiScore:33, finalScore:33, stale:true, status:'완료', statusCls:'done', link:'scoring_secondary_v1_260708.html'},           // 완료 + 재채점 권장(인식 수정됨)
   {id:'10113', name:'노유찬', method:'typing', aiStatus:'-', aiScore:'-', finalScore:'-', status:'미채점', statusCls:'none', link:'scoring_secondary_v1_260708.html'},          // 미채점 (직접 입력)
-  {id:'10114', name:'백시우', aiStatus:'-', ocrFail:true, aiScore:'-', finalScore:'-', status:'미채점', statusCls:'none', link:'scoring_secondary_v1_260708.html'}             // 미채점 + 인식 실패 · 다시 인식 ›
+  {id:'10114', name:'백시우', aiStatus:'-', ocrFail:true, scoreFail:true, aiScore:'-', finalScore:'-', status:'미채점', statusCls:'none', link:'scoring_secondary_v1_260708.html'}  // 인식 실패 → 채점도 실패(연쇄)
 ];
 
 // ══════ 정렬 드롭다운 (개발 시안 1104:21045 — 헤더 클릭 정렬 폐지) ══════
@@ -854,11 +855,6 @@ function rmExec() {
   showToast('success', n + '명의 AI 채점을 시작합니다. 완료되면 결과 확인에서 볼 수 있어요.');
 }
 
-function finalCellVal(s){
-  var v = ''+s.finalScore;
-  if (s.stale) v += ' <button class="btn-rescore-text" onclick="rescoreStudent(&#39;'+s.id+'&#39;,&#39;'+s.name+'&#39;)"><i data-lucide="rotate-cw" style="width:13px;height:13px"></i>다시 채점</button>';
-  return v;
-}
 function renderTable(){
   var tbody = document.getElementById('studentTbody');
   syncSortMenu();
@@ -874,11 +870,13 @@ function renderTable(){
     else if (s.ocrDone || s.aiScore !== '-') ocrCell = '완료';
     else ocrCell = '<span class="muted">-</span>';
     var aiStatCell;
-    if (s.scoreFail) aiStatCell = '<span class="st-chip st-chip-red">채점 실패</span>';
+    // 인식 실패는 채점 실패를 낳는다(연쇄) · 처리 액션 '다시 채점'은 여기에 붙는다 (26-08-28)
+    if (s.scoreFail || s.ocrFail) aiStatCell = '<span class="st-chip-wrap"><span class="st-chip st-chip-red">채점 실패</span>'
+      + '<button class="btn-rescore-text" onclick="rescoreStudent(&#39;'+s.id+'&#39;,&#39;'+s.name+'&#39;)"><i data-lucide="rotate-cw" style="width:13px;height:13px"></i>다시 채점</button></span>';
     else if (s.aiScore !== '-') aiStatCell = '완료';
     else aiStatCell = '<span class="muted">-</span>';
     var scoreCell = s.aiScore !== '-' ? '('+s.aiScore+')' : '<span class="muted">-</span>';
-    var finalCell = s.finalScore === '-' ? '<span class="muted">-</span>' : finalCellVal(s);
+    var finalCell = s.finalScore === '-' ? '<span class="muted">-</span>' : ''+s.finalScore;
     return '<tr>'
       +'<td class="col-id">'+s.id+'</td>'
       +'<td class="col-name">'+s.name+'</td>'
@@ -953,7 +951,7 @@ function updateBulkAiLevelLabels(){
 function renderBulkAiStudentTable(){
   var tbody = document.getElementById('bulkAiStudentTable');
   tbody.innerHTML = STUDENTS.map(function(s){
-    var disabled = s.status === '미제출' || s.ocrFail; // 미제출·인식 실패 → AI 채점 대상 제외 (직접 채점은 가능)
+    var disabled = s.status === '미제출'; // 미제출만 제외 — 인식 실패는 다시 채점 시 인식이 재실행됨 (26-08-28)
     var checked = BULK_AI_STATE.selected.has(s.id);
     return '<tr class="' + (disabled ? 'disabled' : '') + '" data-id="' + s.id + '">'
       + '<td><label class="checkbox-row ' + (checked ? 'checked' : '') + (disabled ? ' disabled' : '') + '" onclick="toggleBulkAiStudent(event, \'' + s.id + '\')">'
