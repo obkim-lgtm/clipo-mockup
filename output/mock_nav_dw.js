@@ -58,7 +58,10 @@
     ssDone:      { f:'submit',  h:'done' },
     ssBoth:      { f:'submit',  h:'both' },
     ssFileonly:  { f:'submit',  h:'fileonly' },
-    ssPreparing: { f:'submit',  h:'preparing' },
+    /* 핸들러만 있고 라우트가 없어 눌러도 안 먹던 두 건을 살림 (2026-08-28) */
+    ssOneQ:      { f:'submit',  h:'one-question' },
+    ssGoneQ:     { f:'submit',  h:'question-removed' },
+    /* ssPreparing(문항 미작성)은 제거 — PRD v0.5에서 빈 문항 상태가 사라졌고 씬도 없다 */
     ssClosed:    { f:'submit',  h:'closed' },
     ssBefore:    { f:'submit',  h:'result-before' },
     ssFile:      { f:'submit',  h:'result-file' },
@@ -98,23 +101,30 @@
     /* 시안 5만 싣는다 (2026-08-11 올립). 시안 1~4는 화면이 파일에 그대로 있어
        해시로 열린다: #current · #new · #student · #cards
        다시 보이게 하려면 아래 주석 네 줄만 풀 것 — 지우지 말 것 */
-    { tab:'s', t:'과제 홈', items:[
-        ['shHome6','과제 목록',{sub:'시안 6 · 단일 표 + 상태 칩'}],
-        ['shTask6','과제 메뉴',{sub:'내용 동일 · 헤더만 다름'}]] },
+    /* 학생 탭은 학생이 겪는 순서로 묶는다 — 받다 / 쓰다 / 내고 나서 (2026-08-28 올립).
+       홈·과제 목록·이탈 기록은 이미 실서버에 배포된 화면이라 케이스를 세세히 싣지 않는다 */
+    { tab:'s', t:'과제를 받다', items:[
+        ['shHome6','홈',{sub:'배포됨 · 진입 확인용'}],
+        ['shTask6','과제 목록',{sub:'배포됨 · 진입 확인용'}]] },
     // { tab:'s', t:'└ 이전 시안 (비교용)', items:[
     //     ['shCur','1. 현재 개발 화면 + 대시보드',{sub:'표 유지 · 상단 2칸 요약만 추가'}],
     //     ['shNew','2. 개선안',{sub:'할 일 기준 재배열 · 오늘 요약 배너'}],
     //     ['shStu','3. 전면 개편안 · 결과 목록형',{sub:'결과 행 + 점수 · 더 보기 공통'}],
     //     ['shCards','4. 전면 개편안 · 결과 카드형',{sub:'결과 카드 그리드 · 수업 필터는 드롭다운'}]] },
-    { tab:'s', t:'과제 제출',            items:[['ssWrite','① 작성'],['ssDone','② 제출 완료']] },
-    { tab:'s', t:'└ 작성 화면 케이스',   items:[
-        ['ssGuide','시작 안내 팝업',{sub:'과제 최초 진입 · 처음 한 번만'}],
-        ['ssCoverAway','화면 벗어난 동안',{sub:'덮개 유지 — 옆에 띄우고 베끼기 차단'}],
-        ['ssCoverBack','돌아온 직후 3초',{sub:'덮은 채 다녀온 시간 알림'}],
-        ['ssAttachPv','첨부 PDF 열기',{sub:'팝업 미리보기 · 이탈 아님'}],
-        ['ssAttachDl','첨부 한글 열기',{sub:'다운로드 · 이탈 1회'}]] },
-    { tab:'s', t:'└ 다른 설정으로 낸 과제', items:[['ssBoth','직접 작성 + 파일 제출'],['ssFileonly','파일 제출만'],['ssPreparing','문항 미작성'],['ssClosed','제출 못 한 채 마감',{sub:'쓰던 글은 비활성 에디터로'}]] },
-    { tab:'s', t:'└ 제출 완료 화면 상태', items:[['ssBefore','결과 공개 전'],['ssAfter','결과 공개 후'],['ssPdf','답안 PDF']] }
+    { tab:'s', t:'답을 쓰다', items:[
+        ['ssWrite','문항별로 답 쓰기',{sub:'이번 과업 · 문항 단위 입력'}],
+        ['ssOneQ','문항이 하나인 과제'],
+        ['ssGoneQ','선생님이 문항을 지움',{sub:'내가 쓴 글은 남고 입력만 막힘'}],
+        ['ssBoth','직접 쓰기 + 파일 둘 다 받는 과제'],
+        ['ssFileonly','파일로만 내는 과제'],
+        ['ssGuide','작성 기록 안내 팝업',{sub:'과제 최초 진입 1회 · 기능은 배포됨'}]] },
+    { tab:'s', t:'내고 나서', items:[
+        ['ssDone','제출 완료'],
+        ['ssBefore','결과 공개 전',{sub:'다시 낼 수 있음'}],
+        ['ssAfter','결과 공개 후',{sub:'다시 못 냄'}],
+        ['ssFile','선생님이 대신 올려줌'],
+        ['ssClosed','못 낸 채 마감',{sub:'쓰던 글은 읽기만'}],
+        ['ssPdf','답안 PDF']] }
   ];
 
   /* 파일이 갈아끼운 목록(student_home 등)엔 tab이 없을 수 있다 — 그룹명으로 추정.
