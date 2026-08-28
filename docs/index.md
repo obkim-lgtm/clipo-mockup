@@ -24,7 +24,7 @@
 - **실시간 모니터링(수업 중 화면) 이어받기 → handoff/HANDOFF_live_monitor_260819.md** (상태 판정·동작 규칙·미결. 디자인은 별도로 새로 잡음)
 - OCR·채점 포팅(HIAI 동일 기획) 스펙 → handoff/HANDOFF_hiai_ocr_scoring_port_260625.md
 - **평가 설계 포팅(HIAI 시안 → CLIPO) 준비 → handoff/HANDOFF_hiai_eval_design_port_260826.md** — ⚠️**HIAI 시안 확정 전이라 착수 금지.** 치환표·확정 카피·이식 사양은 준비됨. 먼저 결정할 충돌 3건: ① 이미 있는 `scoring_diagnosis_v1` 진단과의 관계 ② 활동지 탭 소유권 ③ 미리보기·시험 채점의 크레딧 차감 여부
-- **과제물 인식·AI 채점 크레딧 정책(채점당 1크레딧·인식 무과금·학생 단위 직접 채점) → handoff/HANDOFF_ocr_credit_policy_260826.md** (정책 전부 확정·목업 반영 중. **§8 작업 현황 = 이어받기 시작점**. §4-3 갈래 제거는 번복 — 선택지 복원이 최종)
+- **과제물 인식·AI 채점 이어받기(사후 확인 모델·채점당 1크레딧·인식 무과금) → handoff/HANDOFF_ocr_credit_policy_260826.md** (**최상단 "이어받기" 섹션이 시작점** — 끝난 것/열린 것/함정. 그 아래 이력 섹션은 아카이브라 정책 근거로 쓰지 말 것). PRD는 Notion `C- OCR 확인 후 채` **V1.0(2026.08.28)**
 - 그 외 인수인계 문서 → handoff/ (교사의날 이벤트·OCR 채점 260615·초등 채점 v2)
 - 내부 검토 문서 → reviews/ (**gitignore 대상 — public repo라 커밋 금지**)
 - PRD 작성 → ../prd_guide.md
