@@ -1124,13 +1124,17 @@ function onReturn(){
   coverTimer = setTimeout(hideCover, COVER_HOLD * 1000);
   leaveStart = null; leaveType = null;
 }
-/* 브라우저가 실제로 구분해 주는 종류만 쓴다 — '탭 전환'·'다른 창 이동'은 알 수 없는 추론 (2026-08-11 제이콥) */
-/* ⚠️ blur/focus에 !document.hidden 가드를 두지 말 것 — 임베드된 미리보기 창에서는
-   document.hidden이 true로 고정돼 가드에 걸려 감지가 통째로 죽는다 (2026-08-12 확인).
-   중복 집계는 onLeave의 leaveStart 가드가 이미 막는다 */
-document.addEventListener('visibilitychange', function(){ document.hidden ? onLeave('화면 안 보임') : onReturn(); });
-window.addEventListener('blur',  function(){ onLeave('포커스 벗어남'); });
-window.addEventListener('focus', function(){ onReturn(); });
+/* ───────── 실제 브라우저 이벤트 감지는 기본 꺼둔다 (2026-08-28 올립) ─────────
+   목업을 검토하는 사람이 브라우저 탭을 옮길 때마다 덮개가 떠서 화면 전환이 막혔다.
+   이탈 기록은 이미 실서버에 배포된 기능이라 목업에서 굳이 실감지를 돌릴 이유가 없다.
+   동작을 보고 싶으면 콘솔에서 `setAutoLeave(true)` 또는 `simulateLeave(초)`.
+   ⚠️ 되살릴 때 blur/focus에 !document.hidden 가드를 두지 말 것 — 임베드된 미리보기 창에서는
+   document.hidden이 true로 고정돼 가드에 걸려 감지가 통째로 죽는다 (2026-08-12 확인) */
+var AUTO_LEAVE = false;
+function setAutoLeave(on){ AUTO_LEAVE = !!on; if(!on){ leaveStart = null; hideCover(); } return AUTO_LEAVE; }
+document.addEventListener('visibilitychange', function(){ if(!AUTO_LEAVE) return; document.hidden ? onLeave('화면 안 보임') : onReturn(); });
+window.addEventListener('blur',  function(){ if(AUTO_LEAVE) onLeave('포커스 벗어남'); });
+window.addEventListener('focus', function(){ if(AUTO_LEAVE) onReturn(); });
 function fmtDur(s){ return s >= 60 ? Math.floor(s/60) + '분' + (s%60 ? ' ' + s%60 + '초' : '') : s + '초'; }
 
 /* ───────── 공통 ───────── */
