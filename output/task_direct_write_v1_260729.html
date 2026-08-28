@@ -481,9 +481,7 @@
     .ds-icons{ display:flex; gap:8px; }
     .ds-icon-btn{ width:34px; height:34px; border:1px solid #d9d9d9; background:white; border-radius:6px; color:#3b3f4c; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; line-height:1; vertical-align:middle; }
     .ds-icon-btn:hover{ background:#f6f7f9; }
-    /* 문항 미작성 배지 (신규) */
-    .ds-warn{ display:inline-flex; align-items:center; justify-content:center; gap:5px; height:26px; padding:0 10px; border-radius:6px; background:#fff3f4; color:#ab303a; font-size:13px; font-weight:600; line-height:1; white-space:nowrap; align-self:flex-start; }
-    .ds-warn i, .ds-warn svg{ width:14px; height:14px; }
+    /* .ds-warn(문항 미작성 배지)은 제거 — PRD v0.5에서 빈 문항 상태 자체가 없어짐 (2026-08-28) */
     /* 회색 상태 태그 — '이전된 과제'처럼 조치가 필요 없는 사실 표시에만 (2026-08-28) */
     .ds-tag{ display:inline-flex; align-items:center; justify-content:center; gap:5px; height:26px; padding:0 10px; border-radius:6px; background:#f1f3f5; color:#3b3f4c; font-size:13px; font-weight:600; line-height:1; white-space:nowrap; align-self:flex-start; }
     .ds-tag i, .ds-tag svg{ width:14px; height:14px; color:#6d7381; }
@@ -931,7 +929,6 @@
       <div class="ds-card" onclick="openDesign(0, false)">
         <div>
           <div class="ds-title">사회 변동과 현대사회의 문제 분석</div>
-          <div id="ds-warn-slot" style="margin-top:10px;"></div>
         </div>
         <div class="ds-meta">
           <span class="ds-meta-txt">방금 수정됨 · 교내 공개</span>
@@ -963,10 +960,8 @@
       </div>
 
       <!-- 케이스: 이전된 기존 과제.
-           2026-08-28 회의로 마이그레이션 문항에 `답안을 입력해 주세요.` 내용이 들어가면서
-           '빈 문항' 상태 자체가 사라졌다 → `문항 미작성` 배지 대신 `이전된 과제` 태그로 바꿈.
-           ⚠️ 이제 저장된 설계가 문항 미작성이 되는 경로가 없다 — renderList의 배지 로직은
-           남겨 뒀지만 실제로는 뜨지 않는다(PRD 개정 시 함께 정리할 것) -->
+           마이그레이션 문항에 `답안을 입력해 주세요.` 내용이 들어가면서 '빈 문항' 상태가 사라졌다.
+           → `문항 미작성` 배지는 PRD v0.5에서 제거 확정, 여기는 `이전된 과제` 태그만 단다 (2026-08-28) -->
       <div class="ds-card" onclick="applyDesignState(0, {migrated:true}); go('design');">
         <div>
           <div class="ds-title">1학기 사회 논술형 평가</div>
@@ -1695,8 +1690,8 @@ function setSubmitted(n){
 }
 
 /* 목록 카드 → 그 과제의 상태로 설계 상세 열기.
-   카드마다 상태를 새로 깔아준다 — 안 그러면 앞서 연 과제의 문항이 그대로 남아
-   '문항 미작성' 카드에 문항이 보이는 사고가 남 (2026-08-07 수정) */
+   카드마다 상태를 새로 깔아준다 — 안 그러면 앞서 연 과제의 문항·제출 방식이 그대로 남아
+   카드 이름과 화면이 어긋나는 사고가 난다 (2026-08-07 수정, 08-28 수집 방법까지 확대) */
 function applyDesignState(submitted, opt){
   opt = opt || {};
   var withQ   = (submitted > 0) || opt.withQ !== false;   /* 제출이 있으면 문항이 있다는 뜻 */
@@ -2102,20 +2097,11 @@ function saveDesign(){
   toastMsg('평가 설계가 저장되었습니다.');
 }
 
-/* ── 목록 카드의 '문항 미작성' 표시 ── */
-/* 배지는 '저장을 마친 설계'에만 붙인다.
-   임시 저장은 설계 미완료라 과제가 시작되지도, 채점되지도 않으므로 붙이지 않는다.
-   2026-08-28 — 목록에 남기는 배지는 이것 하나뿐이다(회색 상태 태그는 제거).
-   v0.4에서 빈 문항이면 설계 저장이 막히므로, 저장된 설계가 이 배지를 다는 경우는
-   '이전된 기존 과제'뿐이다. 드물지만 학생이 답을 쓸 수 없는 상태라 조치가 필요하다 */
-function renderList(){
-  var writeOn = document.getElementById('way-write').classList.contains('on');
-  var noQ = writeOn && QUESTIONS.filter(function(q){ return q.trim() !== ''; }).length === 0;
-  document.getElementById('ds-warn-slot').innerHTML = noQ
-    ? '<span class="ds-warn"><i data-lucide="circle-alert" style="width:14px;height:14px"></i>문항 미작성</span>'
-    : '';
-  lucide.createIcons();
-}
+/* 목록 카드의 '문항 미작성' 배지는 제거 — PRD v0.5 확정 (2026-08-28).
+   이전된 과제도 문항 내용이 `답안을 입력해 주세요.`로 채워지면서
+   저장된 설계가 빈 문항이 되는 경로가 사라졌다. 뜰 수 없는 배지는 두지 않는다.
+   renderList는 호출부가 여럿이라 이름만 남긴다 */
+function renderList(){}
 
 /* ── 목업 내비게이터 (접기 · 드래그) ── */
 function mjToggle(){
