@@ -916,10 +916,28 @@ window.MOCK_NAV_FILE  = 'home';
    교사 그룹(평가 설계·과제물 관리·채점 상세)을 싣지 않고, 교사 쪽은 '과제 설계 목록' 한 줄로만 연결한다.
    학생 유즈케이스는 전부 고유 해시를 갖는다(아래 CASES 참조) — 까망이에서 바로 그 케이스로 뛴다.
    기본 목록(mock_nav_dw.js의 GROUPS)은 나머지 4개 파일이 그대로 쓴다 */
-/* 전용 목록(MOCK_NAV_GROUPS)을 걷어냈다 (2026-08-28 올립) — 학생 화면에서도 교사 탭을 볼 수 있어야 한다.
-   문항형 제출은 교사가 문항을 만들고 학생이 답하는 한 과업이라 두 관점을 오가며 봐야 한다.
-   공용 목록(mock_nav_dw.js)이 교사/학생 두 탭을 모두 싣고 있으므로 그걸 그대로 쓴다.
-   목록을 고칠 일이 있으면 mock_nav_dw.js 한 곳만 고치면 된다 */
+window.MOCK_NAV_GROUPS = [
+  /* 학생 홈 과업 전용 (2026-08-12 올립) — 화면 셋(홈 / 과제 목록 / 과제 상세)이 최상위,
+     케이스는 그 아래 하위 그룹. 교사 화면은 이 과업이 아니므로 싣지 않는다.
+     말로 설명하면 되는 것(이탈 배너 유무·기록 안내 끔)은 케이스로 만들지 않는다 —
+     목록이 길어지면 정작 봐야 할 화면이 묻힌다.
+     student_home과 student_submit이 같은 목록을 쓴다(화면을 오가도 까망이가 안 바뀌게) */
+  { t:'학생 · 화면',            items:[
+      ['shHome6','홈',{sub:'전체 12건 · 상태 칩 + 검색'}],
+      ['shTask6','과제 목록',{sub:'내용 동일 · 헤더만 타이틀+설명'}],
+      ['ssWrite','과제 상세',{sub:'목록에서 과제를 누르면 여기로'}]] },
+  { t:'└ 목록 케이스',          items:[
+      ['shHome6NoRes','검색 결과 없음'],
+      ['shHome6Zero','과제 0건',{sub:'신학기 · 도구 모음까지 감춤'}]] },
+  { t:'└ 과제 상세 케이스',     items:[
+      ['ssBoth','직접 작성 + 파일 제출'],
+      ['ssFileonly','파일 제출만'],
+      ['ssPreparing','문항 미작성'],
+      ['ssBefore','제출 완료 · 결과 공개 전',{sub:'다시 제출 가능'}],
+      ['ssAfter','제출 완료 · 결과 공개 후',{sub:'재제출 차단'}],
+      ['ssClosed','제출 못 한 채 마감',{sub:'쓰던 글은 읽기 전용'}],
+      ['ssPdf','답안 PDF']] }
+];
 window.MOCK_NAV_APPLY = {
   shHome6:      function(){ goHash('home6'); },
   shTask6:      function(){ goHash('task6'); },
@@ -934,5 +952,5 @@ window.MOCK_NAV_APPLY = {
   if (typeof _go === 'function') window.go = function(s){ _go.apply(this, arguments); if (window.mockNavSetCurrent && MAP[s]) window.mockNavSetCurrent(MAP[s]); };
 })();
 </script>
-<script src="mock_nav_dw.js?v=260828f"></script></body>
+<script src="mock_nav_dw.js?v=260828b"></script></body>
 </html>
