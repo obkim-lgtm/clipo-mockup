@@ -531,23 +531,7 @@ body.nav-expanded .main-wrap{ padding-left:200px; }
       <button class="rm-close" onclick="closeRmModal('runModal1')"><i data-lucide="x" style="width:20px;height:20px"></i></button>
     </div>
     <div class="rm-body">
-      <!-- 채점 방식 — 교사 선택지 (2026-08-26 복원: 바로 채점 기본 / 인식 먼저는 옵트인) -->
-      <div class="rm-field" id="rmMethodField">
-        <span class="rm-label">답안 인식 확인</span>
-        <p class="rm-help">AI는 과제물의 글씨를 읽어(인식) 채점해요. 인식 결과를 채점 전에 확인할지 선택하세요.</p>
-        <div class="rm-seg" role="radiogroup">
-          <button type="button" class="rm-seg-opt on" id="rmMethodDirect" onclick="rmSetMethod('direct')">
-            <i data-lucide="wand-sparkles"></i>
-            <span class="rm-seg-tit">바로 채점</span>
-            <span class="rm-seg-desc">답안 인식과 채점을 동시에 진행</span>
-          </button>
-          <button type="button" class="rm-seg-opt" id="rmMethodOcr" onclick="rmSetMethod('ocr')">
-            <i data-lucide="scan-text"></i>
-            <span class="rm-seg-tit">확인하고 채점</span>
-            <span class="rm-seg-desc">답안 인식 결과 확인 후 채점 진행</span>
-          </button>
-        </div>
-      </div>
+      <p class="rm-help" style="margin:0;">AI가 과제물의 글씨를 읽어(인식) 채점해요. 인식 결과는 채점 후 학생 화면에서 확인·수정할 수 있어요.</p>
       <div id="rm-score-fields" style="display:flex;flex-direction:column;gap:22px;">
       <!-- AI 점수 수준 (HIAI 동일: 점수 자체를 조절) -->
       <div class="rm-field">
@@ -656,7 +640,7 @@ function toggleNav(){ document.getElementById('icon-sb').classList.toggle('expan
 var STUDENTS = [
   // ── C안 케이스 전수 배치 (2026-08-26): 상태 4종 + 걸림 사유 칩 ──
   {id:'10101', name:'김서윤', aiStatus:'채점 완료', aiScore:33, finalScore:33, status:'완료',   statusCls:'done', link:'scoring_secondary_v1_260708.html'},                    // 완료
-  {id:'10102', name:'이준호', aiStatus:'-', ocrReview:true, aiScore:'-', finalScore:'-', status:'미채점', statusCls:'none', link:'scoring_secondary_v1_260708.html'},          // 미채점 + 인식 확인 필요 › (인식 화면 review와 정합)
+  {id:'10102', name:'이준호', aiStatus:'채점 완료', ocrReview:true, aiScore:30, finalScore:'-', status:'확인 필요', statusCls:'need', link:'scoring_secondary_v1_260708.html'},          // 미채점 + 인식 확인 필요 › (인식 화면 review와 정합)
   {id:'10103', name:'박지민', aiStatus:'채점 완료', aiScore:28, finalScore:'-', status:'확인 필요', statusCls:'need', link:'scoring_secondary_v1_260708.html'},                // 확인 필요 (AI 채점됨·검토 대기)
   {id:'10104', name:'최유진', aiStatus:'-', ocrLow:true, aiScore:'-', finalScore:'-', status:'미채점', statusCls:'none', link:'scoring_secondary_v1_260708.html'},             // 미채점 + 정확도 낮음 › (인식 화면 lowacc와 정합)
   {id:'10105', name:'정현우', method:'typing', aiStatus:'-', aiScore:'-', finalScore:'-', status:'미채점', statusCls:'none', link:'scoring_secondary_v1_260708.html'},          // 미채점 (직접 입력 — 인식 없음)
@@ -664,7 +648,7 @@ var STUDENTS = [
   {id:'10107', name:'조민재', aiStatus:'채점 완료', aiScore:33, finalScore:30, status:'완료', statusCls:'done', link:'scoring_secondary_v1_260708.html'},                      // 완료 — 교사가 AI와 다르게 확정(33→30)
   {id:'10108', name:'윤하은', aiStatus:'채점 완료', aiScore:33, finalScore:33, status:'완료', statusCls:'done', link:'scoring_secondary_v1_260708.html'},                      // 완료
   {id:'10109', name:'임도윤', method:'typing', aiStatus:'-', aiScore:'-', finalScore:'-', status:'미제출', statusCls:'none', link:'scoring_secondary_v1_260708.html'},          // 미제출
-  {id:'10110', name:'신예린', aiStatus:'-', ocrDone:true, aiScore:'-', finalScore:'-', status:'미채점', statusCls:'none', link:'scoring_secondary_v1_260708.html'},            // 미채점 + 인식 완료 ›
+  {id:'10110', name:'신예린', aiStatus:'-', aiScore:'-', finalScore:'-', status:'미채점', statusCls:'none', link:'scoring_secondary_v1_260708.html'},            // 미채점 + 인식 완료 ›
   {id:'10111', name:'김도현', method:'typing', aiStatus:'-', scoreFail:true, aiScore:'-', finalScore:'-', status:'미채점', statusCls:'none', link:'scoring_secondary_v1_260708.html'},          // 미채점 + 채점 실패 · 다시 채점 ›
   {id:'10112', name:'송하림', aiStatus:'채점 완료', aiScore:33, finalScore:33, stale:true, status:'완료', statusCls:'done', link:'scoring_secondary_v1_260708.html'},           // 완료 + 재채점 권장(인식 수정됨)
   {id:'10113', name:'노유찬', method:'typing', aiStatus:'-', aiScore:'-', finalScore:'-', status:'미채점', statusCls:'none', link:'scoring_secondary_v1_260708.html'},          // 미채점 (직접 입력)
@@ -707,46 +691,11 @@ function sortedStudents(){
 /* ═══ AI 채점 실행 모달 (task_ocr_v3 이식 — 채점 목록과 단일 모달 공유) ═══ */
 function openRmModal(id) { document.getElementById(id).classList.add('open'); lucide.createIcons(); }
 function closeRmModal(id) { document.getElementById(id).classList.remove('open'); }
-var rmMethod = 'direct';
-function rmSetMethod(m) {
-  rmMethod = m;
-  var d = document.getElementById('rmMethodDirect');
-  var o = document.getElementById('rmMethodOcr');
-  if (d) d.classList.toggle('on', m === 'direct');
-  if (o) o.classList.toggle('on', m === 'ocr');
-  var ocr = (m === 'ocr');
-  // 바로 채점일 때만: 점수 수준·피드백 구성 (인식만 할 땐 채점 설정이 아직 필요 없음)
-  var sf = document.getElementById('rm-score-fields');
-  if (sf) sf.style.display = ocr ? 'none' : 'flex';
-  // 학생 선택 제목·컬럼
-  var lt = document.getElementById('rm2-list-title');
-  if (lt) lt.textContent = ocr ? '인식할 학생 선택' : '채점할 학생 선택';
-  var colA = document.getElementById('rm2-col-a');
-  var colB = document.getElementById('rm2-col-b');
-  if (colA) { colA.textContent = ocr ? '제출 방식' : 'AI 채점'; colA.style.width = ocr ? '200px' : '110px'; }
-  if (colB) colB.style.display = ocr ? 'none' : '';
-  // CTA
-  var btn = document.getElementById('rm-exec-btn');
-  if (btn) btn.innerHTML = ocr
-    ? '<i data-lucide="scan-text" style="width:16px;height:16px"></i>과제물 인식 · <span id="rm-exec-count">0</span>'
-    : '<i data-lucide="wand-sparkles" style="width:16px;height:16px"></i>AI 채점 실행 · <span id="rm-exec-count">0</span>';
-  renderRunStudents();
-  lucide.createIcons();
-}
 // CTA — 방식에 따라 채점 실행 / 과제물 인식 시작
 function rmExecPrimary() {
   var picked = RUN_STUDENTS.filter(function(s){ return !rmIsDisabled(s) && s.checked; });
   if (picked.length === 0) return;
-  if (rmMethod === 'ocr') {
-    picked.forEach(function(st){ st.ocrPre = true; });
-    closeRmModal('runModal1');
-    showToast('success', picked.length + '명 과제물 인식을 시작했어요. AI 크레딧 ' + picked.length + '개가 차감됐어요.');
-    return;
-  }
-  if (!document.querySelector('#rm-fb-list .rm-radio.selected')) {
-    showToast('info', '학생 피드백 구성을 선택해 주세요.');
-    return;
-  }
+  if (!document.querySelector('#rm-fb-list .rm-radio.selected')) { showToast('info','학생 피드백 구성을 선택해 주세요.'); return; }
   rmExec();
 }
 function rmSetLevel(p) {
@@ -791,7 +740,6 @@ function studentAllExcluded(id) {
   } catch(_) { return false; }
 }
 function rmIsDisabled(s) {
-  if (rmMethod === 'ocr') return !!(s.absent || s.method === 'typing'); // 인식: 직접 입력은 읽을 필요 없음. 인식 실패는 재인식 대상이라 선택 가능
   return !!(s.absent || s.ocrfail || s.lowacc || s.selfGrade);
 }
 // 채점 불가 사유 — 라벨에 'OCR' 접두어를 붙이지 않는다
@@ -807,16 +755,9 @@ function rmTeacherBadge(t) {
   if (t === '확인 필요') return '<span class="rm-tag red">확인 필요</span>';
   return '<span style="color:#6d7381;">미채점</span>'; // 미채점 = 담백 회색 텍스트(바탕 상태)
 }
-// 인식 모드 컬럼: 제출 방식 (파일 / 직접 입력 / 미제출)
-function rmMethodCell(s) {
-  if (s.absent) return '<span style="color:#b3b6bd;white-space:nowrap;">미제출</span>';
-  if (s.method === 'typing') return '<span style="color:#6d7381;white-space:nowrap;">직접 입력 · 인식 불필요</span>';
-  if (s.ocrfail) return '<span style="white-space:nowrap;color:#222631;">파일 <span style="color:#c3c7cf;">·</span> <span class="rm-tag red" style="vertical-align:middle;">인식 실패</span></span>';
-  return '<span style="color:#222631;white-space:nowrap;">파일</span>';
-}
 function rmAiCell(s) {
   var reason = rmBlockReason(s);
-  if (reason === '__SELF__') return '<a href="task_ocr_v3_260623.html#ocr-b=' + s.id + '" style="color:#7c3aed;font-weight:600;white-space:nowrap;text-decoration:none;">직접 채점 · 해제 ›</a>';
+  if (reason === '__SELF__') return '<a href="scoring_secondary_v1_260708.html?id=' + s.id + '" style="color:#7c3aed;font-weight:600;white-space:nowrap;text-decoration:none;">직접 채점 · 해제 ›</a>';
   if (reason) return '<span style="color:#6d7381;white-space:nowrap;">' + reason + '</span>';
   if (s.ai === 'fail') return '<span class="rm-tag red">채점 실패</span>';
   return '<span style="color:#6d7381;">-</span>';
@@ -832,8 +773,8 @@ function renderRunStudents() {
       + '<td><input type="checkbox" class="rm-chk" ' + (disabled ? 'disabled' : (s.checked ? 'checked' : '')) + ' onchange="rmToggle(' + i + ', this.checked)"></td>'
       + '<td>' + s.id + '</td>'
       + '<td>' + s.name + '</td>'
-      + '<td>' + (rmMethod === 'ocr' ? rmMethodCell(s) : rmAiCell(s)) + '</td>'
-      + (rmMethod === 'ocr' ? '' : '<td>' + rmTeacherBadge(s.t) + '</td>')
+      + '<td>' + (rmAiCell(s)) + '</td>'
+      + '<td>' + rmTeacherBadge(s.t) + '</td>'
       + '</tr>';
   });
   tbody.innerHTML = html;
@@ -856,17 +797,9 @@ function rmUpdateCount() {
   if (all) { all.checked = n === eligible; all.indeterminate = n > 0 && n < eligible; }
   var btn = document.getElementById('rm-exec-btn');
   if (btn) { btn.disabled = n === 0; btn.style.opacity = n === 0 ? '.5' : '1'; btn.style.cursor = n === 0 ? 'not-allowed' : 'pointer'; }
-  // 크레딧 = 학생당 1개 선차감 (26-08-27 확정): 인식 실행 시 1, 이어지는 채점은 추가 차감 없음
+  // 크레딧 = AI 채점 1회당 학생 1명 1개 (26-08-28 확정)
   var credit = document.getElementById('rm2-credit');
-  if (credit) {
-    if (rmMethod === 'ocr') {
-      credit.innerHTML = '<span>AI 크레딧 <strong>' + n + '</strong>개가 차감돼요.</span>';
-    } else {
-      var pre = RUN_STUDENTS.filter(function(s){ return !rmIsDisabled(s) && s.checked && s.ocrPre; }).length;
-      credit.innerHTML = '<span>AI 크레딧 <strong>' + (n - pre) + '</strong>개가 차감돼요.'
-        + (pre > 0 ? '<span style="color:#6d7381;"> 인식 때 차감된 ' + pre + '명은 추가 차감이 없어요.</span>' : '') + '</span>';
-    }
-  }
+  if (credit) credit.innerHTML = '<span>AI 크레딧 <strong>' + n + '</strong>개가 차감돼요.</span>';
 }
 function rmExec() {
   var n = RUN_STUDENTS.filter(function(s){ return !rmIsDisabled(s) && s.checked; }).length;
@@ -888,10 +821,10 @@ function renderTable(){
     var ocrCell;
     if (s.status === '미제출') ocrCell = '<span class="muted">미제출</span>';
     else if (s.method === 'typing') ocrCell = '<span class="muted">-</span>'; // 직접 입력 — 채점돼도 인식은 없음
-    else if (s.ocrFail) ocrCell = '<a class="st-chip st-chip-red" href="task_ocr_v3_260623.html#ocr-b='+s.id+'"><i data-lucide="scan-text" style="width:12px;height:12px;"></i>실패 · 다시 인식 ›</a>';
-    else if (s.ocrLow) ocrCell = '<a class="st-chip st-chip-red" href="task_ocr_v3_260623.html#ocr-b='+s.id+'"><i data-lucide="scan-text" style="width:12px;height:12px;"></i>정확도 낮음 ›</a>';
-    else if (s.ocrReview) ocrCell = '<a class="st-chip st-chip-orange" href="task_ocr_v3_260623.html#ocr-b='+s.id+'"><i data-lucide="scan-text" style="width:12px;height:12px;"></i>확인 필요 ›</a>';
-    else if (s.ocrDone || s.aiScore !== '-') ocrCell = '<a href="task_ocr_v3_260623.html#ocr-b='+s.id+'" style="color:#3b3f4c;text-decoration:none;">완료</a>';
+    else if (s.ocrFail) ocrCell = '<a class="st-chip st-chip-red" href="scoring_secondary_v1_260708.html?id='+s.id+'"><i data-lucide="scan-text" style="width:12px;height:12px;"></i>실패 · 다시 인식 ›</a>';
+    else if (s.ocrLow) ocrCell = '<a class="st-chip st-chip-red" href="scoring_secondary_v1_260708.html?id='+s.id+'"><i data-lucide="scan-text" style="width:12px;height:12px;"></i>정확도 낮음 ›</a>';
+    else if (s.ocrReview) ocrCell = '<a class="st-chip st-chip-orange" href="scoring_secondary_v1_260708.html?id='+s.id+'"><i data-lucide="scan-text" style="width:12px;height:12px;"></i>확인 필요 ›</a>';
+    else if (s.ocrDone || s.aiScore !== '-') ocrCell = '<a href="scoring_secondary_v1_260708.html?id='+s.id+'" style="color:#3b3f4c;text-decoration:none;">완료</a>';
     else ocrCell = '<span class="muted">-</span>';
     var aiStatCell;
     if (s.scoreFail) aiStatCell = '<a class="st-chip st-chip-red" href="javascript:void(0)" onclick="rescoreStudent(&#39;'+s.id+'&#39;,&#39;'+s.name+'&#39;)"><i data-lucide="rotate-cw" style="width:12px;height:12px;"></i>실패 · 다시 채점 ›</a>';
@@ -937,10 +870,9 @@ function toggleModelCard(){
 }
 
 function runBulkAi(){
+  renderRunStudents();
   // 채점 목록과 동일한 단일 실행 모달 (바로 채점 / 확인하고 채점)
-  var f=document.getElementById('rmMethodField'); if(f) f.style.display='';
-  rmSetMethod('direct');
-  openRmModal('runModal1');
+    openRmModal('runModal1');
 }
 
 function showBulkAiStep(n){
