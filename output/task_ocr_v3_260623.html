@@ -172,6 +172,15 @@
     .rm-field{ display:flex; flex-direction:column; gap:12px; }
     .rm-field-hd{ display:flex; align-items:center; justify-content:space-between; gap:8px; }
     .rm-label{ font-size:16px; font-weight:600; color:#222631; display:inline-flex; align-items:center; gap:6px; }
+    /* AI 채점 안내 카드 (모델 버전 표기 대체, 26-08-28) */
+    .rm-guide{ display:flex; gap:12px; background:#f4f8ff; border:1px solid #dce6ff; border-radius:10px; padding:16px 18px; }
+    .rm-guide-ic{ width:36px; height:36px; border-radius:10px; background:#e0eaff; color:#3151c4; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+    .rm-guide-body{ flex:1; min-width:0; display:flex; flex-direction:column; gap:8px; }
+    .rm-guide-lead{ font-size:15px; font-weight:600; color:#222631; line-height:1.55; margin:0; }
+    .rm-guide-list{ margin:0; padding-left:18px; display:flex; flex-direction:column; gap:4px; }
+    .rm-guide-list li{ font-size:14px; color:#3b3f4c; line-height:1.6; }
+    .rm-guide-btn{ align-self:flex-start; display:inline-flex; align-items:center; justify-content:center; line-height:1; gap:5px; height:32px; padding:0 12px; margin-top:2px; background:#fff; border:1px solid #a3c3ff; border-radius:8px; color:#3151c4; font-family:inherit; font-size:13px; font-weight:700; cursor:pointer; }
+    .rm-guide-btn:hover{ background:#eef3ff; }
     .rm-help{ font-size:14px; color:#6d7381; line-height:1.5; margin:-8px 0 0; } /* 라벨 바로 아래 설명 — 여백은 여기서만 관리 */
     .rm-qtip{ position:relative; display:inline-flex; align-items:center; cursor:help; }
     .rm-qtip > i, .rm-qtip > svg{ width:18px; height:18px; color:#6d7381; }
@@ -1739,17 +1748,30 @@
 
 <!-- ===== AI 채점 실행 모달 (1/2): 인식 확인 시점·점수 수준·학생 피드백 구성 ===== -->
 <div id="runModal1" class="rm-overlay" onclick="if(event.target===this) closeRmModal('runModal1')">
-  <div class="rm-modal" style="max-height:min(620px,90vh);">
+  <div class="rm-modal" style="max-height:min(660px,90vh);">
     <div class="rm-hd">
-      <div class="rm-title">AI 채점 실행</div>
+      <div class="rm-title" id="rm1-title">AI 채점 실행 (1/2)</div>
       <button class="rm-close" onclick="closeRmModal('runModal1')"><i data-lucide="x" style="width:20px;height:20px"></i></button>
     </div>
     <div class="rm-body">
-      <p class="rm-help" style="margin:0;">AI가 과제물의 글씨를 읽어(인식) 채점해요. 인식 결과는 채점 후 학생 화면에서 확인·수정할 수 있어요.</p>
-      <div id="rm-score-fields" style="display:flex;flex-direction:column;gap:22px;">
-      <!-- AI 점수 수준 (HIAI 동일: 점수 자체를 조절) -->
+      <!-- AI 채점 안내 (모델 버전 표기 폐기 — 선택지가 아니라 안내, 26-08-28) -->
       <div class="rm-field">
-        <span class="rm-label">AI 점수 수준 <span class="rm-qtip"><i data-lucide="circle-help"></i><span class="rm-qtip-box">AI가 매길 점수를 조절합니다. 점수에 맞춰 피드백 내용도 함께 바뀝니다.</span></span></span>
+        <span class="rm-label">AI가 이렇게 채점해요</span>
+        <div class="rm-guide">
+          <div class="rm-guide-ic"><i data-lucide="wand-sparkles" style="width:20px;height:20px"></i></div>
+          <div class="rm-guide-body">
+            <p class="rm-guide-lead">손글씨·수식·그래프를 읽고, 채점기준에 맞춰 문항별로 점수와 근거를 매겨요.</p>
+            <ul class="rm-guide-list">
+              <li>수학·과학·정보 과목의 서술형 답안도 채점할 수 있어요.</li>
+              <li>채점이 끝나면 <strong>학생 채점 화면에서 과제물 인식 결과를 보고 수정</strong>할 수 있어요. 수정하면 그 내용으로 다시 채점돼요.</li>
+            </ul>
+            <button class="rm-guide-btn" onclick="openScoringGuide()"><i data-lucide="external-link" style="width:14px;height:14px"></i>채점 활용 예시보기</button>
+          </div>
+        </div>
+      </div>
+      <!-- 채점 수준 -->
+      <div class="rm-field">
+        <span class="rm-label">채점 수준 <span class="rm-qtip"><i data-lucide="circle-help"></i><span class="rm-qtip-box">AI가 매길 점수를 조절합니다. 점수에 맞춰 피드백 내용도 함께 바뀝니다.</span></span></span>
         <div>
           <div class="rm-slider-bar" id="rm-slider" onclick="rmSliderClick(event)">
             <div class="rm-slider-fill" id="rm-slider-fill" style="width:50%;"></div>
@@ -1758,9 +1780,9 @@
             <div class="rm-slider-thumb" id="rm-slider-thumb" style="left:50%;"></div>
           </div>
           <div class="rm-slider-marks">
-            <span onclick="rmSetLevel(0)">더 낮은 점수<br><small style="color:#9ea3ad;font-weight:500;">(엄격하게)</small></span>
-            <span onclick="rmSetLevel(50)" style="margin-left:14px;text-align:center;">기본 점수<br><small style="color:#9ea3ad;font-weight:500;">(비슷하게)</small></span>
-            <span onclick="rmSetLevel(100)" style="text-align:right;">더 높은 점수<br><small style="color:#9ea3ad;font-weight:500;">(관대하게)</small></span>
+            <span onclick="rmSetLevel(0)">관대하게</span>
+            <span onclick="rmSetLevel(50)" style="margin-left:14px;text-align:center;">기본값</span>
+            <span onclick="rmSetLevel(100)" style="text-align:right;">엄격하게</span>
           </div>
         </div>
       </div>
@@ -1774,29 +1796,42 @@
           <div class="rm-radio" onclick="rmSelectFb(this)"><div class="ring"></div><div class="lbl">선생님이 직접 작성</div></div>
         </div>
       </div>
-      </div>
-      <!-- 학생 선택 (방식에 따라 채점/인식 대상) -->
-      <div class="rm-field">
-        <span class="rm-label" id="rm2-list-title">채점할 학생 선택</span>
-        <div class="rm-tbl-wrap">
-          <table class="rm-tbl">
-            <thead>
-              <tr>
-                <th style="width:64px;"><input type="checkbox" class="rm-chk" id="rm-chk-all" onchange="rmToggleAll(this)"></th>
-                <th style="width:100px;">학번</th>
-                <th>이름</th>
-                <th style="width:110px;" id="rm2-col-a">AI 채점</th>
-                <th style="width:120px;" id="rm2-col-b">선생님 채점</th>
-              </tr>
-            </thead>
-            <tbody id="rm-student-tbody"></tbody>
-          </table>
-        </div>
+    </div>
+    <div class="rm-ft">
+      <button class="btn btn-primary" id="rm1-next" onclick="rmNext()">다음으로 <i data-lucide="chevron-right" style="width:18px;height:18px"></i></button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== AI 채점 실행 (2/2): 학생 선택 ===== -->
+<div id="runModal2" class="rm-overlay" onclick="if(event.target===this) closeRmModal('runModal2')">
+  <div class="rm-modal" style="height:660px;max-height:90vh;">
+    <div class="rm-hd">
+      <div class="rm-title" id="rm2-title">AI 채점 실행 (2/2)</div>
+      <button class="rm-close" onclick="closeRmModal('runModal2')"><i data-lucide="x" style="width:20px;height:20px"></i></button>
+    </div>
+    <div class="rm-body">
+      <div class="rm-tbl-wrap">
+        <table class="rm-tbl">
+          <thead>
+            <tr>
+              <th style="width:64px;"><input type="checkbox" class="rm-chk" id="rm-chk-all" onchange="rmToggleAll(this)"></th>
+              <th style="width:100px;">학번</th>
+              <th>이름</th>
+              <th style="width:110px;" id="rm2-col-a">AI 채점</th>
+              <th style="width:120px;" id="rm2-col-b">선생님 채점</th>
+            </tr>
+          </thead>
+          <tbody id="rm-student-tbody"></tbody>
+        </table>
       </div>
     </div>
-    <div class="rm-ft" style="justify-content:space-between;align-items:center;border-top:1px solid #eceef2;">
-      <div id="rm2-credit" style="display:flex;align-items:center;font-size:14px;color:#3b3f4c;"></div>
-      <button class="btn btn-primary" id="rm-exec-btn" onclick="rmExecPrimary()"><i data-lucide="wand-sparkles" style="width:16px;height:16px"></i>AI 채점 실행 · <span id="rm-exec-count">0</span></button>
+    <div class="rm-ft" style="justify-content:space-between;align-items:center;">
+      <button class="btn btn-outline" onclick="rmBack()"><i data-lucide="chevron-left" style="width:16px;height:16px"></i>이전으로</button>
+      <div style="display:flex;align-items:center;gap:14px;">
+        <div id="rm2-credit" style="display:flex;align-items:center;font-size:14px;color:#3b3f4c;"></div>
+        <button class="btn btn-primary" id="rm-exec-btn" onclick="rmExecPrimary()"><i data-lucide="wand-sparkles" style="width:16px;height:16px"></i>AI 채점 실행 · <span id="rm-exec-count">0</span></button>
+      </div>
     </div>
   </div>
 </div>
@@ -3159,11 +3194,20 @@ function openRmModal(id) { document.getElementById(id).classList.add('open'); lu
 function closeRmModal(id) { document.getElementById(id).classList.remove('open'); }
 // 채점 목록 학급 행의 'AI 채점' 칸 — 실행 후 '채점 중' 스피너를 그 자리에 표시
 var runCtxCell = null;
-function openRunModal(btn) { runCtxCell = (btn && btn.closest) ? btn.closest('td') : null; renderRunStudents(); openRmModal('runModal1'); }
+function openRunModal(btn) { runCtxCell = (btn && btn.closest) ? btn.closest('td') : null; openRmModal('runModal1'); }
 
 // ── 채점 방식 (2026-08-26 복원) — 바로 채점 기본 / 인식 먼저는 옵트인.
 // 단순화 유지: 인식은 무과금·전체 학생 대상이라 학생 선택 단계를 거치지 않는다.
 // CTA — 방식에 따라 채점 실행 / 과제물 인식 시작
+function rmNext() {
+  closeRmModal('runModal1');
+  renderRunStudents();
+  openRmModal('runModal2');
+}
+function rmBack() {
+  closeRmModal('runModal2');
+  openRmModal('runModal1');
+}
 function rmExecPrimary() {
   var picked = RUN_STUDENTS.filter(function(s){ return !rmIsDisabled(s) && s.checked; });
   if (picked.length === 0) return;
@@ -3290,7 +3334,7 @@ function rmUpdateCount() {
 function rmExec() {
   var n = RUN_STUDENTS.filter(function(s){ return !rmIsDisabled(s) && s.checked; }).length;
   if (n === 0) return;
-  closeRmModal('runModal1');
+  closeRmModal('runModal2');
   showToast(n + '명의 AI 채점을 시작합니다. 완료되면 결과 확인에서 볼 수 있어요.', 'success');
   // 채점 목록 학급 칸 → '채점 중' 스피너 (데모: 잠시 후 재실행 가능)
   if (runCtxCell) {
