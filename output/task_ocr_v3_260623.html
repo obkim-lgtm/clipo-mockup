@@ -199,11 +199,6 @@
     .rm-radio .ring{ width:20px; height:20px; border-radius:50%; border:1.5px solid #c7cbd3; background:#fff; flex-shrink:0; }
     .rm-radio.selected .ring{ border:6px solid #365eef; }
     .rm-radio .lbl{ font-size:15px; font-weight:600; color:#222631; line-height:1.4; }
-    /* 하단 크레딧 표기 — 재채점 모달과 동일 포맷 */
-    .rm-credit{ display:inline-flex; align-items:center; gap:6px; font-size:13px; color:#3b3f4c; line-height:1; white-space:nowrap; }
-    .rm-credit i{ color:#365eef; flex-shrink:0; }
-    .rm-credit strong{ color:#365eef; font-weight:700; }
-    .rm-credit .sub{ color:#6d7381; }
     /* V3 하이브리드: 채점 방식 세그먼트 (인라인 기본 / 인식 먼저 옵트인) */
     .rm-seg{ display:flex; gap:10px; }
     .rm-seg-opt{ flex:1; display:flex; flex-direction:column; align-items:flex-start; gap:3px; padding:14px 16px; border:1.5px solid #e3e6eb; border-radius:10px; background:#fff; cursor:pointer; font-family:inherit; text-align:left; transition:border-color .12s, background .12s; }
@@ -249,7 +244,7 @@
     .badge-blue{ background:#e9f2ff; color:#3151c4; }
 
     /* ===== Buttons ===== */
-    .btn{ height:40px; border-radius:4px; font-weight:600; font-size:15px; font-family:inherit; cursor:pointer; display:inline-flex; align-items:center; gap:8px; padding:0 16px; border:none; transition:opacity .15s; }
+    .btn{ height:40px; border-radius:4px; font-weight:600; font-size:15px; font-family:inherit; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; gap:8px; padding:0 16px; border:none; white-space:nowrap; flex-shrink:0; line-height:1; transition:opacity .15s; }
     .btn:hover{ opacity:.88; }
     .btn-primary{ background:#416bff; color:white; }
     .btn-primary:hover{ background:#365eef; opacity:1; }
@@ -1826,7 +1821,6 @@
     <div class="rm-ft" style="justify-content:space-between;align-items:center;">
       <button class="btn btn-outline" onclick="rmBack()"><i data-lucide="chevron-left" style="width:16px;height:16px"></i>이전으로</button>
       <div style="display:flex;align-items:center;gap:14px;">
-        <div id="rm2-credit" style="display:flex;align-items:center;"></div>
         <button class="btn btn-primary" id="rm-exec-btn" onclick="rmExecPrimary()"><i data-lucide="wand-sparkles" style="width:16px;height:16px"></i>AI 채점 실행 · <span id="rm-exec-count">0</span></button>
       </div>
     </div>
@@ -3335,10 +3329,6 @@ function rmUpdateCount() {
   if (all) { all.checked = n === eligible; all.indeterminate = n > 0 && n < eligible; }
   var btn = document.getElementById('rm-exec-btn');
   if (btn) { btn.disabled = n === 0; btn.style.opacity = n === 0 ? '.5' : '1'; btn.style.cursor = n === 0 ? 'not-allowed' : 'pointer'; }
-  // 크레딧 = AI 채점 1회당 학생 1명 1개 (26-08-28 회의 확정 — 사후 확인 모델)
-  var credit = document.getElementById('rm2-credit');
-  if (credit) credit.innerHTML = '<span class="rm-credit"><i data-lucide="bot" style="width:14px;height:14px"></i>AI 크레딧 <strong>' + n + '개</strong> 사용<span class="sub">· 잔여 900개</span></span>';
-  if (credit && typeof lucide !== 'undefined') lucide.createIcons();
 }
 function rmExec() {
   var n = RUN_STUDENTS.filter(function(s){ return !rmIsDisabled(s) && s.checked; }).length;
