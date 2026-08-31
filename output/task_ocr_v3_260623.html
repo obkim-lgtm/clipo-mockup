@@ -162,7 +162,7 @@
     .gcalm{ background:#f6f7f9; border-radius:8px; padding:12px 16px; display:flex; align-items:flex-start; gap:8px; }
     .gcalm i{ width:17px; height:17px; color:#6d7381; flex-shrink:0; margin-top:2px; }
     .gcalm p{ font-size:14px; color:#3b3f4c; line-height:1.6; margin:0; }
-    .rm-modal{ background:#fff; border-radius:12px; width:680px; max-width:calc(100vw - 48px); box-shadow:0 20px 60px rgba(0,0,0,.25); max-height:calc(100vh - 48px); display:flex; flex-direction:column; }
+    .rm-modal{ background:#fff; border-radius:12px; width:520px; max-width:calc(100vw - 48px); box-shadow:0 20px 60px rgba(0,0,0,.25); max-height:calc(100vh - 48px); display:flex; flex-direction:column; }
     .rm-hd{ position:relative; padding:24px 24px 16px; flex-shrink:0; }
     .rm-title{ font-size:20px; font-weight:600; color:#222631; line-height:1.25; }
     .rm-close{ position:absolute; top:16px; right:16px; width:36px; height:36px; border:0; background:none; border-radius:6px; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; line-height:1; color:#6d7381; }
@@ -173,7 +173,7 @@
     .rm-field-hd{ display:flex; align-items:center; justify-content:space-between; gap:8px; }
     .rm-label{ font-size:16px; font-weight:600; color:#222631; display:inline-flex; align-items:center; gap:6px; }
     /* AI 채점 안내 카드 (모델 버전 표기 대체, 26-08-28) */
-    .rm-guide{ display:flex; gap:12px; background:#f7faff; border:1px solid #e3ebfa; border-radius:10px; padding:14px 16px; }
+    .rm-guide{ display:flex; background:#f7faff; border:1px solid #e3ebfa; border-radius:10px; padding:14px 16px; }
     .rm-guide-ic{ width:32px; height:32px; border-radius:9px; background:#e4edff; color:#3151c4; display:flex; align-items:center; justify-content:center; flex-shrink:0; margin-top:1px; }
     .rm-guide-body{ flex:1; min-width:0; display:flex; flex-direction:column; }
     .rm-guide-lead{ font-size:15px; font-weight:600; color:#222631; line-height:1.6; margin:0; letter-spacing:-.1px; }
@@ -183,19 +183,27 @@
     .rm-help{ font-size:14px; color:#6d7381; line-height:1.5; margin:-8px 0 0; } /* 라벨 바로 아래 설명 — 여백은 여기서만 관리 */
     .rm-qtip{ position:relative; display:inline-flex; align-items:center; cursor:help; }
     .rm-qtip > i, .rm-qtip > svg{ width:18px; height:18px; color:#6d7381; }
-    .rm-qtip .rm-qtip-box{ display:none; position:absolute; left:50%; transform:translateX(-50%); bottom:calc(100% + 8px); width:280px; background:#fff; border:1px solid #e4e7ee; border-radius:8px; box-shadow:0 6px 20px rgba(0,0,0,.12); padding:10px 12px; font-size:14px; font-weight:400; color:#3b3f4c; line-height:1.55; z-index:30; }
+    .rm-qtip .rm-qtip-box{ display:none; position:absolute; left:0; bottom:calc(100% + 8px); width:280px; max-width:calc(100% + 260px); background:#fff; border:1px solid #e4e7ee; border-radius:8px; box-shadow:0 6px 20px rgba(0,0,0,.12); padding:10px 12px; font-size:14px; font-weight:400; color:#3b3f4c; line-height:1.55; z-index:30; }
     .rm-qtip:hover .rm-qtip-box{ display:block; }
-    .rm-slider-bar{ position:relative; height:10px; border-radius:100px; background:#dde1e8; cursor:pointer; margin:6px 10px 0; }
-    .rm-slider-fill{ position:absolute; left:0; top:0; bottom:0; background:#416bff; border-radius:100px; }
-    .rm-slider-dot{ position:absolute; top:50%; width:8px; height:8px; border-radius:50%; transform:translate(-50%,-50%); }
-    .rm-slider-thumb{ position:absolute; top:50%; width:24px; height:24px; border-radius:50%; background:#fff; border:2px solid #416bff; transform:translate(-50%,-50%); box-shadow:0 1px 4px rgba(0,0,0,.18); transition:left .15s; }
+    /* 재채점 모달과 동일한 슬라이더 (26-08-28 UI 통일) — 레이블만 각자 다름 */
+    .rm-slider{ width:100%; -webkit-appearance:none; appearance:none; height:6px; background:linear-gradient(to right,#365eef 0%,#365eef 50%,#dde1e8 50%,#dde1e8 100%); border-radius:3px; outline:none; cursor:pointer; margin:6px 0 0; }
+    .rm-slider::-webkit-slider-thumb{ -webkit-appearance:none; appearance:none; width:22px; height:22px; border-radius:50%; background:#fff; cursor:pointer; border:3px solid #365eef; box-shadow:0 1px 3px rgba(0,0,0,.15); }
+    .rm-slider::-moz-range-thumb{ width:22px; height:22px; border-radius:50%; background:#fff; cursor:pointer; border:3px solid #365eef; box-shadow:0 1px 3px rgba(0,0,0,.15); }
     .rm-slider-marks{ display:flex; justify-content:space-between; margin-top:12px; font-size:16px; color:#222631; line-height:1.35; }
     .rm-slider-marks small{ font-size:13px; }
     .rm-slider-marks span{ cursor:pointer; }
-    .rm-radio{ display:flex; align-items:center; gap:12px; cursor:pointer; padding:4px 0; }
-    .rm-radio .ring{ width:22px; height:22px; border-radius:50%; border:1.5px solid #c7cbd3; background:#fff; flex-shrink:0; }
-    .rm-radio.selected .ring{ border:7px solid #416bff; }
-    .rm-radio .lbl{ font-size:16px; color:#222631; }
+    /* 박스형 라디오 — 재채점 모달과 동일 (26-08-28 UI 통일) */
+    .rm-radio{ display:flex; align-items:center; gap:10px; cursor:pointer; padding:12px 14px; border:1px solid #dde1e8; border-radius:12px; transition:border-color .15s, background .15s; }
+    .rm-radio:hover{ border-color:#a3c3ff; background:#f4f8ff; }
+    .rm-radio.selected{ border-color:#365eef; background:#f4f8ff; }
+    .rm-radio .ring{ width:20px; height:20px; border-radius:50%; border:1.5px solid #c7cbd3; background:#fff; flex-shrink:0; }
+    .rm-radio.selected .ring{ border:6px solid #365eef; }
+    .rm-radio .lbl{ font-size:15px; font-weight:600; color:#222631; line-height:1.4; }
+    /* 하단 크레딧 표기 — 재채점 모달과 동일 포맷 */
+    .rm-credit{ display:inline-flex; align-items:center; gap:6px; font-size:13px; color:#3b3f4c; line-height:1; white-space:nowrap; }
+    .rm-credit i{ color:#365eef; flex-shrink:0; }
+    .rm-credit strong{ color:#365eef; font-weight:700; }
+    .rm-credit .sub{ color:#6d7381; }
     /* V3 하이브리드: 채점 방식 세그먼트 (인라인 기본 / 인식 먼저 옵트인) */
     .rm-seg{ display:flex; gap:10px; }
     .rm-seg-opt{ flex:1; display:flex; flex-direction:column; align-items:flex-start; gap:3px; padding:14px 16px; border:1.5px solid #e3e6eb; border-radius:10px; background:#fff; cursor:pointer; font-family:inherit; text-align:left; transition:border-color .12s, background .12s; }
@@ -1756,10 +1764,9 @@
       <!-- AI 채점 안내 (모델 버전 표기 폐기 — 선택지가 아니라 안내, 26-08-28) -->
       <div class="rm-field">
         <div class="rm-guide">
-          <div class="rm-guide-ic"><i data-lucide="wand-sparkles" style="width:20px;height:20px"></i></div>
           <div class="rm-guide-body">
-            <p class="rm-guide-lead">손글씨·수식·그래프를 읽고, 채점기준에 맞춰 문항별로 점수와 근거를 매겨요.</p>
-            <p class="rm-guide-sub">학생 채점 화면에서 과제물 인식 결과를 보고 수정한 뒤, 다시 채점할 수 있어요.</p>
+            <p class="rm-guide-lead">손글씨·수식·그래프를 읽고 문항별로 채점해요.</p>
+            <p class="rm-guide-sub">잘못 읽은 부분은 채점 후 고칠 수 있어요.</p>
             <button class="rm-guide-btn" onclick="openScoringGuide()"><i data-lucide="external-link" style="width:14px;height:14px"></i>채점 활용 예시보기</button>
           </div>
         </div>
@@ -1768,16 +1775,11 @@
       <div class="rm-field">
         <span class="rm-label">채점 수준 <span class="rm-qtip"><i data-lucide="circle-help"></i><span class="rm-qtip-box">AI가 매길 점수를 조절합니다. 점수에 맞춰 피드백 내용도 함께 바뀝니다.</span></span></span>
         <div>
-          <div class="rm-slider-bar" id="rm-slider" onclick="rmSliderClick(event)">
-            <div class="rm-slider-fill" id="rm-slider-fill" style="width:50%;"></div>
-            <div class="rm-slider-dot" style="left:1.5%;background:#416bff;"></div>
-            <div class="rm-slider-dot" style="left:98.5%;background:#c7cbd3;"></div>
-            <div class="rm-slider-thumb" id="rm-slider-thumb" style="left:50%;"></div>
-          </div>
+          <input type="range" class="rm-slider" id="rm-slider" min="0" max="2" step="1" value="1" oninput="rmSliderInput()">
           <div class="rm-slider-marks">
             <span onclick="rmSetLevel(0)">엄격하게<br><small style="color:#9ea3ad;font-weight:500;">(점수 낮게)</small></span>
-            <span onclick="rmSetLevel(50)" style="margin-left:14px;text-align:center;">기본값</span>
-            <span onclick="rmSetLevel(100)" style="text-align:right;">관대하게<br><small style="color:#9ea3ad;font-weight:500;">(점수 높게)</small></span>
+            <span onclick="rmSetLevel(1)" style="margin-left:14px;text-align:center;">기본값</span>
+            <span onclick="rmSetLevel(2)" style="text-align:right;">관대하게<br><small style="color:#9ea3ad;font-weight:500;">(점수 높게)</small></span>
           </div>
         </div>
       </div>
@@ -1824,7 +1826,7 @@
     <div class="rm-ft" style="justify-content:space-between;align-items:center;">
       <button class="btn btn-outline" onclick="rmBack()"><i data-lucide="chevron-left" style="width:16px;height:16px"></i>이전으로</button>
       <div style="display:flex;align-items:center;gap:14px;">
-        <div id="rm2-credit" style="display:flex;align-items:center;font-size:14px;color:#3b3f4c;"></div>
+        <div id="rm2-credit" style="display:flex;align-items:center;"></div>
         <button class="btn btn-primary" id="rm-exec-btn" onclick="rmExecPrimary()"><i data-lucide="wand-sparkles" style="width:16px;height:16px"></i>AI 채점 실행 · <span id="rm-exec-count">0</span></button>
       </div>
     </div>
@@ -3185,7 +3187,7 @@ function closeCreateMenu() {
 document.addEventListener('click', function(){ closeCreateMenu(); });
 
 // ── AI 채점 실행 모달 (1/2 → 2/2) ──
-function openRmModal(id) { document.getElementById(id).classList.add('open'); lucide.createIcons(); }
+function openRmModal(id) { document.getElementById(id).classList.add('open'); if(id==='runModal1' && document.getElementById('rm-slider')) rmSliderInput(); lucide.createIcons(); }
 function closeRmModal(id) { document.getElementById(id).classList.remove('open'); }
 // 채점 목록 학급 행의 'AI 채점' 칸 — 실행 후 '채점 중' 스피너를 그 자리에 표시
 var runCtxCell = null;
@@ -3217,15 +3219,18 @@ function rmSelectedCount() {
   return RUN_STUDENTS.filter(function(s){ return !rmIsDisabled(s) && s.checked; }).length;
 }
 
-function rmSetLevel(p) {
-  document.getElementById('rm-slider-fill').style.width = p + '%';
-  document.getElementById('rm-slider-thumb').style.left = p + '%';
+function rmSliderInput() {
+  // 채운 구간을 값에 맞춰 다시 칠한다 (재채점 모달과 동일 방식)
+  var el = document.getElementById('rm-slider');
+  var pct = (parseInt(el.value, 10) / 2) * 100;
+  el.style.background = 'linear-gradient(to right,#365eef 0%,#365eef ' + pct + '%,#dde1e8 ' + pct + '%,#dde1e8 100%)';
+  var marks = document.querySelectorAll('.rm-slider-marks span');
+  for (var i = 0; i < marks.length; i++) marks[i].style.color = (i === parseInt(el.value, 10)) ? '#365eef' : '#222631';
 }
-function rmSliderClick(e) {
-  var bar = document.getElementById('rm-slider');
-  var rect = bar.getBoundingClientRect();
-  var ratio = (e.clientX - rect.left) / rect.width;
-  rmSetLevel(ratio < 0.25 ? 0 : (ratio > 0.75 ? 100 : 50));
+function rmSetLevel(v) {
+  var el = document.getElementById('rm-slider');
+  el.value = v;
+  rmSliderInput();
 }
 function rmSelectFb(el) {
   document.querySelectorAll('#rm-fb-list .rm-radio').forEach(function(r){ r.classList.remove('selected'); });
@@ -3332,7 +3337,8 @@ function rmUpdateCount() {
   if (btn) { btn.disabled = n === 0; btn.style.opacity = n === 0 ? '.5' : '1'; btn.style.cursor = n === 0 ? 'not-allowed' : 'pointer'; }
   // 크레딧 = AI 채점 1회당 학생 1명 1개 (26-08-28 회의 확정 — 사후 확인 모델)
   var credit = document.getElementById('rm2-credit');
-  if (credit) credit.innerHTML = '<span>AI 크레딧 <strong>' + n + '</strong>개가 차감돼요.</span>';
+  if (credit) credit.innerHTML = '<span class="rm-credit"><i data-lucide="bot" style="width:14px;height:14px"></i>AI 크레딧 <strong>' + n + '개</strong> 사용<span class="sub">· 잔여 900개</span></span>';
+  if (credit && typeof lucide !== 'undefined') lucide.createIcons();
 }
 function rmExec() {
   var n = RUN_STUDENTS.filter(function(s){ return !rmIsDisabled(s) && s.checked; }).length;
