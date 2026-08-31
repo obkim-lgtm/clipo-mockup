@@ -61,6 +61,10 @@ body{background:#fff;color:#222631;overflow:hidden;height:100vh}
 .icon-btn-circle:hover{background:#d6e6ff;border-color:#365eef}
 
 /* ══════ 메인 영역 ══════ */
+/* 채점 중 — 실행 버튼 자리에 도는 스피너 */
+.cta-spinner{width:14px;height:14px;border:2px solid rgba(255,255,255,.45);border-top-color:#fff;border-radius:50%;animation:spin .7s linear infinite;flex-shrink:0}
+.empty-state-cta.running{opacity:.75;cursor:default;pointer-events:none}
+@keyframes spin{to{transform:rotate(360deg)}}
 /* 좌측 인식 결과 패널의 빈 상태 */
 .ve-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;text-align:center;padding:80px 24px;color:#3b3f4c}
 .ve-empty-ic{width:56px;height:56px;border-radius:14px;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0}
@@ -3576,6 +3580,23 @@ function renderViewerEmpty(kind){
   }
   if(typeof lucide!=='undefined') lucide.createIcons();
 }
+function applyRunningUI(){
+  // 채점 중 = 채점 전 화면 그대로. 실행 버튼만 잠그고 스피너를 돌린다.
+  document.querySelectorAll('.empty-state-title').forEach(function(t){
+    t.textContent = 'AI가 채점하고 있어요';   // '아직 실행하지 않았어요'는 스피너와 모순
+  });
+  document.querySelectorAll('.empty-state-sub').forEach(function(t){
+    t.textContent = '채점이 끝나면 채점 근거와 피드백을 볼 수 있어요.';
+  });
+  document.querySelectorAll('.empty-state-cta').forEach(function(b){
+    b.classList.add('running');
+    b.innerHTML = '<span class="cta-spinner"></span>채점 중';
+    b.removeAttribute('onclick');
+  });
+  var rerunBtn = document.querySelector('.btn-rerun-text'); if(rerunBtn) rerunBtn.style.display = 'none';
+  var ed = document.getElementById('ocrEditBtn'); if(ed) ed.classList.add('ve-ctrl-off');
+  var chk = document.getElementById('veSolveCheck'); if(chk) chk.classList.add('ve-ctrl-off');
+}
 function applyCaseUI(kind){
   renderViewerEmpty(kind);   // 배너 없음 — 좌측 빈 상태가 이미 같은 말을 한다
 }
@@ -3627,6 +3648,10 @@ var _isHistory = _curStudent && _curStudent.history === true;
 var _noTranscript = false; // 미채점·채점 실패: OCR 미실행 → 전사 텍스트 없음 (원본만)
 if(_isNotSubmitted){
   applyNotSubmittedUI();
+} else if(_curStudent && _curStudent.running){
+  applyNotGradedUI();      // 채점 전과 같은 화면
+  applyViewerNoTranscript();
+  applyRunningUI();        // 실행 버튼 잠금 + 스피너
 } else if(_curStudent && _curStudent.ocrCase){
   // 인식 실패·정확도 낮음 — 상단 배너 + 좌측 빈 상태. 우측 점수·루브릭 AI 는 살려 둔다 (HIAI 구조)
   applyNotGradedUI();
