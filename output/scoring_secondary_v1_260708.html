@@ -1885,7 +1885,6 @@ function syncSelectedStudent(){
   var sh = '';
   if(s.statusCls==='need') sh='<span class="st-status-need">('+s.status+')</span>';
   else if(s.statusCls==='fail') sh='<span class="st-status-fail">('+s.status+')</span>';
-  else if(s.ocrReview) sh='<span style="color:#ea580c;font-weight:700;margin-left:6px;">●</span>';
   else if(s.statusCls==='stale') sh='<span class="st-status-stale">('+s.status+')</span>';
   else if(s.statusCls==='done') sh='<span class="st-status-done">('+s.status+')</span>';
   else if(s.status) sh='<span style="color:#6d7381;font-weight:400;font-size:14px;margin-left:6px">('+s.status+')</span>';
@@ -2330,6 +2329,10 @@ function doRerunAi(mode){
     // 결과 카드 렌더링 (채점전이었으면 empty state → 결과로 전환)
     renderInstructionCards();
     renderElementCards();
+    if (typeof renderRubricGrounds === 'function') renderRubricGrounds();   // 근거는 점수 칩 아래에 있다
+    // 파일 교체 배너 해소 — 새 파일로 다시 채점했으므로
+    if (_curStudent) _curStudent.stale = false;
+    var _sbDone = document.getElementById('staleBanner'); if (_sbDone) _sbDone.style.display = 'none';
     // ★ 자동 selected 처리 안 함 — AI 예상점수는 빗금으로만 표시,
     //   교사가 확정하려면 점수 클릭 또는 [AI 점수 적용] 버튼 사용
     // autoSelectAiScores();
