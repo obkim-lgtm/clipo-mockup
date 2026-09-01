@@ -3180,7 +3180,7 @@ function closeCreateMenu() {
 document.addEventListener('click', function(){ closeCreateMenu(); });
 
 // ── AI 채점 실행 모달 (1/2 → 2/2) ──
-function openRmModal(id) { document.getElementById(id).classList.add('open'); if(id==='runModal1' && document.getElementById('rm-slider')) rmSliderInput(); lucide.createIcons(); }
+function openRmModal(id) { document.getElementById(id).classList.add('open'); if(id==='runModal1') rmRestoreSettings(); lucide.createIcons(); }
 function closeRmModal(id) { document.getElementById(id).classList.remove('open'); }
 // 채점 목록 학급 행의 'AI 채점' 칸 — 실행 후 '채점 중' 스피너를 그 자리에 표시
 var runCtxCell = null;
@@ -3212,6 +3212,11 @@ function rmSelectedCount() {
   return RUN_STUDENTS.filter(function(s){ return !rmIsDisabled(s) && s.checked; }).length;
 }
 
+// ── 채점 설정 기억 (실행 ↔ 재채점 공유) ──
+var SC_LEVEL_KEY = 'clipo_last_scoring_level';
+var SC_FB_KEY    = 'clipo_last_feedback_mode';
+function scGet(k, d){ try { var v = localStorage.getItem(k); return v === null ? d : parseInt(v, 10); } catch(e){ return d; } }
+function scSet(k, v){ try { localStorage.setItem(k, v); } catch(e){} }
 function rmSliderInput() {
   // 채운 구간을 값에 맞춰 다시 칠한다 (재채점 모달과 동일 방식)
   var el = document.getElementById('rm-slider');
@@ -3219,6 +3224,7 @@ function rmSliderInput() {
   el.style.background = 'linear-gradient(to right,#365eef 0%,#365eef ' + pct + '%,#dde1e8 ' + pct + '%,#dde1e8 100%)';
   var marks = document.querySelectorAll('.rm-slider-marks span');
   for (var i = 0; i < marks.length; i++) marks[i].style.color = (i === parseInt(el.value, 10)) ? '#365eef' : '#222631';
+  scSet(SC_LEVEL_KEY, el.value);
 }
 function rmSetLevel(v) {
   var el = document.getElementById('rm-slider');
@@ -3226,8 +3232,19 @@ function rmSetLevel(v) {
   rmSliderInput();
 }
 function rmSelectFb(el) {
-  document.querySelectorAll('#rm-fb-list .rm-radio').forEach(function(r){ r.classList.remove('selected'); });
-  el.classList.add('selected');
+  var items = document.querySelectorAll('#rm-fb-list .rm-radio');
+  for (var i = 0; i < items.length; i++) {
+    items[i].classList.toggle('selected', items[i] === el);
+    if (items[i] === el) scSet(SC_FB_KEY, i);
+  }
+}
+function rmRestoreSettings() {
+  // 마지막 선택 복원 — 재채점 모달과 같은 값을 쓴다
+  var sl = document.getElementById('rm-slider');
+  if (sl) { sl.value = scGet(SC_LEVEL_KEY, 1); rmSliderInput(); }
+  var items = document.querySelectorAll('#rm-fb-list .rm-radio');
+  var fb = scGet(SC_FB_KEY, 2);
+  for (var i = 0; i < items.length; i++) items[i].classList.toggle('selected', i === fb);
 }
 
 // 명단 = OCR 상세(STUDENTS_B1)·채점 상세(STUDENT_LIST)와 동일한 김서윤 14명 세트. typing 5명(정현우·한지우·임도윤·김도현·노유찬) 일치.

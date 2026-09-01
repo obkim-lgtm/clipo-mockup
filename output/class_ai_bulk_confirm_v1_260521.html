@@ -46,6 +46,16 @@ body{background:#f6f7f9;color:#222631;min-height:100vh}
 .page-header{display:flex;flex-direction:column;gap:8px}
 .btn-back{display:inline-flex;align-items:center;gap:4px;font-size:15px;font-weight:500;color:#3b3f4c;background:none;border:none;cursor:pointer;padding:0;line-height:1;font-family:inherit;align-self:flex-start;margin-bottom:6px}
 .btn-back:hover{color:#222631}
+/* 재채점 필요 안내 — 과제물 교체 후 미재채점 학생이 있을 때만 (26-09-01) */
+.stale-warn{display:none;gap:12px;background:#fff7ed;border:1px solid #fdba74;border-radius:12px;padding:18px 20px;margin-bottom:20px}
+.stale-warn.show{display:flex}
+.stale-warn-ic{color:#ea580c;flex-shrink:0;margin-top:1px}
+.stale-warn-body{display:flex;flex-direction:column;gap:8px;min-width:0;flex:1}
+.stale-warn-title{font-size:16px;font-weight:700;color:#c2410c;line-height:1.5}
+.stale-warn-text{font-size:14px;color:#3b3f4c;line-height:1.7}
+.stale-warn-names{display:flex;flex-wrap:wrap;gap:6px}
+.stale-warn-name{display:inline-flex;align-items:center;height:26px;padding:0 10px;border-radius:100px;background:#fff;border:1px solid #fdba74;color:#9a3412;font-size:13px;font-weight:600;line-height:1}
+tr.row-stale{background:#fffbf5}
 .page-title{font-size:22px;font-weight:700;color:#222631;line-height:1.3}
 .page-desc{font-size:14px;color:#3b3f4c;line-height:1.55}
 
@@ -185,6 +195,16 @@ body{background:#f6f7f9;color:#222631;min-height:100vh}
       <p class="page-desc">AI 채점 결과를 검토한 뒤, 선택한 학생에게 AI 점수를 한 번에 적용합니다. 학생마다 직접 입력하지 않아도 됩니다.</p>
     </div>
 
+    <!-- 과제물 교체 후 미재채점 학생 경고 (해당자 있을 때만) -->
+    <div class="stale-warn" id="staleWarn">
+      <i data-lucide="alert-triangle" class="stale-warn-ic" style="width:20px;height:20px"></i>
+      <div class="stale-warn-body">
+        <span class="stale-warn-title" id="staleWarnTitle">과제물이 바뀐 뒤 다시 채점하지 않은 학생이 있습니다.</span>
+        <span class="stale-warn-text">지금 점수를 적용하면 <strong>이전 파일 기준 점수</strong>로 확정됩니다. 아래 학생은 다시 채점한 뒤 적용해 주세요.</span>
+        <div class="stale-warn-names" id="staleWarnNames"></div>
+      </div>
+    </div>
+
     <!-- 점수 표 카드 -->
     <section class="card">
       <div class="card-hd">
@@ -231,7 +251,7 @@ body{background:#f6f7f9;color:#222631;min-height:100vh}
 var STUDENTS = [
   {id:'10101', name:'김두나',   status:'완료', e1:8, e2:16, e3:8,   ground:'현재에 대해서는 기사 형식을 일부 차용하고 출처를 제시하며 냉동인간 관련 연구와 공동 연구 상황을 언급하고 있음. 과거에 대해서는 사례 1건과 연도를 명시했으나, 미래 예측은 다소 일반적인 표현에 머무름.', feedback:'과거 사례와 전문가 의견을 통해 주제의 배경을 잘 제시하고 미래 예측에 구체적인 연도와 기술 발전 속도를 활용한 점이 인상적입니다. 다만 미래 예측을 좀 더 구체적인 시나리오로 표현해 보면 좋겠어요.'},
   {id:'10102', name:'김세나',   status:'완료', e1:10, e2:18, e3:8,  ground:'과거 부분에서 IMF 외환위기, 카드대란, 글로벌 금융위기 등 여러 시점을 언급하며 연도와 자살률 수치(인구 10만 명당 31.7명 등)를 정확히 제시. 미래 예측에서는 자살률 추이와 관련 기관 변화를 근거 있게 상상.', feedback:'과거와 현재의 변화를 구체적인 수치와 사건으로 잘 서술하고 미래 자살률과 관련 기관 증가를 근거 있게 상상한 점이 매우 인상적입니다.'},
-  {id:'10103', name:'김하나',   status:'완료', e1:8, e2:16, e3:8,   ground:'현재 음악 직업의 수익 구조와 직업별 위상에 대해 기사 형식의 출처를 제시하며 기술하고 있음. 또한 과거 사례로 2016년, 2018년의 변화를 제시하고 미래의 가능성을 구분함.', feedback:'현재와 과거 사례를 나누어 설명하고 미래의 가능성을 구분한 점에서 글의 구조가 잘 잡혀 있습니다. 다만, 기사나 통계의 구체적인 수치 인용을 더 보강하면 좋겠어요.'},
+  {id:'10103', name:'김하나',   status:'완료', stale:true, e1:8, e2:16, e3:8,   ground:'현재 음악 직업의 수익 구조와 직업별 위상에 대해 기사 형식의 출처를 제시하며 기술하고 있음. 또한 과거 사례로 2016년, 2018년의 변화를 제시하고 미래의 가능성을 구분함.', feedback:'현재와 과거 사례를 나누어 설명하고 미래의 가능성을 구분한 점에서 글의 구조가 잘 잡혀 있습니다. 다만, 기사나 통계의 구체적인 수치 인용을 더 보강하면 좋겠어요.'},
   {id:'10104', name:'샘플학생4', status:'완료', e1:10, e2:18, e3:8, ground:'미래 예측 시나리오에서 AI를 활용한 신약개발로 정확하고 신속한 치료, 항암제 개발, 불치병 치료 가능성 등 긍정적 전망이 제시됨. 다만 부정적 측면과 윤리적 쟁점 다루기는 부족.', feedback:'과거와 미래 사례를 통해 신약개발 기술 발전에 대한 전반적인 이해를 잘 보여주었으나, 각 사례가 기술 발전 흐름과 어떻게 연결되는지 좀 더 명확하게 다루어 주면 좋겠어요.'},
   {id:'10105', name:'샘플학생5', status:'완료', e1:10, e2:18, e3:8, ground:'현재 모습에 대해서는 청소년 운동 부족 실태, 원인(학업, 스마트폰 사용)과 VR 스포츠의 효과를 기사와 통계 자료, 출처를 인용하여 자세히 제시함.', feedback:'학생은 과거와 현재 청소년의 운동 환경을 구체적인 사례와 자료로 비교하며 주제를 명확히 전달하는 능력이 뛰어납니다. 또한 VR 스포츠 효과의 통계 인용이 신뢰도를 높였어요.'},
   {id:'10106', name:'샘플학생6', status:'완료', e1:8, e2:16, e3:8,  ground:'스마트 병원, 소프트웨어 의료기기, 원격 중환자실 등 현재 의료 분야의 모습에 대한 기사 내용을 간단히 요약하고, 코로나19 시기 비대면 의료 사례를 제시.', feedback:'현재 의료 분야에 대한 기본적인 이해와 미래 방향성 제시는 잘 이루어졌으나, 과거와 현재를 비교하는 구체적 자료와 통계 인용이 부족합니다.'},
@@ -244,13 +264,26 @@ var STUDENTS = [
 // 모든 학생 default 선택
 STUDENTS.forEach(function(s){ s.checked = true; });
 
+// ══════ 과제물 교체 후 미재채점 경고 (A안) ══════
+// 조건 = 선택된 학생 중 stale 이 있을 때만. 없으면 아무것도 뜨지 않는다.
+function updateStaleWarn(){
+  var list = STUDENTS.filter(function(s){ return s.stale && s.checked; });
+  var box = document.getElementById('staleWarn');
+  if(!box) return;
+  box.classList.toggle('show', list.length > 0);
+  if(!list.length) return;
+  document.getElementById('staleWarnTitle').textContent =
+    '과제물이 바뀐 뒤 다시 채점하지 않은 학생이 ' + list.length + '명 있습니다.';
+  document.getElementById('staleWarnNames').innerHTML =
+    list.map(function(s){ return '<span class="stale-warn-name">' + s.id + ' ' + s.name + '</span>'; }).join('');
+}
 function totalOf(s){ return s.e1 + s.e2 + s.e3; }
 
 function renderTable(){
   var tbody = document.getElementById('studentTbody');
   tbody.innerHTML = STUDENTS.map(function(s, idx){
     var checkClass = 'tbl-checkbox' + (s.checked ? ' checked' : '');
-    return '<tr>'
+    return '<tr class="' + (s.stale ? 'row-stale' : '') + '">'
       +'<td class="col-check"><span class="'+checkClass+'" onclick="toggleStudent('+idx+',this)"><i data-lucide="check" style="width:13px;height:13px"></i></span></td>'
       +'<td class="col-id">'+s.id+'</td>'
       +'<td class="col-name" style="text-align:left;padding-left:14px">'+s.name+'</td>'
@@ -287,6 +320,7 @@ function updateSelectedCount(){
   var btn = document.getElementById('btnConfirm');
   btn.disabled = (n === 0);
   document.getElementById('btnLabel').textContent = '선택한 ' + n + '명 점수 적용';
+  updateStaleWarn();
 }
 
 // 진입 경로 (?from=) 활용 — 도장 아이콘 누른 학생 채점 상세로 정확히 복귀
