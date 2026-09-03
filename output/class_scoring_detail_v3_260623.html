@@ -663,7 +663,9 @@ var STUDENTS = [
   {id:'10111', name:'김도현', aiStatus:'채점 실패', aiScore:'-', finalScore:'-', status:'미채점', statusCls:'todo', scoreFail:true, ocrDone:true, link:'scoring_secondary_v1_260708.html'},  // 인식은 됐고 채점만 실패
   {id:'10112', name:'송하림', aiStatus:'채점 완료', aiScore:54, finalScore:54, status:'완료', statusCls:'done', stale:true, link:'scoring_secondary_v1_260708.html'},              // 과제물 파일 교체 — 신호는 학생 상세 배너만
   {id:'10113', name:'노유찬', aiStatus:'채점 완료', aiScore:54, finalScore:54, status:'완료', statusCls:'done', legacy:true, link:'scoring_secondary_v1_260708.html'},           // 업데이트 전 채점 — 인식 결과 없음
-  {id:'10114', name:'백시우', aiStatus:'채점 실패', aiScore:'-', finalScore:'-', status:'미채점', statusCls:'todo', scoreFail:true, ocrFail:true, link:'scoring_secondary_v1_260708.html'}   // 인식 실패 → 채점 실패
+  {id:'10114', name:'백시우', aiStatus:'채점 실패', aiScore:'-', finalScore:'-', status:'미채점', statusCls:'todo', scoreFail:true, ocrFail:true, link:'scoring_secondary_v1_260708.html'},   // 인식 실패 → 채점 실패
+  {id:'10115', name:'오세진', aiStatus:'채점 완료', aiScore:52, finalScore:52, status:'완료', statusCls:'done', questionChanged:true, link:'scoring_secondary_v1_260708.html'},   // 채점 뒤 문항 변경 — 신호는 학생 상세 배너만
+  {id:'10116', name:'류지안', aiStatus:'채점 완료', aiScore:44, finalScore:'-', status:'확인 필요', statusCls:'need', selfGrade:true, link:'scoring_secondary_v1_260708.html'}   // 직접 채점(AI 제외) — AI 채점 대상 아님
 ];
 
 // ══════ 정렬 드롭다운 (개발 시안 1104:21045 — 헤더 클릭 정렬 폐지) ══════
@@ -753,20 +755,22 @@ function rmRestoreSettings() {
 }
 // 명단 = 위 STUDENTS 표·학생 채점 상세와 동일한 14명. 직접 입력 3명(정현우·한지우·임도윤).
 var RUN_STUDENTS = [
-  { id:'10101', name:'김서윤', ai:'-',    t:'미채점',   checked:true,  method:'file',   file:'10101_미래시나리오.pdf' },
-  { id:'10102', name:'이준호', ai:'fail', t:'확인 필요', checked:true,  method:'file',   file:'10102_미래시나리오.pdf' }, // 이전 채점 실패 → 재채점 대상
-  { id:'10103', name:'박지민', ai:'-',    t:'미채점',   checked:false, method:'file', file:'10103_미래시나리오.pdf' }, // 인식 완료 · 미채점
-  { id:'10104', name:'최유진', ai:'-',    t:'미채점',   checked:true,  method:'file',   file:'10104_미래시나리오.pdf' },
+  { id:'10101', name:'김서윤', ai:'-',    t:'완료',     checked:false, method:'file',   file:'10101_미래시나리오.pdf' },
+  { id:'10102', name:'이준호', ai:'-',    t:'확인 필요', checked:true,  method:'file',   file:'10102_미래시나리오.pdf' }, // 채점됨 + 인식 불확실
+  { id:'10103', name:'박지민', ai:'-',    t:'확인 필요', checked:true,  method:'file', file:'10103_미래시나리오.pdf' }, // 인식 수정 후 미재채점
+  { id:'10104', name:'최유진', ai:'-',    t:'확인 필요', checked:true,  method:'file',   file:'10104_미래시나리오.pdf' },
   { id:'10105', name:'정현우', ai:'-',    t:'미채점',   checked:true,  method:'typing' },
-  { id:'10106', name:'한지우', ai:'-',    t:'미채점',   checked:true,  method:'typing' },
+  { id:'10106', name:'한지우', ai:'-',    t:'완료',     checked:false, method:'typing' },
   { id:'10107', name:'조민재', ai:'-',    t:'완료',     checked:false, method:'file', file:'10107_미래시나리오.pdf' }, // 채점 완료 = 인식 완료
   { id:'10108', name:'윤하은', ai:'-',    t:'미채점',   checked:true,  method:'file',   file:'10108_미래시나리오.pdf' },
-  { id:'10109', name:'임도윤', ai:'-',    t:'미채점',   checked:true,  method:'typing' },
-  { id:'10110', name:'신예린', ai:'absent', t:'미채점', absent:true,   method:'file',   file:'-' }, // 미제출 → 채점·인식 대상 제외
+  { id:'10109', name:'임도윤', ai:'absent', t:'미채점', absent:true,   method:'typing' }, // 미제출 → 채점 대상 제외,
+  { id:'10110', name:'신예린', ai:'-',    t:'미채점',   checked:true,  method:'file',   file:'10110_미래시나리오.pdf' }, // 제출했고 아직 채점 전
   { id:'10111', name:'김도현', ai:'-',    t:'미채점',   checked:true,  method:'file',   file:'10111_미래시나리오.pdf' },
   { id:'10112', name:'송하림', ai:'-',    t:'완료',     checked:false, method:'file', file:'10112_미래시나리오.pdf' }, // 채점 완료 = 인식 완료
-  { id:'10113', name:'노유찬', ai:'-',    t:'미채점',   checked:true,  method:'file',   file:'10113_미래시나리오.pdf' },
-  { id:'10114', name:'백시우', ai:'-',    t:'미채점',   checked:true,  method:'file',   ocrfail:true, file:'10114_미래시나리오.pdf' } // 인식 실패 → 다시 채점하면 인식도 재실행됨 (26-08-28)
+  { id:'10113', name:'노유찬', ai:'-',    t:'완료',     checked:false, method:'file',   file:'10113_미래시나리오.pdf' },
+  { id:'10114', name:'백시우', ai:'fail', t:'미채점',   checked:true,  method:'file',   ocrfail:true, file:'10114_미래시나리오.pdf' }, // 인식 실패 → 채점 실패. 다시 채점하면 인식도 재실행
+  { id:'10115', name:'오세진', ai:'-',    t:'완료',     checked:false, method:'file',   file:'10115_미래시나리오.pdf' }, // 채점 뒤 문항 변경
+  { id:'10116', name:'류지안', ai:'-',    t:'미채점',   selfGradeFixed:true, method:'file', file:'10116_미래시나리오.pdf' } // 직접 채점(AI 제외)
 ];
 // 채점 대상 제외 규칙 — AI가 채점할 수 없거나(미제출·인식 실패·정확도 낮음),
 // 교사가 직접 채점하기로 한 학생. 모두 크레딧 차감 대상에서 빠진다.
