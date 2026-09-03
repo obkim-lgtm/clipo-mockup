@@ -3056,13 +3056,24 @@ function applyNotSubmittedUI(){
       '<div class="viewer-empty">'
       +'<div class="viewer-empty-card">'
       +'<i data-lucide="file-x-2" style="width:48px;height:48px;color:#9ca3af"></i>'
-      +'<div class="viewer-empty-title">과제 미제출</div>'
-      +'<div class="viewer-empty-sub">이 학생은 과제를 제출하지 않아<br>채점 자료가 없습니다.</div>'
+      +'<div class="viewer-empty-title">과제를 제출하지 않았어요</div>'
+      +'<div class="viewer-empty-sub">채점할 자료가 없어요.</div>'
       +'</div>'
       +'</div>';
   }
   // 뷰어 상단 페이지 정보 비활성화
   var pi = document.getElementById('viewerPageInfo'); if(pi) pi.textContent = '-';
+
+  // 볼 과제물이 없으니 탭 전환·인식 결과 수정도 잠근다
+  _noTranscript = true;
+  ['ve-tab-orig','ve-tab-text','ocrEditBtn'].forEach(function(id){
+    var el = document.getElementById(id);
+    if(el){ el.classList.add('ve-ctrl-off'); el.title = '과제를 제출하지 않아 볼 내용이 없어요'; }
+  });
+  var solveChk = document.getElementById('veSolveCheck');
+  if(solveChk) solveChk.style.display = 'none';
+  var imgbar = document.getElementById('ve-imgbar');
+  if(imgbar) imgbar.style.display = 'none';
 
   // 상태 radio: '미제출' 두 번째 항목 선택
   document.querySelectorAll('.status-radios .radio-ring').forEach(function(r,i){
@@ -3747,7 +3758,7 @@ function applyCaseUI(kind){
 renderDropdown();
 syncSelectedStudent();
 var _curStudent = STUDENT_LIST[currentStudentIdx];
-var _isNotSubmitted = _curStudent && _curStudent.status === '미제출';
+var _isNotSubmitted = _curStudent && (_curStudent.unsubmitted === true || _curStudent.status === '미제출');   // 상태 라벨이 아니라 사실로 판정 (미제출은 '미채점'에 흡수됨)
 var _isNotGraded = _curStudent && _curStudent.status === '미채점';
 var _isFailed = _curStudent && _curStudent.status === '채점 실패';
 var _isLegacy = _curStudent && _curStudent.legacy === true;
