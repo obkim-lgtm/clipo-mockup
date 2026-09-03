@@ -3259,9 +3259,9 @@ var RUN_STUDENTS = [
   { id:'10108', name:'윤하은', ai:'-',    t:'미채점',   checked:true,  method:'file',   file:'10108_미래시나리오.pdf' },
   { id:'10109', name:'임도윤', ai:'-',    t:'미채점',   checked:true,  method:'typing' },
   { id:'10110', name:'신예린', ai:'absent', t:'미채점', absent:true,   method:'file',   file:'-' }, // 미제출 → 채점·인식 대상 제외
-  { id:'10111', name:'김도현', ai:'-',    t:'미채점',   checked:true,  method:'typing' },
+  { id:'10111', name:'김도현', ai:'-',    t:'미채점',   checked:true,  method:'file',   file:'10111_미래시나리오.pdf' },
   { id:'10112', name:'송하림', ai:'-',    t:'완료',     checked:false, method:'file', file:'10112_미래시나리오.pdf' }, // 채점 완료 = 인식 완료
-  { id:'10113', name:'노유찬', ai:'-',    t:'미채점',   checked:true,  method:'typing' },
+  { id:'10113', name:'노유찬', ai:'-',    t:'미채점',   checked:true,  method:'file',   file:'10113_미래시나리오.pdf' },
   { id:'10114', name:'백시우', ai:'-',    t:'미채점',   checked:true,  method:'file',   ocrfail:true, file:'10114_미래시나리오.pdf' } // 인식 실패 → 다시 채점하면 인식도 재실행됨 (26-08-28)
 ];
 // 채점 대상 제외 규칙 — AI가 채점할 수 없거나(미제출·인식 실패·정확도 낮음),
@@ -3307,7 +3307,10 @@ function _selfGradeFromSession(id) {
   } catch(_) { return false; }
 }
 function jumpToOcrBById(id) {
-  location.href = 'scoring_secondary_v1_260708.html?id=' + id; // 직접 채점 해제 = 학생 채점 상세 드로워에서
+  // 직접 채점 해제 = 학생 채점 상세 드로워에서. 이름까지 넘겨야 상세가 엉뚱한 학생으로 뜨지 않는다.
+  var s = RUN_STUDENTS.filter(function(x){ return x.id === id; })[0];
+  var f = (id === '10101') ? 'scoring_elementary_v3_260623.html' : 'scoring_secondary_v1_260708.html';
+  location.href = f + '?id=' + id + (s ? '&name=' + encodeURIComponent(s.name) : '');
 }
 function renderRunStudents() {
   // 직접 채점(전 문항 AI 제외) 학생은 채점 대상에서 제외 — 인식 결과 화면 토글에서 파생
@@ -4223,7 +4226,7 @@ function bmShowCase(key){
     studentDetail:'scoring_elementary_v3_260623.html?id=10101&name=' + enc('김서윤'),
     caseSecondaryCur:   'scoring_secondary_current_v1_260708.html',
     caseSecondaryInline:'scoring_secondary_v1_260708.html',
-    caseTyping:   'scoring_elementary_v3_260623.html?id=10105&name=' + enc('정현우')
+    caseTyping:   'scoring_secondary_v1_260708.html?id=10105&name=' + enc('정현우')
   };
   // 상세 화면에 들어가면 해당 케이스 목록으로 펼쳐지는 그룹들 (진입 항목은 그 화면에서 숨겨 라벨 중복 방지)
   var SURVEY_CASES = ['uploadSurvey','surveyFormat','surveyMatch','surveyOver'];

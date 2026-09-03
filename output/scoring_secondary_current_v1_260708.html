@@ -296,7 +296,8 @@ body.before-ai-rerun .score-btn.ai-suggest:hover{background:#f4f8ff;border-color
 .ec-level .ai-suggest-note{font-size:11px;font-weight:500;color:#6d7381;margin-left:4px}
 .ec-level .ai-suggest-prefix{font-size:11px;font-weight:500;color:#6d7381;margin-right:4px}
 .ec-summary{flex:1;font-size:15px;font-weight:600;color:#222631;line-height:1.4}
-/* 문항 제목 1줄 말줄임 + 호버 시 전체 텍스트 디자인 툴팁(블랙,.ec-summary-wrap{flex:1;min-width:0;position:relative;display:flex}
+/* 문항 제목 1줄 말줄임 + 호버 시 전체 텍스트 디자인 툴팁(블랙, 340px) */
+.ec-summary-wrap{flex:1;min-width:0;position:relative;display:flex}
 #pane-instruction .ec-summary-wrap>.ec-summary,#pane-rubric .ec-summary-wrap>.ec-summary{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .ec-summary-tip{position:absolute;left:0;bottom:calc(100% + 8px);background:#222631;color:#fff;font-size:13px;line-height:1.5;font-weight:500;padding:8px 12px;border-radius:8px;max-width:340px;opacity:0;visibility:hidden;transition:opacity .15s,visibility .15s;z-index:1100;pointer-events:none;box-shadow:0 4px 16px rgba(0,0,0,.25);text-align:left;white-space:normal}
 .ec-summary-tip::after{content:"";position:absolute;top:100%;left:16px;border:5px solid transparent;border-top-color:#222631}
@@ -542,6 +543,8 @@ body.before-ai-rerun .score-btn.ai-suggest:hover{background:#f4f8ff;border-color
 .sd-status.fail{color:#db3e51}
 .sd-status.stale{color:#c2410c}
 .sd-status.none{color:#6d7381}
+.sd-status.todo{color:#ea580c}
+.sd-status.running{color:#3151c4}
 
 /* ══════ 모달 ══════ */
 .modal-overlay{position:fixed;inset:0;background:rgba(34,38,49,.5);display:none;align-items:center;justify-content:center;z-index:1000;padding:24px}
@@ -1846,14 +1849,14 @@ var STUDENT_LIST = [
   {id:'10106', name:'한지우', status:'완료',    statusCls:'done', method:'typing'},                  // 직접 입력 · 채점 완료
   {id:'10107', name:'조민재', status:'완료',    statusCls:'done'},                                   // 완료(교사 조정)
   {id:'10108', name:'윤하은', status:'채점 중',  statusCls:'todo', running:true},                     // AI 채점 진행 중
-  {id:'10109', name:'임도윤', status:'미채점',  statusCls:'todo', unsubmitted:true},                 // 미제출이지만 채점 대상 → 상태는 미채점
+  {id:'10109', name:'임도윤', status:'미채점',  statusCls:'todo', method:'typing', unsubmitted:true},                 // 미제출이지만 채점 대상 → 상태는 미채점
   {id:'10110', name:'신예린', status:'미채점',  statusCls:'todo'},                                    // 미채점 (사후 모델 — 채점 전 인식 없음)
   {id:'10111', name:'김도현', status:'미채점',  statusCls:'todo', scoreFail:true},                   // AI 채점 실패 → 아직 미채점
   {id:'10112', name:'송하림', status:'완료',    statusCls:'done', stale:true},                       // 완료 + 재채점 권장
   {id:'10113', name:'노유찬', status:'완료',    statusCls:'done', legacy:true},                  // 업데이트 전 채점 — 인식 결과 없음
   {id:'10114', name:'백시우', status:'미채점',  statusCls:'todo', ocrCase:'failed'}                  // 인식 실패 → 직접 채점
 ];
-var BASE_FILE = 'scoring_elementary_rubric_v1_260702.html';
+var BASE_FILE = 'scoring_secondary_current_v1_260708.html';
 var currentStudentIdx = STUDENT_LIST.findIndex(function(s){ return s.id === studentId; });
 if (currentStudentIdx < 0) currentStudentIdx = 0;
 
@@ -4040,7 +4043,7 @@ function goDemoScoring(n){
     studentDetail:'scoring_elementary_v3_260623.html?id=10101&name=' + enc('김서윤'),
     caseSecondaryCur:   'scoring_secondary_current_v1_260708.html',
     caseSecondaryInline:'scoring_secondary_v1_260708.html',
-    caseTyping:   'scoring_elementary_v3_260623.html?id=10105&name=' + enc('정현우')
+    caseTyping:   'scoring_secondary_current_v1_260708.html?id=10105&name=' + enc('정현우')
   };
   // 상세 화면에 들어가면 해당 케이스 목록으로 펼쳐지는 그룹들 (진입 항목은 그 화면에서 숨겨 라벨 중복 방지)
   var SURVEY_CASES = ['uploadSurvey','surveyFormat','surveyMatch','surveyOver'];
