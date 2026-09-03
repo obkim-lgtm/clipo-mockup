@@ -1144,12 +1144,6 @@ body.vs-hide-topbar .vs-float{display:inline-flex}
       <span style="font-size:14px;color:#3b3f4c;line-height:1.6;flex:1;"><strong style="color:#b91c1c;">인식 정확도가 낮아요.</strong> AI가 답안을 제대로 읽지 못해 점수가 낮게 나왔을 수 있어요. 원본 제출물과 비교해 확인해 주세요.</span>
       <button onclick="switchViewer('orig')" style="display:inline-flex;align-items:center;justify-content:center;line-height:1;gap:5px;height:32px;padding:0 12px;background:#fff;border:1px solid #fecaca;border-radius:100px;color:#b91c1c;font-family:inherit;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap;"><i data-lucide="file-image" style="width:13px;height:13px;"></i>원본 보기</button>
     </div>
-    <!-- 채점 뒤 문항 구성이 바뀜 — 파일 교체와 같은 성질(점수가 지금 문항과 안 맞음) -->
-    <div id="qChangedBanner" style="display:none;align-items:center;gap:10px;background:#fff7ed;border-bottom:1px solid #fed7aa;padding:14px 20px;">
-      <i data-lucide="refresh-cw" style="width:16px;height:16px;color:#ea580c;flex-shrink:0;"></i>
-      <span style="font-size:14px;color:#3b3f4c;line-height:1.6;flex:1;"><strong style="color:#c2410c;">문항이 바뀌었어요.</strong> 지금 점수는 바뀌기 전 문항 기준이에요.</span>
-      <button onclick="ocrRerunNow()" style="display:inline-flex;align-items:center;justify-content:center;line-height:1;gap:5px;height:32px;padding:0 12px;background:#fff;border:1px solid #fed7aa;border-radius:100px;color:#ea580c;font-family:inherit;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap;"><i data-lucide="rotate-cw" style="width:13px;height:13px;"></i>다시 채점</button>
-    </div>
     <div id="ocrEditedBanner" style="display:none;align-items:center;gap:10px;background:#fff7ed;border-bottom:1px solid #fed7aa;padding:14px 20px;">
       <i data-lucide="refresh-cw" style="width:16px;height:16px;color:#ea580c;flex-shrink:0;"></i>
       <span style="font-size:14px;color:#3b3f4c;line-height:1.6;flex:1;"><strong style="color:#c2410c;">인식 결과를 고쳤어요.</strong> 지금 점수는 고치기 전 답안 기준이에요.</span>
@@ -1884,7 +1878,6 @@ var STUDENT_LIST = [
   {id:'10112', name:'송하림', status:'완료',    statusCls:'done', stale:true},                       // 완료 + 재채점 권장
   {id:'10113', name:'노유찬', status:'완료',    statusCls:'done', legacy:true},                  // 업데이트 전 채점 — 인식 결과 없음
   {id:'10114', name:'백시우', status:'미채점',  statusCls:'todo', ocrCase:'failed'},                 // 인식 실패 → 채점 실패
-  {id:'10115', name:'오세진', status:'완료',    statusCls:'done', questionChanged:true},         // 채점 뒤 문항이 바뀜 — 재채점 유도
   {id:'10116', name:'류지안', status:'확인 필요', statusCls:'need', selfGrade:true}                // 직접 채점(AI 제외)으로 지정됨
 ];
 var BASE_FILE = 'scoring_secondary_v1_260708.html';
@@ -3755,7 +3748,6 @@ updateShareBtnState();
 updatePreviewBtnState();
 applyOcrReviewNotice();
 if (_curStudent && _curStudent.ocrLowAcc) { var _lb = document.getElementById('lowAccBanner'); if (_lb) _lb.style.display = 'flex'; }
-if (_curStudent && _curStudent.questionChanged) { var _qb = document.getElementById('qChangedBanner'); if (_qb) _qb.style.display = 'flex'; }
 if (_curStudent && _curStudent.ocrEdited) { var _eb = document.getElementById('ocrEditedBanner'); if (_eb) _eb.style.display = 'flex'; }
 if (_curStudent && _curStudent.stale) { var _sb = document.getElementById("staleBanner"); if (_sb) _sb.style.display = "flex"; }
 applySelfGradeNotice();   // 맨 뒤 — 직접 채점이면 위 재채점 안내를 도로 감춘다   // 우측 패널 상단 (인식 불확실 안내와 같은 자리)
@@ -3822,7 +3814,7 @@ function applySelfGradeNotice(){
   // 직접 채점 중에는 재채점 유도 안내를 띄우지 않는다.
   // 'AI 채점에서 뺐다'와 '다시 채점하세요'가 한 화면에 같이 있으면 서로 모순이다.
   if(on){
-    ['ocrReviewNotice','ocrEditedBanner','qChangedBanner','staleBanner'].forEach(function(id){
+    ['ocrReviewNotice','ocrEditedBanner','staleBanner'].forEach(function(id){
       var b = document.getElementById(id);
       if(b) b.style.display = 'none';
     });
