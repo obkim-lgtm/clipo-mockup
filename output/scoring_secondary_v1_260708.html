@@ -147,6 +147,11 @@ body.hide-solve .ocr-ans-box[data-solve]{display:none}
 .ocr-drawer-cancel:hover{border-color:#a3c3ff;color:#365eef}
 .ocr-drawer-save{display:inline-flex;align-items:center;justify-content:center;gap:6px;height:40px;padding:0 18px;border-radius:100px;background:#416bff;border:none;color:#fff;font-size:15px;font-weight:600;cursor:pointer;font-family:inherit;line-height:1}
 .ocr-drawer-save:hover{background:#365eef}
+.ocr-drawer-save:disabled{background:#e9ebef;color:#9ca3af;cursor:not-allowed}
+.ocr-drawer-save:disabled:hover{background:#e9ebef}
+/* AI 채점이 잠기면 [수정 저장]이 유일한 실행 버튼 — 채워진 버튼으로 승격 */
+.ocr-drawer-ft.ai-off .ocr-drawer-cancel.as-primary{background:#416bff;border-color:#416bff;color:#fff}
+.ocr-drawer-ft.ai-off .ocr-drawer-cancel.as-primary:hover{background:#365eef;border-color:#365eef;color:#fff}
 
 /* ══════ 총점 영역 ══════ */
 .total-score-section{display:flex;align-items:center;justify-content:space-between;padding:20px 24px;background:#fff;border-bottom:1px solid #eaecf0}
@@ -3681,7 +3686,24 @@ function openOcrEdit(){
   if(typeof _noTranscript!=='undefined' && _noTranscript){ showToast('warning','인식 결과는 AI 채점 실행 후 수정할 수 있어요.'); return; }
   if (typeof switchViewer === 'function') switchViewer('orig'); // 좌측을 원본 제출물로 고정해 비교
   document.getElementById('ocrDrawer').classList.add('open');
+  syncDrawerAiBtn();
   if (typeof lucide !== 'undefined') lucide.createIcons();
+}
+
+// 직접 채점(AI 제외) 상태를 드로워 하단 버튼에 반영한다.
+// 켜져 있으면 이 학생은 AI 채점 대상이 아니므로 [저장 후 AI 채점]을 잠근다.
+function syncDrawerAiBtn(){
+  var on = document.getElementById('drawer-selfgrade');
+  on = !!(on && on.checked);
+  var ft   = document.querySelector('.ocr-drawer-ft');
+  var save = document.querySelector('.ocr-drawer-save');
+  var edit = document.querySelector('.ocr-drawer-ft .ocr-drawer-cancel[onclick*="saveOcrEdit"]');
+  if(save){
+    save.disabled = on;
+    save.title = on ? '직접 채점으로 두면 AI 채점을 실행할 수 없어요. 위 설정을 끄면 실행할 수 있어요.' : '';
+  }
+  if(ft)   ft.classList.toggle('ai-off', on);
+  if(edit) edit.classList.toggle('as-primary', on);
 }
 function closeOcrEdit(){
   document.getElementById('ocrDrawer').classList.remove('open');
@@ -3708,6 +3730,7 @@ function toggleStudentExcludeDrawer(){
     if (on) { for (var i = 0; i < 5; i++) m[id][i] = true; }
     sessionStorage.setItem("clipo_ocr_exclude", JSON.stringify(m));
   } catch(_) {}
+  syncDrawerAiBtn();
   showToast(on ? "info" : "success", on ? "이 학생의 모든 문항을 선생님이 직접 채점해요. AI 채점에서 제외됩니다." : "AI 채점 대상으로 돌아왔어요.");
 }
 function openOcrRerunAsk(){
