@@ -163,9 +163,6 @@ body.hide-solve .ocr-ans-box[data-solve]{display:none}
 .ocr-drawer-save:hover{background:#365eef}
 .ocr-drawer-save:disabled{background:#e9ebef;color:#9ca3af;cursor:not-allowed}
 .ocr-drawer-save:disabled:hover{background:#e9ebef}
-/* AI 채점이 잠기면 [수정 저장]이 유일한 실행 버튼 — 채워진 버튼으로 승격 */
-.ocr-drawer-ft.ai-off .ocr-drawer-cancel.as-primary{background:#416bff;border-color:#416bff;color:#fff}
-.ocr-drawer-ft.ai-off .ocr-drawer-cancel.as-primary:hover{background:#365eef;border-color:#365eef;color:#fff}
 
 /* ══════ 총점 영역 ══════ */
 .total-score-section{display:flex;align-items:center;justify-content:space-between;padding:20px 24px;background:#fff;border-bottom:1px solid #eaecf0}
@@ -3898,11 +3895,11 @@ if(_isNotSubmitted){
 updateShareBtnState();
 updatePreviewBtnState();
 applyOcrReviewNotice();
-applySelfGradeNotice();
 if (_curStudent && _curStudent.ocrLowAcc) { var _lb = document.getElementById('lowAccBanner'); if (_lb) _lb.style.display = 'flex'; }
 if (_curStudent && _curStudent.questionChanged) { var _qb = document.getElementById('qChangedBanner'); if (_qb) _qb.style.display = 'flex'; }
 if (_curStudent && _curStudent.ocrEdited) { var _eb = document.getElementById('ocrEditedBanner'); if (_eb) _eb.style.display = 'flex'; }
-if (_curStudent && _curStudent.stale) { var _sb = document.getElementById("staleBanner"); if (_sb) _sb.style.display = "flex"; }   // 우측 패널 상단 (인식 불확실 안내와 같은 자리)
+if (_curStudent && _curStudent.stale) { var _sb = document.getElementById("staleBanner"); if (_sb) _sb.style.display = "flex"; }
+applySelfGradeNotice();   // 맨 뒤 — 직접 채점이면 위 재채점 안내를 도로 감춘다   // 우측 패널 상단 (인식 불확실 안내와 같은 자리)
 
 // 진행 칩 동적화 (포크 잔재 '7명 중' → 통일 명단 기준)
 (function(){
@@ -3960,8 +3957,17 @@ function readSelfGrade(){
   } catch(_) { return false; }
 }
 function applySelfGradeNotice(){
+  var on = readSelfGrade();
   var box = document.getElementById('selfGradeNotice');
-  if(box) box.style.display = readSelfGrade() ? 'flex' : 'none';
+  if(box) box.style.display = on ? 'flex' : 'none';
+  // 직접 채점 중에는 재채점 유도 안내를 띄우지 않는다.
+  // 'AI 채점에서 뺐다'와 '다시 채점하세요'가 한 화면에 같이 있으면 서로 모순이다.
+  if(on){
+    ['ocrReviewNotice','ocrEditedBanner','qChangedBanner','staleBanner'].forEach(function(id){
+      var b = document.getElementById(id);
+      if(b) b.style.display = 'none';
+    });
+  }
 }
 function restoreDrawerSelfGrade(){
   var t = document.getElementById('drawer-selfgrade');
@@ -3974,13 +3980,11 @@ function syncDrawerAiBtn(){
   on = !!(on && on.checked);
   var ft   = document.querySelector('.ocr-drawer-ft');
   var save = document.querySelector('.ocr-drawer-save');
-  var edit = document.querySelector('.ocr-drawer-ft .ocr-drawer-cancel[onclick*="saveOcrEdit"]');
   if(save){
     save.disabled = on;
     save.title = on ? '직접 채점으로 두면 AI 채점을 실행할 수 없어요. 위 설정을 끄면 실행할 수 있어요.' : '';
   }
-  if(ft)   ft.classList.toggle('ai-off', on);
-  if(edit) edit.classList.toggle('as-primary', on);
+  if(ft) ft.classList.toggle('ai-off', on);
 }
 function closeOcrEdit(){
   document.getElementById('ocrDrawer').classList.remove('open');
