@@ -1840,7 +1840,7 @@ var STUDENT_LIST = [
   {id:'10108', name:'윤하은', status:'채점 중',  statusCls:'todo', running:true},                     // AI 채점 진행 중
   {id:'10109', name:'임도윤', status:'미채점',  statusCls:'todo', method:'typing', unsubmitted:true},                 // 미제출이지만 채점 대상 → 상태는 미채점
   {id:'10110', name:'신예린', status:'미채점',  statusCls:'todo'},                                    // 미채점 (사후 모델 — 채점 전 인식 없음)
-  {id:'10111', name:'김도현', status:'미채점',  statusCls:'todo', scoreFail:true},                   // AI 채점 실패 → 아직 미채점
+  {id:'10111', name:'김도현', status:'미채점',  statusCls:'todo', scoreFail:true, ocrDone:true},    // 인식은 완료 · 채점만 실패 → 상태는 미채점
   {id:'10112', name:'송하림', status:'완료',    statusCls:'done', stale:true},                       // 완료 + 재채점 권장
   {id:'10113', name:'노유찬', status:'완료',    statusCls:'done', legacy:true},                  // 업데이트 전 채점 — 인식 결과 없음
   {id:'10114', name:'백시우', status:'미채점',  statusCls:'todo', ocrCase:'failed'}                  // 인식 실패 → 직접 채점
@@ -3523,7 +3523,7 @@ function applyFailedUI(){
   var errorHtml = '<div class="empty-state error">'
     +'<i data-lucide="alert-triangle" class="empty-state-icon" style="width:36px;height:36px"></i>'
     +'<div class="empty-state-title">AI 채점에 실패했어요</div>'
-    +'<div class="empty-state-sub">잠시 후 다시 시도해 주세요.</div>'
+    +'<div class="empty-state-sub">인식한 답안은 그대로 있어요. 다시 채점하면 그 내용으로 채점해요.</div>'
     +'<button class="empty-state-cta" onclick="rerunAi()"><i data-lucide="rotate-cw" style="width:16px;height:16px"></i>AI 채점 다시 시도</button>'
     +'</div>';
   document.getElementById('pane-instruction').innerHTML = errorHtml;
@@ -3623,6 +3623,9 @@ if(_isNotSubmitted){
   applyNotGradedUI();
   applyCaseUI(_curStudent.ocrCase);
   highlightRubricAi();
+} else if(_isNotGraded && _curStudent.scoreFail && _curStudent.ocrDone){
+  // 인식은 됐고 채점만 실패 — 인식 결과는 그대로 두고(수정도 가능), 우측만 실패 상태로
+  applyFailedUI();
 } else if(_isNotGraded){
   applyNotGradedUI();
   applyViewerNoTranscript();
