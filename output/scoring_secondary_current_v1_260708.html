@@ -3962,6 +3962,14 @@ function applyFormula(){
   closeFormulaModal();
 }
 
+// '학생 풀이와 답안 보기' 는 인식 결과 탭 전용. 원본 제출물 탭에선 감춘다.
+// 감출 때 오른쪽 정렬(margin-left:auto)을 '인식 결과 수정' 버튼이 이어받아 버튼이 밀리지 않게 한다.
+function applySolveCheckVisibility(isText){
+  var chk = document.getElementById('veSolveCheck');
+  var ed  = document.getElementById('ocrEditBtn');
+  if(chk) chk.style.display = isText ? 'inline-flex' : 'none';
+  if(ed)  ed.style.marginLeft = isText ? '12px' : 'auto';
+}
 function switchViewer(mode){
   if(mode==='text' && typeof _noTranscript!=='undefined' && _noTranscript){ showToast('warning','인식 결과는 AI 채점 실행 후 표시할 수 있어요.'); return; }
   var isText = (mode === 'text');
@@ -3976,9 +3984,11 @@ function switchViewer(mode){
   if (imgbar) imgbar.style.display = isText ? 'none' : 'flex';
   if (tText){ tText.style.background = isText ? '#fff' : 'transparent'; tText.style.color = isText ? '#3b3f4c' : '#cfd3da'; }
   if (tOrig){ tOrig.style.background = isText ? 'transparent' : '#fff'; tOrig.style.color = isText ? '#cfd3da' : '#3b3f4c'; }
+  applySolveCheckVisibility(isText);
   if (window.lucide) lucide.createIcons();
 }
-if(!_noTranscript) switchViewer(getViewerMode());
+if(_noTranscript) applySolveCheckVisibility(false);
+else switchViewer(getViewerMode());
 
 lucide.createIcons();
 </script>
