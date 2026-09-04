@@ -867,7 +867,7 @@ body.vs-hide-topbar .vs-float{display:inline-flex}
     <button class="sub-tab" onclick="location.href='question_tab_v1_260617.html'">활동지</button>
     <button class="sub-tab" onclick="location.href='task_ocr_v3_260623.html'">과제물 관리</button>
     <button class="sub-tab on" onclick="location.href='task_ocr_v3_260623.html#scoring'">채점</button>
-    <button class="sub-tab" onclick="showToast('success','세부능력 및 특기사항 지원은 준비 중입니다.')">세부능력 및 특기사항 지원</button>
+    <button class="sub-tab" onclick="showToast('success','세부능력 및 특기사항 지원은 준비 중이에요.')">세부능력 및 특기사항 지원</button>
   </div>
 </div>
 
@@ -1059,7 +1059,7 @@ body.vs-hide-topbar .vs-float{display:inline-flex}
   <div class="grading-panel">
     <div id="selfGradeBanner" style="display:none;align-items:flex-start;gap:10px;background:#f5f0ff;border-radius:10px;padding:12px 16px;margin-bottom:14px;">
       <i data-lucide="pen-line" style="width:16px;height:16px;color:#7c3aed;flex-shrink:0;margin-top:2px;"></i>
-      <span style="font-size:14px;color:#3b3f4c;line-height:1.6;">이 학생은 AI 채점 없이 <strong style="color:#7c3aed;">직접 채점</strong>해요. <a id="selfGradeBannerLink" href="#" style="color:#7c3aed;font-weight:600;">인식 결과 화면에서 해제 ›</a></span>
+      <span style="font-size:14px;color:#3b3f4c;line-height:1.6;">이 학생은 AI 채점 없이 <strong style="color:#7c3aed;">직접 채점</strong>해요. 점수와 피드백을 선생님이 직접 적어 주세요.</span>
     </div>
 
     <!-- 총점 -->
@@ -1839,7 +1839,7 @@ function syncSelectedStudent(){
 }
 function navStudent(dir){
   var next = currentStudentIdx+dir;
-  if(next<0||next>=STUDENT_LIST.length){ showToast('error',dir>0?'마지막 학생입니다.':'첫 번째 학생입니다.'); return; }
+  if(next<0||next>=STUDENT_LIST.length){ showToast('error',dir>0?'마지막 학생이에요.':'첫 번째 학생이에요.'); return; }
   selectStudent(next);
 }
 document.addEventListener('click',function(){ document.getElementById('studentDropdownList').classList.remove('show'); });
@@ -1868,7 +1868,7 @@ function resetScores(){
   scores = {}; updateTotal();
   if(typeof updateShareBtnState === 'function') updateShareBtnState();
   if(typeof updatePreviewBtnState === 'function') updatePreviewBtnState();
-  showToast('success','점수가 초기화되었습니다.');
+  showToast('success','점수를 초기화했어요.');
 }
 // 채점 완료 학생 진입 시: AI 추천 점수를 자동으로 selected 처리
 function autoSelectAiScores(){
@@ -1883,8 +1883,8 @@ function autoSelectAiScores(){
   });
   updateTotal();
 }
-function applyAiScores(){ showToast('success','AI 점수가 적용되었습니다.'); }
-function bulkSaveAiScores(){ showToast('success','AI 점수를 일괄 저장했습니다.'); }
+function applyAiScores(){ showToast('success','AI 점수를 적용했어요.'); }
+function bulkSaveAiScores(){ showToast('success','AI 점수를 일괄 저장했어요.'); }
 function updateTotal(){
   var sum=0, has=false;
   Object.keys(scores).forEach(function(k){ if(scores[k]){sum+=scores[k];has=true;} });
@@ -2107,7 +2107,7 @@ function notifyAutosave(){
   if(!hasScore){
     showToast('error', '점수 체크 후 저장해 주세요.');
   } else {
-    showToast('success', '저장되었습니다.');
+    showToast('success', '저장했어요.');
   }
 }
 
@@ -2171,7 +2171,7 @@ function saveInstructionEdit(){
   closeInstructionEditModal();
   renderInstructionCards();
   lucide.createIcons();
-  showToast('success', '문항 정보가 저장되었습니다.');
+  showToast('success', '문항 정보를 저장했어요.');
 }
 
 // ══════ 다시 채점 ══════
@@ -2253,7 +2253,7 @@ function confirmRerun(){
   doRerunAi('overwrite');
 }
 function doRerunAi(mode){
-  showToast('success', 'AI 채점을 실행합니다.');
+  showToast('success', 'AI 채점을 실행해요.');
   setTimeout(function(){
     // 채점 실행 완료 — 이후 [다시 채점]엔 덮어쓰기/이어쓰기 모드 선택 노출
     _hasGradedOnce = true;
@@ -2843,7 +2843,7 @@ function applyNotSubmittedUI(){
       +'<div class="viewer-empty-card">'
       +'<i data-lucide="file-x-2" style="width:48px;height:48px;color:#9ca3af"></i>'
       +'<div class="viewer-empty-title">과제 미제출</div>'
-      +'<div class="viewer-empty-sub">이 학생은 과제를 제출하지 않아<br>채점 자료가 없습니다.</div>'
+      +'<div class="viewer-empty-sub">이 학생은 과제를 제출하지 않아<br>채점 자료가 없어요.</div>'
       +'</div>'
       +'</div>';
   }
@@ -2972,7 +2972,7 @@ function confirmRubricAi(){
       if(dirtyEditable) preserved[idx] = dirtyEditable.innerHTML;
     });
   }
-  showToast('success', 'AI 피드백을 생성합니다.');
+  showToast('success', 'AI 피드백을 만들어요.');
   setTimeout(function(){
     renderRubricAiResult();
     if(mode === 'append'){
@@ -3539,7 +3539,7 @@ if(_isNotSubmitted){
 updateShareBtnState();
 updatePreviewBtnState();
 applyOcrReviewNotice();
-// ── 직접 채점(전 문항 AI 제외) 학생 배너 — 인식 결과 화면 토글에서 파생 (세션 공유) ──
+// ── 직접 채점(전 문항 AI 제외) 학생 배너 — 중고등 채점 상세 상단 토글에서 파생 (세션 공유) ──
 (function(){
   try {
     var m = JSON.parse(sessionStorage.getItem('clipo_ocr_exclude')) || {};
@@ -3548,7 +3548,6 @@ applyOcrReviewNotice();
     if (c >= 5) {
       var b = document.getElementById('selfGradeBanner');
       if (b) { b.style.display = 'flex'; }
-      var l = document.getElementById('selfGradeBannerLink');
     }
   } catch(_) {}
 })();
@@ -3596,7 +3595,7 @@ function closeOcrRerunAsk(){
 function ocrRerunNow(){
   document.getElementById('ocrRerunAskModal').classList.remove('show');
   if (typeof rerunAi === 'function') rerunAi(); // 기존 다시 채점 설정 모달로 연결
-  else showToast('loading','AI 채점을 다시 실행합니다.');
+  else showToast('loading','AI 채점을 다시 실행해요.');
 }
 
 // ══════ OCR 드로워: 문항별 인식 결과 인라인 편집 (task_ocr_inline_v1 이식) ══════

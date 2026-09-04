@@ -414,7 +414,7 @@ body.nav-expanded .main-wrap{ padding-left:200px; }
       <button class="sub-tab" onclick="location.href='question_tab_v1_260617.html'">활동지</button>
       <button class="sub-tab" onclick="location.href='task_ocr_v3_260623.html'">과제물 관리</button>
       <button class="sub-tab on">채점</button>
-      <button class="sub-tab" onclick="showToast('success','세부능력 및 특기사항 지원은 준비 중입니다.')">세부능력 및 특기사항 지원</button>
+      <button class="sub-tab" onclick="showToast('success','세부능력 및 특기사항 지원은 준비 중이에요.')">세부능력 및 특기사항 지원</button>
     </div>
   </div>
 
@@ -429,7 +429,7 @@ body.nav-expanded .main-wrap{ padding-left:200px; }
           <i data-lucide="chevron-left" style="width:18px;height:18px"></i>이전으로
         </button>
         <h1 class="page-title">1학년 1반 채점 현황</h1>
-        <p class="page-desc">{수행평가명} AI 채점 결과를 확인하고 점수를 확정하세요. 수정이 필요한 학생은 개별 조정할 수 있습니다</p>
+        <p class="page-desc">{수행평가명} AI 채점 결과를 확인하고 점수를 확정해 주세요. 수정이 필요한 학생은 개별 조정할 수 있어요.</p>
       </div>
       <button class="btn-download">
         <i data-lucide="download" style="width:18px;height:18px"></i>채점 결과 다운로드
@@ -812,7 +812,9 @@ function rmAiCell(s) {
   return '<span style="color:#6d7381;">-</span>';
 }
 function renderRunStudents() {
-  RUN_STUDENTS.forEach(function(s){ s.selfGrade = studentAllExcluded(s.id); });
+  // 상세 화면 토글로 켜고 끈 기록이 있으면 그것을, 없으면 명단 고정값을 쓴다
+  var _sgMap = {}; try { _sgMap = JSON.parse(sessionStorage.getItem('clipo_ocr_exclude')) || {}; } catch(_) {}
+  RUN_STUDENTS.forEach(function(s){ s.selfGrade = Object.prototype.hasOwnProperty.call(_sgMap, s.id) ? studentAllExcluded(s.id) : !!s.selfGradeFixed; });
   var tbody = document.getElementById('rm-student-tbody');
   var html = '';
   RUN_STUDENTS.forEach(function(s, i) {
@@ -851,7 +853,7 @@ function rmExec() {
   var n = RUN_STUDENTS.filter(function(s){ return !rmIsDisabled(s) && s.checked; }).length;
   if (n === 0) return;
   closeRmModal('runModal2');
-  showToast('success', n + '명의 AI 채점을 시작합니다. 완료되면 결과 확인에서 볼 수 있어요.');
+  showToast('success', n + '명의 AI 채점을 시작해요. 완료되면 결과 확인에서 볼 수 있어요.');
 }
 
 function renderTable(){
@@ -879,7 +881,7 @@ function renderTable(){
 }
 
 function rescoreStudent(id, name){
-  showToast('loading', name + ' 학생 AI 채점을 다시 실행합니다.');
+  showToast('loading', name + ' 학생 AI 채점을 다시 실행해요.');
 }
 
 function openStudentScoring(id, name, link){

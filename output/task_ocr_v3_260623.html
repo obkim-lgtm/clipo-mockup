@@ -3308,14 +3308,15 @@ function _selfGradeFromSession(id) {
   } catch(_) { return false; }
 }
 function jumpToOcrBById(id) {
-  // 직접 채점 해제 = 학생 채점 상세 드로워에서. 이름까지 넘겨야 상세가 엉뚱한 학생으로 뜨지 않는다.
+  // 직접 채점 해제 = 학생 채점 상세 상단 토글에서. 이름까지 넘겨야 상세가 엉뚱한 학생으로 뜨지 않는다.
   var s = RUN_STUDENTS.filter(function(x){ return x.id === id; })[0];
   var f = (id === '10101') ? 'scoring_elementary_v3_260623.html' : 'scoring_secondary_v1_260708.html';
   location.href = f + '?id=' + id + (s ? '&name=' + encodeURIComponent(s.name) : '');
 }
 function renderRunStudents() {
-  // 직접 채점(전 문항 AI 제외) 학생은 채점 대상에서 제외 — 인식 결과 화면 토글에서 파생
-  RUN_STUDENTS.forEach(function(s){ s.selfGrade = s.selfGradeFixed || _selfGradeFromSession(s.id); });
+  // 직접 채점(전 문항 AI 제외) 학생은 채점 대상에서 제외 — 채점 상세 상단 토글에서 파생. 켜고 끈 기록이 있으면 명단 고정값보다 우선
+  var _sgMap = {}; try { _sgMap = JSON.parse(sessionStorage.getItem('clipo_ocr_exclude')) || {}; } catch(_) {}
+  RUN_STUDENTS.forEach(function(s){ s.selfGrade = Object.prototype.hasOwnProperty.call(_sgMap, s.id) ? _selfGradeFromSession(s.id) : !!s.selfGradeFixed; });
   var tbody = document.getElementById('rm-student-tbody');
   var html = '';
   RUN_STUDENTS.forEach(function(s, i) {
