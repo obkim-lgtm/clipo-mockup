@@ -3248,19 +3248,17 @@ var RUN_STUDENTS = [
   { id:'10112', name:'송하림', ai:'-',    t:'완료',     checked:false, method:'file', file:'10112_미래시나리오.pdf' }, // 채점 완료 = 인식 완료
   { id:'10113', name:'노유찬', ai:'-',    t:'완료',     checked:false, method:'file',   file:'10113_미래시나리오.pdf' },
   { id:'10114', name:'백시우', ai:'fail', t:'미채점',   checked:true,  method:'file',   ocrfail:true, file:'10114_미래시나리오.pdf' }, // 인식 실패 → 채점 실패. 다시 채점하면 인식도 재실행
-  { id:'10116', name:'류지안', ai:'-',    t:'미채점',   selfGradeFixed:true, method:'file', file:'10116_미래시나리오.pdf' } // 직접 채점(AI 제외)
 ];
 // 채점 대상 제외 규칙 — AI가 채점할 수 없거나(미제출·인식 실패·정확도 낮음),
 // 교사가 직접 채점하기로 한 학생. 모두 크레딧 차감 대상에서 빠진다.
 function rmIsDisabled(s) {
-  // 채점 불가 = 미제출 · 직접 채점(교사 선택)뿐.
+  // 채점 불가 = 미제출뿐. (직접 채점 지정 기능은 26-09-04 삭제)
   // 인식 실패·정확도 낮음은 다시 채점하면 인식이 재실행되므로 선택 가능 (26-08-28)
-  return !!(s.absent || s.selfGrade);
+  return !!s.absent;
 }
 // 채점 불가 사유 — 라벨에 'OCR' 접두어를 붙이지 않는다
 function rmBlockReason(s) {
   if (s.absent)    return '과제 미제출';
-  if (s.selfGrade) return '__SELF__';
   return '';
 }
 // 이전 채점 결과 표시 (선택은 가능 — 다시 채점하면 인식부터 재실행)
@@ -3277,31 +3275,13 @@ function rmTeacherBadge(t) {
 // 인식 모드 컬럼: 제출 방식 (파일 / 직접 입력 / 미제출)
 function rmAiCell(s) {
   var reason = rmBlockReason(s);
-  if (reason === '__SELF__') return '<a href="javascript:void(0)" onclick="jumpToOcrBById(&#39;' + s.id + '&#39;)" style="color:#7c3aed;font-weight:600;white-space:nowrap;text-decoration:none;">직접 채점 · 해제 ›</a>';
   if (reason) return '<span style="color:#6d7381;white-space:nowrap;">' + reason + '</span>';
   var prev = rmPrevResult(s);
   if (prev) return prev;
   if (s.ai === 'fail') return '<span class="rm-tag red">채점 실패</span>';
   return '<span style="color:#6d7381;">-</span>';
 }
-function _selfGradeFromSession(id) {
-  try {
-    var m = JSON.parse(sessionStorage.getItem('clipo_ocr_exclude')) || {};
-    var e = m[id]; if (!e) return false;
-    var c = 0; for (var k in e) if (e[k]) c++;
-    return c >= 5;
-  } catch(_) { return false; }
-}
-function jumpToOcrBById(id) {
-  // 직접 채점 해제 = 학생 채점 상세 상단 토글에서. 이름까지 넘겨야 상세가 엉뚱한 학생으로 뜨지 않는다.
-  var s = RUN_STUDENTS.filter(function(x){ return x.id === id; })[0];
-  var f = (id === '10101') ? 'scoring_elementary_v3_260623.html' : 'scoring_secondary_v1_260708.html';
-  location.href = f + '?id=' + id + (s ? '&name=' + encodeURIComponent(s.name) : '');
-}
 function renderRunStudents() {
-  // 직접 채점(전 문항 AI 제외) 학생은 채점 대상에서 제외 — 채점 상세 상단 토글에서 파생. 켜고 끈 기록이 있으면 명단 고정값보다 우선
-  var _sgMap = {}; try { _sgMap = JSON.parse(sessionStorage.getItem('clipo_ocr_exclude')) || {}; } catch(_) {}
-  RUN_STUDENTS.forEach(function(s){ s.selfGrade = Object.prototype.hasOwnProperty.call(_sgMap, s.id) ? _selfGradeFromSession(s.id) : !!s.selfGradeFixed; });
   var tbody = document.getElementById('rm-student-tbody');
   var html = '';
   RUN_STUDENTS.forEach(function(s, i) {
