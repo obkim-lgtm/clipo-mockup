@@ -1375,10 +1375,6 @@ body.vs-hide-topbar .vs-float{display:inline-flex}
         <i data-lucide="alert-circle" style="width:16px;height:16px;flex-shrink:0;margin-top:2px;"></i>
         <span><strong>인식이 불확실한 문항</strong>이 있어요. 표시된 문항을 확인하고 고친 뒤 다시 채점하면 점수가 더 정확해져요.</span>
       </div>
-      <div id="lowAccBanner" class="ocrd-notice ocrd-notice--danger" style="display:none;">
-        <i data-lucide="alert-triangle" style="width:16px;height:16px;flex-shrink:0;margin-top:2px;"></i>
-        <span><strong>인식 정확도가 낮아요.</strong> AI가 답안을 제대로 읽지 못해 점수가 낮게 나왔을 수 있어요. 왼쪽 원본과 비교해 고치거나, 위에서 직접 채점으로 바꿔 주세요.</span>
-      </div>
       <!-- 문항 1 — 정상 인식 -->
       <!-- 문항 1 — 책 선정 이유 -->
       <div class="rubric-ocr-section">
@@ -1862,7 +1858,7 @@ var STUDENT_LIST = [
   {id:'10101', name:'김서윤', status:'완료',    statusCls:'done', link:'scoring_elementary_v3_260623.html'},   // 초등 화면                                   // 채점 완료
   {id:'10102', name:'이준호', status:'확인 필요', statusCls:'need', ocrReview:true},                  // 채점 완료 + 인식 불확실 (사후 확인)
   {id:'10103', name:'박지민', status:'확인 필요', statusCls:'need', ocrEdited:true},                  // 인식 결과를 고쳤는데 재채점은 안 함
-  {id:'10104', name:'최유진', status:'확인 필요', statusCls:'need', ocrLowAcc:true},               // 인식 정확도 낮음 — 채점은 됐고 점수가 바닥
+  {id:'10104', name:'최유진', status:'미채점',  statusCls:'todo', ocrCase:'lowacc'},               // 인식 정확도 낮음(불확실 70%↑) — 인식 결과 미표시 + AI 채점 제외 (26-09-04)
   {id:'10105', name:'정현우', status:'미채점',  statusCls:'todo', method:'typing'},                  // 직접 입력 · 미채점
   {id:'10106', name:'한지우', status:'완료',    statusCls:'done', method:'typing'},                  // 직접 입력 · 채점 완료
   {id:'10107', name:'조민재', status:'완료',    statusCls:'done'},                                   // 정상 — 파일 제출·채점 완료
@@ -2183,13 +2179,13 @@ function bindEditableHandlers(){
     el.addEventListener('blur', function(){
       var snap = el.getAttribute('data-snapshot');
       if(snap === null) return;
-      if(snap !== el.textContent) notifyAutosave();
+      // 자동저장 없음 — 내용은 [저장 후 다음]으로 저장 (올립 26-09-04)
       el.removeAttribute('data-snapshot');
     });
   });
 }
 
-// blur 시 자동저장 토스트 (점수 미선택이면 에러 토스트)
+// (폐기) blur 자동저장 토스트 — CLIPO는 자동저장이 없어 26-09-04 호출 제거. 함수는 미사용
 function notifyAutosave(){
   var hasScore = document.querySelectorAll('.score-btn.selected').length > 0;
   if(!hasScore){
@@ -2753,7 +2749,7 @@ function confirmShare(){
   showToast('success', '학생에게 결과가 공개됐어요.');
 }
 
-// iframe 로드 완료 시 옵션 전송 + 선생님 한마디 textarea blur 자동저장 토스트
+// iframe 로드 완료 시 옵션 전송 (선생님 피드백 blur 자동저장 토스트는 26-09-04 제거)
 document.addEventListener('DOMContentLoaded', function(){
   var shareIframe = document.querySelector('#shareModal .share-preview-frame');
   if(shareIframe){ shareIframe.addEventListener('load', sendShareOpts); }
@@ -2767,7 +2763,7 @@ document.addEventListener('DOMContentLoaded', function(){
     tf.addEventListener('blur', function(){
       var snap = tf.getAttribute('data-snapshot');
       if(snap === null) return;
-      if(snap !== tf.value) notifyAutosave();
+      // 자동저장 없음 — [저장 후 다음]으로 저장
       tf.removeAttribute('data-snapshot');
     });
   }
@@ -3645,7 +3641,12 @@ function highlightRubricAi(){
 var CASE_UI = {
   failed: { tone:'warn',  eIcon:'file-x-2',        eTitle:'과제물 인식에 실패했어요',
             eSub:'답안을 읽어내지 못해 채점도 하지 못했어요.<br>다시 채점하거나, 원본 제출물을 보고 직접 채점해 주세요.',
-            eCta:'다시 채점', eAct:'rerunAi()', lock:true },
+            eCta:'다시 채점', eAct:'rerunAi()', lock:true,
+            rTitle:'AI 채점에 실패했어요', rSub:'답안을 읽어내지 못해 채점하지 못했어요.<br>다시 채점하면 인식부터 다시 해요.', rCta:'다시 채점' },
+  lowacc: { tone:'warn',  eIcon:'alert-triangle',  eTitle:'인식 정확도가 너무 낮아요',
+            eSub:'확인이 필요한 문항이 대부분이라 인식 결과를 표시하지 않아요.<br>AI 채점에서 빠졌으니 원본을 보고 직접 채점하거나, 다시 채점해 주세요.',
+            eCta:'다시 채점', eAct:'rerunAi()', lock:true,
+            rTitle:'AI 채점에서 빠졌어요', rSub:'인식 정확도가 낮아 AI가 채점하지 않았어요.<br>원본을 보고 직접 채점하거나, 다시 채점해 보세요.', rCta:'다시 채점' },
   legacy: { tone:'info',  eIcon:'info',            eTitle:'이 채점에는 인식 결과가 없어요',
             eSub:'이 기능이 생기기 전에 채점한 건이에요.<br>다시 채점하면 볼 수 있어요.',
             eCta:'다시 채점', eAct:'rerunAi()', lock:true }
@@ -3685,6 +3686,15 @@ function applyRunningUI(){
 }
 function applyCaseUI(kind){
   renderViewerEmpty(kind);   // 배너 없음 — 좌측 빈 상태가 이미 같은 말을 한다
+  // 우측 AI 피드백 빈 상태 — '아직 실행하지 않았어요'가 아니라 왜 점수가 없는지로
+  var c = CASE_UI[kind]; if(!c || !c.rTitle) return;
+  document.querySelectorAll('.empty-state').forEach(function(es){
+    var ttl = es.querySelector('.empty-state-title'), sub = es.querySelector('.empty-state-sub'), cta = es.querySelector('.empty-state-cta');
+    if(ttl) ttl.textContent = c.rTitle;
+    if(sub) sub.innerHTML = c.rSub;
+    if(cta && c.rCta) cta.innerHTML = '<i data-lucide="rotate-ccw" style="width:16px;height:16px"></i>' + c.rCta;
+  });
+  if(typeof lucide !== 'undefined') lucide.createIcons();
 }
 // ══════ 초기화 ══════
 renderDropdown();
@@ -3728,7 +3738,6 @@ if(_isNotSubmitted){
   applyHistoryUI();
   fillTeacherFeedbackDraft();
 } else {
-  if(_curStudent && _curStudent.ocrLowAcc) applyLowAccUI();
   renderInstructionCards();
   renderElementCards();
   renderRubricGrounds();
@@ -3743,7 +3752,6 @@ if(_isNotSubmitted){
 updateShareBtnState();
 updatePreviewBtnState();
 applyOcrReviewNotice();
-if (_curStudent && _curStudent.ocrLowAcc) { var _lb = document.getElementById('lowAccBanner'); if (_lb) _lb.style.display = 'flex'; }
 if (_curStudent && _curStudent.ocrEdited) { var _eb = document.getElementById('ocrEditedBanner'); if (_eb) _eb.style.display = 'flex'; }
 if (_curStudent && _curStudent.stale) { var _sb = document.getElementById("staleBanner"); if (_sb) _sb.style.display = "flex"; }
 applySelfGradeNotice();   // 맨 뒤 — 직접 채점이면 위 재채점 안내를 도로 감춘다   // 우측 패널 상단 (인식 불확실 안내와 같은 자리)
@@ -3767,28 +3775,6 @@ function openOcrEdit(){
   if (typeof lucide !== 'undefined') lucide.createIcons();
 }
 
-// ══════ 인식 정확도 낮음 — 채점은 됐지만 점수가 바닥 (26-09-03) ══════
-// 인식이 부정확하면 AI가 채점기준에 맞는 내용을 찾지 못해 모든 항목이 미도달로 나온다.
-// 화면이 '채점 안 됨'처럼 보이면 교사가 원인을 오해하므로, 결과는 그대로 보여주고
-// 왜 이런 점수인지를 배너로 알린다.
-function applyLowAccUI(){
-  var GROUND = '제출한 답안에서 이 채점기준에 해당하는 내용을 찾지 못함.';
-  var FEED   = '인식된 답안만으로는 평가하기 어려웠어요. 원본 제출물을 함께 확인해 주세요.';
-  ELEMENTS.forEach(function(e){
-    e.level = 'low'; e.relevance = 0;
-    e.score = 6; e.explanation = GROUND; e.feedback = FEED;
-  });
-  INSTRUCTIONS.forEach(function(it){
-    it.level = 'low'; it.aiScore = 0;
-    it.explanation = GROUND; it.feedback = FEED;
-  });
-  // AI 추천 점수를 각 채점기준의 최저 버튼으로 옮긴다
-  document.querySelectorAll('[data-rubric]').forEach(function(g){
-    var btns = g.querySelectorAll('.score-btn');
-    for(var i=0;i<btns.length;i++) btns[i].classList.remove('ai-suggest');
-    if(btns.length) btns[btns.length-1].classList.add('ai-suggest');
-  });
-}
 // ══════ 직접 채점(AI 제외) 상태 — 저장·복원·표시 ══════
 // 켠 사실은 드로워를 닫아도 남아야 한다. 안 남으면 교사가 왜 AI 채점이 안 도는지 알 수 없다.
 function readSelfGrade(){
@@ -3814,13 +3800,13 @@ function applySelfGradeNotice(){
   document.body.classList.toggle('self-grade', on);
   // 인식 결과 수정 진입점의 확인 필요 점 — 인식 불확실·정확도 낮음 학생, 직접 채점으로 뺀 뒤엔 끔
   var dot = document.getElementById('ocrEditDot'), eb = document.getElementById('ocrEditBtn');
-  var needCheck = !!(_curStudent && (_curStudent.ocrReview || _curStudent.ocrLowAcc)) && !on;
+  var needCheck = !!(_curStudent && _curStudent.ocrReview) && !on;
   if(dot) dot.style.display = needCheck ? 'block' : 'none';
   if(eb) eb.title = needCheck ? '인식 확인이 필요해요' : '';
   // 직접 채점 중에는 재채점 유도 안내를 띄우지 않는다.
   // 'AI 채점에서 뺐다'와 '다시 채점하세요'가 한 화면에 같이 있으면 서로 모순이다.
   if(on){
-    ['ocrReviewNotice','lowAccBanner','ocrEditedBanner','staleBanner'].forEach(function(id){
+    ['ocrReviewNotice','ocrEditedBanner','staleBanner'].forEach(function(id){
       var b = document.getElementById(id);
       if(b) b.style.display = 'none';
     });
@@ -3829,7 +3815,6 @@ function applySelfGradeNotice(){
     if(_curStudent.stale){ var sb = document.getElementById('staleBanner'); if(sb) sb.style.display = 'flex'; }
     if(_curStudent.ocrEdited){ var eb = document.getElementById('ocrEditedBanner'); if(eb) eb.style.display = 'flex'; }
     if(_curStudent.ocrReview && typeof applyOcrReviewNotice === 'function') applyOcrReviewNotice();
-    if(_curStudent.ocrLowAcc){ var lb2 = document.getElementById('lowAccBanner'); if(lb2) lb2.style.display = 'flex'; }
   }
   // AI 채점 진입점(채점 전 empty state의 CTA)을 잠그고, 무엇을 하면 되는지로 바꿔 보여 준다
   document.querySelectorAll('.empty-state').forEach(function(es){
@@ -3978,16 +3963,8 @@ function saveSection(ta, gi){
   if (section) section.classList.remove('section-editing');
   var editBadge = document.getElementById('ocrd-editing-badge-' + gi);
   if (editBadge) editBadge.remove();
-  var btn = section ? section.querySelector('button[onclick^="editSection"]') : null;
-  var saved = document.createElement('span');
-  saved.className = 'saved-badge';
-  saved.innerHTML = '✓ 저장됨';
-  if (btn) btn.parentElement.insertBefore(saved, btn);
-  setTimeout(function(){ saved.style.opacity='0'; }, 1200);
-  setTimeout(function(){ if (saved.parentNode) saved.remove(); }, 1700);
-  if (typeof showToast === 'function') {
-    showToast('success', hadNote ? '수정한 문항의 확인 필요 표시를 해제했어요.' : '저장했어요.');
-  }
+  // 문항 편집을 닫아도 '저장됨' 표시는 하지 않는다 — CLIPO는 자동저장이 없고, 저장은 아래 [수정 저장]으로만 (올립 26-09-04)
+  if (hadNote && typeof showToast === 'function') showToast('success', '수정한 문항의 확인 필요 표시를 해제했어요.');
   // 불확실 구간 모두 해소되면 과제물 영역 상단 안내 배너도 숨김
   refreshOcrReviewNotice();
 }
