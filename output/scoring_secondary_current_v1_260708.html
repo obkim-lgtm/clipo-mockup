@@ -3946,8 +3946,8 @@ function applySelfGradeNotice(){
   var on = readSelfGrade();
   var row = document.getElementById('selfGradeRow');
   var tg  = document.getElementById('selfgrade-toggle');
-  // 미제출·채점 중엔 켜고 끌 이유가 없다 — 줄 자체를 감춘다
-  var hideRow = (typeof _isNotSubmitted !== 'undefined' && _isNotSubmitted) || (_curStudent && _curStudent.running);
+  // 미제출·채점 중·레거시(업데이트 전 채점, 인식 결과 없음)엔 켜고 끌 이유가 없다 — 줄 자체를 감춘다 (레거시는 올립 26-09-04)
+  var hideRow = (typeof _isNotSubmitted !== 'undefined' && _isNotSubmitted) || (_curStudent && (_curStudent.running || _curStudent.legacy === true));
   if(row) row.style.display = hideRow ? 'none' : 'flex';
   if(tg) tg.checked = on;
   if(row) row.classList.toggle('on', on);
