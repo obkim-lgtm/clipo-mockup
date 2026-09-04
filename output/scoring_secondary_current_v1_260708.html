@@ -359,14 +359,14 @@ body.before-ai-rerun .score-btn.ai-suggest:hover{background:#f4f8ff;border-color
 .grund-content .editable:focus{background:#fff;border-color:#6d7381}
 
 /* ══════ 직접 채점(AI 제외) — 채점 패널 상단 고정 토글 (26-09-04 1안: 채점 전·후 같은 자리) ══════ */
-.selfgrade-row{display:flex;align-items:center;gap:12px;padding:12px 20px;background:#f6f7f9;border-bottom:1px solid #eaecf0}
-.selfgrade-row .sg-icon{width:16px;height:16px;color:#6d7381;flex-shrink:0}
-.selfgrade-row .sg-text{flex:1;display:flex;flex-direction:column;gap:2px;min-width:0}
-.selfgrade-row .sg-title{font-size:14px;font-weight:700;color:#222631;line-height:1.5}
-.selfgrade-row .sg-desc{font-size:14px;color:#6d7381;line-height:1.5}
-.selfgrade-row.on{background:#f5f0ff;border-bottom-color:#ddd0ff}
-.selfgrade-row.on .sg-icon,.selfgrade-row.on .sg-title{color:#6d28d9}
-.selfgrade-row.on .sg-desc{color:#3b3f4c}
+/* 인식 결과 툴바 안의 컴팩트 토글 — 어두운 바에 맞춘 변형 */
+.ve-selfgrade{gap:8px;margin-left:12px;padding:0 10px;height:30px;border:1px solid rgba(255,255,255,.3);border-radius:6px;color:#cfd3da;font-size:13px;font-weight:600;line-height:1;user-select:none}
+.ve-selfgrade .ve-sg-label{white-space:nowrap}
+.ve-selfgrade .q-exclude-track{width:32px;height:18px;background:rgba(255,255,255,.28)}
+.ve-selfgrade .q-exclude-thumb{width:14px;height:14px}
+.ve-selfgrade input:checked + .q-exclude-track{background:#a78bfa}
+.ve-selfgrade input:checked + .q-exclude-track .q-exclude-thumb{left:16px}
+.ve-selfgrade.on{border-color:#a78bfa;background:rgba(167,139,250,.18);color:#fff}
 .q-exclude-toggle{display:inline-flex;align-items:center;gap:7px;cursor:pointer;flex-shrink:0}
 .q-exclude-toggle input{display:none}
 .q-exclude-track{width:40px;height:22px;border-radius:100px;background:#d9d9d9;position:relative;transition:background .15s;flex-shrink:0}
@@ -1043,6 +1043,13 @@ body.vs-hide-topbar .vs-float{display:inline-flex}
       </div>
       <label class="ve-check" id="veSolveCheck"><input type="checkbox" checked onchange="toggleSolveView(this)">학생 풀이와 답안 보기</label>
       <button id="ocrEditBtn" onclick="openOcrEdit()" style="margin-left:12px;height:30px;padding:0 12px;border:1px solid rgba(255,255,255,.3);border-radius:6px;background:transparent;color:#fff;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:5px;"><i data-lucide="scan-text" style="width:14px;height:14px"></i>인식 결과 수정</button>
+      <!-- 직접 채점(AI 제외) — 인식 결과 툴바. AI가 읽은 내용이 못 쓸 정도일 때 이 자리에서 바로 뺀다 (26-09-04 올립: 채점 결과 화면이 아니라 OCR 영역) -->
+      <label class="q-exclude-toggle ve-selfgrade" id="selfGradeRow" title="AI가 읽은 답안이 잘못돼 채점을 맡기기 어려울 때 켜세요. 켜면 AI 채점 대상에서 빠지고, 점수와 피드백을 선생님이 직접 적어요.">
+        <i data-lucide="user-pen" style="width:14px;height:14px"></i>
+        <span class="ve-sg-label">직접 채점 (AI 제외)</span>
+        <input type="checkbox" id="selfgrade-toggle" onchange="toggleSelfGrade()">
+        <span class="q-exclude-track"><span class="q-exclude-thumb"></span></span>
+      </label>
     </div>
     <!-- 원본 제출물 모드 전용 컨트롤 (2번째 줄) -->
     <div id="ve-imgbar" style="display:none;align-items:center;justify-content:center;gap:2px;height:40px;background:#33373f;border-top:1px solid rgba(255,255,255,.08);flex-shrink:0;">
@@ -1160,18 +1167,6 @@ body.vs-hide-topbar .vs-float{display:inline-flex}
 
   <!-- 우측: 채점 패널 -->
   <div class="grading-panel">
-    <!-- 직접 채점(AI 제외) — 채점 패널 상단 고정 토글. 채점 전·후 어느 상태에서든 같은 자리에서 켜고 끈다 (26-09-04 1안) -->
-    <div class="selfgrade-row" id="selfGradeRow">
-      <i data-lucide="user-pen" class="sg-icon"></i>
-      <span class="sg-text">
-        <span class="sg-title">이 학생 직접 채점 (AI 제외)</span>
-        <span class="sg-desc">켜면 AI 채점 대상에서 빠지고, 점수와 피드백을 선생님이 직접 적어요.</span>
-      </span>
-      <label class="q-exclude-toggle" title="이 학생의 모든 문항을 선생님이 직접 채점해요.">
-        <input type="checkbox" id="selfgrade-toggle" onchange="toggleSelfGrade()">
-        <span class="q-exclude-track"><span class="q-exclude-thumb"></span></span>
-      </label>
-    </div>
     <div id="ocrReviewNotice" style="display:none;align-items:center;gap:10px;background:#fff7ed;border-bottom:1px solid #fdba74;padding:14px 20px;">
       <i data-lucide="alert-circle" style="width:16px;height:16px;color:#ea580c;flex-shrink:0;"></i>
       <span style="font-size:14px;color:#3b3f4c;line-height:1.6;flex:1;"><strong style="color:#c2410c;">인식이 불확실한 문항</strong>이 있어요. 답안을 확인하고 고친 뒤 다시 채점하면 점수가 더 정확해져요.</span>
@@ -3946,9 +3941,9 @@ function applySelfGradeNotice(){
   var on = readSelfGrade();
   var row = document.getElementById('selfGradeRow');
   var tg  = document.getElementById('selfgrade-toggle');
-  // 미제출·채점 중·레거시(업데이트 전 채점, 인식 결과 없음)엔 켜고 끌 이유가 없다 — 줄 자체를 감춘다 (레거시는 올립 26-09-04)
+  // 미제출·채점 중·레거시(업데이트 전 채점, 인식 결과 없음)엔 켜고 끌 이유가 없다 — 토글 자체를 감춘다 (레거시는 올립 26-09-04)
   var hideRow = (typeof _isNotSubmitted !== 'undefined' && _isNotSubmitted) || (_curStudent && (_curStudent.running || _curStudent.legacy === true));
-  if(row) row.style.display = hideRow ? 'none' : 'flex';
+  if(row) row.style.display = hideRow ? 'none' : 'inline-flex';
   if(tg) tg.checked = on;
   if(row) row.classList.toggle('on', on);
   document.body.classList.toggle('self-grade', on);
