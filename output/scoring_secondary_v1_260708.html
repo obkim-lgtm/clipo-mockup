@@ -1182,7 +1182,7 @@ body.vs-hide-topbar .vs-float{display:inline-flex}
     <div class="total-score-section">
       <div class="score-total">
         <span class="lbl">총점</span>
-        <span class="val" id="totalScoreVal">- / 60</span>
+        <span class="val" id="totalScoreVal">- / 30</span>
         <span class="unit">점</span>
         <span class="plan">(A)</span>
       </div>
@@ -1225,58 +1225,31 @@ body.vs-hide-topbar .vs-float{display:inline-flex}
         </div>
 
         <div class="rubric-row">
-          <span class="rubric-name">1. 책 선정 이유</span>
+          <span class="rubric-name">1. 내용 이해와 요약</span>
           <div class="score-btns" data-rubric="1">
-            <button class="score-btn ai-suggest" onclick="selectScore(this,1,10)">10</button>
-            <button class="score-btn" onclick="selectScore(this,1,8)">8</button>
+            <button class="score-btn" onclick="selectScore(this,1,10)">10</button>
+            <button class="score-btn ai-suggest" onclick="selectScore(this,1,8)">8</button>
             <button class="score-btn" onclick="selectScore(this,1,6)">6</button>
           </div>
           <div class="rubric-ground" id="rubricGround1"></div>
         </div>
         <div class="rubric-row">
-          <span class="rubric-name">2. 핵심 내용 요약</span>
+          <span class="rubric-name">2. 생각의 변화와 진로 연계</span>
           <div class="score-btns" data-rubric="2">
-            <button class="score-btn" onclick="selectScore(this,2,10)">10</button>
-            <button class="score-btn ai-suggest" onclick="selectScore(this,2,8)">8</button>
+            <button class="score-btn ai-suggest" onclick="selectScore(this,2,10)">10</button>
+            <button class="score-btn" onclick="selectScore(this,2,8)">8</button>
             <button class="score-btn" onclick="selectScore(this,2,6)">6</button>
           </div>
           <div class="rubric-ground" id="rubricGround2"></div>
         </div>
         <div class="rubric-row">
-          <span class="rubric-name">3. 생각의 변화</span>
+          <span class="rubric-name">3. 후속 탐구 계획과 보고서 구성</span>
           <div class="score-btns" data-rubric="3">
-            <button class="score-btn ai-suggest" onclick="selectScore(this,3,10)">10</button>
-            <button class="score-btn" onclick="selectScore(this,3,8)">8</button>
+            <button class="score-btn" onclick="selectScore(this,3,10)">10</button>
+            <button class="score-btn ai-suggest" onclick="selectScore(this,3,8)">8</button>
             <button class="score-btn" onclick="selectScore(this,3,6)">6</button>
           </div>
           <div class="rubric-ground" id="rubricGround3"></div>
-        </div>
-        <div class="rubric-row">
-          <span class="rubric-name">4. 진로·관심사와의 연계</span>
-          <div class="score-btns" data-rubric="4">
-            <button class="score-btn ai-suggest" onclick="selectScore(this,4,10)">10</button>
-            <button class="score-btn" onclick="selectScore(this,4,8)">8</button>
-            <button class="score-btn" onclick="selectScore(this,4,6)">6</button>
-          </div>
-          <div class="rubric-ground" id="rubricGround4"></div>
-        </div>
-        <div class="rubric-row">
-          <span class="rubric-name">5. 종합 평가·후속 탐구 계획</span>
-          <div class="score-btns" data-rubric="5">
-            <button class="score-btn" onclick="selectScore(this,5,10)">10</button>
-            <button class="score-btn ai-suggest" onclick="selectScore(this,5,8)">8</button>
-            <button class="score-btn" onclick="selectScore(this,5,6)">6</button>
-          </div>
-          <div class="rubric-ground" id="rubricGround5"></div>
-        </div>
-        <div class="rubric-row">
-          <span class="rubric-name">6. 보고서 구성 및 형식</span>
-          <div class="score-btns" data-rubric="6">
-            <button class="score-btn" onclick="selectScore(this,6,10)">10</button>
-            <button class="score-btn ai-suggest" onclick="selectScore(this,6,8)">8</button>
-            <button class="score-btn" onclick="selectScore(this,6,6)">6</button>
-          </div>
-          <div class="rubric-ground" id="rubricGround6"></div>
         </div>
       </div>
 
@@ -1988,7 +1961,7 @@ function bulkSaveAiScores(){ showToast('success','AI 점수를 일괄 저장했�
 function updateTotal(){
   var sum=0, has=false;
   Object.keys(scores).forEach(function(k){ if(scores[k]){sum+=scores[k];has=true;} });
-  document.getElementById('totalScoreVal').textContent = has?(sum+' / 60'):('- / 60');
+  document.getElementById('totalScoreVal').textContent = has?(sum+' / 30'):('- / 30');
 }
 
 // ══════ 보기 전환 (문항별 / 채점요소별) ══════
@@ -2044,34 +2017,19 @@ var INSTRUCTIONS = [
 
 var ELEMENTS = [
   {
-    name:'책 선정 이유', level:'high', relevance:100, score:10, maxScore:10,
-    explanation:'책을 선택한 동기가 ‘원소에 대한 다양한 이야기’라는 흥미 요소로 분명히 제시되어 있음. 주기율표를 단순 지식으로만 알았는데 여러 이야기가 있다는 점이 신기했다는 이유가 구체적으로 드러나 있으며, 독서 전 기대(화학에 대한 태도를 배우고 싶었다는 점)도 명시되어 있음. 이 책이 다루는 주제(원소, 화학적 지식, 주기율표)에 대한 관심과 자신의 화학에 대한 태도 형성과 연결되고 있어 선택 이유의 타당성이 잘 나타남. 다만 문장부호와 연결의 매끄러움이 다소 아쉬운 부분이 있으나, 내용 기준으로는 최고 수준에 근접함.',
-    feedback:'선택 동기와 독서 전 기대가 모두 구체적으로 드러났어요. 문장부호와 연결 어미만 다듬으면 더 매끄럽게 읽혀요.'
+    name:'내용 이해와 요약', level:'high', relevance:100, score:8, maxScore:10,
+    explanation:'책을 고른 동기(원소에 얽힌 다양한 이야기)와 읽기 전 기대(화학에 대해 가져야 할 태도)가 분명히 제시됨. 요약에서는 주기율표의 탄생, 멘델레예프 이후의 원소 발견, 우라늄·플루토늄과 원자폭탄처럼 원소가 문명에 끼친 영향까지 큰 줄기를 잡고 ‘원소는 과학 지식에 그치지 않고 인간 문명에 큰 영향을 끼친다’는 핵심 개념을 문장으로 정리함. 다만 근거 사례가 원자폭탄 하나에 치우치고 ‘나타내고 있다’가 반복되어 요약의 폭이 한 단계 부족함.',
+    feedback:'고른 이유와 책의 핵심 개념을 잘 잡았어요. 요약에 사례를 한두 개 더 고르게 넣고 반복되는 표현을 줄이면 훨씬 단단해져요.'
   },
   {
-    name:'핵심 내용 요약', level:'high', relevance:100, score:8, maxScore:10,
-    explanation:'각 원소에 대한 역사와 이야기, 주기율표 탄생 과정, 멘델레예프 이후 과학자들의 원소 발견, 그리고 원소가 인간 문명과 전쟁(우라늄·플루토늄과 원자폭탄)에 끼친 영향 등 작품의 주요 내용이 잘 잡혀 있음. ‘원소가 그저 과학적 지식이 아니라 인간 문명에 큰 영향을 끼친다’는 핵심 개념과 주제도 분명히 제시되어 있음. 전반적인 흐름은 논리적이나, 책 전반의 다양한 사례나 세부 근거는 일부만 제시되어 있고 표현이 약간 반복·장황한 부분이 있어 최고의 기준보다는 한 단계 낮은 수준에 가까움.',
-    feedback:'주요 사건 전개와 핵심 주제를 잘 잡았어요. 사례를 조금 더 고르게 담고 반복되는 표현을 줄이면 요약이 한결 간결해져요.'
+    name:'생각의 변화와 진로 연계', level:'high', relevance:100, score:10, maxScore:10,
+    explanation:'읽기 전(외워야 하는 지식, 해만 끼치는 우라늄)과 읽은 후(역사적 이야기, 우연한 발견과 가설 입증, 납·우라늄으로 지구 나이 측정)의 인식 차이를 패터슨 사례 등 책 속 근거로 대비해 설명함. 화학공학과 진학 희망을 명시하고 원자폭탄 사례에서 윤리적 책임을, 바나듐·가돌리늄 사례에서 인간에게 이익이 되는 연구라는 진로 목표를 끌어냈으며, 모즐리 사례로 스스로 생각하는 태도까지 가치관과 연결함. 생각의 변화·진로·가치관 세 갈래 모두 근거가 구체적임.',
+    feedback:'읽기 전후의 생각 변화를 책 속 사례로 대비하고, 진로·가치관까지 구체적으로 이어 쓴 점이 인상적이에요.'
   },
   {
-    name:'생각의 변화', level:'high', relevance:100, score:10, maxScore:10,
-    explanation:'독서 전에는 원소와 주기율표를 ‘그저 외워야 되는 과학적 지식’, 우라늄을 ‘해만 끼치는 방사성 원소’ 정도로 인식했다는 점이 명확히 서술되어 있음. 독서 후에는 원소와 주기율표에 담긴 역사적 이야기와 삶에 끼친 영향, 우연한 발견·가설 입증 등 다양한 발견 양상이 있다는 점을 알게 되었음을 구체적 내용과 연결하여 설명하고 있음. 우라늄·납을 통해 지구 나이를 알 수 있다는 사례, 패터슨이 납 오염을 막게 된 과정 등 책 속 내용·인물을 근거로 생각 변화의 이유를 논리적으로 제시하고 있어 기준에서 요구하는 요소들이 충족됨.',
-    feedback:'읽기 전후의 인식 차이를 책 속 인물과 사례를 근거로 설명한 점이 좋아요.'
-  },
-  {
-    name:'진로·관심사와의 연계', level:'high', relevance:100, score:10, maxScore:10,
-    explanation:'화학공학과 진학 희망을 명시하고, 이 책이 그 이유를 ‘더욱 확실하게’ 해주었다는 점을 분명히 밝히고 있음. 우라늄·플루토늄과 원자폭탄, 전쟁에의 영향 사례를 통해 ‘화학 연구에서 이익·기술 발전뿐 아니라 윤리적 책임이 중요하다’는 가치관 형성을 서술함. 바나듐의 의약품 활용, 가돌리늄의 MRI 활용 등 구체적 예시를 들어 원소를 인간에게 이익이 되는 방향으로 쓰고 싶다는 진로 목표(화학공학자로서의 연구 방향)와 연결하고 있음. 또한 모즐리 사례를 통해 기존 틀에 안주하지 않고 스스로 생각하는 태도의 중요성을 자신의 가치관과 연결하여 분석하고 있어, 연계와 영향 분석이 충분히 드러남.',
-    feedback:'진로 희망과 책의 내용을 구체적 사례로 연결하고, 가치관 형성까지 짚어낸 점이 인상적이에요.'
-  },
-  {
-    name:'종합 평가·후속 탐구 계획', level:'high', relevance:100, score:8, maxScore:10,
-    explanation:'책을 통해 ‘원소들이 다양한 이야기를 가지고 영향을 미친다’는 점을 깨달았다는 종합적인 인상을 제시하고 있음. 후속 탐구 계획으로 사라진 스푼인 갈륨에 대해, 특히 반도체에서의 활용을 더 알아보고 싶다는 의지를 분명히 언급하고 있음. 그러나 이 책 전체에 대한 평가(장점·아쉬운 점, 서술 방식, 구성 등)에 대한 구체적인 분석과, 갈륨 탐구를 어떤 방식으로 진행할지에 대한 실행 가능한 구체 계획(자료 조사 방법, 실험·탐구 방향 등)은 제시되어 있지 않아 계획의 구체성과 현실성이 다소 부족한 편임.',
-    feedback:'탐구 주제가 뚜렷해요. 어떤 자료로 어떻게 알아볼지까지 적으면 계획이 훨씬 단단해져요.'
-  },
-  {
-    name:'보고서 구성 및 형식', level:'high', relevance:100, score:8, maxScore:10,
-    explanation:'제시된 5개 문항에 모두 답변이 작성되어 있으며, 각 문항별로 요구된 내용을 전반적으로 충실히 담고 있음. 문단 구성과 문장 배열은 전체적으로 논리적 흐름을 갖추고 있어 내용 이해에 큰 어려움은 없음. 다만 문장부호의 과도한 사용(마침표, 줄임표), 오탈자 및 맞춤법 오류(“주기율표에 대해. 다양한”, “이책”, “을을”, “추기율표”, “ㅅ낙동” 등), 일부 문장의 어색한 끊김 등 형식적 측면에서 보완이 필요해 보이는 부분이 다수 존재함.',
-    feedback:'모든 문항을 충실히 채웠어요. 맞춤법과 문장부호를 한 번 더 살펴보면 완성도가 올라가요.'
+    name:'후속 탐구 계획과 보고서 구성', level:'high', relevance:100, score:8, maxScore:10,
+    explanation:'책을 통한 깨달음을 한 문장으로 정리하고 후속 탐구 주제로 ‘사라진 스푼’인 갈륨과 반도체 활용을 분명히 제시함. 다섯 문항에 모두 답했고 문단 흐름도 논리적임. 다만 갈륨을 어떤 자료로 어떻게 알아볼지 탐구 방법이 없고, 문장부호 과다·오탈자(“이책”, “을을”, “추기율표” 등)·어색한 끊김이 여러 곳 있어 계획의 구체성과 형식 완성도가 부족함.',
+    feedback:'탐구 주제가 뚜렷하고 모든 문항을 충실히 채웠어요. 어떤 자료로 어떻게 알아볼지 계획을 덧붙이고 맞춤법·문장부호를 한 번 더 살펴보면 완성도가 올라가요.'
   }
 ];
 
@@ -3000,7 +2958,7 @@ function applyNotSubmittedUI(){
   });
 
   // 총점 (미제출 기본 점수)
-  document.getElementById('totalScoreVal').textContent = '10 / 60';
+  document.getElementById('totalScoreVal').textContent = '5 / 30';
 
   // 채점 결과 표: AI 추천 표시만 제거 (선생님이 수동 채점 가능)
   document.querySelectorAll('.score-btn').forEach(function(b){
@@ -3039,40 +2997,22 @@ function applyNotSubmittedUI(){
 // AI 피드백 = 채점기준 텍스트를 입력으로 AI 생성 (학생 답안 못 봤으니 일반론 톤)
 var RUBRIC_AI_RESULT = [
   {
-    name: '책 선정 이유',
+    name: '내용 이해와 요약',
     score: 6, max: 10,
-    ground: '제시된 책 선정 이유 기준 중 가장 낮은 단계로 평가됨.\n• 책을 고른 이유가 드러나지 않음\n• 읽기 전 기대했던 점이 서술되지 않음',
-    feedback: '이 책을 왜 골랐는지부터 적어 보세요. 제목이나 표지에서 끌린 점, 읽기 전에 기대했던 점을 한두 문장씩 쓰면 충분해요.'
+    ground: '제시된 내용 이해와 요약 기준 중 가장 낮은 단계로 평가됨.\n• 책을 고른 이유와 읽기 전 기대가 드러나지 않음\n• 책의 주요 주장·근거·핵심 개념이 정리되지 않음',
+    feedback: '이 책을 왜 골랐는지부터 적고, 책이 말하려는 것을 한 문장으로 정리한 뒤 근거가 되는 이야기를 두세 개 골라 덧붙여 보세요. 기억에 남는 장면부터 시작하면 쉬워요.'
   },
   {
-    name: '핵심 내용 요약',
+    name: '생각의 변화와 진로 연계',
     score: 6, max: 10,
-    ground: '제시된 핵심 내용 요약 기준 중 가장 낮은 단계로 평가됨.\n• 책의 주요 주장과 근거가 정리되지 않음\n• 핵심 개념·주제가 제시되지 않음',
-    feedback: '책이 말하려는 것을 한 문장으로 먼저 적고, 그 근거가 되는 이야기를 두세 개 골라 덧붙여 보세요. 기억에 남는 장면부터 시작하면 쉬워요.'
+    ground: '제시된 생각의 변화와 진로 연계 기준 중 가장 낮은 단계로 평가됨.\n• 읽기 전과 읽은 후의 생각 차이가 드러나지 않음\n• 책의 내용과 나의 진로·관심사·가치관의 연결이 서술되지 않음',
+    feedback: '읽기 전에는 어떻게 생각했고 읽고 나서 무엇이 달라졌는지 나란히 적어 보세요. 관심 있는 분야나 하고 싶은 일이 책의 어떤 부분과 이어지는지도 함께 적으면 좋아요.'
   },
   {
-    name: '생각의 변화',
+    name: '후속 탐구 계획과 보고서 구성',
     score: 6, max: 10,
-    ground: '제시된 생각의 변화 기준 중 가장 낮은 단계로 평가됨.\n• 읽기 전과 읽은 후의 생각 차이가 드러나지 않음\n• 변화의 이유가 제시되지 않음',
-    feedback: '읽기 전에는 어떻게 생각했고 읽고 나서 무엇이 달라졌는지 나란히 적어 보세요. 왜 달라졌는지 책 속 내용을 이유로 들면 좋아요.'
-  },
-  {
-    name: '진로·관심사와의 연계',
-    score: 6, max: 10,
-    ground: '제시된 진로·관심사와의 연계 기준 중 가장 낮은 단계로 평가됨.\n• 책의 내용과 나의 진로·관심사·가치관의 연결이 서술되지 않음',
-    feedback: '관심 있는 분야나 하고 싶은 일을 먼저 떠올리고, 책의 어떤 부분이 그것과 이어지는지 적어 보세요. 아직 진로가 정해지지 않았다면 관심사만으로도 괜찮아요.'
-  },
-  {
-    name: '종합 평가·후속 탐구 계획',
-    score: 6, max: 10,
-    ground: '제시된 종합 평가·후속 탐구 계획 기준 중 가장 낮은 단계로 평가됨.\n• 책을 읽은 후의 깨달음이 정리되지 않음\n• 더 탐구하고 싶은 주제가 제시되지 않음',
-    feedback: '책을 다 읽고 남은 생각을 한 줄로 적고, 더 알아보고 싶은 주제를 하나 골라 보세요. 어떤 자료로 알아볼지까지 적으면 더 좋아요.'
-  },
-  {
-    name: '보고서 구성 및 형식',
-    score: 6, max: 10,
-    ground: '제시된 보고서 구성 및 형식 기준 중 가장 낮은 단계로 평가됨.\n• 5개 문항에 대한 답변이 작성되지 않음',
-    feedback: '다섯 문항을 순서대로 채워 보세요. 각 문항에 두세 문장씩만 써도 보고서의 틀이 잡혀요.'
+    ground: '제시된 후속 탐구 계획과 보고서 구성 기준 중 가장 낮은 단계로 평가됨.\n• 더 탐구하고 싶은 주제가 제시되지 않음\n• 5개 문항에 대한 답변이 작성되지 않음',
+    feedback: '더 알아보고 싶은 주제를 하나 골라 어떤 자료로 알아볼지 적어 보세요. 다섯 문항을 순서대로 두세 문장씩만 채워도 보고서의 틀이 잡혀요.'
   }
 ];
 
@@ -3273,7 +3213,7 @@ function applyNotGradedUI(){
   });
 
   // 총점: 점수 없음
-  document.getElementById('totalScoreVal').textContent = '— / 60';
+  document.getElementById('totalScoreVal').textContent = '— / 30';
 
   // 채점 결과 표: ai-suggest 클래스는 보존(데이터 유지) + body 플래그로 시각만 일반 버튼처럼
   document.body.classList.add('before-ai-rerun');
@@ -3312,14 +3252,11 @@ var HISTORY_LOG = [
   {
     round: 3, isCurrent: true,
     at: '2026.05.18 14:23', level: '보통',
-    total: 54, max: 60,
+    total: 26, max: 30,
     rubrics: [
-      {name:'책 선정 이유', options:[10,8,6], selected:10},
-      {name:'핵심 내용 요약', options:[10,8,6], selected:8},
-      {name:'생각의 변화', options:[10,8,6], selected:10},
-      {name:'진로·관심사와의 연계', options:[10,8,6], selected:10},
-      {name:'종합 평가·후속 탐구 계획', options:[10,8,6], selected:8},
-      {name:'보고서 구성 및 형식', options:[10,8,6], selected:8}
+      {name:'내용 이해와 요약', options:[10,8,6], selected:8},
+      {name:'생각의 변화와 진로 연계', options:[10,8,6], selected:10},
+      {name:'후속 탐구 계획과 보고서 구성', options:[10,8,6], selected:8}
     ],
     instructions: [
       {label:'문항 1', level:'목표 도달', summary:'책 선정 이유', ground:'선택 동기와 읽기 전 기대가 모두 구체적으로 드러남.', feedback:'처음 흥미가 생긴 계기까지 더하면 더 생생해져요.'},
@@ -3329,26 +3266,20 @@ var HISTORY_LOG = [
       {label:'문항 5', level:'목표 도달', summary:'종합 평가·후속 탐구 계획', ground:'탐구 주제(갈륨·반도체)는 뚜렷하나 방법이 없음.', feedback:'어떤 자료로 무엇부터 알아볼지 적어 보세요.'}
     ],
     elements: [
-      {name:'책 선정 이유', score:10, max:10, ground:'선택 동기와 독서 전 기대가 모두 구체적임.', feedback:'문장부호와 연결 어미만 다듬으면 더 매끄러워요.'},
-      {name:'핵심 내용 요약', score:8, max:10, ground:'핵심 개념은 분명하나 사례가 일부에 치우침.', feedback:'사례를 고르게 담고 반복 표현을 줄여 보세요.'},
-      {name:'생각의 변화', score:10, max:10, ground:'읽기 전후의 차이를 근거와 함께 논리적으로 제시함.', feedback:'책 속 인물을 근거로 든 점이 좋아요.'},
-      {name:'진로·관심사와의 연계', score:10, max:10, ground:'진로 목표와 가치관 형성까지 구체적으로 연결함.', feedback:'진로 연계가 아주 구체적이에요.'},
-      {name:'종합 평가·후속 탐구 계획', score:8, max:10, ground:'탐구 주제는 분명하나 실행 계획이 없음.', feedback:'자료와 방법까지 적으면 계획이 단단해져요.'},
-      {name:'보고서 구성 및 형식', score:8, max:10, ground:'5개 문항 모두 작성했으나 오탈자·문장부호 오류가 여러 곳 있음.', feedback:'맞춤법과 문장부호를 한 번 더 살펴보세요.'}
+      {name:'내용 이해와 요약', score:8, max:10, ground:'선정 이유와 핵심 개념은 분명하나 요약 사례가 일부에 치우침.', feedback:'사례를 고르게 담고 반복 표현을 줄여 보세요.'},
+      {name:'생각의 변화와 진로 연계', score:10, max:10, ground:'읽기 전후의 차이와 진로·가치관 연결을 근거와 함께 제시함.', feedback:'책 속 인물을 근거로 든 점이 좋아요.'},
+      {name:'후속 탐구 계획과 보고서 구성', score:8, max:10, ground:'탐구 주제는 분명하나 방법이 없고 오탈자가 여러 곳 있음.', feedback:'자료와 방법까지 적고 맞춤법을 살펴보세요.'}
     ],
     teacherNote: '✨ 잘한 점\n• 읽기 전과 후의 생각 변화를 책 속 사례로 설명했어요\n• 화학공학과라는 진로와 책의 내용을 구체적으로 이어 썼어요\n\n🎯 다음에 해볼 도전\n• 핵심 내용 요약에 사례를 더 고르게 담아 보기\n• 갈륨 탐구 계획을 구체적으로 적어 보기\n\n💬 종합 의견\n다섯 문항을 모두 책 속 사례에 근거해 성실하게 썼어요. 다음에는 탐구 계획을 구체적으로 세워 보면 훨씬 좋은 보고서가 될 거예요. 🌟'
   },
   {
     round: 2, isCurrent: false,
     at: '2026.05.17 09:10', level: '엄격',
-    total: 48, max: 60,
+    total: 22, max: 30,
     rubrics: [
-      {name:'책 선정 이유', options:[10,8,6], selected:8},
-      {name:'핵심 내용 요약', options:[10,8,6], selected:8},
-      {name:'생각의 변화', options:[10,8,6], selected:10},
-      {name:'진로·관심사와의 연계', options:[10,8,6], selected:8},
-      {name:'종합 평가·후속 탐구 계획', options:[10,8,6], selected:6},
-      {name:'보고서 구성 및 형식', options:[10,8,6], selected:8}
+      {name:'내용 이해와 요약', options:[10,8,6], selected:8},
+      {name:'생각의 변화와 진로 연계', options:[10,8,6], selected:8},
+      {name:'후속 탐구 계획과 보고서 구성', options:[10,8,6], selected:6}
     ],
     instructions: [
       {label:'문항 1', level:'부분 도달', summary:'책 선정 이유', ground:'선택 동기는 있으나 기대한 점이 한 줄에 그침.', feedback:'읽기 전 기대를 조금 더 구체적으로 적어 보세요.'},
@@ -3358,26 +3289,20 @@ var HISTORY_LOG = [
       {label:'문항 5', level:'미도달', summary:'종합 평가·후속 탐구 계획', ground:'책 전체에 대한 평가와 탐구 방법이 없음.', feedback:'책의 좋았던 점·아쉬운 점과 탐구 방법을 적어 보세요.'}
     ],
     elements: [
-      {name:'책 선정 이유', score:8, max:10, ground:'엄격 모드 — 기대한 점의 구체성 부족.', feedback:'읽기 전 기대를 더 자세히 적어 주세요.'},
-      {name:'핵심 내용 요약', score:8, max:10, ground:'사례 편중과 반복 표현으로 감점.', feedback:'사례를 고르게 담아 주세요.'},
-      {name:'생각의 변화', score:10, max:10, ground:'근거를 든 변화 서술이 충실함.', feedback:'좋아요.'},
-      {name:'진로·관심사와의 연계', score:8, max:10, ground:'가치관 연결이 상대적으로 짧음.', feedback:'가치관 서술을 보강해 보세요.'},
-      {name:'종합 평가·후속 탐구 계획', score:6, max:10, ground:'책에 대한 평가와 탐구 방법이 없음.', feedback:'평가와 탐구 방법을 함께 적어 주세요.'},
-      {name:'보고서 구성 및 형식', score:8, max:10, ground:'오탈자·문장부호 오류가 다수.', feedback:'맞춤법을 점검해 주세요.'}
+      {name:'내용 이해와 요약', score:8, max:10, ground:'엄격 모드 — 기대한 점의 구체성과 사례 폭 부족.', feedback:'읽기 전 기대와 사례를 더 채워 주세요.'},
+      {name:'생각의 변화와 진로 연계', score:8, max:10, ground:'변화 서술은 충실하나 가치관 연결이 짧음.', feedback:'가치관 서술을 보강해 보세요.'},
+      {name:'후속 탐구 계획과 보고서 구성', score:6, max:10, ground:'탐구 방법이 없고 오탈자·문장부호 오류가 다수.', feedback:'탐구 방법을 적고 맞춤법을 점검해 주세요.'}
     ],
     teacherNote: '✨ 잘한 점\n• 읽기 전과 후의 생각 변화를 이유와 함께 잘 썼어요\n\n🎯 다음에 해볼 도전\n• 책 전체에 대한 평가와 탐구 방법 적어 보기\n• 요약에 사례 더 담기\n\n💬 종합 의견\n생각의 변화가 잘 드러났어요. 후속 탐구 계획을 구체적으로 적으면 훨씬 좋아질 거예요.'
   },
   {
     round: 1, isCurrent: false,
     at: '2026.05.15 11:02', level: '보통',
-    total: 52, max: 60,
+    total: 24, max: 30,
     rubrics: [
-      {name:'책 선정 이유', options:[10,8,6], selected:10},
-      {name:'핵심 내용 요약', options:[10,8,6], selected:8},
-      {name:'생각의 변화', options:[10,8,6], selected:10},
-      {name:'진로·관심사와의 연계', options:[10,8,6], selected:10},
-      {name:'종합 평가·후속 탐구 계획', options:[10,8,6], selected:6},
-      {name:'보고서 구성 및 형식', options:[10,8,6], selected:8}
+      {name:'내용 이해와 요약', options:[10,8,6], selected:8},
+      {name:'생각의 변화와 진로 연계', options:[10,8,6], selected:10},
+      {name:'후속 탐구 계획과 보고서 구성', options:[10,8,6], selected:6}
     ],
     instructions: [
       {label:'문항 1', level:'목표 도달', summary:'책 선정 이유', ground:'선택 동기와 기대가 모두 드러남.', feedback:'좋아요.'},
@@ -3387,12 +3312,9 @@ var HISTORY_LOG = [
       {label:'문항 5', level:'미도달', summary:'종합 평가·후속 탐구 계획', ground:'탐구 방법이 없음.', feedback:'어떻게 알아볼지 적어 보세요.'}
     ],
     elements: [
-      {name:'책 선정 이유', score:10, max:10, ground:'선택 동기가 매우 분명함.', feedback:'좋아요.'},
-      {name:'핵심 내용 요약', score:8, max:10, ground:'사례가 다소 적음.', feedback:'사례를 더 담아 보세요.'},
-      {name:'생각의 변화', score:10, max:10, ground:'변화와 이유가 충실함.', feedback:'좋아요.'},
-      {name:'진로·관심사와의 연계', score:10, max:10, ground:'진로 연계가 구체적임.', feedback:'좋아요.'},
-      {name:'종합 평가·후속 탐구 계획', score:6, max:10, ground:'탐구 방법이 없음.', feedback:'방법까지 적어 보세요.'},
-      {name:'보고서 구성 및 형식', score:8, max:10, ground:'오탈자가 여러 곳 있음.', feedback:'맞춤법을 살펴보세요.'}
+      {name:'내용 이해와 요약', score:8, max:10, ground:'선정 이유는 분명하나 요약 사례가 적음.', feedback:'사례를 더 담아 보세요.'},
+      {name:'생각의 변화와 진로 연계', score:10, max:10, ground:'변화와 진로 연계가 구체적임.', feedback:'좋아요.'},
+      {name:'후속 탐구 계획과 보고서 구성', score:6, max:10, ground:'탐구 방법이 없고 오탈자가 여러 곳 있음.', feedback:'방법까지 적고 맞춤법을 살펴보세요.'}
     ],
     teacherNote: '✨ 잘한 점\n• 진로와 책의 내용을 구체적으로 연결했어요\n• 읽기 전후의 생각 변화를 잘 썼어요\n\n🎯 다음에 해볼 도전\n• 탐구 계획에 방법까지 적어 보기\n\n💬 종합 의견\n진로 연계가 아주 좋아요! 다음에는 탐구 계획을 어떻게 실행할지까지 적어 보면 더 좋겠어요.'
   }
@@ -3403,27 +3325,21 @@ var RUBRIC_HISTORY_LOG = [
   {
     round: 2, isCurrent: true,
     at: '2026.05.18 14:40',
-    total: 54, max: 60,
+    total: 26, max: 30,
     rubrics: [
-      {name:'책 선정 이유', score:10, max:10, feedback:'고른 이유와 기대가 모두 잘 드러났어요.'},
-      {name:'핵심 내용 요약', score:8, max:10, feedback:'핵심 개념은 분명해요. 사례를 한두 개 더 담아 보세요.'},
-      {name:'생각의 변화', score:10, max:10, feedback:'읽기 전과 후의 생각을 이유와 함께 잘 썼어요.'},
-      {name:'진로·관심사와의 연계', score:10, max:10, feedback:'진로와 책의 내용을 구체적으로 이었어요.'},
-      {name:'종합 평가·후속 탐구 계획', score:8, max:10, feedback:'탐구 주제가 뚜렷해요. 방법까지 적어 보세요.'},
-      {name:'보고서 구성 및 형식', score:8, max:10, feedback:'모든 문항을 채웠어요. 맞춤법을 한 번 더 살펴보세요.'}
+      {name:'내용 이해와 요약', score:8, max:10, feedback:'고른 이유와 핵심 개념은 분명해요. 요약에 사례를 한두 개 더 담아 보세요.'},
+      {name:'생각의 변화와 진로 연계', score:10, max:10, feedback:'읽기 전과 후의 생각, 진로와 책의 내용을 구체적으로 이었어요.'},
+      {name:'후속 탐구 계획과 보고서 구성', score:8, max:10, feedback:'탐구 주제가 뚜렷해요. 방법까지 적고 맞춤법을 한 번 더 살펴보세요.'}
     ]
   },
   {
     round: 1, isCurrent: false,
     at: '2026.05.17 10:05',
-    total: 48, max: 60,
+    total: 22, max: 30,
     rubrics: [
-      {name:'책 선정 이유', score:8, max:10, feedback:'고른 이유는 좋아요. 기대한 점도 적어 보세요.'},
-      {name:'핵심 내용 요약', score:8, max:10, feedback:'큰 줄기는 잡았어요. 사례를 더 담아 보세요.'},
-      {name:'생각의 변화', score:10, max:10, feedback:'생각의 변화가 잘 드러났어요.'},
-      {name:'진로·관심사와의 연계', score:8, max:10, feedback:'진로 연계는 좋아요. 가치관도 함께 적어 보세요.'},
-      {name:'종합 평가·후속 탐구 계획', score:6, max:10, feedback:'더 알아보고 싶은 주제와 방법을 적어 보세요.'},
-      {name:'보고서 구성 및 형식', score:8, max:10, feedback:'맞춤법과 문장부호를 점검해 보세요.'}
+      {name:'내용 이해와 요약', score:8, max:10, feedback:'고른 이유는 좋아요. 기대한 점과 사례를 더 적어 보세요.'},
+      {name:'생각의 변화와 진로 연계', score:8, max:10, feedback:'생각의 변화가 잘 드러났어요. 가치관도 함께 적어 보세요.'},
+      {name:'후속 탐구 계획과 보고서 구성', score:6, max:10, feedback:'더 알아보고 싶은 주제와 방법을 적고, 맞춤법과 문장부호를 점검해 보세요.'}
     ]
   }
 ];
@@ -3679,7 +3595,7 @@ function applyFailedUI(){
   });
 
   // 총점: 점수 없음
-  document.getElementById('totalScoreVal').textContent = '— / 60';
+  document.getElementById('totalScoreVal').textContent = '— / 30';
 
   // 채점 결과 표: ai-suggest 클래스는 보존 + body 플래그로 시각만 일반 버튼처럼 (다시 시도하면 빗금 노출)
   document.body.classList.add('before-ai-rerun');
