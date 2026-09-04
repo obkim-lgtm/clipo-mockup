@@ -359,14 +359,9 @@ body.before-ai-rerun .score-btn.ai-suggest:hover{background:#f4f8ff;border-color
 .grund-content .editable:focus{background:#fff;border-color:#6d7381}
 
 /* ══════ 직접 채점(AI 제외) — 채점 패널 상단 고정 토글 (26-09-04 1안: 채점 전·후 같은 자리) ══════ */
-/* 인식 결과 툴바 안의 컴팩트 토글 — 어두운 바에 맞춘 변형 */
-.ve-selfgrade{gap:8px;margin-left:12px;padding:0 10px;height:30px;border:1px solid rgba(255,255,255,.3);border-radius:6px;color:#cfd3da;font-size:13px;font-weight:600;line-height:1;user-select:none}
-.ve-selfgrade .ve-sg-label{white-space:nowrap}
-.ve-selfgrade .q-exclude-track{width:32px;height:18px;background:rgba(255,255,255,.28)}
-.ve-selfgrade .q-exclude-thumb{width:14px;height:14px}
-.ve-selfgrade input:checked + .q-exclude-track{background:#a78bfa}
-.ve-selfgrade input:checked + .q-exclude-track .q-exclude-thumb{left:16px}
-.ve-selfgrade.on{border-color:#a78bfa;background:rgba(167,139,250,.18);color:#fff}
+/* 인식 결과 수정 드로워 헤더의 토글 — 지정은 여기서만 (올립 26-09-04: AI가 읽은 내용을 보고 판단하는 자리) */
+.q-exclude-label{font-size:13px;font-weight:600;color:#3b3f4c;white-space:nowrap}
+.q-exclude-toggle.on .q-exclude-label{color:#6d28d9}
 .q-exclude-toggle{display:inline-flex;align-items:center;gap:7px;cursor:pointer;flex-shrink:0}
 .q-exclude-toggle input{display:none}
 .q-exclude-track{width:40px;height:22px;border-radius:100px;background:#d9d9d9;position:relative;transition:background .15s;flex-shrink:0}
@@ -1043,13 +1038,6 @@ body.vs-hide-topbar .vs-float{display:inline-flex}
       </div>
       <label class="ve-check" id="veSolveCheck"><input type="checkbox" checked onchange="toggleSolveView(this)">학생 풀이와 답안 보기</label>
       <button id="ocrEditBtn" onclick="openOcrEdit()" style="margin-left:12px;height:30px;padding:0 12px;border:1px solid rgba(255,255,255,.3);border-radius:6px;background:transparent;color:#fff;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:5px;"><i data-lucide="scan-text" style="width:14px;height:14px"></i>인식 결과 수정</button>
-      <!-- 직접 채점(AI 제외) — 인식 결과 툴바. AI가 읽은 내용이 못 쓸 정도일 때 이 자리에서 바로 뺀다 (26-09-04 올립: 채점 결과 화면이 아니라 OCR 영역) -->
-      <label class="q-exclude-toggle ve-selfgrade" id="selfGradeRow" title="AI가 읽은 답안이 잘못돼 채점을 맡기기 어려울 때 켜세요. 켜면 AI 채점 대상에서 빠지고, 점수와 피드백을 선생님이 직접 적어요.">
-        <i data-lucide="user-pen" style="width:14px;height:14px"></i>
-        <span class="ve-sg-label">직접 채점 (AI 제외)</span>
-        <input type="checkbox" id="selfgrade-toggle" onchange="toggleSelfGrade()">
-        <span class="q-exclude-track"><span class="q-exclude-thumb"></span></span>
-      </label>
     </div>
     <!-- 원본 제출물 모드 전용 컨트롤 (2번째 줄) -->
     <div id="ve-imgbar" style="display:none;align-items:center;justify-content:center;gap:2px;height:40px;background:#33373f;border-top:1px solid rgba(255,255,255,.08);flex-shrink:0;">
@@ -1382,6 +1370,12 @@ body.vs-hide-topbar .vs-float{display:inline-flex}
   <div class="ocr-drawer" id="ocrDrawer">
     <div class="ocr-drawer-hd">
       <div class="ocr-drawer-title"><i data-lucide="scan-text" style="width:20px;height:20px;color:#416bff;"></i>인식 결과 수정</div>
+      <!-- 직접 채점(AI 제외) — 인식 결과 수정 안에서만 지정 (올립 26-09-04). 채점 전 학생은 드로워가 안 열리므로 지정 대상 아님 -->
+      <label class="q-exclude-toggle" id="selfGradeRow" style="gap:7px;margin-left:auto;" title="AI가 읽은 답안이 잘못돼 채점을 맡기기 어려울 때 켜세요. 켜면 AI 채점 대상에서 빠지고, 점수와 피드백을 선생님이 직접 적어요.">
+        <input type="checkbox" id="selfgrade-toggle" onchange="toggleSelfGrade()">
+        <span class="q-exclude-track"><span class="q-exclude-thumb"></span></span>
+        <span class="q-exclude-label">이 학생 직접 채점 (AI 제외)</span>
+      </label>
     </div>
     <div class="ocr-drawer-body">
       <!-- 문항 1 — 정상 인식 -->
@@ -3941,7 +3935,7 @@ function applySelfGradeNotice(){
   var on = readSelfGrade();
   var row = document.getElementById('selfGradeRow');
   var tg  = document.getElementById('selfgrade-toggle');
-  // 미제출·채점 중·레거시(업데이트 전 채점, 인식 결과 없음)엔 켜고 끌 이유가 없다 — 토글 자체를 감춘다 (레거시는 올립 26-09-04)
+  // 미제출·채점 중·레거시(인식 결과 없음)엔 켜고 끌 이유가 없다 — 토글 자체를 감춘다. (드로워 자체가 채점 후에만 열리므로 채점 전 학생도 자연히 지정 대상 아님)
   var hideRow = (typeof _isNotSubmitted !== 'undefined' && _isNotSubmitted) || (_curStudent && (_curStudent.running || _curStudent.legacy === true));
   if(row) row.style.display = hideRow ? 'none' : 'inline-flex';
   if(tg) tg.checked = on;
