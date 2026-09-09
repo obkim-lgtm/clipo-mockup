@@ -96,7 +96,7 @@ body{background:#fff;color:#222631;overflow:hidden;height:100vh}
 .viewer{flex:1;display:flex;flex-direction:column;min-width:0;position:relative;background:#dde1e8}
 .viewer-topbar{min-height:44px;background:#3f3f46;display:flex;align-items:center;gap:12px;padding:6px 20px;flex-shrink:0}
 .viewer-ctrl{display:flex;align-items:center;gap:2px}
-.ctrl-btn{width:32px;height:32px;\1border-radius:4px}
+.ctrl-btn{width:32px;height:32px;display:flex;align-items:center;justify-content:center;border:none;background:none;color:#fff;cursor:pointer;border-radius:4px}
 .ctrl-btn:hover{background:rgba(255,255,255,.12)}
 .ctrl-sep{width:1px;height:16px;background:rgba(255,255,255,.25);margin:0 4px}
 .ctrl-page-info{font-size:13px;color:#fff;min-width:40px;text-align:center}
@@ -168,12 +168,63 @@ body{background:#fff;color:#222631;overflow:hidden;height:100vh}
 .ob-btn.primary{background:#fff;color:#222631;border-color:#fff}
 .ob-btn.primary:hover{background:#eef3ff}
 body.hide-solve .ocr-ans-box[data-solve]{display:none}
-.ocr-drawer{position:absolute;top:0;right:0;bottom:0;width:640px;max-width:100%;background:#fff;z-index:60;transform:translateX(100%);transition:transform .28s ease;box-shadow:-8px 0 24px rgba(0,0,0,.12);display:flex;flex-direction:column}
-.ocr-drawer.open{transform:translateX(0)}
-.ocr-drawer-hd{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:16px 24px;border-bottom:1px solid #eaecf0;flex-shrink:0}
-.ocr-drawer-title{font-size:18px;font-weight:700;color:#222631;display:inline-flex;align-items:center;gap:8px;line-height:1.3}
-.ocr-drawer-sub{font-size:13px;color:#6d7381;line-height:1.55;margin-top:4px}
-.ocr-drawer-body{flex:1;overflow-y:auto;padding:20px 24px;display:flex;flex-direction:column;gap:18px}
+/* ══════ 인식 결과 수정 팝업 — 풀와이드 2단(좌 원본 / 우 인식 텍스트). 줄리 시안 2173:15203 ══════ */
+.ocrm{position:fixed;inset:0;z-index:1100;background:#fff;display:none;flex-direction:column}
+.ocrm.open{display:flex}
+.ocrm-hd{height:64px;flex-shrink:0;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:0 16px 0 24px;border-bottom:1px solid #eaecf0}
+.ocrm-title{font-size:18px;font-weight:700;color:#222631;line-height:1.3}
+.ocrm-x{display:inline-flex;align-items:center;justify-content:center;line-height:1;vertical-align:middle;width:36px;height:36px;border:none;background:none;border-radius:8px;color:#6d7381;cursor:pointer}
+.ocrm-x:hover{background:#f1f3f5}
+.ocrm-body{flex:1;display:flex;min-height:0}
+/* 좌 — 원본 제출물 (OCR 채점 과제는 파일 1건이라 파일 선택 없음) */
+.ocrm-left{width:50%;min-width:0;display:flex;flex-direction:column;border-right:1px solid #eaecf0;background:#dde1e8}
+.ocrm-filebar{height:56px;flex-shrink:0;background:#fff;display:flex;align-items:center;gap:12px;padding:0 20px;border-bottom:1px solid #eaecf0}
+.ocrm-fname{font-size:16px;font-weight:700;color:#222631}
+.ocrm-toolbar{min-height:44px;flex-shrink:0;background:#3f3f46;display:flex;align-items:center;justify-content:center;gap:16px;padding:6px 16px}
+.ocrm-tb-label{font-size:14px;font-weight:600;color:#fff;white-space:nowrap}
+.ocrm-view{flex:1;overflow:auto;padding:20px;display:flex;flex-direction:column;align-items:center}
+.ocrm-pages{display:flex;flex-direction:column;align-items:center;gap:16px;width:100%;max-width:720px}
+/* 우 — 인식 결과 */
+.ocrm-right{width:50%;min-width:0;display:flex;flex-direction:column;background:#fff}
+.ocrm-rhd{min-height:56px;flex-shrink:0;display:flex;align-items:center;gap:10px;padding:8px 16px 8px 20px;border-bottom:1px solid #eaecf0}
+.ocrm-rhd-t{font-size:16px;font-weight:700;color:#222631;white-space:nowrap}
+.ocrm-rhd-sub{font-size:14px;color:#6d7381;line-height:1.5}
+.ocrm-reset{margin-left:auto;display:inline-flex;align-items:center;justify-content:center;line-height:1;vertical-align:middle;gap:6px;height:32px;padding:0 12px;border:none;border-radius:100px;background:none;color:#3b3f4c;font-family:inherit;font-size:14px;font-weight:600;cursor:pointer;white-space:nowrap;flex-shrink:0}
+.ocrm-reset:hover{background:#f1f3f5;color:#3151c4}
+.ocrm-list{flex:1;overflow-y:auto;padding:16px 20px 24px;display:flex;flex-direction:column;gap:14px}
+/* 문항 카드 */
+.ocrq{border:1px solid #dde1e8;border-radius:8px;overflow:hidden;flex-shrink:0;background:#fff}
+.ocrq-hd{display:flex;align-items:center;gap:8px;padding:12px 14px;background:#f6f7f9;cursor:pointer;user-select:none}
+.ocrq-chev{width:18px;height:18px;color:#6d7381;flex-shrink:0;transition:transform .18s}
+.ocrq.collapsed .ocrq-chev{transform:rotate(-90deg)}
+.ocrq-no{font-size:15px;font-weight:700;color:#3151c4;flex-shrink:0}
+.ocrq-name{font-size:15px;font-weight:700;color:#222631;min-width:0;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+.ocrq-bd{padding:14px 16px 16px;border-top:1px solid #dde1e8;display:flex;flex-direction:column;gap:10px}
+.ocrq.collapsed .ocrq-bd{display:none}
+.ocrq-prompt{margin:0;font-size:15px;color:#3b3f4c;line-height:1.7}
+.ocrq-div{border-top:1px dashed #dde1e8;margin:4px 0 2px}
+.ocrq-frow{display:flex;align-items:center;gap:8px;min-height:24px}
+.ocrq-flabel{font-size:14px;font-weight:700;color:#222631}
+/* 고칠 수 있는 칸은 칸처럼 — 바탕색으로 가르고 hover·focus 로 알림 */
+.ocrq-fld{display:block;width:100%;box-sizing:border-box;background:#f6f7f9;border:1px solid #f6f7f9;border-radius:8px;padding:12px 14px;font-family:inherit;font-size:16px;line-height:1.8;color:#222631;outline:none;resize:none;overflow:hidden}
+.ocrq-fld::placeholder{color:#9ca3af}
+.ocrq-fld:hover{background:#fff;border-color:#dde1e8}
+.ocrq-fld:focus{background:#fff;border-color:#416bff;box-shadow:0 0 0 3px rgba(65,107,255,.12)}
+/* 푸터 */
+.ocrm-ft{flex-shrink:0;display:flex;align-items:center;justify-content:flex-end;gap:18px;padding:12px 24px;border-top:1px solid #eaecf0;background:#fafbff}
+.ocrm-ft-note{margin-right:auto;font-size:14px;color:#6d7381;line-height:1.6;display:none;align-items:center;gap:6px}
+.ocrm-ft-note.on{display:inline-flex}
+.ocrm-chk{display:inline-flex;align-items:center;gap:8px;font-size:15px;font-weight:600;color:#3b3f4c;cursor:pointer;user-select:none;line-height:1}
+.ocrm-chk input{width:18px;height:18px;accent-color:#416bff;cursor:pointer}
+.ocrm-save{display:inline-flex;align-items:center;justify-content:center;line-height:1;vertical-align:middle;gap:6px;height:44px;padding:0 22px;border-radius:100px;background:#416bff;border:none;color:#fff;font-size:16px;font-weight:700;font-family:inherit;cursor:pointer}
+.ocrm-save:hover{background:#365eef}
+/* 닫기 확인 — 팝업 위에 모달을 또 띄우지 않고 푸터 위 한 줄로 */
+.ocrm-confirm{display:none;align-items:center;gap:12px;padding:12px 24px;border-top:1px solid #fed7aa;background:#fff7ed}
+.ocrm-confirm.on{display:flex}
+.ocrm-confirm-t{flex:1;font-size:15px;color:#3b3f4c;line-height:1.6}
+.ocrm-confirm-btn{display:inline-flex;align-items:center;justify-content:center;line-height:1;vertical-align:middle;gap:5px;height:36px;padding:0 14px;border-radius:100px;background:#fff;border:1px solid #dde1e8;color:#3b3f4c;font-family:inherit;font-size:14px;font-weight:600;cursor:pointer}
+.ocrm-confirm-btn.warn{border-color:#fed7aa;color:#c2410c}
+.ocrm-confirm-btn:hover{border-color:#a3c3ff;color:#365eef}
 .ocr-q{display:flex;flex-direction:column;gap:8px}
 .ocr-q-label{font-size:13px;font-weight:700;color:#3151c4;line-height:1.5}
 .ocr-q-text{min-height:84px;border:1px solid #d9d9d9;border-radius:8px;padding:12px 14px;font-size:16px;font-family:inherit;line-height:1.7;color:#222631;outline:none;background:#fff}
@@ -183,13 +234,6 @@ body.hide-solve .ocr-ans-box[data-solve]{display:none}
 .ocr-uncertainty-note{margin-top:8px;background:#fff7ed;border:1px solid #fdba74;padding:10px 14px;display:flex;flex-direction:column;gap:4px;border-radius:8px}
 .ocr-uncertainty-label{font-size:13px;font-weight:700;color:#c2410c;display:flex;align-items:center;gap:4px}
 .ocr-uncertainty-text{font-size:14px;color:#9a3412;line-height:1.65}
-.ocr-drawer-ft{display:flex;justify-content:flex-end;gap:10px;padding:14px 24px 18px;border-top:1px solid #eaecf0;flex-shrink:0;background:#fafbff}
-.ocr-drawer-cancel{display:inline-flex;align-items:center;justify-content:center;gap:6px;height:40px;padding:0 18px;border-radius:100px;background:#fff;border:1px solid #dde1e8;color:#3b3f4c;font-size:15px;font-weight:600;cursor:pointer;font-family:inherit;line-height:1}
-.ocr-drawer-cancel:hover{border-color:#a3c3ff;color:#365eef}
-.ocr-drawer-save{display:inline-flex;align-items:center;justify-content:center;gap:6px;height:40px;padding:0 18px;border-radius:100px;background:#416bff;border:none;color:#fff;font-size:15px;font-weight:600;cursor:pointer;font-family:inherit;line-height:1}
-.ocr-drawer-save:hover{background:#365eef}
-.ocr-drawer-save:disabled{background:#e9ebef;color:#9ca3af;cursor:not-allowed}
-.ocr-drawer-save:disabled:hover{background:#e9ebef}
 
 /* ══════ 총점 영역 ══════ */
 .total-score-section{display:flex;align-items:center;justify-content:space-between;padding:20px 24px;background:#fff;border-bottom:1px solid #eaecf0}
@@ -776,23 +820,12 @@ select.field-input{appearance:none;-webkit-appearance:none;background-image:url(
 /* ===== OCR 드로워: 문항별 인식 결과 수정 섹션 (task_ocr_inline_v1 이식) ===== */
 .badge{ display:inline-flex; align-items:center; justify-content:center; border-radius:100px; padding:3px 10px; font-size:13px; font-weight:600; white-space:nowrap; line-height:1; }
 .badge-purple{ background:#e9f2ff; color:#3151c4; }
-/* flex 컬럼(.ocr-drawer-body)의 아이템 — overflow:hidden 이 최소높이를 0으로 만들어
-   내용이 눌려 잘리던 버그. flex-shrink:0 으로 자기 높이를 지키고 본문이 스크롤되게 한다 (26-08-28) */
-.rubric-ocr-section{ border:1px solid #dde1e8; border-radius:4px; overflow:hidden; flex-shrink:0; }
-.rubric-ocr-header{ display:flex; align-items:center; gap:8px; padding:10px 14px; background:#f6f7f9; border-bottom:1px solid #dde1e8; flex-wrap:wrap; }
-.rubric-ocr-desc{ font-size:14px; color:#6d7381; font-weight:500; flex:1; min-width:0; overflow:hidden; white-space:nowrap; text-overflow:ellipsis; }
 .rubric-suspect-chip{ display:inline-flex; align-items:center; gap:4px; background:#fff7ed; border:1px solid #fdba74; border-radius:100px; padding:2px 8px; font-size:13px; font-weight:600; color:#c2410c; flex-shrink:0; }
-.rubric-ocr-body{ padding:14px 16px; font-size:16px; line-height:1.85; color:#222631; cursor:text; position:relative; }
-.rubric-ocr-body:hover{ background:#fbfbfc; }
-.section-editing{ border-color:#416bff !important; box-shadow:0 0 0 2px rgba(65,107,255,.12); }
-.section-editing .rubric-ocr-header{ background:#e9f2ff; }
-.editing-badge{ font-size:11px; font-weight:600; color:#3151c4; background:#e9f2ff; border-radius:100px; padding:2px 8px; }
 .saved-badge{ font-size:12px; font-weight:600; color:#1ab864; display:inline-flex; align-items:center; gap:3px; transition:opacity .4s; }
 .fbtn{ height:32px; min-width:40px; padding:0 10px; background:white; border:1px solid #d9d9d9; border-radius:6px; color:#3b3f4c; font-family:inherit; font-size:14px; font-weight:700; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; line-height:1; }
 .fbtn:hover{ background:#f6f7f9; border-color:#b3b3b3; }
-.formula-insert-btn{ display:none; }
-.section-editing .formula-insert-btn{ display:inline-flex; }
-.section-editing .rubric-suspect-chip{ display:none; }
+.formula-insert-btn{ display:inline-flex; align-items:center; justify-content:center; line-height:1; vertical-align:middle; gap:3px; height:24px; padding:0 8px; background:#fff; border:1px solid #d9d9d9; border-radius:6px; color:#3b3f4c; font-family:inherit; font-size:11px; font-weight:700; cursor:pointer; flex-shrink:0; }
+.formula-insert-btn:hover{ border-color:#a3c3ff; color:#365eef; }
 
 /* ══════════════════════════════════════════════════
    보기 설정 (뷰어/패널 커스터마이즈) — 사용자별 자동 저장
@@ -1383,84 +1416,186 @@ body.vs-hide-topbar .vs-float{display:inline-flex}
 
   </div>
 
-  <!-- ══════ 인식 결과 수정 드로워 (우측 채점 패널 인플레이스 전환) ══════ -->
-  <div class="ocr-drawer" id="ocrDrawer">
-    <div class="ocr-drawer-hd">
-      <div class="ocr-drawer-title"><i data-lucide="scan-text" style="width:20px;height:20px;color:#416bff;"></i>인식 결과 수정</div>
-    </div>
-    <div class="ocr-drawer-body">
-      <!-- OCR 품질 안내 — 채점 패널이 아니라 여기(인식 결과 수정) 안에서만. 진입점 버튼엔 점만 (올립 26-09-04: OCR 얘기는 OCR 화면에서, 채점 화면은 기존 그대로) -->
-      <div id="ocrReviewNotice" class="ocrd-notice ocrd-notice--warn" style="display:none;">
-        <i data-lucide="alert-circle" style="width:16px;height:16px;flex-shrink:0;margin-top:2px;"></i>
-        <span><strong>인식이 불확실한 문항</strong>이 있어요. 표시된 문항을 확인하고 고친 뒤 다시 채점하면 점수가 더 정확해져요.</span>
-      </div>
-      <!-- 문항 1 — 정상 인식 -->
-      <!-- 문항 1 — 책 선정 이유 -->
-      <div class="rubric-ocr-section">
-        <div class="rubric-ocr-header">
-          <span class="badge badge-purple" style="font-size:12px;padding:3px 10px;">문항 1</span>
-          <span class="rubric-ocr-desc">왜 이 책을 골랐는지, 읽기 전 기대했던 점을 작성해 봅시다.</span>
-          <button class="formula-insert-btn" onmousedown="event.preventDefault()" onclick="openFormulaInput('ocrd-ta-0')" title="수식 입력" style="align-items:center;justify-content:center;line-height:1;gap:3px;height:24px;padding:0 8px;background:white;border:1px solid #d9d9d9;border-radius:6px;color:#3b3f4c;font-family:inherit;font-size:11px;font-weight:700;cursor:pointer;flex-shrink:0;"><i data-lucide="sigma" style="width:11px;height:11px;"></i>수식</button>
-          <button onclick="editSection(this,0)" title="편집" style="background:none;border:none;cursor:pointer;color:#b3b6bd;padding:2px 4px;flex-shrink:0;display:flex;align-items:center;"><i data-lucide="pencil" style="width:13px;height:13px;"></i></button>
-        </div>
-        <div class="rubric-ocr-body" id="ocrd-body-0" onclick="editSectionByBody(this,0)"><span style="color:#222631;">내가 ‘사라진 스푼’을 고른 이유는 원소에 대해 다양한 이야기가 얽혀있다는 점에 흥미가 갔기 때문이다. 그저 과학적 지식인줄 알았던 주기율표에 대해 다양한 이야기가 있다는 것이 신기했고 궁금해져서 선택하였다. 또 이 책을 통해 내가 화학에 대해 가져야 할 태도를 배울 수 있기를 기대하면서 이 책을 골랐다.</span></div>
-        <textarea id="ocrd-ta-0" onblur="saveSection(this,0)" style="display:none;width:100%;border:none;border-top:1px solid #ccdfff;padding:12px 15px;font-family:inherit;font-size:16px;line-height:1.8;color:#222631;outline:none;resize:none;overflow:hidden;box-sizing:border-box;" rows="4">내가 ‘사라진 스푼’을 고른 이유는 원소에 대해 다양한 이야기가 얽혀있다는 점에 흥미가 갔기 때문이다. 그저 과학적 지식인줄 알았던 주기율표에 대해 다양한 이야기가 있다는 것이 신기했고 궁금해져서 선택하였다. 또 이 책을 통해 내가 화학에 대해 가져야 할 태도를 배울 수 있기를 기대하면서 이 책을 골랐다.</textarea>
-      </div>
-      <!-- 문항 2 — 핵심 내용 요약 -->
-      <div class="rubric-ocr-section">
-        <div class="rubric-ocr-header">
-          <span class="badge badge-purple" style="font-size:12px;padding:3px 10px;">문항 2</span>
-          <span class="rubric-ocr-desc">책의 주요 주장과 근거, 핵심 개념, 주제 등을 요약해 봅시다.</span>
-          <span class="rubric-suspect-chip" id="ocrd-chip-1" style="display:none;"><i data-lucide="alert-circle" style="width:11px;height:11px;"></i>확인 필요</span>
-          <button class="formula-insert-btn" onmousedown="event.preventDefault()" onclick="openFormulaInput('ocrd-ta-1')" title="수식 입력" style="align-items:center;justify-content:center;line-height:1;gap:3px;height:24px;padding:0 8px;background:white;border:1px solid #d9d9d9;border-radius:6px;color:#3b3f4c;font-family:inherit;font-size:11px;font-weight:700;cursor:pointer;flex-shrink:0;"><i data-lucide="sigma" style="width:11px;height:11px;"></i>수식</button>
-          <button onclick="editSection(this,1)" title="편집" style="background:none;border:none;cursor:pointer;color:#b3b6bd;padding:2px 4px;flex-shrink:0;display:flex;align-items:center;"><i data-lucide="pencil" style="width:13px;height:13px;"></i></button>
-        </div>
-        <div class="rubric-ocr-body" id="ocrd-body-1" onclick="editSectionByBody(this,1)"><span style="color:#222631;">‘사라진 스푼’은 각 원소들에 대한 역사와 이야기를 나타내고 있다. 주기율표가 어떻게 탄생하게 되었는지와 멘델레예프가 주기율표를 만든 후 남은 원소들을 다양한 과학자들이 찾는 과정을 담고 있고, 또한 그 원소들이 우리 인간 문명에 어떠한 영향을 끼쳤는지를 나타내고 있다. 예를 들어 우라늄과 플루토늄 같은 원소를 발견한 뒤 원자폭탄 발명에 영향을 미쳐 전쟁에도 큰 영향을 끼친 등의 이야기가 있다. 이렇게 이 책은 원소가 그저 과학적 지식이 아니라 인간문명에도 큰 영향을 끼친다는 핵심개념을 가지고 있다.</span></div>
-        <textarea id="ocrd-ta-1" onblur="saveSection(this,1)" style="display:none;width:100%;border:none;border-top:1px solid #ccdfff;padding:12px 15px;font-family:inherit;font-size:16px;line-height:1.8;color:#222631;outline:none;resize:none;overflow:hidden;box-sizing:border-box;" rows="4">‘사라진 스푼’은 각 원소들에 대한 역사와 이야기를 나타내고 있다. 주기율표가 어떻게 탄생하게 되었는지와 멘델레예프가 주기율표를 만든 후 남은 원소들을 다양한 과학자들이 찾는 과정을 담고 있고, 또한 그 원소들이 우리 인간 문명에 어떠한 영향을 끼쳤는지를 나타내고 있다. 예를 들어 우라늄과 플루토늄 같은 원소를 발견한 뒤 원자폭탄 발명에 영향을 미쳐 전쟁에도 큰 영향을 끼친 등의 이야기가 있다. 이렇게 이 책은 원소가 그저 과학적 지식이 아니라 인간문명에도 큰 영향을 끼친다는 핵심개념을 가지고 있다.</textarea>
-        <div class="ocr-uncertainty-note" id="ocrd-note-1" style="display:none;">
-          <span class="ocr-uncertainty-label"><i data-lucide="alert-circle" style="width:13px;height:13px;"></i>AI 인식 불확실</span>
-          <span class="ocr-uncertainty-text">일부 글자의 받침 판독이 불확실합니다. 흘려 쓴 글씨로 <b>‘멘델레예프’</b> 구간이 부정확하게 인식되었을 수 있어요. 원본 이미지와 대조 후 수정해 주세요.</span>
+</div>
+
+<!-- ══════ 인식 결과 수정 팝업 — 풀와이드 2단(좌 원본 / 우 인식 텍스트). 줄리 시안 2173:15203 ══════ -->
+<div class="ocrm" id="ocrDrawer" role="dialog" aria-modal="true" aria-labelledby="ocrmTitle">
+  <div class="ocrm-hd">
+    <span class="ocrm-title" id="ocrmTitle">인식 결과 수정</span>
+    <button class="ocrm-x" onclick="closeOcrEdit()" aria-label="닫기"><i data-lucide="x" style="width:20px;height:20px"></i></button>
+  </div>
+  <div class="ocrm-body">
+
+    <!-- 좌: 원본 제출물 — OCR 채점 과제는 파일 1건만 받으므로 파일 선택 없이 쪽 넘김·확대만 -->
+    <div class="ocrm-left">
+      <div class="ocrm-filebar"><span class="ocrm-fname" id="ocrmFileName">10107_조민재.pdf</span></div>
+      <div class="ocrm-toolbar">
+        <span class="ocrm-tb-label">원본 제출물</span>
+        <div class="ve-ctrl">
+          <button class="ctrl-btn" onclick="ocrmPage(-1)" aria-label="이전 쪽"><i data-lucide="chevron-left" style="width:18px;height:18px"></i></button>
+          <span class="ve-page-input" id="ocrmPageInfo">1</span>
+          <span class="ve-page-total" id="ocrmPageTotal">2</span>
+          <button class="ctrl-btn" onclick="ocrmPage(1)" aria-label="다음 쪽"><i data-lucide="chevron-right" style="width:18px;height:18px"></i></button>
+          <div class="ctrl-sep"></div>
+          <button class="ctrl-btn" onclick="ocrmRotate(90)" title="회전"><i data-lucide="rotate-cw" style="width:18px;height:18px"></i></button>
+          <span class="zoom-info" id="ocrmZoomInfo" onclick="ocrmZoomReset()" title="100%로 되돌리기">100%</span>
+          <button class="ctrl-btn" onclick="ocrmZoom(10)" aria-label="확대"><i data-lucide="zoom-in" style="width:18px;height:18px"></i></button>
+          <button class="ctrl-btn" onclick="ocrmZoom(-10)" aria-label="축소"><i data-lucide="zoom-out" style="width:18px;height:18px"></i></button>
         </div>
       </div>
-      <!-- 문항 3 — 생각의 변화 -->
-      <div class="rubric-ocr-section">
-        <div class="rubric-ocr-header">
-          <span class="badge badge-purple" style="font-size:12px;padding:3px 10px;">문항 3</span>
-          <span class="rubric-ocr-desc">읽기 전/읽은 후 생각의 차이, 책의 내용 중 비판하고 싶은 점 등을 이유를 들어 구체적으로 작성해 봅시다.</span>
-          <button class="formula-insert-btn" onmousedown="event.preventDefault()" onclick="openFormulaInput('ocrd-ta-2')" title="수식 입력" style="align-items:center;justify-content:center;line-height:1;gap:3px;height:24px;padding:0 8px;background:white;border:1px solid #d9d9d9;border-radius:6px;color:#3b3f4c;font-family:inherit;font-size:11px;font-weight:700;cursor:pointer;flex-shrink:0;"><i data-lucide="sigma" style="width:11px;height:11px;"></i>수식</button>
-          <button onclick="editSection(this,2)" title="편집" style="background:none;border:none;cursor:pointer;color:#b3b6bd;padding:2px 4px;flex-shrink:0;display:flex;align-items:center;"><i data-lucide="pencil" style="width:13px;height:13px;"></i></button>
+      <div class="ocrm-view">
+        <div class="ocrm-pages" id="ocrmPages">
+          <div class="viewer-page">
+            <span class="viewer-page-num">1 / 2</span>
+            <img src="reading_report_p1.png" alt="독후 활동 보고서 1페이지" onerror="this.style.display='none';this.parentNode.querySelector('.viewer-page-placeholder').style.display='flex'">
+            <div class="viewer-page-placeholder" style="display:none">
+              <i data-lucide="file-image" style="width:36px;height:36px"></i>
+              <div class="ph-title">독후 활동 보고서 1페이지</div>
+            </div>
+          </div>
+          <div class="viewer-page" style="display:none">
+            <span class="viewer-page-num">2 / 2</span>
+            <img src="reading_report_p2.png" alt="독후 활동 보고서 2페이지" onerror="this.style.display='none';this.parentNode.querySelector('.viewer-page-placeholder').style.display='flex'">
+            <div class="viewer-page-placeholder" style="display:none">
+              <i data-lucide="file-image" style="width:36px;height:36px"></i>
+              <div class="ph-title">독후 활동 보고서 2페이지</div>
+            </div>
+          </div>
         </div>
-        <div class="rubric-ocr-body" id="ocrd-body-2" onclick="editSectionByBody(this,2)"><span style="color:#222631;">나는 이 책을 읽기 전에는 원소와 주기율표가 그저 외워야 되는 과학적 지식이라고 생각하고 있는데 사실 원소와 주기율표에는 다양한 역사적 이야기를 가지고 있고 우리 삶에 많은 영향을 끼쳐왔음을 알게 되었다. 그리고 기존에는 이러한 원소들을 모두 새로운 원소를 발견하겠다는 과학자들의 사명을 가지고 발견한 줄 알았는데 이 책을 통해 보니 과학자들이 그저 우연한 사고로 발견하게 된 원소도 있고 자신의 생각이 맞음을 입증하기 위해 연구를 한 과학자들도 있었음을 알게 되었다.</span></div>
-        <textarea id="ocrd-ta-2" onblur="saveSection(this,2)" style="display:none;width:100%;border:none;border-top:1px solid #ccdfff;padding:12px 15px;font-family:inherit;font-size:16px;line-height:1.8;color:#222631;outline:none;resize:none;overflow:hidden;box-sizing:border-box;" rows="4">나는 이 책을 읽기 전에는 원소와 주기율표가 그저 외워야 되는 과학적 지식이라고 생각하고 있는데 사실 원소와 주기율표에는 다양한 역사적 이야기를 가지고 있고 우리 삶에 많은 영향을 끼쳐왔음을 알게 되었다. 그리고 기존에는 이러한 원소들을 모두 새로운 원소를 발견하겠다는 과학자들의 사명을 가지고 발견한 줄 알았는데 이 책을 통해 보니 과학자들이 그저 우연한 사고로 발견하게 된 원소도 있고 자신의 생각이 맞음을 입증하기 위해 연구를 한 과학자들도 있었음을 알게 되었다.</textarea>
-      </div>
-      <!-- 문항 4 — 진로·관심사와의 연계 -->
-      <div class="rubric-ocr-section">
-        <div class="rubric-ocr-header">
-          <span class="badge badge-purple" style="font-size:12px;padding:3px 10px;">문항 4</span>
-          <span class="rubric-ocr-desc">책의 내용이 나의 진로, 관심사, 가치관과 어떻게 연결되는지 구체적으로 작성해 봅시다.</span>
-          <button class="formula-insert-btn" onmousedown="event.preventDefault()" onclick="openFormulaInput('ocrd-ta-3')" title="수식 입력" style="align-items:center;justify-content:center;line-height:1;gap:3px;height:24px;padding:0 8px;background:white;border:1px solid #d9d9d9;border-radius:6px;color:#3b3f4c;font-family:inherit;font-size:11px;font-weight:700;cursor:pointer;flex-shrink:0;"><i data-lucide="sigma" style="width:11px;height:11px;"></i>수식</button>
-          <button onclick="editSection(this,3)" title="편집" style="background:none;border:none;cursor:pointer;color:#b3b6bd;padding:2px 4px;flex-shrink:0;display:flex;align-items:center;"><i data-lucide="pencil" style="width:13px;height:13px;"></i></button>
-        </div>
-        <div class="rubric-ocr-body" id="ocrd-body-3" onclick="editSectionByBody(this,3)"><span style="color:#222631;">‘사라진 스푼’은 내가 화학공학과에 진학하고자 하는 이유를 더욱 확실하게 만들어주었다. 우라늄과 플루토늄의 발견으로 원자폭탄이 만들어지면서 전쟁에 영향을 미쳤다는 사실이, 내가 화학을 연구하면서 고려해야 할 것이 그저 이익과 기술의 발전 뿐 아니라 윤리적 책임도 있다는 것을 느끼게 되었다. 또 바나듐이 의약품으로 쓰이는 것이나 가돌리늄이 MRI에 활용되는 것과 같이 원소를 우리에게 도움이 되는 방향으로도 활용할 수 있다는 것을 알게 되었다.</span></div>
-        <textarea id="ocrd-ta-3" onblur="saveSection(this,3)" style="display:none;width:100%;border:none;border-top:1px solid #ccdfff;padding:12px 15px;font-family:inherit;font-size:16px;line-height:1.8;color:#222631;outline:none;resize:none;overflow:hidden;box-sizing:border-box;" rows="4">‘사라진 스푼’은 내가 화학공학과에 진학하고자 하는 이유를 더욱 확실하게 만들어주었다. 우라늄과 플루토늄의 발견으로 원자폭탄이 만들어지면서 전쟁에 영향을 미쳤다는 사실이, 내가 화학을 연구하면서 고려해야 할 것이 그저 이익과 기술의 발전 뿐 아니라 윤리적 책임도 있다는 것을 느끼게 되었다. 또 바나듐이 의약품으로 쓰이는 것이나 가돌리늄이 MRI에 활용되는 것과 같이 원소를 우리에게 도움이 되는 방향으로도 활용할 수 있다는 것을 알게 되었다.</textarea>
-      </div>
-      <!-- 문항 5 — 종합 평가·후속 탐구 계획 -->
-      <div class="rubric-ocr-section">
-        <div class="rubric-ocr-header">
-          <span class="badge badge-purple" style="font-size:12px;padding:3px 10px;">문항 5</span>
-          <span class="rubric-ocr-desc">책을 읽고 난 후의 깨달음 또는 더 탐구하고 싶은 주제를 구체적으로 작성해 봅시다.</span>
-          <button class="formula-insert-btn" onmousedown="event.preventDefault()" onclick="openFormulaInput('ocrd-ta-4')" title="수식 입력" style="align-items:center;justify-content:center;line-height:1;gap:3px;height:24px;padding:0 8px;background:white;border:1px solid #d9d9d9;border-radius:6px;color:#3b3f4c;font-family:inherit;font-size:11px;font-weight:700;cursor:pointer;flex-shrink:0;"><i data-lucide="sigma" style="width:11px;height:11px;"></i>수식</button>
-          <button onclick="editSection(this,4)" title="편집" style="background:none;border:none;cursor:pointer;color:#b3b6bd;padding:2px 4px;flex-shrink:0;display:flex;align-items:center;"><i data-lucide="pencil" style="width:13px;height:13px;"></i></button>
-        </div>
-        <div class="rubric-ocr-body" id="ocrd-body-4" onclick="editSectionByBody(this,4)"><span style="color:#222631;">이 책을 읽고 나서 원소들이 다양한 이야기를 가지고 영향을 미친다는 것을 깨닫게 되었다. 하지만 이 책에서는 원소를 현재 어떻게 활용하는지 자세히는 알 수 없었어서 사라진 스푼인 갈륨에 대해 자세히 탐구해 보고 싶다. 특히 갈륨의 현재 반도체에서의 활용에 대해 알아보고 싶다.</span></div>
-        <textarea id="ocrd-ta-4" onblur="saveSection(this,4)" style="display:none;width:100%;border:none;border-top:1px solid #ccdfff;padding:12px 15px;font-family:inherit;font-size:16px;line-height:1.8;color:#222631;outline:none;resize:none;overflow:hidden;box-sizing:border-box;" rows="4">이 책을 읽고 나서 원소들이 다양한 이야기를 가지고 영향을 미친다는 것을 깨닫게 되었다. 하지만 이 책에서는 원소를 현재 어떻게 활용하는지 자세히는 알 수 없었어서 사라진 스푼인 갈륨에 대해 자세히 탐구해 보고 싶다. 특히 갈륨의 현재 반도체에서의 활용에 대해 알아보고 싶다.</textarea>
       </div>
     </div>
-    <div class="ocr-drawer-ft">
-      <button class="ocr-drawer-cancel" onclick="closeOcrEdit()">취소</button>
-      <button class="ocr-drawer-cancel" onclick="saveOcrEdit()" style="border-color:#a3c3ff;color:#365eef;"><i data-lucide="check" style="width:16px;height:16px;"></i>수정 저장</button>
-      <button class="ocr-drawer-save" onclick="saveAndRerunAi()"><i data-lucide="wand-sparkles" style="width:16px;height:16px;"></i>저장 후 AI 채점</button>
+
+    <!-- 우: 인식 결과 — 답과 풀이만 편집 가능 -->
+    <div class="ocrm-right">
+      <div class="ocrm-rhd">
+        <span class="ocrm-rhd-t">인식 결과</span>
+        <span class="ocrm-rhd-sub">답과 풀이만 수정할 수 있어요.</span>
+        <button class="ocrm-reset" onclick="ocrmResetAll()"><i data-lucide="rotate-ccw" style="width:15px;height:15px"></i>초기 인식 결과로 되돌리기</button>
+      </div>
+      <div class="ocrm-list">
+        <!-- OCR 품질 안내 — 채점 화면이 아니라 여기(인식 결과 수정) 맨 위에만 (올립 26-09-04) -->
+        <div id="ocrReviewNotice" class="ocrd-notice ocrd-notice--warn" style="display:none;">
+          <i data-lucide="alert-circle" style="width:16px;height:16px;flex-shrink:0;margin-top:2px;"></i>
+          <span><strong>인식이 불확실한 문항</strong>이 있어요. 표시된 문항을 확인하고 고친 뒤 다시 채점하면 점수가 더 정확해져요.</span>
+        </div>
+        <!-- 공통 지시문 — 읽기 전용 -->
+        <section class="ocrq">
+          <div class="ocrq-hd" onclick="ocrmToggle(this)">
+            <i data-lucide="chevron-down" class="ocrq-chev"></i>
+            <span class="ocrq-name">공통 지시문</span>
+          </div>
+          <div class="ocrq-bd"><p class="ocrq-prompt">2학기 독서 수행평가 · 독후 활동 보고서. 읽은 책 『사라진 스푼』에 대해 아래 5개 항목을 각각 구체적으로 작성하시오.</p></div>
+        </section>
+        <!-- 문항 1 — 책 선정 이유 -->
+        <section class="ocrq">
+          <div class="ocrq-hd" onclick="ocrmToggle(this)">
+            <i data-lucide="chevron-down" class="ocrq-chev"></i>
+            <span class="ocrq-no">문항 1.</span>
+            <span class="ocrq-name">책 선정 이유</span>
+          </div>
+          <div class="ocrq-bd">
+            <p class="rubric-ocr-desc ocrq-prompt">왜 이 책을 골랐는지, 읽기 전 기대했던 점을 작성해 봅시다.</p>
+            <div class="ocrq-div"></div>
+            <div class="ocrq-frow"><span class="ocrq-flabel">풀이</span></div>
+            <textarea class="ocrq-fld ocrq-solve" id="ocrd-solve-0" rows="1" placeholder="(미작성 · 필요 시 직접 입력)" oninput="ocrmInput(this,0)"></textarea>
+            <div class="ocrq-frow"><span class="ocrq-flabel">답</span>
+              <button class="formula-insert-btn" style="margin-left:auto;" onmousedown="event.preventDefault()" onclick="openFormulaInput('ocrd-body-0')" title="수식 입력"><i data-lucide="sigma" style="width:11px;height:11px;"></i>수식</button>
+            </div>
+            <textarea class="ocrq-fld ocrq-ans" id="ocrd-body-0" rows="1" oninput="ocrmInput(this,0)">내가 ‘사라진 스푼’을 고른 이유는 원소에 대해 다양한 이야기가 얽혀있다는 점에 흥미가 갔기 때문이다. 그저 과학적 지식인줄 알았던 주기율표에 대해 다양한 이야기가 있다는 것이 신기했고 궁금해져서 선택하였다. 또 이 책을 통해 내가 화학에 대해 가져야 할 태도를 배울 수 있기를 기대하면서 이 책을 골랐다.</textarea>
+          </div>
+        </section>
+        <!-- 문항 2 — 핵심 내용 요약 -->
+        <section class="ocrq">
+          <div class="ocrq-hd" onclick="ocrmToggle(this)">
+            <i data-lucide="chevron-down" class="ocrq-chev"></i>
+            <span class="ocrq-no">문항 2.</span>
+            <span class="ocrq-name">핵심 내용 요약</span>
+          </div>
+          <div class="ocrq-bd">
+            <p class="rubric-ocr-desc ocrq-prompt">책의 주요 주장과 근거, 핵심 개념, 주제 등을 요약해 봅시다.</p>
+            <div class="ocrq-div"></div>
+            <div class="ocrq-frow"><span class="ocrq-flabel">풀이</span></div>
+            <textarea class="ocrq-fld ocrq-solve" id="ocrd-solve-1" rows="1" placeholder="(미작성 · 필요 시 직접 입력)" oninput="ocrmInput(this,1)">답안 아래 여백에 '바나듐 가돌리늄' 이라고 손으로 덧붙여 적음</textarea>
+            <div class="ocrq-frow"><span class="ocrq-flabel">답</span>
+              <span class="rubric-suspect-chip" id="ocrd-chip-1" style="display:none;"><i data-lucide="alert-circle" style="width:11px;height:11px;"></i>확인 필요</span>
+              <button class="formula-insert-btn" style="margin-left:auto;" onmousedown="event.preventDefault()" onclick="openFormulaInput('ocrd-body-1')" title="수식 입력"><i data-lucide="sigma" style="width:11px;height:11px;"></i>수식</button>
+            </div>
+            <textarea class="ocrq-fld ocrq-ans" id="ocrd-body-1" rows="1" oninput="ocrmInput(this,1)">‘사라진 스푼’은 각 원소들에 대한 역사와 이야기를 나타내고 있다. 주기율표가 어떻게 탄생하게 되었는지와 멘델레예프가 주기율표를 만든 후 남은 원소들을 다양한 과학자들이 찾는 과정을 담고 있고, 또한 그 원소들이 우리 인간 문명에 어떠한 영향을 끼쳤는지를 나타내고 있다. 예를 들어 우라늄과 플루토늄 같은 원소를 발견한 뒤 원자폭탄 발명에 영향을 미쳐 전쟁에도 큰 영향을 끼친 등의 이야기가 있다. 이렇게 이 책은 원소가 그저 과학적 지식이 아니라 인간문명에도 큰 영향을 끼친다는 핵심개념을 가지고 있다.</textarea>
+            <div class="ocr-uncertainty-note" id="ocrd-note-1" style="display:none;">
+              <span class="ocr-uncertainty-label"><i data-lucide="alert-circle" style="width:13px;height:13px;"></i>AI 인식 불확실</span>
+              <span class="ocr-uncertainty-text">일부 글자의 받침 판독이 불확실합니다. 흘려 쓴 글씨로 <b>‘멘델레예프’</b> 구간이 부정확하게 인식되었을 수 있어요. 원본 이미지와 대조 후 수정해 주세요.</span>
+            </div>
+          </div>
+        </section>
+        <!-- 문항 3 — 생각의 변화 -->
+        <section class="ocrq">
+          <div class="ocrq-hd" onclick="ocrmToggle(this)">
+            <i data-lucide="chevron-down" class="ocrq-chev"></i>
+            <span class="ocrq-no">문항 3.</span>
+            <span class="ocrq-name">생각의 변화</span>
+          </div>
+          <div class="ocrq-bd">
+            <p class="rubric-ocr-desc ocrq-prompt">읽기 전/읽은 후 생각의 차이, 책의 내용 중 비판하고 싶은 점 등을 이유를 들어 구체적으로 작성해 봅시다.</p>
+            <div class="ocrq-div"></div>
+            <div class="ocrq-frow"><span class="ocrq-flabel">풀이</span></div>
+            <textarea class="ocrq-fld ocrq-solve" id="ocrd-solve-2" rows="1" placeholder="(미작성 · 필요 시 직접 입력)" oninput="ocrmInput(this,2)"></textarea>
+            <div class="ocrq-frow"><span class="ocrq-flabel">답</span>
+              <button class="formula-insert-btn" style="margin-left:auto;" onmousedown="event.preventDefault()" onclick="openFormulaInput('ocrd-body-2')" title="수식 입력"><i data-lucide="sigma" style="width:11px;height:11px;"></i>수식</button>
+            </div>
+            <textarea class="ocrq-fld ocrq-ans" id="ocrd-body-2" rows="1" oninput="ocrmInput(this,2)">나는 이 책을 읽기 전에는 원소와 주기율표가 그저 외워야 되는 과학적 지식이라고 생각하고 있는데 사실 원소와 주기율표에는 다양한 역사적 이야기를 가지고 있고 우리 삶에 많은 영향을 끼쳐왔음을 알게 되었다. 그리고 기존에는 이러한 원소들을 모두 새로운 원소를 발견하겠다는 과학자들의 사명을 가지고 발견한 줄 알았는데 이 책을 통해 보니 과학자들이 그저 우연한 사고로 발견하게 된 원소도 있고 자신의 생각이 맞음을 입증하기 위해 연구를 한 과학자들도 있었음을 알게 되었다.</textarea>
+          </div>
+        </section>
+        <!-- 문항 4 — 진로·관심사와의 연계 -->
+        <section class="ocrq">
+          <div class="ocrq-hd" onclick="ocrmToggle(this)">
+            <i data-lucide="chevron-down" class="ocrq-chev"></i>
+            <span class="ocrq-no">문항 4.</span>
+            <span class="ocrq-name">진로·관심사와의 연계</span>
+          </div>
+          <div class="ocrq-bd">
+            <p class="rubric-ocr-desc ocrq-prompt">책의 내용이 나의 진로, 관심사, 가치관과 어떻게 연결되는지 구체적으로 작성해 봅시다.</p>
+            <div class="ocrq-div"></div>
+            <div class="ocrq-frow"><span class="ocrq-flabel">풀이</span></div>
+            <textarea class="ocrq-fld ocrq-solve" id="ocrd-solve-3" rows="1" placeholder="(미작성 · 필요 시 직접 입력)" oninput="ocrmInput(this,3)"></textarea>
+            <div class="ocrq-frow"><span class="ocrq-flabel">답</span>
+              <button class="formula-insert-btn" style="margin-left:auto;" onmousedown="event.preventDefault()" onclick="openFormulaInput('ocrd-body-3')" title="수식 입력"><i data-lucide="sigma" style="width:11px;height:11px;"></i>수식</button>
+            </div>
+            <textarea class="ocrq-fld ocrq-ans" id="ocrd-body-3" rows="1" oninput="ocrmInput(this,3)">‘사라진 스푼’은 내가 화학공학과에 진학하고자 하는 이유를 더욱 확실하게 만들어주었다. 우라늄과 플루토늄의 발견으로 원자폭탄이 만들어지면서 전쟁에 영향을 미쳤다는 사실이, 내가 화학을 연구하면서 고려해야 할 것이 그저 이익과 기술의 발전 뿐 아니라 윤리적 책임도 있다는 것을 느끼게 되었다. 또 바나듐이 의약품으로 쓰이는 것이나 가돌리늄이 MRI에 활용되는 것과 같이 원소를 우리에게 도움이 되는 방향으로도 활용할 수 있다는 것을 알게 되었다.</textarea>
+          </div>
+        </section>
+        <!-- 문항 5 — 종합 평가·후속 탐구 계획 -->
+        <section class="ocrq">
+          <div class="ocrq-hd" onclick="ocrmToggle(this)">
+            <i data-lucide="chevron-down" class="ocrq-chev"></i>
+            <span class="ocrq-no">문항 5.</span>
+            <span class="ocrq-name">종합 평가·후속 탐구 계획</span>
+          </div>
+          <div class="ocrq-bd">
+            <p class="rubric-ocr-desc ocrq-prompt">책을 읽고 난 후의 깨달음 또는 더 탐구하고 싶은 주제를 구체적으로 작성해 봅시다.</p>
+            <div class="ocrq-div"></div>
+            <div class="ocrq-frow"><span class="ocrq-flabel">풀이</span></div>
+            <textarea class="ocrq-fld ocrq-solve" id="ocrd-solve-4" rows="1" placeholder="(미작성 · 필요 시 직접 입력)" oninput="ocrmInput(this,4)"></textarea>
+            <div class="ocrq-frow"><span class="ocrq-flabel">답</span>
+              <button class="formula-insert-btn" style="margin-left:auto;" onmousedown="event.preventDefault()" onclick="openFormulaInput('ocrd-body-4')" title="수식 입력"><i data-lucide="sigma" style="width:11px;height:11px;"></i>수식</button>
+            </div>
+            <textarea class="ocrq-fld ocrq-ans" id="ocrd-body-4" rows="1" oninput="ocrmInput(this,4)">이 책을 읽고 나서 원소들이 다양한 이야기를 가지고 영향을 미친다는 것을 깨닫게 되었다. 하지만 이 책에서는 원소를 현재 어떻게 활용하는지 자세히는 알 수 없었어서 사라진 스푼인 갈륨에 대해 자세히 탐구해 보고 싶다. 특히 갈륨의 현재 반도체에서의 활용에 대해 알아보고 싶다.</textarea>
+          </div>
+        </section>
+      </div>
     </div>
+  </div>
+
+  <!-- 닫기 확인 — 팝업 위에 모달을 또 띄우지 않는다 -->
+  <div class="ocrm-confirm" id="ocrmCloseConfirm">
+    <i data-lucide="alert-circle" style="width:18px;height:18px;color:#c2410c;flex-shrink:0;"></i>
+    <span class="ocrm-confirm-t">고친 내용이 아직 저장되지 않았어요. 저장하지 않고 닫을까요?</span>
+    <button class="ocrm-confirm-btn" onclick="ocrmKeepEditing()">계속 수정</button>
+    <button class="ocrm-confirm-btn warn" onclick="ocrmDiscardClose()">저장하지 않고 닫기</button>
+  </div>
+  <div class="ocrm-ft">
+    <span class="ocrm-ft-note" id="ocrmCreditNote"><i data-lucide="coins" style="width:15px;height:15px;flex-shrink:0;"></i>저장하면 이어서 AI 채점을 실행해요. 인식은 다시 하지 않고, AI 크레딧 1개가 차감돼요. (지금 842개)</span>
+    <label class="ocrm-chk"><input type="checkbox" id="ocrmRescore" onchange="ocrmSyncFooter()">저장 후 바로 채점</label>
+    <button class="ocrm-save" id="ocrmSaveBtn" onclick="ocrmSave()"><i data-lucide="check" style="width:17px;height:17px"></i>결과 저장</button>
   </div>
 </div>
 
@@ -1561,24 +1696,6 @@ body.vs-hide-topbar .vs-float{display:inline-flex}
         <button class="btn-modal-cancel" onclick="closeRerunConfirm()">취소</button>
         <button class="btn-modal-save" onclick="confirmRerun()"><i data-lucide="wand-sparkles" style="width:14px;height:14px"></i>채점 실행</button>
       </div>
-    </div>
-  </div>
-</div>
-
-<!-- OCR 수정 후 재채점 유도 (조건부: 채점된 학생 + 인식 변경 시) -->
-<div class="modal-overlay" id="ocrRerunAskModal" onclick="if(event.target===this)closeOcrRerunAsk()">
-  <div class="modal" style="max-width:480px">
-    <div class="modal-hd">
-      <span class="modal-title">AI 채점 다시 실행</span>
-      <button class="modal-close" onclick="closeOcrRerunAsk()"><i data-lucide="x" style="width:18px;height:18px"></i></button>
-    </div>
-    <div class="modal-body">
-      <p style="font-size:16px;color:#222631;line-height:1.65;margin:0;">인식 결과를 수정했어요. 변경된 내용으로 <strong>AI 채점을 다시 실행할까요?</strong></p>
-      <p style="font-size:14px;color:#6d7381;line-height:1.6;margin:8px 0 0;">크레딧 1개가 차감돼요. 방금 고친 내용으로 채점하고, 인식은 다시 하지 않아요.</p>
-    </div>
-    <div class="modal-ft">
-      <button class="btn-modal-cancel" onclick="closeOcrRerunAsk()">나중에 하기</button>
-      <button class="btn-modal-save" onclick="ocrRerunNow()"><i data-lucide="wand-sparkles" style="width:14px;height:14px"></i>지금 다시 채점</button>
     </div>
   </div>
 </div>
@@ -3281,7 +3398,7 @@ function applyTypingViewer(){
   // 문항 발문·본문은 인식 결과 드로워와 같은 과제에서 가져온다
   var qs = [], as = [];
   document.querySelectorAll('#ocrDrawer .rubric-ocr-desc').forEach(function(e){ qs.push(e.textContent.trim()); });
-  document.querySelectorAll('#ocrDrawer .rubric-ocr-body').forEach(function(e){ as.push(e.textContent.trim()); });
+  document.querySelectorAll('#ocrDrawer .ocrq-ans').forEach(function(e){ as.push(e.value.trim()); });
 
   // 미채점 학생은 마지막 문항을 비워 '답을 쓰지 않은' 상태도 함께 보여준다
   if(_curStudent && _curStudent.status === '미채점') as[as.length-1] = '';
@@ -3915,13 +4032,40 @@ applyOcrDot();   // 인식 결과 수정 버튼의 확인 필요 점
 // ── 좌측 뷰어 전환: 전사 텍스트 ↔ 원본 제출물 (마지막 선택 옵션 유지) ──
 // 정책 = 마지막 선택 기억. 저장값 없으면 기본은 '인식 결과' — 26-08-28
 function getViewerMode(){ try { return localStorage.getItem('clipoViewerMode') || 'text'; } catch(e){ return 'text'; } }
-// ══════ 인식 결과 수정 드로워 (인플레이스 전환) ══════
+// ══════ 인식 결과 수정 팝업 — 풀와이드 2단(좌 원본 / 우 인식 텍스트). 줄리 시안 2173:15203 ══════
+// 26-09-09: 우측 채점 패널을 인플레이스로 바꿔 쓰던 드로워를 팝업으로 옮김.
+// 원본과 인식 텍스트를 나란히 놓고 대조하는 게 이 화면의 유일한 과업이라, 화면 전체를 그 과업에 쓴다.
+var _ocrmDirty = false, _ocrmPage = 1, _ocrmZoom = 100, _ocrmRot = 0, _ocrmOrig = null;
+
+// 열 때 한 번 — '초기 인식 결과로 되돌리기'가 돌아갈 지점
+function ocrmSnapshot(){
+  _ocrmOrig = [];
+  document.querySelectorAll('#ocrDrawer .ocrq-fld').forEach(function(f){ _ocrmOrig.push([f.id, f.value]); });
+}
 function openOcrEdit(){
   if(typeof _noTranscript!=='undefined' && _noTranscript){ showToast('warning','인식 결과는 AI 채점 실행 후 수정할 수 있어요.'); return; }
-  if (typeof switchViewer === 'function') switchViewer('orig'); // 좌측을 원본 제출물로 고정해 비교
+  if(!_ocrmOrig) ocrmSnapshot();
   document.getElementById('ocrDrawer').classList.add('open');
+  document.body.style.overflow = 'hidden';
+  ocrmApplyFileName();
+  ocrmPageShow();
+  ocrmApplyZoom();
+  document.querySelectorAll('#ocrDrawer .ocrq-fld').forEach(ocrmFit);
+  ocrmSyncFooter();
   if (typeof lucide !== 'undefined') lucide.createIcons();
 }
+// ③ 고친 게 있으면 한 번 묻는다 — 팝업 위에 모달을 또 띄우지 않고 푸터 위 한 줄로
+function closeOcrEdit(){
+  if(_ocrmDirty){ document.getElementById('ocrmCloseConfirm').classList.add('on'); return; }
+  ocrmHide();
+}
+function ocrmHide(){
+  document.getElementById('ocrmCloseConfirm').classList.remove('on');
+  document.getElementById('ocrDrawer').classList.remove('open');
+  document.body.style.overflow = '';
+}
+function ocrmKeepEditing(){ document.getElementById('ocrmCloseConfirm').classList.remove('on'); }
+function ocrmDiscardClose(){ ocrmResetAll(true); ocrmHide(); }
 
 // ══════ 인식 결과 수정 진입점의 확인 필요 점 (인식 불확실 학생) ══════
 function applyOcrDot(){
@@ -3930,112 +4074,112 @@ function applyOcrDot(){
   if(dot) dot.style.display = needCheck ? 'block' : 'none';
   if(eb) eb.title = needCheck ? '인식 확인이 필요해요' : '';
 }
-function closeOcrEdit(){
-  document.getElementById('ocrDrawer').classList.remove('open');
+
+// ── 문항 카드 접기/펴기 ──
+function ocrmToggle(hd){ hd.parentElement.classList.toggle('collapsed'); }
+
+// ── 답·풀이 입력 ──
+function ocrmFit(el){ el.style.height='auto'; el.style.height=Math.max(el.scrollHeight, 48)+'px'; }
+function ocrmInput(el, gi){
+  ocrmFit(el);
+  if(!_ocrmDirty){ _ocrmDirty = true; ocrmSyncFooter(); }
+  // 고친 문항의 '확인 필요' 표시는 그 자리에서 해제 (지우지 않고 감춰야 되돌리기가 산다)
+  var chip = document.getElementById('ocrd-chip-' + gi), note = document.getElementById('ocrd-note-' + gi);
+  var had = (chip && chip.style.display !== 'none') || (note && note.style.display !== 'none');
+  if(chip) chip.style.display = 'none';
+  if(note) note.style.display = 'none';
+  if(had){
+    if(typeof showToast === 'function') showToast('success','수정한 문항의 확인 필요 표시를 해제했어요.');
+    refreshOcrReviewNotice();
+  }
 }
-function saveOcrEdit(){
-  if (typeof refreshOcrReviewNotice === 'function') refreshOcrReviewNotice();
-  closeOcrEdit();
-  // 조건부 재채점 유도: 이미 채점된 학생 + 인식 변경 시에만 노출 (이 상세 화면은 채점된 학생 → 표시).
-  // 미채점 학생이면 이 분기를 건너뛰고 토스트만: showToast('success','인식 결과를 저장했어요.')
-  openOcrRerunAsk();
+// 남은 불확실 구간이 0이면 맨 위 안내도 내린다
+function refreshOcrReviewNotice(){
+  var left = 0;
+  document.querySelectorAll('#ocrDrawer .rubric-suspect-chip, #ocrDrawer .ocr-uncertainty-note').forEach(function(e){
+    if(e.style.display !== 'none') left++;
+  });
+  var n = document.getElementById('ocrReviewNotice');
+  if(n && left === 0) n.style.display = 'none';
 }
-function saveAndRerunAi(){
-  if (typeof refreshOcrReviewNotice === "function") refreshOcrReviewNotice();
-  closeOcrEdit();
-  showToast("loading","수정한 인식 내용으로 다시 채점해요. AI 크레딧 1개가 차감돼요.");
-  if (typeof rerunAi === "function") setTimeout(rerunAi, 400);
+function ocrmResetAll(silent){
+  if(!_ocrmOrig) return;
+  _ocrmOrig.forEach(function(p){ var f = document.getElementById(p[0]); if(f){ f.value = p[1]; ocrmFit(f); } });
+  _ocrmDirty = false;
+  ocrmSyncFooter();
+  if(typeof applyOcrReviewNotice === 'function') applyOcrReviewNotice();   // 확인 필요 칩·안내 복원
+  if(!silent && typeof showToast === 'function') showToast('success','처음 인식한 결과로 되돌렸어요.');
 }
-function openOcrRerunAsk(){
-  document.getElementById('ocrRerunAskModal').classList.add('show');
-  if (typeof lucide !== 'undefined') lucide.createIcons();
+
+// ── 푸터: ② 크레딧 확인을 팝업 안에서 끝낸다 (모달 위 모달 금지) ──
+function ocrmSyncFooter(){
+  var chk = document.getElementById('ocrmRescore');
+  var note = document.getElementById('ocrmCreditNote');
+  if(note) note.classList.toggle('on', !!(chk && chk.checked));
 }
-function closeOcrRerunAsk(){
-  document.getElementById('ocrRerunAskModal').classList.remove('show');
+function ocrmSave(){
+  var rescore = !!(document.getElementById('ocrmRescore') || {}).checked;
+  var changed = _ocrmDirty;
+  _ocrmDirty = false;
+  ocrmSnapshot();            // 저장한 값이 새 기준
+  ocrmHide();
+  if(rescore){
+    // 크레딧 확인은 푸터에서 이미 끝냈다 — 다시 채점 설정 모달을 또 띄우지 않고 바로 실행
+    showToast('loading','수정한 인식 내용으로 채점해요. AI 크레딧 1개가 차감돼요.');
+    setTimeout(function(){
+      if(typeof doRerunAi === 'function') doRerunAi('overwrite');
+      else if(typeof rerunAi === 'function') rerunAi();
+    }, 400);
+    return;
+  }
   showToast('success','인식 결과를 저장했어요. 점수는 그대로예요.');
+  // 고쳐 놓고 다시 채점하지 않은 상태 — 우측 패널 재채점 유도 배너
+  if(changed){
+    var b = document.getElementById('ocrEditedBanner');
+    if(b){ b.style.display = 'flex'; if(typeof lucide !== 'undefined') lucide.createIcons(); }
+  }
 }
+
+// ── 좌측 원본 뷰어 (팝업 전용 상태) ──
+function ocrmPageShow(){
+  var wrap = document.getElementById('ocrmPages'); if(!wrap) return;
+  var pages = wrap.children;
+  Array.prototype.forEach.call(pages, function(p,i){ p.style.display = (i === _ocrmPage-1) ? '' : 'none'; });
+  var info = document.getElementById('ocrmPageInfo'); if(info) info.textContent = _ocrmPage;
+  var tot = document.getElementById('ocrmPageTotal'); if(tot) tot.textContent = pages.length;
+}
+function ocrmPage(d){
+  var n = document.getElementById('ocrmPages').children.length;
+  _ocrmPage = Math.max(1, Math.min(n, _ocrmPage + d));
+  ocrmPageShow();
+}
+function ocrmZoom(d){ _ocrmZoom = Math.max(50, Math.min(200, _ocrmZoom + d)); ocrmApplyZoom(); }
+function ocrmZoomReset(){ _ocrmZoom = 100; ocrmApplyZoom(); }
+function ocrmApplyZoom(){
+  var z = document.getElementById('ocrmZoomInfo'); if(z) z.textContent = _ocrmZoom + '%';
+  var p = document.getElementById('ocrmPages'); if(p) p.style.maxWidth = (720 * (_ocrmZoom/100)) + 'px';
+}
+function ocrmRotate(d){
+  _ocrmRot = (_ocrmRot + d + 360) % 360;
+  var p = document.getElementById('ocrmPages'); if(p) p.style.transform = 'rotate(' + _ocrmRot + 'deg)';
+}
+function ocrmApplyFileName(){
+  var el = document.getElementById('ocrmFileName');
+  if(!el || typeof _curStudent === 'undefined' || !_curStudent) return;
+  el.textContent = (_curStudent.method === 'typing') ? '직접 입력 제출' : (_curStudent.id + '_' + _curStudent.name + '.pdf');
+}
+document.addEventListener('keydown', function(e){
+  if(e.key !== 'Escape') return;
+  var m = document.getElementById('ocrDrawer');
+  if(m && m.classList.contains('open')) closeOcrEdit();
+});
+
+// 배너의 [다시 채점] — 기존 다시 채점 설정 모달로 연결
 function ocrRerunNow(){
-  document.getElementById('ocrRerunAskModal').classList.remove('show');
-  if (typeof rerunAi === 'function') rerunAi(); // 기존 다시 채점 설정 모달로 연결
+  if (typeof rerunAi === 'function') rerunAi();
   else showToast('loading','AI 채점을 다시 실행해요.');
 }
-
-// ══════ OCR 드로워: 문항별 인식 결과 인라인 편집 (task_ocr_inline_v1 이식) ══════
-function autoResize(el){ el.style.height='1px'; el.style.height=Math.max(60, el.scrollHeight)+'px'; }
-function editSectionByBody(bodyEl, gi){ openSectionEdit(gi); }
-function editSection(btn, gi){
-  var ta = document.getElementById('ocrd-ta-' + gi);
-  if (!ta) return;
-  if (ta.style.display !== 'none') { saveSection(ta, gi); return; }
-  openSectionEdit(gi);
-}
-var _ocrdEditingSection = null;
-function openSectionEdit(gi){
-  if (_ocrdEditingSection !== null && _ocrdEditingSection !== gi) {
-    var prevTa = document.getElementById('ocrd-ta-' + _ocrdEditingSection);
-    if (prevTa && prevTa.style.display !== 'none') { saveSection(prevTa, _ocrdEditingSection); }
-  }
-  if (_ocrdEditingSection === gi) return;
-  var body = document.getElementById('ocrd-body-' + gi);
-  var ta = document.getElementById('ocrd-ta-' + gi);
-  if (!body || !ta) return;
-  ta.value = body.innerText.trim();
-  body.style.display = 'none';
-  ta.style.display = 'block';
-  ta.style.height = 'auto';
-  ta.style.height = Math.max(ta.scrollHeight, 80) + 'px';
-  ta.style.overflowY = 'hidden';
-  ta.oninput = function(){ this.style.height='auto'; this.style.height=this.scrollHeight+'px'; };
-  var section = ta.closest('.rubric-ocr-section');
-  section.classList.add('section-editing');
-  var btn = section.querySelector('button[onclick^="editSection"]');
-  if (btn && !document.getElementById('ocrd-editing-badge-' + gi)) {
-    var badge = document.createElement('span');
-    badge.className = 'editing-badge';
-    badge.id = 'ocrd-editing-badge-' + gi;
-    badge.textContent = '편집 중';
-    btn.parentElement.insertBefore(badge, btn);
-  }
-  _ocrdEditingSection = gi;
-  ta.focus();
-}
-function saveSection(ta, gi){
-  if (_ocrdFormulaOpen) return; // 수식 입력 중에는 편집 모드 유지
-  if (ta.style.display === 'none') return;
-  _ocrdEditingSection = null;
-  var body = document.getElementById('ocrd-body-' + gi);
-  if (!body) return;
-  var newText = ta.value;
-
-  // 불확실 노트 + '확인 필요' 칩 해제 (있었던 경우)
-  var section = ta.closest('.rubric-ocr-section');
-  var hadNote = section ? !!section.querySelector('.ocr-uncertainty-note') : false;
-  if (section) {
-    var note = section.querySelector('.ocr-uncertainty-note');
-    if (note) note.remove();
-    var chip = section.querySelector('.rubric-suspect-chip');
-    if (chip) chip.remove();
-  }
-
-  body.innerHTML = '<span style="color:#222631;">' + newText.replace(/\n/g, '<br>') + '</span>';
-  body.style.display = '';
-  ta.style.display = 'none';
-  if (section) section.classList.remove('section-editing');
-  var editBadge = document.getElementById('ocrd-editing-badge-' + gi);
-  if (editBadge) editBadge.remove();
-  // 문항 편집을 닫아도 '저장됨' 표시는 하지 않는다 — CLIPO는 자동저장이 없고, 저장은 아래 [수정 저장]으로만 (올립 26-09-04)
-  if (hadNote && typeof showToast === 'function') showToast('success', '수정한 문항의 확인 필요 표시를 해제했어요.');
-  // 불확실 구간 모두 해소되면 과제물 영역 상단 안내 배너도 숨김
-  refreshOcrReviewNotice();
-}
-// 드로워에 남은 불확실 구간(노트·확인 필요 칩)이 0이면 OCR 안내 배너 숨김
-function refreshOcrReviewNotice(){
-  var drawer = document.getElementById('ocrDrawer');
-  var remaining = drawer ? drawer.querySelectorAll('.ocr-uncertainty-note, .rubric-suspect-chip').length : 0;
-  var notice = document.getElementById('ocrReviewNotice');
-  if (notice && remaining === 0) notice.style.display = 'none';
-}
-// 수식 입력기
+// ══════ 수식 입력기 ══════
 var _ocrdFormulaTargetId = null;
 var _ocrdFormulaOpen = false; // 수식 모달 열림 — textarea blur 저장 보류용
 function openFormulaInput(taId){
@@ -4050,7 +4194,7 @@ function closeFormulaModal(){
   document.getElementById('formulaModal').style.display = 'none';
   _ocrdFormulaOpen = false;
   var ta = _ocrdFormulaTargetId ? document.getElementById(_ocrdFormulaTargetId) : null;
-  if (ta && ta.style.display !== 'none') ta.focus();
+  if (ta) ta.focus();
 }
 function applyFormula(){
   var ta = document.getElementById(_ocrdFormulaTargetId);
@@ -4058,7 +4202,7 @@ function applyFormula(){
   if (ta && fm) {
     var sep = (ta.value && !/\s$/.test(ta.value)) ? ' ' : '';
     ta.value += sep + '$' + fm + '$';
-    if (ta.style.display !== 'none') { ta.style.height = 'auto'; ta.style.height = ta.scrollHeight + 'px'; }
+    ocrmInput(ta, parseInt((ta.id.split('-')[2] || '0'), 10));
   }
   closeFormulaModal();
 }
@@ -4086,7 +4230,7 @@ function applyFileBar(){
 var OB_KEY = 'clipo_ocr_onboard_v1';
 var OB_STEPS = [
   { t:'#ve-tab-text', title:'AI가 읽은 답안을 확인해 보세요', body:'인식 결과 탭에서 AI가 읽은 학생 답안을 볼 수 있어요. 점수가 이상하면 여기서 먼저 확인해 보세요.', skip:'건너뛰기', next:'다음' },
-  { t:'#ocrEditBtn',  title:'잘못 읽은 부분은 여기서 고쳐요', body:'문항별로 고친 뒤 저장하거나, 바로 다시 채점할 수 있어요. 고친 내용은 AI 채점에만 쓰여요.', next:'닫기' }
+  { t:'#ocrEditBtn',  title:'잘못 읽은 부분은 여기서 고쳐요', body:'원본과 인식 결과를 나란히 놓고 고칠 수 있어요. 고친 내용은 AI 채점에만 쓰여요.', next:'닫기' }
 ];
 var _ob = null;
 function startOcrOnboarding(force){
