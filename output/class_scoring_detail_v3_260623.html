@@ -325,6 +325,11 @@ body.nav-expanded .main-wrap{ padding-left:200px; }
     .rm-guide-sub{ font-size:15px; font-weight:400; color:#4b5563; line-height:1.6; margin:8px 0 0; letter-spacing:-.1px; }
     .rm-guide-btn{ align-self:flex-start; display:inline-flex; align-items:center; justify-content:center; line-height:1; gap:6px; height:32px; padding:0 12px; margin-top:12px; background:#fff; border:1px solid #cfdcf7; border-radius:100px; color:#3151c4; font-family:inherit; font-size:13px; font-weight:700; cursor:pointer; }
     .rm-guide-btn:hover{ background:#eef3ff; border-color:#a3c3ff; }
+    a.rm-guide-btn{ text-decoration:none; }
+    .rm-model-meta{ font-size:14px; font-weight:500; color:#6d7381; }
+    .rm-fb-group{ display:flex; flex-direction:column; gap:8px; }
+    .rm-fb-group-lbl{ display:flex; align-items:center; gap:8px; font-size:14px; font-weight:600; color:#3b3f4c; }
+    .rm-fb-group-lbl small{ font-size:13px; font-weight:400; color:#9ea3ad; }
     .rm-help{ font-size:14px; color:#6d7381; line-height:1.5; margin:-8px 0 0; } /* 라벨 바로 아래 설명 — 여백은 여기서만 관리 */
     .rm-qtip{ position:relative; display:inline-flex; align-items:center; cursor:help; }
     .rm-qtip > i, .rm-qtip > svg{ width:18px; height:18px; color:#6d7381; }
@@ -526,13 +531,13 @@ body.nav-expanded .main-wrap{ padding-left:200px; }
       <button class="rm-close" onclick="closeRmModal('runModal1')"><i data-lucide="x" style="width:20px;height:20px"></i></button>
     </div>
     <div class="rm-body">
-      <!-- AI 채점 안내 (모델 버전 표기 폐기 — 선택지가 아니라 안내, 26-08-28) -->
+      <!-- 채점 모델 — 버전·업데이트일은 시스템 값, 사람이 손대는 건 이점 한 줄뿐. 상세는 가이드로 (26-09-09 줄리·루카스 피드백 반영: 설명 덜어내고 이점 중심 + 신규 사용자용 안내 링크) -->
       <div class="rm-field">
+        <span class="rm-label" style="justify-content:space-between;width:100%;">채점 모델 <span class="rm-model-meta">v3.3 · 2026-09 업데이트</span></span>
         <div class="rm-guide">
           <div class="rm-guide-body">
-            <p class="rm-guide-lead">손글씨·수식·그래프를 읽고 문항별로 채점해요.</p>
-            <p class="rm-guide-sub">잘못 읽은 부분은 채점 후 고칠 수 있어요.</p>
-            <button class="rm-guide-btn" onclick="openScoringGuide()"><i data-lucide="external-link" style="width:14px;height:14px"></i>채점 활용 예시보기</button>
+            <p class="rm-guide-lead">학생 답안을 문항별로 더 정확히 읽어요. AI가 읽은 답안을 확인하고 고칠 수 있어요.</p>
+            <a class="rm-guide-btn" href="../guide/" target="_blank" rel="noopener"><i data-lucide="book-open" style="width:14px;height:14px"></i>AI 채점은 어떻게 동작하나요?</a>
           </div>
         </div>
       </div>
@@ -551,11 +556,18 @@ body.nav-expanded .main-wrap{ padding-left:200px; }
       <!-- 학생 피드백 구성 -->
       <div class="rm-field">
         <span class="rm-label">학생 피드백 구성 <i data-lucide="circle-help" style="width:18px;height:18px;color:#6d7381;"></i></span>
-        <div id="rm-fb-list" style="display:flex;flex-direction:column;gap:8px;">
-          <div class="rm-radio" onclick="rmSelectFb(this)"><div class="ring"></div><div class="lbl">자동 구성 : AI 채점 근거</div></div>
-          <div class="rm-radio" onclick="rmSelectFb(this)"><div class="ring"></div><div class="lbl">자동 구성 : AI 피드백</div></div>
-          <div class="rm-radio selected" onclick="rmSelectFb(this)"><div class="ring"></div><div class="lbl">자동 구성 : AI 채점 근거 + AI 피드백</div></div>
-          <div class="rm-radio" onclick="rmSelectFb(this)"><div class="ring"></div><div class="lbl">선생님이 직접 작성</div></div>
+        <!-- 자동/직접 두 그룹으로 (루카스 26-09-09). 라디오 순서·개수는 그대로 — 저장값이 인덱스라 재채점 모달과 그대로 맞음 -->
+        <div id="rm-fb-list" style="display:flex;flex-direction:column;gap:14px;">
+          <div class="rm-fb-group">
+            <div class="rm-fb-group-lbl">자동 구성 <small>AI가 채워요</small></div>
+            <div class="rm-radio" onclick="rmSelectFb(this)"><div class="ring"></div><div class="lbl">AI 채점 근거</div></div>
+            <div class="rm-radio" onclick="rmSelectFb(this)"><div class="ring"></div><div class="lbl">AI 피드백</div></div>
+            <div class="rm-radio selected" onclick="rmSelectFb(this)"><div class="ring"></div><div class="lbl">AI 채점 근거 + AI 피드백</div></div>
+          </div>
+          <div class="rm-fb-group">
+            <div class="rm-fb-group-lbl">직접 구성 <small>선생님이 채워요</small></div>
+            <div class="rm-radio" onclick="rmSelectFb(this)"><div class="ring"></div><div class="lbl">선생님이 직접 작성</div></div>
+          </div>
         </div>
       </div>
     </div>

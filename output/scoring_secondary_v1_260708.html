@@ -625,7 +625,10 @@ select.field-input{appearance:none;-webkit-appearance:none;background-image:url(
 .scoring-level-labels span.active{color:#365eef;font-weight:600}
 
 /* 라디오 카드 */
-.modal-radio-group{display:flex;flex-direction:column;gap:8px}
+.modal-radio-group{display:flex;flex-direction:column;gap:14px}
+.modal-fb-group{display:flex;flex-direction:column;gap:8px}
+.modal-fb-group-lbl{display:flex;align-items:center;gap:8px;font-size:14px;font-weight:600;color:#3b3f4c}
+.modal-fb-group-lbl small{font-size:13px;font-weight:400;color:#9ea3ad}
 .modal-radio-item{display:flex;align-items:flex-start;gap:10px;padding:12px 14px;border:1px solid #dde1e8;border-radius:12px;cursor:pointer;transition:border-color .15s,background .15s}
 .modal-radio-item:hover{border-color:#a3c3ff;background:#f4f8ff}
 .modal-radio-item.selected{border-color:#365eef;background:#f4f8ff}
@@ -1492,10 +1495,17 @@ body.vs-hide-topbar .vs-float{display:inline-flex}
       <div class="field">
         <span class="field-lbl">학생 피드백 구성</span>
         <div class="modal-radio-group" id="rerunFbGroup">
-          <label class="modal-radio-item" onclick="selectRerunFb(this)"><span class="radio-ring"></span><span class="modal-radio-content"><span class="modal-radio-text">자동 구성 : AI 채점 근거</span></span></label>
-          <label class="modal-radio-item" onclick="selectRerunFb(this)"><span class="radio-ring"></span><span class="modal-radio-content"><span class="modal-radio-text">자동 구성 : AI 피드백</span></span></label>
-          <label class="modal-radio-item selected" onclick="selectRerunFb(this)"><span class="radio-ring checked"></span><span class="modal-radio-content"><span class="modal-radio-text">자동 구성 : AI 채점 근거 + AI 피드백</span></span></label>
-          <label class="modal-radio-item" onclick="selectRerunFb(this)"><span class="radio-ring"></span><span class="modal-radio-content"><span class="modal-radio-text">선생님이 직접 작성</span></span></label>
+          <!-- 자동/직접 두 그룹 (루카스 26-09-09). 라디오 순서·개수 그대로 — 저장값이 인덱스 -->
+          <div class="modal-fb-group">
+            <div class="modal-fb-group-lbl">자동 구성 <small>AI가 채워요</small></div>
+            <label class="modal-radio-item" onclick="selectRerunFb(this)"><span class="radio-ring"></span><span class="modal-radio-content"><span class="modal-radio-text">AI 채점 근거</span></span></label>
+            <label class="modal-radio-item" onclick="selectRerunFb(this)"><span class="radio-ring"></span><span class="modal-radio-content"><span class="modal-radio-text">AI 피드백</span></span></label>
+            <label class="modal-radio-item selected" onclick="selectRerunFb(this)"><span class="radio-ring checked"></span><span class="modal-radio-content"><span class="modal-radio-text">AI 채점 근거 + AI 피드백</span></span></label>
+          </div>
+          <div class="modal-fb-group">
+            <div class="modal-fb-group-lbl">직접 구성 <small>선생님이 채워요</small></div>
+            <label class="modal-radio-item" onclick="selectRerunFb(this)"><span class="radio-ring"></span><span class="modal-radio-content"><span class="modal-radio-text">선생님이 직접 작성</span></span></label>
+          </div>
         </div>
       </div>
       <div class="modal-warning" id="rerunWarning" style="display:none">
