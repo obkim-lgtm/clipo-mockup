@@ -18,7 +18,6 @@ const PAGES=[
   document.body.insertAdjacentHTML('afterbegin',`
   <header class="hdr">
     <a class="home-link" href="index.html"><span class="logo">CLIPO</span></a><span class="divider"></span><a class="home-link doc" href="index.html">AI 채점 안내</a>
-    <label class="search"><span>🔍</span><input type="search" placeholder="검색 (준비 중)" aria-label="검색"><kbd>/</kbd></label>
     <button class="menu-btn" id="menuBtn" aria-label="메뉴 접기/펼치기">메뉴</button>
   </header>`);
   // 왼쪽 트리
@@ -55,7 +54,4 @@ const PAGES=[
   side.querySelectorAll('a').forEach(a=>a.addEventListener('click',()=>{ if(matchMedia('(max-width:640px)').matches) side.classList.add('closed'); }));
   // 트리 접기: 쉐브론 클릭
   side.querySelectorAll('.chev').forEach(ch=>ch.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();ch.closest('li').classList.toggle('collapsed');}));
-  // 도움 되었나요 (목업: 표시만)
-  const help=document.querySelector('.helpful');
-  if(help){ help.querySelectorAll('button').forEach(b=>b.addEventListener('click',()=>{help.innerHTML='<span class="thanks">의견 감사해요. 더 나은 안내로 보답할게요.</span>';})); }
 })();
