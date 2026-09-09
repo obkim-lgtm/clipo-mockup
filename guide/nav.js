@@ -36,7 +36,7 @@ const PAGES=[
   // 오른쪽 목차 (데스크톱) + 본문 상단 접이식 목차 (좁은 화면)
   if(heads.length){
     const items=heads.map(h=>`<li><a href="#${h.id}" data-sub="${h.id}">${esc(h.textContent)}</a></li>`).join('');
-    document.body.insertAdjacentHTML('beforeend',`<nav class="toc" id="toc"><div class="ttl">이 페이지에서</div><ul>${items}</ul><button class="top" id="topBtn">맨 위로 ↑</button></nav>`);
+    document.querySelector('.wrap').insertAdjacentHTML('beforeend',`<nav class="toc" id="toc"><div class="ttl">이 페이지에서</div><ul>${items}</ul><button class="top" id="topBtn">맨 위로 ↑</button></nav>`);
     document.getElementById('topBtn').addEventListener('click',()=>window.scrollTo(0,0));
   }
   // 스크롤 스파이
