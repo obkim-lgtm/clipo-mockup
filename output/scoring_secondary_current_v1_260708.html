@@ -945,6 +945,29 @@ body.vs-hide-topbar .vs-float{display:inline-flex}
 .width-coach .wc-hint{display:block;margin-top:8px;font-size:12px;color:#b3b6bd}
 .width-coach .wc-arrow{position:absolute;right:-5px;top:50%;transform:translateY(-50%) rotate(45deg);width:10px;height:10px;background:#222631}
 .width-coach.flip .wc-arrow{right:auto;left:-5px}
+
+/* ══════ 과제물 인식 Beta 고지 · 의견 남기기 (26-09-10) ══════ */
+/* Beta 표기는 인식 결과가 노출되는 자리마다, 의견 창구는 한 곳만(인식 결과 탭 안내 박스) */
+.beta-badge{display:inline-flex;align-items:center;justify-content:center;line-height:1;vertical-align:middle;height:20px;padding:0 7px;margin-left:2px;border-radius:4px;background:#416bff;color:#fff;font-size:11px;font-weight:700;letter-spacing:.2px;flex-shrink:0}
+.ve-seg-btn.on .beta-badge{background:#e9f2ff;color:#3151c4}
+.beta-badge.light{height:22px;padding:0 8px;margin-left:6px;background:#e9f2ff;color:#3151c4;font-size:12px}
+/* 안내 박스 — 탭 콘텐츠 바깥(탭바 바로 아래). 인식 실패·빈 상태에도 같은 자리에 붙어 케이스 분기가 없다 */
+.ocr-beta-note{display:none;align-items:flex-start;gap:10px;padding:12px 20px;background:#f6f7f9;border-bottom:1px solid #dde1e8;flex-shrink:0}
+.ocr-beta-note.on{display:flex}
+.ocr-beta-note .bn-ico{width:18px;height:18px;color:#6d7381;flex-shrink:0;margin-top:1px}
+.ocr-beta-note .bn-txt{font-size:14px;color:#3b3f4c;line-height:1.6;flex:1;min-width:0}
+.ocr-beta-note .bn-txt em{display:block;font-style:normal;color:#6d7381}
+.ocr-beta-note .bn-go{display:inline-flex;align-items:center;justify-content:center;line-height:1;vertical-align:middle;gap:5px;height:32px;padding:0 12px;border:1px solid #dde1e8;border-radius:4px;background:#fff;font-family:inherit;font-size:14px;font-weight:600;color:#3151c4;cursor:pointer;white-space:nowrap;flex-shrink:0}
+.ocr-beta-note .bn-go:hover{border-color:#a3c3ff;background:#f4f8ff}
+/* 의견 모달 */
+.fb-chips{display:flex;flex-wrap:wrap;gap:8px}
+.fb-chip{display:inline-flex;align-items:center;justify-content:center;line-height:1;vertical-align:middle;height:40px;padding:0 14px;border-radius:4px;border:1px solid #dde1e8;background:#fff;cursor:pointer;font-family:inherit;font-size:15px;font-weight:500;color:#3b3f4c}
+.fb-chip:hover{border-color:#a3c3ff;color:#3151c4}
+.fb-chip.on{border-color:#416bff;background:#f4f8ff;color:#3151c4;font-weight:600}
+.fb-ta{width:100%;min-height:96px;border:1px solid #dde1e8;border-radius:4px;padding:12px 14px;font-family:inherit;font-size:16px;line-height:1.6;color:#222631;outline:none;resize:vertical;box-sizing:border-box}
+.fb-ta:focus{border-color:#416bff}
+.fb-lbl{font-size:16px;font-weight:600;color:#222631;margin-bottom:8px}
+.fb-lbl small{font-size:14px;font-weight:400;color:#6d7381;margin-left:4px}
 </style>
 </head>
 <body class="vs-chrome">
@@ -1098,7 +1121,7 @@ body.vs-hide-topbar .vs-float{display:inline-flex}
     <div class="viewer-topbar">
       <div class="ve-seg">
         <button id="ve-tab-orig" class="ve-seg-btn on" onclick="switchViewer('orig')"><i data-lucide="file-text" style="width:16px;height:16px"></i>제출 원본</button>
-        <button id="ve-tab-text" class="ve-seg-btn" onclick="switchViewer('text')"><i data-lucide="square-split-vertical" style="width:16px;height:16px"></i>인식 결과</button>
+        <button id="ve-tab-text" class="ve-seg-btn" onclick="switchViewer('text')"><i data-lucide="square-split-vertical" style="width:16px;height:16px"></i>인식 결과<span class="beta-badge" id="ocrBetaBadge">Beta</span></button>
       </div>
       <div class="ve-ctrl" id="ve-imgbar" style="display:none;">
         <button class="ctrl-btn" onclick="changeViewerPage(-1)"><i data-lucide="chevron-left" style="width:18px;height:18px"></i></button>
@@ -1115,6 +1138,12 @@ body.vs-hide-topbar .vs-float{display:inline-flex}
       <button id="ocrEditBtn" onclick="openOcrEdit()" style="position:relative;margin-left:12px;height:30px;padding:0 12px;border:1px solid rgba(255,255,255,.3);border-radius:6px;background:transparent;color:#fff;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;display:inline-flex;align-items:center;gap:5px;white-space:nowrap;flex-shrink:0;"><i data-lucide="scan-text" style="width:14px;height:14px"></i>인식 결과 수정<span class="ocr-dot" id="ocrEditDot" style="display:none"></span></button>
     </div>
     <!-- OCR 인식 불확실 안내 배너 (인식 확인 필요 학생만) -->
+    <!-- 과제물 인식 Beta 고지 · 의견 남기기 (26-09-10) — 탭 콘텐츠 바깥(탭바 바로 아래)이라 인식 실패·빈 상태에도 자리가 같다 -->
+    <div class="ocr-beta-note" id="ocrBetaNote">
+      <i data-lucide="circle-alert" class="bn-ico"></i>
+      <span class="bn-txt">과제물 인식은 아직 Beta 기능이라 정확하지 않을 수 있어요.<em>잘못 읽었거나 읽지 못한 부분을 알려주시면 인식 품질을 개선하는 데 써요.</em></span>
+      <button class="bn-go" onclick="openOcrFeedback()"><i data-lucide="message-square-text" style="width:16px;height:16px"></i>알려주기</button>
+    </div>
     <div class="viewer-body">
       <div class="viewer-pages" id="viewerPages">
         <div class="viewer-page">
@@ -1468,7 +1497,7 @@ body.vs-hide-topbar .vs-float{display:inline-flex}
     <!-- 우: 인식 결과 — 답과 풀이만 편집 가능 -->
     <div class="ocrm-right">
       <div class="ocrm-rhd">
-        <span class="ocrm-rhd-t">인식 결과</span>
+        <span class="ocrm-rhd-t">인식 결과</span><span class="beta-badge light" id="ocrmBetaBadge" title="과제물 인식은 Beta 기능이에요">Beta</span>
         <span class="ocrm-rhd-sub">답과 풀이만 수정할 수 있어요.</span>
         <button class="ocrm-reset" onclick="ocrmResetAll()"><i data-lucide="rotate-ccw" style="width:15px;height:15px"></i>초기 인식 결과로 되돌리기</button>
       </div>
@@ -1966,6 +1995,40 @@ body.vs-hide-topbar .vs-float{display:inline-flex}
 <div class="toast" id="toast">
   <i id="toastIcon" data-lucide="circle-check-big" style="width:18px;height:18px;flex-shrink:0"></i>
   <span id="toastMsg"></span>
+</div>
+
+<!-- ══════ 과제물 인식 의견 모달 (26-09-10) — 의견 창구는 이 하나뿐 ══════ -->
+<div class="modal-overlay" id="ocrFeedbackModal" onclick="if(event.target===this)closeOcrFeedback()">
+  <div class="modal" style="max-width:560px">
+    <div class="modal-hd">
+      <span class="modal-title">잘못 인식된 부분 알려주기</span>
+      <button class="modal-close" onclick="closeOcrFeedback()"><i data-lucide="x" style="width:18px;height:18px"></i></button>
+    </div>
+    <div class="modal-body">
+      <div>
+        <div class="fb-lbl">어떤 부분이 잘못 인식됐나요? <small>여러 개 고를 수 있어요</small></div>
+        <div class="fb-chips">
+          <button type="button" class="fb-chip" onclick="toggleFbChip(this)">글씨를 못 읽었어요</button>
+          <button type="button" class="fb-chip" onclick="toggleFbChip(this)">표·그림을 못 읽었어요</button>
+          <button type="button" class="fb-chip" onclick="toggleFbChip(this)">줄·문단이 뒤섞였어요</button>
+          <button type="button" class="fb-chip" onclick="toggleFbChip(this)">수식·기호가 틀렸어요</button>
+          <button type="button" class="fb-chip" onclick="toggleFbChip(this)">문항과 답이 잘못 짝지어졌어요</button>
+          <button type="button" class="fb-chip" onclick="toggleFbChip(this)">빈 답을 있는 것처럼 인식했어요</button>
+        </div>
+      </div>
+      <div>
+        <div class="fb-lbl">자세한 의견 <small>선택</small></div>
+        <textarea class="fb-ta" id="ocrfbTa" placeholder="예: 3번 문항에서 학생이 쓴 화학식이 다른 글자로 인식됐어요."></textarea>
+      </div>
+      <p class="ocrfb-sub" id="ocrfbSub" style="font-size:14px;color:#6d7381;line-height:1.55;margin:0"></p>
+    </div>
+    <div class="modal-ft">
+      <div class="modal-actions" style="margin-left:auto">
+        <button class="btn-modal-cancel" onclick="closeOcrFeedback()">취소</button>
+        <button class="btn-modal-save" onclick="submitOcrFeedback()"><i data-lucide="send" style="width:14px;height:14px"></i>보내기</button>
+      </div>
+    </div>
+  </div>
 </div>
 
 <script>
@@ -4021,6 +4084,50 @@ applyOcrReviewNotice();
 if (_curStudent && _curStudent.ocrEdited) { var _eb = document.getElementById('ocrEditedBanner'); if (_eb) _eb.style.display = 'flex'; }
 if (_curStudent && _curStudent.stale) { var _sb = document.getElementById("staleBanner"); if (_sb) _sb.style.display = "flex"; }
 applyOcrDot();   // 인식 결과 수정 버튼의 확인 필요 점
+// ══════ 과제물 인식 Beta 고지 · 의견 남기기 (26-09-10) ══════
+// 대상 = AI가 읽은 결과가 있는 건 + 인식 실패(반복 실패 제보가 개선 가치가 가장 크다).
+// 대상 아님 = 직접 입력(.txt·OCR을 안 거침) · 미제출(패널 자체 없음) · 레거시(인식 결과가 없던 시절 건) ·
+//            인식 전(미채점·채점 중 — 읽은 결과가 아직 없음).
+var _betaTarget = (function(){
+  var s = (typeof _curStudent !== 'undefined') ? _curStudent : null;
+  if(!s) return false;
+  if(s.unsubmitted === true || s.status === '미제출') return false;
+  if(s.method === 'typing') return false;
+  if(s.legacy === true) return false;
+  if(s.ocrCase === 'failed') return true;           // 인식 실패도 의견 수집 대상
+  return !(typeof _noTranscript !== 'undefined' && _noTranscript);
+})();
+function applyBetaNotice(){
+  var badge = document.getElementById('ocrBetaBadge');
+  if(badge) badge.style.display = _betaTarget ? '' : 'none';
+  var badge2 = document.getElementById('ocrmBetaBadge');
+  if(badge2) badge2.style.display = _betaTarget ? '' : 'none';
+  var box = document.getElementById('ocrBetaNote');
+  var tab = document.getElementById('ve-tab-text');
+  var textOn = !!(tab && tab.classList.contains('on'));
+  if(box) box.classList.toggle('on', !!(_betaTarget && textOn));
+}
+function toggleFbChip(el){ el.classList.toggle('on'); }
+function openOcrFeedback(){
+  var sub = document.getElementById('ocrfbSub');
+  if(sub && typeof _curStudent !== 'undefined' && _curStudent){
+    sub.textContent = '1학년 1반 ' + _curStudent.name + '(' + _curStudent.id + ') · 2학기 독서 수행평가의 인식 결과에 대한 의견이에요.';
+  }
+  var m = document.getElementById('ocrFeedbackModal');
+  if(m){ m.classList.add('show'); if(window.lucide) lucide.createIcons(); }
+}
+function closeOcrFeedback(){
+  var m = document.getElementById('ocrFeedbackModal');
+  if(m) m.classList.remove('show');
+  var ta = document.getElementById('ocrfbTa'); if(ta) ta.value = '';
+  document.querySelectorAll('#ocrFeedbackModal .fb-chip.on').forEach(function(c){ c.classList.remove('on'); });
+}
+function submitOcrFeedback(){
+  closeOcrFeedback();
+  showToast('success','의견을 보냈어요. 인식 품질을 개선하는 데 쓸게요.');
+}
+applyBetaNotice();
+
 
 // 진행 칩 동적화 (포크 잔재 '7명 중' → 통일 명단 기준)
 (function(){
@@ -4296,6 +4403,7 @@ function switchViewer(mode){
   if (imgbar) imgbar.style.display = isText ? 'none' : 'flex';
   if (tText) tText.classList.toggle('on', isText);
   if (tOrig) tOrig.classList.toggle('on', !isText);
+  if (typeof applyBetaNotice === 'function') applyBetaNotice();   // Beta 안내 박스는 인식 결과 탭에서만
   applySolveCheckVisibility(isText);
   if (window.lucide) lucide.createIcons();
   if (_ob && _ob.step === 0 && isText) obNext();   // 온보딩 1단계에서 탭을 직접 누르면 다음 단계로 (레이아웃 반영 뒤)

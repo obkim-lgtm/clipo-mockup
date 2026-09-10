@@ -26,6 +26,8 @@
 - **평가 설계 포팅(HIAI 시안 → CLIPO) 준비 → handoff/HANDOFF_hiai_eval_design_port_260826.md** — ⚠️**HIAI 시안 확정 전이라 착수 금지.** 치환표·확정 카피·이식 사양은 준비됨. 먼저 결정할 충돌 3건: ① 이미 있는 `scoring_diagnosis_v1` 진단과의 관계 ② 활동지 탭 소유권 ③ 미리보기·시험 채점의 크레딧 차감 여부
 - **과제물 인식·AI 채점 이어받기(사후 확인 모델·채점당 1크레딧·인식 무과금) → handoff/HANDOFF_ocr_credit_policy_260826.md** (**최상단 "이어받기" 섹션이 시작점** — 끝난 것/열린 것/함정. 그 아래 이력 섹션은 아카이브라 정책 근거로 쓰지 말 것). PRD는 Notion `C- OCR 확인 후 채` **V1.0(2026.08.28)**
 - **과제물 인식·재채점 26-09-03 작업 정리 → handoff/HANDOFF_ocr_260903.md** (고친 것 14커밋·케이스↔학생 15명 표·판단 대기 항목·검수 유의점. 위 260826 핸드오프의 후속 — 케이스별 학생 찾을 땐 이 문서)
+- **과제물 인식 Beta 고지·인식 결과 검수 이어받기 → handoff/HANDOFF_ocr_beta_review_260910.md** (**§7 "26-09-10 착수 결과"가 시작점** — 만든 것·가정 8건·올립 확인 대기 항목). 목업 2종 완료: 백오피스 `output/backoffice_ocr_review_v1_260910.html` · 교사 화면 Beta 표기는 중고등 채점 상세 2파일에 얹음. **CLIPO는 비식별화가 없어** 전처리 단이 통째로 빠졌고, `정확도 낮음`·`다시 인식`도 CLIPO엔 없다. PRD(C-)는 목업 확정 후 작성
+- **CLIPO Admin(백오피스) 화면 그리기 전 → output/backoffice_ocr_review_v1_260910.html 복제** — CLIPO 백오피스 자산은 이 파일 하나뿐이다. 상단바(`CLIPO Admin` + 햄버거 드로워)·NB 그룹 순서(26-09-10 재정렬안)·신형 목록 관례(칩+드롭다운+검색 필터 카드 / `총 N건` 헤더 / 뱃지 셀 / 행 outline 버튼)가 여기 들어 있다. 구형 목록(`staffs/records`) 패턴을 따라 그리지 말 것
 - 그 외 인수인계 문서 → handoff/ (교사의날 이벤트·OCR 채점 260615·초등 채점 v2)
 - 내부 검토 문서 → reviews/ (**gitignore 대상 — public repo라 커밋 금지**)
 - PRD 작성 → ../prd_guide.md
