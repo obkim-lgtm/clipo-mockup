@@ -15,27 +15,42 @@ strong{font-weight:700}
 
 /* ===== 상단 바 ===== */
 .hdr{position:fixed;top:0;left:0;right:0;height:var(--header);background:#fff;border-bottom:1px solid var(--line);z-index:40;display:flex;align-items:center;gap:14px;padding:0 20px}
-.hdr .logo{font-weight:800;color:var(--blue);font-size:20px;letter-spacing:.02em}
+.hdr .home-link{display:inline-flex;align-items:center;color:var(--text)}
+.hdr .logo{display:block;height:17px;width:auto}
 .hdr .divider{width:1px;height:20px;background:var(--line)}
 .hdr .doc{font-size:15px;font-weight:600;color:var(--text)}
-.hdr .menu-btn{display:none;margin-left:auto;align-items:center;justify-content:center;line-height:1;vertical-align:middle;width:40px;height:40px;border:1px solid var(--line);border-radius:10px;background:#fff;cursor:pointer;font-size:18px}
-.hdr .home-link{color:var(--text)}
+/* 문서 목록 접기 버튼 — 왼쪽 패널을 다루므로 헤더 맨 왼쪽에 둔다 */
+.hdr .menu-btn{display:inline-flex;align-items:center;justify-content:center;line-height:1;vertical-align:middle;width:36px;height:36px;margin-left:-6px;border:0;border-radius:10px;background:transparent;cursor:pointer;flex:none}
+.hdr .menu-btn:hover{background:var(--bg)}
+.hdr .menu-btn i{display:block;width:17px;height:1.8px;border-radius:2px;background:var(--sub);position:relative}
+.hdr .menu-btn i::before,.hdr .menu-btn i::after{content:"";position:absolute;left:0;width:17px;height:1.8px;border-radius:2px;background:var(--sub)}
+.hdr .menu-btn i::before{top:-5.5px} .hdr .menu-btn i::after{top:5.5px}
+/* 클리포 본 서비스로 나가는 버튼 */
+.hdr-cta{margin-left:auto;display:inline-flex;align-items:center;justify-content:center;line-height:1;vertical-align:middle;height:36px;padding:0 14px;border:1px solid var(--line);border-radius:10px;background:#fff;color:var(--sub);font-size:14px;font-weight:600;flex:none}
+.hdr-cta::after{content:"↗";margin-left:5px;font-size:13px}
+.hdr-cta:hover{border-color:var(--blue-line);background:var(--blue-bg);color:var(--blue)}
 
 /* ===== 왼쪽 문서 트리 ===== */
 .side{position:fixed;top:var(--header);left:0;bottom:0;width:var(--side);border-right:1px solid var(--line);background:#fff;overflow-y:auto;padding:20px 12px 40px;z-index:30}
+.side.ready{transition:transform .18s ease}
+.side.closed{transform:translateX(-100%)}
+body.side-closed .wrap{margin-left:0}
 .side .grp{font-size:12px;font-weight:700;color:var(--mute);letter-spacing:.04em;padding:8px 12px 6px}
 .side ul{list-style:none;margin:0;padding:0}
 .side a{display:flex;align-items:center;gap:9px;min-height:38px;padding:8px 12px;border-radius:10px;color:var(--sub);font-size:14.5px;font-weight:500;line-height:1.4}
 .side a:hover{background:var(--bg);color:var(--text)}
 .side a.active{background:var(--blue-bg);color:var(--blue);font-weight:700}
 .side .num{display:inline-flex;align-items:center;justify-content:center;line-height:1;width:20px;height:20px;border-radius:6px;background:var(--card);color:var(--sub);font-size:11.5px;font-weight:800;flex:none}
+.side .num.blank{background:transparent}   /* 번호 없는 문서도 글자 시작점을 맞춘다 */
 .side a.active .num{background:var(--blue);color:#fff}
-.side ul ul{margin:2px 0 6px 22px;border-left:1px solid var(--line);padding-left:8px}
+.side a.active .num.blank{background:transparent}
+.side .grp{margin-top:18px;border-top:1px solid var(--line);padding-top:14px}
+.side .grp:first-child{margin-top:0;border-top:0;padding-top:2px}
+/* 지금 보는 문서의 소제목만 펼친다 */
+.side ul ul{margin:2px 0 8px 24px;border-left:1px solid var(--line);padding-left:8px}
 .side ul ul a{min-height:30px;padding:4px 10px;font-size:13.5px;color:var(--mute);font-weight:500}
+.side ul ul a:hover{color:var(--text)}
 .side ul ul a.active{background:transparent;color:var(--blue);font-weight:600}
-.side li.collapsed>ul{display:none}
-.side .chev{margin-left:auto;width:8px;height:8px;border-right:1.5px solid var(--mute);border-bottom:1.5px solid var(--mute);transform:rotate(45deg);flex:none;opacity:.7}
-.side li.collapsed>a .chev{transform:rotate(-45deg)}
 
 /* ===== 본문 ===== */
 .wrap{margin-left:var(--side);display:flex;justify-content:center;align-items:flex-start;gap:56px;padding:calc(var(--header) + 40px) 40px 96px}
@@ -46,6 +61,9 @@ h1{font-size:33px;line-height:1.28;margin:0 0 14px;font-weight:800;letter-spacin
 .lead{font-size:17px;color:var(--sub);margin:0 0 36px;line-height:1.72}
 h2{font-size:23px;line-height:1.35;margin:56px 0 16px;font-weight:800;letter-spacing:-.01em}
 h3{font-size:20px;line-height:1.4;margin:52px 0 14px;font-weight:700;letter-spacing:-.01em;padding-top:4px}
+/* 절이 바뀌는 자리에 옅은 구분선. 채워진 박스 뒤에서는 여백만으로 경계가 안 잡힌다 */
+.doc-body h3{border-top:1px solid var(--line);margin-top:54px;padding-top:32px}
+.doc-body h3:first-of-type{border-top:0;margin-top:44px;padding-top:4px}
 p{margin:0 0 16px}
 ul.list{margin:0 0 18px;padding-left:22px}
 ul.list li{margin:8px 0}
@@ -55,21 +73,25 @@ hr{border:0;border-top:1px solid var(--line);margin:44px 0}
 .callout.blue{background:var(--blue-bg)} .callout.green{background:var(--green-bg)} .callout.red{background:var(--red-bg)}
 .callout .ic{font-size:19px;line-height:1.5;flex:none} .callout .body{flex:1} .callout p{margin:0;font-size:16px} .callout p+p{margin-top:8px}
 
-/* 표 — 가로선만 남겨 가볍게 */
-.tbl{width:100%;border-collapse:collapse;margin:18px 0 24px;font-size:16px;line-height:1.6}
-.tbl th,.tbl td{border:0;border-bottom:1px solid var(--line);padding:14px 14px 14px 0;vertical-align:top;text-align:left}
-.tbl th:last-child,.tbl td:last-child{padding-right:0}
-.tbl th{font-weight:700;font-size:14px;color:var(--mute);border-bottom:1px solid var(--line-strong);padding-bottom:10px;letter-spacing:.01em}
+/* 표 — 머리글은 색 면, 본문은 가로선만 */
+.tbl{width:100%;border-collapse:separate;border-spacing:0;margin:18px 0 24px;font-size:16px;line-height:1.6}
+.tbl th,.tbl td{border:0;padding:14px;vertical-align:top;text-align:left}
+.tbl td{border-bottom:1px solid var(--line)}
+.tbl th{background:var(--blue-bg);color:#33459f;font-weight:700;font-size:14.5px;padding-top:12px;padding-bottom:12px;letter-spacing:-.01em}
+.tbl th:first-child{border-radius:10px 0 0 10px}
+.tbl th:last-child{border-radius:0 10px 10px 0}
 .tbl tr:last-child td{border-bottom:0}
+.tbl code{overflow-wrap:anywhere}   /* 긴 예시 칩이 좁은 화면에서 표를 밀어내지 않게 */
 .tbl td.k{font-weight:700;color:var(--text)} .tbl td.c,.tbl th.c{text-align:center}
 .tbl-wrap{overflow-x:auto}
-.tbl.status th{padding-left:12px;padding-right:12px;border-radius:10px 10px 0 0;font-size:14.5px;color:var(--text)}
-.tbl.status td{padding-left:12px;padding-right:12px}
-.tbl.status th:nth-child(1){background:var(--green-bg)} .tbl.status th:nth-child(2){background:var(--orange-bg)} .tbl.status th:nth-child(3){background:var(--red-bg)}
+/* 소제목 앞 상태 점 (잘 돼요 · 확인하면 좋아요 · 아직 어려워요) */
+h3 .mark{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:10px;vertical-align:middle;position:relative;top:-2px}
+h3 .mark.ok{background:var(--green)} h3 .mark.cond{background:var(--orange)} h3 .mark.hard{background:var(--red)}
 
 figure{margin:22px 0 28px}
 figure img{display:block;max-width:100%;height:auto;border:1px solid var(--line);border-radius:14px;background:#fff}
 figure.plain img{border:0}
+figure.wide img{width:100%}   /* 원본이 본문 폭보다 좁은 그림을 꽉 채운다 */
 figcaption{font-size:14.5px;color:var(--mute);margin-top:10px;line-height:1.6}
 
 .cards{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:18px 0 24px}
@@ -176,9 +198,11 @@ details figure{margin:8px 0}
 /* 640px 이하(휴대폰): 메뉴는 기본 펼침, 상단 "메뉴" 버튼으로 접었다 편다 */
 @media (max-width:640px){
   body{font-size:16px}
-  .hdr .menu-btn{display:inline-flex;width:auto;padding:0 12px;font-size:14px;font-weight:600}
-  .side{width:min(280px,84vw);box-shadow:0 8px 24px rgba(0,0,0,.12);transition:transform .2s}
-  .side.closed{transform:translateX(-100%);box-shadow:none}
+  .hdr{padding:0 16px;gap:10px}
+  .hdr .divider,.hdr .doc{display:none}   /* 좁은 화면에선 문서명이 줄바꿈돼 깨진다. 바로 아래 제목이 대신한다 */
+  .hdr-cta{padding:0 12px;font-size:13.5px}
+  .side{width:min(280px,84vw);box-shadow:0 8px 24px rgba(0,0,0,.12)}
+  .side.closed{box-shadow:none}
   .wrap{margin-left:0;padding:calc(var(--header) + 24px) 18px 72px}
   .doclist a{padding:20px}
 }
