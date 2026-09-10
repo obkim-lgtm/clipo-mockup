@@ -12,7 +12,7 @@ const PAGES=[
 ];
 // 순서대로 읽는 흐름 밖에 있는 참고 문서
 const REFS=[
- {file:'examples.html',title:'과목별 채점 예시'},
+ {file:'examples.html',num:'＋',title:'과목별 채점 예시'},   // 번호 대신 홈 카드와 같은 표시
 ];
 (function(){
   const here=location.pathname.split('/').pop()||'index.html';
@@ -45,12 +45,12 @@ const REFS=[
   tree+=`<div class="grp">참고</div><ul>${REFS.map(item).join('')}</ul>`;
   document.body.insertAdjacentHTML('afterbegin',`<aside class="side${closed?' closed':''}" id="side">${tree}</aside>`);
   if(closed) document.body.classList.add('side-closed');
-  // 오른쪽 목차 (데스크톱) + 본문 상단 접이식 목차 (좁은 화면)
-  if(heads.length){
-    const items=heads.map(h=>`<li><a href="#${h.id}" data-sub="${h.id}">${esc(h.textContent)}</a></li>`).join('');
-    document.querySelector('.wrap').insertAdjacentHTML('beforeend',`<nav class="toc" id="toc"><div class="ttl">이 페이지에서</div><ul>${items}</ul><button class="top" id="topBtn">맨 위로 ↑</button></nav>`);
-    document.getElementById('topBtn').addEventListener('click',()=>window.scrollTo(0,0));
-  }
+  // 오른쪽 목차. 소제목이 없는 문서도 **빈 칸을 그대로 둔다** —
+  // 그래야 시작하기·과목별 예시로 오갈 때 본문 시작점이 흔들리지 않는다.
+  const items=heads.map(h=>`<li><a href="#${h.id}" data-sub="${h.id}">${esc(h.textContent)}</a></li>`).join('');
+  const inner=heads.length?`<div class="ttl">이 페이지에서</div><ul>${items}</ul><button class="top" id="topBtn">맨 위로 ↑</button>`:'';
+  document.querySelector('.wrap').insertAdjacentHTML('beforeend',`<nav class="toc" id="toc">${inner}</nav>`);
+  if(heads.length) document.getElementById('topBtn').addEventListener('click',()=>window.scrollTo(0,0));
   // 스크롤 스파이
   const links=[...document.querySelectorAll('a[data-sub]')].filter(a=>a.dataset.sub);
   const paint=id=>links.forEach(a=>a.classList.toggle('active',a.dataset.sub===id));
