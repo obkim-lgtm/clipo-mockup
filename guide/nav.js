@@ -6,7 +6,7 @@ const PAGES=[
  {file:'examples.html',num:'',title:'과목별 채점 예시',parent:'ch2.html'},
  {file:'ch3.html',num:3,title:'과제물은 이렇게 준비해요',subs:[['s3-1','세 가지만 지켜 주세요'],['s3-2','잘 안 읽히는 표기'],['s3-3','학생용 안내 한 줄'],['s3-4','파일 조건']]},
  {file:'ch4.html',num:4,title:'이런 답안은 어때요?',subs:[['s4-1','형태별로 한눈에'],['s4-2','잘 돼요 · 조건이 있어요 · 아직 어려워요']]},
- {file:'ch5.html',num:5,title:'AI 채점 결과가 기대와 다를 때',subs:[]},
+ {file:'ch5.html',num:5,title:'AI 채점 결과가 기대와 다를 때',subs:[['s5-1','순서대로 확인해요'],['s5-2','화면에서는 이렇게 보여요'],['s5-3','알아 두면 좋은 것']]},
  {file:'ch6.html',num:6,title:'자주 묻는 질문',subs:[]},
 ];
 (function(){
