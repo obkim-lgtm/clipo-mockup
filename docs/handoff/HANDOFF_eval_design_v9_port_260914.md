@@ -11,9 +11,9 @@
 | 무엇 | 어디 |
 |---|---|
 | 작업본 목업 | `hiai_mockup/output/evaluation_design_v9.html` — 까망이 탭 `채점기준 검토` / `정확도 향상` / `고친 뒤 처리` |
-| 배포본 | https://obkim-lgtm.github.io/hiai-mockup/output/evaluation_design_v9.html (⚠️ 26-09-10 저장 선택창 변경은 **미배포** — 로컬 파일이 최신) |
+| 배포본 | https://obkim-lgtm.github.io/hiai-mockup/output/evaluation_design_v9.html (26-09-10 저장 선택창까지 배포됨) |
 | 결정 이력 | `hiai_mockup/docs/sessions/2026-09-03.md` — 맨 위 `09-09`·`09-10` 절 + 아래 `회의 확정(이안·빌·올립)` 절 |
-| PRD | Notion **H-2608 V1.2**(26-09-08). ⚠️ 26-09-10 저장 선택창 변경(조건·케이스별 문구)은 **PRD에 아직 없음** |
+| PRD | Notion **H-2608 V1.2**(26-09-08). 26-09-10 저장 선택창 조건은 V1.2 본문에 반영(26-09-14, 상단 `V1.2 수정` 줄). 문구는 PRD에 없음(목업·세션 로그가 기준) |
 | 피그마 | `2026-GGD-Design` Basic_Modal 3종 + 토스트(26-09-10 올립 작성) |
 
 ---
