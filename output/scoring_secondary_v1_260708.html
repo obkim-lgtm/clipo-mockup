@@ -936,6 +936,8 @@ body.vs-hide-topbar .vs-float{display:inline-flex}
 .vf-badge{display:inline-flex;align-items:center;justify-content:center;line-height:1;vertical-align:middle;gap:4px;height:24px;padding:0 8px;border-radius:4px;background:#f1f3f5;color:#3b3f4c;font-size:13px;font-weight:500;white-space:nowrap;flex-shrink:0}
 .viewer-empty-ic{width:48px;height:48px;border-radius:50%;background:#f1f3f5;display:flex;align-items:center;justify-content:center;color:#6d7381}
 .viewer-empty-card .vf-download{margin-left:0;margin-top:8px}
+.empty-state-cta:disabled{background:#cfd3da;cursor:not-allowed}
+.empty-state-cta:disabled:hover{background:#cfd3da}
 /* ══════ 과제물 인식 Beta 고지 · 의견 남기기 (26-09-10) ══════ */
 /* Beta 표기는 인식 결과가 노출되는 자리마다, 의견 창구는 한 곳만(인식 결과 탭 안내 박스) */
 .beta-badge{display:inline-flex;align-items:center;justify-content:center;line-height:1;vertical-align:middle;height:20px;padding:0 7px;margin-left:2px;border-radius:4px;background:#416bff;color:#fff;font-size:11px;font-weight:700;letter-spacing:.2px;flex-shrink:0}
@@ -3334,6 +3336,11 @@ function applyUnsupportedUI(){
       + '<button class="vf-download" onclick="showToast(\'success\',\'파일을 다운로드했어요.\')"><i data-lucide="download" style="width:16px;height:16px"></i>다운로드</button>'
       + '</div></div>';
   }
+  // AI가 읽을 수 없는 파일이라 AI 채점 실행은 막는다 (점수는 선생님이 직접 고름)
+  document.querySelectorAll('.empty-state-cta').forEach(function(b){
+    b.disabled = true; b.removeAttribute('onclick');
+    b.title = '채점 지원되지 않는 파일이라 AI 채점을 실행할 수 없어요';
+  });
   if(typeof lucide !== 'undefined') lucide.createIcons();
 }
 function applyTypingViewer(){
