@@ -727,6 +727,17 @@ var ROWS = [
   }
 })();
 
+/* 인식 실패 + Fail 판정 — 더미 행 하나를 케이스로 쓴다 (케이스 학생 명단엔 인식 실패가 백시우 한 명뿐이라 미판정만 있었음) */
+(function(){
+  var r = ROWS.filter(function(x){ return x.id === 'gen4'; })[0];
+  if (!r) return;
+  r.unc = null; r.total = null; r.cur = null; r.cmp = null; r.cmpFail = true;
+  r.verdict = 'F'; r.verdictBy = 'Lean'; r.verdictAt = '2026-09-09 10:35';
+  r.reason = '스캔 해상도가 낮아 인식 자체가 실패했어요. 3.1 Pro로 테스트해도 똑같이 실패해요. 선생님께 재업로드 안내가 필요해요.';
+  r.vocs = [{ when:'09/08 18:40', by:r.teacher, chips:['글씨를 못 읽었어요'],
+    text:'인식 실패로 떠서 다시 채점을 눌러도 계속 실패해요.' }];
+})();
+
 /* ═════════ 목록 ═════════ */
 var FILTER = 'all', QUERY = '', SORT_DESC = true, PER_PAGE = 20, PAGE = 1;
 
