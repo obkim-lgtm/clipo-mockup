@@ -959,6 +959,12 @@ body.vs-hide-topbar .vs-float{display:inline-flex}
 .ocr-beta-note .bn-txt em{display:block;font-style:normal;color:#6d7381}
 .ocr-beta-note .bn-go{display:inline-flex;align-items:center;justify-content:center;line-height:1;vertical-align:middle;gap:5px;height:32px;padding:0 12px;border:1px solid #dde1e8;border-radius:4px;background:#fff;font-family:inherit;font-size:14px;font-weight:600;color:#3151c4;cursor:pointer;white-space:nowrap;flex-shrink:0}
 .ocr-beta-note .bn-go:hover{border-color:#a3c3ff;background:#f4f8ff}
+/* 인식 결과 수정 팝업 안 — 탭바 아래 띠가 아니라 결과 목록 맨 위 박스 */
+.ocr-beta-note.pop{display:flex;margin:0;padding:12px 14px;border:1px solid #eaecf0;border-radius:10px;background:#f6f7f9;align-items:center}
+.ocr-beta-note.pop.off{display:none}
+/* 의견 모달 — 인식 결과 수정 팝업(z-index 1100) 위에서도 열린다 */
+#ocrFeedbackModal{z-index:1200}
+.fb-foot{display:flex;align-items:center;gap:6px;font-size:14px;color:#6d7381;line-height:1.55;margin:0}
 /* 의견 모달 */
 .fb-chips{display:flex;flex-wrap:wrap;gap:8px}
 .fb-chip{display:inline-flex;align-items:center;justify-content:center;line-height:1;vertical-align:middle;height:40px;padding:0 14px;border-radius:4px;border:1px solid #dde1e8;background:#fff;cursor:pointer;font-family:inherit;font-size:15px;font-weight:500;color:#3b3f4c}
@@ -1141,7 +1147,7 @@ body.vs-hide-topbar .vs-float{display:inline-flex}
     <!-- 과제물 인식 Beta 고지 · 의견 남기기 (26-09-10) — 탭 콘텐츠 바깥(탭바 바로 아래)이라 인식 실패·빈 상태에도 자리가 같다 -->
     <div class="ocr-beta-note" id="ocrBetaNote">
       <i data-lucide="circle-alert" class="bn-ico"></i>
-      <span class="bn-txt">과제물 인식은 아직 Beta 기능이라 정확하지 않을 수 있어요.<em>잘못 읽었거나 읽지 못한 부분을 알려주시면 인식 품질을 개선하는 데 써요.</em></span>
+      <span class="bn-txt">AI는 실수할 수 있어요. 선생님의 확인이 필요해요.<em>잘못 인식된 부분이 있다면 알려주세요. 인식 품질 개선에 반영돼요.</em></span>
       <button class="bn-go" onclick="openOcrFeedback()"><i data-lucide="message-square-text" style="width:16px;height:16px"></i>알려주기</button>
     </div>
     <div class="viewer-body">
@@ -1502,6 +1508,12 @@ body.vs-hide-topbar .vs-float{display:inline-flex}
         <button class="ocrm-reset" onclick="ocrmResetAll()"><i data-lucide="rotate-ccw" style="width:15px;height:15px"></i>초기 인식 결과로 되돌리기</button>
       </div>
       <div class="ocrm-list">
+        <!-- 과제물 인식 Beta 안내 · 의견 남기기 (26-09-14) — 인식 결과를 보고 고치는 자리라 여기서 바로 알린다 -->
+        <div class="ocr-beta-note pop" id="ocrmBetaNote">
+          <i data-lucide="circle-alert" class="bn-ico"></i>
+          <span class="bn-txt">AI는 실수할 수 있어요. 선생님의 확인이 필요해요.<em>잘못 인식된 부분이 있다면 알려주세요. 인식 품질 개선에 반영돼요.</em></span>
+          <button class="bn-go" onclick="openOcrFeedback()"><i data-lucide="message-square-text" style="width:16px;height:16px"></i>알려주기</button>
+        </div>
         <!-- OCR 품질 안내 — 채점 화면이 아니라 여기(인식 결과 수정) 맨 위에만 (올립 26-09-04) -->
         <div id="ocrReviewNotice" class="ocrd-notice ocrd-notice--warn" style="display:none;">
           <i data-lucide="alert-circle" style="width:16px;height:16px;flex-shrink:0;margin-top:2px;"></i>
@@ -2006,7 +2018,7 @@ body.vs-hide-topbar .vs-float{display:inline-flex}
     </div>
     <div class="modal-body">
       <div>
-        <div class="fb-lbl">어떤 부분이 잘못 인식됐나요? <small>여러 개 고를 수 있어요</small></div>
+        <div class="fb-lbl">어떤 부분이 잘못 인식됐나요? <small>(복수 선택 가능)</small></div>
         <div class="fb-chips">
           <button type="button" class="fb-chip" onclick="toggleFbChip(this)">글씨를 못 읽었어요</button>
           <button type="button" class="fb-chip" onclick="toggleFbChip(this)">표·그림을 못 읽었어요</button>
@@ -2020,12 +2032,12 @@ body.vs-hide-topbar .vs-float{display:inline-flex}
         <div class="fb-lbl">자세한 의견 <small>선택</small></div>
         <textarea class="fb-ta" id="ocrfbTa" placeholder="예: 3번 문항에서 학생이 쓴 화학식이 다른 글자로 인식됐어요."></textarea>
       </div>
-      <p class="ocrfb-sub" id="ocrfbSub" style="font-size:14px;color:#6d7381;line-height:1.55;margin:0"></p>
+      <p class="fb-foot"><i data-lucide="circle-alert" style="width:15px;height:15px;flex-shrink:0"></i>AI는 실수할 수 있어요. 선생님의 확인이 필요해요.</p>
     </div>
     <div class="modal-ft">
       <div class="modal-actions" style="margin-left:auto">
         <button class="btn-modal-cancel" onclick="closeOcrFeedback()">취소</button>
-        <button class="btn-modal-save" onclick="submitOcrFeedback()"><i data-lucide="send" style="width:14px;height:14px"></i>보내기</button>
+        <button class="btn-modal-save" id="ocrfbSend" onclick="submitOcrFeedback()" disabled>의견 보내기</button>
       </div>
     </div>
   </div>
@@ -4106,13 +4118,17 @@ function applyBetaNotice(){
   var tab = document.getElementById('ve-tab-text');
   var textOn = !!(tab && tab.classList.contains('on'));
   if(box) box.classList.toggle('on', !!(_betaTarget && textOn));
+  var box2 = document.getElementById('ocrmBetaNote');
+  if(box2) box2.classList.toggle('off', !_betaTarget);
 }
-function toggleFbChip(el){ el.classList.toggle('on'); }
+// 유형을 하나 이상 골라야 보낼 수 있다 (자유 의견만으로는 유형별 빈도를 셀 수 없음)
+function syncFbSend(){
+  var btn = document.getElementById('ocrfbSend');
+  if(btn) btn.disabled = !document.querySelector('#ocrFeedbackModal .fb-chip.on');
+}
+function toggleFbChip(el){ el.classList.toggle('on'); syncFbSend(); }
 function openOcrFeedback(){
-  var sub = document.getElementById('ocrfbSub');
-  if(sub && typeof _curStudent !== 'undefined' && _curStudent){
-    sub.textContent = '1학년 1반 ' + _curStudent.name + '(' + _curStudent.id + ') · 2학기 독서 수행평가의 인식 결과에 대한 의견이에요.';
-  }
+  syncFbSend();
   var m = document.getElementById('ocrFeedbackModal');
   if(m){ m.classList.add('show'); if(window.lucide) lucide.createIcons(); }
 }
@@ -4121,8 +4137,10 @@ function closeOcrFeedback(){
   if(m) m.classList.remove('show');
   var ta = document.getElementById('ocrfbTa'); if(ta) ta.value = '';
   document.querySelectorAll('#ocrFeedbackModal .fb-chip.on').forEach(function(c){ c.classList.remove('on'); });
+  syncFbSend();
 }
 function submitOcrFeedback(){
+  if(!document.querySelector('#ocrFeedbackModal .fb-chip.on')) return;
   closeOcrFeedback();
   showToast('success','의견을 보냈어요. 인식 품질을 개선하는 데 쓸게요.');
 }
