@@ -31,7 +31,7 @@ const REFS=[
   document.body.insertAdjacentHTML('afterbegin',`
   <header class="hdr">
     <button class="menu-btn" id="menuBtn" aria-label="문서 목록 접기·펼치기" aria-expanded="${closed?'false':'true'}"><i></i></button>
-    <a class="home-link" href="https://clipo.ai" aria-label="클리포 홈"><img class="logo" src="clipo_wordmark.svg" alt="CLIPO" width="76" height="16"></a><span class="divider"></span><a class="home-link doc" href="index.html">AI 채점 안내</a>
+    <a class="home-link" href="https://clipo.ai" aria-label="클리포 홈"><img class="logo" src="clipo_wordmark.svg" alt="CLIPO" width="76" height="16"></a><span class="divider"></span><a class="home-link doc" href="index.html">AI 채점 가이드</a>
     <a class="hdr-cta" href="https://clipo.ai">클리포로 이동</a>
   </header>`);
   // 왼쪽 문서 목록
