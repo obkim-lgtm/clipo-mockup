@@ -170,6 +170,7 @@ tbody tr.clickable:hover .go{color:#416bff}
   margin-left:auto;height:34px;padding:0 12px;background:#fff;border:1px solid #a3c3ff;border-radius:4px;
   font-size:14px;font-weight:600;color:#365eef;cursor:pointer;white-space:nowrap;flex-shrink:0}
 .btn-test:hover{background:#f4f8ff}
+.btn-test.on{background:#e9f2ff;border-color:#416bff;color:#3151c4}
 .ch-x{display:inline-flex;align-items:center;justify-content:center;margin-left:auto;width:30px;height:30px;
   background:none;border:none;border-radius:4px;cursor:pointer;color:#6d7381;flex-shrink:0}
 .ch-x:hover{background:#f6f7f9}
@@ -490,7 +491,7 @@ tbody tr.clickable:hover .go{color:#416bff}
           <span class="ch-nm"><i data-lucide="scan-text" style="width:18px;height:18px;color:#416bff"></i>인식 결과</span>
           <span class="ch-meta" id="curMeta"></span>
           <span class="ch-meta edit" id="editMeta"></span>
-          <button class="btn-test" onclick="openTest()"><i data-lucide="flask-conical" style="width:15px;height:15px"></i>모델 테스트</button>
+          <button class="btn-test" id="btnTest" onclick="toggleTest()"><i data-lucide="flask-conical" style="width:15px;height:15px"></i>모델 테스트</button>
         </div>
         <div class="col-body" id="colCur"></div>
       </div>
@@ -868,8 +869,19 @@ function toggleEdit(i){
   el.style.display = (el.style.display === 'none') ? 'block' : 'none';
 }
 
-function openTest(){ document.getElementById('colTest').style.display = 'flex'; if (window.lucide) lucide.createIcons(); }
-function closeTest(){ document.getElementById('colTest').style.display = 'none'; }
+/* 모델 테스트 열 — 버튼은 2단↔3단 토글. 열려 있으면 버튼이 눌린 상태로 보인다 */
+function openTest(){
+  document.getElementById('colTest').style.display = 'flex';
+  document.getElementById('btnTest').classList.add('on');
+  if (window.lucide) lucide.createIcons();
+}
+function closeTest(){
+  document.getElementById('colTest').style.display = 'none';
+  document.getElementById('btnTest').classList.remove('on');
+}
+function toggleTest(){
+  if (document.getElementById('colTest').style.display === 'none') openTest(); else closeTest();
+}
 
 /* 파일 드롭다운 — 한 번의 제출에 파일이 여러 개여도 행은 갈리지 않는다.
    교사 화면과 같은 단위로 보이도록 상세에서 파일만 바꿔 본다 */
