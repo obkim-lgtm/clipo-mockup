@@ -23,7 +23,7 @@
 - **학생 과제 홈 개편 이어받기(시안 5 제작·노출 정책·필터 구조) → handoff/HANDOFF_student_home_260811.md** (시안 4종은 output/student_home_v1_260729.html 한 파일 안. 정책 동일·UI만 차이)
 - **실시간 모니터링(수업 중 화면) 이어받기 → handoff/HANDOFF_live_monitor_260819.md** (상태 판정·동작 규칙·미결. 디자인은 별도로 새로 잡음)
 - OCR·채점 포팅(HIAI 동일 기획) 스펙 → handoff/HANDOFF_hiai_ocr_scoring_port_260625.md
-- **평가 설계 포팅(HIAI 시안 → CLIPO) 준비 → handoff/HANDOFF_hiai_eval_design_port_260826.md** — ⚠️**HIAI 시안 확정 전이라 착수 금지.** 치환표·확정 카피·이식 사양은 준비됨. 먼저 결정할 충돌 3건: ① 이미 있는 `scoring_diagnosis_v1` 진단과의 관계 ② 활동지 탭 소유권 ③ 미리보기·시험 채점의 크레딧 차감 여부
+- **평가 설계 — HIAI v9를 CLIPO에 적용하는 기획 → handoff/HANDOFF_eval_design_v9_port_260914.md** (**§3 '새 세션에서 정할 것'이 시작점.** CLIPO 결정 0건. 핵심 차이: `확인 필요` 라벨이 CLIPO에선 이미 AI 채점 실패 뜻 · 점수 지우고 다시 채점하면 크레딧 차감). 옛 handoff/HANDOFF_hiai_eval_design_port_260826.md는 HIAI 시안1·2 전제라 **§2 충돌·§3 치환표만 참고**
 - **과제물 인식·AI 채점 이어받기(사후 확인 모델·채점당 1크레딧·인식 무과금) → handoff/HANDOFF_ocr_credit_policy_260826.md** (**최상단 "이어받기" 섹션이 시작점** — 끝난 것/열린 것/함정. 그 아래 이력 섹션은 아카이브라 정책 근거로 쓰지 말 것). PRD는 Notion `C- OCR 확인 후 채` **V1.0(2026.08.28)**
 - **과제물 인식·재채점 26-09-03 작업 정리 → handoff/HANDOFF_ocr_260903.md** (고친 것 14커밋·케이스↔학생 15명 표·판단 대기 항목·검수 유의점. 위 260826 핸드오프의 후속 — 케이스별 학생 찾을 땐 이 문서)
 - **과제물 인식 Beta 고지·인식 결과 검수 이어받기 → handoff/HANDOFF_ocr_beta_review_260910.md** (**§7 "26-09-10 착수 결과"가 시작점** — 만든 것·가정 8건·올립 확인 대기 항목). 목업 2종 완료: 백오피스 `output/backoffice_ocr_review_v1_260910.html` · 교사 화면 Beta 표기는 중고등 채점 상세 2파일에 얹음. **CLIPO는 비식별화가 없어** 전처리 단이 통째로 빠졌고, `정확도 낮음`·`다시 인식`도 CLIPO엔 없다. PRD(C-)는 목업 확정 후 작성

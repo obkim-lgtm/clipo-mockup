@@ -1,5 +1,7 @@
 # HANDOFF — HIAI 평가 설계 시안 → CLIPO 포팅 준비 (2026-08-26)
 
+> ⛔ **26-09-14 기준 전제 폐기 — 새 문서 `HANDOFF_eval_design_v9_port_260914.md`부터 읽을 것.** HIAI 시안1·시안2·잠금 2축이 모두 없어져 §1·§4·§5·§6(시안 사양·카피·케이스)은 쓰지 않는다. 유효한 건 §2 CLIPO 고유 충돌과 §3 치환표(`빈 활동지` 행 제외)뿐.
+
 > **상태: 시안 확정 전 사전 준비.** HIAI에서 평가 설계 시안 2개를 만들어 컨펌 대기 중이고, 확정되면 **CLIPO에도 동일 기획으로 들어간다**(올립 지시). 디자인 스타일만 CLIPO 것으로.
 > **디자인·크롬은 CLIPO 것**(파랑 `#416bff`·Pretendard GOV·표준 헤더/좌측 NB/6탭 밴드/1240px), **기획·UX·문구·상태 로직은 HIAI 원본대로**.
 > HIAI 원본(권위 소스): `hiai_mockup/output/evaluation_design_v5.html`(시안1) · `evaluation_design_v6.html`(시안2). 배포 https://obkim-lgtm.github.io/hiai-mockup/output/index.html · 기획 배경 `hiai_mockup/docs/sessions/2026-08-26.md`
