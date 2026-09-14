@@ -99,6 +99,7 @@ tbody tr:hover{background:#fafbfc}
 .bdg{display:inline-flex;align-items:center;justify-content:center;line-height:1;vertical-align:middle;gap:4px;
   height:26px;padding:0 10px;border-radius:4px;font-size:13px;font-weight:600;white-space:nowrap}
 .bdg-swap{background:#eef3ff;color:#3151c4}
+tbody td .bdg{height:22px}   /* 표 안 뱃지는 행 높이를 늘리지 않게 */
 .bdg-p{background:#e6f7ef;color:#0f8a4d}
 .bdg-f{background:#fdecee;color:#d43f4c}
 .bdg-none{color:#b9bdc6;font-size:16px}
@@ -107,10 +108,11 @@ tbody tr:hover{background:#fafbfc}
 .ratio .frac{font-size:14px;font-weight:400;color:#9ea3ad}
 .voc{display:inline-flex;align-items:center;justify-content:center;line-height:1;gap:5px;
   font-size:15px;font-weight:600;color:#416bff}
-.btn-row{display:inline-flex;align-items:center;justify-content:center;line-height:1;vertical-align:middle;
-  height:34px;padding:0 14px;background:#fff;border:1px solid #a3c3ff;border-radius:4px;
-  font-size:14px;font-weight:600;color:#365eef;cursor:pointer;white-space:nowrap}
-.btn-row:hover{background:#f4f8ff}
+/* 행 전체가 상세 진입 — 이 목록의 행 액션은 상세 보기 하나뿐이라 버튼을 따로 두지 않는다 */
+tbody tr.clickable{cursor:pointer}
+tbody tr.clickable:hover{background:#f4f8ff}
+.go{display:inline-flex;align-items:center;justify-content:center;line-height:1;color:#c7cbd3}
+tbody tr.clickable:hover .go{color:#416bff}
 .empty{padding:60px 0;text-align:center;color:#9ea3ad;font-size:16px}
 .pager{display:flex;align-items:center;justify-content:center;gap:4px;padding:20px 0 24px}
 .pager button{min-width:36px;height:36px;padding:0 8px;border-radius:4px;border:1px solid transparent;background:none;
@@ -221,7 +223,6 @@ tbody tr:hover{background:#fafbfc}
 .q-edit{border-top:1px dashed #dde1e8;margin:0 14px;padding:11px 0 13px}
 .q-edit-lbl{font-size:14px;font-weight:600;color:#416bff;margin-bottom:5px}
 .q-edit-body{font-size:16px;line-height:1.7;color:#222631;white-space:pre-wrap}
-.unc-mark{background:#fff4e0;border-bottom:2px solid #f97316;border-radius:2px;padding:0 1px}
 .col-empty{height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;
   padding:24px;text-align:center;color:#9ea3ad;font-size:16px;line-height:1.7}
 .col-empty b{color:#3b3f4c}
@@ -288,16 +289,6 @@ tbody tr:hover{background:#fafbfc}
   display:flex;align-items:center;gap:8px;opacity:0;pointer-events:none;transition:opacity .2s,transform .2s}
 #toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
 
-/* 까망이(목업 내비게이터) */
-#mockpick{position:fixed;left:16px;bottom:110px;z-index:300;width:262px;background:#222631;color:#fff;
-  border-radius:10px;box-shadow:0 8px 28px rgba(0,0,0,.28);font-size:13px;overflow:hidden}
-.mp-head{display:flex;align-items:center;justify-content:space-between;padding:10px 12px;cursor:move;font-weight:700}
-.mp-body{padding:6px;display:flex;flex-direction:column;gap:4px;max-height:62vh;overflow-y:auto}
-.mp-cap{font-size:11px;color:#9ea3ad;padding:6px 6px 2px}
-.mp-btn{display:block;width:100%;text-align:left;background:#2e3440;border:none;border-radius:6px;
-  color:#fff;padding:8px 10px;font-size:13px;font-weight:600;cursor:pointer;line-height:1.35}
-.mp-btn:hover{background:#3b4252}
-.mp-sub{display:block;font-size:11px;font-weight:400;color:#b9c0cc;margin-top:2px}
 </style>
 </head>
 <body>
@@ -418,7 +409,7 @@ tbody tr:hover{background:#fafbfc}
       <table>
         <thead>
           <tr>
-            <th style="width:160px">인식 일시</th>
+            <th style="width:210px">인식 일시</th>
             <th style="width:220px">수행평가명</th>
             <th style="width:190px">학교</th>
             <th style="width:110px">교사명</th>
@@ -427,7 +418,7 @@ tbody tr:hover{background:#fafbfc}
             <th style="width:170px" class="sort-th" onclick="toggleSort()">확인 필요 <i data-lucide="arrow-down" id="sortIcon" style="width:14px;height:14px"></i></th>
             <th style="width:90px">의견</th>
             <th style="width:110px">판정</th>
-            <th style="width:120px"></th>
+            <th style="width:56px"></th>
           </tr>
         </thead>
         <tbody id="rows"></tbody>
@@ -562,27 +553,6 @@ tbody tr:hover{background:#fafbfc}
 
 <div id="toast"><i data-lucide="circle-check-big" style="width:18px;height:18px"></i><span id="toastMsg"></span></div>
 
-<!-- ══════ 까망이 (목업 화면 선택기 · 실제 화면 아님) ══════ -->
-<div id="mockpick">
-  <div class="mp-head" onclick="mpToggle()">
-    <span style="display:inline-flex;align-items:center;gap:6px"><i data-lucide="layout-grid" style="width:13px;height:13px"></i>MOCKUP · 화면 보기</span>
-    <i id="mpCaret" data-lucide="chevron-down" style="width:14px;height:14px;transform:rotate(180deg)"></i>
-  </div>
-  <div class="mp-body" id="mpBody">
-    <button class="mp-btn" onclick="goList()">인식 결과 검수 목록 <span class="mp-sub">필터 · 확인 필요 % · 의견</span></button>
-    <div class="mp-cap">1학년 1반 · 2학기 독서 수행평가</div>
-    <button class="mp-btn" onclick="openDetail('10107')">조민재 · 0%인데 의견 2건 <span class="mp-sub">시스템이 못 잡은 오류 · 미판정</span></button>
-    <button class="mp-btn" onclick="openDetail('10102')">이준호 · 확인 필요 1문항 <span class="mp-sub">인식 불확실 · 선생님 수정 1문항</span></button>
-    <button class="mp-btn" onclick="openDetail('10103')">박지민 · 인식 불확실 많음 100% <span class="mp-sub">결과는 그대로 노출 · 모델 테스트 이미 실행함</span></button>
-    <div class="mp-cap">송하림 10112 · 인식 3건 (교체 2회)</div>
-    <button class="mp-btn" onclick="openDetail('10112')">교체 전 · 판정 뒤집힘 <span class="mp-sub">Lean Pass(사유 없음) → 올립 Fail</span></button>
-    <button class="mp-btn" onclick="openDetail('10112s')">교체 1회 · 파일 3개 <span class="mp-sub">파일 드롭다운 · 확인 필요 1/5</span></button>
-    <button class="mp-btn" onclick="openDetail('10112s2')">교체 2회 · 최신 <span class="mp-sub">교체 뒤 선생님 수정 1문항</span></button>
-    <div class="mp-cap">그 외</div>
-    <button class="mp-btn" onclick="openDetail('10111')">김도현 · 의견 있지만 Pass <span class="mp-sub">대조해 보니 인식은 정확했음</span></button>
-    <button class="mp-btn" onclick="openDetail('10114')">백시우 · 인식 실패 · 미판정 <span class="mp-sub">검수 대기 · 다른 모델로도 실패</span></button>
-  </div>
-</div>
 
 <script>
 /* ═════════ 데이터 ═════════
@@ -821,8 +791,8 @@ function renderRows(){
   document.getElementById('listCount').textContent = list.length;
 
   document.getElementById('rows').innerHTML = pageRows.map(function(r){
-    return '<tr>'
-      + '<td><span class="recog-at">' + (r.recogAt || r.date).slice(5) + '</span>'
+    return '<tr class="clickable" onclick="openDetail(\'' + r.id + '\')">'
+      + '<td style="white-space:nowrap"><span class="recog-at">' + (r.recogAt || r.date).slice(5) + '</span>'
       + (r.swap ? '<span class="bdg bdg-swap" style="margin-left:6px">교체 ' + r.swap + '회</span>' : '') + '</td>'
       + '<td><span class="ell" title="' + r.evalName + '">' + r.evalName + '</span></td>'
       + '<td><span class="ell" title="' + r.school + '">' + r.school + '</span></td>'
@@ -832,7 +802,7 @@ function renderRows(){
       + '<td>' + ratioCell(r) + '</td>'
       + '<td>' + (vocsOf(r).length ? '<span class="voc"><i data-lucide="message-square-text" style="width:15px;height:15px"></i>' + vocsOf(r).length + '</span>' : '<span class="bdg-none">—</span>') + '</td>'
       + '<td>' + verdictCell(r) + '</td>'
-      + '<td><button class="btn-row" onclick="openDetail(\'' + r.id + '\')">검수하기</button></td>'
+      + '<td><span class="go"><i data-lucide="chevron-right" style="width:18px;height:18px"></i></span></td>'
       + '</tr>';
   }).join('');
   document.getElementById('emptyMsg').style.display = list.length ? 'none' : 'block';
@@ -871,15 +841,6 @@ function renderPager(total){
 var CUR = null, _file = 0, _page = 1, _zoom = 100, _rot = 0;
 var ADMIN_NAME = '올립';
 
-function markUnc(text, marks){
-  if (!marks || !marks.length) return text;
-  var out = text;
-  marks.forEach(function(m){
-    if (!m) return;
-    out = out.split(m).join('<span class="unc-mark">' + m + '</span>');
-  });
-  return out;
-}
 function qCards(texts, marks, edits){
   if (!texts) return '';
   return texts.map(function(t, i){
@@ -894,7 +855,7 @@ function qCards(texts, marks, edits){
       + '<span class="q-nm" title="' + q.name + '">' + q.name + '</span>'
       + (badges ? '<span class="q-badges">' + badges + '</span>' : '')
       + '</div>'
-      + '<div class="q-body">' + markUnc(t, mk) + '</div>'
+      + '<div class="q-body">' + t + '</div>'
       + (edited ? '<div class="q-edit" id="qedit-' + i + '" style="display:none">'
           + '<div class="q-edit-lbl">선생님 수정본</div><div class="q-edit-body">' + edited + '</div></div>' : '')
       + '</div>';
@@ -1207,29 +1168,6 @@ function routeHash(h){
 }
 window.addEventListener('hashchange', function(){ routeHash(location.hash); });
 
-/* 까망이 — 접기·드래그 */
-function mpToggle(){
-  var b = document.getElementById('mpBody');
-  var open = b.style.display !== 'none';
-  b.style.display = open ? 'none' : 'flex';
-  document.getElementById('mpCaret').style.transform = open ? 'rotate(0deg)' : 'rotate(180deg)';
-}
-(function(){
-  var el = document.getElementById('mockpick'), head = el.querySelector('.mp-head');
-  var dx = 0, dy = 0;
-  head.addEventListener('mousedown', function(e){
-    var r = el.getBoundingClientRect();
-    dx = e.clientX - r.left; dy = e.clientY - r.top;
-    function mv(ev){
-      el.style.left = Math.max(0, Math.min(ev.clientX - dx, innerWidth - el.offsetWidth)) + 'px';
-      el.style.top  = Math.max(0, Math.min(ev.clientY - dy, innerHeight - 40)) + 'px';
-      el.style.bottom = 'auto';
-    }
-    function up(){ document.removeEventListener('mousemove', mv); document.removeEventListener('mouseup', up); }
-    document.addEventListener('mousemove', mv);
-    document.addEventListener('mouseup', up);
-  });
-})();
 
 renderRows();
 lucide.createIcons();
