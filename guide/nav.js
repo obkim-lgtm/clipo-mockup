@@ -2,7 +2,7 @@
 // 왼쪽 목록은 **지금 보는 문서의 소제목만** 펼친다. 모든 장의 소제목을 늘 펼치면 목록이 서른 줄이 된다.
 // 소제목은 각 페이지의 h3[id]에서 직접 읽는다. 여기에 따로 적어 두면 본문을 고칠 때마다 어긋난다.
 const PAGES=[
- {file:'index.html',num:0,title:'시작하기'},
+ {file:'index.html',num:'🏠',title:'시작하기'},
  {file:'ch1.html',num:1,title:'AI는 이렇게 채점해요'},
  {file:'ch2.html',num:2,title:'채점기준은 이렇게 써요'},
  {file:'ch3.html',num:3,title:'과제물은 이렇게 준비해요'},
@@ -12,10 +12,18 @@ const PAGES=[
 ];
 // 순서대로 읽는 흐름 밖에 있는 참고 문서
 const REFS=[
- {file:'examples.html',num:'＋',title:'과목별 채점 예시'},   // 번호 대신 홈 카드와 같은 표시
+ {file:'examples.html',num:'📚',title:'과목별 채점 예시'},   // 번호 대신 홈 카드와 같은 표시
+ {file:'contest.html',num:'🍯',title:'에크연 × 클리포 연구 사례'},
+];
+// 연구 사례는 소제목 대신 사례 목록을 하위로 펼친다 (2·3등은 심사 뒤 추가)
+const CASES=[
+ {file:'contest_1.html',title:'1등 · 중학교 영어'},
+ {title:'2등·3등 · 심사 후 공개'},
 ];
 (function(){
   const here=location.pathname.split('/').pop()||'index.html';
+  // 연구 사례 개별 페이지(contest_1.html …)는 목록에 따로 두지 않고 표지(contest.html)가 켜진 것으로 본다
+  const hereDoc=here.startsWith('contest_')?'contest.html':here;
   const esc=s=>String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;');
   // 현재 페이지의 소제목(h3) → 오른쪽 목차 + 왼쪽 트리 하위 항목
   const heads=[...document.querySelectorAll('.doc-body h3[id]')];
@@ -31,18 +39,21 @@ const REFS=[
   document.body.insertAdjacentHTML('afterbegin',`
   <header class="hdr">
     <button class="menu-btn" id="menuBtn" aria-label="문서 목록 접기·펼치기" aria-expanded="${closed?'false':'true'}"><i></i></button>
-    <a class="home-link" href="https://clipo.ai" aria-label="클리포 홈"><img class="logo" src="clipo_wordmark.svg" alt="CLIPO" width="76" height="16"></a><span class="divider"></span><a class="home-link doc" href="index.html">AI 채점 가이드</a>
+    <a class="home-link" href="https://clipo.ai" aria-label="클리포 홈"><img class="logo-symbol" src="clipo_symbol.svg" alt="" width="25" height="19"><img class="logo" src="clipo_wordmark.svg" alt="CLIPO" width="76" height="16"></a><span class="divider"></span><a class="home-link doc" href="index.html">AI 채점 가이드</a>
     <a class="hdr-cta" href="https://clipo.ai">클리포로 이동</a>
   </header>`);
   // 왼쪽 문서 목록
   const subList=heads.length?`<ul>${heads.map(h=>`<li><a href="#${h.id}" data-sub="${h.id}">${esc(h.textContent)}</a></li>`).join('')}</ul>`:'';
   const item=p=>{
-    const on=here===p.file;
-    const num=p.num!==undefined&&p.num!==''?`<span class="num">${p.num}</span>`:'<span class="num blank"></span>';
-    return `<li><a href="${p.file}"${on?' class="active"':''}>${num}${esc(p.title)}</a>${on?subList:''}</li>`;
+    const on=hereDoc===p.file;
+    const num=p.num!==undefined&&p.num!==''?`<span class="num${/^\d+$/.test(p.num)?'':' emoji'}">${p.num}</span>`:'<span class="num blank"></span>';
+    let sub=on?subList:'';
+    if(on&&p.file==='contest.html') sub=`<ul>${CASES.map(c=>c.file?`<li><a href="${c.file}"${here===c.file?' class="active"':''}>${esc(c.title)}</a></li>`:`<li><span class="soon">${esc(c.title)}</span></li>`).join('')}</ul>`;
+    return `<li><a href="${p.file}"${on?' class="active"':''}>${num}${esc(p.title)}</a>${sub}</li>`;
   };
-  let tree=`<div class="grp">가이드</div><ul>${PAGES.map(item).join('')}</ul>`;
-  tree+=`<div class="grp">참고</div><ul>${REFS.map(item).join('')}</ul>`;
+  // 시작하기(홈)는 가이드·사례 모음을 모두 안내하는 문서라 그룹 밖 맨 위에 둔다
+  let tree=`<ul class="solo">${item(PAGES[0])}</ul><div class="grp">가이드</div><ul>${PAGES.slice(1).map(item).join('')}</ul>`;
+  tree+=`<div class="grp">사례 모음</div><ul>${REFS.map(item).join('')}</ul>`;
   document.body.insertAdjacentHTML('afterbegin',`<aside class="side${closed?' closed':''}" id="side">${tree}</aside>`);
   if(closed) document.body.classList.add('side-closed');
   // 오른쪽 목차. 소제목이 없는 문서도 **빈 칸을 그대로 둔다** —
