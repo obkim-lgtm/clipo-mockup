@@ -15,10 +15,13 @@ const REFS=[
  {file:'examples.html',num:'📚',title:'과목별 채점 예시'},   // 번호 대신 홈 카드와 같은 표시
  {file:'contest.html',num:'🍯',title:'에크연 × 클리포 연구 사례'},
 ];
-// 연구 사례는 소제목 대신 사례 목록을 하위로 펼친다 (2·3등은 심사 뒤 추가)
+// 연구 사례는 소제목 대신 사례 목록을 하위로 펼친다
 const CASES=[
  {file:'contest_1.html',title:'1등 · 중학교 영어'},
- {title:'2등·3등 · 심사 후 공개'},
+ {file:'contest_2.html',title:'2등 · 중학교 역사'},
+ {file:'contest_3.html',title:'2등 · 고등학교 미술'},
+ {file:'contest_4.html',title:'3등 · 초등학교 사회'},
+ {file:'contest_5.html',title:'3등 · 중학교 수학'},
 ];
 (function(){
   const here=location.pathname.split('/').pop()||'index.html';
@@ -102,3 +105,29 @@ const CASES=[
   menuBtn.addEventListener('click',()=>setClosed(!side.classList.contains('closed'),true));
   side.querySelectorAll('a').forEach(a=>a.addEventListener('click',()=>{ if(isPhone()) setClosed(true,false); }));
 })();
+
+// 연구 사례 세트 탭: 평가 설계 · 과제물과 채점 결과. 학생 선택, 과제물 쪽 넘기기
+document.querySelectorAll('.cs').forEach(cs=>{
+  const tab=t=>{
+    cs.querySelectorAll('.cs-tabs button').forEach(b=>{const on=b.dataset.t===t;b.classList.toggle('on',on);b.setAttribute('aria-selected',on)});
+    cs.querySelectorAll('.cs-p').forEach(p=>p.hidden=p.dataset.p!==t);
+  };
+  const stu=i=>{
+    cs.querySelectorAll('.cs-stu button').forEach(b=>b.classList.toggle('on',b.dataset.s===i));
+    cs.querySelectorAll('.cs-s').forEach(d=>d.hidden=d.dataset.s!==i);
+  };
+  cs.querySelectorAll('.cs-tabs button').forEach(b=>b.addEventListener('click',()=>tab(b.dataset.t)));
+  cs.querySelectorAll('.cs-stu button').forEach(b=>b.addEventListener('click',()=>stu(b.dataset.s)));
+  // 과제물을 누르면 그 자리에서 크게(한 칸 전체), 다시 누르면 원래대로
+  cs.querySelectorAll('.rv-img').forEach(b=>b.addEventListener('click',()=>{
+    const rv=b.closest('.rv');const z=rv.classList.toggle('zoom');
+    rv.querySelector('.rv-cap').textContent=z?'다시 누르면 작게 돌아가요':'과제물을 누르면 이 자리에서 크게 볼 수 있어요';
+    const hd=parseInt(getComputedStyle(document.documentElement).getPropertyValue('--header'))||60;
+    scrollTo({top:rv.getBoundingClientRect().top+scrollY-hd-(cs.querySelector('.cs-stu')?90:16)});
+  }));
+  cs.querySelectorAll('.rv-sheet').forEach(sh=>sh.querySelectorAll('.rv-pg button').forEach(b=>b.addEventListener('click',()=>{
+    sh.querySelectorAll('.rv-pg button').forEach(x=>x.classList.toggle('on',x===b));
+    sh.querySelectorAll('.rv-img').forEach(a=>a.hidden=a.dataset.pg!==b.dataset.pg);
+  })));
+});
+// 세트 탭 끝
