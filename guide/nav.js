@@ -12,8 +12,8 @@ const PAGES=[
 ];
 // 순서대로 읽는 흐름 밖에 있는 참고 문서
 const REFS=[
+ {file:'contest.html',num:'🍯',title:'채점기준 꿀팁'},       // 꿀팁(어떻게 쓰나) 먼저 → 예시(과목별로 보기)
  {file:'examples.html',num:'📚',title:'과목별 채점 예시'},   // 번호 대신 홈 카드와 같은 표시
- {file:'contest.html',num:'🍯',title:'채점기준 꿀팁'},
 ];
 // 연구 사례는 소제목 대신 사례 목록을 하위로 펼친다
 const CASES=[
@@ -56,7 +56,7 @@ const CASES=[
   };
   // 시작하기(홈)는 가이드·사례 모음을 모두 안내하는 문서라 그룹 밖 맨 위에 둔다
   let tree=`<ul class="solo">${item(PAGES[0])}</ul><div class="grp">가이드</div><ul>${PAGES.slice(1).map(item).join('')}</ul>`;
-  tree+=`<div class="grp">사례 모음</div><ul>${REFS.map(item).join('')}</ul>`;
+  tree+=`<div class="grp">꿀팁과 예시</div><ul>${REFS.map(item).join('')}</ul>`;
   document.body.insertAdjacentHTML('afterbegin',`<aside class="side${closed?' closed':''}" id="side">${tree}</aside>`);
   if(closed) document.body.classList.add('side-closed');
   // 오른쪽 목차. 소제목이 없는 문서도 **빈 칸을 그대로 둔다** —
