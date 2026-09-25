@@ -22,6 +22,10 @@ const CASES=[
  {file:'contest_3.html',title:'2등 · 고등학교 미술'},
  {file:'contest_4.html',title:'3등 · 초등학교 사회'},
  {file:'contest_5.html',title:'3등 · 중학교 수학'},
+ {file:'contest_6.html',title:'참여 · 고등학교 영어'},
+ {file:'contest_7.html',title:'참여 · 중학교 역사'},
+ {file:'contest_8.html',title:'참여 · 초등학교 사회'},
+ {file:'contest_more.html',title:'함께 찾은 꿀팁 · 모아 보기'},
 ];
 (function(){
   const here=location.pathname.split('/').pop()||'index.html';
