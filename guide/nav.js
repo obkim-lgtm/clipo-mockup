@@ -15,17 +15,20 @@ const REFS=[
  {file:'contest.html',num:'🍯',title:'채점기준 꿀팁'},       // 꿀팁(어떻게 쓰나) 먼저 → 예시(과목별로 보기)
  {file:'examples.html',num:'📚',title:'과목별 채점 예시'},   // 번호 대신 홈 카드와 같은 표시
 ];
-// 연구 사례는 소제목 대신 사례 목록을 하위로 펼친다
+// 연구 사례는 소제목 대신 사례 목록(과목순, 등수 없음)을 하위로 펼친다
 const CASES=[
- {file:'contest_1.html',title:'1등 · 중학교 영어'},
- {file:'contest_2.html',title:'2등 · 중학교 역사'},
- {file:'contest_3.html',title:'2등 · 고등학교 미술'},
- {file:'contest_4.html',title:'3등 · 초등학교 사회'},
- {file:'contest_5.html',title:'3등 · 중학교 수학'},
- {file:'contest_6.html',title:'참여 · 고등학교 영어'},
- {file:'contest_7.html',title:'참여 · 중학교 역사'},
- {file:'contest_8.html',title:'참여 · 초등학교 사회'},
- {file:'contest_more.html',title:'함께 찾은 꿀팁 · 모아 보기'},
+ {file:'contest_9.html',title:'초6 국어'},
+ {file:'contest_10.html',title:'고2 주제 탐구 독서'},
+ {file:'contest_1.html',title:'중3 영어'},
+ {file:'contest_6.html',title:'고1 영어'},
+ {file:'contest_4.html',title:'초4 사회'},
+ {file:'contest_8.html',title:'초5 사회'},
+ {file:'contest_2.html',title:'중2 역사 · 칭기즈칸'},
+ {file:'contest_12.html',title:'중2 역사 · 통일신라'},
+ {file:'contest_7.html',title:'중3 역사'},
+ {file:'contest_5.html',title:'중2 수학'},
+ {file:'contest_11.html',title:'중2 과학'},
+ {file:'contest_3.html',title:'고1 미술'},
 ];
 (function(){
   const here=location.pathname.split('/').pop()||'index.html';
@@ -135,3 +138,28 @@ document.querySelectorAll('.cs').forEach(cs=>{
   })));
 });
 // 세트 탭 끝
+
+// 과목별 사례 목록: 과목 버튼으로 거르기
+document.querySelectorAll('.subj-filter').forEach(f=>{
+  const list=document.querySelector('.cases-list');
+  f.querySelectorAll('button').forEach(b=>b.addEventListener('click',()=>{
+    f.querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b));
+    list.querySelectorAll('li').forEach(li=>li.hidden=!(b.dataset.subj==='all'||li.dataset.subj===b.dataset.subj));
+  }));
+});
+
+// 연구 사례 초입 탭: #tips / #cases 주소로 열고, 고르면 주소도 바꿔 뒤로 가기·사례 목록 링크가 같은 탭으로 돌아오게
+(function(){
+  const ct=document.getElementById('ct'); if(!ct) return;
+  const show=(t,scroll)=>{
+    ct.querySelectorAll('.ct-tabs button').forEach(b=>{const on=b.dataset.t===t;b.classList.toggle('on',on);b.setAttribute('aria-selected',on)});
+    ct.querySelectorAll('.ct-p').forEach(p=>p.hidden=p.dataset.p!==t);
+    if(scroll){const hd=parseInt(getComputedStyle(document.documentElement).getPropertyValue('--header'))||60;scrollTo({top:ct.getBoundingClientRect().top+scrollY-hd-4});}
+  };
+  const fromHash=()=>{const h=location.hash.slice(1);if(h==='tips'||h==='cases'){show(h,true);return true}return false};
+  ct.querySelectorAll('.ct-tabs button').forEach(b=>b.addEventListener('click',()=>{history.replaceState(null,'','#'+b.dataset.t);show(b.dataset.t,window.scrollY>ct.getBoundingClientRect().top+scrollY)}));
+  ct.querySelectorAll('.ct-go').forEach(b=>b.addEventListener('click',()=>{history.replaceState(null,'','#'+b.dataset.go);show(b.dataset.go,true)}));
+  addEventListener('hashchange',fromHash);
+  // 앵커가 hidden 패널 안이라 브라우저가 못 찾으므로 직접 연다
+  if(!fromHash()) show('tips',false);
+})();
