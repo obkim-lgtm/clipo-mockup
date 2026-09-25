@@ -13,7 +13,7 @@ const PAGES=[
 // 순서대로 읽는 흐름 밖에 있는 참고 문서
 const REFS=[
  {file:'examples.html',num:'📚',title:'과목별 채점 예시'},   // 번호 대신 홈 카드와 같은 표시
- {file:'contest.html',num:'🍯',title:'에크연 × 클리포 연구 사례'},
+ {file:'contest.html',num:'🍯',title:'채점기준 꿀팁'},
 ];
 // 연구 사례는 소제목 대신 사례 목록을 하위로 펼친다
 const CASES=[
