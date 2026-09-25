@@ -218,7 +218,7 @@
 
   var wrap = document.createElement('div'); wrap.id = 'mockNav';
   wrap.innerHTML =
-      '<div class="mn-head"><span class="mn-hl"><span class="mn-dot"></span><span class="mn-full">MOCKUP · 학생 과제 (시안 6)</span><span class="mn-mini">목업</span></span>'
+      '<div class="mn-head"><span class="mn-hl"><span class="mn-dot"></span><span class="mn-full">' + (window.MOCK_NAV_TITLE || 'MOCKUP · 학생 과제 (시안 6)') + '</span><span class="mn-mini">목업</span></span>'
     + '<button class="mn-caret" aria-label="접기/펼치기">&#9662;</button></div>'
     + (SHOW_TABS ? '<div class="mn-tabs"><button class="mn-tab" data-t="t">교사</button><button class="mn-tab" data-t="s">학생</button></div>' : '')
     + '<div class="mn-body" id="mnBody"></div>';

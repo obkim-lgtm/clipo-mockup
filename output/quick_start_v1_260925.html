@@ -1,0 +1,1897 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/png" href="clipo_favicon.png">
+  <title>활동지로 바로 채점 — 빠른 시작 (CLIPO)</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard-gov.min.css">
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+  <style>
+    *{ font-family:'Pretendard GOV',-apple-system,sans-serif; box-sizing:border-box; }
+    body{ margin:0; background:#f6f7f9; color:#222631; font-size:16px; min-width:1280px; }
+    a{ text-decoration:none; color:inherit; }
+    button{ font-family:inherit; }
+
+    /* ===== Global Header (CLIPO 표준 · 58px 신규 상단바) ===== */
+    .g-hd { height:58px; background:#fff; border-bottom:1px solid #dde1e8; display:flex; align-items:center; padding:0 20px 0 9px; position:fixed; top:0; left:0; right:0; z-index:200; }
+    .gh-menu-btn { width:40px; height:40px; border:none; background:none; border-radius:4px; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; color:#3b3f4c; margin-right:9px; line-height:1; }
+    .gh-menu-btn:hover { background:#f6f7f9; }
+    .gh-logo { display:inline-flex; align-items:center; cursor:pointer; padding:4px; border-radius:4px; }
+    .g-hd-r { margin-left:auto; display:flex; align-items:center; gap:16px; font-size:15px; color:#18181b; }
+    .hd-plan { display:flex; align-items:center; gap:8px; }
+    .plan-badge { display:inline-flex; align-items:center; height:20px; background:#e9f2ff; border:1px solid #ccdfff; color:#3151c4; font-size:12px; font-weight:500; padding:0 6px; border-radius:6px; line-height:1; }
+    .credit-wrap { display:flex; align-items:center; gap:8px; font-size:15px; font-weight:500; color:#18181b; }
+    .user-btn { display:inline-flex; align-items:center; justify-content:center; gap:4px; height:36px; padding:0 12px; border:1px solid #c7cbd3; border-radius:9999px; background:none; font-size:14px; color:#27272a; cursor:pointer; line-height:1; font-weight:500; }
+
+    /* ===== Sidebar (CLIPO 표준 icon-sb) ===== */
+    .icon-sb { width:56px; background:#fff; border-right:1px solid #d9d9d9; position:fixed; top:58px; bottom:0; left:0; display:flex; flex-direction:column; padding:8px 0; z-index:150; transition:width .2s ease; }
+    .icon-sb.expanded { width:200px; }
+    .si { height:40px; display:flex; align-items:center; border-radius:8px; color:#6d7381; cursor:pointer; margin:0 8px 2px; position:relative; padding:0 4px 0 8px; gap:10px; white-space:nowrap; flex-shrink:0; }
+    .si:hover { background:#f1f3f5; }
+    .si.active { background:#e9f2ff; color:#416bff; }
+    .si-icon { width:24px; height:24px; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+    .si-label { font-size:13px; font-weight:500; opacity:0; transition:opacity .1s; overflow:hidden; }
+    .icon-sb.expanded .si-label { opacity:1; }
+    .si-tip { position:absolute; left:48px; top:50%; transform:translateY(-50%); background:#222631; color:#fff; font-size:11px; padding:3px 8px; border-radius:4px; white-space:nowrap; display:none; z-index:300; pointer-events:none; }
+    .si:hover .si-tip { display:block; }
+    .icon-sb.expanded .si-tip { display:none !important; }
+    .nav-bottom { margin-top:auto; width:100%; }
+    .nav-div { height:1px; background:#f1f3f5; margin:4px 8px; }
+
+    /* ===== Layout ===== */
+    .main-wrap{ padding-top:58px; padding-left:56px; transition:padding-left .2s; min-height:100vh; display:flex; flex-direction:column; }
+    body.nav-expanded .main-wrap{ padding-left:200px; }
+    .screen{ display:none; flex:1; flex-direction:column; }
+    .screen.active{ display:flex; }
+    .page-wrap{ max-width:1240px; width:100%; margin:0 auto; padding:28px 32px 0; flex:1; display:flex; flex-direction:column; }
+    .page-wrap.home{ max-width:1320px; }
+    .site-footer{ margin-top:auto; padding:48px 0 40px; display:flex; flex-direction:column; align-items:center; gap:16px; }
+    .sf-links{ display:flex; align-items:center; }
+    .sf-links a{ font-size:14px; color:#3b3f4c; padding:0 16px; }
+    .sf-links a + a{ border-left:1px solid #dde1e8; }
+    .sf-copy{ font-size:14px; color:#9aa0ad; }
+
+    /* ===== 버튼 (task_ocr_v3 토큰) ===== */
+    .btn{ height:40px; border-radius:4px; font-weight:600; font-size:15px; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; gap:8px; padding:0 16px; border:none; white-space:nowrap; flex-shrink:0; line-height:1; vertical-align:middle; transition:opacity .15s; }
+    .btn:hover{ opacity:.88; }
+    .btn-primary{ background:#416bff; color:#fff; } .btn-primary:hover{ background:#365eef; opacity:1; }
+    .btn-secondary{ background:#fff; color:#3151c4; border:1px solid #ccdfff; } .btn-secondary:hover{ background:#e9f2ff; opacity:1; }
+    .btn-outline{ background:#fff; color:#3b3f4c; border:1px solid #d9d9d9; }
+    .btn-ghost{ background:transparent; color:#416bff; border:none; padding:0 8px; }
+    .btn-lg{ height:48px; font-size:16px; padding:0 22px; }
+    .btn:disabled{ opacity:.45; cursor:not-allowed; }
+    .badge{ display:inline-flex; align-items:center; justify-content:center; border-radius:100px; padding:3px 10px; font-size:13px; font-weight:600; white-space:nowrap; line-height:1.3; }
+    .b-done{ background:#eefcf4; color:#319d64; } .b-todo{ background:#fff7ed; color:#f97316; } .b-check{ background:#fff3f4; color:#db3e51; } .b-info{ background:#e9f2ff; color:#3151c4; } .b-gray{ background:#f1f3f5; color:#6d7381; }
+    .sec-desc{ font-size:14px; color:#6d7381; line-height:1.55; }
+    .note{ display:flex; align-items:flex-start; gap:6px; font-size:14px; color:#3b3f4c; line-height:1.55; }
+    .note i{ width:16px; height:16px; color:#416bff; flex-shrink:0; margin-top:2px; }
+    .note b{ color:#222631; font-weight:600; }
+    .toast{ position:fixed; bottom:28px; left:50%; transform:translateX(-50%) translateY(12px); opacity:0; min-width:320px; max-width:560px; padding:14px 22px 14px 16px; border-radius:4px; display:flex; align-items:center; gap:12px; font-size:15px; font-weight:600; box-shadow:0 0 1px #2226314D, 0 4px 12px #00000026; z-index:9999; transition:opacity .2s, transform .2s; pointer-events:none; background:#319d64; color:#fff; }
+    .toast.show{ opacity:1; transform:translateX(-50%) translateY(0); }
+    .toast.info{ background:#416bff; }
+
+    /* ===== 홈 (home_v1 복제 + 빠른 시작 카드) ===== */
+    .home-cols{ display:flex; gap:24px; align-items:flex-start; }
+    .home-main{ flex:1; min-width:0; }
+    .home-rail{ width:320px; flex-shrink:0; display:flex; flex-direction:column; gap:20px; }
+    .my-hd{ display:flex; align-items:center; justify-content:space-between; gap:14px; margin-bottom:18px; }
+    .my-title{ font-size:26px; font-weight:700; margin:0; }
+    .my-tools{ display:flex; align-items:center; gap:14px; }
+    .sort-sel{ height:38px; padding:0 10px; border:1px solid #d9d9d9; border-radius:6px; font-size:14px; color:#3b3f4c; background:#fff; cursor:pointer; }
+    .btn-make{ height:40px; border-radius:100px; padding:0 18px; background:#416bff; color:#fff; border:none; font-size:15px; font-weight:600; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; line-height:1; vertical-align:middle; gap:6px; }
+    .btn-make:hover{ background:#365eef; }
+    .sem-hd{ display:flex; align-items:center; gap:12px; padding:14px 0; }
+    .sem-title{ font-size:20px; font-weight:700; }
+    .sem-meta{ font-size:14px; color:#6d7381; }
+    .sem-grid{ display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:18px; padding-bottom:18px; }
+    .cc{ background:#fff; border-radius:12px; padding:20px; min-height:172px; display:flex; flex-direction:column; cursor:pointer; box-shadow:0 0 1px #2226314D, 0 2px 8px #0000000F; position:relative; transition:box-shadow .12s; }
+    .cc:hover{ box-shadow:0 0 0 1.5px #ccdfff, 0 4px 12px #0000001A; }
+    .cc-name{ font-size:17px; font-weight:600; line-height:1.45; margin:0; }
+    .cc-evals{ font-size:15px; color:#3b3f4c; margin-top:14px; }
+    .cc-tags{ display:flex; align-items:center; gap:6px; margin-top:auto; padding-top:16px; flex-wrap:wrap; }
+    .tag-subj{ display:inline-flex; align-items:center; justify-content:center; background:#e9f2ff; color:#3151c4; font-size:13px; font-weight:600; border-radius:6px; padding:3px 10px; }
+    .tag-owner{ display:inline-flex; align-items:center; justify-content:center; background:#ebdfff; color:#6f34db; font-size:13px; font-weight:600; border-radius:6px; padding:3px 10px; }
+    /* 새 입구 카드 — 같은 그리드, 같은 크기. 수업 카드와 위계를 맞추되 '시작점'임을 채움색으로만 구분 */
+    .cc.quick{ background:#e9f2ff; border:1px dashed #a3c3ff; box-shadow:none; }
+    .cc.quick:hover{ border-style:solid; border-color:#416bff; box-shadow:none; }
+    .cc.quick .qk-ico{ width:40px; height:40px; border-radius:10px; background:#fff; display:inline-flex; align-items:center; justify-content:center; color:#416bff; margin-bottom:12px; }
+    .cc.quick .cc-name{ color:#1f47b3; }
+    .cc.quick .cc-evals{ color:#3b3f4c; font-size:14px; line-height:1.5; margin-top:8px; }
+    .cc.empty{ background:transparent; border:1px dashed #c7cbd3; box-shadow:none; }
+    .cc.empty:hover{ border-color:#9ea3ad; box-shadow:none; }
+    .cc.empty .em-ico{ width:40px; height:40px; border-radius:10px; background:#f1f2f4; display:inline-flex; align-items:center; justify-content:center; color:#6d7381; margin-bottom:12px; }
+    .cc.empty .cc-name{ color:#3b3f4c; }
+    .cc.empty .cc-evals{ color:#6d7381; font-size:14px; line-height:1.5; margin-top:8px; }
+    .cc.empty .em-cta{ margin-top:auto; padding-top:14px; font-size:14px; font-weight:600; color:#3b3f4c; }
+    .cc.quick .qk-foot{ margin-top:auto; padding-top:14px; display:flex; align-items:center; justify-content:space-between; gap:8px; }
+    .cc.quick .qk-foot .qk-cta{ margin-top:0; padding-top:0; }
+    .cc.quick .qk-new{ display:inline-flex; align-items:center; justify-content:center; line-height:1; vertical-align:middle; border:none; background:none; padding:0; font-size:14px; color:#6d7381; cursor:pointer; text-decoration:underline; }
+    .cc.quick .qk-inl{ display:inline; border:none; background:none; padding:0; font:inherit; color:#3151c4; font-weight:600; text-decoration:underline; cursor:pointer; }
+    .cc.quick .qk-tag{ display:inline-flex; align-items:center; height:22px; padding:0 8px; border-radius:6px; background:#fff; color:#3151c4; font-size:13px; font-weight:600; margin-left:6px; vertical-align:middle; }
+    .cc.quick .qk-cta{ margin-top:auto; padding-top:14px; display:inline-flex; align-items:center; gap:4px; font-size:14px; font-weight:600; color:#3151c4; }
+    .rail-card{ background:#fff; border-radius:12px; padding:20px; box-shadow:0 0 1px #2226314D, 0 2px 8px #0000000F; }
+    .rail-hd{ display:flex; align-items:center; justify-content:space-between; margin-bottom:14px; }
+    .rail-title{ font-size:17px; font-weight:700; }
+    .rail-more{ font-size:13px; color:#6d7381; background:none; border:none; cursor:pointer; display:inline-flex; align-items:center; gap:2px; }
+    .notice-row{ display:flex; align-items:center; gap:8px; padding:7px 0; font-size:14px; color:#3b3f4c; cursor:pointer; }
+    .notice-txt{ flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+    .notice-date{ font-size:13px; color:#9ea3ad; flex-shrink:0; }
+    .res-row{ display:flex; align-items:flex-start; gap:10px; border-radius:8px; padding:12px; cursor:pointer; }
+    .res-row:hover{ background:#f6f7f9; }
+    .res-name{ font-size:14px; font-weight:600; color:#222631; margin:0 0 3px; }
+    .res-desc{ font-size:13px; color:#6d7381; margin:0; line-height:1.45; }
+
+    /* ===== 빠른 시작 공통: 스텝바 · 2단 레이아웃 ===== */
+    .qs-top{ display:flex; align-items:center; gap:12px; margin-bottom:6px; }
+    .back-link{ display:inline-flex; align-items:center; justify-content:center; line-height:1; vertical-align:middle; gap:4px; font-size:15px; font-weight:600; color:#222631; background:none; border:none; cursor:pointer; padding:0; }
+    .back-link i{ color:#416bff; width:18px; height:18px; }
+    .back-link:hover{ color:#416bff; }
+    .qs-h1{ font-size:26px; font-weight:700; margin:0 0 6px; }
+    .qs-sub{ font-size:16px; color:#3b3f4c; margin:0 0 22px; line-height:1.55; }
+    .steps{ display:flex; align-items:center; gap:0; margin:0 0 26px; }
+    .step{ display:flex; align-items:center; gap:8px; font-size:15px; color:#9ea3ad; font-weight:500; }
+    .step .n{ width:26px; height:26px; border-radius:50%; border:1.5px solid #c7cbd3; display:inline-flex; align-items:center; justify-content:center; font-size:13px; font-weight:700; color:#9ea3ad; background:#fff; line-height:1; }
+    .step.on{ color:#222631; } .step.on .n{ background:#416bff; border-color:#416bff; color:#fff; }
+    .step.done{ color:#3b3f4c; } .step.done .n{ background:#e9f2ff; border-color:#ccdfff; color:#3151c4; }
+    .step-line{ width:56px; height:1px; background:#dde1e8; margin:0 12px; }
+    .step-line.done{ background:#a3c3ff; }
+    .cols{ display:flex; gap:24px; align-items:flex-start; }
+    .col-main{ flex:1; min-width:0; }
+    .col-side{ width:340px; flex-shrink:0; display:flex; flex-direction:column; gap:16px; }
+    .card{ background:#fff; border-radius:12px; padding:24px; box-shadow:0 0 1px #2226314D, 0 2px 8px #0000000F; }
+    .card + .card{ margin-top:16px; }
+    .card-t{ font-size:20px; font-weight:600; margin:0 0 6px; }
+    .card-d{ font-size:14px; color:#6d7381; margin:0 0 18px; line-height:1.55; }
+    .side-box{ background:#fff; border-radius:12px; padding:20px; box-shadow:0 0 1px #2226314D, 0 2px 8px #0000000F; }
+    .side-t{ font-size:16px; font-weight:700; margin:0 0 10px; display:flex; align-items:center; gap:8px; }
+    .side-t i{ width:18px; height:18px; color:#416bff; }
+    .side-list{ margin:0; padding:0; list-style:none; display:flex; flex-direction:column; gap:10px; }
+    .side-list li{ display:flex; gap:8px; font-size:15px; color:#3b3f4c; line-height:1.5; }
+    .side-list li i{ width:16px; height:16px; flex-shrink:0; margin-top:3px; color:#1ab864; }
+    .side-list li.dim{ color:#9ea3ad; } .side-list li.dim i{ color:#c7cbd3; }
+    .foot-bar{ display:flex; align-items:center; justify-content:space-between; gap:12px; margin-top:20px; padding-top:20px; border-top:1px solid #eceef2; }
+
+    /* 드롭존 */
+    .drop{ border:1.5px dashed #b3c6ff; background:#f4f8ff; border-radius:12px; padding:44px 24px; text-align:center; cursor:pointer; transition:background .12s; }
+    .drop:hover{ background:#e9f2ff; }
+    .drop i{ width:36px; height:36px; color:#416bff; }
+    .drop-t{ font-size:17px; font-weight:600; margin:12px 0 6px; }
+    .drop-d{ font-size:14px; color:#6d7381; margin:0; }
+    .drop-alt{ display:flex; justify-content:center; gap:8px; margin-top:16px; }
+
+    /* 활동지 미리보기 */
+    .sheet{ display:flex; gap:20px; }
+    .sheet-pv{ width:300px; flex-shrink:0; background:#f6f7f9; border:1px solid #dde1e8; border-radius:8px; padding:18px 16px; min-height:360px; font-size:13px; color:#3b3f4c; line-height:1.6; }
+    .sheet-pv h4{ margin:0 0 10px; font-size:15px; color:#222631; }
+    .sheet-pv .blank{ height:56px; border:1px dashed #c7cbd3; border-radius:4px; margin:6px 0 12px; background:#fff; }
+    .sheet-info{ flex:1; min-width:0; }
+    .kv{ display:grid; grid-template-columns:120px 1fr; gap:10px 16px; font-size:15px; align-items:center; }
+    .kv dt{ color:#6d7381; margin:0; } .kv dd{ margin:0; color:#222631; }
+    .kv{ gap:12px 16px; }
+    .kv select, .kv input{ height:40px; border:1px solid #d9d9d9; border-radius:6px; padding:0 12px; font-size:15px; background:#fff; width:100%; max-width:320px; font-family:inherit; color:#222631; }
+    .kv select{ appearance:none; -webkit-appearance:none; padding-right:38px; cursor:pointer; background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='18' height='18' viewBox='0 0 24 24' fill='none' stroke='%236d7381' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>"); background-repeat:no-repeat; background-position:right 12px center; }
+    .kv select:focus, .kv input:focus{ outline:none; border-color:#416bff; box-shadow:0 0 0 2px rgba(65,107,255,.12); }
+    /* 문항 목록 (채점 대상 고르기 · 고치기) */
+    .q-hd{ display:flex; align-items:center; justify-content:space-between; margin:0 0 8px; }
+    .q-hd .t{ font-size:15px; font-weight:600; }
+    .q-hd .c{ font-size:13px; color:#6d7381; }
+    .q-item{ align-items:flex-start; }
+    .q-item input[type=checkbox]{ width:18px; height:18px; margin:3px 0 0; accent-color:#416bff; flex-shrink:0; cursor:pointer; }
+    .q-item .qt{ flex:1; min-width:0; outline:none; border-radius:4px; padding:0 4px; margin:0 -4px; }
+    .q-item.editing{ border-color:#416bff; box-shadow:0 0 0 2px rgba(65,107,255,.18); background:#f4f8ff; }
+    .q-item.editing .qt{ background:#fff; box-shadow:inset 0 0 0 1px #a3c3ff; padding:2px 6px; margin:-2px -6px; }
+    .q-item.editing .qe{ background:#416bff; color:#fff; }
+    .q-item.editing .qe:hover{ background:#365eef; color:#fff; }
+    .q-item .qe{ width:28px; height:28px; border:none; background:none; border-radius:6px; color:#6d7381; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; flex-shrink:0; }
+    .q-item .qe:hover{ background:#f1f3f5; color:#416bff; }
+    .q-item.off{ background:#fbfbfc; }
+    .q-item.off .qt, .q-item.off .qn{ color:#9ea3ad; text-decoration:line-through; }
+    .q-tools{ display:flex; align-items:center; gap:4px; margin-top:8px; }
+    .q-tools .btn{ height:32px; font-size:13px; padding:0 8px; }
+    /* 초안 만드는 중 */
+    .making{ display:flex; flex-direction:column; align-items:center; text-align:center; padding:48px 24px 40px; }
+    .spin{ width:40px; height:40px; border:3px solid #dde1e8; border-top-color:#416bff; border-radius:50%; animation:sp 1s linear infinite; margin-bottom:18px; }
+    @keyframes sp{ to{ transform:rotate(360deg); } }
+    .making h3{ margin:0 0 6px; font-size:20px; }
+    .making .msg{ font-size:15px; color:#3b3f4c; min-height:24px; margin:0 0 18px; transition:opacity .2s; }
+    .pbar{ width:360px; max-width:100%; height:6px; background:#eceef2; border-radius:3px; overflow:hidden; margin-bottom:14px; }
+    .pbar i{ display:block; width:38%; height:100%; background:#416bff; border-radius:3px; animation:slide 1.4s ease-in-out infinite; }
+    @keyframes slide{ 0%{ transform:translateX(-110%); } 100%{ transform:translateX(280%); } }
+    .making .eta{ font-size:13px; color:#6d7381; margin:0; line-height:1.6; }
+    .making .ctx{ display:flex; gap:8px; flex-wrap:wrap; justify-content:center; margin-top:20px; }
+    .q-item{ border:1px solid #dde1e8; border-radius:8px; padding:12px 14px; font-size:15px; line-height:1.55; display:flex; gap:10px; }
+    .q-item + .q-item{ margin-top:8px; }
+    .q-item .qn{ font-weight:700; color:#416bff; flex-shrink:0; }
+
+    /* 1단계: 더 좋은 초안 (선택 · 접힘) */
+    .opt{ background:#fff; border-radius:12px; box-shadow:0 0 1px #2226314D, 0 2px 8px #0000000F; margin-top:16px; }
+    .opt-bar{ display:flex; align-items:center; gap:12px; padding:16px 24px; cursor:pointer; user-select:none; }
+    .opt-bar:hover{ background:#fbfbfc; border-radius:12px; }
+    .opt-bar .t{ font-size:16px; font-weight:600; }
+    .opt-bar .d{ font-size:14px; color:#6d7381; flex:1; }
+    .opt-bar .chev{ color:#6d7381; transition:transform .15s; }
+    .opt.open .opt-bar .chev{ transform:rotate(180deg); }
+    .opt-body{ display:none; padding:4px 24px 22px; }
+    .opt.open .opt-body{ display:block; }
+    .opt-tag{ font-size:12px; font-weight:600; color:#6d7381; background:#f1f3f5; border-radius:6px; padding:3px 8px; }
+    .opt-sec{ padding:14px 0; border-top:1px solid #eceef2; }
+    .opt-sec:first-child{ border-top:none; padding-top:6px; }
+    .opt-lab{ font-size:15px; font-weight:600; margin:0 0 8px; display:flex; align-items:center; gap:8px; }
+    .opt-lab i{ width:16px; height:16px; color:#416bff; }
+    .opt-lab span.sub{ font-size:13px; font-weight:400; color:#6d7381; }
+    .chips{ display:flex; flex-wrap:wrap; gap:8px; margin-bottom:10px; }
+    .chip{ height:34px; padding:0 12px; border-radius:100px; border:1px solid #d9d9d9; background:#fff; font-size:14px; color:#3b3f4c; cursor:pointer; display:inline-flex; align-items:center; gap:6px; line-height:1; }
+    .chip:hover{ border-color:#416bff; }
+    .chip.on{ background:#e9f2ff; border-color:#a3c3ff; color:#1f47b3; font-weight:600; }
+    .req-in{ width:100%; height:44px; border:1px solid #d9d9d9; border-radius:8px; padding:0 14px; font-size:16px; color:#222631; font-family:inherit; }
+    .req-in:focus{ outline:none; border-color:#416bff; box-shadow:0 0 0 2px rgba(65,107,255,.12); }
+    .req-ta{ width:100%; min-height:72px; border:1px solid #d9d9d9; border-radius:8px; padding:12px 14px; font-size:16px; line-height:1.6; color:#222631; resize:vertical; font-family:inherit; }
+    .req-ta:focus{ outline:none; border-color:#416bff; box-shadow:0 0 0 2px rgba(65,107,255,.12); }
+    .mat-row{ display:flex; gap:12px; align-items:center; flex-wrap:wrap; }
+    .mat-row select{ height:38px; border:1px solid #d9d9d9; border-radius:6px; padding:0 10px; font-size:14px; background:#fff; min-width:380px; }
+    .mat-row .or{ font-size:13px; color:#9ea3ad; line-height:1.5; }
+    .mat-row .file{ display:inline-flex; align-items:center; gap:6px; font-size:13px; color:#27724b; background:#eefcf4; border-radius:6px; padding:6px 10px; }
+    .mat-row .file i{ width:14px; height:14px; }
+    .req-sum{ display:flex; flex-wrap:wrap; gap:8px; align-items:center; margin:0 0 14px; font-size:14px; color:#6d7381; }
+    .req-sum .pill{ display:inline-flex; align-items:center; gap:5px; background:#f1f3f5; border-radius:6px; padding:4px 9px; color:#3b3f4c; font-weight:500; }
+    .req-sum .pill i{ width:13px; height:13px; color:#416bff; }
+    .req-sum button{ background:none; border:none; padding:0; font-size:14px; font-weight:600; color:#416bff; cursor:pointer; margin-left:4px; }
+    /* 채점기준 표 (수준별 배점) */
+    .rub{ border:1px solid #dde1e8; border-radius:8px; overflow:hidden; }
+    .rub-row{ display:flex; border-bottom:1px solid #eceef2; }
+    .rub-row:last-child{ border-bottom:none; }
+    .rub-l{ width:230px; flex-shrink:0; padding:14px 16px; border-right:1px solid #eceef2; background:#fbfbfc; }
+    .rub-l .nm{ font-size:16px; font-weight:600; color:#222631; margin:0 0 4px; }
+    .rub-l .pt{ font-size:13px; color:#6d7381; }
+    .rub-r{ flex:1; min-width:0; }
+    .lv{ display:flex; border-bottom:1px solid #f1f3f5; }
+    .lv:last-child{ border-bottom:none; }
+    .lv .sc{ width:56px; flex-shrink:0; padding:10px 8px; text-align:center; font-size:15px; font-weight:700; color:#222631; border-right:1px solid #f1f3f5; }
+    .lv .ds{ flex:1; padding:10px 14px; font-size:15px; color:#3b3f4c; line-height:1.55; }
+    .rub-l{ position:relative; }
+    .rub-l .hd{ display:flex; align-items:flex-start; gap:6px; }
+    .rub-l .hd .nm{ flex:1; }
+    .rub-l .qe{ width:26px; height:26px; border:none; background:none; border-radius:6px; color:#9ea3ad; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; flex-shrink:0; }
+    .rub-l .qe:hover{ background:#eceef2; color:#416bff; }
+    .rub-l .edit{ display:none; flex-direction:column; gap:8px; margin-top:8px; }
+    .rub-row.editing .rub-l .edit{ display:flex; }
+    .rub-row.editing .rub-l .pt{ display:none; }
+    .rub-row.editing .rub-l{ background:#f4f8ff; box-shadow:inset 0 0 0 2px #416bff; border-radius:6px 0 0 6px; }
+    .rub-row.editing .rub-l .qe{ background:#416bff; color:#fff; }
+    .rub-row.editing .rub-l .qe:hover{ background:#365eef; color:#fff; }
+    .rub-row.editing .rub-l .hd .nm{ color:#1f47b3; }
+    .rub-l .edit input:focus{ outline:none; border-color:#416bff; box-shadow:0 0 0 2px rgba(65,107,255,.15); }
+    .rub-l .edit input{ height:34px; border:1px solid #d9d9d9; border-radius:6px; padding:0 10px; font-size:14px; font-family:inherit; width:100%; }
+    .rub-l .edit .row{ display:flex; align-items:center; gap:8px; font-size:13px; color:#6d7381; }
+    .qchip{ height:26px; padding:0 9px; border-radius:100px; border:1px solid #d9d9d9; background:#fff; font-size:12px; font-weight:600; color:#3b3f4c; cursor:pointer; display:inline-flex; align-items:center; line-height:1; }
+    .qchip.on{ background:#e9f2ff; border-color:#a3c3ff; color:#1f47b3; }
+    .rub-l .edit .acts{ display:flex; gap:6px; margin-top:2px; }
+    .rub-l .edit .acts .btn{ height:30px; font-size:13px; padding:0 10px; }
+    .rub-l .edit .del{ color:#db3e51; }
+    .lv{ position:relative; }
+    .lv .sc{ cursor:text; }
+    .lv .lx{ position:absolute; right:6px; top:50%; transform:translateY(-50%); width:24px; height:24px; border:none; background:none; border-radius:6px; color:#c7cbd3; cursor:pointer; display:none; align-items:center; justify-content:center; }
+    .lv:hover .lx{ display:inline-flex; }
+    .lv .lx:hover{ background:#fee2e2; color:#db3e51; }
+    .lv .ds{ padding-right:36px; }
+    .lv-add{ display:flex; align-items:center; gap:6px; padding:8px 14px; font-size:13px; font-weight:600; color:#416bff; background:none; border:none; cursor:pointer; width:100%; text-align:left; }
+    .lv-add:hover{ background:#f4f8ff; }
+    .lv-add i{ width:14px; height:14px; }
+    .rub-add{ margin-top:12px; }
+    .rub.editmode{ border-color:#416bff; box-shadow:0 0 0 2px rgba(65,107,255,.15); }
+    .rub.editmode .rub-l{ background:#f4f8ff; }
+    .rub .ein{ width:100%; height:36px; border:1px solid #c7cbd3; border-radius:6px; padding:0 10px; font-size:15px; font-weight:600; font-family:inherit; color:#222631; background:#fff; }
+    .rub .ein:focus, .rub .esc:focus, .rub .eds:focus{ outline:none; border-color:#416bff; box-shadow:0 0 0 2px rgba(65,107,255,.15); }
+    .rub .esc{ width:44px; height:32px; border:1px solid #c7cbd3; border-radius:6px; text-align:center; font-size:15px; font-weight:700; font-family:inherit; color:#222631; background:#fff; }
+    .rub .eds{ width:100%; min-height:38px; border:1px solid #c7cbd3; border-radius:6px; padding:7px 10px; font-size:15px; line-height:1.5; font-family:inherit; color:#222631; background:#fff; resize:vertical; }
+    .rub .eq{ display:flex; align-items:center; gap:6px; margin-top:8px; font-size:13px; color:#6d7381; flex-wrap:wrap; }
+    .rub .edel{ margin-top:10px; background:none; border:none; padding:0; font-size:13px; font-weight:600; color:#db3e51; cursor:pointer; display:inline-flex; align-items:center; gap:4px; }
+    .rub .edel i{ width:14px; height:14px; }
+    .rub.editmode .lv{ align-items:flex-start; padding:6px 0; }
+    .rub.editmode .lv .sc{ width:64px; padding:0 8px 0 10px; display:flex; align-items:center; }
+    .rub.editmode .lv .ds{ padding:0 44px 0 6px; }
+    .rub-tools{ display:flex; align-items:center; justify-content:space-between; margin-bottom:12px; gap:12px; }
+    .rub-tools .l{ display:flex; align-items:center; gap:10px; flex-shrink:0; }
+    .rub-tools .btn{ white-space:nowrap; }
+    .ai-tag{ display:inline-flex; align-items:center; gap:4px; font-size:13px; font-weight:600; color:#6f34db; background:#ebdfff; border-radius:6px; padding:3px 8px; }
+    .ai-tag i{ width:13px; height:13px; }
+
+    mark{ border-radius:3px; padding:0 3px; color:inherit; }
+    mark.c1{ background:#dbe8ff; box-shadow:inset 0 -2px 0 #416bff; }
+    mark.c2{ background:#dbf1e0; box-shadow:inset 0 -2px 0 #1ab864; }
+    mark.c3{ background:#ebdfff; box-shadow:inset 0 -2px 0 #6f34db; }
+    .ar{ display:flex; gap:10px; font-size:13px; line-height:1.5; color:#6d7381; align-items:flex-start; }
+    .ar .k{ display:inline-flex; align-items:center; gap:6px; width:120px; flex-shrink:0; font-weight:600; color:#222631; }
+    .ar .v{ width:44px; flex-shrink:0; font-weight:700; color:#222631; }
+    .ar .v.low{ color:#ea580c; }
+    .ar b{ color:#ea580c; font-weight:600; }
+    .diag{ display:flex; gap:10px; align-items:flex-start; padding:12px 14px; border-radius:8px; background:#fff7ed; margin-top:14px; }
+    .diag i{ width:18px; height:18px; color:#f97316; flex-shrink:0; margin-top:1px; }
+    .diag p{ margin:0; font-size:14px; color:#3b3f4c; line-height:1.55; }
+    .diag p b{ color:#222631; }
+
+
+    /* ===== 3단계: 답안 있음/없음 분기 ===== */
+    .branch{ display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+    .br{ border:1.5px solid #dde1e8; border-radius:12px; padding:20px; background:#fff; cursor:pointer; display:flex; gap:14px; align-items:flex-start; }
+    .br:hover{ border-color:#a3c3ff; }
+    .br.on{ border-color:#416bff; background:#f4f8ff; box-shadow:0 0 0 2px rgba(65,107,255,.12); }
+    .br .rd{ width:20px; height:20px; border-radius:50%; border:1.5px solid #c7cbd3; flex-shrink:0; background:#fff; margin-top:2px; }
+    .br.on .rd{ border:6px solid #416bff; }
+    .br .t{ font-size:17px; font-weight:600; margin:0 0 4px; }
+    .br .d{ font-size:14px; color:#6d7381; margin:0; line-height:1.55; }
+    .br-panel{ margin-top:16px; }
+    .sub-h{ font-size:15px; font-weight:600; margin:0 0 6px; display:flex; align-items:center; gap:8px; }
+    .sub-h .opt-tag{ font-weight:600; }
+    .sub-d{ font-size:14px; color:#6d7381; margin:0 0 10px; line-height:1.55; }
+    /* 모범답안 올리기 (선택) */
+    .mine-drop{ border:1.5px dashed #b3c6ff; background:#f4f8ff; border-radius:8px; padding:12px 14px; display:flex; align-items:center; gap:8px; font-size:14px; color:#3b3f4c; cursor:pointer; }
+    .mine-drop:hover{ background:#e9f2ff; }
+    .mine-drop i{ width:18px; height:18px; color:#416bff; flex-shrink:0; }
+    .mine-drop b{ color:#1f47b3; font-weight:600; }
+    .mine-link{ background:none; border:none; padding:0; margin-top:8px; font-size:13px; font-weight:600; color:#6d7381; cursor:pointer; text-decoration:underline; text-underline-offset:2px; font-family:inherit; }
+    .mine-link:hover{ color:#416bff; }
+    .mine-file{ display:flex; align-items:center; gap:8px; font-size:14px; color:#27724b; background:#eefcf4; border-radius:8px; padding:10px 12px; }
+    .mine-file i{ width:16px; height:16px; color:#1ab864; flex-shrink:0; }
+    .mine-file .nm{ font-weight:600; }
+    .mine-read{ margin-top:8px; background:#f6f7f9; border-radius:8px; padding:10px 12px; font-size:14px; line-height:1.6; color:#3b3f4c; }
+    .mine-read .lab{ display:block; font-size:12px; font-weight:600; color:#6d7381; margin-bottom:4px; }
+    .mine-ta{ width:100%; min-height:110px; border:1px solid #d9d9d9; border-radius:8px; padding:10px 12px; font-size:15px; line-height:1.6; font-family:inherit; color:#222631; resize:vertical; }
+    .mine-ta:focus{ outline:none; border-color:#416bff; box-shadow:0 0 0 2px rgba(65,107,255,.12); }
+    .files{ display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:8px; margin-top:12px; }
+    .fi{ display:flex; align-items:center; gap:8px; border:1px solid #eceef2; border-radius:8px; padding:8px 10px; font-size:13px; color:#3b3f4c; background:#fff; min-width:0; }
+    .fi i{ width:16px; height:16px; color:#416bff; flex-shrink:0; }
+    .fi .nm{ flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-weight:500; }
+    .fi .x{ width:22px; height:22px; border:none; background:none; border-radius:6px; color:#c7cbd3; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; flex-shrink:0; }
+    .fi .x:hover{ background:#fee2e2; color:#db3e51; }
+    .fi .x i{ width:13px; height:13px; color:inherit; }
+    /* 3단계 없음: 수준 고르기 */
+    .lvsel{ display:flex; flex-direction:column; gap:8px; margin-bottom:14px; }
+    .lvc{ display:flex; align-items:center; gap:14px; border:1.5px solid #dde1e8; border-radius:10px; padding:14px 16px; background:#fff; cursor:pointer; }
+    .lvc:hover{ border-color:#a3c3ff; }
+    .lvc.on{ border-color:#416bff; background:#f4f8ff; }
+    .lvc .ck{ width:20px; height:20px; border-radius:5px; border:1.5px solid #c7cbd3; background:#fff; flex-shrink:0; display:inline-flex; align-items:center; justify-content:center; }
+    .lvc.on .ck{ background:#416bff; border-color:#416bff; }
+    .lvc.on .ck::after{ content:''; width:10px; height:6px; border-left:2px solid #fff; border-bottom:2px solid #fff; transform:rotate(-45deg) translate(1px,-1px); }
+    .lvc > div{ flex:1; min-width:0; }
+    .lvc .t{ font-size:16px; font-weight:600; margin:0 0 2px; display:flex; align-items:center; gap:6px; }
+    .lvc .d{ font-size:14px; color:#6d7381; margin:0; }
+    .lvc .cr{ font-size:13px; font-weight:600; color:#6d7381; flex-shrink:0; }
+    .lvc .rec{ font-size:12px; font-weight:600; color:#3151c4; background:#e9f2ff; border-radius:6px; padding:2px 6px; }
+    /* 4단계 예시: 왼쪽 답안 · 오른쪽 채점 결과 */
+    .seg{ display:inline-flex; background:#f1f3f5; border-radius:8px; padding:3px; gap:2px; margin-bottom:14px; }
+    .seg button{ height:34px; padding:0 14px; border:none; background:none; border-radius:6px; font-size:14px; font-weight:500; color:#6d7381; cursor:pointer; font-family:inherit; display:inline-flex; align-items:center; justify-content:center; line-height:1; }
+    .seg button.on{ background:#fff; color:#222631; box-shadow:0 1px 2px rgba(0,0,0,.08); }
+    .cmp2{ display:grid; grid-template-columns:1fr 1fr; gap:16px; align-items:start; }
+    .pane{ border:1px solid #dde1e8; border-radius:10px; overflow:hidden; background:#fff; }
+    .pane-hd{ display:flex; align-items:center; gap:8px; padding:12px 16px; border-bottom:1px solid #eceef2; background:#fbfbfc; font-size:15px; font-weight:600; }
+    .pane-hd i{ width:16px; height:16px; color:#416bff; }
+    .pane-hd .sub{ font-size:13px; font-weight:500; color:#6d7381; margin-left:auto; }
+    .pane-hd .tot{ margin-left:auto; font-size:20px; font-weight:800; color:#416bff; }
+    .pane-hd .tot small{ font-size:13px; font-weight:500; color:#6d7381; margin-left:2px; }
+    .pane-body{ padding:16px; font-size:15px; line-height:1.75; color:#3b3f4c; }
+    .pane-body.ans p{ margin:0 0 12px; } .pane-body.ans p:last-child{ margin:0; }
+    .pane-body.ans mark{ background:#e9f2ff; box-shadow:inset 0 -2px 0 #a3c3ff; border-radius:3px; padding:0 2px; color:inherit; }
+    .rc{ border-bottom:1px solid #f1f3f5; padding:0 0 12px; margin:0 0 12px; }
+    .rc:last-of-type{ border-bottom:none; }
+    .rc-hd{ display:flex; align-items:center; gap:8px; margin-bottom:4px; }
+    .rc-hd .nm{ font-size:15px; font-weight:600; color:#222631; flex:1; }
+    .rc-hd .sc{ font-size:16px; font-weight:800; color:#222631; }
+    .rc-lv{ font-size:13px; color:#6d7381; margin:0 0 4px; }
+    .rc-why{ font-size:14px; color:#3b3f4c; line-height:1.6; margin:0; }
+    .rc-why q{ quotes:none; color:#1f47b3; background:#e9f2ff; border-radius:3px; padding:0 3px; }
+    .fb{ background:#f6f7f9; border-radius:8px; padding:12px 14px; }
+    .fb .lab{ display:block; font-size:12px; font-weight:600; color:#6d7381; margin-bottom:4px; }
+    .fb p{ margin:0; font-size:14px; line-height:1.65; color:#3b3f4c; }
+    #sdFixSec .fix{ margin-top:0; }
+    .fix{ margin-top:20px; border:1px solid #dde1e8; border-radius:12px; background:#fff; }
+    .fix-hd{ display:flex; align-items:center; gap:10px; padding:14px 18px; cursor:pointer; user-select:none; }
+    .fix-hd:hover{ background:#fbfbfc; border-radius:12px; }
+    .fix-hd > i:first-child{ width:18px; height:18px; color:#f59e0b; flex-shrink:0; }
+    .fix-hd .t{ font-size:16px; font-weight:600; color:#222631; white-space:nowrap; }
+    .fix-hd .d{ font-size:14px; color:#6d7381; flex:1; min-width:0; }
+    .fix-hd .chev{ width:18px; height:18px; color:#6d7381; transition:transform .15s; flex-shrink:0; }
+    .fix.open .fix-hd .chev{ transform:rotate(180deg); }
+    .fix-body{ display:none; padding:2px 18px 18px; }
+    .fix.open .fix-body{ display:block; }
+    .fix-lead{ margin:0 0 12px; font-size:14px; color:#3b3f4c; line-height:1.65; }
+    .fix-lead b{ color:#222631; }
+    .fix-chips{ display:flex; flex-wrap:wrap; gap:8px; margin-bottom:12px; }
+    .fix-pane{ border-radius:10px; background:#f6f7f9; padding:16px 18px; display:none; }
+    .fix-pane.on{ display:block; }
+    .fix-pane .pr{ display:flex; align-items:center; gap:8px; margin:0 0 6px; font-size:15px; font-weight:700; color:#222631; }
+    .fix-pane .pr .no{ display:inline-flex; align-items:center; justify-content:center; width:22px; height:22px; border-radius:50%; background:#416bff; color:#fff; font-size:12px; font-weight:700; line-height:1; }
+    .fix-pane .why{ margin:0 0 12px; font-size:14px; color:#3b3f4c; line-height:1.6; }
+    .ba{ display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-bottom:6px; }
+    .ba > div{ background:#fff; border:1px solid #eceef2; border-radius:8px; padding:10px 12px; font-size:14px; line-height:1.6; color:#3b3f4c; }
+    .ba .lab{ display:block; font-size:12px; font-weight:700; margin-bottom:4px; }
+    .ba .b4 .lab{ color:#9ea3ad; } .ba .af .lab{ color:#1a7f4b; }
+    .ba .af{ border-color:#b7e4c7; }
+    .src{ font-size:12px; color:#9ea3ad; margin:0 0 12px; }
+    .req-box{ display:block; background:#fff; border:1px solid #c7cbd3; border-radius:8px; padding:10px 12px; font-size:14px; line-height:1.6; color:#222631; margin-bottom:12px; cursor:text; transition:border-color .12s, box-shadow .12s; }
+    .req-box:hover{ border-color:#a3c3ff; }
+    .req-box:focus-within{ border-color:#416bff; box-shadow:0 0 0 2px rgba(65,107,255,.15); }
+    .req-box .lab em{ font-style:normal; font-weight:500; color:#9ea3ad; margin-left:6px; }
+    .req-edit{ display:block; width:100%; border:none; outline:none; resize:vertical; padding:0; margin:0; min-height:48px; font-family:inherit; font-size:15px; line-height:1.6; color:#222631; background:transparent; }
+    .req-box .lab{ display:block; font-size:12px; font-weight:700; color:#3151c4; margin-bottom:4px; }
+    .fix-acts{ display:flex; gap:8px; justify-content:flex-end; }
+    .fix-case{ display:flex; align-items:center; gap:14px; margin-top:14px; padding:12px; border:1px solid #eceef2; border-radius:10px; color:#3b3f4c; font-size:13px; line-height:1.55; }
+    .fix-case:hover{ border-color:#a3c3ff; background:#f4f8ff; }
+    .fix-case img{ width:84px; height:60px; object-fit:cover; object-position:top; border-radius:6px; border:1px solid #eceef2; flex-shrink:0; }
+    .fix-case b{ display:block; font-size:14px; color:#222631; margin-bottom:2px; }
+    .fix-case i{ width:16px; height:16px; color:#6d7381; flex-shrink:0; }
+    #s-detail .sd-fixlink{ width:100%; display:flex; align-items:center; gap:8px; background:#fffbeb; border:1px solid #fde68a; border-radius:10px; padding:12px 14px; font-size:14px; font-weight:600; color:#92400e; cursor:pointer; font-family:inherit; }
+    #s-detail .sd-fixlink:hover{ background:#fef3c7; }
+    .next-bar{ display:flex; align-items:center; gap:10px; margin-top:20px; padding-top:18px; border-top:1px solid #eceef2; }
+    .next-bar .nb-txt{ flex:1; min-width:0; font-size:14px; color:#3b3f4c; line-height:1.55; }
+    .next-bar .nb-txt b{ color:#222631; font-weight:600; }
+    /* 결과: 예시 답안 행 */
+    .tbl2 td.lbl{ text-align:left; }
+    .tbl2 td.lbl .nm{ font-weight:600; }
+    .tbl2 td.lbl .sub{ display:block; font-size:13px; color:#6d7381; margin-top:2px; }
+    .exp-ans{ background:#fff; border:1px solid #eceef2; border-radius:8px; padding:12px 14px; margin-bottom:10px; font-size:14px; line-height:1.7; color:#3b3f4c; }
+    .exp-ans p{ margin:0 0 8px; } .exp-ans p:last-child{ margin:0; }
+    .exp-row{ display:flex; gap:10px; font-size:14px; line-height:1.55; padding:3px 0; }
+    .exp-row .k{ width:110px; flex-shrink:0; font-weight:600; color:#222631; }
+    .exp-row .v{ width:44px; flex-shrink:0; font-weight:700; color:#222631; }
+    .sample-strip{ display:flex; align-items:center; gap:10px; background:#fff7ed; border-radius:10px; padding:12px 16px; margin-bottom:16px; font-size:14px; color:#3b3f4c; }
+    .sample-strip i{ width:18px; height:18px; color:#f97316; flex-shrink:0; }
+    /* 답안 업로드 */
+    .ans-pick{ display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+    .apk{ border:1px solid #dde1e8; border-radius:10px; padding:18px; cursor:pointer; display:flex; gap:14px; align-items:flex-start; background:#fff; }
+    .apk:hover{ border-color:#416bff; }
+    .apk.on{ border-color:#416bff; background:#f4f8ff; }
+    .apk i{ width:24px; height:24px; color:#416bff; flex-shrink:0; }
+    .apk .t{ font-size:16px; font-weight:600; margin:0 0 4px; }
+    .apk .d{ font-size:14px; color:#6d7381; margin:0; line-height:1.5; }
+    .thumbs{ display:grid; grid-template-columns:repeat(7,minmax(0,1fr)); gap:10px; margin-top:16px; }
+    .thumb{ aspect-ratio:3/4; background:#fff; border:1px solid #dde1e8; border-radius:6px; position:relative; overflow:hidden; }
+    .thumb::before{ content:''; position:absolute; inset:10px 10px auto 10px; height:6px; background:#e5e7eb; border-radius:3px; box-shadow:0 12px 0 #eceef2, 0 24px 0 #eceef2, 0 36px 0 #eceef2, 0 48px 0 #eceef2; }
+    .thumb .no{ position:absolute; left:6px; bottom:6px; font-size:11px; font-weight:700; color:#3b3f4c; background:#f1f3f5; border-radius:4px; padding:2px 5px; }
+    .thumb.more{ display:flex; align-items:center; justify-content:center; font-size:14px; font-weight:600; color:#6d7381; background:#f6f7f9; }
+    .thumb.more::before{ display:none; }
+    .ans-kind{ margin:4px 0 16px; }
+    .split-row{ display:flex; align-items:center; gap:10px; margin-top:16px; font-size:16px; color:#222631; }
+    .split-r{ margin-left:6px; color:#3b3f4c; }
+    .stepper{ display:inline-flex; align-items:center; border:1px solid #c7cbd3; border-radius:8px; overflow:hidden; background:#fff; }
+    .stepper button{ width:36px; height:36px; border:none; background:#fff; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; line-height:1; vertical-align:middle; color:#3b3f4c; }
+    .stepper button:hover{ background:#f4f8ff; }
+    .stepper button svg{ width:16px; height:16px; }
+    .stepper b{ min-width:36px; text-align:center; font-size:16px; }
+    .btn-link{ display:inline-flex; align-items:center; justify-content:center; line-height:1; vertical-align:middle; border:none; background:none; padding:0; color:#416bff; font-size:14px; font-weight:600; cursor:pointer; text-decoration:underline; }
+    .credit-line{ display:flex; align-items:center; gap:14px; background:#f6f7f9; border-radius:10px; padding:14px 16px; margin-top:16px; }
+    .credit-line i{ width:20px; height:20px; color:#416bff; }
+    .credit-line b{ font-weight:700; }
+
+    /* 결과 */
+    .kpis{ display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:14px; margin-bottom:16px; }
+    .kpi{ background:#fff; border-radius:12px; padding:18px 20px; box-shadow:0 0 1px #2226314D, 0 2px 8px #0000000F; }
+    .kpi .k{ font-size:13px; color:#6d7381; margin-bottom:6px; }
+    .kpi .v{ font-size:26px; font-weight:800; color:#222631; line-height:1; }
+    .kpi .v small{ font-size:13px; font-weight:500; color:#6d7381; margin-left:4px; }
+    .dist{ display:flex; align-items:flex-end; gap:6px; height:52px; margin-top:8px; }
+    .dist span{ flex:1; background:#ccdfff; border-radius:3px 3px 0 0; }
+    .dist span.hi{ background:#416bff; }
+    .tbl2{ width:100%; border-collapse:separate; border-spacing:0; }
+    .tbl2 th{ background:#f6f7f9; height:44px; font-size:15px; font-weight:500; color:#3b3f4c; padding:0 12px; text-align:center; border-top:1px solid #dde1e8; border-bottom:1px solid #dde1e8; }
+    .tbl2 th:first-child{ border-left:1px solid #dde1e8; border-top-left-radius:8px; }
+    .tbl2 th:last-child{ border-right:1px solid #dde1e8; border-top-right-radius:8px; }
+    .tbl2 td{ font-size:16px; padding:12px; text-align:center; color:#222631; border-bottom:1px solid #eceef2; }
+    .tbl2 td:first-child{ border-left:1px solid #dde1e8; }
+    .tbl2 td:last-child{ border-right:1px solid #dde1e8; }
+    .tbl2 tr:last-child td{ border-bottom:1px solid #dde1e8; }
+    .tbl2 tr:last-child td:first-child{ border-bottom-left-radius:8px; }
+    .tbl2 tr:last-child td:last-child{ border-bottom-right-radius:8px; }
+    .tbl2 tr.exp td{ background:#fbfbfc; text-align:left; font-size:14px; color:#3b3f4c; line-height:1.6; padding:14px 18px; }
+    .bridge{ background:#fff; border-radius:12px; padding:22px; box-shadow:0 0 0 1.5px #416bff, 0 8px 24px rgba(65,107,255,.14); }
+    .bridge .t{ font-size:18px; font-weight:700; margin:0 0 8px; color:#1f47b3; }
+    .bridge .d{ font-size:15px; color:#3b3f4c; margin:0 0 14px; line-height:1.55; }
+    .bridge ul{ margin:0 0 16px; padding:0; list-style:none; display:flex; flex-direction:column; gap:8px; }
+    .bridge li{ display:flex; gap:8px; font-size:14px; color:#3b3f4c; align-items:flex-start; line-height:1.5; }
+    .bridge li i{ width:16px; height:16px; color:#416bff; flex-shrink:0; margin-top:2px; }
+    .bridge .acts{ display:flex; flex-direction:column; gap:8px; }
+    .bridge .acts .btn{ width:100%; }
+
+    /* 내 반에 연결 */
+    .pick-list{ display:flex; flex-direction:column; gap:10px; }
+    .pk{ border:1px solid #dde1e8; border-radius:10px; padding:14px 16px; display:flex; align-items:center; gap:14px; cursor:pointer; background:#fff; }
+    .pk:hover{ border-color:#416bff; }
+    .pk.on{ border-color:#416bff; background:#f4f8ff; }
+    .pk .rd{ width:20px; height:20px; border-radius:50%; border:1.5px solid #c7cbd3; flex-shrink:0; background:#fff; }
+    .pk.on .rd{ border:6px solid #416bff; }
+    .pk .nm{ font-size:16px; font-weight:600; }
+    .pk .mt{ font-size:14px; color:#6d7381; margin-left:auto; }
+    .pk.new{ border-style:dashed; }
+    .pk .ds{ display:block; font-size:14px; color:#6d7381; margin-top:4px; line-height:1.5; }
+    .how-t{ font-size:16px; font-weight:700; color:#222631; margin:24px 0 10px; }
+    .how-note{ font-size:14px; color:#6d7381; margin:10px 0 0; }
+    .match{ display:grid; grid-template-columns:1fr 1fr; gap:10px 14px; }
+    .mrow{ display:flex; align-items:center; gap:10px; border:1px solid #eceef2; border-radius:8px; padding:10px 12px; font-size:15px; background:#fff; }
+    .mrow .an{ width:72px; flex-shrink:0; font-weight:600; color:#3b3f4c; }
+    .mrow .arrow{ color:#c7cbd3; width:16px; height:16px; flex-shrink:0; }
+    .mrow select{ flex:1; height:34px; border:1px solid #d9d9d9; border-radius:6px; padding:0 8px; font-size:14px; background:#fff; }
+    .mrow.warn{ border-color:#fed7aa; background:#fffaf3; }
+    .done-box{ text-align:center; padding:36px 20px; }
+    .done-box .ic{ width:56px; height:56px; border-radius:50%; background:#eefcf4; color:#1ab864; display:inline-flex; align-items:center; justify-content:center; margin-bottom:14px; }
+    .done-box .ic i{ width:28px; height:28px; }
+    .done-box h3{ margin:0 0 8px; font-size:22px; }
+    .done-box p{ margin:0 0 20px; font-size:15px; color:#3b3f4c; line-height:1.6; }
+    .next-grid{ display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px; text-align:left; }
+    #s-bridge .col-main > .card{ margin-top:0; }
+    .next-grid .nx .t{ white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .nx{ border:1px solid #dde1e8; border-radius:10px; padding:14px 16px; background:#fff; cursor:pointer; }
+    .nx:hover{ border-color:#416bff; }
+    .nx .t{ font-size:15px; font-weight:600; margin:0 0 4px; display:flex; align-items:center; gap:6px; }
+    .nx .t i{ width:16px; height:16px; color:#416bff; }
+    .nx .d{ font-size:13px; color:#6d7381; margin:0; line-height:1.5; }
+
+    /* 기존 흐름과 비교 */
+    .cmp{ display:grid; grid-template-columns:1fr 1fr; gap:20px; }
+    .cmp-col{ background:#fff; border-radius:12px; padding:22px; box-shadow:0 0 1px #2226314D, 0 2px 8px #0000000F; }
+    .cmp-col h3{ margin:0 0 4px; font-size:18px; }
+    .cmp-col .who{ font-size:14px; color:#6d7381; margin:0 0 16px; }
+    .flow{ display:flex; flex-direction:column; gap:0; }
+    .fl{ display:flex; gap:12px; align-items:flex-start; }
+    .fl .dot{ width:28px; height:28px; border-radius:50%; background:#f1f3f5; color:#6d7381; font-size:13px; font-weight:700; display:inline-flex; align-items:center; justify-content:center; flex-shrink:0; }
+    .fl .dot.val{ background:#e9f2ff; color:#3151c4; }
+    .fl .dot.gold{ background:#fef9c3; color:#854d0e; }
+    .fl .body{ flex:1; padding-bottom:18px; border-left:1px dashed #dde1e8; margin-left:-12px; padding-left:24px; margin-top:0; }
+    .fl:last-child .body{ border-left-color:transparent; padding-bottom:0; }
+    .fl .body .t{ font-size:15px; font-weight:600; margin:4px 0 2px; }
+    .fl .body .d{ font-size:13px; color:#6d7381; margin:0; line-height:1.5; }
+    .cmp-note{ margin-top:18px; background:#f6f7f9; border-radius:10px; padding:14px 16px; font-size:14px; color:#3b3f4c; line-height:1.6; }
+    .cmp-note b{ color:#222631; }
+    /* ===== 답안별 채점 상세 (scoring_secondary_v1 이식 · #s-detail 스코프) ===== */
+#s-detail .top-bar{height:64px;background:#f7f8f9;display:flex;align-items:stretch;position:fixed;top:var(--chrome-top,0px);left:var(--chrome-left,0px);right:0;z-index:200;border-bottom:1px solid #dde1e8;transition:top .2s ease,left .2s ease}
+#s-detail .btn-back{display:inline-flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;width:64px;height:64px;background:#365eef;color:#fff;font-size:12px;font-weight:600;font-family:inherit;cursor:pointer;flex-shrink:0;border:none;border-radius:0;line-height:1}
+#s-detail .btn-back:hover{background:#3151c4}
+#s-detail .tb-bar{flex:1;min-width:0;display:flex;align-items:center;justify-content:space-between;gap:16px;padding:0 20px}
+#s-detail .tb-left{display:flex;align-items:center;gap:16px;min-width:0}
+#s-detail .tb-student-area{display:flex;align-items:center;gap:12px;position:relative}
+#s-detail .tb-right{display:inline-flex;align-items:center;gap:12px;flex-shrink:0}
+#s-detail .tb-nav{display:inline-flex;align-items:center;gap:12px}
+#s-detail .tb-right-link{display:inline-flex;align-items:center;gap:4px;font-size:14px;font-weight:500;color:#3b3f4c;cursor:pointer;border:none;background:none;padding:0;line-height:1;font-family:inherit}
+#s-detail .tb-right-link:hover{color:#365eef}
+#s-detail .tb-nav-divider{width:1px;height:13px;background:#dde1e8;flex-shrink:0}
+#s-detail .tb-btn-group{display:inline-flex;align-items:center;gap:8px}
+#s-detail .btn-save{display:inline-flex;align-items:center;justify-content:center;gap:4px;height:36px;padding:0 12px;border-radius:4px;background:#365eef;color:#fff;font-size:14px;font-weight:500;border:none;cursor:pointer;white-space:nowrap;line-height:1;font-family:inherit}
+#s-detail .btn-save:hover{background:#3151c4}
+#s-detail .ve-ctrl-off{opacity:.4;pointer-events:none}
+#s-detail .viewer{flex:1;display:flex;flex-direction:column;min-width:0;position:relative;background:#dde1e8}
+#s-detail .viewer-topbar{min-height:44px;background:#3f3f46;display:flex;align-items:center;gap:12px;padding:6px 20px;flex-shrink:0}
+#s-detail .viewer-ctrl{display:flex;align-items:center;gap:2px}
+#s-detail .ctrl-btn{width:32px;height:32px;display:flex;align-items:center;justify-content:center;border:none;background:none;color:#fff;cursor:pointer;border-radius:4px}
+#s-detail .ctrl-btn:hover{background:rgba(255,255,255,.12)}
+#s-detail .ctrl-sep{width:1px;height:16px;background:rgba(255,255,255,.25);margin:0 4px}
+#s-detail .zoom-info{font-size:14px;color:#fff;width:56px;min-width:56px;text-align:center;cursor:pointer}
+#s-detail .viewer-body{flex:1;overflow:auto;padding:24px;background:#dde1e8;display:flex;flex-direction:column;align-items:center;gap:16px}
+#s-detail .viewer-pages{display:flex;flex-direction:column;align-items:center;gap:16px;width:100%;max-width:820px}
+#s-detail .viewer-page{background:#fff;width:100%;box-shadow:0 2px 8px rgba(0,0,0,.15);position:relative;overflow:hidden}
+#s-detail .viewer-page img{display:block;width:100%;height:auto}
+#s-detail .viewer-page-placeholder{aspect-ratio:1/1.414;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;color:#6d7381;background:repeating-linear-gradient(45deg,#fff,#fff 12px,#f6f7f9 12px,#f6f7f9 24px)}
+#s-detail .viewer-page-placeholder .ph-title{font-size:18px;font-weight:600;color:#3b3f4c}
+#s-detail .viewer-page-placeholder .ph-sub{font-size:14px;color:#6d7381;text-align:center;line-height:1.6}
+#s-detail .viewer-page-num{position:absolute;top:12px;right:16px;background:rgba(34,38,49,.75);color:#fff;font-size:12px;font-weight:600;padding:4px 10px;border-radius:100px}
+#s-detail .grading-panel{width:640px;background:#f5f7ff;overflow-y:auto;flex-shrink:0;border-left:1px solid #eaecf0}
+#s-detail .ocr-blk-label{display:inline-flex;align-items:center;height:24px;padding:0 10px;border-radius:6px;background:#f1f3f5;color:#3b3f4c;font-size:13px;font-weight:600;line-height:1}
+#s-detail .ocr-blk-text{margin:10px 0 0;font-size:15px;line-height:1.85;color:#222631}
+#s-detail .ocr-blk-div{border-top:1px dashed #dde1e8}
+#s-detail .ocr-q-head{display:flex;align-items:center;gap:8px}
+#s-detail .ocr-q-chip{display:inline-flex;align-items:center;height:24px;padding:0 10px;border-radius:6px;background:#eef3ff;color:#3151c4;font-size:13px;font-weight:700;line-height:1;flex-shrink:0}
+#s-detail .ocr-q-name{font-size:15px;font-weight:700;color:#222631;line-height:1.5}
+#s-detail .ocr-q-prompt{margin:10px 0 0;font-size:15px;line-height:1.85;color:#3b3f4c}
+#s-detail .ocr-ans-box{margin-top:12px;background:#f6f7f9;border-radius:8px;padding:14px 16px}
+#s-detail .ocr-ans-label{display:block;font-size:13px;font-weight:700;color:#6d7381;margin-bottom:6px;line-height:1}
+#s-detail .ocr-ans-box p{margin:0;font-size:15px;line-height:1.85;color:#222631}
+#s-detail .ve-check{display:inline-flex;align-items:center;gap:6px;margin-left:auto;font-size:13px;font-weight:500;color:#cfd3da;cursor:pointer;user-select:none;line-height:1}
+#s-detail .ve-check input{width:14px;height:14px;accent-color:#416bff;cursor:pointer}
+#s-detail .viewer-filebar{height:56px;background:#fff;display:flex;align-items:center;gap:12px;padding:8px 20px;border-bottom:1px solid #eaecf0;flex-shrink:0}
+#s-detail .vf-name{font-size:16px;font-weight:600;color:#18181b;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#s-detail .vf-date{font-size:14px;font-weight:500;color:#52525b;white-space:nowrap}
+#s-detail .vf-download{margin-left:auto;display:inline-flex;align-items:center;justify-content:center;line-height:1;vertical-align:middle;gap:4px;height:36px;padding:0 12px;border:1px solid #c7cbd3;border-radius:4px;background:transparent;color:#27272a;font-size:14px;font-weight:500;font-family:inherit;cursor:pointer;flex-shrink:0}
+#s-detail .vf-download:hover{background:#f6f7f9}
+#s-detail .ve-seg{display:inline-flex;align-items:center;background:#27272a;border-radius:8px;padding:4px;flex-shrink:0}
+#s-detail .ve-seg-btn{display:inline-flex;align-items:center;justify-content:center;line-height:1;vertical-align:middle;gap:6px;height:30px;padding:0 12px;border:none;border-radius:6px;background:transparent;color:#a1a1aa;font-size:14px;font-weight:600;font-family:inherit;cursor:pointer;white-space:nowrap}
+#s-detail .ve-seg-btn.on{background:#f6f7f9;color:#18181b}
+#s-detail .ve-ctrl{display:flex;align-items:center;gap:4px}
+#s-detail .ve-page-input{width:44px;height:32px;background:#27272a;border-radius:4px;color:#fff;font-size:14px;font-weight:500;display:inline-flex;align-items:center;justify-content:center}
+#s-detail .ve-page-total{width:32px;text-align:center;color:#fff;font-size:14px;font-weight:500}
+#s-detail.hide-solve .ocr-ans-box[data-solve]{display:none}
+#s-detail .total-score-section{display:flex;align-items:center;justify-content:space-between;padding:20px 24px;background:#fff;border-bottom:1px solid #eaecf0}
+#s-detail .score-total{display:inline-flex;align-items:baseline;gap:6px}
+#s-detail .score-total .lbl{font-size:18px;font-weight:600;color:#222631}
+#s-detail .score-total .val{font-size:22px;font-weight:700;color:#365eef}
+#s-detail .score-total .unit{font-size:18px;font-weight:600;color:#222631}
+#s-detail .score-total .plan{font-size:18px;font-weight:600;color:#3b3f4c;margin-left:4px}
+#s-detail .pn-section{padding:20px 24px;border-bottom:6px solid #eaecf0}
+#s-detail .pn-section:last-of-type{border-bottom:none}
+#s-detail .pn-section.white-bg{background:#fff}
+#s-detail .pn-section-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+#s-detail .pn-section-hd-left{display:inline-flex;align-items:center;gap:8px}
+#s-detail .pn-section-title{font-size:18px;font-weight:700;color:#222631;line-height:1}
+#s-detail .icon-help{width:36px;height:36px;display:inline-flex;align-items:center;justify-content:center;border:none;background:none;cursor:pointer;color:#6d7381;border-radius:4px}
+#s-detail .icon-help:hover{background:#eef1f8;color:#3b3f4c}
+#s-detail .rubric-box{border:1px solid #eaecf0;border-radius:12px;padding:20px;background:#fff}
+#s-detail .btn-ground-toggle{display:inline-flex;align-items:center;justify-content:center;line-height:1;gap:6px;height:32px;padding:0 12px;border-radius:8px;background:#fff;border:1px solid #dde1e8;color:#6d7381;font-family:inherit;font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap}
+#s-detail .btn-ground-toggle:hover{border-color:#a3c3ff;color:#3151c4}
+#s-detail .btn-ground-toggle.on{background:#eef3ff;border-color:#a3c3ff;color:#3151c4}
+#s-detail .btn-ground-toggle .bgt-box{width:15px;height:15px;border-radius:4px;border:1.5px solid #c7cbd3;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;background:#fff}
+#s-detail .btn-ground-toggle.on .bgt-box{background:#416bff;border-color:#416bff;color:#fff}
+#s-detail .btn-ground-toggle .bgt-box i{opacity:0}
+#s-detail .btn-ground-toggle.on .bgt-box i{opacity:1}
+#s-detail .rubric-box-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+#s-detail .rubric-box-title{font-size:16px;font-weight:600;color:#222631;line-height:1}
+#s-detail .rubric-box-actions{display:inline-flex;gap:8px;align-items:center}
+#s-detail .btn-ai-apply{display:inline-flex;align-items:center;justify-content:center;gap:4px;height:32px;padding:0 14px;border-radius:100px;background:#fff;border:1px solid #dde1e8;font-size:13px;font-weight:600;color:#3b3f4c;cursor:pointer;font-family:inherit;line-height:1}
+#s-detail .btn-ai-apply:hover{border-color:#a3c3ff;color:#365eef}
+#s-detail .btn-ai-apply.applied{background:#e9f2ff;border-color:#a3c3ff;color:#365eef}
+#s-detail .icon-btn-32{width:32px;height:32px;display:inline-flex;align-items:center;justify-content:center;border:1px solid #dde1e8;border-radius:100px;background:#fff;cursor:pointer;color:#3b3f4c}
+#s-detail .icon-btn-32:hover{border-color:#a3c3ff;color:#365eef}
+#s-detail .rubric-row{display:flex;flex-direction:column;align-items:flex-start;gap:10px;padding:16px 0;border-bottom:1px solid #eaecf0}
+#s-detail .rubric-row:last-of-type{border-bottom:none}
+#s-detail .rubric-ground{font-size:14px;line-height:1.8;color:#3b3f4c;white-space:pre-wrap}
+#s-detail.hide-ground .rubric-ground{display:none}
+#s-detail .rubric-row:last-child{border-bottom:none}
+#s-detail .rubric-name{font-size:16px;font-weight:700;color:#222631;line-height:1.5}
+#s-detail .score-btns{display:inline-flex;gap:8px;align-items:center}
+#s-detail .score-btn{min-width:40px;height:32px;padding:0 10px;border-radius:100px;font-size:14px;font-weight:600;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;border:1px solid #dde1e8;background:#fff;color:#3b3f4c;transition:all .12s;line-height:1;font-family:inherit}
+#s-detail .score-btn:hover{border-color:#a3c3ff;background:#f4f8ff;color:#365eef}
+#s-detail .score-btn.ai-suggest{background:repeating-linear-gradient(-45deg,#f0f9ff,#f0f9ff 4px,#bae6fd 4px,#bae6fd 7px);border:1.5px solid #38bdf8;color:#0284c7}
+#s-detail .score-btn.ai-suggest:hover{background:repeating-linear-gradient(-45deg,#e0f2fe,#e0f2fe 4px,#7dd3fc 4px,#7dd3fc 7px);border-color:#0ea5e9;color:#0369a1}
+#s-detail .score-btn.selected,
+#s-detail .score-btn.ai-suggest.selected{background:#365eef !important;color:#fff;border-color:#365eef;background-image:none !important}
+#s-detail.before-ai .score-btn.ai-suggest{background:#fff;border:1px solid #dde1e8;color:#3b3f4c}
+#s-detail.before-ai .score-btn.ai-suggest:hover{background:#f4f8ff;border-color:#a3c3ff;color:#365eef}
+#s-detail .ai-notice{font-size:14px;color:#6d7381;line-height:1.5;margin-top:16px;display:flex;align-items:flex-start;gap:6px}
+#s-detail .eval-tab-pane{display:none;flex-direction:column;gap:12px}
+#s-detail .eval-tab-pane.active{display:flex}
+#s-detail .eval-card{border-radius:14px;padding:0;background:#fff;border:1px solid #eaecf0;box-shadow:0 2px 8px rgba(54,94,239,.06);position:relative}
+#s-detail .eval-card.ac-blue{--ac:#365eef;--ac-bg:#e9f2ff;--ac-text:#3151c4;--ac-soft:#f0f5ff}
+#s-detail .eval-card.ac-teal{--ac:#0d9488;--ac-bg:#ccfbf1;--ac-text:#0f766e;--ac-soft:#f0fdfb}
+#s-detail .eval-card.ac-orange{--ac:#a3613c;--ac-bg:#f3e6da;--ac-text:#9a5734;--ac-soft:#faf4ef}
+#s-detail .eval-card.ac-purple{--ac:#7c3aed;--ac-bg:#f5f3ff;--ac-text:#6d28d9;--ac-soft:#faf8ff}
+#s-detail .eval-card.ac-green{--ac:#3e7d71;--ac-bg:#e1eeeb;--ac-text:#356b62;--ac-soft:#f2f8f6}
+#s-detail .eval-card.ac-amber{--ac:#8a7038;--ac-bg:#f3eeda;--ac-text:#7d6630;--ac-soft:#faf7ee}
+#s-detail .eval-card.ac-neutral{--ac:#5e6678;--ac-bg:#eef0f4;--ac-text:#515869;--ac-soft:#f6f7f9}
+#s-detail .ec-card-header{display:flex;align-items:center;gap:10px;padding:14px 18px;background:var(--ac-bg);border-radius:14px 14px 0 0;cursor:pointer;transition:background .15s}
+#s-detail .ec-card-header:hover{filter:brightness(.97)}
+#s-detail .ec-card-header.readonly-header{cursor:default}
+#s-detail .ec-card-header.readonly-header:hover{filter:none}
+#s-detail .ec-summary{flex:1;font-size:15px;font-weight:600;color:#222631;line-height:1.4}
+#s-detail .ec-summary-wrap{flex:1;min-width:0;position:relative;display:flex}
+#s-detail .ec-summary-tip{position:absolute;left:0;bottom:calc(100% + 8px);background:#222631;color:#fff;font-size:13px;line-height:1.5;font-weight:500;padding:8px 12px;border-radius:8px;max-width:340px;opacity:0;visibility:hidden;transition:opacity .15s,visibility .15s;z-index:1100;pointer-events:none;box-shadow:0 4px 16px rgba(0,0,0,.25);text-align:left;white-space:normal}
+#s-detail .ec-summary-tip::after{content:"";position:absolute;top:100%;left:16px;border:5px solid transparent;border-top-color:#222631}
+#s-detail .ec-summary-wrap.has-tip:hover .ec-summary-tip{opacity:1;visibility:visible}
+#s-detail .ec-card-body{padding:16px 18px;display:flex;flex-direction:column;gap:12px;border-radius:0 0 14px 14px}
+#s-detail .ec-block{display:flex;flex-direction:column;gap:6px}
+#s-detail .ec-block-lbl-row{display:flex;align-items:center;gap:8px}
+#s-detail .ec-block-lbl{font-size:13px;font-weight:700;color:#6d7381;line-height:1;flex-shrink:0}
+#s-detail .ec-block-lbl-spacer{flex:1}
+#s-detail .pn-section-hd-right{display:inline-flex;align-items:center;gap:6px}
+#s-detail .teacher-fb-ta{width:100%;background:#fff;border:1px solid #dde1e8;border-radius:12px;padding:18px;min-height:300px;resize:vertical;font-size:16px;font-family:inherit;color:#222631;outline:none;line-height:1.7;white-space:pre-wrap}
+#s-detail .teacher-fb-ta:focus{border-color:#365eef}
+#s-detail .teacher-fb-bottom{display:flex;align-items:center;justify-content:space-between;margin-top:8px}
+#s-detail .teacher-fb-save{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-top:12px;flex-wrap:wrap}
+#s-detail .teacher-fb-save-left{display:inline-flex;align-items:center;gap:4px;flex-wrap:wrap}
+#s-detail .teacher-fb-save-right{display:inline-flex;align-items:center;gap:8px;flex-wrap:wrap}
+#s-detail .btn-rerun-text{display:inline-flex;align-items:center;justify-content:center;gap:6px;height:42px;padding:0 18px;background:#fff;border:1px solid #ccdfff;border-radius:100px;color:#3151c4;font-size:15px;font-weight:600;cursor:pointer;font-family:inherit;line-height:1}
+#s-detail .btn-rerun-text:hover{background:#f4f8ff;border-color:#a3c3ff}
+#s-detail .btn-rerun-text i{color:#3151c4}
+#s-detail .btn-save-next{display:inline-flex;align-items:center;justify-content:center;gap:6px;background:#365eef;border:none;border-radius:100px;height:42px;padding:0 22px;font-size:15px;font-weight:600;color:#fff;cursor:pointer;font-family:inherit;line-height:1}
+#s-detail .btn-save-next:hover{background:#3151c4}
+#s-detail .rubric-box.disabled{opacity:.55;pointer-events:none;background:#f9fafb}
+#s-detail .score-btn[disabled]{cursor:not-allowed;opacity:.6}
+#s-detail #pane-rubric .ec-card-header{background:#e9f2ff}
+#s-detail #pane-rubric .ec-summary{color:#18181b;font-size:15px}
+#s-detail .ec-score-pill{display:inline-flex;align-items:center;justify-content:center;padding:4px 8px;border-radius:9999px;background:#ccdfff;color:#3151c4;font-size:12px;font-weight:700;line-height:1.25;flex-shrink:0;white-space:nowrap}
+#s-detail .eval-card .editable{font-size:var(--ai-font,16px)}
+#s-detail.hide-ground .eval-card .ec-block--ground{display:none}
+#s-detail .beta-badge{display:inline-flex;align-items:center;justify-content:center;line-height:1;vertical-align:middle;height:20px;padding:0 7px;margin-left:2px;border-radius:4px;background:#416bff;color:#fff;font-size:11px;font-weight:700;letter-spacing:.2px;flex-shrink:0}
+#s-detail .ve-seg-btn.on .beta-badge{background:#e9f2ff;color:#3151c4}
+#s-detail .beta-badge.light{height:22px;padding:0 8px;margin-left:6px;background:#e9f2ff;color:#3151c4;font-size:12px}
+#s-detail{ flex-direction:column; flex:none; height:calc(100vh - 58px); min-height:0; overflow:hidden; }
+#s-detail .top-bar{ position:static; flex-shrink:0; }
+#s-detail .sd-main{ display:flex; flex:1; min-height:0; }
+#s-detail .viewer{ min-height:0; }
+#s-detail .grading-panel{ width:560px; }
+#s-detail .sd-paper{ background:#fff; width:100%; max-width:760px; box-shadow:0 2px 8px rgba(0,0,0,.15); padding:36px 44px; position:relative; }
+#s-detail .sd-paper h4{ margin:0 0 14px; font-size:17px; color:#222631; }
+#s-detail .sd-paper .q{ font-size:15px; color:#3b3f4c; line-height:1.7; margin:0 0 8px; }
+#s-detail .sd-paper .a{ min-height:120px; border:1px solid #c7cbd3; border-radius:4px; padding:12px 14px; margin:0 0 22px; font-size:17px; line-height:1.9; color:#1f3a8a; font-style:italic; letter-spacing:.2px; }
+#s-detail .sd-uncertain{ display:flex; gap:8px; align-items:flex-start; background:#fff7ed; border-radius:8px; padding:12px 14px; font-size:14px; color:#3b3f4c; line-height:1.6; margin-bottom:6px; }
+#s-detail .sd-uncertain i{ width:16px; height:16px; color:#ea580c; flex-shrink:0; margin-top:2px; }
+#s-detail .sd-fail{ display:flex; gap:10px; align-items:flex-start; background:#fff7ed; border-radius:10px; padding:14px 16px; font-size:14px; color:#3b3f4c; line-height:1.6; margin-top:14px; }
+#s-detail .sd-fail i{ width:18px; height:18px; color:#ea580c; flex-shrink:0; margin-top:1px; }
+#s-detail .sd-fail b{ color:#c2410c; }
+#s-detail .tb-file{ font-size:16px; font-weight:700; color:#222631; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:320px; }
+#s-detail .score-btn{ cursor:default; pointer-events:none; }
+#s-detail.sample .sd-paper .a{ font-style:normal; color:#222631; font-size:16px; }
+#s-detail .tb-pre{ font-size:13px; color:#6d7381; white-space:nowrap; }
+
+  </style>
+</head>
+<body>
+
+<!-- ===== Global Header ===== -->
+<header class="g-hd">
+  <button class="gh-menu-btn" onclick="toggleNav()"><i data-lucide="panel-left-open" style="width:20px;height:20px"></i></button>
+  <a class="gh-logo" href="home_v1_260612.html" title="홈으로">
+    <svg width="76" height="16" viewBox="0 0 76 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M11.3613 4.03516H4.09668V11.9629H8.88281L8.88086 11.9648H15.6016V16H4.02539C1.80242 15.9998 0 14.223 0 12.0322V3.96777C0 1.77696 1.80242 0.000177874 4.02539 0H15.4561L11.3613 4.03516ZM22.0703 11.9648H33.5781V16H22.002C19.7788 16 17.9756 14.2231 17.9756 12.0322V0H22.0703V11.9648ZM40.0459 16H35.9521V0H40.0459V16ZM54.5381 0C56.4564 0 58.0138 1.53228 58.0186 3.42285L58.0166 3.4248V8.54297C58.014 10.4333 56.4567 11.9648 54.5361 11.9648H46.5107L42.416 16V0H54.5381ZM71.9746 0C74.0086 0.000134956 75.6887 1.49046 75.958 3.42285H76V12.5771H75.958C75.6887 14.5095 74.011 15.9999 71.9746 16H64.4238C62.3897 16 60.7098 14.5096 60.4404 12.5771C60.4145 12.398 60.3984 12.2184 60.3984 12.0322V3.96777C60.3984 3.78159 60.4145 3.60205 60.4404 3.42285C60.7098 1.49037 62.3873 0 64.4238 0H71.9746ZM64.4922 12.5771H71.9062V3.42285H64.4922V12.5771ZM46.5107 3.42285V8.54004H53.9238V3.42285H46.5107Z" fill="#365EEF"/></svg>
+  </a>
+  <div class="g-hd-r">
+    <div class="hd-plan"><span class="plan-badge">매일 무료</span><span style="font-size:15px;font-weight:500;">오늘 50 크레딧</span></div>
+    <div class="credit-wrap"><i data-lucide="bot" style="width:20px;height:20px;color:#416bff"></i><span id="hdCredit">50 크레딧</span></div>
+    <button class="user-btn">김하나 <i data-lucide="chevron-down" style="width:16px;height:16px"></i></button>
+  </div>
+</header>
+
+<!-- ===== Sidebar ===== -->
+<nav class="icon-sb" id="icon-sb">
+  <div class="si active" onclick="go('home')"><div class="si-icon"><i data-lucide="home" style="width:20px;height:20px"></i></div><span class="si-label">홈</span><span class="si-tip">홈</span></div>
+  <div class="si" onclick="notReady('평가계획')"><div class="si-icon"><i data-lucide="scissors" style="width:20px;height:20px"></i></div><span class="si-label">평가계획</span><span class="si-tip">평가계획</span></div>
+  <div class="si" onclick="location.href='co_teacher_review_v1_260611.html'"><div class="si-icon"><i data-lucide="layout-grid" style="width:20px;height:20px"></i></div><span class="si-label">수업</span><span class="si-tip">수업</span></div>
+  <div class="si" onclick="location.href='creative_activity_list_v6_260507.html'"><div class="si-icon"><i data-lucide="notebook-pen" style="width:20px;height:20px"></i></div><span class="si-label">창의적 체험활동 <span style="font-size:10px;background:#416bff;color:#fff;padding:1px 5px;border-radius:3px;margin-left:2px">Beta</span></span><span class="si-tip">창의적 체험활동</span></div>
+  <div class="si" onclick="location.href='quick_seteuk_dev_list_v1_260604.html'"><div class="si-icon"><i data-lucide="zap" style="width:20px;height:20px"></i></div><span class="si-label">세특 간편 생성기</span><span class="si-tip">세특 간편 생성기</span></div>
+  <div class="si" onclick="notReady('행동특성 및 종합기록')"><div class="si-icon"><i data-lucide="smile" style="width:20px;height:20px"></i></div><span class="si-label">행동특성 및 종합기록</span><span class="si-tip">행동특성 및 종합기록</span></div>
+  <div class="si" onclick="notReady('리포트')"><div class="si-icon"><i data-lucide="bar-chart-2" style="width:20px;height:20px"></i></div><span class="si-label">리포트</span><span class="si-tip">리포트</span></div>
+  <div class="si" onclick="notReady('학교 설정')"><div class="si-icon"><i data-lucide="building-2" style="width:20px;height:20px"></i></div><span class="si-label">학교 설정</span><span class="si-tip">학교 설정</span></div>
+  <div class="nav-bottom">
+    <div class="nav-div"></div>
+    <div class="si" onclick="notReady('매뉴얼 다운로드')"><div class="si-icon"><i data-lucide="file-down" style="width:20px;height:20px"></i></div><span class="si-label">매뉴얼 다운로드</span><span class="si-tip">매뉴얼 다운로드</span></div>
+    <div class="si" onclick="notReady('요금제')"><div class="si-icon"><i data-lucide="credit-card" style="width:20px;height:20px"></i></div><span class="si-label">요금제</span><span class="si-tip">요금제</span></div>
+    <div class="si" onclick="notReady('고객센터')"><div class="si-icon"><i data-lucide="help-circle" style="width:20px;height:20px"></i></div><span class="si-label">고객센터</span><span class="si-tip">고객센터</span></div>
+  </div>
+</nav>
+
+<div class="main-wrap">
+
+<!-- =================================================================== 홈 -->
+<section class="screen" id="s-home">
+<div class="page-wrap home">
+  <div class="home-cols">
+    <div class="home-main">
+      <div class="my-hd">
+        <h1 class="my-title">내 수업</h1>
+        <div class="my-tools">
+          <select class="sort-sel"><option>최근 활동순</option><option>수업명순</option></select>
+          <button class="btn-make" onclick="notReady('수업 만들기')"><i data-lucide="plus" style="width:16px;height:16px"></i>수업 만들기</button>
+        </div>
+      </div>
+      <div class="sem-hd"><span class="sem-title">2026학년도 2학기</span><span class="sem-meta" id="sem2Meta">아직 수업이 없어요</span></div>
+      <div class="sem-grid">
+        <!-- 새 입구: 현재 학기 그리드 첫 칸. 수업이 0개든 여러 개든 같은 자리(수업이 있으면 그 뒤로 수업 카드가 이어짐) -->
+        <div class="cc quick" id="qkCard" onclick="qkGo()">
+          <div class="qk-ico"><i data-lucide="scan-text" style="width:22px;height:22px"></i></div>
+          <h3 class="cc-name" id="qkT">활동지로 바로 채점해 보기</h3>
+          <div class="cc-evals" id="qkD">수업·학생을 등록하지 않아도 돼요. 활동지 1장이면 채점기준 초안을 받고 바로 채점해 볼 수 있어요.</div>
+          <div class="qk-foot"><span class="qk-cta" id="qkC">시작하기 <i data-lucide="arrow-right" style="width:15px;height:15px"></i></span><button class="qk-new" id="qkNew" style="display:none;" onclick="event.stopPropagation();QS.progress=null;go('upload')">다른 활동지로 시작</button></div>
+        </div>
+        <div class="cc" id="homeCls2" style="display:none;" onclick="toastMsg('수업 홈은 이 목업에서 열지 않아요.', true)"><h3 class="cc-name">사회</h3><div class="cc-evals">2학년 3반 · 수행평가 1개</div><div class="cc-tags"><span class="tag-subj">사회</span></div></div>
+        <div class="cc empty" id="homeEmpty" onclick="notReady('수업 만들기')">
+          <div class="em-ico"><i data-lucide="folder-plus" style="width:22px;height:22px"></i></div>
+          <h3 class="cc-name">2학기 수업부터 만들려면</h3>
+          <div class="cc-evals">수업을 만들고 평가를 설계해요. 채점해 본 뒤 결과를 가져오면서 만들어도 돼요.</div>
+          <span class="em-cta">수업 만들기</span>
+        </div>
+      </div>
+      <div class="sem-hd"><span class="sem-title">2026학년도 1학기</span><span class="sem-meta">1개</span></div>
+      <div class="sem-grid">
+        <div class="cc" onclick="toastMsg('지난 학기 수업은 이 목업에서 열지 않아요.', true)"><h3 class="cc-name">사회</h3><div class="cc-evals">2학년 3반 · 수행평가 2개</div><div class="cc-tags"><span class="tag-subj">사회</span></div></div>
+      </div>
+    </div>
+    <div class="home-rail">
+      <div class="rail-card">
+        <div class="rail-hd"><span class="rail-title">공지사항</span><button class="rail-more" onclick="toastMsg('공지사항 목록은 이 목업에서 제공하지 않습니다.', true)">더보기 <i data-lucide="chevron-right" style="width:13px;height:13px"></i></button></div>
+        <div class="notice-row">🔔 <span class="notice-txt">[안내] 채점 결과 공동 확인 기능 오픈</span><span class="notice-date">26/09/29</span></div>
+        <div class="notice-row">🔔 <span class="notice-txt">클리포 충남교육청 '인수레' 연수 안내</span><span class="notice-date">26/09/12</span></div>
+        <div class="notice-row"><span style="width:18px;"></span><span class="notice-txt">2학기 수행평가 준비, 이렇게 시작해요</span><span class="notice-date">26/09/01</span></div>
+      </div>
+      <div class="rail-card" style="padding:14px;">
+        <div class="rail-hd" style="padding:6px 6px 0;"><span class="rail-title">자료실</span></div>
+        <div class="res-row" onclick="toastMsg('외부 링크는 이 목업에서 연결하지 않습니다.', true)"><span style="font-size:18px;">▶️</span><div><p class="res-name">기능별 가이드 영상</p><p class="res-desc">과업별 1~2분 영상으로 따라해 보세요.</p></div></div>
+        <div class="res-row" onclick="toastMsg('외부 링크는 이 목업에서 연결하지 않습니다.', true)"><span style="font-size:18px;">✅</span><div><p class="res-name">학습지원 소프트웨어 체크리스트</p><p class="res-desc">학운위 심의 참고 자료를 확인해 보세요.</p></div></div>
+      </div>
+    </div>
+  </div>
+  <footer class="site-footer"><div class="sf-links"><a href="#" onclick="return false;">회사소개</a><a href="#" onclick="return false;">이용약관</a><a href="#" onclick="return false;">개인정보처리방침</a><a href="#" onclick="return false;">고객센터</a></div><div class="sf-copy">© 2026. Datadriven Inc. All rights reserved.</div></footer>
+</div>
+</section>
+
+<!-- =================================================================== 1. 활동지 -->
+<section class="screen" id="s-upload">
+<div class="page-wrap">
+  <div class="qs-top"><button class="back-link" onclick="go('home')"><i data-lucide="chevron-left"></i>홈</button></div>
+  <h1 class="qs-h1">활동지로 바로 채점해 보기</h1>
+  <p class="qs-sub">지금 필요한 건 활동지 1장뿐이에요. 수업과 학생은 결과를 본 뒤에 연결해도 돼요.</p>
+  <div class="steps" id="steps-upload"></div>
+  <div class="cols">
+    <div class="col-main">
+      <div class="card" id="upEmpty">
+        <h2 class="card-t">활동지 올리기</h2>
+        <p class="card-d">문항이 적힌 활동지나 시험지를 올려 주세요. 사진으로 찍어 올려도 돼요.</p>
+        <div class="drop" onclick="upLoaded()">
+          <i data-lucide="upload"></i>
+          <p class="drop-t">여기에 파일을 끌어다 놓거나 클릭해서 선택</p>
+          <p class="drop-d">PDF · JPG · PNG · 1장이면 충분해요</p>
+          <div class="drop-alt"><button class="btn btn-secondary" onclick="event.stopPropagation();upLoaded('sample')"><i data-lucide="file-text" style="width:16px;height:16px"></i>활동지가 없어요, 예시로 볼게요</button></div>
+        </div>
+      </div>
+      <div id="upDone" style="display:none;">
+        <div class="card">
+          <div class="sheet">
+            <div class="sheet-pv">
+              <h4>2학년 사회 수행평가 · 화산 지형 탐구</h4>
+              1. 다음 지도와 사진을 보고, 제주도 성산일출봉이 만들어진 과정을 <b>마그마의 성질</b>과 연결하여 설명하시오.
+              <div class="blank"></div>
+              2. 성산일출봉과 백두산 천지의 지형이 다른 이유를 <b>자료에서 근거를 찾아</b> 서술하시오.
+              <div class="blank"></div>
+            </div>
+            <div class="sheet-info">
+              <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;"><span class="badge b-done"><i data-lucide="check" style="width:13px;height:13px;margin-right:4px"></i>활동지 읽음</span><span class="sec-desc" id="upFileName">화산지형_활동지.pdf · 1장</span><button class="btn btn-ghost" style="margin-left:auto;padding:0;" onclick="upReset()"><i data-lucide="rotate-ccw" style="width:15px;height:15px"></i>다른 활동지</button></div>
+              <dl class="kv">
+                <dt>학교급 · 학년</dt><dd><select><option>중학교 2학년</option><option>중학교 1학년</option><option>중학교 3학년</option><option>고등학교 1학년</option></select></dd>
+                <dt>과목</dt><dd><select><option>사회</option><option>역사</option><option>과학</option><option>국어</option></select></dd>
+                <dt>과제 이름</dt><dd><input value="화산 지형 탐구"></dd>
+              </dl>
+              <p class="sec-desc" style="margin:6px 0 16px;">활동지에서 읽어 채운 값이에요. 틀리면 고쳐 주세요.</p>
+              <div class="q-hd"><span class="t">읽어 낸 문항 <span id="qCount">3</span>개</span><span class="c">채점할 문항만 켜 두세요 · 잘못 읽었으면 연필로 고쳐요</span></div>
+              <div class="q-item" id="q1"><input type="checkbox" checked onchange="qToggle(1,this)"><span class="qn">1</span><span class="qt">성산일출봉이 만들어진 과정을 마그마의 성질과 연결하여 설명</span><button class="qe" title="문항 수정" onclick="qEdit(this)"><i data-lucide="pencil" style="width:15px;height:15px"></i></button></div>
+              <div class="q-item" id="q2"><input type="checkbox" checked onchange="qToggle(2,this)"><span class="qn">2</span><span class="qt">성산일출봉과 백두산 천지의 지형이 다른 이유를 자료 근거로 서술</span><button class="qe" title="문항 수정" onclick="qEdit(this)"><i data-lucide="pencil" style="width:15px;height:15px"></i></button></div>
+              <div class="q-item" id="q3"><input type="checkbox" checked onchange="qToggle(3,this)"><span class="qn">3</span><span class="qt">두 지형 중 한 곳을 골라 여행 안내문을 세 문장으로 쓰기 (심화 · 선택)</span><button class="qe" title="문항 수정" onclick="qEdit(this)"><i data-lucide="pencil" style="width:15px;height:15px"></i></button></div>
+              <div class="q-tools">
+                <button class="btn btn-ghost" onclick="qAdd()"><i data-lucide="plus" style="width:14px;height:14px"></i>문항 추가</button>
+                <span class="sec-desc" style="margin-left:auto;" id="qNote">3개 문항에 채점기준을 만들어요</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 없어도 만들어지고, 있으면 더 좋아지는 것 — 접힌 한 줄 -->
+        <div class="opt" id="opt">
+          <div class="opt-bar" onclick="optToggle()">
+            <span class="t">더 좋은 초안을 원하면</span><span class="opt-tag">선택</span>
+            <span class="d">강조할 점을 한 줄 적거나, 단원·수업 자료를 더해요. 비워 둬도 활동지만으로 만들어요.</span>
+            <i data-lucide="chevron-down" class="chev" style="width:20px;height:20px"></i>
+          </div>
+          <div class="opt-body">
+            <div class="opt-sec">
+              <p class="opt-lab"><i data-lucide="message-square-text"></i>이런 점을 강조해 주세요 <span class="sub">골라도 되고 직접 써도 돼요</span></p>
+              <div class="chips">
+                <button class="chip" onclick="chipToggle(this)"><i data-lucide="plus" style="width:14px;height:14px"></i>자료에서 근거 찾기</button>
+                <button class="chip" onclick="chipToggle(this)"><i data-lucide="plus" style="width:14px;height:14px"></i>개념 정확성</button>
+                <button class="chip" onclick="chipToggle(this)"><i data-lucide="plus" style="width:14px;height:14px"></i>서술의 논리</button>
+                <button class="chip" onclick="chipToggle(this)"><i data-lucide="plus" style="width:14px;height:14px"></i>창의적 해석</button>
+                <button class="chip" onclick="chipToggle(this)"><i data-lucide="plus" style="width:14px;height:14px"></i>정답 개수로 채점</button>
+              </div>
+              <textarea class="req-ta" id="reqTa" placeholder="예) 마그마의 점성이라는 개념어를 정확히 썼는지 꼭 봐 주세요. 자료에서 근거를 찾은 답을 높게 쳐 주세요."></textarea>
+            </div>
+            <div class="opt-sec">
+              <p class="opt-lab"><i data-lucide="book-open"></i>단원 · 수업 내용 <span class="sub">수업에서 다룬 범위와 용어에 맞춰요</span></p>
+              <input class="req-in" id="unitIn" placeholder="예) 2단원 화산 지형. 점성·응회구·칼데라까지 배웠고 판 구조론은 아직 안 다룸" oninput="unitPick(this)">
+              <div class="mat-row" style="margin-top:10px;">
+                <button class="btn btn-outline" id="matBtn" onclick="matFile()"><i data-lucide="paperclip" style="width:16px;height:16px"></i>수업 자료 올리기</button>
+                <span class="file" id="matFileName" style="display:none;"><i data-lucide="check"></i>2단원_화산지형_수업PPT.pdf <button class="btn btn-ghost" style="height:auto;padding:0 0 0 4px;font-size:13px;" onclick="matFile()">지우기</button></span>
+                <span class="or">수업 PPT · 학습지 · 수행평가 계획서 · 교과서 해당 쪽 사진 · 성취기준표 (PDF·PPT·이미지. 한글 파일은 PDF로 저장해 올려 주세요)</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="foot-bar">
+          <span class="note"><i data-lucide="info"></i><span>초안 만들기에 <b>크레딧 1개</b>가 쓰여요. 만든 뒤 얼마든지 고칠 수 있어요.</span></span>
+          <button class="btn btn-primary btn-lg" onclick="makeRubric()"><i data-lucide="sparkles" style="width:18px;height:18px"></i>채점기준 초안 받기</button>
+        </div>
+      </div>
+    </div>
+    <div class="col-side">
+      <div class="side-box">
+        <p class="side-t"><i data-lucide="list-checks"></i>이 흐름에서 하는 일</p>
+        <ul class="side-list">
+          <li><i data-lucide="check-circle-2"></i>활동지 1장으로 채점기준 초안 받기</li>
+          <li><i data-lucide="check-circle-2"></i>답안을 올려 채점 · 없으면 예시 답안으로</li>
+          <li class="dim"><i data-lucide="circle"></i>결과를 본 뒤 내 수업에 가져오기 (선택)</li>
+        </ul>
+      </div>
+      <div class="side-box">
+        <p class="side-t"><i data-lucide="bot"></i>크레딧</p>
+        <div class="note"><i data-lucide="info"></i><span>채점기준 초안 <b>1개</b>, 답안은 <b>1장당 1개</b>, 예시 답안은 <b>1편당 2개</b>씩 쓰여요. 오늘 50개로 반 하나(28명)는 넉넉히 끝나요.</span></div>
+      </div>
+    </div>
+  </div>
+  <footer class="site-footer"><div class="sf-copy">© 2026. Datadriven Inc. All rights reserved.</div></footer>
+</div>
+</section>
+
+<!-- =================================================================== 2. 채점기준 -->
+<section class="screen" id="s-rubric">
+<div class="page-wrap">
+  <div class="qs-top"><button class="back-link" onclick="go('upload')"><i data-lucide="chevron-left"></i>활동지</button></div>
+  <h1 class="qs-h1">채점기준 초안이 나왔어요</h1>
+  <p class="qs-sub">필요하면 고치고, 다음 단계에서 이 기준으로 채점해 봐요. 답안이 아직 없어도 돼요.</p>
+  <div class="steps" id="steps-rubric"></div>
+  <div class="cols">
+    <div class="col-main">
+      <div class="card" id="rubMaking" style="display:none;">
+        <div class="making">
+          <div class="spin"></div>
+          <h3>채점기준 초안을 만들고 있어요</h3>
+          <p class="msg" id="mkMsg">활동지의 문항을 읽고 있어요</p>
+          <div class="pbar"><i></i></div>
+          <p class="eta">보통 1~2분, 길면 3분까지 걸려요.<br>이 화면을 닫아도 만들기는 계속되고, 다시 들어오면 결과가 보여요.</p>
+          <div class="ctx" id="mkCtx"></div>
+        </div>
+      </div>
+      <div id="rubReady">
+      <div class="card">
+        <div class="rub-tools">
+          <div class="l"><h2 class="card-t" style="margin:0;white-space:nowrap;">채점기준 초안</h2></div>
+          <div style="display:flex;gap:8px;" id="rubViewBtns"><button class="btn btn-secondary" onclick="rubStartEdit()"><i data-lucide="pencil" style="width:16px;height:16px"></i>채점기준 수정</button><button class="btn btn-outline" onclick="useCredit(1);toastMsg('같은 조건으로 채점기준을 다시 만들었어요. 크레딧 1개를 썼어요.')"><i data-lucide="refresh-cw" style="width:16px;height:16px"></i>다시 만들기</button><button class="btn btn-outline" onclick="notReady('쓰던 채점기준표 사진으로 올리기')"><i data-lucide="image-up" style="width:16px;height:16px"></i>쓰던 기준표 올리기</button></div>
+          <div style="display:none;gap:8px;" id="rubEditBtns"><button class="btn btn-outline" onclick="rubCancel()">취소</button><button class="btn btn-primary" onclick="rubSave()"><i data-lucide="check" style="width:16px;height:16px"></i>수정 완료</button></div>
+        </div>
+        <p class="card-d"><span id="rubSum">총점 24점 · 채점기준 3개</span><span id="rubHint">. 활동지로 만든 AI 초안이에요. 고치려면 채점기준 수정, 새로 받으려면 다시 만들기(크레딧 1개).</span></p>
+        <div class="rub" id="rub"></div>
+        <button class="btn btn-ghost rub-add" id="rubAddBtn" style="display:none;" onclick="rubAdd()"><i data-lucide="plus" style="width:16px;height:16px"></i>채점기준 추가</button>
+        <div class="foot-bar">
+          <span class="note"><i data-lucide="info"></i><span>다음 단계에서 답안을 올리거나, 없으면 <b>예시 답안</b>으로 이 기준이 어떻게 채점하는지 볼 수 있어요.</span></span>
+          <button class="btn btn-primary btn-lg" onclick="go('answers')">이 기준으로 채점해 보기 <i data-lucide="arrow-right" style="width:18px;height:18px"></i></button>
+        </div>
+      </div>
+      </div><!-- /rubReady -->
+    </div>
+    <div class="col-side">
+      <div class="side-box">
+        <p class="side-t"><i data-lucide="file-text"></i>활동지</p>
+        <div style="font-size:15px;font-weight:600;margin-bottom:4px;">화산 지형 탐구</div>
+        <div class="sec-desc">중학교 2학년 · 사회</div>
+        <div class="sec-desc" style="margin-top:12px;font-weight:600;color:#3b3f4c;">이 초안에 반영한 것</div>
+        <div class="req-sum" style="margin:6px 0 0;"><span class="pill" id="reqPillQ"><i data-lucide="file-text"></i>문항 3개</span><span class="pill" id="reqPillUnit" style="display:none;"><i data-lucide="book-open"></i></span><span class="pill" id="reqPillFile" style="display:none;"><i data-lucide="presentation"></i>수업 PPT</span><span class="pill" id="reqPillReq" style="display:none;"><i data-lucide="message-square-text"></i></span></div>
+        <button class="btn btn-ghost" style="margin-top:10px;padding:0;" onclick="go('upload')">활동지로 돌아가 더하거나 바꾸기</button>
+      </div>
+      <div class="side-box">
+        <p class="side-t"><i data-lucide="bot"></i>크레딧</p>
+        <div class="note"><i data-lucide="info"></i><span>채점은 <b>파일 1개(학생 1명)당 1개</b>. 예시 답안은 만들기 1 + 채점 1이라 <b>1편당 2개</b>예요.</span></div>
+      </div>
+    </div>
+  </div>
+  <footer class="site-footer"><div class="sf-copy">© 2026. Datadriven Inc. All rights reserved.</div></footer>
+</div>
+</section>
+
+<!-- =================================================================== 3. 답안 (있음 / 없음 분기) -->
+<section class="screen" id="s-answers">
+<div class="page-wrap">
+  <div class="qs-top"><button class="back-link" onclick="go('rubric')"><i data-lucide="chevron-left"></i>채점기준</button></div>
+  <h1 class="qs-h1">채점할 답안이 있나요?</h1>
+  <p class="qs-sub">있으면 올려서 채점하고, 아직 없으면 예시 답안으로 이 기준이 어떻게 채점하는지 볼 수 있어요.</p>
+  <div class="steps" id="steps-answers"></div>
+  <div class="cols">
+    <div class="col-main">
+      <div class="card">
+        <div class="branch">
+          <div class="br on" id="brHas" onclick="branch('has')"><span class="rd"></span><div><p class="t">답안이 있어요</p><p class="d">학생별로 찍은 사진이나 PDF가 있어요. 파일 1개가 학생 1명. 이름은 지금 없어도 돼요.</p></div></div>
+          <div class="br" id="brNone" onclick="branch('none')"><span class="rd"></span><div><p class="t">아직 없어요</p><p class="d">원하는 수준(잘 쓴 · 보통 · 미흡)의 예시 답안을 만들어 채점해 보여줘요. 클리포가 답안을 어떻게 채점하는지 볼 수 있어요.</p></div></div>
+        </div>
+
+        <!-- 있음 -->
+        <div class="br-panel" id="panHas">
+          <p class="sub-h">가지고 있는 답안을 올려 주세요</p>
+          <div class="pick-list ans-kind">
+            <div class="pk how on" data-kind="scan" onclick="ansKind('scan')"><span class="rd"></span><div><span class="nm">반 전체를 스캔한 PDF 1개</span><span class="ds">복합기로 한 번에 스캔한 파일이에요. 학생별로 나눠서 채점해요.</span></div></div>
+            <div class="pk how" data-kind="files" onclick="ansKind('files')"><span class="rd"></span><div><span class="nm">학생별 파일 여러 개</span><span class="ds">사진이나 PDF가 학생마다 따로 있어요. 파일 1개가 학생 1명이에요.</span></div></div>
+          </div>
+          <div id="ansEmpty">
+            <div class="drop" onclick="ansLoaded()">
+              <i data-lucide="upload"></i>
+              <p class="drop-t">여기에 파일을 끌어다 놓거나 클릭해서 선택</p>
+              <p class="drop-d" id="ansDropD">PDF 1개 · 학생 이름은 지금 없어도 돼요</p>
+            </div>
+          </div>
+          <div id="ansDone" style="display:none;">
+            <!-- 스캔 PDF -->
+            <div id="ansScan">
+              <div style="display:flex;align-items:center;gap:10px;margin-top:4px;"><span class="badge b-done"><i data-lucide="check" style="width:13px;height:13px;margin-right:4px"></i>2학년3반_화산지형.pdf · 56쪽</span></div>
+              <div class="split-row">
+                <span class="split-l">학생 한 명당</span>
+                <div class="stepper"><button onclick="scanPer(-1)" aria-label="줄이기"><i data-lucide="minus"></i></button><b id="scanPerV">2</b><button onclick="scanPer(1)" aria-label="늘리기"><i data-lucide="plus"></i></button></div>
+                <span class="split-l">쪽</span>
+                <span class="split-r">→ 답안 <b id="scanN">28</b>장으로 나눠요</span>
+              </div>
+              <div class="files" id="scanList"></div>
+              <p class="sec-desc" style="margin-top:10px;">스캔한 순서가 답안 순서예요. 내 수업에 가져올 때 번호순으로 학생과 맞춰요. 학생마다 쪽수가 다르면 <button class="btn-link" onclick="notReady('나눈 곳 고치기')">나눈 곳 고치기</button></p>
+            </div>
+            <!-- 학생별 파일 -->
+            <div id="ansFiles" style="display:none;">
+              <div style="display:flex;align-items:center;gap:10px;margin-top:4px;"><span class="badge b-done"><i data-lucide="check" style="width:13px;height:13px;margin-right:4px"></i>파일 12개 = 답안 12장</span><span class="sec-desc">파일명이 그대로 답안 이름이 돼요 · 나중에 학생과 맞출 때 써요</span></div>
+              <div class="files" id="fileList"></div>
+            </div>
+            <div class="credit-line"><i data-lucide="bot"></i><span>답안 <span class="ansN">28</span>장 채점에 <b>크레딧 <span class="ansN">28</span>개</b>가 쓰여요.</span></div>
+            <div class="foot-bar">
+              <button class="btn btn-ghost" onclick="ansReset()"><i data-lucide="rotate-ccw" style="width:16px;height:16px"></i>처음부터 다시 올리기</button>
+              <button class="btn btn-primary btn-lg" onclick="runScoring('real')"><i data-lucide="bot" style="width:18px;height:18px"></i>AI 채점 실행 (<span class="ansN">28</span>장)</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- 없음 -->
+        <div class="br-panel" id="panNone" style="display:none;">
+          <p class="sub-h">어떤 수준의 답을 만들어 채점해 볼까요</p>
+          <p class="sub-d">고른 수준마다 활동지에 맞는 예시 답안을 만들고, 이 기준으로 채점해 보여줘요. 저장되지는 않아요.</p>
+          <div class="lvsel">
+            <div class="lvc" id="lvc-good" onclick="lvcToggle('good')"><span class="ck"></span><div><p class="t">잘 쓴 답</p><p class="d">개념과 근거를 모두 갖춘 답</p></div><span class="cr">1편 · 크레딧 2개</span></div>
+            <div class="lvc on" id="lvc-mid" onclick="lvcToggle('mid')"><span class="ck"></span><div><p class="t">보통 답 <span class="rec">추천</span></p><p class="d">부분 점수가 어떻게 갈리는지 가장 잘 보여요</p></div><span class="cr">1편 · 크레딧 2개</span></div>
+            <div class="lvc" id="lvc-low" onclick="lvcToggle('low')"><span class="ck"></span><div><p class="t">미흡한 답</p><p class="d">핵심이 빠지거나 근거가 없는 답</p></div><span class="cr">1편 · 크레딧 2개</span></div>
+          </div>
+          <div class="credit-line"><i data-lucide="bot"></i><span id="lvcCredit"></span></div>
+          <div class="foot-bar" style="justify-content:flex-end;">
+            <button class="btn btn-primary btn-lg" id="lvcBtn" onclick="runScoring('sample')"><i data-lucide="sparkles" style="width:18px;height:18px"></i><span id="lvcBtnT"></span></button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-side">
+      <div class="side-box">
+        <p class="side-t"><i data-lucide="file-text"></i>채점에 쓰는 기준</p>
+        <div style="font-size:15px;font-weight:600;margin-bottom:4px;">화산 지형 탐구 · 총점 <span id="sideTotal">24</span>점</div>
+        <div class="sec-desc" id="sideCrit">형성 과정 10 · 자료 해석 8 · 논리적 서술 6</div>
+        <button class="btn btn-ghost" style="margin-top:8px;padding:0;" onclick="go('rubric')">기준 다시 보기</button>
+      </div>
+      <div class="side-box" id="sideTips">
+        <p class="side-t"><i data-lucide="scan"></i>이렇게 준비하면 AI가 더 잘 읽어요</p>
+        <ul class="side-list">
+          <li class="tip-scan"><i data-lucide="check-circle-2"></i>첨삭하기 전 원본을 먼저 스캔해요</li>
+          <li class="tip-scan"><i data-lucide="check-circle-2"></i>학생 번호순으로 쌓아 스캔하면 가져올 때 바로 맞아요</li>
+          <li class="tip-scan"><i data-lucide="check-circle-2"></i>학생마다 쪽수가 같으면 나누기가 쉬워요</li>
+          <li class="tip-files" style="display:none;"><i data-lucide="check-circle-2"></i>첨삭하기 전 원본을 먼저 찍어요</li>
+          <li class="tip-files" style="display:none;"><i data-lucide="check-circle-2"></i>사진은 그림자 없이 정면에서, 한 장에 한 학생</li>
+          <li class="tip-files" style="display:none;"><i data-lucide="check-circle-2"></i>파일명에 이름이나 번호가 있으면 나중에 학생과 맞추기 쉬워요</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <footer class="site-footer"><div class="sf-copy">© 2026. Datadriven Inc. All rights reserved.</div></footer>
+</div>
+</section>
+
+<!-- =================================================================== 4. 결과 (실제 / 예시 공용) -->
+<section class="screen" id="s-result">
+<div class="page-wrap">
+  <div class="qs-top"><button class="back-link" onclick="go('answers')"><i data-lucide="chevron-left"></i>답안</button></div>
+  <h1 class="qs-h1" id="resH1">채점 결과 · 화산 지형 탐구</h1>
+  <p class="qs-sub" id="resSub">답안 12장을 채점했어요. 답안별 점수와 근거를 확인해 보세요. AI는 제안하고 결정은 선생님이 해요.</p>
+  <div class="steps" id="steps-result"></div>
+  <div class="cols">
+    <div class="col-main">
+      <div class="sample-strip" id="sampleStrip" style="display:none;"><i data-lucide="flask-conical"></i><span><b>예시 답안으로 채점한 결과</b>예요. 실제 학생 답안이 아니고, 저장되지 않아요.</span></div>
+      <div class="kpis" id="resKpis">
+        <div class="kpi"><div class="k">평균</div><div class="v">15.2<small>/ 24</small></div></div>
+        <div class="kpi"><div class="k">최고 · 최저</div><div class="v">23<small>· 6</small></div></div>
+        <div class="kpi"><div class="k">확인이 필요한 답안</div><div class="v" style="color:#db3e51;">1<small>장</small></div></div>
+        <div class="kpi"><div class="k">점수 분포</div><div class="dist"><span style="height:20%"></span><span style="height:35%"></span><span style="height:60%"></span><span class="hi" style="height:100%"></span><span style="height:75%"></span><span style="height:40%"></span></div></div>
+      </div>
+      <div class="card" id="resTableCard">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;gap:12px;">
+          <h2 class="card-t" style="margin:0;" id="resTblT">답안별 점수</h2>
+          <div style="display:flex;gap:8px;" id="resTools"><button class="btn btn-outline" onclick="toastMsg('결과를 엑셀로 내려받았어요.')"><i data-lucide="download" style="width:16px;height:16px"></i>엑셀</button><button class="btn btn-outline" onclick="toastMsg('채점 수준을 조정해 다시 채점하면 크레딧이 다시 쓰여요.', true)"><i data-lucide="sliders-horizontal" style="width:16px;height:16px"></i>채점 수준 조정</button></div>
+        </div>
+        <table class="tbl2">
+          <thead><tr><th style="width:190px;">답안 (파일명)</th><th>형성 과정 <span style="color:#9ea3ad;font-weight:400;">/10</span></th><th>자료 해석 <span style="color:#9ea3ad;font-weight:400;">/8</span></th><th>논리적 서술 <span style="color:#9ea3ad;font-weight:400;">/6</span></th><th style="width:90px;">총점</th><th style="width:120px;">상태</th><th style="width:100px;">상세</th></tr></thead>
+          <tbody id="resBody"></tbody>
+        </table>
+
+        <div class="fix">
+          <div class="fix-hd" onclick="fixToggle(this)">
+            <i data-lucide="lightbulb"></i>
+            <span class="t">점수가 기대와 다른가요?</span>
+            <span class="d">어떻게 달랐는지 고르면 채점기준을 고칠 방향을 알려 드려요</span>
+            <i data-lucide="chevron-down" class="chev"></i>
+          </div>
+          <div class="fix-body">
+            <p class="fix-lead">AI는 채점기준 문장에 적힌 것만, 적힌 대로 봐요. 그래서 결과가 기대와 다르면 답안이 아니라 <b>기준 문장</b>을 고치는 게 빠르고, 고친 문장은 다음 학생에게도 그대로 적용돼요.</p>
+            <div class="fix-chips"></div>
+            <div class="fix-pane"></div>
+            <a class="fix-case" href="https://obkim-lgtm.github.io/clipo-blog/guide/contest.html" target="_blank" rel="noopener">
+              <img src="qs_case_thumb.jpg" alt="선생님 연구 사례 활동지">
+              <span><b>선생님들이 찾은 채점기준 꿀팁</b>에듀테크 교사 연구회 선생님들이 처음 기준 → 어긋남 → 고친 문장 → 결과를 직접 보여 준 사례예요.</span>
+              <i data-lucide="external-link"></i>
+            </a>
+          </div>
+        </div>
+        <div class="next-bar">
+          <div class="nb-txt"><b>내 수업에 가져오면</b> 파일명으로 학생과 자동으로 맞추고, 점수 저장 · 결과 공개 · 세특까지 늘 쓰던 흐름으로 이어져요. 가져오지 않으면 임시 채점으로 30일 보관돼요.</div>
+          <button class="btn btn-outline" onclick="toastMsg('결과 PDF를 내려받았어요. 홈 첫 칸에서 이어서 볼 수 있어요.', true)">결과만 내려받기</button>
+          <button class="btn btn-primary btn-lg" onclick="brStart('real')">내 수업에 가져오기 <i data-lucide="arrow-right" style="width:18px;height:18px"></i></button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <footer class="site-footer"><div class="sf-copy">© 2026. Datadriven Inc. All rights reserved.</div></footer>
+</div>
+</section>
+
+<!-- =================================================================== 4-1. 답안 채점 상세 (scoring_secondary_v1 레이아웃 이식 · 빠른 시작에서 안 쓰는 것 제거) -->
+<section class="screen" id="s-detail">
+  <!-- 채점 액션바: 학생 드롭다운 대신 파일명 (내 반 연결 전) · 답안 이동 · 저장 -->
+  <div class="top-bar">
+    <button class="btn-back" onclick="sdBack()"><i data-lucide="arrow-left" style="width:20px;height:20px"></i><span id="sdBackT">목록으로</span></button>
+    <div class="tb-bar">
+      <div class="tb-left">
+        <span class="tb-file" id="sdFile"></span>
+        <span class="tb-pre" id="sdPre">채점 결과 보기 · 점수 확정은 내 수업에 가져온 뒤 채점 화면에서 해요</span>
+      </div>
+      <div class="tb-right">
+        <div class="tb-nav">
+          <button class="tb-right-link" onclick="sdNav(-1)"><i data-lucide="chevron-left" style="width:16px;height:16px"></i><span id="sdPrevT">이전 답안</span></button>
+          <span class="tb-nav-divider"></span>
+          <button class="tb-right-link" onclick="sdNav(1)"><span id="sdNextT">다음 답안</span><i data-lucide="chevron-right" style="width:16px;height:16px"></i></button>
+        </div>
+        <div class="tb-btn-group"><button class="tb-right-link" id="sdUpload" style="display:none;margin-right:6px;" onclick="go('answers');branch('has')">실제 답안 올리기</button><button class="btn-save" onclick="brStart(sdMode)">내 수업에 가져오기<i data-lucide="chevron-right" style="width:16px;height:16px"></i></button></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sd-main">
+    <!-- 좌: 뷰어 -->
+    <div class="viewer">
+      <div class="viewer-filebar">
+        <span class="vf-name" id="sdVfName"></span>
+        <span class="vf-date" id="sdVfDate">오늘 14:02 업로드</span>
+        <button class="vf-download" onclick="toastMsg('파일을 내려받았어요.')"><i data-lucide="download" style="width:16px;height:16px"></i>다운로드</button>
+      </div>
+      <div class="viewer-topbar">
+        <div class="ve-seg">
+          <button id="sdTabOrig" class="ve-seg-btn on" onclick="sdTab('orig')"><i data-lucide="file-text" style="width:16px;height:16px"></i>제출 원본</button>
+          <button id="sdTabText" class="ve-seg-btn" onclick="sdTab('text')"><i data-lucide="square-split-vertical" style="width:16px;height:16px"></i>인식 결과<span class="beta-badge">Beta</span></button>
+        </div>
+        <div class="ve-ctrl" id="sdCtrl">
+          <button class="ctrl-btn"><i data-lucide="chevron-left" style="width:18px;height:18px"></i></button>
+          <span class="ve-page-input">1</span><span class="ve-page-total">1</span>
+          <button class="ctrl-btn"><i data-lucide="chevron-right" style="width:18px;height:18px"></i></button>
+          <div class="ctrl-sep"></div>
+          <button class="ctrl-btn" title="회전"><i data-lucide="rotate-cw" style="width:18px;height:18px"></i></button>
+          <span class="zoom-info">100%</span>
+          <button class="ctrl-btn"><i data-lucide="zoom-in" style="width:18px;height:18px"></i></button>
+          <button class="ctrl-btn"><i data-lucide="zoom-out" style="width:18px;height:18px"></i></button>
+        </div>
+      </div>
+      <div class="viewer-body">
+        <div class="sd-paper" id="sdOrig"></div>
+        <div id="sdText" style="display:none;width:100%;max-width:760px;background:#fff;border-radius:4px;box-shadow:0 2px 8px rgba(0,0,0,.15);padding:32px 40px;"></div>
+      </div>
+    </div>
+
+    <!-- 우: 채점 패널 -->
+    <div class="grading-panel">
+      <div class="total-score-section">
+        <div class="score-total"><span class="lbl">총점</span><span class="val" id="sdTotal">- / 24</span><span class="unit">점</span></div>
+      </div>
+      <div class="pn-section white-bg">
+        <div class="pn-section-hd"><div class="pn-section-hd-left"><i data-lucide="circle-check-big" style="width:20px;height:20px;color:#365eef"></i><span class="pn-section-title">점수 및 채점근거</span></div></div>
+        <div class="rubric-box" id="sdRubricBox">
+          <div class="rubric-box-hd">
+            <button class="btn-ground-toggle on" id="sdGroundBtn" onclick="sdGround()"><span class="bgt-box"><i data-lucide="check" style="width:11px;height:11px"></i></span>채점근거 같이보기</button>
+          </div>
+          <div id="sdRows"></div>
+        </div>
+        <div id="sdFail"></div>
+        <div class="ai-notice"><i data-lucide="info" style="width:16px;height:16px;color:#6d7381;flex-shrink:0;margin-top:2px"></i><span>AI Assistant의 채점 결과는 언제나 부정확할 수 있습니다. 선생님의 최종 확인이 필요합니다.</span></div>
+      </div>
+      <div class="pn-section white-bg" id="sdAiSec">
+        <div class="pn-section-hd"><div class="pn-section-hd-left"><i data-lucide="bot" style="width:20px;height:20px;color:#365eef"></i><span class="pn-section-title">AI 피드백</span></div></div>
+        <div class="eval-tab-pane active" id="sdFb"></div>
+      </div>
+      <div class="pn-section white-bg" id="sdFixSec">
+        <div class="fix">
+          <div class="fix-hd" onclick="fixToggle(this)">
+            <i data-lucide="lightbulb"></i>
+            <span class="t">점수가 기대와 다른가요?</span>
+            <span class="d">어떻게 달랐는지 고르면 채점기준을 고칠 방향을 알려 드려요</span>
+            <i data-lucide="chevron-down" class="chev"></i>
+          </div>
+          <div class="fix-body">
+            <p class="fix-lead">AI는 채점기준 문장에 적힌 것만, 적힌 대로 봐요. 그래서 결과가 기대와 다르면 답안이 아니라 <b>기준 문장</b>을 고치는 게 빠르고, 고친 문장은 다음 학생에게도 그대로 적용돼요.</p>
+            <div class="fix-chips"></div>
+            <div class="fix-pane"></div>
+            <a class="fix-case" href="https://obkim-lgtm.github.io/clipo-blog/guide/contest.html" target="_blank" rel="noopener">
+              <img src="qs_case_thumb.jpg" alt="선생님 연구 사례 활동지">
+              <span><b>선생님들이 찾은 채점기준 꿀팁</b>에듀테크 교사 연구회 선생님들이 처음 기준 → 어긋남 → 고친 문장 → 결과를 직접 보여 준 사례예요.</span>
+              <i data-lucide="external-link"></i>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- =================================================================== 5. 내 반에 연결 -->
+<section class="screen" id="s-bridge">
+<div class="page-wrap">
+  <div class="qs-top"><button class="back-link" onclick="go('result')"><i data-lucide="chevron-left"></i>채점 결과</button></div>
+  <h1 class="qs-h1">내 수업에 가져오기</h1>
+  <p class="qs-sub" id="brSub">채점 결과는 그대로 두고, 어느 수업의 누구 답안인지만 붙여요.</p>
+  <div class="cols">
+    <div class="col-main">
+      <div class="card" id="brStep1">
+        <h2 class="card-t">1. 어느 수업인가요</h2>
+        <p class="card-d">2학기 수업이 아직 없어요. 새로 만들면 학년·과목은 활동지에서 읽은 값으로 채우고, 학생은 학교 명단에서 불러와요.</p>
+        <div class="pick-list">
+          <div class="pk new on" onclick="pkSel(this)"><span class="rd"></span><span class="nm">새 수업 만들기 · 2026학년도 2학기 · 사회</span><span class="mt">중학교 2학년 · 2학년 3반 28명 (학교 명단)</span></div>
+          <div class="pk" onclick="pkSel(this)"><span class="rd"></span><span class="nm">2026학년도 1학기 · 사회</span><span class="mt">지난 학기 · 2학년 3반 · 학생 28명</span></div>
+        </div>
+        <div id="brHow" style="display:none;">
+          <h3 class="how-t">답안은 어떻게 받을까요</h3>
+          <div class="pick-list">
+            <div class="pk how on" data-how="bulk" onclick="pkSel(this)"><span class="rd"></span><div><span class="nm">선생님이 걷어서 올리기</span><span class="ds">종이 답안을 찍거나 스캔해 올려요. 파일명으로 학생과 자동으로 맞춰요.</span></div><span class="badge b-gray" style="margin-left:auto;">기본</span></div>
+            <div class="pk how" data-how="student" onclick="pkSel(this)"><span class="rd"></span><div><span class="nm">학생이 직접 제출</span><span class="ds">학생이 클리포에 직접 쓰거나 파일로 내요. 걷고 스캔할 일이 없어요.</span></div></div>
+          </div>
+          <p class="how-note">평가 설계에서 언제든 바꿀 수 있어요.</p>
+        </div>
+        <div class="foot-bar" style="border-top:none;padding-top:8px;">
+          <span></span>
+          <button class="btn btn-primary" onclick="brNext()"><span id="brNextT">학생 맞추기</span> <i data-lucide="arrow-right" style="width:16px;height:16px"></i></button>
+        </div>
+      </div>
+      <div class="card" id="brStep2" style="display:none;">
+        <h2 class="card-t">2. 답안과 학생 맞추기</h2>
+        <div id="brMatchScan">
+          <p class="card-d">스캔한 순서대로 2학년 3반 번호순 학생과 맞췄어요. 답안 28장 · 학생 28명이에요.</p>
+          <div style="display:flex;gap:8px;margin-bottom:14px;"><span class="badge b-done">번호순 매칭 28</span><span class="badge b-gray">2학년 3반 · 28명</span></div>
+          <div class="match">
+            <div class="mrow"><span class="an" style="width:118px;">답안 1 · 1~2쪽</span><i data-lucide="arrow-right" class="arrow"></i><select><option>10101 김도현</option><option>10102 이준호</option></select></div>
+            <div class="mrow"><span class="an" style="width:118px;">답안 2 · 3~4쪽</span><i data-lucide="arrow-right" class="arrow"></i><select><option>10102 이준호</option></select></div>
+            <div class="mrow"><span class="an" style="width:118px;">답안 3 · 5~6쪽</span><i data-lucide="arrow-right" class="arrow"></i><select><option>10103 박지민</option></select></div>
+            <div class="mrow"><span class="an" style="width:118px;">답안 4 · 7~8쪽</span><i data-lucide="arrow-right" class="arrow"></i><select><option>10104 송하림</option></select></div>
+            <div class="mrow"><span class="an" style="width:118px;">답안 5 · 9~10쪽</span><i data-lucide="arrow-right" class="arrow"></i><select><option>10105 정현우</option></select></div>
+          </div>
+          <p class="sec-desc" style="margin-top:10px;">… 23장 더 · 결석생이 있어 순서가 밀렸다면 그 줄부터 학생을 바꿔 주세요.</p>
+        </div>
+        <div id="brMatchFiles" style="display:none;">
+        <p class="card-d">파일명의 이름·번호로 12명 중 9명을 맞췄어요. 3장은 확인이 필요해요.</p>
+        <div style="display:flex;gap:8px;margin-bottom:14px;"><span class="badge b-done">자동 매칭 9</span><span class="badge b-check">확인 필요 3</span><span class="badge b-gray">2학년 3반 · 28명</span></div>
+        <div class="match">
+          <div class="mrow"><span class="an" style="width:118px;">김도현_화산.jpg</span><i data-lucide="arrow-right" class="arrow"></i><select><option>10101 김도현</option><option>10102 이준호</option></select></div>
+          <div class="mrow"><span class="an" style="width:118px;">이준호_화산.jpg</span><i data-lucide="arrow-right" class="arrow"></i><select><option>10102 이준호</option></select></div>
+          <div class="mrow"><span class="an" style="width:118px;">박지민.jpg</span><i data-lucide="arrow-right" class="arrow"></i><select><option>10103 박지민</option></select></div>
+          <div class="mrow"><span class="an" style="width:118px;">송하림_화산지형.pdf</span><i data-lucide="arrow-right" class="arrow"></i><select><option>10104 송하림</option></select></div>
+          <div class="mrow warn"><span class="an" style="width:118px;">IMG_2031.jpg</span><i data-lucide="arrow-right" class="arrow"></i><select><option>파일명에 이름이 없어요 — 골라 주세요</option><option>10105 정현우</option><option>10106 한지우</option></select></div>
+          <div class="mrow"><span class="an" style="width:118px;">조민재.jpg</span><i data-lucide="arrow-right" class="arrow"></i><select><option>10107 조민재</option></select></div>
+          <div class="mrow warn"><span class="an" style="width:118px;">IMG_2034.jpg</span><i data-lucide="arrow-right" class="arrow"></i><select><option>파일명에 이름이 없어요 — 골라 주세요</option><option>10111 김서윤 (11번)</option><option>10124 김서윤 (24번)</option></select></div>
+          <div class="mrow warn"><span class="an" style="width:118px;">윤하은.jpg</span><i data-lucide="arrow-right" class="arrow"></i><select><option>명단에 없는 이름 '윤하은' — 골라 주세요</option><option>명단에 학생 추가</option><option>10119 신예린</option></select></div>
+        </div>
+        <p class="sec-desc" style="margin-top:10px;">… 4장 더 (모두 자동 매칭)</p>
+        </div>
+        <div class="foot-bar">
+          <button class="btn btn-ghost" onclick="brBack()"><i data-lucide="chevron-left" style="width:16px;height:16px"></i>수업 다시 고르기</button>
+          <button class="btn btn-primary btn-lg" onclick="brDone()">가져오기 <i data-lucide="check" style="width:18px;height:18px"></i></button>
+        </div>
+      </div>
+      <div class="card" id="brStep3" style="display:none;">
+        <div class="done-box">
+          <div class="ic"><i data-lucide="check"></i></div>
+          <h3 id="brDoneT">2학기 사회 › 화산 지형 탐구로 가져왔어요</h3>
+          <p id="brDoneD">채점 결과 12건이 학생 이름과 함께 저장됐어요. 이제부터는 늘 쓰던 화면에서 이어져요.</p>
+          <div id="brDoneReal"><div class="next-grid">
+            <div class="nx" onclick="location.href='task_ocr_v3_260623.html#scoring'"><p class="t"><i data-lucide="clipboard-check"></i>채점 탭에서 확정</p><p class="d">확인 필요 1장을 보고 점수를 저장해요</p></div>
+            <div class="nx" onclick="location.href='class_scoring_detail_v1_260512.html'"><p class="t"><i data-lucide="megaphone"></i>학생에게 결과 공개</p><p class="d">점수·피드백 공개 범위를 골라요</p></div>
+            <div class="nx" onclick="location.href='task_direct_write_v1_260729.html#design'"><p class="t"><i data-lucide="settings-2"></i>다음엔 학생 제출로</p><p class="d">평가 설계에서 답안 받는 방법을 바꿔요</p></div>
+          </div></div>
+          <div id="brDoneSample" style="display:none;"><div class="next-grid" id="brNextSample"></div></div>
+        </div>
+      </div>
+    </div>
+    <div class="col-side">
+      <div class="side-box">
+        <p class="side-t"><i data-lucide="shield-check"></i>바뀌지 않는 것</p>
+        <ul class="side-list">
+          <li><i data-lucide="check-circle-2"></i><span id="brKeep1">채점 결과와 채점기준은 그대로예요</span></li>
+          <li><i data-lucide="check-circle-2"></i>가져온 뒤에는 기존 수업 화면과 똑같이 동작해요</li>
+          <li><i data-lucide="check-circle-2"></i>기존 수업의 다른 과제에는 영향이 없어요</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+  <footer class="site-footer"><div class="sf-copy">© 2026. Datadriven Inc. All rights reserved.</div></footer>
+</div>
+</section>
+
+<!-- =================================================================== 기존 흐름과 비교 (해결편 설명용) -->
+<section class="screen" id="s-compare">
+<div class="page-wrap">
+  <h1 class="qs-h1">기존 흐름과 새 입구</h1>
+  <p class="qs-sub">기존 흐름은 그대로 두고 입구 하나를 더합니다. 두 흐름은 '내 수업에 가져오기'에서 같은 자리로 합류해요.</p>
+  <div class="cmp">
+    <div class="cmp-col">
+      <h3>기존 흐름 (변경 없음)</h3>
+      <p class="who">수업과 학생이 이미 있는 선생님 · 학생이 직접 제출하는 과제</p>
+      <div class="flow">
+        <div class="fl"><span class="dot">1</span><div class="body"><p class="t">수업 만들기</p><p class="d">학기 · 학년 · 과목 · 반 편성</p></div></div>
+        <div class="fl"><span class="dot">2</span><div class="body"><p class="t">학생 등록</p><p class="d">엑셀 일괄 · 학생 가입 코드</p></div></div>
+        <div class="fl"><span class="dot">3</span><div class="body"><p class="t">평가 설계</p><p class="d">성취기준 · 채점기준 · 답안 받는 방법</p></div></div>
+        <div class="fl"><span class="dot">4</span><div class="body"><p class="t">과제물 관리</p><p class="d">학생 제출 또는 선생님 일괄 업로드</p></div></div>
+        <div class="fl"><span class="dot val">5</span><div class="body"><p class="t">AI 채점 → 결과 확인</p><p class="d">첫 보상이 여기서. 평균 4단계 뒤</p></div></div>
+        <div class="fl"><span class="dot gold">6</span><div class="body"><p class="t">저장 · 공개 · 세특</p><p class="d">축적의 가치</p></div></div>
+      </div>
+    </div>
+    <div class="cmp-col" style="box-shadow:0 0 0 1.5px #416bff, 0 8px 24px rgba(65,107,255,.12);">
+      <h3 style="color:#1f47b3;">새 입구 · 활동지로 바로 채점</h3>
+      <p class="who">채점할 종이를 들고 온 선생님 · 처음 써 보는 선생님</p>
+      <div class="flow">
+        <div class="fl"><span class="dot">1</span><div class="body"><p class="t">활동지 1장 올리기</p><p class="d">수업·학생 없이. 학년·과목은 활동지에서 읽음</p></div></div>
+        <div class="fl"><span class="dot">2</span><div class="body"><p class="t">채점기준 초안</p><p class="d">읽고 필요하면 고침. 크레딧 1개</p></div></div>
+        <div class="fl"><span class="dot val">3</span><div class="body"><p class="t">답안 있으면 올리고(반 전체 스캔 PDF · 학생별 파일), 없으면 예시 답안으로 채점 → 결과</p><p class="d">첫 보상이 여기서. 2단계 뒤. 답안 1장당 1크레딧</p></div></div>
+        <div class="fl"><span class="dot">4</span><div class="body"><p class="t">내 수업에 가져오기</p><p class="d">수업 고르기(또는 만들기) + 답안·학생 자동 매칭. 여기서 기존 흐름에 합류</p></div></div>
+        <div class="fl"><span class="dot gold">5</span><div class="body"><p class="t">저장 · 공개 · 세특</p><p class="d">기존 흐름과 동일</p></div></div>
+      </div>
+    </div>
+  </div>
+  <div class="cmp-note"><b>기존 사용자에게 바뀌는 것</b> — 홈에 카드 1장이 늘어난다. 그 외 화면·메뉴·데이터는 바뀌지 않는다. 연결 전 채점은 '임시 채점'으로 30일 보관되며, 기존 수업 목록에 섞이지 않는다.</div>
+  <footer class="site-footer"><div class="sf-copy">© 2026. Datadriven Inc. All rights reserved.</div></footer>
+</div>
+</section>
+
+</div><!-- /main-wrap -->
+
+<div class="toast" id="toast"><span id="toast-msg"></span></div>
+
+<script>
+function toggleNav(){ document.getElementById('icon-sb').classList.toggle('expanded'); document.body.classList.toggle('nav-expanded'); }
+function notReady(name){ toastMsg((name || '해당 화면') + ' 은(는) 이 목업에서 제공하지 않아요.', true); }
+var _toastTimer = null;
+function toastMsg(msg, info){
+  var t = document.getElementById('toast');
+  document.getElementById('toast-msg').textContent = msg;
+  t.classList.toggle('info', !!info);
+  t.classList.add('show');
+  clearTimeout(_toastTimer);
+  _toastTimer = setTimeout(function(){ t.classList.remove('show'); }, 2600);
+}
+
+/* ── 스텝바 ── */
+var STEPS = ['활동지', '채점기준', '답안', '결과'];
+function renderSteps(id, cur){
+  var el = document.getElementById(id); if (!el) return;
+  var h = '';
+  STEPS.forEach(function(st, i){
+    var k = i < cur ? 'done' : (i === cur ? 'on' : '');
+    h += '<div class="step ' + k + '"><span class="n">' + (i < cur ? '✓' : (i + 1)) + '</span>' + st + '</div>';
+    if (i < STEPS.length - 1) h += '<span class="step-line ' + (i < cur ? 'done' : '') + '"></span>';
+  });
+  el.innerHTML = h;
+}
+renderSteps('steps-upload', 0); renderSteps('steps-rubric', 1); renderSteps('steps-answers', 2); renderSteps('steps-result', 3);
+
+/* ── 크레딧 (가입 첫날 50개 가정) ── */
+var CREDIT = 50;
+function useCredit(n){ CREDIT = Math.max(0, CREDIT - n); document.getElementById('hdCredit').textContent = CREDIT + ' 크레딧'; }
+/* 홈 첫 칸 = 이어서 할 일. null = 처음 / real = 임시 채점 있음 / sample = 채점기준+예시만 / waiting = 수업 평가를 설계했는데 답안 0개 */
+var QS = { progress:null };
+function qkRender(){
+  var p = QS.progress, t = document.getElementById('qkT'); if (!t) return;
+  var arrow = ' <i data-lucide="arrow-right" style="width:15px;height:15px"></i>';
+  if (p === 'real') {
+    t.innerHTML = '화산 지형 탐구<span class="qk-tag">임시 채점</span>';
+    document.getElementById('qkD').textContent = '답안 ' + ansCount() + '장을 채점했어요. 내 수업에 가져오지 않으면 29일 뒤 지워져요.';
+    document.getElementById('qkC').innerHTML = '이어서 보기' + arrow;
+  } else if (p === 'sample') {
+    t.innerHTML = '화산 지형 탐구<span class="qk-tag">채점기준 초안</span>';
+    document.getElementById('qkD').textContent = '예시 답안으로 채점해 봤어요. 답안을 올리면 이 기준으로 바로 채점해요.';
+    document.getElementById('qkC').innerHTML = '답안 올리기' + arrow;
+  } else if (p === 'waiting') {
+    t.innerHTML = '화산 지형 탐구<span class="qk-tag">답안 기다리는 중</span>';
+    document.getElementById('qkD').innerHTML = '2학기 사회 평가를 설계했어요. 걷은 답안을 올리면 바로 채점해요. 걷지 않으려면 <button class="qk-inl" onclick="event.stopPropagation();location.href=\'task_direct_write_v1_260729.html#design\'">학생 제출로 받기</button>';
+    document.getElementById('qkC').innerHTML = '스캔 PDF 올리기' + arrow;
+  } else {
+    t.textContent = '활동지로 바로 채점해 보기';
+    document.getElementById('qkD').textContent = '수업·학생을 등록하지 않아도 돼요. 활동지 1장이면 채점기준 초안을 받고 바로 채점해 볼 수 있어요.';
+    document.getElementById('qkC').innerHTML = '시작하기' + arrow;
+  }
+  document.getElementById('qkNew').style.display = p ? '' : 'none';
+  var w = p === 'waiting';
+  document.getElementById('homeCls2').style.display = w ? '' : 'none';
+  document.getElementById('homeEmpty').style.display = w ? 'none' : '';
+  document.getElementById('sem2Meta').textContent = w ? '진행 중 1개' : '아직 수업이 없어요';
+  document.querySelector('#qkCard .qk-ico').innerHTML = '<i data-lucide="' + (p === 'waiting' ? 'inbox' : p ? 'history' : 'scan-text') + '" style="width:22px;height:22px"></i>';
+}
+function qkGo(){ if (QS.progress === 'waiting') location.href = 'task_ocr_v3_260623.html?nav=uploadBulk'; else if (QS.progress === 'real') go('result', { mode:'real' }); else if (QS.progress === 'sample') { go('answers'); branch('has'); } else go('upload'); }
+function setCredit(n){ CREDIT = n; document.getElementById('hdCredit').textContent = CREDIT + ' 크레딧'; }
+
+/* ── 해시 라우팅 (양방향 · hashchange · replaceState) ── */
+var SCREENS = { home:'s-home', upload:'s-upload', rubric:'s-rubric', answers:'s-answers', result:'s-result', detail:'s-detail', bridge:'s-bridge', compare:'s-compare' };
+var _suppressHash = false;
+var resMode = 'real';
+function setHash(h){ if (_suppressHash || location.hash === '#' + h) return; history.replaceState(null, '', location.pathname + location.search + '#' + h); }
+function go(name, opt){
+  opt = opt || {};
+  if (!SCREENS[name]) name = 'home';
+  document.querySelectorAll('.screen').forEach(function(sc){ sc.classList.remove('active'); });
+  document.getElementById(SCREENS[name]).classList.add('active');
+  document.querySelectorAll('.icon-sb .si').forEach(function(sc){ sc.classList.remove('active'); });
+  if (name === 'home' || name === 'compare') document.querySelector('.icon-sb .si').classList.add('active');
+  /* 앞 단계를 건너뛰어 들어와도 화면이 성립하게 상태를 채운다 */
+  if (name === 'rubric' || name === 'answers' || name === 'result' || name === 'bridge') upLoaded(null, true);
+  if (name === 'rubric' && !opt.making) showMaking(false);
+  if (name === 'result') { resMode = opt.mode || resMode; renderResult(); }
+  if (name === 'bridge' && !opt.keep) brReset();
+  if (name === 'home') qkRender();
+  /* 장면별 크레딧 잔량: 홈·활동지 50 → 초안 1 = 49 → 실제 N장 = 49 − N(스캔 28 / 파일 12) / 예시 N편 = 49 − 2N */
+  setCredit((name === 'home' || name === 'compare') && QS.progress === 'real' ? (49 - ansCount()) : (name === 'home' || name === 'compare') && QS.progress === 'sample' ? (49 - lvcPicked().length * 2) : name === 'home' || name === 'upload' || name === 'compare' ? 50 : (name === 'rubric' || name === 'answers') ? 49 : (name === 'result' && resMode === 'sample') ? (49 - lvcPicked().length * 2) : (49 - ansCount()));
+  if (name === 'detail') setCredit(sdMode === 'sample' ? (49 - lvcPicked().length * 2) : (49 - ansCount()));
+  window.scrollTo(0, 0);
+  setHash(name === 'result' && resMode === 'sample' ? 'result-sample' : name === 'home' && QS.progress === 'real' ? 'home-resume' : name === 'home' && QS.progress === 'waiting' ? 'home-waiting' : name);
+  lucide.createIcons();
+}
+function routeFromHash(){
+  var h = (location.hash || '#home').slice(1);
+  var m = h.match(/^bridge-(\d)$/);
+  _suppressHash = true;
+  try {
+    if (m) { go('bridge', { keep:true }); brStep(parseInt(m[1], 10)); }
+    else if (/^detail-\d+$/.test(h)) openDetail(parseInt(h.split('-')[1], 10));
+    else if (h === 'result-sample') openSample(lvcPicked()[0]);
+    else if (/^sample-(good|mid|low)$/.test(h)) { var sk = h.split('-')[1]; if (!LVC[sk]) { LVC[sk] = true; lvcUpd(); } openSample(sk); }
+    else if (h === 'result') go('result', { mode:'real' });
+    else if (h === 'home-resume') { QS.progress = 'real'; go('home'); setHash('home-resume'); }
+    else if (h === 'home-waiting') { QS.progress = 'waiting'; go('home'); setHash('home-waiting'); }
+    else go(h);
+  } finally { _suppressHash = false; }
+}
+window.addEventListener('hashchange', routeFromHash);
+
+/* ── 1. 활동지 ── */
+function upLoaded(kind, silent){
+  document.getElementById('upEmpty').style.display = 'none';
+  document.getElementById('upDone').style.display = '';
+  document.getElementById('upFileName').textContent = kind === 'sample' ? '예시 활동지 · 클리포 제공' : '화산지형_활동지.pdf · 1장';
+  if (!silent) toastMsg(kind === 'sample' ? '예시 활동지를 불러왔어요. 내 활동지로 바꾸려면 다른 활동지를 누르세요.' : '활동지를 읽었어요. 문항 3개를 찾았어요.');
+  lucide.createIcons();
+}
+function upReset(){ document.getElementById('upEmpty').style.display = ''; document.getElementById('upDone').style.display = 'none'; lucide.createIcons(); }
+function optToggle(){ document.getElementById('opt').classList.toggle('open'); }
+var matHasFile = false, unitVal = '';
+function unitPick(el){ unitVal = el.value.trim(); }
+function matFile(){
+  matHasFile = !matHasFile;
+  document.getElementById('matFileName').style.display = matHasFile ? '' : 'none';
+  document.getElementById('matBtn').style.display = matHasFile ? 'none' : '';
+  if (matHasFile) toastMsg('수업 PPT를 올렸어요. 수업에서 다룬 용어와 범위에 맞춰 만들어요.');
+  lucide.createIcons();
+}
+function chipToggle(el){
+  var on = el.classList.toggle('on');
+  var old = el.querySelector('i, svg'); if (old) old.remove();
+  var ic = document.createElement('i'); ic.setAttribute('data-lucide', on ? 'check' : 'plus'); ic.style.cssText = 'width:14px;height:14px'; el.insertBefore(ic, el.firstChild);
+  lucide.createIcons();
+}
+/* 문항: 체크로 채점 대상, 연필로 수정 */
+var qOn = { 1:true, 2:true, 3:true }, qNext = 4;
+function qToggle(n, cb){ qOn[n] = cb.checked; document.getElementById('q' + n).classList.toggle('off', !cb.checked); qNoteUpd(); }
+function qNoteUpd(){ var n = Object.keys(qOn).filter(function(k){ return qOn[k]; }).length; document.getElementById('qNote').textContent = n ? n + '개 문항에 채점기준을 만들어요' : '문항을 하나 이상 켜 주세요'; }
+function qAdd(){
+  var n = qNext++; qOn[n] = true;
+  var d = document.createElement('div'); d.className = 'q-item'; d.id = 'q' + n;
+  d.innerHTML = '<input type="checkbox" checked onchange="qToggle(' + n + ',this)"><span class="qn">' + n + '</span><span class="qt">새 문항 내용을 적어 주세요</span><button class="qe" title="문항 수정" onclick="qEdit(this)"><i data-lucide="pencil" style="width:15px;height:15px"></i></button>';
+  document.querySelector('.q-tools').before(d);
+  document.getElementById('qCount').textContent = document.querySelectorAll('#upDone .q-item').length;
+  qNoteUpd(); lucide.createIcons(); qEdit(d.querySelector('.qe'));
+}
+function qEdit(btn){
+  var row = btn.closest('.q-item'), t = row.querySelector('.qt');
+  if (t.getAttribute('contenteditable') === 'true') { qEditDone(row); return; }
+  t.setAttribute('contenteditable', 'true'); row.classList.add('editing');
+  btn.innerHTML = '<i data-lucide="check" style="width:15px;height:15px"></i>'; btn.title = '수정 완료';
+  lucide.createIcons();
+  t.focus(); var r = document.createRange(); r.selectNodeContents(t); r.collapse(false); var sel = window.getSelection(); sel.removeAllRanges(); sel.addRange(r);
+  t.onkeydown = function(e){ if (e.key === 'Enter') { e.preventDefault(); qEditDone(row); } };
+  t.onblur = function(){ setTimeout(function(){ if (row.classList.contains('editing')) qEditDone(row); }, 120); };
+}
+function qEditDone(row){
+  var t = row.querySelector('.qt'), btn = row.querySelector('.qe');
+  t.removeAttribute('contenteditable'); row.classList.remove('editing'); t.onkeydown = null; t.onblur = null;
+  if (!t.textContent.trim()) t.textContent = '문항 내용을 적어 주세요';
+  btn.innerHTML = '<i data-lucide="pencil" style="width:15px;height:15px"></i>'; btn.title = '문항 수정';
+  lucide.createIcons();
+}
+/* 초안 만들기 → 2단계로 이동해 진행 화면 */
+var MK_MSGS = ['활동지의 문항을 읽고 있어요', '요청하신 강조점을 채점 요소로 옮기고 있어요', '수준별 배점을 나누고 있어요', '문장을 다듬고 있어요'];
+var mkTimer = null;
+function showMaking(on){
+  document.getElementById('rubMaking').style.display = on ? '' : 'none';
+  document.getElementById('rubReady').style.display = on ? 'none' : '';
+  clearInterval(mkTimer);
+  if (on) { var k = 0, el = document.getElementById('mkMsg'); el.textContent = MK_MSGS[0];
+    mkTimer = setInterval(function(){ k = (k + 1) % MK_MSGS.length; el.style.opacity = 0; setTimeout(function(){ el.textContent = MK_MSGS[k]; el.style.opacity = 1; }, 200); }, 1100); }
+}
+function makeRubric(){
+  var chips = Array.prototype.slice.call(document.querySelectorAll('.chip.on')).map(function(c){ return c.textContent.trim(); });
+  var free = document.getElementById('reqTa').value.trim();
+  var nq = Object.keys(qOn).filter(function(k){ return qOn[k]; }).length;
+  if (!nq) { toastMsg('채점할 문항을 하나 이상 켜 주세요.', true); return; }
+  var pr = document.getElementById('reqPillReq');
+  if (chips.length || free) { pr.style.display = ''; pr.innerHTML = '<i data-lucide="message-square-text"></i>' + chips.join(' · ') + (free ? (chips.length ? ' · ' : '') + '"' + (free.length > 22 ? free.slice(0, 22) + '…' : free) + '"' : ''); }
+  else pr.style.display = 'none';
+  var pu = document.getElementById('reqPillUnit'); pu.style.display = unitVal ? '' : 'none'; if (unitVal) pu.innerHTML = '<i data-lucide="book-open"></i>' + (unitVal.length > 22 ? unitVal.slice(0, 22) + '…' : unitVal);
+  document.getElementById('reqPillFile').style.display = matHasFile ? '' : 'none';
+  document.getElementById('reqPillQ').innerHTML = '<i data-lucide="file-text"></i>문항 ' + nq + '개';
+  var ctx = ['<span class="pill"><i data-lucide="file-text"></i>문항 ' + nq + '개</span>'];
+  if (unitVal) ctx.push('<span class="pill"><i data-lucide="book-open"></i>' + (unitVal.length > 18 ? unitVal.slice(0, 18) + '…' : unitVal) + '</span>');
+  if (matHasFile) ctx.push('<span class="pill"><i data-lucide="presentation"></i>수업 PPT</span>');
+  if (chips.length || free) ctx.push('<span class="pill"><i data-lucide="message-square-text"></i>' + (chips.length ? chips.join(' · ') : '직접 쓴 요청') + '</span>');
+  document.getElementById('mkCtx').innerHTML = '<div class="req-sum" style="margin:0;">' + ctx.join('') + '</div>';
+  go('rubric', { making:true }); showMaking(true);
+  setTimeout(function(){ showMaking(false); window.scrollTo(0, 0); toastMsg('채점기준 초안 3개를 만들었어요. 크레딧 1개를 썼어요.'); lucide.createIcons(); }, 3600);
+}
+
+/* ── 2. 채점기준: 데이터 → 렌더, 읽기/수정 모드 ── */
+var RUB = [
+  { name:'화산 지형의 형성 과정', q:[1], levels:[[10,'마그마의 점성과 분출 방식을 근거로 성산일출봉의 형성 과정을 순서대로 설명함'],[7,'형성 과정은 설명했으나 마그마의 성질과의 연결이 부분적임'],[4,'화산 활동으로 만들어졌다는 수준의 설명에 그침']] },
+  { name:'자료 해석과 근거 제시', q:[2], levels:[[8,'지도·사진에서 두 지형의 차이를 찾아 근거로 제시하고 원인을 설명함'],[5,'차이는 서술했으나 자료에서 찾은 근거가 하나뿐임'],[2,'자료 없이 두 지형이 다르다고만 씀']] },
+  { name:'논리적 서술', q:[1,2], levels:[[6,'주장과 근거가 연결되고 문장이 완결됨'],[4,'근거는 있으나 연결이 느슨하거나 문장이 끊김'],[2,'단어 나열 수준']] }
+];
+var rubMode = 'view', rubBackup = null;
+function rubMax(c){ return Math.max.apply(null, c.levels.map(function(l){ return +l[0] || 0; })); }
+function rubQTxt(c){ return '문항 ' + c.q.slice().sort().join('·'); }
+function esc(t){ return String(t).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;'); }
+function renderRub(){
+  var el = document.getElementById('rub'); if (!el) return;
+  var edit = rubMode === 'edit', qs = [1,2,3];
+  el.classList.toggle('editmode', edit);
+  el.innerHTML = RUB.map(function(c, ci){
+    var lv = c.levels.map(function(l, li){
+      if (!edit) return '<div class="lv"><div class="sc">' + l[0] + '</div><div class="ds">' + esc(l[1]) + '</div></div>';
+      return '<div class="lv"><div class="sc"><input class="esc" type="number" value="' + l[0] + '" onchange="RUB[' + ci + '].levels[' + li + '][0]=+this.value;rubSumUpd()"></div>'
+        + '<div class="ds"><textarea class="eds" rows="2" onchange="RUB[' + ci + '].levels[' + li + '][1]=this.value">' + esc(l[1]) + '</textarea></div>'
+        + (c.levels.length > 2 ? '<button class="lx" style="display:inline-flex;top:14px;transform:none;" title="급간 지우기" onclick="rubLvDel(' + ci + ',' + li + ')"><i data-lucide="x" style="width:14px;height:14px"></i></button>' : '') + '</div>';
+    }).join('');
+    var left = !edit
+      ? '<p class="nm">' + esc(c.name) + '</p><span class="pt">' + rubMax(c) + '점 · ' + rubQTxt(c) + '</span>'
+      : '<input class="ein" value="' + esc(c.name) + '" onchange="RUB[' + ci + '].name=this.value" placeholder="채점기준 이름">'
+        + '<div class="eq">문항 ' + qs.map(function(n){ return '<button class="qchip' + (c.q.indexOf(n) > -1 ? ' on' : '') + '" onclick="rubQ(' + ci + ',' + n + ')">' + n + '</button>'; }).join('') + '</div>'
+        + '<span class="pt" style="display:block;margin-top:8px;">만점 ' + rubMax(c) + '점 · 가장 높은 급간 점수를 따라가요</span>'
+        + '<button class="edel" onclick="rubDel(' + ci + ')"><i data-lucide="trash-2"></i>이 기준 지우기</button>';
+    return '<div class="rub-row"><div class="rub-l">' + left + '</div>'
+      + '<div class="rub-r">' + lv + (edit ? '<button class="lv-add" onclick="rubLvAdd(' + ci + ')"><i data-lucide="plus"></i>급간 추가</button>' : '') + '</div></div>';
+  }).join('');
+  rubSumUpd();
+  var vb = document.getElementById('rubViewBtns'), eb = document.getElementById('rubEditBtns'), ab = document.getElementById('rubAddBtn'), hint = document.getElementById('rubHint');
+  if (vb) vb.style.display = edit ? 'none' : 'flex';
+  if (eb) eb.style.display = edit ? 'flex' : 'none';
+  if (ab) ab.style.display = edit ? '' : 'none';
+  if (hint) hint.textContent = edit ? '. 수정 중 — 완료를 누르면 저장돼요.' : '. 활동지로 만든 AI 초안이에요. 고치려면 채점기준 수정, 새로 받으려면 다시 만들기(크레딧 1개).';
+  lucide.createIcons();
+}
+function rubSumUpd(){
+  var total = RUB.reduce(function(a, c){ return a + rubMax(c); }, 0);
+  var sum = document.getElementById('rubSum'); if (sum) sum.textContent = '총점 ' + total + '점 · 채점기준 ' + RUB.length + '개';
+  var st = document.getElementById('sideTotal'); if (st) st.textContent = total;
+  var sc = document.getElementById('sideCrit'); if (sc) sc.textContent = RUB.map(function(c){ return c.name.replace('화산 지형의 ', '').replace('과 근거 제시', '') + ' ' + rubMax(c); }).join(' · ');
+}
+function rubStartEdit(){ rubBackup = JSON.parse(JSON.stringify(RUB)); rubMode = 'edit'; renderRub(); var f = document.querySelector('#rub .ein'); if (f) f.focus(); }
+function rubCancel(){ if (rubBackup) RUB = rubBackup; rubBackup = null; rubMode = 'view'; renderRub(); }
+function rubSave(){ RUB.forEach(function(c){ c.levels.sort(function(a, b){ return (+b[0]) - (+a[0]); }); }); rubBackup = null; rubMode = 'view'; renderRub(); toastMsg('채점기준을 저장했어요.'); }
+function rubDel(ci){ if (RUB.length <= 1) { toastMsg('채점기준은 하나 이상 있어야 해요.', true); return; } RUB.splice(ci, 1); renderRub(); }
+function rubAdd(){ RUB.push({ name:'새 채점기준', q:[1], levels:[[5,'가장 높은 수준의 답안 설명'],[3,'중간 수준의 답안 설명'],[1,'가장 낮은 수준의 답안 설명']] }); renderRub(); var rows = document.querySelectorAll('#rub .rub-row'); var last = rows[rows.length - 1]; last.scrollIntoView({ behavior:'smooth', block:'center' }); var f = last.querySelector('.ein'); if (f) { f.focus(); f.select(); } }
+function rubQ(ci, n){ var c = RUB[ci], k = c.q.indexOf(n); if (k > -1) { if (c.q.length === 1) { toastMsg('문항을 하나 이상 골라 주세요.', true); return; } c.q.splice(k, 1); } else c.q.push(n); renderRub(); }
+function rubLvAdd(ci){ var c = RUB[ci]; var last = +c.levels[c.levels.length - 1][0]; c.levels.push([Math.max(0, last - 2), '']); renderRub(); var rows = document.querySelectorAll('#rub .rub-row')[ci].querySelectorAll('.eds'); var f = rows[rows.length - 1]; if (f) { f.placeholder = '이 급간에 해당하는 답안 설명'; f.focus(); } }
+function rubLvDel(ci, li){ var c = RUB[ci]; if (c.levels.length <= 2) { toastMsg('급간은 두 개 이상 있어야 해요.', true); return; } c.levels.splice(li, 1); renderRub(); }
+renderRub();
+
+/* ── 3. 답안: 있음 / 없음 ── */
+var ansBranch = 'has';
+function branch(b){
+  ansBranch = b;
+  document.getElementById('brHas').classList.toggle('on', b === 'has');
+  document.getElementById('brNone').classList.toggle('on', b === 'none');
+  document.getElementById('panHas').style.display = b === 'has' ? '' : 'none';
+  document.getElementById('panNone').style.display = b === 'none' ? '' : 'none';
+  document.getElementById('sideTips').style.display = b === 'has' ? '' : 'none';
+  lucide.createIcons();
+}
+var FILES = ['김도현_화산.jpg','이준호_화산.jpg','박지민.jpg','송하림_화산지형.pdf','IMG_2031.jpg','조민재.jpg','한지우_화산.jpg','IMG_2034.jpg','윤하은.jpg','신예린_화산.pdf','임도윤.jpg','IMG_2040.jpg'];
+function renderFiles(){
+  var el = document.getElementById('fileList'); if (!el) return;
+  el.innerHTML = FILES.map(function(f, i){ return '<div class="fi"><i data-lucide="' + (/pdf$/i.test(f) ? 'file-text' : 'image') + '"></i><span class="nm" title="' + f + '">' + f + '</span><button class="x" title="빼기" onclick="toastMsg(\'목업에서는 파일을 빼는 동작을 생략했어요.\', true)"><i data-lucide="x"></i></button></div>'; }).join('');
+  lucide.createIcons();
+}
+function apk(k){}
+/* 답안 형태: scan = 반 전체 스캔 PDF(학교 대부분이 쓰는 방식이라 기본) / files = 학생별 파일 */
+var ANS = { kind:'scan', per:2, pages:56 };
+function ansCount(){ return ANS.kind === 'scan' ? Math.ceil(ANS.pages / ANS.per) : FILES.length; }
+function ansLabel(i){ if (ANS.kind === 'files') return REAL[i] ? REAL[i][0] : ''; var a = i * ANS.per + 1, b = Math.min(ANS.pages, a + ANS.per - 1); return '답안 ' + (i + 1) + ' · ' + (a === b ? a : a + '~' + b) + '쪽'; }
+function ansSync(){
+  var n = ansCount();
+  document.querySelectorAll('.ansN').forEach(function(e){ e.textContent = n; });
+  document.getElementById('scanN').textContent = n; document.getElementById('scanPerV').textContent = ANS.per;
+  var h = ''; for (var i = 0; i < Math.min(7, n); i++) h += '<div class="fi"><i data-lucide="file-text"></i><span class="nm">' + ansLabel(i) + '</span></div>';
+  if (n > 7) h += '<div class="fi" style="color:#6d7381;justify-content:center;">… ' + (n - 7) + '장 더</div>';
+  document.getElementById('scanList').innerHTML = h;
+  document.getElementById('ansScan').style.display = ANS.kind === 'scan' ? '' : 'none';
+  document.getElementById('ansFiles').style.display = ANS.kind === 'files' ? '' : 'none';
+  document.getElementById('ansDropD').textContent = ANS.kind === 'scan' ? 'PDF 1개 · 학생 이름은 지금 없어도 돼요' : 'JPG · PNG · PDF · 여러 파일 한 번에';
+  document.querySelectorAll('.tip-scan').forEach(function(e){ e.style.display = ANS.kind === 'scan' ? '' : 'none'; });
+  document.querySelectorAll('.tip-files').forEach(function(e){ e.style.display = ANS.kind === 'files' ? '' : 'none'; });
+  document.querySelectorAll('.ans-kind .pk').forEach(function(p){ p.classList.toggle('on', p.dataset.kind === ANS.kind); });
+  lucide.createIcons();
+}
+function ansKind(k){ ANS.kind = k; ansReset(); }
+function scanPer(d){ ANS.per = Math.max(1, Math.min(8, ANS.per + d)); ansSync(); }
+function ansLoaded(silent){ document.getElementById('ansEmpty').style.display = 'none'; document.getElementById('ansDone').style.display = ''; renderFiles(); ansSync();
+  if (!silent) toastMsg(ANS.kind === 'scan' ? '56쪽 PDF를 올렸어요. 한 명당 2쪽으로 나눴어요.' : '파일 12개를 올렸어요. 파일 1개가 답안 1장이에요.'); }
+function ansReset(){ document.getElementById('ansEmpty').style.display = ''; document.getElementById('ansDone').style.display = 'none'; ansSync(); }
+var LVC = { good:false, mid:true, low:false };
+var LVC_NAME = { good:'잘 쓴 답', mid:'보통 답', low:'미흡한 답' };
+function lvcPicked(){ return ['good','mid','low'].filter(function(k){ return LVC[k]; }); }
+function lvcToggle(k){ LVC[k] = !LVC[k]; lvcUpd(); }
+function lvcUpd(){
+  ['good','mid','low'].forEach(function(k){ var el = document.getElementById('lvc-' + k); if (el) el.classList.toggle('on', LVC[k]); });
+  var n = lvcPicked().length, c = n * 2;
+  var cr = document.getElementById('lvcCredit'), bt = document.getElementById('lvcBtnT'), btn = document.getElementById('lvcBtn');
+  if (!cr) return;
+  cr.innerHTML = n ? (n + '편 선택 · <b>크레딧 ' + c + '개</b> <span style="color:#9ea3ad;font-size:13px;">(답안 만들기 ' + n + ' + 채점 ' + n + ')</span>') : '수준을 하나 이상 골라 주세요.';
+  bt.textContent = n ? ('예시 답안 ' + n + '편 만들어 채점') : '수준을 골라 주세요';
+  btn.disabled = !n;
+}
+lvcUpd();
+function runScoring(mode){
+  toastMsg(mode === 'sample' ? ('예시 답안 ' + lvcPicked().length + '편을 만들어 채점하고 있어요. 잠시만요.') : 'AI 채점을 시작했어요. ' + ansCount() + '장 · 보통 1~2분 걸려요.', true);
+  setTimeout(function(){ QS.progress = mode; if (mode === 'sample') openSample(lvcPicked()[0]); else go('result', { mode:mode }); toastMsg(mode === 'sample' ? ('예시 답안 ' + lvcPicked().length + '편을 만들어 채점했어요. 크레딧 ' + (lvcPicked().length * 2) + '개를 썼어요.') : '채점이 끝났어요. 확인이 필요한 답안 1장이 있어요.'); }, 900);
+}
+
+/* ── 4. 결과 (실제 / 예시 공용) ── */
+var SAMPLES = {
+  good:{ sc:[10,8,4], lv:[0,0,1], why:['<q>점성이 낮은 현무암질 마그마</q>와 <q>물과 만나 폭발적으로 분출</q> — 성질과 분출 방식을 모두 연결했어요.','<q>지도를 보면 … 해안에</q>, <q>사진에서도 … 원형 / 절벽</q> — 지도와 사진 두 자료에서 근거를 찾았어요.','근거는 충분하지만 마지막 문장 <q>같은 화산이라도</q>가 앞 근거와 느슨하게 이어져요.'],
+    fb:'두 지형의 형성 과정을 마그마의 성질과 정확히 연결했고, 지도와 사진에서 근거를 잘 찾았어요. 마지막 문장에서 앞의 근거를 한 번 더 묶어 결론을 내리면 글이 더 단단해져요.',
+    ans:'<p>1. 성산일출봉은 <mark>점성이 낮은 현무암질 마그마</mark>가 얕은 바다에서 <mark>물과 만나 폭발적으로 분출</mark>하면서 화산재가 겹겹이 쌓여 만들어진 응회구이다. 마그마가 물과 만나 급격히 식고 부서졌기 때문에 용암이 흐른 흔적보다 층을 이룬 화산재가 많고, 위가 넓게 파인 분화구 모양이 남았다.</p><p>2. 백두산 천지는 점성이 높은 마그마가 폭발한 뒤 산꼭대기가 무너져 내려 생긴 칼데라에 물이 고인 호수다. <mark>지도를 보면 성산일출봉은 해안에, 천지는 해발 2천 미터가 넘는 산 정상에</mark> 있고, <mark>사진에서도 성산일출봉은 낮고 넓은 원형, 천지는 깊게 파인 절벽</mark>으로 둘러싸여 있다. <mark>같은 화산이라도</mark> 마그마의 성질과 분출한 환경이 달라 지형이 다르게 만들어진 것이다.</p>' },
+  mid:{ sc:[7,5,4], lv:[1,1,1], why:['<q>물이 들어가 더 세게 터졌고</q>로 분출 방식은 짚었지만 <q>마그마가 달라서</q>에서 멈춰 점성은 없어요.','근거가 <q>사진을 보면 납작하고 / 깊다</q> 하나뿐이고 지도는 쓰지 않았어요.','<q>그래서 재가 많이 나왔다</q>처럼 원인과 결과가 짧게 붙어 있어요.'],
+    fb:'성산일출봉이 바다에서 더 세게 터졌다는 점을 잘 짚었어요. "마그마가 달라서"를 한 걸음 더 나가 점성이 어떻게 다른지 설명하고, 지도에서도 근거를 하나 더 찾아보세요.',
+    ans:'<p>1. 성산일출봉은 화산이 폭발해서 화산재가 쌓여 만들어졌다. 바다 근처에서 <mark>물이 들어가 더 세게 터졌고</mark> <mark>그래서 재가 많이 나왔다</mark>.</p><p>2. 백두산 천지는 화산이 터진 뒤에 꺼져서 물이 고인 것이다. 두 지형은 <mark>마그마가 달라서</mark> 모양이 다르다. <mark>사진을 보면 성산일출봉은 납작하고 천지는 깊다.</mark></p>' },
+  low:{ sc:[4,2,2], lv:[2,2,2], why:['<q>화산이 터져서 만들어진 산</q> — 화산 활동이라는 사실만 있어요.','<q>바다에 있고 / 산 위에 있어서</q>는 위치 차이일 뿐 지도·사진에서 찾은 근거가 아니에요.','주장만 있고 이유를 설명하는 문장이 없어요.'],
+    fb:'두 지형이 다르다는 점은 잘 알아챘어요. 이제 "왜" 다른지를 설명해 볼까요? 활동지의 사진에서 두 지형의 모양 차이를 찾아 한 문장씩 써 보세요.',
+    ans:'<p>1. 화산 때문에 생겼다. 옛날에 <mark>화산이 터져서 만들어진 산</mark>이다.</p><p>2. 성산일출봉은 <mark>바다에 있고</mark> 백두산은 <mark>산 위에 있어서</mark> 다르다. 백두산은 물이 있다.</p>' }
+};
+var REAL = [
+  ['김도현_화산.jpg',[10,8,5],'done',['<q>현무암질 마그마가 바닷물과 만나 폭발적으로 분출</q>에서 점성과 분출 방식을 모두 연결했어요.','지도의 위치와 사진의 지형 단면을 근거로 두 지형의 차이를 제시했어요.','근거와 주장은 연결되나 마지막 문장이 끝맺음 없이 끝나 1점 감점. 감점 사유가 맞지 않으면 점수를 직접 고칠 수 있어요.']],
+  ['이준호_화산.jpg',[7,5,4],'done'], ['박지민.jpg',[4,2,2],'done'], ['송하림_화산지형.pdf',[7,8,4],'done'], ['IMG_2031.jpg',null,'check'], ['조민재.jpg',[10,5,6],'done']
+];
+function renderResult(){
+  if (resMode === 'sample') { openSample(lvcPicked()[0]); return; }
+  document.getElementById('resSub').textContent = '답안 ' + ansCount() + '장을 채점했어요. 답안별 점수와 근거를 확인해 보세요. AI는 제안하고 결정은 선생님이 해요.';
+  var tb = document.getElementById('resBody'), h = '';
+  var crit = ['형성 과정', '자료 해석', '논리적 서술'], mx = [10, 8, 6];
+  {
+    REAL.forEach(function(r, i){
+      var sc = r[1];
+      if (!sc) { h += '<tr><td class="lbl"><span class="nm">' + ansLabel(i) + '</span></td><td>–</td><td>–</td><td>–</td><td><b>–</b></td><td><span class="badge b-check">확인 필요</span></td><td><button class="btn btn-ghost" onclick="openDetail(' + i + ')">보기</button></td></tr>'; return; }
+      var tot = sc[0] + sc[1] + sc[2];
+      h += '<tr><td class="lbl"><span class="nm">' + ansLabel(i) + '</span></td><td>' + sc[0] + '</td><td>' + sc[1] + '</td><td>' + sc[2] + '</td><td><b>' + tot + '</b></td><td><span class="badge b-done">완료</span></td><td>'
+        + '<button class="btn btn-ghost" onclick="openDetail(' + i + ')">보기</button></td></tr>';
+    });
+    h += '<tr><td colspan="7" style="color:#6d7381;font-size:14px;">… ' + (ansCount() - REAL.length) + '장 더 · <button class="btn btn-ghost" onclick="toastMsg(\'전체 목록은 이 목업에서 생략했어요.\', true)">모두 보기</button></td></tr>';
+  }
+  tb.innerHTML = h;
+  lucide.createIcons();
+}
+/* ── 4-1. 답안별 채점 상세 (네이티브) ── */
+var sdIdx = 0, sdSel = [], sdGroundOn = true, sdMode = 'real', sdKey = 'mid';
+var SD_FB = {
+  good:['마그마의 점성과 분출 방식을 정확히 연결했어요. 두 지형을 나란히 비교한 점도 좋아요.','지도와 사진 두 자료에서 근거를 찾은 점이 훌륭해요.','근거가 충분해요. 마지막 문장에서 앞의 근거를 한 번 더 묶어 결론을 내리면 더 단단해져요.'],
+  mid:['분출 방식은 잘 짚었어요. 마그마의 점성이 어떻게 달랐는지까지 한 걸음 더 설명해 보세요.','사진에서 근거를 찾은 점이 좋아요. 지도에서도 근거를 하나 더 찾아보세요.','원인과 결과를 "왜냐하면 … 그래서 …"처럼 이어 쓰면 설명이 더 분명해져요.'],
+  low:['화산 활동으로 만들어졌다는 점은 맞아요. 마그마가 어떤 성질이었는지 활동지 자료를 다시 살펴보세요.','위치 차이보다, 사진 속 두 지형의 모양 차이를 근거로 써 보세요.','주장 뒤에 "왜냐하면"으로 이유를 한 문장 덧붙여 보세요.']
+};
+/* 지금 보는 답안: 실제 = REAL[sdIdx] / 예시 = SAMPLES[sdKey] */
+function sdItem(){
+  if (sdMode === 'sample') { var d = SAMPLES[sdKey]; return { file:'예시 답안 · ' + LVC_NAME[sdKey], sc:d.sc, why:d.why, k:sdKey }; }
+  var r = REAL[sdIdx]; return { file:ansLabel(sdIdx), sc:r[1], why:r[1] ? (r[3] || SAMPLES[sdKind(r[1])].why) : null, k:r[1] ? sdKind(r[1]) : 'low' };
+}
+function openSample(key){
+  var picked = lvcPicked(); if (picked.indexOf(key) < 0) key = picked[0] || 'mid';
+  sdMode = 'sample'; sdKey = key;
+  go('detail'); sdRender(); setHash('sample-' + key);
+ 
+}
+function sdBack(){ if (sdMode === 'sample') { go('answers'); branch('none'); } else go('result', { mode:'real' }); }
+function sdKind(sc){ var t = sc[0] + sc[1] + sc[2]; return t >= 20 ? 'good' : (t >= 13 ? 'mid' : 'low'); }
+function openDetail(i){
+  var r = REAL[i]; if (!r) { go('result', { mode:'real' }); return; }
+  sdIdx = i; sdMode = 'real';
+  go('detail');
+  sdRender();
+  setHash('detail-' + i);
+}
+function sdNav(d){
+  if (sdMode === 'sample') {
+    var pk = lvcPicked(), at = pk.indexOf(sdKey) + d;
+    if (at < 0 || at >= pk.length) { toastMsg(pk.length > 1 ? (d > 0 ? '마지막 예시예요.' : '첫 번째 예시예요.') : '예시를 하나만 만들었어요.', true); return; }
+    openSample(pk[at]); return;
+  }
+  var n = sdIdx + d;
+  if (n < 0 || n >= REAL.length) { toastMsg(d > 0 ? '마지막 답안이에요.' : '첫 번째 답안이에요.', true); return; }
+  openDetail(n);
+}
+function sdTab(t){
+  document.getElementById('sdTabOrig').classList.toggle('on', t === 'orig');
+  document.getElementById('sdTabText').classList.toggle('on', t === 'text');
+  document.getElementById('sdOrig').style.display = t === 'orig' ? '' : 'none';
+  document.getElementById('sdText').style.display = t === 'text' ? '' : 'none';
+  document.getElementById('sdCtrl').style.display = t === 'orig' ? '' : 'none';
+}
+function sdGround(){ sdGroundOn = !sdGroundOn; document.getElementById('sdGroundBtn').classList.toggle('on', sdGroundOn); document.getElementById('s-detail').classList.toggle('hide-ground', !sdGroundOn); }
+function sdRows(){
+  var it = sdItem(), sc = it.sc, why = it.why;
+  document.getElementById('sdRows').innerHTML = RUB.map(function(c, ci){
+    var btns = c.levels.map(function(l){
+      var v = +l[0], cls = 'score-btn' + (sc && sc[ci] === v ? ' ai-suggest' : '') + (sdSel[ci] === v ? ' selected' : '');
+      return '<button class="' + cls + '" tabindex="-1">' + v + '</button>';
+    }).join('');
+    return '<div class="rubric-row"><span class="rubric-name">' + (ci + 1) + '. ' + esc(c.name) + '</span><div class="score-btns">' + btns + '</div>'
+      + (why ? '<div class="rubric-ground">' + why[ci].replace(/<q>/g, '‘').replace(/<\/q>/g, '’') + '</div>' : '') + '</div>';
+  }).join('');
+  var tot = 0, all = true; RUB.forEach(function(c, ci){ if (sdSel[ci] == null) all = false; else tot += sdSel[ci]; });
+  var mx = RUB.reduce(function(a, c){ return a + rubMax(c); }, 0);
+  document.getElementById('sdTotal').textContent = (all ? tot : '-') + ' / ' + mx;
+}
+function sdRender(){
+  var it = sdItem(), sc = it.sc, k = it.k, sm = sdMode === 'sample';
+  var det = document.getElementById('s-detail'); det.classList.toggle('sample', sm);
+  document.getElementById('sdFile').textContent = it.file;
+  document.getElementById('sdVfName').textContent = sm ? it.file + ' (AI가 만든 예시)' : it.file;
+  document.getElementById('sdVfDate').textContent = sm ? '저장되지 않아요' : '오늘 14:02 업로드';
+  document.getElementById('sdPre').textContent = sm ? '예시 답안으로 채점한 결과예요 · 실제 학생 답안이 아니고 저장되지 않아요' : '채점 결과 보기 · 점수 확정은 내 수업에 가져온 뒤 채점 화면에서 해요';
+  document.getElementById('sdBackT').textContent = sm ? '돌아가기' : '목록으로';
+  document.getElementById('sdPrevT').textContent = sm ? '이전 예시' : '이전 답안';
+  document.getElementById('sdNextT').textContent = sm ? '다음 예시' : '다음 답안';
+  document.getElementById('sdUpload').style.display = sm ? '' : 'none';
+  document.getElementById('sdTabText').style.display = sm ? 'none' : '';
+  /* 제출 원본: 활동지 + 손으로 쓴 답 */
+  var ans = sc ? SAMPLES[k].ans.replace(/<\/?mark>/g, '') : '<p>1. 성산일출봉은 화 … (번짐)</p><p>2. (사진이 기울어 읽기 어려움)</p>';
+  var paras = ans.match(/<p>(.*?)<\/p>/g) || [];
+  var qs = ['1. 다음 지도와 사진을 보고, 제주도 성산일출봉이 만들어진 과정을 마그마의 성질과 연결하여 설명하시오.', '2. 성산일출봉과 백두산 천지의 지형이 다른 이유를 자료에서 근거를 찾아 서술하시오.'];
+  document.getElementById('sdOrig').innerHTML = '<span class="viewer-page-num">1 / 1</span><h4>2학년 사회 수행평가 · 화산 지형 탐구</h4>'
+    + qs.map(function(q, i){ return '<p class="q">' + q + '</p><div class="a">' + (paras[i] || '').replace(/<\/?p>/g, '').replace(/^\d\.\s*/, '') + '</div>'; }).join('');
+  /* 인식 결과 */
+  var warn = sc ? '' : '<div class="sd-uncertain"><i data-lucide="alert-triangle"></i><span>AI가 이 파일을 거의 읽지 못했어요. 사진이 흐리거나 기울었을 수 있어요. 제출 원본을 보고 채점하거나, 다시 찍어 올려 주세요.</span></div>';
+  document.getElementById('sdText').innerHTML = warn + '<div style="display:flex;flex-direction:column;gap:24px;">'
+    + qs.map(function(q, i){ return '<div><div class="ocr-q-head"><span class="ocr-q-chip">문항 ' + (i + 1) + '</span></div><p class="ocr-q-prompt">' + q.replace(/^\d\.\s*/, '') + '</p><div class="ocr-ans-box"><span class="ocr-ans-label">답</span><p>' + (paras[i] || '').replace(/<\/?p>/g, '').replace(/^\d\.\s*/, '') + '</p></div></div>'; }).join('') + '</div>';
+  sdTab('orig');
+  /* 점수 · 근거 */
+  sdSel = sc ? sc.slice() : [];
+  document.getElementById('sdRubricBox').classList.toggle('disabled', false);
+  document.getElementById('sdFail').innerHTML = sc ? '' : '<div class="sd-fail"><i data-lucide="alert-triangle"></i><span><b>AI가 답안을 읽지 못해 채점하지 못했어요.</b> 이 답안에 쓴 크레딧 1개는 돌려드렸어요. 다시 찍어 올려 채점하거나, 내 수업에 가져온 뒤 채점 화면에서 직접 점수를 줄 수 있어요.</span></div>';
+  sdRows();
+  /* AI 피드백 */
+  document.getElementById('sdAiSec').style.display = sc ? '' : 'none';
+  if (sc) document.getElementById('sdFb').innerHTML = RUB.map(function(c, ci){
+    return '<div class="eval-card ac-neutral"><div class="ec-card-header readonly-header"><span class="ec-summary-wrap"><span class="ec-summary">' + esc(c.name) + '</span></span><span class="ec-score-pill">' + sc[ci] + ' / ' + rubMax(c) + '</span></div>'
+      + '<div class="ec-card-body"><div class="ec-block ec-block--feedback"><div class="ec-block-lbl">피드백</div><div class="ec-block-content editable" contenteditable="true">' + SD_FB[k][ci] + '</div></div></div></div>';
+  }).join('');
+  lucide.createIcons();
+}
+function toggleExp(id, btn){ var r = document.getElementById(id); var open = r.style.display !== 'none'; r.style.display = open ? 'none' : ''; btn.textContent = open ? '보기' : '접기'; }
+
+/* ── 기대와 다를 때: 원칙 문서(clipo_scoring_guide/rubric_principles.md) §5 진단표 → §2 원칙 + 실제 문장 전·후 ── */
+var FIX = [
+  { key:'low', chip:'전반적으로 낮아요', no:'③', pr:'만점의 높이 맞추기',
+    why:'만점 문장이 너무 높거나 조건을 줄줄이 이어 붙이면, 하나만 빠져도 만점이 안 나와요. 우리 반 상위권 답안이 닿는 높이로 맞춰요.',
+    b4:'…본론에 제시된 모든 논거가 그 입장과 일치하여 … 흔들림 없이 유지됨',
+    af:'서론과 결론에서 입장을 확인할 수 있고, 본론의 논거들이 그 입장과 일치하여 필자의 역사적 판단이 무리 없이 드러남',
+    src:'연구 사례 · 중2 역사 — 반 평균 18.5점 → 21.7점',
+    req:'만점 문장을 우리 반 상위권 답안이 닿을 수 있는 높이로 써 주세요. "모든·흔들림 없이"처럼 완벽을 요구하는 말과, 조건을 줄줄이 이어 붙이는 문장은 빼 주세요.' },
+  { key:'high', chip:'전반적으로 높아요', no:'①', pr:'한 요소에는 판단 하나만',
+    why:'서로 다른 판단이 한 요소에 묶여 있으면, 잘한 쪽이 부족한 쪽을 가려 점수가 올라가요. "구체적으로·논리적으로" 같은 말도 누구에게나 후하게 읽혀요.',
+    b4:'작품 관찰 및 맥락적 이해 (한 요소)',
+    af:'작품 관찰 / 작품 맥락 이해 (두 요소로 나눔) · "답변만 읽어도 작품의 모습이 머릿속에 그려지도록 시각적 요소를 구체적으로 묘사하는가"',
+    src:'연구 사례 · 고1 미술 — AI 42점 → 27점 (선생님 28점)',
+    req:'한 채점 요소에 판단이 하나만 들어가게 나눠 주세요. "구체적으로·논리적으로·창의적으로" 대신 답안에서 보이는 것으로 써 주세요.' },
+  { key:'twice', chip:'같은 실수가 두 번 깎여요', no:'①', pr:'요소마다 무엇만 볼지 적기',
+    why:'요소마다 무엇을 볼지 적혀 있지 않으면, 같은 실수를 여러 요소에서 각각 깎아요.',
+    b4:'(요소 설명 없음)',
+    af:'이 요소에서는 내용만 판단하며 문법과 철자는 언급하지 않는다',
+    src:'연구 사례 · 중3 영어 — 같은 문법 실수가 두 요소에서 두 번 깎이던 것 해소',
+    req:'요소마다 무엇만 보는지 한 문장씩 적어 주세요. 예: "이 요소에서는 내용만 판단하며 맞춤법은 보지 않는다."' },
+  { key:'vague', chip:'두루뭉술한 답도 높아요', no:'②', pr:'판단을 하나로 모으기',
+    why:'"대체로·일부"는 사람마다 다르게 읽혀요. 개수나 답안에서 보이는 조건으로 쓰면 누가 읽어도 같은 결론이 나요.',
+    b4:'대체로 부합하면서도, 일부 표현에서 다듬을 여지가 남아 있다',
+    af:'목표 문법 두 가지가 각각 1회 이상 출현하고 시제 오류가 0개에서 1개이다',
+    src:'연구 사례 · 중3 영어 — 네 답안 모두 선생님 채점과 1~2점 차이 안',
+    req:'"대체로·일부" 같은 말 대신 개수나 답안에서 확인할 수 있는 조건으로 급간을 나눠 주세요. 상과 중을 가르는 예시도 기준 안에 넣어 주세요.' },
+  { key:'wrong', chip:'바른 풀이가 틀렸다고 나와요', no:'②', pr:'문항이 묻는 범위와 다른 풀이 적기',
+    why:'기준이 문항이 묻지 않는 결론까지 요구하거나, 인정할 다른 풀이가 적혀 있지 않으면 바른 답도 깎여요.',
+    b4:'…두 밑각의 크기가 같음을 … 결론을 명확히 도출함 (증명 전체 요구)',
+    af:'…두 삼각형이 SAS 또는 ASA 등 적절한 합동 조건을 만족함을 명확히 서술하고 합동임을 논리적으로 결론지음 (묻는 부분만)',
+    src:'연구 사례 · 중2 수학 — 1점 → 2점 (선생님 판단과 같아짐)',
+    req:'문항이 실제로 묻는 범위만 채점하도록 만점 문장을 맞춰 주세요. 인정할 다른 풀이나 다른 표현도 기준에 적어 주세요.' }
+];
+function fixToggle(hd){ hd.parentNode.classList.toggle('open'); }
+function fixRender(){
+  document.querySelectorAll('.fix').forEach(function(box, bi){
+    box.querySelector('.fix-chips').innerHTML = FIX.map(function(f){ return '<button class="chip" data-k="' + f.key + '" onclick="fixPick(this,\'' + f.key + '\')"><i data-lucide="plus" style="width:14px;height:14px"></i>' + f.chip + '</button>'; }).join('');
+  });
+  lucide.createIcons();
+}
+function fixPick(btn, key){
+  var box = btn.closest('.fix'), f = FIX.filter(function(x){ return x.key === key; })[0];
+  box.querySelectorAll('.fix-chips .chip').forEach(function(c){ var on = c === btn; c.classList.toggle('on', on); var o = c.querySelector('i, svg'); if (o) o.remove(); var ic = document.createElement('i'); ic.setAttribute('data-lucide', on ? 'check' : 'plus'); ic.style.cssText = 'width:14px;height:14px'; c.insertBefore(ic, c.firstChild); });
+  var pane = box.querySelector('.fix-pane');
+  pane.innerHTML = '<p class="pr"><span class="no">' + f.no + '</span>' + f.pr + '</p><p class="why">' + f.why + '</p>'
+    + '<div class="ba"><div class="b4"><span class="lab">바꾸기 전</span>' + f.b4 + '</div><div class="af"><span class="lab">바꾼 후</span>' + f.af + '</div></div>'
+    + '<p class="src">' + f.src + '</p>'
+    + '<label class="req-box"><span class="lab">AI에게 이렇게 요청해요 <em>눌러서 바로 고쳐 쓸 수 있어요</em></span><textarea class="req-edit" rows="3">' + f.req + '</textarea></label>'
+    + '<div class="fix-acts"><button class="btn btn-outline" onclick="go(\'rubric\'); setTimeout(rubStartEdit, 30);"><i data-lucide="pencil" style="width:16px;height:16px"></i>직접 고치기</button>'
+    + '<button class="btn btn-primary" onclick="fixRegen(\'' + f.key + '\', this)"><i data-lucide="sparkles" style="width:16px;height:16px"></i>이 요청으로 다시 만들기</button></div>';
+  pane.classList.add('on');
+  lucide.createIcons();
+}
+function fixRegen(key, btn){
+  var f = FIX.filter(function(x){ return x.key === key; })[0];
+  var ta = btn && btn.closest('.fix') ? btn.closest('.fix').querySelector('.req-edit') : null;
+  var req = ta ? ta.value.trim() : f.req;
+  if (!req) { toastMsg('요청 내용을 적어 주세요.', true); if (ta) ta.focus(); return; }
+  var edited = ta && req !== f.req;
+  document.getElementById('mkCtx').innerHTML = '<div class="req-sum" style="margin:0;"><span class="pill"><i data-lucide="message-square-text"></i>' + (edited ? '고쳐 쓴 요청 · ' : '') + esc(req.length > 40 ? req.slice(0, 40) + '…' : req) + '</span></div>';
+  var pr = document.getElementById('reqPillReq'); pr.style.display = ''; pr.innerHTML = '<i data-lucide="message-square-text"></i>' + f.pr;
+  go('rubric', { making:true }); showMaking(true);
+  setTimeout(function(){ showMaking(false); window.scrollTo(0, 0); useCredit(1); toastMsg('요청을 반영해 채점기준을 다시 만들었어요. 크레딧 1개를 썼어요. 다시 채점해 비교해 보세요.'); lucide.createIcons(); }, 3000);
+}
+fixRender();
+
+/* ── 5. 내 수업에 가져오기 (예시 = 평가만 / 실제 = 답안까지) ── */
+var brFrom = 'real';
+function brStart(from){
+  brFrom = from; go('bridge'); brStep(1);
+  document.getElementById('brSub').textContent = from === 'sample' ? '활동지와 채점기준을 고른 수업의 평가로 만들어요. 예시 답안과 그 채점 결과는 가져오지 않아요.' : '채점 결과는 그대로 두고, 어느 수업의 누구 답안인지만 붙여요.';
+  document.getElementById('brNextT').textContent = from === 'sample' ? '가져오기' : '학생 맞추기';
+  document.getElementById('brHow').style.display = from === 'sample' ? '' : 'none';
+  document.getElementById('brKeep1').textContent = from === 'sample' ? '활동지와 채점기준이 그대로 들어가요' : '채점 결과와 채점기준은 그대로예요';
+  document.querySelectorAll('#brHow .pk').forEach(function(p){ p.classList.toggle('on', p.dataset.how === 'bulk'); });
+}
+function pkSel(el){ el.parentNode.querySelectorAll('.pk').forEach(function(p){ p.classList.remove('on'); }); el.classList.add('on'); }
+function brStep(n){
+  document.getElementById('brStep1').style.display = n === 1 ? '' : 'none';
+  document.getElementById('brStep2').style.display = n === 2 ? '' : 'none';
+  document.getElementById('brStep3').style.display = n === 3 ? '' : 'none';
+  setHash(n === 1 ? 'bridge' : 'bridge-' + n);
+  lucide.createIcons();
+}
+function brReset(){ brStep(1); }
+function brNext(){
+  if (brFrom === 'sample') { brDone(); return; }
+  var sc = ANS.kind === 'scan';
+  document.getElementById('brMatchScan').style.display = sc ? '' : 'none';
+  document.getElementById('brMatchFiles').style.display = sc ? 'none' : '';
+  brStep(2); toastMsg(sc ? '스캔 순서대로 번호순 학생과 맞췄어요.' : '파일명의 이름·번호로 9명을 맞췄어요. 3장은 골라 주세요.');
+}
+function brBack(){ brStep(1); }
+var BR_NEXT = {
+  bulk: [
+    ['upload', '걷은 답안 올리기', '과제물 관리에서 학생별 파일을 올려요', "location.href='task_ocr_v3_260623.html'"],
+    ['file-check-2', '평가 설계 확인', '가져온 채점기준을 평가 설계에서 봐요', "location.href='task_direct_write_v1_260729.html#design'"],
+    ['send', '학생 제출로 바꾸기', '평가 설계에서 답안 받는 방법을 바꿔요', "location.href='task_direct_write_v1_260729.html#design'"]],
+  student: [
+    ['send', '학생에게 과제 내기', '과제를 열면 학생이 클리포에서 답안을 내요', "location.href='task_direct_write_v1_260729.html#design'"],
+    ['file-check-2', '평가 설계 확인', '가져온 채점기준을 평가 설계에서 봐요', "location.href='task_direct_write_v1_260729.html#design'"],
+    ['upload', '직접 올리기로 바꾸기', '평가 설계에서 답안 받는 방법을 바꿔요', "location.href='task_direct_write_v1_260729.html#design'"]]
+};
+function brDone(){
+  var sm = brFrom === 'sample', nw = !!document.querySelector('#brStep1 .pk.new.on');
+  var how = (document.querySelector('#brHow .pk.on') || {}).dataset; how = how ? how.how : 'bulk';
+  var cls = nw ? '2학기 사회' : '1학기 사회', made = nw ? '2학기 사회 수업을 만들고 ' : '1학기 사회 수업에 ';
+  document.getElementById('brDoneT').textContent = sm ? cls + '에 ‘화산 지형 탐구’ 평가를 만들었어요' : cls + ' › 화산 지형 탐구로 가져왔어요';
+  document.getElementById('brDoneD').textContent = sm
+    ? made + '활동지와 채점기준을 넣었어요. ' + (how === 'student' ? '답안은 학생이 직접 제출해요.' : '답안은 걷어서 올리면 같은 기준으로 채점해요.')
+    : made + '채점 결과 ' + ansCount() + '건을 학생 이름과 함께 저장했어요. 이제부터는 늘 쓰던 화면에서 이어져요.';
+  if (sm) document.getElementById('brNextSample').innerHTML = BR_NEXT[how].map(function(n){
+    return '<div class="nx" onclick="' + n[3] + '"><p class="t"><i data-lucide="' + n[0] + '"></i>' + n[1] + '</p><p class="d">' + n[2] + '</p></div>';
+  }).join('');
+  document.getElementById('brDoneReal').style.display = sm ? 'none' : '';
+  document.getElementById('brDoneSample').style.display = sm ? '' : 'none';
+  QS.progress = null;
+  brStep(3); toastMsg(sm ? cls + '에 평가를 만들었어요.' : cls + ' › 화산 지형 탐구로 가져왔어요.');
+}
+
+/* ── 초기 진입 ── */
+routeFromHash();
+lucide.createIcons();
+</script>
+
+</body>
+</html>
