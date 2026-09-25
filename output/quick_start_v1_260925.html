@@ -93,17 +93,64 @@
     .tag-subj{ display:inline-flex; align-items:center; justify-content:center; background:#e9f2ff; color:#3151c4; font-size:13px; font-weight:600; border-radius:6px; padding:3px 10px; }
     .tag-owner{ display:inline-flex; align-items:center; justify-content:center; background:#ebdfff; color:#6f34db; font-size:13px; font-weight:600; border-radius:6px; padding:3px 10px; }
     /* 새 입구 카드 — 같은 그리드, 같은 크기. 수업 카드와 위계를 맞추되 '시작점'임을 채움색으로만 구분 */
-    .cc.quick{ background:#e9f2ff; border:1px dashed #a3c3ff; box-shadow:none; }
-    .cc.quick:hover{ border-style:solid; border-color:#416bff; box-shadow:none; }
+
+    /* ── 수업 만들기 팝업 (class_create_v1_260429 이식 · #cmModal 스코프) ── */
+    #cmModal{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.4);z-index:400;align-items:center;justify-content:center}
+    #cmModal.open{display:flex}
+    #cmModal .modal-box{background:#fff;border-radius:20px;width:540px;max-width:calc(100vw - 48px);box-shadow:0 0 1px #2226314D,0 8px 16px rgba(0,0,0,.1);display:flex;flex-direction:column}
+    #cmModal .modal-head{padding:24px 24px 16px;display:flex;align-items:center;justify-content:space-between}
+    #cmModal .modal-title{font-size:18px;font-weight:600;color:#222631}
+    #cmModal .modal-close{width:36px;height:36px;background:none;border:none;cursor:pointer;border-radius:4px;display:inline-flex;align-items:center;justify-content:center;line-height:1;vertical-align:middle;color:#3b3f4c}
+    #cmModal .modal-close:hover{background:#f1f3f5}
+    #cmModal .modal-body{padding:8px 24px 24px;display:flex;flex-direction:column;gap:16px}
+    #cmModal .row{display:grid;gap:8px}
+    #cmModal .row.cols-2{grid-template-columns:1fr 1fr}
+    #cmModal .field{display:flex;flex-direction:column;gap:6px}
+    #cmModal .field-label{font-size:14px;font-weight:500;color:#222631}
+    #cmModal .field-label.req::after{content:' *';color:#f2525f}
+    #cmModal .select,#cmModal .input{height:40px;border:1px solid #dde1e8;border-radius:4px;padding:0 12px;font-size:16px;font-family:inherit;color:#222631;background:#fff;width:100%}
+    #cmModal .select{appearance:none;-webkit-appearance:none;cursor:pointer;padding-right:36px;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%236d7381' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center}
+    #cmModal .select:focus,#cmModal .input:focus{outline:none;border-color:#416bff}
+    #cmModal .select.placeholder{color:#6d7381}
+    #cmModal .input::placeholder{color:#b3b6bd}
+    #cmModal .radio-group{display:flex;gap:24px;align-items:center;padding-top:8px}
+    #cmModal .radio{display:flex;align-items:center;gap:10px;cursor:pointer;font-size:15px;font-weight:500;color:#222631}
+    #cmModal .radio input{display:none}
+    #cmModal .ring{width:20px;height:20px;border-radius:50%;border:1.5px solid #dde1e8;background:#fff;flex-shrink:0;box-sizing:border-box}
+    #cmModal .radio input:checked + .ring{border:6.5px solid #365eef}
+    #cmModal .helper{display:flex;gap:4px;font-size:14px;color:#222631;font-weight:500}
+    #cmModal .helper a{color:#365eef;text-decoration:none;cursor:pointer}
+    #cmModal .ban-sub{display:flex;flex-direction:column;gap:12px;margin-top:12px;padding-left:30px}
+    #cmModal .ban-sub.hidden{display:none}
+    #cmModal .multiselect{position:relative;width:100%}
+    #cmModal .ms-trigger{height:40px;border:1px solid #dde1e8;border-radius:4px;padding:0 12px;font-size:16px;font-family:inherit;background:#fff;width:100%;display:flex;align-items:center;gap:8px;cursor:pointer;text-align:left}
+    #cmModal .ms-trigger:focus,#cmModal .multiselect.open .ms-trigger{outline:none;border-color:#416bff}
+    #cmModal .ms-display{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#222631}
+    #cmModal .ms-display.placeholder{color:#6d7381;font-weight:500}
+    #cmModal .ms-trigger svg{flex-shrink:0;color:#6d7381;transition:transform .15s}
+    #cmModal .multiselect.open .ms-trigger svg{transform:rotate(180deg)}
+    #cmModal .ms-panel{display:none;position:absolute;top:44px;left:0;right:0;background:#fff;border:1px solid #dde1e8;border-radius:8px;box-shadow:0 4px 12px rgba(0,0,0,.08);padding:6px;z-index:10;max-height:220px;overflow:auto}
+    #cmModal .multiselect.open .ms-panel{display:block}
+    #cmModal .ms-item{display:flex;align-items:center;gap:10px;padding:8px 10px;cursor:pointer;font-size:15px;color:#222631;border-radius:6px}
+    #cmModal .ms-item:hover{background:#f6f7f9}
+    #cmModal .ms-item input{display:none}
+    #cmModal .ms-checkbox{width:18px;height:18px;border:1px solid #d9d9d9;border-radius:4px;flex-shrink:0;display:flex;align-items:center;justify-content:center}
+    #cmModal .ms-item input:checked ~ .ms-checkbox{background:#416bff;border-color:#416bff}
+    #cmModal .ms-item input:checked ~ .ms-checkbox::after{content:'';width:5px;height:9px;border-right:2px solid #fff;border-bottom:2px solid #fff;transform:rotate(45deg) translate(-1px,-1px)}
+    #cmModal .modal-footer{display:flex;gap:12px;justify-content:flex-end;padding:8px 24px 16px}
+    #cmModal .btn-outline{height:40px;background:transparent;border:1px solid #a3c3ff;border-radius:4px;padding:10px 16px;font-size:15px;font-weight:600;color:#365eef;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;line-height:1;vertical-align:middle;font-family:inherit}
+    #cmModal .btn-outline:hover{background:#f4f8ff}
+    #cmModal .btn-solid{height:40px;background:#365eef;border:none;border-radius:4px;padding:10px 16px;font-size:15px;font-weight:600;color:#fff;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;line-height:1;vertical-align:middle;font-family:inherit}
+    #cmModal .btn-solid:hover{background:#3151c4}
+    #cmModal .notice-box{background:#f4f8ff;border:1px solid #ccdfff;border-radius:8px;padding:12px 14px;display:flex;gap:8px;font-size:14px;color:#222631;line-height:1.5}
+    #cmModal .notice-box svg{width:18px;height:18px;flex-shrink:0;margin-top:1px;color:#365eef}
+    #cmModal .notice-box .sub{margin-top:6px;font-size:13px;color:#365eef}
+    #cmModal .notice-box .sub a{color:#365eef;text-decoration:underline;cursor:pointer;font-weight:500}
+    .cc.quick{ background:#e9f2ff; border:1px solid #a3c3ff; box-shadow:0 2px 8px rgba(65,107,255,.12); }
+    .cc.quick:hover{ border-color:#416bff; box-shadow:0 4px 14px rgba(65,107,255,.2); }
     .cc.quick .qk-ico{ width:40px; height:40px; border-radius:10px; background:#fff; display:inline-flex; align-items:center; justify-content:center; color:#416bff; margin-bottom:12px; }
     .cc.quick .cc-name{ color:#1f47b3; }
     .cc.quick .cc-evals{ color:#3b3f4c; font-size:14px; line-height:1.5; margin-top:8px; }
-    .cc.empty{ background:transparent; border:1px dashed #c7cbd3; box-shadow:none; }
-    .cc.empty:hover{ border-color:#9ea3ad; box-shadow:none; }
-    .cc.empty .em-ico{ width:40px; height:40px; border-radius:10px; background:#f1f2f4; display:inline-flex; align-items:center; justify-content:center; color:#6d7381; margin-bottom:12px; }
-    .cc.empty .cc-name{ color:#3b3f4c; }
-    .cc.empty .cc-evals{ color:#6d7381; font-size:14px; line-height:1.5; margin-top:8px; }
-    .cc.empty .em-cta{ margin-top:auto; padding-top:14px; font-size:14px; font-weight:600; color:#3b3f4c; }
     .cc.quick .qk-foot{ margin-top:auto; padding-top:14px; display:flex; align-items:center; justify-content:space-between; gap:8px; }
     .cc.quick .qk-foot .qk-cta{ margin-top:0; padding-top:0; }
     .cc.quick .qk-new{ display:inline-flex; align-items:center; justify-content:center; line-height:1; vertical-align:middle; border:none; background:none; padding:0; font-size:14px; color:#6d7381; cursor:pointer; text-decoration:underline; }
@@ -709,6 +756,86 @@
 #s-detail.sample .sd-paper .a{ font-style:normal; color:#222631; font-size:16px; }
 #s-detail .tb-pre{ font-size:13px; color:#6d7381; white-space:nowrap; }
 
+    .ob-banner{ background:#e9f2ff; border:1px solid #ccdfff; border-radius:12px; padding:22px 24px; display:flex; gap:18px; align-items:flex-start; margin-bottom:28px; position:relative; }
+    .ob-emoji{ font-size:40px; line-height:1; flex-shrink:0; }
+    .ob-title{ font-size:18px; font-weight:700; color:#222631; margin:0 0 6px; }
+    .ob-desc{ font-size:15px; color:#3b3f4c; line-height:1.55; margin:0 0 14px; }
+    .ob-actions{ display:flex; gap:8px; }
+    .ob-meta{ position:absolute; top:16px; right:18px; display:flex; align-items:center; gap:14px; font-size:14px; color:#3b3f4c; }
+    .ob-meta label{ display:inline-flex; align-items:center; gap:6px; cursor:pointer; user-select:none; }
+    .ob-meta button{ background:none; border:none; cursor:pointer; color:#3b3f4c; font-size:14px; display:inline-flex; align-items:center; gap:2px; padding:2px 4px; line-height:1; }
+
+    .my-hd{ display:flex; align-items:center; justify-content:space-between; gap:14px; margin-bottom:18px; }
+    .my-title{ font-size:26px; font-weight:700; margin:0; }
+    .my-tools{ display:flex; align-items:center; gap:14px; }
+    .tgl{ display:inline-flex; align-items:center; gap:8px; cursor:pointer; user-select:none; font-size:15px; color:#3b3f4c; }
+    .tgl-track{ width:40px; height:22px; border-radius:100px; background:#d9d9d9; position:relative; transition:background .15s; flex-shrink:0; }
+    .tgl-knob{ position:absolute; top:2px; left:2px; width:18px; height:18px; border-radius:50%; background:#fff; transition:left .15s; box-shadow:0 1px 3px rgba(0,0,0,.2); }
+    .tgl.on .tgl-track{ background:#416bff; }
+    .tgl.on .tgl-knob{ left:20px; }
+    .sort-sel{ height:38px; padding:0 10px; border:1px solid #d9d9d9; border-radius:6px; font-family:inherit; font-size:14px; color:#3b3f4c; background:#fff; cursor:pointer; }
+    .btn-make{ height:40px; border-radius:100px; padding:0 18px; background:#416bff; color:#fff; border:none; font-size:15px; font-weight:600; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; line-height:1; vertical-align:middle; gap:6px; }
+    .btn-make:hover{ background:#365eef; }
+
+    .sem{ margin-bottom:10px; }
+    .sem-hd{ display:flex; align-items:center; gap:12px; padding:14px 0; cursor:pointer; user-select:none; }
+    .sem-title{ font-size:20px; font-weight:700; }
+    .sem-meta{ font-size:14px; color:#6d7381; }
+    .sem-chev{ margin-left:auto; color:#6d7381; transition:transform .15s; }
+    .sem.closed .sem-chev{ transform:rotate(180deg); }
+    .sem.closed .sem-body{ display:none; }
+    .sem-body{ padding-bottom:18px; }
+    .sem-grid{ display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:18px; }
+    /* 학기 내 서브 그룹 구분 (공유받은 수업 / 보관 중) */
+    .sub-div{ display:flex; align-items:center; gap:10px; margin:22px 0 14px; }
+    .sub-div-label{ font-size:15px; font-weight:600; color:#3b3f4c; display:inline-flex; align-items:center; gap:6px; flex-shrink:0; }
+    .sub-div-desc{ font-size:13px; color:#9ea3ad; flex-shrink:0; }
+    .sub-div-line{ flex:1; height:1px; background:#dde1e8; }
+
+    .cc{ background:#fff; border-radius:12px; padding:20px; min-height:172px; display:flex; flex-direction:column; cursor:pointer; box-shadow:0 0 1px #2226314D, 0 2px 8px #0000000F; position:relative; transition:box-shadow .12s; }
+    .cc:hover{ box-shadow:0 0 0 1.5px #ccdfff, 0 4px 12px #0000001A; }
+    .cc.arch{ background:#fbfbfc; }
+    .cc.arch .cc-name, .cc.arch .cc-evals{ color:#9ea3ad; }
+    .cc-top{ display:flex; align-items:flex-start; justify-content:space-between; gap:8px; }
+    .cc-name{ font-size:17px; font-weight:600; line-height:1.45; margin:0; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
+    .cc-menu-btn{ width:30px; height:30px; border:none; background:none; border-radius:6px; cursor:pointer; color:#6d7381; display:inline-flex; align-items:center; justify-content:center; flex-shrink:0; }
+    .cc-menu-btn:hover{ background:#f1f3f5; }
+    .cc-evals{ font-size:15px; color:#3b3f4c; margin-top:14px; }
+    .cc-tags{ display:flex; align-items:center; gap:6px; margin-top:auto; padding-top:16px; flex-wrap:wrap; }
+    .tag-subj{ display:inline-flex; align-items:center; justify-content:center; background:#e9f2ff; color:#3151c4; font-size:13px; font-weight:600; border-radius:6px; padding:3px 10px; }
+    .tag-shared{ display:inline-flex; align-items:center; justify-content:center; gap:4px; background:#eefcf4; color:#27724b; font-size:13px; font-weight:600; border-radius:6px; padding:3px 10px; }
+    .tag-arch{ display:inline-flex; align-items:center; justify-content:center; gap:4px; background:#f1f3f5; color:#6d7381; font-size:13px; font-weight:600; border-radius:6px; padding:3px 10px; }
+    .tag-owner{ display:inline-flex; align-items:center; justify-content:center; background:#ebdfff; color:#6f34db; font-size:13px; font-weight:600; border-radius:6px; padding:3px 10px; }
+    .cc-noti{ position:absolute; top:-9px; right:-9px; min-width:24px; height:24px; border-radius:100px; background:#f2525f; color:#fff; font-size:13px; font-weight:700; display:flex; align-items:center; justify-content:center; padding:0 7px; box-shadow:0 1px 4px rgba(0,0,0,.2); z-index:5; }
+    .cc-pop{ position:absolute; top:46px; right:14px; background:#fff; border-radius:8px; box-shadow:0 0 1px #2226314D, 0 8px 24px #00000026; padding:6px; z-index:50; min-width:148px; display:none; }
+    .cc-pop.open{ display:block; }
+    .cc-pop button{ width:100%; display:flex; align-items:center; gap:8px; padding:9px 12px; border:none; background:none; border-radius:6px; font-size:14px; color:#222631; cursor:pointer; text-align:left; }
+    .cc-pop button:hover{ background:#f6f7f9; }
+    .cc-pop-div{ height:1px; background:#f1f3f5; margin:4px 6px; }
+    .cc-pop button.cc-del{ color:#f2525f; }
+    .cc-pop button.cc-del:hover{ background:#fdeef0; }
+
+    .rail-card{ background:#fff; border-radius:12px; padding:20px; box-shadow:0 0 1px #2226314D, 0 2px 8px #0000000F; }
+    .rail-hd{ display:flex; align-items:center; justify-content:space-between; margin-bottom:14px; }
+    .rail-title{ font-size:17px; font-weight:700; }
+    .rail-more{ font-size:13px; color:#6d7381; background:none; border:none; cursor:pointer; display:inline-flex; align-items:center; gap:2px; }
+    .notice-row{ display:flex; align-items:center; gap:8px; padding:7px 0; font-size:14px; color:#3b3f4c; cursor:pointer; }
+    .notice-row:hover{ color:#222631; }
+    .notice-txt{ flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+    .notice-date{ font-size:13px; color:#9ea3ad; flex-shrink:0; }
+    .event-card{ background:#ffedd5; border-radius:12px; padding:18px 20px; cursor:pointer; }
+    .event-title{ font-size:15px; font-weight:700; color:#7c2d12; line-height:1.5; margin:0 0 8px; }
+    .event-link{ font-size:13px; font-weight:600; color:#9a4806; display:inline-flex; align-items:center; gap:2px; }
+    .res-row{ display:flex; align-items:flex-start; gap:10px; border-radius:8px; padding:12px; cursor:pointer; }
+    .res-row:hover{ background:#f6f7f9; }
+    .res-name{ font-size:14px; font-weight:600; color:#222631; margin:0 0 3px; }
+    .res-desc{ font-size:13px; color:#6d7381; margin:0; line-height:1.45; }
+    .school-row{ display:flex; gap:10px; margin-top:10px; }
+    .school-stat{ flex:1; background:#f6f7f9; border-radius:8px; padding:12px 14px; display:flex; align-items:center; justify-content:space-between; font-size:14px; color:#3b3f4c; }
+    .school-stat strong{ font-size:16px; color:#222631; }
+
+
+    .sem-empty{ font-size:15px; color:#9ea3ad; padding:4px 0 8px; margin:0; }
   </style>
 </head>
 <body>
@@ -749,48 +876,62 @@
 <!-- =================================================================== 홈 -->
 <section class="screen" id="s-home">
 <div class="page-wrap home">
+  <!-- 온보딩 배너: 개발 화면 그대로 -->
+  <div class="ob-banner" id="ob-banner">
+    <div class="ob-emoji">🚀</div>
+    <div style="flex:1;min-width:0;">
+      <p class="ob-title">클리포가 처음이신가요?</p>
+      <p class="ob-desc">클리포의 주요 메뉴 살펴보고, 평가 설계부터 AI 채점까지의 과정을 미리 체험할 수 있어요. 체험 완료하시면 AI 크레딧도 드려요!</p>
+      <div class="ob-actions">
+        <button class="btn-make" style="border-radius:6px;" onclick="notReady('체험 모드')">체험 시작하기 <i data-lucide="chevron-right" style="width:15px;height:15px"></i></button>
+        <button style="height:40px;border-radius:6px;padding:0 16px;background:#fff;border:1px solid #ccdfff;color:#3151c4;font-size:15px;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;line-height:1;vertical-align:middle;gap:6px;font-family:inherit;" onclick="notReady('AI 채점 예시')"><i data-lucide="wand-sparkles" style="width:15px;height:15px"></i>AI 채점 예시</button>
+      </div>
+    </div>
+    <div class="ob-meta">
+      <label><input type="checkbox" style="width:15px;height:15px;accent-color:#416bff;"> 다시 보지 않기</label>
+      <button onclick="document.getElementById('ob-banner').style.display='none'"><i data-lucide="x" style="width:15px;height:15px"></i> 닫기</button>
+    </div>
+  </div>
+
   <div class="home-cols">
+    <!-- 내 수업: 개발 화면(home_v1_260612) 그대로 -->
     <div class="home-main">
       <div class="my-hd">
         <h1 class="my-title">내 수업</h1>
         <div class="my-tools">
-          <select class="sort-sel"><option>최근 활동순</option><option>수업명순</option></select>
-          <button class="btn-make" onclick="notReady('수업 만들기')"><i data-lucide="plus" style="width:16px;height:16px"></i>수업 만들기</button>
+          <select class="sort-sel" id="hmSort" onchange="hmRender()"><option value="recent">최근 활동순</option><option value="name">수업명순</option></select>
+          <span class="tgl" id="hmArch" onclick="this.classList.toggle('on');toastMsg('보관한 수업이 없어요.', true)"><span class="tgl-track"><span class="tgl-knob"></span></span>보관한 수업 보기</span>
+          <button class="btn-make" onclick="cmOpen()"><i data-lucide="plus" style="width:16px;height:16px"></i>수업 만들기</button>
         </div>
       </div>
-      <div class="sem-hd"><span class="sem-title">2026학년도 2학기</span><span class="sem-meta" id="sem2Meta">아직 수업이 없어요</span></div>
-      <div class="sem-grid">
-        <!-- 새 입구: 현재 학기 그리드 첫 칸. 수업이 0개든 여러 개든 같은 자리(수업이 있으면 그 뒤로 수업 카드가 이어짐) -->
-        <div class="cc quick" id="qkCard" onclick="qkGo()">
-          <div class="qk-ico"><i data-lucide="scan-text" style="width:22px;height:22px"></i></div>
-          <h3 class="cc-name" id="qkT">활동지로 바로 채점해 보기</h3>
-          <div class="cc-evals" id="qkD">수업·학생을 등록하지 않아도 돼요. 활동지 1장이면 채점기준 초안을 받고 바로 채점해 볼 수 있어요.</div>
-          <div class="qk-foot"><span class="qk-cta" id="qkC">시작하기 <i data-lucide="arrow-right" style="width:15px;height:15px"></i></span><button class="qk-new" id="qkNew" style="display:none;" onclick="event.stopPropagation();QS.progress=null;go('upload')">다른 활동지로 시작</button></div>
-        </div>
-        <div class="cc" id="homeCls2" style="display:none;" onclick="toastMsg('수업 홈은 이 목업에서 열지 않아요.', true)"><h3 class="cc-name">사회</h3><div class="cc-evals">2학년 3반 · 수행평가 1개</div><div class="cc-tags"><span class="tag-subj">사회</span></div></div>
-        <div class="cc empty" id="homeEmpty" onclick="notReady('수업 만들기')">
-          <div class="em-ico"><i data-lucide="folder-plus" style="width:22px;height:22px"></i></div>
-          <h3 class="cc-name">2학기 수업부터 만들려면</h3>
-          <div class="cc-evals">수업을 만들고 평가를 설계해요. 채점해 본 뒤 결과를 가져오면서 만들어도 돼요.</div>
-          <span class="em-cta">수업 만들기</span>
-        </div>
-      </div>
-      <div class="sem-hd"><span class="sem-title">2026학년도 1학기</span><span class="sem-meta">1개</span></div>
-      <div class="sem-grid">
-        <div class="cc" onclick="toastMsg('지난 학기 수업은 이 목업에서 열지 않아요.', true)"><h3 class="cc-name">사회</h3><div class="cc-evals">2학년 3반 · 수행평가 2개</div><div class="cc-tags"><span class="tag-subj">사회</span></div></div>
-      </div>
+      <div id="semList"></div>
     </div>
+
     <div class="home-rail">
       <div class="rail-card">
-        <div class="rail-hd"><span class="rail-title">공지사항</span><button class="rail-more" onclick="toastMsg('공지사항 목록은 이 목업에서 제공하지 않습니다.', true)">더보기 <i data-lucide="chevron-right" style="width:13px;height:13px"></i></button></div>
+        <div class="rail-hd"><span class="rail-title">공지사항</span><button class="rail-more" onclick="notReady('공지사항 목록')">더보기 <i data-lucide="chevron-right" style="width:13px;height:13px"></i></button></div>
         <div class="notice-row">🔔 <span class="notice-txt">[안내] 채점 결과 공동 확인 기능 오픈</span><span class="notice-date">26/09/29</span></div>
         <div class="notice-row">🔔 <span class="notice-txt">클리포 충남교육청 '인수레' 연수 안내</span><span class="notice-date">26/09/12</span></div>
         <div class="notice-row"><span style="width:18px;"></span><span class="notice-txt">2학기 수행평가 준비, 이렇게 시작해요</span><span class="notice-date">26/09/01</span></div>
       </div>
+      <div class="event-card" onclick="notReady('이용권 혜택')">
+        <p class="event-title">🎁 [EVENT] 6개월권 기간 연장<br>지금 구매하면 12/31까지 쭉!</p>
+        <span class="event-link">이용권 혜택 보기 <i data-lucide="chevron-right" style="width:13px;height:13px"></i></span>
+      </div>
       <div class="rail-card" style="padding:14px;">
         <div class="rail-hd" style="padding:6px 6px 0;"><span class="rail-title">자료실</span></div>
-        <div class="res-row" onclick="toastMsg('외부 링크는 이 목업에서 연결하지 않습니다.', true)"><span style="font-size:18px;">▶️</span><div><p class="res-name">기능별 가이드 영상</p><p class="res-desc">과업별 1~2분 영상으로 따라해 보세요.</p></div></div>
-        <div class="res-row" onclick="toastMsg('외부 링크는 이 목업에서 연결하지 않습니다.', true)"><span style="font-size:18px;">✅</span><div><p class="res-name">학습지원 소프트웨어 체크리스트</p><p class="res-desc">학운위 심의 참고 자료를 확인해 보세요.</p></div></div>
+        <div class="res-row" onclick="notReady('외부 링크')"><span style="font-size:18px;">▶️</span><div><p class="res-name">클리포 유튜브</p><p class="res-desc">기능별 가이드 영상을 보며 따라해 보세요.</p></div></div>
+        <div class="res-row" onclick="notReady('외부 링크')"><span style="font-size:18px;">✅</span><div><p class="res-name">학습지원 소프트웨어 체크리스트</p><p class="res-desc">학운위 심의 참고 자료를 확인해 보세요.</p></div></div>
+        <div class="res-row" onclick="notReady('외부 링크')"><span style="font-size:18px;">✏️</span><div><p class="res-name">개인정보 동의서 양식</p><p class="res-desc">학부모 안내용 가정통신문으로 활용하세요.</p></div></div>
+      </div>
+      <div class="rail-card">
+        <div class="rail-hd"><span class="rail-title">학교 정보</span><button class="rail-more" onclick="notReady('학교 설정')">더보기 <i data-lucide="chevron-right" style="width:13px;height:13px"></i></button></div>
+        <div style="font-size:13px;color:#6d7381;margin-bottom:4px;">학교명</div>
+        <div style="font-size:16px;font-weight:600;">경기도테스트중학교</div>
+        <div style="font-size:13px;color:#6d7381;margin-top:14px;">선생님</div>
+        <div class="school-row" style="margin-top:6px;"><div class="school-stat">대표교사 <strong>1명</strong></div><div class="school-stat">일반교사 <strong>4명</strong></div></div>
+        <div style="font-size:13px;color:#6d7381;margin-top:14px;">등록 학생</div>
+        <div class="school-row" style="margin-top:6px;"><div class="school-stat">2026학년도 <strong>31명</strong></div></div>
       </div>
     </div>
   </div>
@@ -948,6 +1089,10 @@
         <div class="req-sum" style="margin:6px 0 0;"><span class="pill" id="reqPillQ"><i data-lucide="file-text"></i>문항 3개</span><span class="pill" id="reqPillUnit" style="display:none;"><i data-lucide="book-open"></i></span><span class="pill" id="reqPillFile" style="display:none;"><i data-lucide="presentation"></i>수업 PPT</span><span class="pill" id="reqPillReq" style="display:none;"><i data-lucide="message-square-text"></i></span></div>
         <button class="btn btn-ghost" style="margin-top:10px;padding:0;" onclick="go('upload')">활동지로 돌아가 더하거나 바꾸기</button>
       </div>
+      <a class="side-box" href="https://obkim-lgtm.github.io/clipo-blog/video.html?v=R1" target="_blank" rel="noopener" style="display:block;text-decoration:none;color:inherit;">
+        <p class="side-t"><i data-lucide="play-circle"></i>채점기준 잘 쓰는 법 · 2:26</p>
+        <div class="sec-desc">선생님 점수와 잘 맞는 기준의 원칙 3가지를 영상으로 봐요. <span style="color:#3151c4;font-weight:600;text-decoration:underline;">블로그에서 보기</span></div>
+      </a>
       <div class="side-box">
         <p class="side-t"><i data-lucide="bot"></i>크레딧</p>
         <div class="note"><i data-lucide="info"></i><span>채점은 <b>파일 1개(학생 1명)당 1개</b>. 예시 답안은 만들기 1 + 채점 1이라 <b>1편당 2개</b>예요.</span></div>
@@ -1325,7 +1470,7 @@
       </div>
     </div>
   </div>
-  <div class="cmp-note"><b>기존 사용자에게 바뀌는 것</b> — 홈에 카드 1장이 늘어난다. 그 외 화면·메뉴·데이터는 바뀌지 않는다. 연결 전 채점은 '임시 채점'으로 30일 보관되며, 기존 수업 목록에 섞이지 않는다.</div>
+  <div class="cmp-note"><b>기존 사용자에게 바뀌는 것</b> — 홈 현재 학기 첫 칸에 카드 1장(상태에 따라 이어서 할 일로 바뀜). 그 외 화면·메뉴·데이터는 바뀌지 않는다. 연결 전 채점은 '임시 채점'으로 30일 보관되며, 기존 수업 목록에 섞이지 않는다.</div>
   <footer class="site-footer"><div class="sf-copy">© 2026. Datadriven Inc. All rights reserved.</div></footer>
 </div>
 </section>
@@ -1334,9 +1479,70 @@
 
 <div class="toast" id="toast"><span id="toast-msg"></span></div>
 
+
+<!-- ===== 수업 만들기 팝업 (개발 확정 화면 class_create_v1_260429 이식) ===== -->
+<div id="cmModal" onclick="if(event.target===this)cmClose()">
+  <div class="modal-box">
+    <div class="modal-head">
+      <div class="modal-title">수업 만들기</div>
+      <button class="modal-close" onclick="cmClose()" aria-label="닫기"><i data-lucide="x" style="width:16px;height:16px"></i></button>
+    </div>
+    <div class="modal-body">
+      <div class="row cols-2">
+        <div class="field">
+          <label class="field-label">학기</label>
+          <select class="select" id="cmTerm"><option>2026학년도 1학기</option><option selected>2026학년도 2학기</option></select>
+        </div>
+        <div class="field">
+          <label class="field-label">학년</label>
+          <select class="select" id="cmGrade" onchange="cmGradeChange()"><option value="1">1학년</option><option value="2" selected>2학년</option><option value="3">3학년</option><option value="none">학년 구분 없음</option></select>
+        </div>
+      </div>
+      <div class="field">
+        <label class="field-label">과목명</label>
+        <div class="radio-group">
+          <label class="radio"><input type="radio" name="cmCurri" checked><span class="ring"></span><span>2015 개정 교육과정</span></label>
+          <label class="radio"><input type="radio" name="cmCurri"><span class="ring"></span><span>2022 개정 교육과정</span></label>
+        </div>
+        <select class="select placeholder" id="cmSubject" style="margin-top:6px" onchange="cmSubjectChange()">
+          <option>과목을 선택해 주세요.</option><option>사회</option><option>역사</option><option>과학</option><option>국어</option><option>수학</option><option>도덕</option>
+        </select>
+        <div class="helper"><span>* 원하는 과목이 없을 경우 내 정보에서 교과를 추가해 주세요.</span><a onclick="notReady('교과 추가')">교과 추가</a></div>
+      </div>
+      <div class="field">
+        <label class="field-label">수업명</label>
+        <input class="input" id="cmName" placeholder="수업명을 입력해 주세요. (예: 국어, 수학 1반, 인공지능 이해 등)">
+      </div>
+      <div class="field">
+        <label class="field-label">반 편성</label>
+        <div class="radio-group">
+          <label class="radio"><input type="radio" name="cmBan" checked onchange="cmBanType('homeroom')"><span class="ring"></span><span>학적 기준반</span></label>
+          <label class="radio"><input type="radio" name="cmBan" onchange="cmBanType('move')"><span class="ring"></span><span>이동수업반</span></label>
+        </div>
+        <div class="ban-sub" id="cmBanHome">
+          <div class="field">
+            <label class="field-label req">반 <span style="font-weight:400;color:#6d7381">(여러 반 선택 가능)</span></label>
+            <div class="multiselect" id="cmMs">
+              <button class="ms-trigger" type="button" onclick="cmMsToggle(event)"><span class="ms-display placeholder" id="cmMsDisp">반을 선택해 주세요</span><i data-lucide="chevron-down" style="width:20px;height:20px"></i></button>
+              <div class="ms-panel" id="cmMsPanel"></div>
+            </div>
+          </div>
+          <div class="notice-box"><i data-lucide="info"></i><div><div id="cmNotice">선택한 학년·반의 학생이 자동으로 참여 학생에 추가됩니다.</div><div class="sub">원하는 반이 없나요? <a onclick="notReady('학교설정 › 학생')">학교설정 &gt; 학생</a>에서 학생을 등록하면 반이 자동 생성돼요.</div></div></div>
+        </div>
+        <div class="ban-sub hidden" id="cmBanMove">
+          <div class="notice-box"><i data-lucide="info"></i><div>저장 후 이동반을 만들고 학생을 직접 등록할 수 있어요. 여러 학년·반에서 학생을 모아 명단을 구성할 때 사용하세요.</div></div>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-outline" onclick="cmClose()">취소</button>
+      <button class="btn-solid" onclick="cmCreate()">저장</button>
+    </div>
+  </div>
+</div>
 <script>
 function toggleNav(){ document.getElementById('icon-sb').classList.toggle('expanded'); document.body.classList.toggle('nav-expanded'); }
-function notReady(name){ toastMsg((name || '해당 화면') + ' 은(는) 이 목업에서 제공하지 않아요.', true); }
+function notReady(name){ toastMsg('이 목업에서는 ‘' + (name || '해당 화면') + '’ 화면을 제공하지 않아요.', true); }
 var _toastTimer = null;
 function toastMsg(msg, info){
   var t = document.getElementById('toast');
@@ -1366,34 +1572,59 @@ var CREDIT = 50;
 function useCredit(n){ CREDIT = Math.max(0, CREDIT - n); document.getElementById('hdCredit').textContent = CREDIT + ' 크레딧'; }
 /* 홈 첫 칸 = 이어서 할 일. null = 처음 / real = 임시 채점 있음 / sample = 채점기준+예시만 / waiting = 수업 평가를 설계했는데 답안 0개 */
 var QS = { progress:null };
-function qkRender(){
-  var p = QS.progress, t = document.getElementById('qkT'); if (!t) return;
-  var arrow = ' <i data-lucide="arrow-right" style="width:15px;height:15px"></i>';
-  if (p === 'real') {
-    t.innerHTML = '화산 지형 탐구<span class="qk-tag">임시 채점</span>';
-    document.getElementById('qkD').textContent = '답안 ' + ansCount() + '장을 채점했어요. 내 수업에 가져오지 않으면 29일 뒤 지워져요.';
-    document.getElementById('qkC').innerHTML = '이어서 보기' + arrow;
-  } else if (p === 'sample') {
-    t.innerHTML = '화산 지형 탐구<span class="qk-tag">채점기준 초안</span>';
-    document.getElementById('qkD').textContent = '예시 답안으로 채점해 봤어요. 답안을 올리면 이 기준으로 바로 채점해요.';
-    document.getElementById('qkC').innerHTML = '답안 올리기' + arrow;
-  } else if (p === 'waiting') {
-    t.innerHTML = '화산 지형 탐구<span class="qk-tag">답안 기다리는 중</span>';
-    document.getElementById('qkD').innerHTML = '2학기 사회 평가를 설계했어요. 걷은 답안을 올리면 바로 채점해요. 걷지 않으려면 <button class="qk-inl" onclick="event.stopPropagation();location.href=\'task_direct_write_v1_260729.html#design\'">학생 제출로 받기</button>';
-    document.getElementById('qkC').innerHTML = '스캔 PDF 올리기' + arrow;
-  } else {
-    t.textContent = '활동지로 바로 채점해 보기';
-    document.getElementById('qkD').textContent = '수업·학생을 등록하지 않아도 돼요. 활동지 1장이면 채점기준 초안을 받고 바로 채점해 볼 수 있어요.';
-    document.getElementById('qkC').innerHTML = '시작하기' + arrow;
-  }
-  document.getElementById('qkNew').style.display = p ? '' : 'none';
-  var w = p === 'waiting';
-  document.getElementById('homeCls2').style.display = w ? '' : 'none';
-  document.getElementById('homeEmpty').style.display = w ? 'none' : '';
-  document.getElementById('sem2Meta').textContent = w ? '진행 중 1개' : '아직 수업이 없어요';
-  document.querySelector('#qkCard .qk-ico').innerHTML = '<i data-lucide="' + (p === 'waiting' ? 'inbox' : p ? 'history' : 'scan-text') + '" style="width:22px;height:22px"></i>';
+/* 내 수업 데이터: 개발 홈(home_v1_260612)과 같은 모양. 2학기 0개 · 1학기 사회 1개. waiting이면 2학기 사회(평가 1개)가 있음 */
+/* 내 수업 데이터: 개발 홈(home_v1_260612)과 같은 모양. 2학기 0개 · 1학기 사회 1개. waiting이면 2학기 사회(평가 1개)가 있음 */
+var HM = [ { id:'c1', sem:'2026학년도 1학기', name:'사회', evals:2, subj:'사회', last:260612 } ];
+var HM_SEM = ['2026학년도 2학기', '2026학년도 1학기'];
+var hmClosed = {};
+function hmClasses(){
+  var list = HM.slice();
+  if (QS.progress === 'waiting') list.push({ id:'w1', sem:'2026학년도 2학기', name:'사회', evals:1, subj:'사회', last:260920 });
+  return list;
+}
+/* 개발 카드 그대로 */
+function hmCard(c){
+  return '<div class="cc" onclick="toastMsg(\'수업 홈은 이 목업에서 열지 않아요.\', true)">'
+    + '<div class="cc-top"><h3 class="cc-name" data-nm="' + c.id + '"></h3>'
+    + '<button class="cc-menu-btn" onclick="event.stopPropagation();hmPop(\'' + c.id + '\')"><i data-lucide="more-vertical" style="width:17px;height:17px"></i></button></div>'
+    + '<div class="cc-evals">수행평가 ' + c.evals + '개</div>'
+    + '<div class="cc-tags"><span class="tag-subj">' + c.subj + '</span></div>'
+    + '<div class="cc-pop" id="hpop-' + c.id + '" onclick="event.stopPropagation()">'
+    + '<button onclick="notReady(\'보관하기\')">보관하기</button><button onclick="notReady(\'수업 정보 수정\')">수업 정보 수정</button><div class="cc-pop-div"></div><button class="cc-del" onclick="notReady(\'수업 삭제\')">수업 삭제</button>'
+    + '</div></div>';
+}
+function hmPop(id){ var t = document.getElementById('hpop-' + id), was = t.classList.contains('open'); document.querySelectorAll('.cc-pop').forEach(function(p){ p.classList.remove('open'); }); if (!was) t.classList.add('open'); }
+document.addEventListener('click', function(){ document.querySelectorAll('.cc-pop').forEach(function(p){ p.classList.remove('open'); }); });
+/* 새 입구 카드(현재 학기 첫 칸): 처음 / 임시 채점 / 채점기준 초안 / 답안 기다림 */
+function qkHTML(){
+  var p = QS.progress, arrow = ' <i data-lucide="arrow-right" style="width:15px;height:15px"></i>', t, d, c, ic;
+  if (p === 'real') { ic = 'history'; t = '화산 지형 탐구<span class="qk-tag">임시 채점</span>'; d = '답안 ' + ansCount() + '장을 채점했어요. 내 수업에 가져오지 않으면 29일 뒤 지워져요.'; c = '이어서 보기'; }
+  else if (p === 'sample') { ic = 'history'; t = '화산 지형 탐구<span class="qk-tag">채점기준 초안</span>'; d = '예시 답안으로 채점해 봤어요. 답안을 올리면 이 기준으로 바로 채점해요.'; c = '답안 올리기'; }
+  else if (p === 'waiting') { ic = 'inbox'; t = '화산 지형 탐구<span class="qk-tag">답안 기다리는 중</span>'; d = '2학기 사회 평가를 설계했어요. 걷은 답안을 올리면 바로 채점해요. 걷지 않으려면 <button class="qk-inl" onclick="event.stopPropagation();location.href=\'task_direct_write_v1_260729.html#design\'">학생 제출로 받기</button>'; c = '스캔 PDF 올리기'; }
+  else { ic = 'scan-text'; t = '활동지로 바로 채점해 보기'; d = '수업·학생을 등록하지 않아도 돼요. 활동지 1장이면 채점기준 초안을 받고 바로 채점해 볼 수 있어요.'; c = '시작하기'; }
+  return '<div class="cc quick" id="qkCard" onclick="qkGo()"><div class="qk-ico"><i data-lucide="' + ic + '" style="width:22px;height:22px"></i></div>'
+    + '<h3 class="cc-name">' + t + '</h3><div class="cc-evals">' + d + '</div>'
+    + '<div class="qk-foot"><span class="qk-cta">' + c + arrow + '</span>'
+    + (p ? '<button class="qk-new" onclick="event.stopPropagation();QS.progress=null;go(\'upload\')">다른 활동지로 시작</button>' : '') + '</div></div>';
 }
 function qkGo(){ if (QS.progress === 'waiting') location.href = 'task_ocr_v3_260623.html?nav=uploadBulk'; else if (QS.progress === 'real') go('result', { mode:'real' }); else if (QS.progress === 'sample') { go('answers'); branch('has'); } else go('upload'); }
+function hmRender(){
+  var all = hmClasses(), mode = document.getElementById('hmSort').value, h = '', order = [];
+  HM_SEM.forEach(function(sem, si){
+    var mine = all.filter(function(c){ return c.sem === sem; }).sort(function(a, b){ return mode === 'name' ? a.name.localeCompare(b.name, 'ko') : b.last - a.last; });
+    order = order.concat(mine);
+    var closed = !!hmClosed[sem];
+    h += '<div class="sem' + (closed ? ' closed' : '') + '"><div class="sem-hd" onclick="hmClosed[\'' + sem + '\']=!hmClosed[\'' + sem + '\'];hmRender()">'
+      + '<span class="sem-title">' + sem + '</span><span class="sem-meta">진행 중 ' + mine.length + '개 · 보관 중 0개</span>'
+      + '<i data-lucide="chevron-up" class="sem-chev" style="width:20px;height:20px"></i></div><div class="sem-body">'
+      + '<div class="sem-grid">' + (si === 0 ? qkHTML() : '') + mine.map(hmCard).join('') + '</div>'
+      + '</div></div>';
+  });
+  var el = document.getElementById('semList'); el.innerHTML = h;
+  order.forEach(function(c){ var n = el.querySelector('[data-nm="' + c.id + '"]'); if (n) n.textContent = c.name; });
+  lucide.createIcons();
+}
+function qkRender(){ hmRender(); }
 function setCredit(n){ CREDIT = n; document.getElementById('hdCredit').textContent = CREDIT + ' 크레딧'; }
 
 /* ── 해시 라우팅 (양방향 · hashchange · replaceState) ── */
@@ -1431,6 +1662,7 @@ function routeFromHash(){
     else if (h === 'result-sample') openSample(lvcPicked()[0]);
     else if (/^sample-(good|mid|low)$/.test(h)) { var sk = h.split('-')[1]; if (!LVC[sk]) { LVC[sk] = true; lvcUpd(); } openSample(sk); }
     else if (h === 'result') go('result', { mode:'real' });
+    else if (h === 'class-create') { go('home'); cmOpen(); }
     else if (h === 'home-resume') { QS.progress = 'real'; go('home'); setHash('home-resume'); }
     else if (h === 'home-waiting') { QS.progress = 'waiting'; go('home'); setHash('home-waiting'); }
     else go(h);
@@ -1886,6 +2118,45 @@ function brDone(){
   document.getElementById('brDoneSample').style.display = sm ? '' : 'none';
   QS.progress = null;
   brStep(3); toastMsg(sm ? cls + '에 평가를 만들었어요.' : cls + ' › 화산 지형 탐구로 가져왔어요.');
+}
+
+
+/* ── 수업 만들기 팝업 ── */
+var cmSel = [];
+function cmOpen(){ cmReset(); document.getElementById('cmModal').classList.add('open'); lucide.createIcons(); setHash('class-create'); }
+function cmClose(){ document.getElementById('cmModal').classList.remove('open'); if (location.hash === '#class-create') setHash('home'); }
+function cmBanType(t){ document.getElementById('cmBanHome').classList.toggle('hidden', t !== 'homeroom'); document.getElementById('cmBanMove').classList.toggle('hidden', t === 'homeroom'); }
+function cmSubjectChange(){ var sel = document.getElementById('cmSubject'); if (sel.selectedIndex > 0) { document.getElementById('cmName').value = sel.value; sel.classList.remove('placeholder'); } }
+function cmOpts(){ var g = document.getElementById('cmGrade').value, o = []; (g === 'none' ? ['1','2','3'] : [g]).forEach(function(gr){ for (var i = 1; i <= 5; i++) o.push({ val:gr + '-' + i, label:gr + '-' + i + '반' }); }); return o; }
+function cmBuild(){
+  var panel = document.getElementById('cmMsPanel'); panel.innerHTML = '';
+  cmOpts().forEach(function(o){
+    var lb = document.createElement('label'); lb.className = 'ms-item';
+    var cb = document.createElement('input'); cb.type = 'checkbox'; cb.checked = cmSel.some(function(x){ return x.val === o.val; });
+    cb.addEventListener('change', function(){ var k = cmSel.findIndex(function(x){ return x.val === o.val; }); if (k < 0) cmSel.push(o); else cmSel.splice(k, 1); cmSel.sort(function(a, b){ return a.val.localeCompare(b.val, undefined, { numeric:true }); }); cmDisp(); });
+    var bx = document.createElement('span'); bx.className = 'ms-checkbox';
+    var tx = document.createElement('span'); tx.textContent = o.label;
+    lb.appendChild(cb); lb.appendChild(bx); lb.appendChild(tx); panel.appendChild(lb);
+  });
+}
+function cmDisp(){ var d = document.getElementById('cmMsDisp'); if (!cmSel.length) { d.textContent = '반을 선택해 주세요'; d.classList.add('placeholder'); } else { d.textContent = cmSel.map(function(x){ return x.label; }).join(', '); d.classList.remove('placeholder'); } }
+function cmMsToggle(e){ e.stopPropagation(); document.getElementById('cmMs').classList.toggle('open'); }
+document.addEventListener('click', function(e){ var ms = document.getElementById('cmMs'); if (ms && !ms.contains(e.target)) ms.classList.remove('open'); });
+function cmGradeChange(){ cmSel = []; cmBuild(); cmDisp(); document.getElementById('cmNotice').textContent = document.getElementById('cmGrade').value === 'none' ? '선택한 반의 학생이 자동으로 참여 학생에 추가됩니다.' : '선택한 학년·반의 학생이 자동으로 참여 학생에 추가됩니다.'; }
+function cmReset(){
+  var sj = document.getElementById('cmSubject'); sj.selectedIndex = 0; sj.classList.add('placeholder');
+  document.getElementById('cmName').value = ''; document.getElementById('cmGrade').value = '2';
+  document.querySelectorAll('input[name="cmBan"]')[0].checked = true; cmBanType('homeroom');
+  cmSel = []; cmBuild(); cmDisp(); document.getElementById('cmMs').classList.remove('open');
+}
+function cmCreate(){
+  var sj = document.getElementById('cmSubject'), home = document.querySelectorAll('input[name="cmBan"]')[0].checked;
+  if (sj.selectedIndex === 0) { toastMsg('과목을 선택해 주세요.', true); return; }
+  if (home && !cmSel.length) { toastMsg('반을 선택해 주세요.', true); return; }
+  var name = document.getElementById('cmName').value.trim() || sj.value;
+  HM.push({ id:'n' + Date.now(), sem:document.getElementById('cmTerm').value, name:name, evals:0, subj:sj.value, last:999999 });
+  hmRender();
+  cmClose(); toastMsg('‘' + name + '’ 수업을 만들었어요.');
 }
 
 /* ── 초기 진입 ── */
