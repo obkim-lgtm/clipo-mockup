@@ -1,0 +1,909 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <script>window.MOCK_NAV_ENTRY_HASH = location.hash;</script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/png" href="clipo_favicon.png">
+  <title>홈 리뉴얼 v2 — 내 할 일 + 진행 막대 카드 (CLIPO)</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard-gov.min.css">
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+  <!-- v2(2026-09-26, 올립 A안 선택): v1(home_renewal_v1_260925)과 나란히 비교용. 바뀐 것 = 할 일은 '내 할 일' 목록(처음엔 알약 → 09-26 목록 상자로) · 수업 카드는 과목 아이콘 · 반 · 학생 수 · 평가 진행 막대(파랑 계열). 미확정.
+       이하 v1 설명: 원본 = 개발 확정 홈 home_v1_260612.html 복제. 바뀐 것: 상단바 58px 신규 스펙 · 온보딩 배너/확인 요청 띠 제거 · 수업 카드 = 다음 할 일 · 새 입구 자리 후보 3안(#entry-*) · 오른쪽 레일 -->
+  <style>
+    *{ font-family:'Pretendard GOV',-apple-system,sans-serif; box-sizing:border-box; }
+    body{ margin:0; background:#f6f7f9; color:#222631; font-size:16px; min-width:1280px; }
+    a{ text-decoration:none; color:inherit; }
+    button{ font-family:inherit; }
+
+    /* ===== Global Header (CLIPO 표준 · 58px 신규 상단바) ===== */
+    .g-hd { height:58px; background:#fff; border-bottom:1px solid #dde1e8; display:flex; align-items:center; padding:0 20px 0 9px; position:fixed; top:0; left:0; right:0; z-index:200; }
+    .gh-menu-btn { width:40px; height:40px; border:none; background:none; border-radius:4px; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; color:#3b3f4c; margin-right:9px; line-height:1; vertical-align:middle; }
+    .gh-menu-btn:hover { background:#f6f7f9; }
+    .gh-logo { display:inline-flex; align-items:center; cursor:pointer; padding:4px; border-radius:4px; }
+    .g-hd-r { margin-left:auto; display:flex; align-items:center; gap:16px; font-size:15px; color:#18181b; }
+    .hd-plan { display:flex; align-items:center; gap:8px; }
+    .plan-badge { display:inline-flex; align-items:center; height:20px; background:#e9f2ff; border:1px solid #ccdfff; color:#3151c4; font-size:12px; font-weight:500; padding:0 6px; border-radius:6px; line-height:1; }
+    .credit-wrap { display:flex; align-items:center; gap:8px; font-size:15px; font-weight:500; color:#18181b; }
+    .user-btn { display:inline-flex; align-items:center; justify-content:center; gap:4px; height:36px; padding:0 12px; border:1px solid #c7cbd3; border-radius:9999px; background:none; font-size:14px; color:#27272a; cursor:pointer; line-height:1; vertical-align:middle; font-weight:500; }
+
+    /* ===== Sidebar (CLIPO 표준 icon-sb) ===== */
+    .icon-sb { width:56px; background:#fff; border-right:1px solid #d9d9d9; position:fixed; top:58px; bottom:0; left:0; display:flex; flex-direction:column; padding:8px 0; z-index:150; transition:width .2s ease; }
+    .icon-sb.expanded { width:200px; }
+    .si { height:40px; display:flex; align-items:center; border-radius:8px; color:#6d7381; cursor:pointer; margin:0 8px 2px; position:relative; padding:0 4px 0 8px; gap:10px; white-space:nowrap; flex-shrink:0; }
+    .si:hover { background:#f1f3f5; }
+    .si.active { background:#e9f2ff; color:#416bff; }
+    .si-icon { width:24px; height:24px; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+    .si-label { font-size:13px; font-weight:500; opacity:0; transition:opacity .1s; overflow:hidden; }
+    .icon-sb.expanded .si-label { opacity:1; }
+    .si-tip { position:absolute; left:48px; top:50%; transform:translateY(-50%); background:#222631; color:#fff; font-size:11px; padding:3px 8px; border-radius:4px; white-space:nowrap; display:none; z-index:300; pointer-events:none; }
+    .si:hover .si-tip { display:block; }
+    .icon-sb.expanded .si-tip { display:none !important; }
+    .nav-bottom { margin-top:auto; width:100%; }
+    .nav-div { height:1px; background:#f1f3f5; margin:4px 8px; }
+
+    /* ===== Layout ===== */
+    .main-wrap{ padding-top:58px; padding-left:56px; transition:padding-left .2s; min-height:100vh; display:flex; flex-direction:column; }
+    body.nav-expanded .main-wrap{ padding-left:200px; }
+    .page-wrap{ max-width:1320px; width:100%; margin:0 auto; padding:28px 32px 0; flex:1; display:flex; flex-direction:column; }
+    .home-cols{ display:flex; gap:24px; align-items:flex-start; }
+    .home-main{ flex:1; min-width:0; }
+    .home-rail{ width:320px; flex-shrink:0; display:flex; flex-direction:column; gap:20px; }
+
+    /* ===== 내 수업 헤더 ===== */
+    .my-hd{ display:flex; align-items:center; justify-content:space-between; gap:14px; margin-bottom:18px; }
+    .my-title{ font-size:22px; font-weight:700; margin:0; }   /* v2: 내 할 일과 같은 단(22px), 학기(20px)는 그 아래 */
+    .my-tools{ display:flex; align-items:center; gap:14px; }
+    .tgl{ display:inline-flex; align-items:center; gap:8px; cursor:pointer; user-select:none; font-size:15px; color:#3b3f4c; }
+    .tgl-track{ width:40px; height:22px; border-radius:100px; background:#d9d9d9; position:relative; transition:background .15s; flex-shrink:0; }
+    .tgl-knob{ position:absolute; top:2px; left:2px; width:18px; height:18px; border-radius:50%; background:#fff; transition:left .15s; box-shadow:0 1px 3px rgba(0,0,0,.2); }
+    .tgl.on .tgl-track{ background:#416bff; }
+    .tgl.on .tgl-knob{ left:20px; }
+    .sort-sel{ height:38px; padding:0 36px 0 12px; border:1px solid #d9d9d9; border-radius:6px; font-family:inherit; font-size:14px; color:#3b3f4c; cursor:pointer; appearance:none; -webkit-appearance:none; background:#fff url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='18' height='18' viewBox='0 0 24 24' fill='none' stroke='%236d7381' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>") no-repeat right 12px center; }   /* 기본 화살표는 오른쪽 여백이 없어 커스텀 화살표로(09-25 올립) */
+    .btn-make{ height:40px; border-radius:100px; padding:0 18px; background:#416bff; color:#fff; border:none; font-size:15px; font-weight:600; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; line-height:1; vertical-align:middle; gap:6px; }
+    .btn-make:hover{ background:#365eef; }
+    /* 새 입구 = '수업 만들기' 옆 버튼 — 두 시작점을 나란히. 빈 학기일 땐 두 갈래 카드가 대신하므로 숨김 */
+    .btn-entry{ height:40px; border-radius:100px; padding:0 16px; background:#fff; color:#3151c4; border:1px solid #a3c3ff; font-size:15px; font-weight:600; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; line-height:1; vertical-align:middle; gap:6px; }
+    .btn-entry:hover{ background:#f4f8ff; border-color:#416bff; }
+    /* NEW 태그 = 제품 홈 공지 목록의 NEW 태그(00_홈_260923 캡처: 바탕 #e9f2ff · 글자 #3151c4) */
+    .new-bdg{ display:inline-flex; align-items:center; justify-content:center; height:20px; padding:0 6px; border-radius:4px; background:#e9f2ff; color:#3151c4; font-size:12px; font-weight:600; line-height:1; letter-spacing:.02em; }
+
+    /* ===== 학기 섹션 ===== */
+    .sem{ margin-bottom:10px; }
+    .sem-hd{ display:flex; align-items:center; gap:12px; padding:14px 0; cursor:pointer; user-select:none; }
+    .sem-title{ font-size:20px; font-weight:700; }
+    .sem-meta{ font-size:14px; color:#6d7381; }
+    .sem-chev{ margin-left:auto; color:#6d7381; transition:transform .15s; }
+    .sem.closed .sem-chev{ transform:rotate(180deg); }
+    .sem.closed .sem-body{ display:none; }
+    .sem-body{ padding-bottom:18px; }
+    .sem-grid{ display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:18px; }
+    .sem-empty{ font-size:15px; color:#9ea3ad; padding:4px 0 8px; margin:0; }
+    .sub-div{ display:flex; align-items:center; gap:10px; margin:22px 0 14px; }
+    .sub-div-label{ font-size:15px; font-weight:600; color:#3b3f4c; display:inline-flex; align-items:center; gap:6px; flex-shrink:0; }
+    .sub-div-desc{ font-size:14px; color:#9ea3ad; flex-shrink:0; }
+    .sub-div-line{ flex:1; height:1px; background:#dde1e8; }
+
+    /* ===== 수업 카드 = 이름·⋮(개발 그대로) + 작은 한 줄 + 다음 할 일 하나 ===== */
+    .cc{ background:#fff; border-radius:12px; padding:20px; min-height:172px; display:flex; flex-direction:column; cursor:pointer; box-shadow:0 0 1px #2226314D, 0 2px 8px #0000000F; position:relative; transition:box-shadow .12s; }
+    .cc:hover{ box-shadow:0 0 0 1.5px #ccdfff, 0 4px 12px #0000001A; }
+    .cc.arch{ background:#fbfbfc; min-height:150px; }
+    .cc.arch .cc-name, .cc.arch .cc-sub{ color:#9ea3ad; }
+    .cc-top{ display:flex; align-items:flex-start; justify-content:space-between; gap:8px; }
+    .cc-name{ font-size:17px; font-weight:600; line-height:1.45; margin:0; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }   /* 길면 한 줄 말줄임, 전체는 title로 */
+    .cc-menu-btn{ width:30px; height:30px; border:none; background:none; border-radius:6px; cursor:pointer; color:#6d7381; display:inline-flex; align-items:center; justify-content:center; line-height:1; vertical-align:middle; flex-shrink:0; }
+    .cc-menu-btn:hover{ background:#f1f3f5; }
+    .cc-pop{ position:absolute; top:46px; right:14px; background:#fff; border-radius:8px; box-shadow:0 0 1px #2226314D, 0 8px 24px #00000026; padding:6px; z-index:50; min-width:148px; display:none; }
+    .cc-pop.open{ display:block; }
+    .cc-pop button{ width:100%; display:flex; align-items:center; gap:8px; padding:9px 12px; border:none; background:none; border-radius:6px; font-size:14px; color:#222631; cursor:pointer; text-align:left; }
+    .cc-pop button:hover{ background:#f6f7f9; }
+    .cc-pop-div{ height:1px; background:#f1f3f5; margin:4px 6px; }
+    .cc-pop button.cc-del{ color:#f2525f; }
+    .cc-pop button.cc-del:hover{ background:#fdeef0; }
+
+    /* v2 내 할 일 — 흰 상자 안 2열 목록(알약은 필터처럼 느껴져 폐기, 09-26) */
+    .first-mod{ margin:0 0 32px; }
+    .first-hd{ font-size:22px; font-weight:700; color:#222631; margin:0; padding:0; }
+    .first-hd-row{ display:flex; align-items:center; justify-content:space-between; padding:6px 0 14px; }
+    .first-more{ background:none; border:none; padding:0; font-family:inherit; font-size:14px; color:#6d7381; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; line-height:1; vertical-align:middle; gap:2px; }
+    .first-more:hover{ color:#222631; }   /* 09-26 올립: 위계 — 학기 제목(20px)과 같은 단 */
+    .first-box{ background:#fff; border:1px solid #e6e8ec; border-radius:12px; padding:4px 20px; }
+    .first-grid{ display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); column-gap:36px; }
+    .fi{ display:flex; align-items:center; gap:8px; padding:9px 0; min-width:0; border-top:1px solid #f1f3f5; }
+    .fi:nth-child(-n+2){ border-top:none; }
+    .fi .dt{ width:7px; height:7px; border-radius:50%; flex-shrink:0; }
+    .fi .dt{ background:#b8bdc7; }
+    .fi .x{ flex:1; min-width:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; font-size:15px; font-weight:600; color:#222631; }
+    .fi .x small{ font-size:14px; font-weight:400; color:#6d7381; margin-left:8px; }
+    .fi .go{ background:none; border:none; padding:0; font-family:inherit; font-size:14px; font-weight:600; color:#3151c4; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; line-height:1; vertical-align:middle; gap:1px; white-space:nowrap; flex-shrink:0; }
+    .fi .go:hover{ text-decoration:underline; }
+    /* v2 수업 카드 — 과목 아이콘 · 반 · 학생 수 + 평가 진행 막대(파랑 한 계열: 마감 #416bff · 진행 중 #a3c3ff · 시작 전 #e4e7ec). 주황은 알약의 '놓치면 손해'에만 */
+    .cc.v2{ min-height:0; padding:22px 22px 20px; }   /* 09-26 올립: 너무 좁아 보임 → 약 150px */
+    .cc.v2 .cc-top{ align-items:center; gap:12px; }
+    .cc-ico{ width:40px; height:40px; border-radius:10px; background:#e9f2ff; color:#3151c4; font-size:15px; font-weight:700; display:inline-flex; align-items:center; justify-content:center; flex-shrink:0; }
+    .cc.arch .cc-ico{ background:#f1f3f5; color:#9ea3ad; }
+    .cc-head{ flex:1; min-width:0; }
+    .cc.v2 .cc-name{ font-size:17px; line-height:1.4; display:block; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .cc-meta{ font-size:14px; color:#6d7381; margin:2px 0 0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .ev-bar{ display:flex; gap:3px; height:6px; margin-top:30px; }
+    .ev-bar i{ flex:1; border-radius:3px; background:#e4e7ec; }
+    .ev-bar i.done{ background:#416bff; } .ev-bar i.prog{ background:#a3c3ff; }
+    .cc.arch .ev-bar i.done{ background:#c7cbd3; }
+    .ev-txt{ font-size:14px; color:#6d7381; margin:8px 0 0; }
+    .cc.v2 .ev-bar + .ev-txt{ margin-top:10px; }
+    .cc.v2 .cc-top + .ev-txt{ margin-top:30px; padding-bottom:16px; }
+    /* 카드 안 버튼 = 개발 화면 btn-secondary(흰 바탕 테두리). 파란 채움은 페이지 주 행동(수업 만들기)에만 — 09-25 올립: 파란 버튼이 많아 손이 헤맴 */
+    .nx-sub{ background:none; border:none; padding:0; font-family:inherit; font-size:14px; font-weight:600; color:#3151c4; text-decoration:underline; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; line-height:1; vertical-align:middle; }
+    .nx-sub.muted{ color:#6d7381; font-weight:500; }
+
+    /* 빈 학기 = 시작 화면: 이번 학기 수업이 0개일 때 그 학기 자리가 두 갈래 선택이 된다(배너 아님 — 빈 상태) */
+    .start-q{ font-size:16px; color:#3b3f4c; margin:0 0 14px; }
+    .start-grid{ display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:18px; }
+    /* 09-25 올립: 너무 큼 → 가로형(그림 왼쪽 작게 · 글 오른쪽), 제목 18px */
+    .st-card{ background:#fff; border-radius:12px; padding:20px 22px; display:flex; flex-direction:row; align-items:flex-start; gap:16px; box-shadow:0 0 1px #2226314D, 0 2px 8px #0000000F; }
+    /* 빈 상태 일러스트 — CLIPO 파랑 선(#416bff) + 연한 면(#e9f2ff·#ccdfff). 제품 선 아이콘과 같은 결로 새로 그림(09-25 올립: 기존 3D 로켓은 쓰지 않음) */
+    .st-illu{ display:block; width:88px; height:67px; margin:0 0 0 -6px; flex-shrink:0; }
+    .st-body{ flex:1; min-width:0; display:flex; flex-direction:column; align-self:stretch; }
+    .st-t{ font-size:18px; font-weight:600; color:#222631; margin:0 0 8px; display:flex; align-items:center; gap:8px; }
+    .st-d{ font-size:16px; color:#3b3f4c; line-height:1.55; margin:0; }
+    .st-need{ font-size:14px; color:#6d7381; margin:6px 0 0; line-height:1.5; }
+    .st-act{ display:flex; align-items:center; gap:14px; margin-top:auto; padding-top:14px; }
+    .st-go{ height:40px; padding:0 18px; border-radius:6px; background:#416bff; color:#fff; border:none; font-size:15px; font-weight:600; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; line-height:1; vertical-align:middle; gap:6px; font-family:inherit; }
+    .st-go:hover{ background:#365eef; }
+    /* 접힌 지난 학기에도 남은 할 일 수는 보이게 */
+
+    /* ===== 우측 레일 ===== */
+    .rail-card{ background:#fff; border-radius:12px; padding:20px; box-shadow:0 0 1px #2226314D, 0 2px 8px #0000000F; }
+    .rail-hd{ display:flex; align-items:center; justify-content:space-between; margin-bottom:14px; }
+    .rail-title{ font-size:17px; font-weight:700; }
+    .rail-more{ font-size:14px; color:#6d7381; background:none; border:none; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; line-height:1; vertical-align:middle; gap:2px; }
+    .notice-row{ display:flex; align-items:center; gap:6px; padding:7px 0; font-size:14px; color:#3b3f4c; cursor:pointer; }
+    .notice-row:hover{ color:#222631; }
+    .notice-txt{ flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+    .notice-row.pinned .notice-txt{ font-weight:600; color:#222631; }
+    .notice-dday{ font-size:14px; font-weight:700; color:#416bff; flex-shrink:0; }
+    .notice-date{ font-size:14px; color:#9ea3ad; flex-shrink:0; }
+    /* 지난 학기 이후 달라진 것 */
+    /* 지난 학기 이후 달라진 것 — 본문 열, 이번 학기 수업 뒤·지난 학기 앞(Google Classroom 'Feature spotlight' 자리). 다 확인하면 사라짐 · 접은 상태 기억 */
+    /* 새 기능 소식은 학기와 무관(09-26 올립: 수업만 만들고 학기 말까지 아무것도 안 했을 수도) → 학기 목록과 선으로 떼고 제목을 학기(20px)보다 낮춤 */
+    .wn-mod{ margin:18px 0 18px; padding:6px 0 24px; border-top:1px solid #dde1e8; border-bottom:1px solid #dde1e8; }
+    .wn-hd{ display:flex; align-items:center; gap:10px; padding:14px 0; cursor:pointer; user-select:none; }
+    .wn-title{ display:inline-flex; align-items:center; gap:8px; font-size:17px; font-weight:700; }
+    .wn-meta{ font-size:14px; color:#6d7381; }
+    .wn-all{ font-size:14px; color:#6d7381; display:inline-flex; align-items:center; justify-content:center; line-height:1; vertical-align:middle; gap:3px; text-decoration:underline; }
+    .wn-mod .sem-chev{ margin-left:auto; }
+    .wn-mod.closed .sem-chev{ transform:rotate(180deg); }
+    /* 소식은 수업 카드와 모양을 가른다(09-25 올립: 카드 두 장이 수업 카드처럼 보임) → 흰 상자 하나 안의 목록 줄. 버튼 대신 링크 */
+    .wn-mod.closed .wn-list{ display:none; }
+    .wn-list{ background:#fff; border-radius:12px; padding:6px 20px; box-shadow:0 0 1px #2226314D, 0 2px 8px #0000000F; }
+    .wn-item{ display:flex; align-items:center; gap:14px; padding:14px 0; }
+    .wn-item + .wn-item{ border-top:1px solid #eef0f3; }
+    .wn-ico{ width:40px; height:40px; border-radius:10px; background:#e9f2ff; color:#416bff; display:inline-flex; align-items:center; justify-content:center; flex-shrink:0; }
+    .wn-txt{ flex:1; min-width:0; }
+    .wn-t{ font-size:16px; font-weight:600; color:#222631; margin:0 0 2px; line-height:1.45; }
+    .wn-d{ font-size:14px; color:#6d7381; margin:0; line-height:1.5; }
+    .wn-act{ display:flex; align-items:center; gap:16px; flex-shrink:0; }
+    .wn-try{ background:none; border:none; padding:0; font-family:inherit; font-size:14px; font-weight:600; color:#3151c4; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; line-height:1; vertical-align:middle; gap:1px; }
+    .wn-try:hover{ text-decoration:underline; }
+    .wn-ok{ background:none; border:none; padding:0; font-family:inherit; font-size:14px; font-weight:500; color:#6d7381; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; line-height:1; vertical-align:middle; }
+    /* 이벤트 카드 — 제품 캡처 값: 바탕 #d5bfff · 제목 #3c1c78 · 링크 #53348c · 점 #c7cbd3/#90949d */
+    /* 이벤트 카드 — 제품 캡처 값: 바탕 #d5bfff · 제목 #3c1c78 · 링크 #53348c · 점 #c7cbd3/#90949d
+       높이는 공지보다 눈에 띄지 않게 낮게(09-25 올립): 제목 16px 두 줄 + 링크 한 줄, 일러스트는 제목 옆 작게 */
+    .evt-card{ display:block; position:relative; overflow:hidden; border-radius:12px; padding:16px 18px 14px; cursor:pointer; }
+    /* 09-25 올립: 제품 연보라(#d5bfff)는 너무 튐 → 같은 보라 계열의 옅은 바탕 + 얇은 테두리 */
+    .evt-train{ background:#f5f0ff; box-shadow:inset 0 0 0 1px #e6dbff; } .evt-tips{ background:#f4f8ff; box-shadow:inset 0 0 0 1px #d6e4ff; }
+    .evt-train:before{ content:""; position:absolute; width:120px; height:120px; right:-44px; top:-54px; border-radius:50%; background:rgba(214,196,255,.25); pointer-events:none; }
+    .evt-card > *{ position:relative; }
+    .evt-illu{ position:absolute !important; right:12px; top:12px; width:54px; height:48px; }
+    .evt-t{ font-size:16px; font-weight:700; color:#3c1c78; line-height:1.5; margin:0 60px 8px 0; }
+    .evt-tips .evt-t{ color:#1f3a8a; }
+    .evt-link{ display:inline-flex; align-items:center; gap:2px; font-size:14px; font-weight:600; color:#6f34db; }
+    .evt-tips .evt-link{ color:#3151c4; }
+    .evt-dots{ display:flex; justify-content:center; gap:8px; margin-top:12px; }
+    .evt-dots button{ width:7px; height:7px; border-radius:50%; border:none; padding:0; background:#c7cbd3; cursor:pointer; }
+    .evt-dots button.on{ background:#90949d; }
+    /* 자료실 줄 — 제품 캡처 값: 파란 줄 바탕 #f4f8ff · 아이콘 #2081ff · 이름 #18181b */
+    .res-row{ display:flex; align-items:flex-start; gap:12px; border-radius:8px; padding:14px 16px; background:#f4f8ff; }
+    .res-row + .res-row{ margin-top:8px; }
+    .res-row:hover{ background:#e9f2ff; }
+    .res-video{ background:#fff3f4; } .res-video:hover{ background:#ffe7e9; }   /* 제품 유튜브 줄 바탕 */
+    .res-form{ background:#f6f7f9; } .res-form:hover{ background:#eef0f3; }
+    .res-name{ font-size:16px; font-weight:600; color:#18181b; margin:0 0 4px; }
+    .res-desc{ font-size:14px; color:#3b3f4c; margin:0; line-height:1.5; }
+
+    /* ===== Toast / Footer ===== */
+    .toast{ position:fixed; bottom:28px; left:50%; transform:translateX(-50%) translateY(12px); opacity:0; min-width:320px; max-width:560px; padding:14px 22px 14px 16px; border-radius:4px; display:flex; align-items:center; gap:12px; font-size:15px; font-weight:600; box-shadow:0 0 1px #2226314D, 0 4px 12px #00000026; z-index:9999; transition:opacity .2s, transform .2s; pointer-events:none; background:#319d64; color:#fff; }
+    .toast.show{ opacity:1; transform:translateX(-50%) translateY(0); }
+    .toast.info{ background:#416bff; }
+    .site-footer{ margin-top:auto; padding:48px 0 40px; display:flex; flex-direction:column; align-items:center; gap:16px; }
+    .sf-links{ display:flex; align-items:center; }
+    .sf-links a{ font-size:14px; color:#3b3f4c; padding:0 16px; }
+    .sf-links a + a{ border-left:1px solid #dde1e8; }
+    .sf-copy{ font-size:14px; color:#9aa0ad; }
+  </style>
+</head>
+<body>
+
+<!-- ===== Global Header ===== -->
+<header class="g-hd">
+  <button class="gh-menu-btn" onclick="toggleNav()"><i data-lucide="panel-left-open" style="width:20px;height:20px"></i></button>
+  <a class="gh-logo" href="#home" title="홈으로">
+    <svg width="76" height="16" viewBox="0 0 76 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M11.3613 4.03516H4.09668V11.9629H8.88281L8.88086 11.9648H15.6016V16H4.02539C1.80242 15.9998 0 14.223 0 12.0322V3.96777C0 1.77696 1.80242 0.000177874 4.02539 0H15.4561L11.3613 4.03516ZM22.0703 11.9648H33.5781V16H22.002C19.7788 16 17.9756 14.2231 17.9756 12.0322V0H22.0703V11.9648ZM40.0459 16H35.9521V0H40.0459V16ZM54.5381 0C56.4564 0 58.0138 1.53228 58.0186 3.42285L58.0166 3.4248V8.54297C58.014 10.4333 56.4567 11.9648 54.5361 11.9648H46.5107L42.416 16V0H54.5381ZM71.9746 0C74.0086 0.000134956 75.6887 1.49046 75.958 3.42285H76V12.5771H75.958C75.6887 14.5095 74.011 15.9999 71.9746 16H64.4238C62.3897 16 60.7098 14.5096 60.4404 12.5771C60.4145 12.398 60.3984 12.2184 60.3984 12.0322V3.96777C60.3984 3.78159 60.4145 3.60205 60.4404 3.42285C60.7098 1.49037 62.3873 0 64.4238 0H71.9746ZM64.4922 12.5771H71.9062V3.42285H64.4922V12.5771ZM46.5107 3.42285V8.54004H53.9238V3.42285H46.5107Z" fill="#365EEF"/></svg>
+  </a>
+  <div class="g-hd-r">
+    <div class="hd-plan"><span class="plan-badge">학교 유료</span><span style="font-size:15px;font-weight:500;">D-180</span></div>
+    <div class="credit-wrap"><i data-lucide="bot" style="width:20px;height:20px;color:#416bff"></i><span>200 크레딧</span></div>
+    <button class="user-btn">최대표 (대표교사) <i data-lucide="chevron-down" style="width:16px;height:16px"></i></button>
+  </div>
+</header>
+
+<!-- ===== Sidebar ===== -->
+<nav class="icon-sb" id="icon-sb">
+  <div class="si active" onclick="location.hash='home'"><div class="si-icon"><i data-lucide="home" style="width:20px;height:20px"></i></div><span class="si-label">홈</span><span class="si-tip">홈</span></div>
+  <div class="si" onclick="location.href='eval_plan_v1_260619.html'"><div class="si-icon"><i data-lucide="scissors" style="width:20px;height:20px"></i></div><span class="si-label">평가계획</span><span class="si-tip">평가계획</span></div>
+  <div class="si" onclick="location.href='co_teacher_review_v1_260611.html'"><div class="si-icon"><i data-lucide="layout-grid" style="width:20px;height:20px"></i></div><span class="si-label">수업</span><span class="si-tip">수업</span></div>
+  <div class="si" onclick="location.href='creative_activity_list_v6_260507.html'"><div class="si-icon"><i data-lucide="notebook-pen" style="width:20px;height:20px"></i></div><span class="si-label">창의적 체험활동 <span style="font-size:10px;background:#416bff;color:#fff;padding:1px 5px;border-radius:3px;margin-left:2px">Beta</span></span><span class="si-tip">창의적 체험활동</span></div>
+  <div class="si" onclick="location.href='quick_seteuk_dev_list_v1_260604.html'"><div class="si-icon"><i data-lucide="zap" style="width:20px;height:20px"></i></div><span class="si-label">세특 간편 생성기</span><span class="si-tip">세특 간편 생성기</span></div>
+  <div class="si" onclick="notReady('행동특성 및 종합기록')"><div class="si-icon"><i data-lucide="smile" style="width:20px;height:20px"></i></div><span class="si-label">행동특성 및 종합기록</span><span class="si-tip">행동특성 및 종합기록</span></div>
+  <div class="si" onclick="notReady('리포트')"><div class="si-icon"><i data-lucide="bar-chart-2" style="width:20px;height:20px"></i></div><span class="si-label">리포트</span><span class="si-tip">리포트</span></div>
+  <div class="si" onclick="notReady('학교 설정')"><div class="si-icon"><i data-lucide="building-2" style="width:20px;height:20px"></i></div><span class="si-label">학교 설정</span><span class="si-tip">학교 설정</span></div>
+  <div class="nav-bottom">
+    <div class="nav-div"></div>
+    <div class="si" onclick="notReady('매뉴얼 다운로드')"><div class="si-icon"><i data-lucide="file-down" style="width:20px;height:20px"></i></div><span class="si-label">매뉴얼 다운로드</span><span class="si-tip">매뉴얼 다운로드</span></div>
+    <div class="si" onclick="notReady('요금제')"><div class="si-icon"><i data-lucide="credit-card" style="width:20px;height:20px"></i></div><span class="si-label">요금제</span><span class="si-tip">요금제</span></div>
+    <div class="si" onclick="notReady('고객센터')"><div class="si-icon"><i data-lucide="help-circle" style="width:20px;height:20px"></i></div><span class="si-label">고객센터</span><span class="si-tip">고객센터</span></div>
+  </div>
+</nav>
+
+<div class="main-wrap">
+<div class="page-wrap">
+
+  <div class="home-cols">
+    <!-- ===== 메인: 내 수업 ===== -->
+    <div class="home-main">
+      <!-- 09-26 올립: '내 할 일'을 맨 위 독립 섹션으로. '내 수업' 줄은 다시 수업 목록 바로 위(정렬·보관·만들기 = 목록의 도구). 할 일 없으면 페이지는 '내 수업'부터 -->
+      <div id="todo-mod"></div>
+      <div class="my-hd">
+        <h1 class="my-title">내 수업</h1>
+        <div class="my-tools">
+          <select class="sort-sel" id="sort-sel" onchange="renderAll()">
+            <option value="recent">최근 활동순</option>
+            <option value="name">수업명순</option>
+          </select>
+          <span class="tgl" id="arch-tgl" onclick="toggleArchived()">
+            <span class="tgl-track"><span class="tgl-knob"></span></span>
+            보관한 수업 보기
+          </span>
+          <!-- 두 시작점: 이번 학기 수업이 있을 때만(빈 학기면 두 갈래 카드가 같은 행동이라 숨김) -->
+          <button class="btn-entry" id="toolEntry" onclick="entryStart()"><i data-lucide="scan-text" style="width:16px;height:16px"></i>활동지로 바로 채점<span class="new-bdg">NEW</span></button>
+          <button class="btn-make" id="toolMake" onclick="classCreate()"><i data-lucide="plus" style="width:16px;height:16px"></i>수업 만들기</button>
+        </div>
+      </div>
+      <div id="sem-list"></div>
+    </div>
+
+    <!-- ===== 우측 레일 ===== -->
+    <div class="home-rail">
+      <!-- 공지사항: 운영 안내만(연수·점검·정책). 기능 소식은 본문 '지난 학기 이후 달라진 것'이 맡으므로 여기 두지 않는다(중복 금지) -->
+      <div class="rail-card">
+        <div class="rail-hd">
+          <span class="rail-title">공지사항</span>
+          <button class="rail-more" onclick="toastMsg('공지사항 목록은 이 목업에서 제공하지 않아요.', true)">더보기 <i data-lucide="chevron-right" style="width:13px;height:13px"></i></button>
+        </div>
+        <!-- 연수는 공지가 맡는다(09-25 올립: 연수 공지가 최소 일주일 전에 나감). 신청 기간 중인 연수는 맨 위 고정 + 연수일까지 D-N -->
+        <div class="notice-row pinned" onclick="toastMsg('공지 본문은 이 목업에서 제공하지 않아요.', true)" title="9월 30일(수) 오후 7:00 · Zoom 90분"><i data-lucide="pin" style="width:15px;height:15px;color:#416bff;flex-shrink:0;"></i><span class="notice-txt">[9월] 국어과 실전 연수 신청 안내</span><span class="notice-dday">D-5</span></div>
+        <div class="notice-row" onclick="toastMsg('공지 본문은 이 목업에서 제공하지 않아요.', true)"><span class="new-bdg">NEW</span>🔔 <span class="notice-txt">클리포 충남교육청 '인수레' 연수 안내</span><span class="notice-date">26/09/12</span></div>
+        <div class="notice-row" onclick="toastMsg('공지 본문은 이 목업에서 제공하지 않아요.', true)"><span class="new-bdg">NEW</span>🔔 <span class="notice-txt">2학기 수행평가 준비, 이렇게 시작해요</span><span class="notice-date">26/09/01</span></div>
+        <div class="notice-row" onclick="toastMsg('공지 본문은 이 목업에서 제공하지 않아요.', true)"><span style="width:18px;"></span><span class="notice-txt">선생님의 1학기 마무리를 도와드려요</span><span class="notice-date">26/06/05</span></div>
+      </div>
+
+      <!-- 이벤트 자리 = 캠페인 전용(09-25 올립: 연수 참여는 공지가 맡으므로 여기서 뺌). 제품 홈 이벤트 카드 모양, 일러스트 없음.
+           첫 장 = 연수 강사 안내 — 사실 출처: 블로그 연수 탭 '연수 운영 지원'(강사용 PPT·과목별 채점 예시·인증 코드·강사와 참여자 전원 크레딧 200개 14일·연수일 3일 전 신청) -->
+      <div class="evt-wrap">
+        <a class="evt-card evt-train" id="evt-0" href="https://obkim-lgtm.github.io/clipo-blog/training.html#instructor" target="_blank" rel="noopener">
+          <svg class="evt-illu" viewBox="0 0 96 84" fill="none" aria-hidden="true">
+            <rect x="8" y="8" width="62" height="42" rx="6" fill="#fff" stroke="#6f34db" stroke-width="2.5"/>
+            <path d="M18 38l10-9 8 6 12-12" stroke="#6f34db" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M52 18h8" stroke="#c9b3fb" stroke-width="3" stroke-linecap="round"/>
+            <path d="M39 50v14M30 66h18" stroke="#6f34db" stroke-width="2.5" stroke-linecap="round"/>
+            <g transform="rotate(-10 72 62)"><path d="M52 52h40v8a4 4 0 000 8v8H52v-8a4 4 0 000-8z" fill="#ebdfff" stroke="#6f34db" stroke-width="2.2" stroke-linejoin="round"/><path d="M62 54v20" stroke="#6f34db" stroke-width="1.6" stroke-dasharray="2.5 2.5"/><text x="77" y="68" text-anchor="middle" font-size="10" font-weight="800" fill="#3c1c78" font-family="Pretendard GOV, sans-serif">200</text></g>
+          </svg>
+          <p class="evt-t">동료 선생님과<br>클리포 연수를 열어 보세요</p>
+          <span class="evt-link">강사용 PPT · 인증 코드 · 크레딧 200개 <i data-lucide="chevron-right" style="width:15px;height:15px"></i></span>
+        </a>
+        <!-- 둘째 장 = 채점기준 꿀팁(09-25 올립: 이용권 기간 연장 대신). 사실 출처: 블로그 AI 채점 가이드 '선생님들이 찾은 채점기준 꿀팁'(guide/contest.html) — 에듀테크 교사 연구회 공모전, 14편 중 과목별 사례 12편 -->
+        <a class="evt-card evt-tips" id="evt-1" style="display:none;" href="https://obkim-lgtm.github.io/clipo-blog/guide/contest.html" target="_blank" rel="noopener">
+          <svg class="evt-illu" viewBox="0 0 96 84" fill="none" aria-hidden="true">
+            <rect x="14" y="10" width="50" height="64" rx="6" fill="#fff" stroke="#416bff" stroke-width="2.5"/>
+            <rect x="29" y="5" width="20" height="10" rx="3" fill="#e9f2ff" stroke="#416bff" stroke-width="2.2"/>
+            <path d="M23 30l3.5 3.5 6-6M23 46l3.5 3.5 6-6" stroke="#416bff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M38 31h16M38 47h16M24 62h28" stroke="#a3c3ff" stroke-width="3" stroke-linecap="round"/>
+            <circle cx="74" cy="30" r="14" fill="#fff4d6" stroke="#416bff" stroke-width="2.4"/>
+            <path d="M69.5 48h9M70.5 53h7" stroke="#416bff" stroke-width="2.4" stroke-linecap="round"/><path d="M69 42c0-3-3-5-3-10a8 8 0 0116 0c0 5-3 7-3 10z" fill="#ffd166" stroke="#416bff" stroke-width="2.2" stroke-linejoin="round"/>
+          </svg>
+          <p class="evt-t">현직 교사가 들려준<br>채점기준 꿀팁</p>
+          <span class="evt-link">에듀테크 교사 연구회 공모전 결과 <i data-lucide="chevron-right" style="width:15px;height:15px"></i></span>
+        </a>
+        <div class="evt-dots"><button class="on" onclick="evtShow(0)" aria-label="연수 강사 안내"></button><button onclick="evtShow(1)" aria-label="채점기준 꿀팁"></button></div>
+      </div>
+
+      <!-- 자료실 = 제품 홈 자료실 모양(색 바탕 줄 + 색 아이콘). 별도 덩어리(09-25 올립: 공지와 성격이 다름)
+           ① 기능 배우기 = 제품의 유튜브 줄 자리·모양(빨간 바탕 + 재생 아이콘) — 목적지만 블로그 배우기 탭(유튜브는 갱신 안 함)
+           ② 개인정보 동의서 양식 = 개발 홈 그대로(09-25 올립: 기존처럼 홈에 둠) -->
+      <div class="rail-card" style="padding:20px 20px 16px;">
+        <div class="rail-hd"><span class="rail-title">자료실</span></div>
+        <a class="res-row res-video" href="https://obkim-lgtm.github.io/clipo-blog/learn.html" target="_blank" rel="noopener">
+          <i data-lucide="circle-play" style="width:20px;height:20px;color:#ff0000;flex-shrink:0;margin-top:1px;"></i>
+          <div><p class="res-name">기능 배우기</p><p class="res-desc">기능별 1~2분 영상을 보며 따라 해 보세요.</p></div>
+        </a>
+        <a class="res-row res-form" href="#" onclick="toastMsg('동의서 양식은 이 목업에서 내려받지 않아요.', true);return false;">
+          <i data-lucide="pencil" style="width:20px;height:20px;color:#1ab864;flex-shrink:0;margin-top:1px;"></i>
+          <div><p class="res-name">개인정보 동의서 양식</p><p class="res-desc">학부모 안내용 가정통신문으로 활용하세요.</p></div>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <footer class="site-footer">
+    <div class="sf-links"><a href="#" onclick="return false;">회사소개</a><a href="#" onclick="return false;">이용약관</a><a href="#" onclick="return false;">개인정보처리방침</a><a href="#" onclick="return false;">고객센터</a></div>
+    <div class="sf-copy">© 2026. Datadriven Inc. All rights reserved.</div>
+  </footer>
+</div>
+</div>
+
+<div class="toast" id="toast"><span id="toast-msg"></span></div>
+
+<script>
+function toggleNav(){ document.getElementById('icon-sb').classList.toggle('expanded'); document.body.classList.toggle('nav-expanded'); }
+function notReady(name){ toastMsg((name || '해당 화면') + ' 은(는) 아직 준비 중입니다.', true); }
+var _toastTimer = null;
+function toastMsg(msg, info){
+  var t = document.getElementById('toast');
+  document.getElementById('toast-msg').textContent = msg;
+  t.classList.toggle('info', !!info);
+  t.classList.add('show');
+  clearTimeout(_toastTimer);
+  _toastTimer = setTimeout(function(){ t.classList.remove('show'); }, 2400);
+}
+
+// ── 수업 데이터: 개발 홈(home_v1_260612) + 2학기 수업 3개 추가(역사·도덕·미술 — 09-25 올립 승인, 사다리를 한 화면에 보이려고). 학생은 늘리지 않았다 ──
+// next = 그 수업의 '다음 할 일' 하나. 사다리(라벨은 '~전'으로 통일) = 설계 전 → 답안 받기 전 → 채점 전 → 점수 저장 전 → 결과 공개 전 → 세특 전
+//        공유받은 수업은 '확인 요청'(개발 홈 위쪽 확인 요청 띠가 이 카드로 내려옴)
+//        카드 = 수업명 → 평가명 → '단계 · 라벨에 없는 사실(f)' → 버튼. 색 상자·설명 문장은 뺐다(09-25 올립: 라벨·설명·버튼이 같은 말을 세 번 함)
+//        idle = 할 일로 세지 않음(지난 학기 설계 전·할 일 없음)
+var QS_FLOW = 'quick_start_v1_260925.html';
+var CLASSES = [
+  { id:'c1',  sem:'2026학년도 2학기', name:'사회',     evals:5, bans:'2-1·2-2·2-3반', students:79, evs:['done','done','done','prog','none'], subj:'사회', shared:false, archived:false, last:260924,
+    /* 한 수업 안에 2-1·2-2·2-3반. 평가 5개 = 공개까지 마친 3개(할 일 없음) + 아래 2개. 할 일 = 평가 × 반 → '이어서 할 일' 목록에 한 줄씩 */
+    todos:[
+      { st:'design',  last:260915, lb:'설계 전', t:'세계화와 지역 문화', f:'채점기준을 아직 정하지 않았어요', btn:'설계 이어서', go:"location.href='task_direct_write_v1_260729.html#design'" },
+      { st:'answers', last:260922, ban:'2-1반', lb:'답안 받기 전', t:'인구 문제와 해결 방안', f:'제출 0/26명', btn:'과제물 업로드', go:"location.href='task_ocr_v3_260623.html?nav=list&c=1&t=A'" },
+      { st:'answers', last:260921, ban:'2-2반', lb:'답안 받기 전', t:'인구 문제와 해결 방안', f:'제출 0/27명', btn:'과제물 업로드', go:"location.href='task_ocr_v3_260623.html?nav=list&c=1&t=A'" },
+      { st:'score',   last:260923, ban:'2-3반', lb:'채점 전', t:'인구 문제와 해결 방안', f:'제출 26/26명', btn:'AI 채점', go:"location.href='task_ocr_v3_260623.html#scoring'" }
+    ] },
+  { id:'n1',  sem:'2026학년도 2학기', name:'역사',     evals:2, bans:'2-4반', students:28, evs:['done','prog'], subj:'역사', shared:false, archived:false, last:260923,
+    next:{ st:'score', lb:'채점 전', t:'조선 후기 사회 변화 탐구', f:'제출 28/28명', btn:'AI 채점', go:"location.href='task_ocr_v3_260623.html#scoring'" } },
+  { id:'n2',  sem:'2026학년도 2학기', name:'도덕',     evals:1, bans:'2-1반', students:26, evs:['prog'], subj:'도덕', shared:false, archived:false, last:260922,
+    next:{ st:'save', lb:'점수 저장 전', t:'갈등 해결 방법 제안하기', f:'18/26명', btn:'채점 점수 저장', go:"location.href='class_scoring_detail_v1_260512.html'" } },
+  { id:'n3',  sem:'2026학년도 2학기', name:'미술',     evals:1, bans:'2-2반', students:25, evs:['prog'], subj:'미술', shared:false, archived:false, last:260921,
+    /* 09-26 올립: 저장은 끝났고 마감 전 — 마감해야 세특 대상이 되므로 목록에서 안내(이점 먼저). 버튼 → 수행평가 채점 목록 */
+    next:{ st:'close', lb:'마감 전', t:'작품 감상문 쓰기', f:'마감하면 세특에 쓸 수 있어요', btn:'마감', go:"location.href='task_ocr_v3_260623.html#scoring'" } },
+  /* 09-25 올립: 2학기에도 모든 단계가 보이게 — 설계 전(빈 문서 일러스트)·세특 전 수업 추가. 학생은 늘리지 않음 */
+  { id:'n4',  sem:'2026학년도 2학기', name:'과학',     evals:0, bans:'2-5반', students:27, evs:[], subj:'과학', shared:false, archived:false, last:260925, hasData:false,
+    next:{ st:'design', empty:true, lb:'설계 전', f:'아직 만든 평가가 없어요', btn:'평가 만들기', go:"location.href='task_direct_write_v1_260729.html#list'" } },
+  { id:'n5',  sem:'2026학년도 2학기', name:'국어',     evals:3, bans:'2-3반', students:26, evs:['done','done','done'], subj:'국어', shared:false, archived:false, last:260920,
+    next:{ st:'seteuk', lb:'세특 전', t:'주장하는 글쓰기', f:'세특 대상 24명', btn:'세특 만들기', go:"notReady('세부능력 및 특기사항 지원')" } },
+  { id:'c5',  sem:'2026학년도 1학기', name:'사회',     evals:2, bans:'1-1·1-2반', students:55, evs:['done','done'], subj:'사회', shared:false, archived:false, last:260612, link:'co_teacher_review_v1_260611.html',
+    next:{ st:'seteuk', lb:'세특 전', t:'기후 변화와 우리 생활', f:'세특 대상 26명', btn:'세특 만들기', go:"notReady('세부능력 및 특기사항 지원')" } },
+  { id:'c6',  sem:'2026학년도 1학기', name:'미술',     evals:0, bans:'1-3반', students:27, evs:[], subj:'미술', shared:false, archived:false, last:260520, hasData:false,
+    next:{ st:'design', idle:true, empty:true, lb:'설계 전', f:'아직 만든 평가가 없어요', btn:'평가 만들기', go:"location.href='task_direct_write_v1_260729.html#list'" } },
+  { id:'c11', sem:'2026학년도 1학기', name:'한국사',   evals:2, bans:'3-1반', students:29, evs:['done','done'], subj:'사회', shared:true,  sharedBy:'최대표 선생님', archived:false, last:260611, link:'co_teacher_review_v1_260611.html#step4',
+    next:{ st:'review', lb:'확인 요청', t:'미래 예측 시나리오 작성 2', f:'최대표 선생님 09/22', memo:'서술형 부분점수 위주로 봐주세요', btn:'검토', go:"location.href='co_teacher_review_v1_260611.html#step4'" } },
+  { id:'c7',  sem:'2026학년도 1학기', name:'역사',     evals:1, bans:'3-2반', students:28, evs:['done'], subj:'사회', shared:true,  sharedBy:'김하나 선생님', archived:false, last:260610, link:'co_teacher_review_v1_260611.html#step4',
+    next:{ st:'review', lb:'확인 요청', t:'설득하는 글쓰기', f:'김하나 선생님 09/24', memo:'근거 채점요소 위주로 확인 부탁드려요', btn:'검토', go:"location.href='co_teacher_review_v1_260611.html#step4'" } },
+  { id:'c8',  sem:'2026학년도 1학기', name:'통합사회', evals:1, bans:'1-4반', students:30, evs:['done'], subj:'사회', shared:true,  sharedBy:'박지원 선생님', archived:false, last:260601,
+    next:{ idle:true, lb:'할 일 없음', f:'확인 요청이 오면 여기에 떠요' } },
+  { id:'c9',  sem:'2026학년도 1학기', name:'국어',     evals:1, bans:'1-5반', students:26, evs:['done'], subj:'국어', shared:false, archived:true,  last:260430 },
+  { id:'c10', sem:'2026학년도 1학기', name:'도덕',     evals:1, bans:'1-6반', students:27, evs:['done'], subj:'사회', shared:false, archived:true,  last:260422 },
+  /* 09-26 올립: 2025학년도 수업 — 학기가 쌓였을 때 접힌 학기 줄이 이어지는 모습을 보이려고 추가 */
+  { id:'p1',  sem:'2025학년도 2학기', name:'사회',     evals:3, bans:'2-1·2-2반', students:53, evs:['done','done','done'], subj:'사회', shared:false, archived:false, last:251215 },
+  { id:'p2',  sem:'2025학년도 2학기', name:'역사',     evals:2, bans:'3-1반', students:28, evs:['done','done'], subj:'역사', shared:false, archived:false, last:251120 },
+  { id:'p3',  sem:'2025학년도 1학기', name:'사회',     evals:2, bans:'1-1·1-2반', students:54, evs:['done','done'], subj:'사회', shared:false, archived:false, last:250710 },
+  { id:'p4',  sem:'2025학년도 1학기', name:'통합사회', evals:1, bans:'1-3반', students:27, evs:['done'], subj:'사회', shared:false, archived:false, last:250620 }
+];
+var SEM_ORDER = ['2026학년도 2학기', '2026학년도 1학기', '2025학년도 2학기', '2025학년도 1학기'];
+/* 학기는 모두 같은 모양의 한 줄로 나열 — 이번 학기만 펼치고 나머지는 접힘(09-26 올립: '이전 학기' 묶음 없이 학기별로, 학년도 조회 없음) */
+var CUR_SEM = '2026학년도 2학기';
+var showArchived = false;
+var closedSems = { '2026학년도 1학기':true, '2025학년도 2학기':true, '2025학년도 1학기':true };   // 지난 학기는 접힌 채로 시작(헤더에 남은 할 일 수)
+
+// ── 홈 상태(09-25 올립 확정 = A '빈 학기 = 시작 화면') ──
+// EMPTY = 이번 학기 내 수업 0개(학기 초·새 교사) → 이번 학기 자리가 두 갈래 선택. 목업에선 2학기 사회를 숨겨서 만든다
+// TEMP  = 임시 채점 있음(활동지로 바로 채점 → 실제 답안 12장 채점 → 아직 수업에 안 가져옴) → 학기 위 '수업 없이 채점한 것'
+var EMPTY = false, TEMP = false;
+function classCreate(){ location.href = 'class_create_v1_260429.html'; }
+var TEMP_TODO = { lb:'임시 채점', t:'화산 지형 탐구', f:'29일 남음', btn:'수업에 옮기기',   /* 09-26 올립: '가져오기 전'은 뜻이 안 보임 → 무엇(임시 채점)·왜(지워짐)·어디로(수업) */ go:"location.href=QS_FLOW+'#bridge'", sub:'결과 보기', subGo:"location.href=QS_FLOW+'#result'" };
+function entryStart(){ location.href = QS_FLOW + '#upload'; }
+
+// ── 이어서 할 일(09-26 올립: 구조 전환) — 할 일은 카드 밖, 여러 수업을 합친 목록 하나(Google Classroom 'Recently due' · Canvas 'To Do'형) ──
+// 왜: 카드(수업 1개)에 할 일(평가 × 반, 여러 개)을 담으니 규칙이 계속 붙고, 카드가 수업 입구 역할을 잃었다.
+// 단위 = 평가 × 반 한 줄. 포함 = 이번 학기 할 일 + 확인 요청(기다리는 사람 있음) + 임시 채점. 제외 = 지난 학기 세특·설계, 학생 3명 이하 반의 평가(테스트, todo.test)
+// 순서 = 끝에 가까운 단계부터(점수 저장 전 → 확인 요청 → 가져오기 전 → 결과 공개 전 → 채점 전 → 답안 받기 전 → 세특 전 → 설계 전), 같으면 최근에 손댄 것
+// 처음엔 5개, 더 있으면 제자리에서 펼침(숫자 없이). 할 일이 없으면 목록째 숨김. 숫자는 그 평가 × 반의 학생 수만(합산 금지)
+// 09-26 올립(덜어냄): 목록엔 '시스템이 확실히 알고, 놓치면 손해이거나 누가 기다리는 것'만 — 임시 채점 가져오기 전(지워짐) · 확인 요청(동료가 기다림) · 점수 저장 전(세특에 못 씀) · 채점 전(올렸는데 안 함).
+// 뺀 것 = 답안 받기 전(아직 안 걷었을 수 있음) · 결과 공개 전(선택) · 설계 전 · 세특 전 → 수업 카드(입구)로. 처음 3개, 더 있으면 '모두 보기'(숫자 없음)
+var TODO_RANK = { temp:1, review:2, save:3, close:3.5, score:4 };   /* close = 저장은 다 했는데 마감 전(09-26) */
+var todoOpen = false;
+function todoItems(){
+  var out = [];
+  CLASSES.forEach(function(c){
+    if (c.archived || (EMPTY && c.sem === CUR_SEM)) return;
+    var list = c.todos ? c.todos : (c.next ? [c.next] : []);
+    list.forEach(function(n){
+      if (!n.btn || n.test || !TODO_RANK[n.st]) return;
+      if (c.sem !== CUR_SEM && n.st !== 'review') return;
+      out.push({ cls:c.name, ban:n.ban, t:n.t, lb:n.lb, f:n.f, memo:n.memo, btn:n.btn, go:n.go, st:n.st, last:n.last || c.last });
+    });
+  });
+  if (TEMP) out.push({ temp:true, t:TEMP_TODO.t, lb:TEMP_TODO.lb, f:TEMP_TODO.f, btn:TEMP_TODO.btn, go:TEMP_TODO.go, st:'temp', last:999999 });
+  return out.sort(function(a, b){ return (TODO_RANK[a.st] - TODO_RANK[b.st]) || (b.last - a.last); });
+}
+/* v2 내 할 일(09-26 올립: '먼저 챙길 일'은 급해 보여 개명 — '내 수업'과 평행) = 흰 상자 안 2열 목록(09-26 올립: 알약은 필터처럼 느껴짐 → '무엇 · 상태 · 행동 ›'이 문장처럼 읽히게)
+   개발 홈의 '확인 요청' 띠와 공유 수업 카드의 빨간 배지를 흡수 — 확인 요청은 요청자(누가 기다리는지)까지, 메모는 마우스를 올리면
+   점은 회색 한 가지(09-26 올립: 점 색의 뜻이 화면에 안 드러나고, 파랑이 진행 막대의 '마침'과 겹쳐서). 급한 정도는 글이 말한다. 처음 4칸(넘치면 3건 + '그 밖에 N건 · 모두 보기') */
+function fiHTML(x){
+  var who = x.temp ? x.t : (x.cls + (x.ban ? ' ' + x.ban : ''));
+  var tip = (x.t ? x.t + ' — ' : '') + x.lb + (x.f ? ' · ' + x.f : '') + (x.memo ? ' · “' + x.memo + '”' : '');
+  return '<div class="fi" title="' + tip + '"><span class="dt"></span>'
+    + '<span class="x">' + who + '<small>' + x.lb + (x.f ? ' · ' + x.f : '') + '</small></span>'
+    + '<button class="go" onclick="' + x.go + '">' + x.btn + '<i data-lucide="chevron-right" style="width:14px;height:14px"></i></button></div>';
+}
+function renderTodo(){
+  /* '더보기'는 목록 칸이 아니라 제목 줄 오른쪽(09-26 올립: 할 일 칸에 섞이면 낯섦 — 공지사항 카드의 '더보기 ›'와 같은 자리) */
+  var el = document.getElementById('todo-mod'), items = todoItems();
+  if (!items.length) { el.innerHTML = ''; return; }
+  var shown = todoOpen ? items : items.slice(0, 4);
+  var more = items.length > 4 ? '<button class="first-more" onclick="todoOpen=!todoOpen;renderTodo();lucide.createIcons()">' + (todoOpen ? '접기' : '더보기')
+    + '<i data-lucide="' + (todoOpen ? 'chevron-up' : 'chevron-right') + '" style="width:14px;height:14px"></i></button>' : '';
+  el.innerHTML = '<div class="first-mod"><div class="first-hd-row"><h2 class="first-hd">내 할 일</h2>' + more + '</div>'
+    + '<div class="first-box"><div class="first-grid">' + shown.map(fiHTML).join('') + '</div></div></div>';
+}
+
+// ── 정렬 규칙: 내 수업 → 공유받은 수업 → (토글 시) 보관 중 / 그룹 안에서는 선택한 정렬 기준(개발 홈 그대로) ──
+function sortCards(list){
+  var mode = document.getElementById('sort-sel').value;
+  function group(c){ return c.archived ? 2 : (c.shared ? 1 : 0); }
+  return list.slice().sort(function(a, b){
+    if (group(a) !== group(b)) return group(a) - group(b);
+    if (mode === 'name') return a.name.localeCompare(b.name, 'ko');
+    return b.last - a.last;
+  });
+}
+
+// 수업 카드 v2 — 수업 입구(누르면 수업 홈). 과목 아이콘 · 반 · 학생 수 + 평가 진행 막대(한 칸 = 평가 하나, 모든 반 합산)
+// 마침 = 교사가 '마감'한 평가(09-26 올립 확인: 마감은 교사가 누르는 동작 · 평가 단위). 세특 대상(마감 + 점수 저장)과도 이어짐. 진행 중 = 답안이 들어왔거나 저장했지만 마감 전
+function cardHTML(c){
+  var order = { done:0, prog:1, none:2 };
+  var evs = (c.evs || []).slice().sort(function(a, b){ return order[a] - order[b]; });
+  var done = evs.filter(function(e){ return e === 'done'; }).length;
+  var bar = evs.length ? '<div class="ev-bar">' + evs.map(function(e){ return '<i class="' + e + '"></i>'; }).join('') + '</div>' : '';
+  var prog = evs.indexOf('prog') > -1;
+  var txt = !evs.length ? '아직 만든 평가가 없어요' : done === evs.length ? (evs.length === 1 ? '평가 1개 마감' : '평가 ' + evs.length + '개 모두 마감') : done === 0 ? '평가 ' + evs.length + '개 · ' + (prog ? '진행 중' : '시작 전') : '평가 ' + evs.length + '개 중 ' + done + '개 마감';
+  var meta = [c.bans, c.students ? c.students + '명' : '', c.shared ? c.sharedBy + ' 공유' : ''].filter(Boolean).join(' · ');
+  var open = c.link ? "location.href='" + c.link + "'" : "toastMsg('수업 홈은 1학기 사회 카드에서 체험할 수 있어요.', true)";
+  return '<div class="cc v2' + (c.archived ? ' arch' : '') + '" onclick="' + open + '">'
+    + '<div class="cc-top"><span class="cc-ico">' + c.name.charAt(0) + '</span>'
+    + '<div class="cc-head"><h3 class="cc-name" title="' + c.name + '">' + c.name + '</h3><p class="cc-meta" title="' + meta + '">' + meta + '</p></div>'
+    + '<button class="cc-menu-btn" onclick="event.stopPropagation();togglePop(\'' + c.id + '\')"><i data-lucide="more-vertical" style="width:17px;height:17px"></i></button>'
+    + '</div>'
+    + bar + '<p class="ev-txt">' + txt + '</p>'
+    + '<div class="cc-pop" id="pop-' + c.id + '" onclick="event.stopPropagation()">'
+    + (c.archived
+        ? '<button onclick="setArchived(\'' + c.id + '\', false)">보관 해제</button>'
+        : '<button onclick="setArchived(\'' + c.id + '\', true)">보관하기</button>')
+    + '<button onclick="openCe(\'has\', \'' + c.name + '\', \'' + c.subj + '\')">수업 정보 수정</button>'
+    + (c.shared ? '' : '<div class="cc-pop-div"></div><button class="cc-del" onclick="openDelete(\'' + c.id + '\', \'' + c.name + '\')">수업 삭제</button>')
+    + '</div>'
+    + '</div>';
+}
+
+// ── 빈 상태 일러스트(인라인 SVG) ──
+var ILLU = {
+  sheet: '<svg class="st-illu" viewBox="0 0 132 100" fill="none" aria-hidden="true">'
+    + '<ellipse cx="66" cy="54" rx="58" ry="42" fill="#f4f8ff"/>'
+    + '<rect x="38" y="16" width="54" height="70" rx="6" fill="#fff" stroke="#416bff" stroke-width="2.5"/>'
+    + '<path d="M48 32h34M48 43h34M48 54h34M48 65h20" stroke="#ccdfff" stroke-width="3.5" stroke-linecap="round"/>'
+    + '<path d="M48 32h22M48 43h28" stroke="#416bff" stroke-width="3.5" stroke-linecap="round"/>'
+    + '<path d="M28 22V10h12M104 22V10H92M28 80v12h12M104 80v12H92" stroke="#416bff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>'
+    + '<circle cx="94" cy="76" r="13" fill="#416bff"/><path d="M88 76l4.5 4.5 8-8.5" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>'
+    + '<circle cx="16" cy="40" r="4" fill="#ccdfff"/><circle cx="118" cy="30" r="5" fill="#e9f2ff" stroke="#ccdfff" stroke-width="2"/>'
+    + '</svg>',
+  cls: '<svg class="st-illu" viewBox="0 0 132 100" fill="none" aria-hidden="true">'
+    + '<ellipse cx="66" cy="54" rx="58" ry="42" fill="#f4f8ff"/>'
+    + '<rect x="28" y="12" width="76" height="42" rx="6" fill="#e9f2ff" stroke="#416bff" stroke-width="2.5"/>'
+    + '<path d="M40 26h34M40 38h20" stroke="#416bff" stroke-width="3.5" stroke-linecap="round"/><path d="M78 26h14" stroke="#a3c3ff" stroke-width="3.5" stroke-linecap="round"/>'
+    + '<circle cx="42" cy="66" r="7.5" fill="#fff" stroke="#416bff" stroke-width="2.5"/><path d="M30 92c1-8 6-12 12-12s11 4 12 12" fill="#ccdfff" stroke="#416bff" stroke-width="2.5" stroke-linejoin="round"/>'
+    + '<circle cx="90" cy="66" r="7.5" fill="#fff" stroke="#416bff" stroke-width="2.5"/><path d="M78 92c1-8 6-12 12-12s11 4 12 12" fill="#ccdfff" stroke="#416bff" stroke-width="2.5" stroke-linejoin="round"/>'
+    + '<circle cx="66" cy="63" r="8.5" fill="#fff" stroke="#416bff" stroke-width="2.5"/><path d="M52 92c1-9 7-14 14-14s13 5 14 14" fill="#e9f2ff" stroke="#416bff" stroke-width="2.5" stroke-linejoin="round"/>'
+    + '<circle cx="110" cy="16" r="11" fill="#416bff"/><path d="M110 11v10M105 16h10" stroke="#fff" stroke-width="2.8" stroke-linecap="round"/>'
+    + '<circle cx="14" cy="34" r="4" fill="#ccdfff"/>'
+    + '</svg>',
+  blank: '<svg class="cc-illu" viewBox="0 0 80 64" fill="none" aria-hidden="true">'
+    + '<ellipse cx="40" cy="36" rx="36" ry="26" fill="#f4f8ff"/>'
+    + '<rect x="20" y="8" width="34" height="46" rx="5" fill="#fff" stroke="#a3c3ff" stroke-width="2" stroke-dasharray="4 3"/>'
+    + '<circle cx="37" cy="30" r="9" fill="#e9f2ff"/><path d="M37 25v10M32 30h10" stroke="#416bff" stroke-width="2.5" stroke-linecap="round"/>'
+    + '<path d="M52 54l13-13 4.5 4.5-13 13H52z" fill="#ccdfff" stroke="#416bff" stroke-width="2" stroke-linejoin="round"/><path d="M61.5 44.5l4.5 4.5" stroke="#416bff" stroke-width="2"/>'
+    + '</svg>'
+};
+
+// 빈 학기 = 시작 화면: 두 갈래를 같은 무게로. 수업이 생기면 제목 줄 버튼 둘로 줄어든다
+function startHTML(){
+  return '<p class="start-q">이번 학기 수업이 아직 없어요. 어떻게 시작할까요?</p>'
+    + '<div class="start-grid">'
+    + '<div class="st-card">'
+    +   ILLU.sheet + '<div class="st-body">'
+    +   '<p class="st-t">활동지로 바로 채점<span class="new-bdg">NEW</span></p>'
+    +   '<p class="st-d">활동지 1장으로 채점기준 초안을 받고, 가진 답안으로 바로 채점해 봐요.</p>'
+    +   '<p class="st-need">수업·학생 등록 없이 시작해요. 마음에 들면 나중에 내 수업으로 가져와요.</p>'
+    +   '<div class="st-act"><button class="st-go" onclick="entryStart()">시작</button>'
+    +   '<a class="nx-sub" href="https://obkim-lgtm.github.io/clipo-blog/guide/examples.html" target="_blank" rel="noopener">과목별 채점 예시</a></div>'
+    + '</div></div>'
+    + '<div class="st-card">'
+    +   ILLU.cls + '<div class="st-body">'
+    +   '<p class="st-t">수업 만들기</p>'
+    +   '<p class="st-d">학교 학생 명단으로 수업을 만들고, 한 학기 수행평가를 이어서 운영해요.</p>'
+    +   '<p class="st-need">학생 제출 · 결과 공개 · 세특까지 이 수업 안에서 이어져요.</p>'
+    +   '<div class="st-act"><button class="st-go" onclick="classCreate()">수업 만들기</button></div>'
+    + '</div></div>'
+    + '</div>';
+}
+
+function renderAll(){
+  var wrap = document.getElementById('sem-list');
+  var html = '';
+  var curMine = 0;
+  SEM_ORDER.forEach(function(sem){
+    var all = CLASSES.filter(function(c){ return c.sem === sem && !(EMPTY && sem === CUR_SEM); });
+    var mine = all.filter(function(c){ return !c.archived && !c.shared; });
+    var shared = all.filter(function(c){ return !c.archived && c.shared; });
+    var archived = all.filter(function(c){ return c.archived; });
+    if (sem === CUR_SEM) curMine = mine.length;
+    var meta = '진행 중 ' + (mine.length + shared.length) + '개'
+      + (shared.length ? ' (공유받음 ' + shared.length + '개)' : '')
+      + ' · 보관 중 ' + archived.length + '개';
+    var closed = !!closedSems[sem];
+
+    var body = mine.length ? '<div class="sem-grid">' + sortCards(mine).map(cardHTML).join('') + '</div>'
+      : (sem === CUR_SEM ? startHTML() : '<p class="sem-empty">이 학기 수업이 없어요.</p>');
+    if (shared.length) {
+      body += '<div class="sub-div">'
+        + '<span class="sub-div-label"><i data-lucide="users" style="width:15px;height:15px;color:#27724b;"></i>공유받은 수업 ' + shared.length + '</span>'
+        + '<span class="sub-div-desc">동료 선생님이 공동 확인을 위해 공유한 수업이에요</span>'
+        + '<span class="sub-div-line"></span>'
+        + '</div>'
+        + '<div class="sem-grid">' + sortCards(shared).map(cardHTML).join('') + '</div>';
+    }
+    if (showArchived && archived.length) {
+      body += '<div class="sub-div">'
+        + '<span class="sub-div-label"><i data-lucide="archive" style="width:15px;height:15px;color:#6d7381;"></i>보관 중 ' + archived.length + '</span>'
+        + '<span class="sub-div-desc">목록에서 숨겨둔 수업이에요 · 보관 해제하면 다시 표시돼요</span>'
+        + '<span class="sub-div-line"></span>'
+        + '</div>'
+        + '<div class="sem-grid">' + sortCards(archived).map(cardHTML).join('') + '</div>';
+    }
+
+    html += '<div class="sem' + (closed ? ' closed' : '') + '" id="sem-' + sem.replace(/\s/g,'') + '">'
+      + '<div class="sem-hd" onclick="toggleSem(\'' + sem + '\')">'
+      + '<span class="sem-title">' + sem + '</span>'
+      + '<span class="sem-meta">' + meta + '</span>'
+      + '<i data-lucide="chevron-up" class="sem-chev" style="width:20px;height:20px"></i>'
+      + '</div>'
+      + '<div class="sem-body">' + body + '</div>'
+      + '</div>';
+  });
+  wrap.innerHTML = html;
+  var cur = document.getElementById('sem-' + CUR_SEM.replace(/\s/g,''));
+  if (cur) cur.insertAdjacentHTML('afterend', whatsNewHTML());
+  /* 같은 행동 두 군데 금지: 이번 학기가 비어 두 갈래 카드가 보이면 제목 줄 버튼은 숨긴다 */
+  var showTools = curMine > 0;
+  document.getElementById('toolEntry').style.display = showTools ? '' : 'none';
+  document.getElementById('toolMake').style.display = showTools ? '' : 'none';
+  renderTodo();
+  lucide.createIcons();
+}
+
+function toggleSem(sem){ closedSems[sem] = !closedSems[sem]; renderAll(); }
+function toggleArchived(){
+  showArchived = !showArchived;
+  document.getElementById('arch-tgl').classList.toggle('on', showArchived);
+  renderAll();
+}
+function togglePop(id){
+  var target = document.getElementById('pop-' + id);
+  var wasOpen = target.classList.contains('open');
+  document.querySelectorAll('.cc-pop').forEach(function(p){ p.classList.remove('open'); });
+  if (!wasOpen) target.classList.add('open');
+}
+document.addEventListener('click', function(){ document.querySelectorAll('.cc-pop').forEach(function(p){ p.classList.remove('open'); }); });
+function setArchived(id, on){
+  var c = CLASSES.find(function(x){ return x.id === id; });
+  if (!c) return;
+  c.archived = on;
+  renderAll();
+  toastMsg(on
+    ? '수업을 보관했어요. 삭제가 아니라 목록에서만 숨겨져요 — \'보관한 수업 보기\'를 켜면 다시 볼 수 있어요.'
+    : '보관을 해제했어요. 수업이 다시 목록에 표시됩니다.');
+}
+
+// ── 지난 학기 이후 달라진 것: 안 읽은 것만. 기능 이름이 아니라 교사가 얻는 것으로 쓴다 ──
+/* 노출 조건(09-26): 지난 학기 이전부터 쓰던 교사에게만 · 그 교사가 아직 안 써 본 기능만 · 확인/써 보기/그 기능 사용/학기 교체 시 사라짐.
+   이 페르소나는 공동 확인을 이미 쓰고 있어(공유받은 수업·확인 요청) co는 hidden:true */
+var WN = [
+  { id:'co', hidden:true, ic:'users', t:'같은 학교 선생님과 채점 결과를 함께 검토해요', d:'채점 결과를 공유하면 동료가 점수와 근거를 보고 의견을 남겨요.', go:"location.href='co_teacher_review_v1_260611.html'" },
+  { id:'ds', ic:'pen-line', t:'학생이 클리포에 직접 답안을 써서 낼 수 있어요', d:'종이를 걷어 스캔하지 않아도 돼요. 평가 설계 › 답안 받는 방법에서 골라요.', go:"location.href='task_direct_write_v1_260729.html#design'" }
+];
+var wnRead = {};
+var wnClosed = false;
+try { wnClosed = localStorage.getItem('hr_wnClosed') === '1'; } catch (e) {}
+function whatsNewHTML(){
+  var list = WN.filter(function(w){ return !wnRead[w.id] && !w.hidden; });
+  if (!list.length) return '';   // 다 확인하면 묶음째 사라짐
+  return '<div class="wn-mod' + (wnClosed ? ' closed' : '') + '">'
+    + '<div class="wn-hd" onclick="wnToggle()"><span class="wn-title"><i data-lucide="sparkles" style="width:22px;height:22px;color:#416bff"></i>지난 학기 이후 달라진 것</span>'
+    + '<span class="wn-meta">' + list.length + '개</span>'
+    + '<a class="wn-all" href="https://obkim-lgtm.github.io/clipo-blog/news.html" target="_blank" rel="noopener" onclick="event.stopPropagation()">소식 전체<i data-lucide="external-link" style="width:13px;height:13px"></i></a>'
+    + '<i data-lucide="chevron-up" class="sem-chev" style="width:20px;height:20px"></i></div>'
+    + '<div class="wn-list">' + list.map(function(w){
+        return '<div class="wn-item"><span class="wn-ico"><i data-lucide="' + w.ic + '" style="width:20px;height:20px"></i></span>'
+          + '<div class="wn-txt"><p class="wn-t">' + w.t + '</p><p class="wn-d">' + w.d + '</p></div><div class="wn-act">'
+          + '<button class="wn-try" onclick="wnRead[\'' + w.id + '\']=true;' + w.go + '">써 보기<i data-lucide="chevron-right" style="width:15px;height:15px"></i></button>'
+          + '<button class="wn-ok" onclick="wnRead[\'' + w.id + '\']=true;renderAll();toastMsg(\'확인한 소식은 여기서 사라져요. 블로그 소식 탭에는 남아 있어요.\', true)">확인했어요</button></div></div>';
+      }).join('') + '</div></div>';
+}
+function evtShow(i){ [0,1].forEach(function(k){ document.getElementById('evt-' + k).style.display = k === i ? '' : 'none'; }); document.querySelectorAll('.evt-dots button').forEach(function(b, k){ b.classList.toggle('on', k === i); }); }
+function wnToggle(){ wnClosed = !wnClosed; try { localStorage.setItem('hr_wnClosed', wnClosed ? '1' : '0'); } catch (e) {} renderAll(); }
+
+// ── 해시 라우팅: #home(수업 있음) · #home-empty(이번 학기 0개) · #home-resume / #home-empty-resume(임시 채점 있음) ──
+function routeFromHash(){
+  var h = (location.hash || '#home').slice(1);
+  var m = h.match(/^home(-empty)?(-resume)?$/);
+  if (!m) { m = [null, null, null]; history.replaceState(null, '', location.pathname + location.search + '#home'); }
+  EMPTY = !!m[1]; TEMP = !!m[2];
+  renderAll();
+  /* 까망이 활성 표시 따라오기 */
+  var NAV_MAP = { 'home':'hr2Home', 'home-empty':'hr2Empty', 'home-resume':'hr2Resume', 'home-empty-resume':'hr2EmptyResume' };
+  if (window.mockNavSetCurrent && NAV_MAP[location.hash.slice(1)]) window.mockNavSetCurrent(NAV_MAP[location.hash.slice(1)]);
+  window.scrollTo(0, 0);
+}
+window.addEventListener('hashchange', routeFromHash);
+routeFromHash();
+</script>
+
+<!-- ===== 수업 수정 모달 (인페이지 오버레이) ===== -->
+<style>
+.ce-overlay{position:fixed;inset:0;background:rgba(34,38,49,.45);z-index:500;display:none;align-items:center;justify-content:center}
+.ce-overlay.open{display:flex}
+.ce-modal{background:#fff;border-radius:20px;width:540px;max-width:calc(100vw - 48px);max-height:90vh;overflow:auto;box-shadow:0 8px 24px rgba(0,0,0,.18);display:flex;flex-direction:column}
+.ce-head{padding:24px 24px 6px;display:flex;align-items:flex-start;justify-content:space-between}
+.ce-title{font-size:20px;font-weight:700;color:#222631}
+.ce-close{width:36px;height:36px;background:none;border:none;cursor:pointer;border-radius:8px;display:flex;align-items:center;justify-content:center;color:#3b3f4c}
+.ce-close:hover{background:#f1f3f5}
+.ce-desc{padding:0 24px 4px;font-size:15px;color:#6d7381;line-height:1.55}
+.ce-body{padding:16px 24px 24px;display:flex;flex-direction:column;gap:18px}
+.ce-row2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.ce-field{display:flex;flex-direction:column;gap:6px}
+.ce-label{font-size:14px;font-weight:500;color:#222631}
+.ce-field.locked .ce-label{color:#9aa0ad}
+.ce-select,.ce-input{height:44px;border:1px solid #dde1e8;border-radius:8px;padding:0 12px;font-size:16px;font-weight:500;color:#222631;background:#fff;font-family:inherit;width:100%}
+.ce-select{appearance:none;-webkit-appearance:none;cursor:pointer;padding-right:36px;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%236d7381' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>");background-repeat:no-repeat;background-position:right 12px center}
+.ce-select:focus,.ce-input:focus{outline:none;border-color:#416bff}
+.ce-select:disabled,.ce-input:disabled{background-color:#f4f5f7;color:#9aa0ad;cursor:not-allowed;border-color:#e6e8ec}
+.ce-select:disabled{background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 24 24' fill='none' stroke='%23b8bcc4' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>");background-repeat:no-repeat;background-position:right 12px center}
+.ce-rg{display:flex;gap:24px;align-items:center;padding-top:4px}
+.ce-radio{display:flex;align-items:center;gap:10px;cursor:pointer;font-size:15px;font-weight:500;color:#222631}
+.ce-radio input{display:none}
+.ce-ring{width:20px;height:20px;border-radius:50%;border:1.5px solid #dde1e8;background:#fff;flex-shrink:0;transition:.15s}
+.ce-radio input:checked + .ce-ring{border:6.5px solid #365eef}
+.ce-radio.locked{cursor:not-allowed;color:#9aa0ad;pointer-events:none}
+.ce-radio.locked input:checked + .ce-ring{border:6.5px solid #c4c8d0}
+.ce-lock{display:flex;align-items:flex-start;gap:8px;background:#f4f8ff;border:1px solid #d6e4ff;border-radius:10px;padding:13px 15px;font-size:14px;color:#3151c4;line-height:1.6}
+.ce-lock svg{width:16px;height:16px;flex-shrink:0;margin-top:2px;color:#416bff}
+.ce-lock b{font-weight:700}
+.ce-foot{display:flex;gap:10px;justify-content:flex-end;padding:4px 24px 20px}
+.ce-btn-outline{height:44px;background:#fff;border:1px solid #cdd1d8;border-radius:8px;padding:0 20px;font-size:15px;font-weight:600;color:#3b3f4c;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;line-height:1}
+.ce-btn-outline:hover{background:#f6f7f9}
+.ce-btn-solid{height:44px;background:#365eef;border:none;border-radius:8px;padding:0 22px;font-size:15px;font-weight:600;color:#fff;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;line-height:1}
+.ce-btn-solid:hover{background:#3151c4}
+.ce-demo{position:fixed;right:24px;bottom:24px;z-index:600;background:#222631;border-radius:12px;padding:10px 12px;box-shadow:0 8px 24px #00000033;user-select:none}
+.ce-demo .h{font-size:11px;font-weight:700;color:#9aa0ad;letter-spacing:.04em;margin-bottom:7px}
+.ce-demo .r{display:flex;gap:6px}
+.ce-demo button{border:none;border-radius:7px;padding:7px 12px;font-size:13px;font-weight:600;cursor:pointer;background:#3a3f4c;color:#c5c9d2}
+.ce-demo button.on{background:#416bff;color:#fff}
+</style>
+<div class="ce-overlay" id="ceOverlay">
+  <div class="ce-modal">
+    <div class="ce-head">
+      <div class="ce-title">수업 수정</div>
+      <button class="ce-close" onclick="closeCe()"><i data-lucide="x" style="width:18px;height:18px"></i></button>
+    </div>
+    <div class="ce-body">
+      <div class="ce-lock" id="ceLockBox" style="display:none">
+        <i data-lucide="lock"></i>
+        <div id="ceLockText"></div>
+      </div>
+      <div class="ce-row2">
+        <div class="ce-field">
+          <label class="ce-label">학기</label>
+          <select class="ce-select"><option>2026학년도 1학기</option><option>2026학년도 2학기</option></select>
+        </div>
+        <div class="ce-field" id="ceFieldGrade">
+          <label class="ce-label">학년</label>
+          <select class="ce-select" id="ceGrade"><option value="3" selected>3학년</option><option value="1">1학년</option><option value="2">2학년</option><option value="4">4학년</option><option value="5">5학년</option><option value="6">6학년</option><option value="none">학년 구분 없음</option></select>
+        </div>
+      </div>
+      <div class="ce-field" id="ceFieldSubject">
+        <label class="ce-label">과목명</label>
+        <div class="ce-rg">
+          <label class="ce-radio ce-curri"><input type="radio" name="ceCurri" checked><span class="ce-ring"></span><span>2015 개정 교육과정</span></label>
+          <label class="ce-radio ce-curri"><input type="radio" name="ceCurri"><span class="ce-ring"></span><span>2022 개정 교육과정</span></label>
+        </div>
+        <select class="ce-select" id="ceSubject" style="margin-top:6px"><option>사회</option></select>
+      </div>
+      <div class="ce-field">
+        <label class="ce-label">수업명</label>
+        <input class="ce-input" value="사회">
+      </div>
+      <div class="ce-field" id="ceFieldBan">
+        <label class="ce-label">반 편성</label>
+        <div class="ce-rg">
+          <label class="ce-radio ce-ban"><input type="radio" name="ceBan" checked><span class="ce-ring"></span><span>학적 기준반</span></label>
+          <label class="ce-radio ce-ban"><input type="radio" name="ceBan"><span class="ce-ring"></span><span>이동수업반</span></label>
+        </div>
+      </div>
+    </div>
+    <div class="ce-foot">
+      <button class="ce-btn-outline" onclick="closeCe()">취소</button>
+      <button class="ce-btn-solid" onclick="saveCe()">저장</button>
+    </div>
+  </div>
+  <div class="ce-demo">
+    <div class="h">데모 · 등록 학생</div>
+    <div class="r">
+      <button id="ceStuNone" onclick="setCeStu('none')">없음</button>
+      <button id="ceStuHas" class="on" onclick="setCeStu('has')">있음</button>
+    </div>
+    <div class="h" style="margin-top:9px">데모 · 등록 설계</div>
+    <div class="r">
+      <button id="ceDsgNone" onclick="setCeDesign('none')">없음</button>
+      <button id="ceDsgHas" class="on" onclick="setCeDesign('has')">있음</button>
+    </div>
+  </div>
+</div>
+<script>
+function openCe(state, name, subj, dsg){
+  document.getElementById('ceOverlay').classList.add('open');
+  if(name){ var inp=document.querySelector('#ceOverlay .ce-input'); if(inp) inp.value=name; }
+  if(subj){ var ss=document.getElementById('ceSubject'); if(ss) ss.innerHTML='<option>'+subj+'</option>'; }
+  setCeStu(state||'has');
+  setCeDesign(dsg||'has');
+  lucide.createIcons();
+}
+function closeCe(){ document.getElementById('ceOverlay').classList.remove('open'); }
+function saveCe(){ closeCe(); if(window.toastMsg) toastMsg('수업 정보를 저장했어요.'); }
+function setCeStu(s){
+  document.getElementById('ceStuNone').classList.toggle('on', s==='none');
+  document.getElementById('ceStuHas').classList.toggle('on', s==='has');
+  var locked=(s==='has');
+  document.getElementById('ceGrade').disabled=locked;
+  document.getElementById('ceFieldGrade').classList.toggle('locked', locked);
+  document.getElementById('ceFieldBan').classList.toggle('locked', locked);
+  document.querySelectorAll('.ce-ban').forEach(function(r){ r.classList.toggle('locked', locked); });
+  updateLock(); lucide.createIcons();
+}
+function setCeDesign(d){
+  document.getElementById('ceDsgNone').classList.toggle('on', d==='none');
+  document.getElementById('ceDsgHas').classList.toggle('on', d==='has');
+  var locked=(d==='has');
+  document.getElementById('ceFieldSubject').classList.toggle('locked', locked);
+  document.querySelectorAll('.ce-curri').forEach(function(r){ r.classList.toggle('locked', locked); });
+  document.getElementById('ceSubject').disabled=locked;
+  updateLock(); lucide.createIcons();
+}
+function updateLock(){
+  var stu=document.getElementById('ceStuHas').classList.contains('on');
+  var dsg=document.getElementById('ceDsgHas').classList.contains('on');
+  var box=document.getElementById('ceLockBox'); var html='';
+  if(stu) html+='<div>등록된 학생이 있어 <b>학년 · 반 편성</b>은 바꿀 수 없어요. 바꾸려면 참여 학생을 모두 삭제하거나, 수업을 삭제하고 새로 만들어 주세요.</div>';
+  if(dsg) html+='<div'+(stu?' style="margin-top:8px"':'')+'>등록된 평가 설계가 있어 <b>교육과정 · 과목명</b>은 바꿀 수 없어요. 바꾸려면 평가 설계를 모두 삭제하거나, 수업을 새로 만들어 주세요.</div>';
+  if(html){ document.getElementById('ceLockText').innerHTML=html; box.style.display='flex'; }
+  else box.style.display='none';
+}
+document.getElementById('ceOverlay').addEventListener('click', function(e){ if(e.target===this) closeCe(); });
+</script>
+
+<!-- ===== 수업 삭제 확인 팝업 (데이터 유무 분기) ===== -->
+<style>
+.cf-bg{position:fixed;inset:0;background:rgba(34,38,49,.45);z-index:700;display:none;align-items:center;justify-content:center}
+.cf-bg.open{display:flex}
+.cf-dlg{background:#fff;border-radius:12px;width:400px;max-width:calc(100vw - 48px);padding:28px 20px;box-shadow:0 0 1px #2226314D,0 8px 16px #0000001A;display:flex;flex-direction:column;align-items:center;gap:20px;text-align:center}
+.cf-ic{width:44px;height:44px;border-radius:100px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.cf-ic.blue{background:#e9f2ff}.cf-ic.blue svg{color:#416bff}
+.cf-ic.red{background:#fee2e2}.cf-ic.red svg{color:#db3e51}
+.cf-txt{display:flex;flex-direction:column;gap:12px;width:100%}
+.cf-t{font-size:18px;font-weight:600;color:#222631;line-height:1.55;margin:0}
+.cf-d{font-size:15px;font-weight:400;color:#6d7381;line-height:1.55;margin:0}
+.cf-btns{display:flex;gap:12px;width:100%}
+.cf-btn{flex:1;height:40px;border-radius:4px;font-size:15px;font-weight:500;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;line-height:1;font-family:inherit;border:1px solid transparent}
+.cf-out-blue{background:#fff;border-color:#416bff;color:#3151c4}.cf-out-blue:hover{background:#f4f8ff}
+.cf-solid-blue{background:#365eef;color:#fff}.cf-solid-blue:hover{background:#3151c4}
+.cf-out-red{background:#fff;border-color:#f2525f;color:#ab303a}.cf-out-red:hover{background:#fff5f5}
+.cf-solid-red{background:#db3e51;color:#fff}.cf-solid-red:hover{background:#c5263a}
+</style>
+<div class="cf-bg" id="cfBlue">
+  <div class="cf-dlg">
+    <div class="cf-ic blue"><i data-lucide="info" style="width:24px;height:24px"></i></div>
+    <div class="cf-txt">
+      <p class="cf-t">이 수업에는 평가 데이터가 있습니다</p>
+      <p class="cf-d">삭제하면 수업 안에 쌓인 모든 평가 데이터가 사라지고, 복구할 수 없습니다. 삭제 범위를 확인한 뒤 진행해 주세요.</p>
+    </div>
+    <div class="cf-btns">
+      <button class="cf-btn cf-out-blue" onclick="closeCf()">취소</button>
+      <button class="cf-btn cf-solid-blue" onclick="location.href='class_delete_v2_260624.html'">확인하러 가기</button>
+    </div>
+  </div>
+</div>
+<div class="cf-bg" id="cfRed">
+  <div class="cf-dlg">
+    <div class="cf-ic red"><i data-lucide="trash-2" style="width:22px;height:22px"></i></div>
+    <div class="cf-txt">
+      <p class="cf-t" id="cfRedTitle">정말 ‘수업명’을 삭제하시겠습니까?</p>
+      <p class="cf-d">삭제한 수업은 복구할 수 없습니다.</p>
+    </div>
+    <div class="cf-btns">
+      <button class="cf-btn cf-out-red" onclick="closeCf()">취소</button>
+      <button class="cf-btn cf-solid-red" onclick="confirmDeleteNoData()">삭제</button>
+    </div>
+  </div>
+</div>
+<script>
+function openDelete(id, name){
+  var c = CLASSES.find(function(x){ return x.id === id; });
+  if (c && c.hasData === false){
+    document.getElementById('cfRedTitle').textContent = '정말 ‘' + name + '’을 삭제하시겠습니까?';
+    document.getElementById('cfRed').classList.add('open');
+  } else {
+    document.getElementById('cfBlue').classList.add('open');
+  }
+  lucide.createIcons();
+}
+function closeCf(){ document.getElementById('cfBlue').classList.remove('open'); document.getElementById('cfRed').classList.remove('open'); }
+function confirmDeleteNoData(){ closeCf(); toastMsg('수업을 삭제했어요.'); }
+document.querySelectorAll('.cf-bg').forEach(function(o){ o.addEventListener('click', function(e){ if(e.target===o) closeCf(); }); });
+</script>
+
+<!-- ===== 목업 내비게이터(까망이) — 공유 파일 방식. 규칙 docs/mockup-navigator.md ===== -->
+<script>
+window.MOCK_NAV_FILE  = 'homeRenew2';
+window.MOCK_NAV_TITLE = 'MOCKUP · 홈 리뉴얼 v2';
+window.MOCK_NAV_GROUPS = [
+  { tab:'t', t:'홈 상태', items:[
+    ['hr2Home','이번 학기 수업 있음',{sub:'내 할 일 · 진행 막대 카드'}],
+    ['hr2Empty','이번 학기 수업 없음',{sub:'학기 자리가 두 갈래 시작으로'}]] },
+  { tab:'t', t:'임시 채점 있을 때', items:[
+    ['hr2Resume','이번 학기 수업 있음',{sub:'목록에 임시 채점'}],
+    ['hr2EmptyResume','이번 학기 수업 없음',{sub:'목록에 임시 채점 + 두 갈래 시작'}]] }
+];
+(function(){
+  function show(h){ history.replaceState(null, '', location.pathname + location.search + '#' + h); routeFromHash(); }
+  window.MOCK_NAV_APPLY = {
+    hr2Home:        function(){ show('home'); },
+    hr2Empty:       function(){ show('home-empty'); },
+    hr2Resume:      function(){ show('home-resume'); },
+    hr2EmptyResume: function(){ show('home-empty-resume'); }
+  };
+})();
+</script>
+<script src="mock_nav_dw.js?v=260926a"></script>
+
+</body>
+</html>

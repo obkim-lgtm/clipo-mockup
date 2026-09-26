@@ -2,7 +2,7 @@
  * 규칙: docs/mockup-navigator.md
  * 삽입 파일: task_direct_write_v1_260729 · focus_log_v2_260806 ·
  *            scoring_direct_write_v1_260729 · student_home_v1_260729 ·
- *            student_submit_v1_260729
+ *            student_submit_v1_260729 · home_renewal_v1_260925(자기 목록만)
  *
  * 각 파일이 이 스크립트보다 먼저 선언해야 하는 것:
  *   window.MOCK_NAV_FILE  = 'submit';            // 아래 FILES 의 키
@@ -16,7 +16,9 @@
     task:    'focus_log_v3_260819.html',   /* 최종본. v1(260728)·v2(260806)는 기존 시안 — 까망이 제거됨(2026-08-19) */
     scoring: 'scoring_direct_write_v1_260729.html',
     home:    'student_home_v1_260729.html',
-    submit:  'student_submit_v1_260729.html'
+    submit:  'student_submit_v1_260729.html',
+    homeRenew: 'home_renewal_v1_260925.html',  /* 홈 리뉴얼 — 자기 목록(MOCK_NAV_GROUPS)만 싣는다 (2026-09-25 올립 요청) */
+    homeRenew2: 'home_renewal_v2_260926.html'  /* 홈 리뉴얼 v2 비교 시안 (2026-09-26) */
   };
 
   /* route → { f:파일키, h:해시(딥링크) } */
@@ -70,7 +72,15 @@
     ssCoverAway: { f:'submit',  h:'cover-away' },
     ssCoverBack: { f:'submit',  h:'cover-back' },
     ssAttachPv:  { f:'submit',  h:'attach-preview' },
-    ssAttachDl:  { f:'submit',  h:'attach-download' }
+    ssAttachDl:  { f:'submit',  h:'attach-download' },
+    hrHome:        { f:'homeRenew', h:'home' },
+    hrEmpty:       { f:'homeRenew', h:'home-empty' },
+    hrResume:      { f:'homeRenew', h:'home-resume' },
+    hrEmptyResume: { f:'homeRenew', h:'home-empty-resume' },
+    hr2Home:        { f:'homeRenew2', h:'home' },
+    hr2Empty:       { f:'homeRenew2', h:'home-empty' },
+    hr2Resume:      { f:'homeRenew2', h:'home-resume' },
+    hr2EmptyResume: { f:'homeRenew2', h:'home-empty-resume' }
   };
 
   /* 전체 화면·케이스를 항상 펼쳐 둔다. 길이는 패널 내부 스크롤로 처리(2026-08-06).

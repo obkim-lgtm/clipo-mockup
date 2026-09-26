@@ -10,7 +10,7 @@
 | 방식 | 구현체 | 삽입 파일 |
 |---|---|---|
 | A. 파일 내장 (기존) | 각 HTML 하단 `#mockNav` script 블록 | `task_ocr_v3` · `class_scoring_detail_v3` · `scoring_elementary_v3` · `scoring_survey_v1` · `scoring_secondary_v1` · `scoring_secondary_current_v1` |
-| B. 공유 파일 (권장) | `output/mock_nav_dw.js` 하나 | `task_direct_write_v1_260729` · `focus_log_v1_260728` · `scoring_direct_write_v1_260729` · `student_home_v1_260729` · `student_submit_v1_260729` |
+| B. 공유 파일 (권장) | `output/mock_nav_dw.js` 하나 | `task_direct_write_v1_260729` · `focus_log_v1_260728` · `scoring_direct_write_v1_260729` · `student_home_v1_260729` · `student_submit_v1_260729` · `home_renewal_v1_260925`(자기 목록 `MOCK_NAV_GROUPS`만, 2026-09-25) |
 
 확인: `grep -l mockNav output/*.html` · `grep -l mock_nav_dw output/*.html`
 

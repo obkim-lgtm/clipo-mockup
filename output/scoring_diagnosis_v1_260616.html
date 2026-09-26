@@ -1477,10 +1477,10 @@
       <p id="student-upload-title" style="font-size:20px;font-weight:600;line-height:1.25;color:#222631;margin:0;">학생 파일 추가/제거</p>
     </div>
     <div style="padding:0 24px;display:flex;flex-direction:column;gap:20px;">
-      <p style="font-size:16px;font-weight:400;line-height:1.55;color:#222631;margin:0;">가장 먼저 올린 파일 1개만 채점·OCR 대상이 됩니다. 나머지 파일은 참고용으로 함께 보관됩니다.</p>
+      <p style="font-size:16px;font-weight:400;line-height:1.55;color:#222631;margin:0;">가장 최근에 올린 파일 1개만 채점·OCR 대상이 됩니다. 나머지 파일은 참고용으로 함께 보관됩니다.</p>
       <div style="background:#e9f2ff;border:1px solid #ccdfff;border-radius:4px;padding:12px;">
         <ul style="list-style:disc;padding-left:24px;margin:0;font-size:15px;font-weight:400;line-height:1.55;color:#3151c4;">
-          <li>여러 파일을 올릴 수 있어요 (채점·OCR은 가장 먼저 올린 파일만)</li>
+          <li>여러 파일을 올릴 수 있어요 (채점·OCR은 가장 최근에 올린 파일만)</li>
           <li>제출 가능한 파일 형식 : PDF, PNG, JPG</li>
         </ul>
       </div>
@@ -3229,7 +3229,7 @@ function renderSubmissionMethodCell(method) {
   }
   return '<span style="display:inline-flex;align-items:center;gap:4px;color:#3b3f4c;background:#f1f3f5;border-radius:100px;padding:2px 8px;font-size:13px;font-weight:600;"><i data-lucide="paperclip" style="width:13px;height:13px;"></i>파일</span>';
 }
-// 제출 파일 셀: 첫(=채점 대상) 파일명 + 여러 개면 '외 N개'. 정책 — 가장 먼저 올린 파일만 채점·OCR.
+// 제출 파일 셀: 채점 대상 파일명 + 여러 개면 '외 N개'. 정책 — OCR 가능한 파일 중 가장 최근에 올린 1개만 채점(2026-08-10 개발 확인)
 function scoredFileCell(name, count) {
   count = count || 1;
   var extra = count > 1 ? '<span style="font-size:13px;color:#6d7381;flex-shrink:0;">외 ' + (count - 1) + '개</span>' : '';
@@ -3545,7 +3545,7 @@ function renderStudentUploadList() {
       list.innerHTML = '<span style="font-size:14px;color:#b3b6bd;">아직 추가된 파일이 없습니다.</span>';
     } else {
       list.innerHTML = studentUploadFiles.map(function(name, i) {
-        var tag = (i === 0)
+        var tag = (i === studentUploadFiles.length - 1)   /* 채점 대상 = 가장 최근에 올린 파일(마지막) */
           ? '<span style="font-size:11px;font-weight:700;background:#e9f2ff;color:#3151c4;border-radius:100px;padding:1px 8px;white-space:nowrap;flex-shrink:0;">채점 대상</span>'
           : '<span style="font-size:11px;font-weight:600;background:#f1f3f5;color:#6d7381;border-radius:100px;padding:1px 8px;white-space:nowrap;flex-shrink:0;">참고용</span>';
         return '<div style="display:flex;align-items:center;gap:8px;background:#f6f7f9;border:1px solid #e6e8ec;border-radius:6px;padding:6px 10px;">'
