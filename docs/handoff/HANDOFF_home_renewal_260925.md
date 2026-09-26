@@ -5,6 +5,10 @@
 > - 목업: `output/home_renewal_v2_260926.html`(원본, 까망이 4케이스 hr2*)과 `output/quick_start_v1_260925.html` `#home`(흐름 페르소나 김하나로 이식). **홈을 고치면 두 파일을 같이** 고친다. `home_renewal_v1_260925.html`은 비교용으로만 남긴다.
 > - 시각 · 구조 규칙의 원본은 `../design-system.md` '홈·카드 시각 규칙'이다(v2 기준으로 새로 씀).
 > - 다음 후보는 §9 끝 '남은 것'이다.
+> - **배포(09-26 마감)**: GitHub `obkim-lgtm/clipo-mockup` master `25904c7`. 공개 주소 https://obkim-lgtm.github.io/clipo-mockup/output/home_renewal_v2_260926.html (`#home` · `#home-empty` · `#home-resume` · `#home-empty-resume`), 흐름 목업 https://obkim-lgtm.github.io/clipo-mockup/output/quick_start_v1_260925.html#home . 허브 카드는 아직 안 넣었다(목업 카드는 올립에게 먼저 묻기).
+> - **마지막 결정(09-26)**: 임시 채점 줄 = `화산 지형 탐구 · 임시 채점 · 29일 남음 · [수업에 옮기기 ›]`. '가져오기 전'(뜻 안 보임) · '29일 뒤 지워져요'(김)는 기각.
+> - **올립 답을 기다리는 질문**: 흐름 목업 `quick_start_v1_260925.html` 안의 `내 수업에 가져오기` 7곳을 홈 버튼 이름 `수업에 옮기기`에 맞출지(홈에서 누른 말 = 도착한 화면의 말). 답을 받기 전엔 고치지 않는다.
+> - **커밋에서 뺀 것**: `output/eval_design_quick_v1_260925.html`(평가 만들기 통합, 다른 세션 작업 중) · `service_overview.md`(09-21 개정분, 다른 세션). 홈 작업과 무관하니 건드리지 않는다.
 
 > 작성 Olivia. '활동지로 바로 채점' 목업 작업 중에 "당장 개발이 어려우니 이 기회에 홈도 리뉴얼하자"로 커졌다. 목적이 달라서 새 세션으로 분리한다.
 > 흐름 목업(`output/quick_start_v1_260925.html`)의 홈은 **개발 홈 + 새 입구 카드 1장**으로 되돌려 두었다. 리뉴얼 초안은 `output/home_renewal_draft_260925.html`에 그대로 보존(이 파일의 `#home`만 보면 된다. 나머지 화면은 흐름 목업 사본).
