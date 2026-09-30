@@ -340,7 +340,14 @@ body.nav-expanded .main-wrap{ padding-left:200px; }
     .ar-avg{ display:inline-flex; align-items:center; justify-content:center; flex-shrink:0; padding:3px 6px; border-radius:4px; background:#e9f2ff; color:#3151c4; font-size:14px; font-weight:500; line-height:1.3; white-space:nowrap; }
     .ar-plot{ display:flex; align-items:flex-end; height:126px; margin-top:26px; border-top:1px solid #e0e0e0; border-bottom:1px solid #e0e0e0; }
     .ar-plot.sm{ height:82px; }
-    .ar-col{ flex:1; min-width:0; height:100%; display:flex; align-items:flex-end; justify-content:center; }
+    .ar-col{ flex:1; min-width:0; height:100%; display:flex; align-items:flex-end; justify-content:center; cursor:default; outline:none; }
+    .ar-col:hover .ar-bar, .ar-col:focus-visible .ar-bar{ background:#365eef; }
+    .ar-col:focus-visible{ box-shadow:inset 0 0 0 2px #a3c3ff; border-radius:4px; }
+    /* 막대에 올리면 그 점수를 받은 학생 이름 (v4 델타 — 제품에는 없음) */
+    .ar-tip{ position:fixed; z-index:1700; display:none; max-width:260px; padding:10px 12px; border-radius:8px; background:#222631; color:#fff; box-shadow:0 6px 18px rgba(0,0,0,.22); pointer-events:none; }
+    .ar-tip.show{ display:block; }
+    .ar-tip-h{ font-size:14px; font-weight:700; line-height:1.4; }
+    .ar-tip-n{ font-size:14px; font-weight:400; line-height:1.6; margin-top:2px; word-break:keep-all; color:#e6e9f0; }
     .ar-bar{ position:relative; width:70%; min-height:2px; background:rgba(65,107,255,.85); border:1px solid #416bff; border-bottom:none; }
     .ar-bar span{ position:absolute; left:50%; bottom:100%; transform:translateX(-50%); margin-bottom:4px; font-size:14px; font-weight:600; color:#18181b; white-space:nowrap; line-height:1.3; }
     .ar-x{ display:flex; padding-top:8px; }
@@ -841,6 +848,7 @@ body.nav-expanded .main-wrap{ padding-left:200px; }
 </div><!-- /main-wrap -->
 
 <!-- 토스트 -->
+<div class="ar-tip" id="arTip" role="tooltip"></div>
 <div class="toast" id="toast">
   <i id="toastIcon" data-lucide="circle-check-big" style="width:18px;height:18px;flex-shrink:0"></i>
   <span id="toastMsg"></span>
@@ -1174,17 +1182,38 @@ function renderDetail(){
 // ══════ AI 채점 결과 확인 팝업 (v4, #ai) — 제품 화면 그대로: 요약 3칸 + 총점 점수 분포 + 채점 요소별 점수 분포 ══════
 // 막대 = 그 점수를 받은 학생 수(가로축은 실제로 나온 점수만). AI 점수 기준이고, AI 채점이 안 된 학생은 분포에서 빠진다
 function avgTxt(x){ var r = Math.round(x * 10) / 10; return (r % 1 ? r.toFixed(1) : r) + '점'; }
-function distChart(vals, small){
-  var cnt = {}; vals.forEach(function(v){ cnt[v] = (cnt[v] || 0) + 1; });
-  var keys = Object.keys(cnt).map(Number).sort(function(a, b){ return a - b; }), mx = Math.max.apply(null, keys.map(function(k){ return cnt[k]; }));
+// pts = [{v:점수, name:학생 이름}] — 막대 칸에 올리면 그 점수를 받은 학생 이름이 말풍선으로 나온다(올립 09-30, 제품에는 없는 델타)
+function distChart(pts, small){
+  var who = {}; pts.forEach(function(p){ (who[p.v] = who[p.v] || []).push(p.name); });
+  var keys = Object.keys(who).map(Number).sort(function(a, b){ return a - b; }), mx = Math.max.apply(null, keys.map(function(k){ return who[k].length; }));
   return '<div class="ar-chart"><div class="ar-plot' + (small ? ' sm' : '') + '">'
-    + keys.map(function(k){ return '<div class="ar-col"><div class="ar-bar" style="height:' + Math.round(cnt[k] / mx * 100) + '%"><span>' + cnt[k] + '명</span></div></div>'; }).join('') + '</div>'
+    + keys.map(function(k){
+        var names = who[k].join(' · ');
+        return '<div class="ar-col" tabindex="0" data-tip-h="' + k + '점 · ' + who[k].length + '명" data-tip="' + names + '" aria-label="' + k + '점 ' + who[k].length + '명: ' + who[k].join(', ') + '">'
+          + '<div class="ar-bar" style="height:' + Math.round(who[k].length / mx * 100) + '%"><span>' + who[k].length + '명</span></div></div>';
+      }).join('') + '</div>'
     + '<div class="ar-x">' + keys.map(function(k){ return '<span>' + k + '점</span>'; }).join('') + '</div></div>';
 }
+function arTipShow(col){
+  var tip = document.getElementById('arTip'), bar = col.querySelector('.ar-bar').getBoundingClientRect();
+  tip.innerHTML = '<div class="ar-tip-h">' + col.getAttribute('data-tip-h') + '</div><div class="ar-tip-n">' + col.getAttribute('data-tip') + '</div>';
+  tip.classList.add('show');
+  var w = tip.offsetWidth, h = tip.offsetHeight, x = bar.left + bar.width / 2 - w / 2, y = bar.top - h - 30; // 막대 위 'N명' 글자 위쪽
+  if(y < 8) y = bar.bottom + 8;
+  tip.style.left = Math.max(8, Math.min(window.innerWidth - w - 8, x)) + 'px'; tip.style.top = y + 'px';
+}
+function arTipHide(){ document.getElementById('arTip').classList.remove('show'); }
+(function(){
+  var body = document.getElementById('aiResultBody');
+  var over = function(e){ var c = e.target.closest && e.target.closest('.ar-col'); if(c) arTipShow(c); else arTipHide(); };
+  body.addEventListener('mouseover', over); body.addEventListener('focusin', over);
+  body.addEventListener('mouseleave', arTipHide); body.addEventListener('focusout', arTipHide); body.addEventListener('scroll', arTipHide);
+})();
 function renderAiResult(){
   var rows = basisRows('ai'), N = rows.length, nFail = STUDENTS.filter(function(s){ return s.aiStatus === '채점 실패'; }).length;
-  var card = function(title, vals, small){
-    return '<div class="ar-card"><div class="ar-card-hd"><div class="ar-card-t">' + title + '</div><span class="ar-avg">평균 ' + avgTxt(sumArr(vals) / N) + '</span></div>' + distChart(vals, small) + '</div>';
+  var card = function(title, val, small){ // val(r) = 그 학생의 점수
+    var pts = rows.map(function(r){ return { v:val(r), name:r.name }; });
+    return '<div class="ar-card"><div class="ar-card-hd"><div class="ar-card-t">' + title + '</div><span class="ar-avg">평균 ' + avgTxt(sumArr(pts.map(function(p){ return p.v; })) / N) + '</span></div>' + distChart(pts, small) + '</div>';
   };
   document.getElementById('aiResultBody').innerHTML =
     '<div class="ar-info"><i data-lucide="info"></i><span>AI 채점 결과는 참고용 초안입니다. 선생님께서 직접 확인 후 수정해 주세요.</span></div>'
@@ -1192,13 +1221,14 @@ function renderAiResult(){
     +   '<div class="ar-count"><span class="ar-count-l">전체</span><span class="ar-count-v">' + STUDENTS.length + '명</span></div>'
     +   '<div class="ar-count"><span class="ar-count-l">AI 채점 성공</span><span class="ar-count-v ok">' + N + '명</span></div>'
     +   '<div class="ar-count"><span class="ar-count-l">AI 채점 실패</span><span class="ar-count-v off">' + nFail + '명</span></div></div>'
-    +   '<p class="ar-note">※ 미채점 학생의 채점 결과는 점수 분포에 반영되지 않습니다.</p></div>'
-    + '<div class="ar-sec"><p class="ar-sec-t">총점 점수 분포</p>' + card('1학년 1반 : 미래 예측 보고서 작성의 과제', rows.map(function(r){ return r.total; }), false) + '</div>'
+    +   '<p class="ar-note">※ 미채점 학생의 채점 결과는 점수 분포에 반영되지 않습니다.</p>'
+    +   '<p class="ar-note" style="margin-top:-4px;">※ 막대에 마우스를 올리면 그 점수를 받은 학생을 볼 수 있습니다.</p></div>'
+    + '<div class="ar-sec"><p class="ar-sec-t">총점 점수 분포</p>' + card('1학년 1반 : 미래 예측 보고서 작성의 과제', function(r){ return r.total; }, false) + '</div>'
     + '<div class="ar-sec"><p class="ar-sec-t">채점 요소별 점수 분포</p><div class="ar-cards">'
-    +   CRIT.map(function(c, i){ return card(c.name, rows.map(function(r){ return r.arr[i]; }), true); }).join('') + '</div></div>';
+    +   CRIT.map(function(c, i){ return card(c.name, function(r){ return r.arr[i]; }, true); }).join('') + '</div></div>';
 }
 function openAiResult(){ view.aiPop = true; renderAiResult(); openRmModal('aiResultModal'); document.getElementById('aiResultBody').scrollTop = 0; syncHash(); }
-function closeAiResult(){ view.aiPop = false; closeRmModal('aiResultModal'); syncHash(); }
+function closeAiResult(){ view.aiPop = false; arTipHide(); closeRmModal('aiResultModal'); syncHash(); }
 
 // ══════ 채점 진행 단계 (v4) — 단계마다 지금 상태(사실만) + 그 단계의 버튼 ══════
 function renderSteps(){

@@ -202,6 +202,7 @@
 | 활동지 (수업 탭 — 업로드·인식·정확도 부스터) | `output/question_tab_v1_260617.html` — 상세 인수인계: `../context_question_tab.md` |
 | 평가(과제) 설계 상세 | `output/evaluation_design_v4_260615.html` |
 | 학급 채점 현황 → 학생 채점 → 결과 공개 | `output/class_scoring_detail_v1_260512.html` |
+| 학급 채점 현황의 `AI 채점 결과 확인` 팝업 · `점수 일괄 수정` 페이지 | `output/class_scoring_detail_v4_260930.html` (`#ai` / `#edit`) — 09-30 실제 제품 화면의 구성·문구를 옮긴 것. 이 파일의 나머지(채점 진행 카드·채점 결과 요약·채점 요소별 점수)는 **제안**이지 개발 화면이 아니다. 팝업의 막대 말풍선(학생 이름)도 제안. 상세 = `docs/class_report.md` §6 |
 | 창의적 체험활동 목록 | `output/creative_activity_list_v6_260507.html` |
 | 세특 간편 생성기 목록 | `output/quick_seteuk_dev_list_v1_260604.html` |
 | 학교 설정 › 선생님 목록 | `output/rep_teacher_succession_v1_260731.html` (`#af3`) — 서브탭(학생/선생님) · 권한 필터(전체/대표교사/일반교사/인증 대기) · 컬럼(권한·이름·아이디(이메일)·최근 활동·인증일·권한 변경·소속 해제) |
