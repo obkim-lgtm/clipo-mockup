@@ -312,7 +312,7 @@ html body .main-wrap{margin-top:58px}
     <optgroup label="파일 — 등록 막힘"><option value="type">.xlsx 아닌 형식</option><option value="size">20MB 초과</option><option value="broken">파일 열기 실패</option></optgroup>
     <optgroup label="양식 — 등록 막힘"><option value="format">양식 불일치</option><option value="blank">빈 파일</option></optgroup>
     <optgroup label="내용 — 등록 막힘"><option value="over">1,000자 초과</option><option value="level">활동 수준 값 오류</option></optgroup>
-    <optgroup label="매칭"><option value="emptyid">학번·이름 빈 행 (막힘)</option><option value="dup">학번 중복 (막힘)</option><option value="match">명단에 없음·동명이인 (직접 지정)</option></optgroup>
+    <optgroup label="매칭"><option value="emptyid">학번·이름 빈 행 (막힘)</option><option value="dup">학번 중복 (막힘)</option><option value="match">명단에 없음·동명이인 (막힘)</option></optgroup>
     <optgroup label="시스템 — 토스트"><option value="net">네트워크 오류</option><option value="server">처리 중 오류</option></optgroup>
   </select>
 </div>
@@ -437,6 +437,7 @@ function upRejects(){ return {
   format: ['양식을 읽을 수 없어 등록할 수 없어요.', '양식 <b>맨 윗줄(제목 줄)이 지워졌거나 열 순서가 바뀐</b> 것 같아요. 내용을 복사해 붙이실 때 <b>제목 줄은 그대로 두고</b> 학생 내용만 채워 주세요. 헷갈리면 <b>양식을 다시 받아</b> 작성해 주세요.', true],
   blank:  ['파일에 등록할 내용이 없어요.', '제목 줄 아래에 학생 행이 없어요. 학번·이름과 내용을 채운 뒤 다시 올려 주세요.', true],
   emptyid:['학번 또는 이름이 비어 있는 행이 있어요.', '<b>5번째 행</b>의 학번·이름을 채운 뒤 다시 올려 주세요.', false],
+  match:  ['명단과 맞지 않는 행이 있어요.', '학번·이름이 학생 명단에 없거나, 같은 이름이 둘인데 학번이 비어 있는 행이에요. 표시된 행의 학번·이름을 고친 뒤 다시 올려 주세요.', false, 'match'],
   dup:    ['중복된 학번이 있어요.', `학번 <b>${currentRows[0].sid}</b>이 두 행에 있어요. 한 행만 남기고 다시 올려 주세요.`, false],
   over:   ['1,000자를 넘는 활동 내역이 있어 등록할 수 없어요.', '표시된 항목을 1,000자 이내로 줄여 다시 올려 주세요.', false, 'over'],
   level:  ['활동 수준은 상·중·하만 입력할 수 있어요.', `<b>${(currentRows[1]||currentRows[0]).name}</b> 학생의 활동 수준이 \'보통\'으로 되어 있어요. 상·중·하 중 하나로 고치거나 비워 두고 다시 올려 주세요.`, false, 'level'],
@@ -464,18 +465,13 @@ function applyUpCase(){
     // 내용 오류는 어느 행인지 보여 주려고 결과 표를 같이 둠, 나머지는 표 없이 안내만
     document.getElementById('resultSection').style.display = rj[3] ? '' : 'none';
     const fr = document.querySelector('#resultRows tr');
+    if (rj[3] === 'match'){ const tb = document.getElementById('resultRows'); const n = tb.children.length;
+      [['20188','홍서윤','명단에 없는 학번·이름'],['',currentRows[0].name,'같은 이름이 둘 — 학번 필요']].forEach(([sid, nm, why], k) => {
+        tb.insertAdjacentHTML('beforeend', `<tr class="up-over-row"><td class="up-miss-cell">${sid || '—'}</td><td class="up-miss-cell">${nm}</td><td colspan="${2}"><span class="up-over-chip">${why}</span></td></tr>`);
+      }); }
     if (rj[3] === 'over' && fr){ fr.classList.add('up-over-row'); const c = fr.children[2]; if (c) c.insertAdjacentHTML('beforeend', '<div><span class="up-over-chip">1,000자 초과</span></div>'); }
     if (rj[3] === 'level'){ const r2 = document.querySelectorAll('#resultRows tr')[1] || fr; if (r2){ r2.classList.add('up-over-row'); const c = r2.children[3]; if (c){ c.textContent = '보통'; c.insertAdjacentHTML('beforeend', '<div><span class="up-over-chip">상·중·하만 가능</span></div>'); } } }
     save.disabled = true; lucide.createIcons(); return;
-  }
-  if (upCase === 'match'){
-    const tb = document.getElementById('resultRows'); const n = tb.children.length;
-    const opts = '<option>학생 직접 지정…</option>' + currentRows.slice(0, 3).map(r => `<option>${r.sid} ${r.name}</option>`).join('');
-    const row = (no, sid, name, msg) => `<tr class="up-miss-row"><td class="up-miss-cell">${sid}</td><td class="up-miss-cell">${name}</td><td colspan="${2}"><div class="up-miss-act"><span class="m"><i data-lucide="user-x" style="width:14px;height:14px"></i>${msg}</span><select>${opts}</select><button>행 제외</button></div></td></tr>`;
-    tb.innerHTML += row(n + 1, '20188', '홍서윤', '명단에 없는 학번·이름이에요') + row(n + 2, '—', currentRows[0].name, '같은 이름이 둘이라 어느 학생인지 확인이 필요해요');
-    warn.style.display = 'flex';
-    document.getElementById('upWarnText').innerHTML = '명단에서 찾을 수 없는 행이 <b>2건</b> 있어요. 학번·이름을 확인해 직접 지정하거나 해당 행을 제외한 뒤 등록할 수 있어요. (같은 이름은 서로 바뀔 수 있으니 한 번 더 확인해 주세요)';
-    save.disabled = true;
   }
   lucide.createIcons();
 }
