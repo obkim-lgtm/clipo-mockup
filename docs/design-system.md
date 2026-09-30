@@ -97,7 +97,8 @@
 
 ### 수업 탭 밴드 (표준, 임의 변경 금지)
 수업 내 모든 화면 상단의 탭 밴드(`.tab-band` / `.tab-band-inner` / `.sub-tab`)는 **모든 페이지에서 동일**. 페이지마다 모양·개수·동작이 다르면 탭 이동 시 들썩이고 일관성이 깨진다.
-- **6탭 고정 순서**: `수업 홈 / 평가 설계 / 활동지 / 과제물 관리 / 채점 / 세부능력 및 특기사항 지원`
+- **⚠️ 2026-09-30 올립: 탭 구성이 바뀌었다.** 새 탭 줄 = `수업 홈 / 설계 / 과제물 관리 / 채점 / 세부능력 및 특기사항 지원 / 공동 평가`. **`활동지` 탭은 넣지 않기로 했고 `공동 평가`가 새로 생겼다.** 제품 화면의 `수행평가 설계`·`수행평가 채점`은 탭이 길어 `설계`·`채점`으로 줄인다(올립 09-30). 새로 그리는 화면은 이 구성을 쓴다(리포트 탭 제안이 들어가면 `채점` 뒤 — `output/class_report_v2_260930.html`이 기준). **채점 흐름에 연결된 6개는 새 탭 줄로 바꿨다**(09-30: `task_ocr_v3`·`class_scoring_detail_v3`·`co_teacher_review_v1`·`task_direct_write_v1`·`scoring_secondary_v1`·`scoring_elementary_v3` — 리포트 탭은 `class_report_v2_260930.html`로 연결). **나머지 목업은 아직 아래 옛 6탭** — 전수 교체는 올립이 요청할 때.
+- (옛) 6탭 고정 순서: `수업 홈 / 평가 설계 / 활동지 / 과제물 관리 / 채점 / 세부능력 및 특기사항 지원`
 - **활성 탭 = 색(`#416bff`) + 하단 밑줄만.** ⚠️ **`font-weight` 변화 금지**(굵어지면 폭이 커져 옆 탭이 밀림 = 움찔거림. 2026-06-18 전 파일 수정).
   - `.sub-tab{ font-weight:500 }` / `.sub-tab.on{ color:#416bff; border-bottom:2px solid #416bff; }` ← 굵기 동일
 - **링크 규약**: 수업 홈→`co_teacher_review_v1`, 평가 설계→`task_ocr_v3_260623.html#design`(=`goDesignList()`), 활동지→`question_tab_v1_260617`, 과제물 관리→`task_ocr_v3_260623.html`(같은 파일 내면 `showScreen('screen-task')`), 채점→`task_ocr_v3_260623.html#scoring`(=`goScoringList()`), 세특→`notReady()` 토스트.
