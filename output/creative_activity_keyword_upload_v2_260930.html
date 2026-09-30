@@ -156,6 +156,9 @@ html body .main-wrap{margin-top:58px}
 .mk-toggle button{padding:7px 12px;border:none;background:none;color:#b3b6bd;font-size:13px;font-weight:500;cursor:pointer;font-family:inherit;border-radius:18px;line-height:1;display:inline-flex;align-items:center;justify-content:center}
 .mk-toggle button:hover{color:#fff}
 .mk-toggle button.on{background:#416bff;color:#fff}
+.mk-sel{height:30px;padding:0 10px;border:none;border-radius:16px;background:#416bff;color:#fff;font-size:13px;font-weight:500;font-family:inherit;cursor:pointer;outline:none}
+.mk-sel option,.mk-sel optgroup{background:#fff;color:#222631}
+.toast.err .toast-ic{color:#f2525f}
 /* 업로드 실패 케이스 — task_ocr_v3 설문 업로드와 같은 모양 */
 .up-reject{display:flex;align-items:flex-start;gap:12px;background:#fff3f4;border:1px solid #f5b5bc;border-radius:8px;padding:16px 18px}
 .up-reject .t{font-size:16px;font-weight:700;color:#c0394a;margin-bottom:4px}
@@ -304,11 +307,14 @@ html body .main-wrap{margin-top:58px}
 
 <div class="mk-toggle" id="mkToggle">
   <span class="mk-l">MOCKUP</span>
-  <button data-c="normal" class="on" onclick="setUpCase('normal')">정상</button>
-  <button data-c="format" onclick="setUpCase('format')">양식 불일치</button>
-  <button data-c="match" onclick="setUpCase('match')">매칭 실패</button>
-  <button data-c="over" onclick="setUpCase('over')">1,000자 초과</button>
-  <button data-c="blank" onclick="setUpCase('blank')">빈 파일</button>
+  <select id="upCaseSel" class="mk-sel" onchange="setUpCase(this.value)">
+    <option value="normal">정상</option>
+    <optgroup label="파일 — 등록 막힘"><option value="type">.xlsx 아닌 형식</option><option value="size">20MB 초과</option><option value="broken">파일 열기 실패</option></optgroup>
+    <optgroup label="양식 — 등록 막힘"><option value="format">양식 불일치</option><option value="blank">빈 파일</option></optgroup>
+    <optgroup label="내용 — 등록 막힘"><option value="over">1,000자 초과</option><option value="level">활동 수준 값 오류</option></optgroup>
+    <optgroup label="매칭"><option value="emptyid">학번·이름 빈 행 (막힘)</option><option value="dup">학번 중복 (막힘)</option><option value="match">명단에 없음·동명이인 (직접 지정)</option></optgroup>
+    <optgroup label="시스템 — 토스트"><option value="net">네트워크 오류</option><option value="server">처리 중 오류</option></optgroup>
+  </select>
 </div>
 <div class="toast" id="toast"></div>
 
@@ -419,35 +425,57 @@ lucide.createIcons();
 let upCase = 'normal';
 function setUpCase(c){
   upCase = c;
-  document.querySelectorAll('#mkToggle button').forEach(b => b.classList.toggle('on', b.dataset.c === c));
+  const sel = document.getElementById('upCaseSel'); if (sel) sel.value = c;
   history.replaceState(null, '', '#case-' + c);
   onFilePicked();   // 케이스를 바꿀 때마다 결과를 처음부터 다시 그림(앞 케이스 행·경고가 남지 않게)
 }
+// 펜딩 PRD 'C-창체 일괄 업로드 에러 케이스 정리'(7/30) 기준. 등록 막힘 = 빨간 안내 + 등록 버튼 막힘, 시스템 오류 = 토스트 후 처음 상태
+function upRejects(){ return {
+  type:   ['지원하지 않는 형식이에요.', '활동 내역 양식(.xlsx)으로 작성해 올려 주세요.', true],
+  size:   ['파일 용량이 20MB를 넘어요.', '용량을 줄여 다시 올려 주세요.', false],
+  broken: ['파일을 열 수 없어요.', '파일이 손상되지 않았는지 확인하고 다시 올려 주세요.', false],
+  format: ['양식을 읽을 수 없어 등록할 수 없어요.', '양식 <b>맨 윗줄(제목 줄)이 지워졌거나 열 순서가 바뀐</b> 것 같아요. 내용을 복사해 붙이실 때 <b>제목 줄은 그대로 두고</b> 학생 내용만 채워 주세요. 헷갈리면 <b>양식을 다시 받아</b> 작성해 주세요.', true],
+  blank:  ['파일에 등록할 내용이 없어요.', '제목 줄 아래에 학생 행이 없어요. 학번·이름과 내용을 채운 뒤 다시 올려 주세요.', true],
+  emptyid:['학번 또는 이름이 비어 있는 행이 있어요.', '<b>5번째 행</b>의 학번·이름을 채운 뒤 다시 올려 주세요.', false],
+  dup:    ['중복된 학번이 있어요.', `학번 <b>${currentRows[0].sid}</b>이 두 행에 있어요. 한 행만 남기고 다시 올려 주세요.`, false],
+  over:   ['1,000자를 넘는 활동 내역이 있어 등록할 수 없어요.', '표시된 항목을 1,000자 이내로 줄여 다시 올려 주세요.', false, 'over'],
+  level:  ['활동 수준은 상·중·하만 입력할 수 있어요.', `<b>${(currentRows[1]||currentRows[0]).name}</b> 학생의 활동 수준이 \'보통\'으로 되어 있어요. 상·중·하 중 하나로 고치거나 비워 두고 다시 올려 주세요.`, false, 'level'],
+}; }
+function showErrToast(msg){
+  const t = document.getElementById('toast');
+  t.innerHTML = `<span class="toast-ic"><i data-lucide="alert-circle" style="width:16px;height:16px"></i></span>${msg}`;
+  t.classList.add('show', 'err'); lucide.createIcons();
+  setTimeout(() => t.classList.remove('show', 'err'), 2600);
+}
 function applyUpCase(){
   const reject = document.getElementById('upReject'), warn = document.getElementById('upWarn'), save = document.getElementById('saveBtn');
-  if (upCase === 'format' || upCase === 'blank'){
-    document.getElementById('upRejectT').textContent = upCase === 'format' ? '양식을 읽을 수 없어 등록할 수 없어요.' : '파일에 등록할 내용이 없어요.';
-    document.getElementById('upRejectD').innerHTML = upCase === 'format'
-      ? '양식 <b>맨 윗줄(제목 줄)이 지워졌거나 열 순서가 바뀐</b> 것 같아요. 내용을 복사해 붙이실 때 <b>제목 줄은 그대로 두고</b> 학생 내용만 채워 주세요. 헷갈리면 <b>양식을 다시 받아</b> 작성해 주세요.'
-      : '제목 줄 아래에 학생 행이 없어요. 학번·이름과 내용을 채운 뒤 다시 올려 주세요.';
-    warn.style.display = 'none';
-    reject.style.display = ''; document.getElementById('resultSection').style.display = 'none'; document.getElementById('uploadEmpty').style.display = 'none';
+  warn.style.display = 'none'; reject.style.display = 'none';
+  if (upCase === 'net' || upCase === 'server'){
+    _clearUploadOrig(); save.disabled = true;
+    showErrToast(upCase === 'net' ? '업로드에 실패했어요. 잠시 후 다시 시도해 주세요.' : '처리 중 오류가 발생했어요. 잠시 후 다시 시도해 주세요.');
+    return;
+  }
+  const rj = upRejects()[upCase];
+  if (rj){
+    document.getElementById('upRejectT').textContent = rj[0];
+    document.getElementById('upRejectD').innerHTML = rj[1];
+    const rb = document.querySelector('#upReject .rb'); if (rb) rb.style.display = rj[2] ? '' : 'none';
+    reject.style.display = ''; document.getElementById('uploadEmpty').style.display = 'none';
+    // 내용 오류는 어느 행인지 보여 주려고 결과 표를 같이 둠, 나머지는 표 없이 안내만
+    document.getElementById('resultSection').style.display = rj[3] ? '' : 'none';
+    const fr = document.querySelector('#resultRows tr');
+    if (rj[3] === 'over' && fr){ fr.classList.add('up-over-row'); const c = fr.children[2]; if (c) c.insertAdjacentHTML('beforeend', '<div><span class="up-over-chip">1,000자 초과</span></div>'); }
+    if (rj[3] === 'level'){ const r2 = document.querySelectorAll('#resultRows tr')[1] || fr; if (r2){ r2.classList.add('up-over-row'); const c = r2.children[3]; if (c){ c.textContent = '보통'; c.insertAdjacentHTML('beforeend', '<div><span class="up-over-chip">상·중·하만 가능</span></div>'); } } }
     save.disabled = true; lucide.createIcons(); return;
   }
-  reject.style.display = 'none';
   if (upCase === 'match'){
     const tb = document.getElementById('resultRows'); const n = tb.children.length;
     const opts = '<option>학생 직접 지정…</option>' + currentRows.slice(0, 3).map(r => `<option>${r.sid} ${r.name}</option>`).join('');
-    const row = (no, sid, name, msg) => `<tr class="up-miss-row">$<td class="up-miss-cell">${sid}</td><td class="up-miss-cell">${name}</td><td colspan="${2}"><div class="up-miss-act"><span class="m"><i data-lucide="user-x" style="width:14px;height:14px"></i>${msg}</span><select>${opts}</select><button>행 제외</button></div></td></tr>`;
+    const row = (no, sid, name, msg) => `<tr class="up-miss-row"><td class="up-miss-cell">${sid}</td><td class="up-miss-cell">${name}</td><td colspan="${2}"><div class="up-miss-act"><span class="m"><i data-lucide="user-x" style="width:14px;height:14px"></i>${msg}</span><select>${opts}</select><button>행 제외</button></div></td></tr>`;
     tb.innerHTML += row(n + 1, '20188', '홍서윤', '명단에 없는 학번·이름이에요') + row(n + 2, '—', currentRows[0].name, '같은 이름이 둘이라 어느 학생인지 확인이 필요해요');
     warn.style.display = 'flex';
     document.getElementById('upWarnText').innerHTML = '명단에서 찾을 수 없는 행이 <b>2건</b> 있어요. 학번·이름을 확인해 직접 지정하거나 해당 행을 제외한 뒤 등록할 수 있어요. (같은 이름은 서로 바뀔 수 있으니 한 번 더 확인해 주세요)';
     save.disabled = true;
-  } else if (upCase === 'over'){
-    const fr = document.querySelector('#resultRows tr'); if (fr){ fr.classList.add('up-over-row'); const c = fr.children[2]; if (c) c.insertAdjacentHTML('beforeend', '<div><span class="up-over-chip">1,000자 초과</span></div>'); }
-    warn.style.display = 'flex'; document.getElementById('upWarnText').innerHTML = '활동 내역 글자수 <b>1,000자</b>를 넘는 학생이 있어요. 넘는 부분은 잘릴 수 있으니 확인 후 등록해 주세요.';
-  } else {
-    warn.style.display = 'none';
   }
   lucide.createIcons();
 }
@@ -455,7 +483,7 @@ const _renderResultOrig = renderResult;
 renderResult = function(){ _renderResultOrig(); applyUpCase(); };
 const _clearUploadOrig = clearUpload;
 clearUpload = function(){ _clearUploadOrig(); document.getElementById('upReject').style.display = 'none'; document.getElementById('upWarn').style.display = 'none'; };
-(function(){ const m = (location.hash || '').match(/^#case-(\w+)/); if (m && ['format','match','over','blank'].includes(m[1])) setTimeout(() => setUpCase(m[1]), 200); })();
+(function(){ const m = (location.hash || '').match(/^#case-(\w+)/); if (m && ['type','size','broken','format','blank','emptyid','dup','over','match','net','server','level'].includes(m[1])) setTimeout(() => setUpCase(m[1]), 200); })();
 
 (function(){ const el=document.getElementById('mkToggle'); if(!el) return; let sx,sy,ox,oy,drag=false,moved=false;
   el.addEventListener('mousedown',e=>{drag=true;moved=false;sx=e.clientX;sy=e.clientY;const r=el.getBoundingClientRect();ox=r.left;oy=r.top;});

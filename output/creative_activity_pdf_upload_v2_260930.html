@@ -175,6 +175,9 @@ html body .main-wrap{margin-top:58px}
 .mk-toggle button{padding:7px 12px;border:none;background:none;color:#b3b6bd;font-size:13px;font-weight:500;cursor:pointer;font-family:inherit;border-radius:18px;line-height:1;display:inline-flex;align-items:center;justify-content:center}
 .mk-toggle button:hover{color:#fff}
 .mk-toggle button.on{background:#416bff;color:#fff}
+.mk-sel{height:30px;padding:0 10px;border:none;border-radius:16px;background:#416bff;color:#fff;font-size:13px;font-weight:500;font-family:inherit;cursor:pointer;outline:none}
+.mk-sel option,.mk-sel optgroup{background:#fff;color:#222631}
+.toast.err .toast-ic{color:#f2525f}
 /* 업로드 실패 케이스 — task_ocr_v3 설문 업로드와 같은 모양 */
 .up-reject{display:flex;align-items:flex-start;gap:12px;background:#fff3f4;border:1px solid #f5b5bc;border-radius:8px;padding:16px 18px}
 .up-reject .t{font-size:16px;font-weight:700;color:#c0394a;margin-bottom:4px}
@@ -238,6 +241,12 @@ html body .main-wrap{margin-top:58px}
   <div class="card">
 
     <!-- 빈 상태 -->
+    <div id="upReject" style="display:none;margin-bottom:16px">
+      <div class="up-reject">
+        <i data-lucide="alert-circle" style="width:20px;height:20px;color:#f2525f;flex-shrink:0;margin-top:1px"></i>
+        <div><div class="t" id="upRejectT"></div><div class="d" id="upRejectD"></div></div>
+      </div>
+    </div>
     <div id="emptyState">
       <div class="empty-upload">
         <div class="empty-upload-icon"><i data-lucide="paperclip" style="width:28px;height:28px"></i></div>
@@ -354,9 +363,12 @@ html body .main-wrap{margin-top:58px}
 
 <div class="mk-toggle" id="mkToggle">
   <span class="mk-l">MOCKUP</span>
-  <button data-c="normal" class="on" onclick="setPdfCase('normal')">정상</button>
-  <button data-c="miss" onclick="setPdfCase('miss')">미지정 페이지</button>
-  <button data-c="pgerr" onclick="setPdfCase('pgerr')">페이지 번호 오류</button>
+  <select id="upCaseSel" class="mk-sel" onchange="setPdfCase(this.value)">
+    <option value="normal">정상</option>
+    <optgroup label="파일 — 등록 막힘"><option value="size">20MB 초과</option><option value="broken">파일 열기 실패(암호 PDF 등)</option></optgroup>
+    <optgroup label="나누기"><option value="pgerr">페이지 번호 오류 (막힘)</option><option value="miss">미지정 페이지 (확인 후 제외)</option></optgroup>
+    <optgroup label="시스템 — 토스트"><option value="net">네트워크 오류</option><option value="server">처리 중 오류</option></optgroup>
+  </select>
 </div>
 <div class="toast" id="toast"></div>
 <div class="ov" id="missModal">
@@ -524,9 +536,30 @@ lucide.createIcons();
 
 <script>if(typeof notReady!=='function'){window.notReady=function(n){if(typeof showToast==='function')showToast(n+' 화면은 이 목업에 없어요');};}
 // ── MOCKUP 케이스: 정상 / 미지정 페이지 / 페이지 번호 오류 ──
+function showErrToast(msg){
+  const t = document.getElementById('toast');
+  t.innerHTML = `<span class="toast-ic"><i data-lucide="alert-circle" style="width:16px;height:16px"></i></span>${msg}`;
+  t.classList.add('show', 'err'); lucide.createIcons();
+  setTimeout(() => t.classList.remove('show', 'err'), 2600);
+}
+// 펜딩 PRD 'C-창체 일괄 업로드 에러 케이스 정리'(7/30): 20MB 초과·열기 실패 = 막힘, 네트워크·처리 오류 = 토스트
+const PDF_REJECTS = {
+  size:   ['파일 용량이 20MB를 넘어요.', '용량을 줄여 다시 올려 주세요.'],
+  broken: ['파일을 열 수 없어요.', '암호가 걸려 있다면 해제한 뒤 다시 올려 주세요.'],
+};
 function setPdfCase(c){
-  document.querySelectorAll('#mkToggle button').forEach(b => b.classList.toggle('on', b.dataset.c === c));
+  const sel = document.getElementById('upCaseSel'); if (sel) sel.value = c;
   history.replaceState(null, '', '#case-' + c);
+  const rej = document.getElementById('upReject'); rej.style.display = 'none';
+  if (PDF_REJECTS[c] || c === 'net' || c === 'server'){
+    clearUpload();
+    if (PDF_REJECTS[c]){
+      document.getElementById('upRejectT').textContent = PDF_REJECTS[c][0];
+      document.getElementById('upRejectD').textContent = PDF_REJECTS[c][1];
+      rej.style.display = '';
+    } else showErrToast(c === 'net' ? '업로드에 실패했어요. 잠시 후 다시 시도해 주세요.' : '처리 중 오류가 발생했어요. 잠시 후 다시 시도해 주세요.');
+    lucide.createIcons(); return;
+  }
   onFilePicked(); startSplit();
   const rows = [...document.querySelectorAll('#resRows tr')];
   const setR = (i, a, b) => { const ins = rows[i].querySelectorAll('.pg-in'); ins[0].value = a; ins[1].value = b; recount(ins[0]); };
@@ -535,7 +568,7 @@ function setPdfCase(c){
   if (c === 'miss') { document.getElementById('pgErr').style.display = 'none'; finishUpload(); }
   lucide.createIcons();
 }
-(function(){ const m = (location.hash || '').match(/^#case-(\w+)/); if (m && ['normal','miss','pgerr'].includes(m[1])) setTimeout(() => setPdfCase(m[1]), 200); })();
+(function(){ const m = (location.hash || '').match(/^#case-(\w+)/); if (m && ['normal','miss','pgerr','size','broken','net','server'].includes(m[1])) setTimeout(() => setPdfCase(m[1]), 200); })();
 
 (function(){ const el=document.getElementById('mkToggle'); if(!el) return; let sx,sy,ox,oy,drag=false,moved=false;
   el.addEventListener('mousedown',e=>{drag=true;moved=false;sx=e.clientX;sy=e.clientY;const r=el.getBoundingClientRect();ox=r.left;oy=r.top;});
