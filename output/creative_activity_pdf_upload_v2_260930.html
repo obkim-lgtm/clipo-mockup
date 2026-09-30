@@ -179,6 +179,8 @@ html body .main-wrap{margin-top:58px}
 .mk-sel option,.mk-sel optgroup{background:#fff;color:#222631}
 .toast.err .toast-ic{color:#f2525f}
 /* 업로드 실패 케이스 — task_ocr_v3 설문 업로드와 같은 모양 */
+.res-table tr.full5 td{color:#9aa0ad}
+.full-chip{display:inline-block;margin-top:4px;font-size:12px;color:#6d7381;background:#f1f3f5;border-radius:100px;padding:1px 8px;font-weight:600;white-space:nowrap}
 .up-reject{display:flex;align-items:flex-start;gap:12px;background:#fff3f4;border:1px solid #f5b5bc;border-radius:8px;padding:16px 18px}
 .up-reject .t{font-size:16px;font-weight:700;color:#c0394a;margin-bottom:4px}
 .up-reject .d{font-size:14px;color:#9a1b29;line-height:1.6}
@@ -387,12 +389,14 @@ const _params = new URLSearchParams(location.search);
 // v2 흐름(창체 목록 v7 → 입력 v2)에서 왔으면 v2로 돌아감
 const INPUT_PAGE = 'creative_activity_input_v2_260930.html';
 const V2Q = ('&v=2&mode=' + encodeURIComponent(_params.get('mode') || 'class') + '&year=' + encodeURIComponent(_params.get('year') || '2026'));
+// 목업: 자료가 이미 5개 찬 학생 예시(추가로 들어왔을 때만 표시) — 5개 초과 학생은 이번 파일 제외, 나머지는 등록(09-30)
+const FULL_SIDS = ['20101'];
 (function(){
   const how = _params.get('how');
   if (!how) return;
   const el = document.getElementById('howNote');
   document.getElementById('howText').innerHTML = how === 'add'
-    ? '기존 자료에 <b style="color:#222631">추가</b>돼요. 자료가 5개 찬 학생에게는 추가되지 않아요.'
+    ? `기존 자료에 <b style="color:#222631">추가</b>돼요. 자료가 5개 찬 학생 ${FULL_SIDS.length}명에게는 추가되지 않아요.`
     : '학생이 따로 올린 자료까지 등록된 활동지·보고서를 <b style="color:#222631">모두 지우고 교체</b>해요.';
   el.style.display = 'flex';
 })();
@@ -445,7 +449,8 @@ function startSplit() {
   const start = parseInt(nums[1].value || '1', 10);
   document.getElementById('resRows').innerHTML = RES_STU.map(([sid, name], i) => {
     const a = start + i * per, b = a + per - 1;
-    return `<tr><td>${sid}</td><td>${name}</td><td class="pc">${per}</td>
+    const full = _params.get('how') === 'add' && FULL_SIDS.includes(sid);
+    return `<tr class="${full ? 'full5' : ''}"><td>${sid}</td><td>${name}${full ? '<div><span class="full-chip">5개 참 · 이번엔 추가 안 됨</span></div>' : ''}</td><td class="pc">${per}</td>
       <td><input class="pg-in" value="${a}" oninput="recount(this)"><span class="pg-tilde">~</span><input class="pg-in" value="${b}" oninput="recount(this)"></td>
       <td><input type="checkbox" class="res-cb" onchange="toggleMiss(this)"></td></tr>`;
   }).join('');

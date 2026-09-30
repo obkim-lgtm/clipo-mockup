@@ -219,6 +219,14 @@ html body .main-wrap{margin-top:58px}
 .bm-sec.collapsed .bm-body{ display:none; }
 .bm-strip{ display:flex; align-items:flex-start; gap:9px; background:#fff7ed; padding:11px 22px; font-size:13px; color:#9a3412; line-height:1.55; border-bottom:1px solid #ffe8d1; }
 .bm-strip i{ width:15px; height:15px; color:#f97316; flex-shrink:0; margin-top:2px; }
+.bm-strip.gray{ background:#f6f7f9; color:#3b3f4c; border-bottom-color:#eef0f3; }
+.bm-strip.gray i{ color:#6d7381; }
+.bm-over-row{ display:flex; align-items:flex-start; gap:14px; padding:14px 22px; border-bottom:1px solid #f1f3f5; }
+.bm-over-row:last-child{ border-bottom:none; }
+.bm-over-row .who{ width:220px; flex-shrink:0; font-size:15px; color:#222631; }
+.bm-over-row .who .cnt{ display:block; font-size:13px; color:#6d7381; margin-top:3px; }
+.bm-over-row .fls{ display:flex; flex-wrap:wrap; gap:6px; min-width:0; }
+.bm-over-row .fl{ display:inline-flex; align-items:center; gap:5px; height:28px; padding:0 10px; border-radius:6px; background:#f6f7f9; color:#6d7381; font-size:14px; }
 .bm-row{ display:grid; grid-template-columns:1fr 32px 300px 124px; align-items:center; gap:14px; padding:14px 22px; border-bottom:1px solid #f1f3f5; }
 .bm-row:last-child{ border-bottom:none; }
 .bm-file{ display:flex; align-items:center; gap:10px; min-width:0; }
@@ -334,8 +342,21 @@ html body .main-wrap{margin-top:58px}
         <span class="bm-fold"><i data-lucide="chevron-down" style="width:18px;height:18px"></i></span>
       </div>
       <div class="bm-body">
-        <div class="bm-strip"><i data-lucide="info"></i><span>학생을 찾지 못했거나 학생당 5개를 넘는 파일이에요. 어느 학생의 파일인지 직접 지정하거나, ‘이 파일은 등록 안 함’을 선택해 주세요.</span></div>
+        <div class="bm-strip"><i data-lucide="info"></i><span>학생을 찾지 못한 파일이에요. 어느 학생의 파일인지 직접 지정하거나, ‘이 파일은 등록 안 함’을 선택해 주세요.</span></div>
         <div id="bm-warn-body"></div>
+      </div>
+    </div>
+
+    <!-- 5개 초과로 제외 (09-30 올립: 넘는 학생은 이번 파일 전부 제외, 나머지 학생은 등록. 읽기 전용, 등록은 막지 않음) -->
+    <div class="bm-sec" id="bm-sec-over">
+      <div class="bm-sec-hd static">
+        <i data-lucide="file-x" class="ic" style="color:#6d7381"></i>
+        <span class="tt">5개를 넘어 등록되지 않는 파일</span>
+        <span class="sb" id="bm-over-sub"></span>
+      </div>
+      <div class="bm-body">
+        <div class="bm-strip gray"><i data-lucide="info"></i><span>기존 자료와 합쳐 5개를 넘는 학생은 이번에 올린 파일이 등록되지 않아요. 기존 자료를 정리한 뒤 다시 올려 주세요.</span></div>
+        <div id="bm-over-body"></div>
       </div>
     </div>
 
@@ -440,13 +461,12 @@ function bmPick(){
   setTimeout(bmStartMatch, 700);
 }
 function bmStartMatch(){
-  // 파일명 매칭 → 학생별 개수 세며 5개 넘으면 확인 필요
-  const cnt = {}; rows = [];
+  // 파일명 매칭 → 학생마다 '기존 + 이번'이 5개를 넘으면 그 학생의 이번 파일은 전부 제외(일부만 고르지 않음), 나머지 학생은 등록
+  const add = {}; rows = [];
+  FILES.forEach(x => { if (x.sid) add[x.sid] = (add[x.sid] || 0) + 1; });
   FILES.forEach(x => {
     if(!x.sid){ rows.push({ f:x.f, state:'warn', why:x.why, pick:'' }); return; }
-    const now = (cnt[x.sid] ?? base(x.sid));
-    if(now >= 5){ rows.push({ f:x.f, state:'warn', why:'이 학생은 이미 5개예요', pick:'', over:x.sid }); return; }
-    cnt[x.sid] = now + 1;
+    if(base(x.sid) + add[x.sid] > 5){ rows.push({ f:x.f, sid:x.sid, state:'over' }); return; }
     rows.push({ f:x.f, sid:x.sid, state:'ok' });
   });
   document.getElementById('bm-state-upload').style.display = 'none';
@@ -460,9 +480,19 @@ function fileIc(f){ return `<div class="fic"><i data-lucide="${isImg(f) ? 'image
 function bmRender(){
   const warn = rows.map((r, i) => ({ r, i })).filter(x => x.r.state === 'warn');
   const ok = rows.map((r, i) => ({ r, i })).filter(x => x.r.state === 'ok');
+  const overRows = rows.filter(r => r.state === 'over');
+  const overSids = new Set(overRows.map(r => r.sid));
+  // 5개를 넘어 등록되지 않는 파일 — 학생별 한 줄(기존 n개 + 이번 m개, 빠지는 파일 이름). 읽기 전용
+  document.getElementById('bm-over-body').innerHTML = [...overSids].map(sid => {
+    const fs = overRows.filter(r => r.sid === sid);
+    return `<div class="bm-over-row"><div class="who"><b>${sid}</b> ${nameOf(sid)}<span class="cnt">기존 ${base(sid)}개 + 이번 ${fs.length}개</span></div>
+      <div class="fls">${fs.map(r => `<span class="fl"><i data-lucide="${isImg(r.f) ? 'image' : 'file-text'}" style="width:14px;height:14px"></i>${r.f}</span>`).join('')}</div></div>`;
+  }).join('');
+  document.getElementById('bm-over-sub').textContent = `${overSids.size}명 · 파일 ${overRows.length}개`;
+  document.getElementById('bm-sec-over').style.display = overSids.size ? '' : 'none';
   // 확인 필요 — 선택지: 5개 미만인 학생 + 등록 안 함 (지금 이 행이 고른 학생은 유지)
   document.getElementById('bm-warn-body').innerHTML = warn.map(({ r, i }) => {
-    const opts = STU.filter(s => r.pick === s[0] || countFor(s[0]) < 5)
+    const opts = STU.filter(s => r.pick === s[0] || (countFor(s[0]) < 5 && !overSids.has(s[0])))
       .map(s => `<option value="${s[0]}" ${r.pick === s[0] ? 'selected' : ''}>${s[0]} ${s[1]} (${countFor(s[0]) - (r.pick === s[0] ? 1 : 0)}/5)</option>`).join('');
     const cls = r.pick === '__skip__' ? 'skip' : (r.pick ? 'done' : '');
     const chip = r.pick === '__skip__' ? '<span class="bm-chip gray">등록 안 함</span>'
@@ -489,7 +519,7 @@ function bmRender(){
   document.getElementById('bm-ok-sub').textContent = ok.length + '개';
   // 이번에 파일이 없는 학생
   const got = new Set(rows.filter(r => r.state === 'ok').map(r => r.sid).concat(rows.filter(r => r.pick && r.pick !== '__skip__').map(r => r.pick)));
-  const none = STU.filter(s => !got.has(s[0]));
+  const none = STU.filter(s => !got.has(s[0]) && !overSids.has(s[0]));   // 제외된 학생은 위 묶음에 이미 나옴
   document.getElementById('bm-none-sub').textContent = none.length + '명';
   document.getElementById('bm-none-body').innerHTML = `<div style="padding:14px 22px;display:flex;flex-wrap:wrap;gap:8px">${none.map(s => `<span class="bm-chip gray">${s[0]} ${s[1]}${HOW === 'add' && s[2] ? ` · 기존 ${s[2]}개 유지` : ''}</span>`).join('')}</div>`;
   document.getElementById('bm-sec-none').style.display = none.length ? '' : 'none';
@@ -498,7 +528,10 @@ function bmRender(){
   const reg = ok.length + warn.filter(x => x.r.pick && x.r.pick !== '__skip__').length;
   document.getElementById('bm-reg-txt').textContent = `${reg}건 등록`;
   document.getElementById('bm-reg-btn').disabled = pending > 0 || reg === 0;
-  document.getElementById('bm-note-txt').textContent = pending ? `확인이 필요한 ${pending}건의 파일을 학생과 매칭해 주세요.` : (HOW === 'replace' ? '등록하면 기존 활동지·보고서는 모두 삭제돼요.' : '기존에 올린 자료는 그대로 두고 더해요.');
+  document.getElementById('bm-note-txt').textContent = pending ? `확인이 필요한 ${pending}건의 파일을 학생과 매칭해 주세요.`
+    : overSids.size ? `5개를 넘는 학생 ${overSids.size}명(파일 ${overRows.length}개)은 제외하고 등록해요.`
+    : (HOW === 'replace' ? '등록하면 기존 활동지·보고서는 모두 삭제돼요.' : '기존에 올린 자료는 그대로 두고 더해요.');
+  window._overCount = overSids.size;
   lucide.createIcons();
 }
 function bmSetPick(i, v){ rows[i].pick = v; bmRender(); }
@@ -513,7 +546,7 @@ function bmReset(){
 }
 function bmRegister(){
   const n = document.getElementById('bm-reg-txt').textContent;
-  showToast(`학생별 파일 ${n.replace(' 등록','')}을 등록했어요`);
+  showToast(`${n.replace(' 등록','')}을 등록했어요.` + (window._overCount ? ` ${window._overCount}명은 5개를 넘어 제외했어요.` : ''));
   setTimeout(() => {
     const params = new URLSearchParams({ type: ACTIVITY_TYPE, cls: CLS, demo: '1' });
     location.href = INPUT_PAGE + '?' + params.toString() + V2Q;
