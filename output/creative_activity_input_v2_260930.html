@@ -1226,6 +1226,16 @@ html body .main-wrap{margin-top:58px}
             <div class="rc-desc">학급 전체 활동지·보고서 PDF 파일을<br>학번 순서대로 묶어 일괄 등록</div>
           </div>
         </button>
+        <button class="reg-card" data-type="files" onclick="pickRegisterType('files')">
+          <div class="rc-icon"><i data-lucide="folder-up" style="width:22px;height:22px"></i></div>
+          <div class="rc-body">
+            <div class="rc-title-row">
+              <div class="rc-title">학생별 파일 (PDF·이미지)</div>
+              <span class="rc-chip ai"><i data-lucide="wand-sparkles" style="width:12px;height:12px"></i> AI 자동 분석</span>
+            </div>
+            <div class="rc-desc">학생마다 따로 받은 PDF·사진을 한 번에 올리면<br>파일명으로 학생을 찾아 등록</div>
+          </div>
+        </button>
         <button class="reg-card" data-type="keyword" onclick="pickRegisterType('keyword')">
           <div class="rc-icon aux"><i data-lucide="pencil" style="width:22px;height:22px"></i></div>
           <div class="rc-body">
@@ -3961,13 +3971,16 @@ function pickAor(v){
   // 5개가 찬 학생 안내는 '추가'일 때만
   document.getElementById('aorFullNote').style.display = (v === 'add' && window._aorFull > 0) ? 'flex' : 'none';
 }
+let aorType = 'activity';
 function confirmAor(){
   closeModal('modal-add-or-replace');
-  doRegisterTypeUpload('activity', aorChoice);
+  doRegisterTypeUpload(aorType, aorChoice);
 }
 function pickRegisterType(type){
   // 활동지·보고서는 학생당 최대 5개라 '추가 / 교체'를 고르게 한다 (2026-09-30)
-  if (type === 'activity' && hasFileOfType(type)) {
+  const hasActFiles = STUDENTS.some(s => s.files.some(f => f.kindLabel === '활동지' || f.kindLabel === '개별'));
+  if ((type === 'activity' && hasFileOfType(type)) || (type === 'files' && hasActFiles)) {
+    aorType = type;
     const full = STUDENTS.filter(s => s.files.filter(f => f.kindLabel === '활동지' || f.kindLabel === '개별').length >= 5).length;
     window._aorFull = full;
     document.getElementById('aorFullText').textContent = `자료가 5개 찬 학생 ${full}명에게는 추가되지 않아요.`;
@@ -4007,6 +4020,10 @@ function doRegisterTypeUpload(type, how){
   }
   if(type === 'activity'){
     location.href = 'creative_activity_pdf_upload_v2_260930.html?' + params.toString();
+    return;
+  }
+  if(type === 'files'){
+    location.href = 'creative_activity_file_upload_v2_260930.html?' + params.toString();
     return;
   }
 }

@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>학생별 파일 일괄 등록 - CLIPO</title>
+<link rel="icon" type="image/svg+xml" href="favicon_chang.svg">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard-gov.min.css">
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<style>
+* { font-family: 'Pretendard GOV', -apple-system, sans-serif; box-sizing: border-box; margin: 0; padding: 0; }
+body { background: #f6f7f9; color: #222631; }
+
+/* 헤더 */
+.g-hd { height: 56px; background: #fff; border-bottom: 1px solid #d9d9d9; display: flex; align-items: center; padding: 0 20px 0 8px; position: fixed; top: 0; left: 0; right: 0; z-index: 200; }
+.g-hd-r { margin-left: auto; display: flex; align-items: center; gap: 6px; font-size: 14px; color: #3b3f4c; }
+.plan-badge { background: #416bff; color: #fff; font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 4px; }
+.hd-div { width: 1px; height: 14px; background: #d9d9d9; margin: 0 4px; }
+.credit-wrap { display: flex; align-items: center; gap: 4px; padding: 4px 10px; background: #f6f7f9; border-radius: 6px; font-size: 13px; font-weight: 600; color: #3b3f4c; }
+.user-btn { display: inline-flex; align-items: center; justify-content: center; gap: 4px; padding: 4px 10px; border: 1px solid #d9d9d9; border-radius: 6px; background: #fff; font-size: 13px; color: #3b3f4c; cursor: pointer; line-height: 1; }
+
+/* 사이드바 */
+.icon-sb { width: 56px; background: #fff; border-right: 1px solid #d9d9d9; position: fixed; top: 56px; bottom: 0; left: 0; display: flex; flex-direction: column; padding: 8px 0; z-index: 150; transition: width .2s ease; }
+.icon-sb.expanded { width: 200px; }
+.si { height: 40px; display: flex; align-items: center; border-radius: 8px; color: #6d7381; cursor: pointer; margin-bottom: 2px; position: relative; padding: 0 4px 0 16px; gap: 10px; white-space: nowrap; flex-shrink: 0; }
+.si:hover { background: #f1f3f5; }
+.si.active { background: #e9f2ff; color: #416bff; }
+.si-icon { width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.si-label { font-size: 13px; font-weight: 500; opacity: 0; transition: opacity .1s; overflow: hidden; }
+.icon-sb.expanded .si-label { opacity: 1; }
+.si-tip { position: absolute; left: 48px; top: 50%; transform: translateY(-50%); background: #222631; color: #fff; font-size: 11px; padding: 3px 8px; border-radius: 4px; white-space: nowrap; display: none; z-index: 300; pointer-events: none; }
+.si:hover .si-tip { display: block; }
+.icon-sb.expanded .si-tip { display: none !important; }
+.nav-bottom { margin-top: auto; width: 100%; }
+.nav-div { height: 1px; background: #f1f3f5; margin: 4px 0; }
+body.nav-expanded .main-shell { margin-left: 200px; transition: margin-left .2s ease; }
+
+/* 메인 */
+.main-shell { margin-left: 56px; margin-top: 56px; min-height: calc(100vh - 56px); }
+.main { padding: 24px clamp(20px, 3vw, 48px) 48px; }
+
+.back-link { display: inline-flex; align-items: center; gap: 4px; font-size: 14px; color: #6d7381; text-decoration: none; margin-bottom: 8px; cursor: pointer; font-weight: 500; }
+.back-link:hover { color: #416bff; }
+
+.page-title { font-size: 24px; font-weight: 700; color: #222631; margin-bottom: 8px; line-height: 1.3; }
+.page-sub { font-size: 14px; color: #6d7381; margin-bottom: 24px; line-height: 1.55; }
+
+/* 카드 */
+.card { background: #fff; border: 1px solid #e5e7eb; border-radius: 12px; padding: 0; margin-bottom: 16px; overflow: hidden; }
+
+/* 빈 상태 */
+.empty-upload { padding: 80px 20px; text-align: center; }
+.empty-upload-icon { width: 56px; height: 56px; border-radius: 50%; background: #f1f3f5; color: #6d7381; display: inline-flex; align-items: center; justify-content: center; margin-bottom: 16px; }
+.empty-upload-msg { font-size: 16px; font-weight: 700; color: #222631; margin-bottom: 8px; }
+.empty-upload-sub { font-size: 14px; color: #6d7381; margin-bottom: 4px; }
+.empty-upload-sub.muted { color: #b3b6bd; font-size: 13px; margin-bottom: 24px; }
+.btn-primary { display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 11px 22px; border-radius: 8px; background: #416bff; color: #fff; border: none; font-size: 14px; font-weight: 600; font-family: inherit; cursor: pointer; line-height: 1; }
+.btn-primary:hover { background: #365eef; }
+
+/* 분할 UI */
+.split-wrap { display: grid; grid-template-columns: 1fr 380px; min-height: 640px; }
+.pdf-pane { background: #f1f3f5; padding: 16px; display: flex; flex-direction: column; gap: 12px; border-right: 1px solid #e5e7eb; }
+.pdf-toolbar { display: flex; align-items: center; gap: 12px; background: #222631; color: #fff; padding: 8px 14px; border-radius: 6px; font-size: 13px; }
+.pdf-toolbar-time { color: #b3b6bd; }
+.pdf-toolbar-spacer { flex: 1; }
+.pdf-page-nav { display: flex; align-items: center; gap: 6px; }
+.pdf-page-btn { background: rgba(255,255,255,.1); color: #fff; border: none; width: 28px; height: 28px; border-radius: 4px; display: inline-flex; align-items: center; justify-content: center; cursor: pointer; }
+.pdf-page-btn:hover { background: rgba(255,255,255,.2); }
+.pdf-page-input { background: #fff; color: #222631; border-radius: 4px; padding: 4px 8px; min-width: 32px; text-align: center; font-weight: 600; }
+.pdf-page-total { color: #b3b6bd; padding: 0 6px; }
+.pdf-toolbar-div { width: 1px; height: 14px; background: rgba(255,255,255,.2); }
+.pdf-zoom { display: flex; align-items: center; gap: 6px; }
+.pdf-zoom-val { font-weight: 600; }
+.pdf-preview { flex: 1; background: #fff; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: #c7cbd3; min-height: 480px; }
+
+.settings-pane { padding: 28px 28px; background: #fff; display: flex; flex-direction: column; }
+.settings-title { font-size: 18px; font-weight: 700; color: #222631; margin-bottom: 18px; }
+.settings-section { margin-bottom: 28px; }
+.settings-section-title { font-size: 14px; font-weight: 600; color: #222631; margin-bottom: 12px; }
+.settings-row { display: flex; align-items: center; gap: 8px; padding: 10px 12px; background: #f6f7f9; border-radius: 8px; margin-bottom: 8px; font-size: 13px; color: #3b3f4c; }
+.settings-row-label { color: #6d7381; flex-shrink: 0; }
+.settings-num-wrap { display: inline-flex; align-items: center; background: #fff; border: 1px solid #d9d9d9; border-radius: 6px; height: 32px; padding: 0 4px 0 8px; }
+.settings-num-input { border: none; background: transparent; width: 32px; text-align: center; font-size: 13px; font-weight: 600; color: #222631; font-family: inherit; outline: none; padding: 0; }
+.settings-num-btns { display: flex; flex-direction: column; }
+.settings-num-btn { width: 16px; height: 12px; background: none; border: none; color: #6d7381; cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 0; }
+.settings-num-btn:hover { color: #416bff; }
+
+.radio-row { display: flex; gap: 20px; padding: 2px; }
+.radio-opt { display: flex; align-items: center; gap: 6px; cursor: pointer; font-size: 14px; color: #3b3f4c; }
+.radio-opt input[type=radio] { accent-color: #416bff; width: 16px; height: 16px; cursor: pointer; }
+
+.settings-actions { margin-top: auto; display: flex; gap: 8px; justify-content: flex-end; padding-top: 16px; }
+.btn-outline-sm { display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 10px 18px; border-radius: 999px; background: #fff; color: #416bff; border: 1px solid #d4e0ff; font-size: 14px; font-weight: 600; font-family: inherit; cursor: pointer; line-height: 1; }
+.btn-outline-sm:hover { background: #f4f8ff; }
+.btn-primary-sm { display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 10px 18px; border-radius: 999px; background: #416bff; color: #fff; border: none; font-size: 14px; font-weight: 600; font-family: inherit; cursor: pointer; line-height: 1; }
+.btn-primary-sm:hover { background: #365eef; }
+
+/* 하단 액션 */
+.footer-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 16px; }
+.btn-cancel-lg { padding: 12px 28px; border-radius: 999px; background: #fff; color: #416bff; font-size: 14px; font-weight: 600; font-family: inherit; cursor: pointer; line-height: 1; border: 1px solid #d4e0ff; }
+.btn-cancel-lg:hover { background: #f4f8ff; }
+.btn-save-lg { padding: 12px 28px; border: none; border-radius: 999px; background: #416bff; color: #fff; font-size: 14px; font-weight: 600; font-family: inherit; cursor: pointer; line-height: 1; display: inline-flex; align-items: center; justify-content: center; gap: 6px; }
+.btn-save-lg:hover { background: #365eef; }
+.btn-save-lg:disabled { background: #c1cefb; color: #fff; cursor: not-allowed; }
+
+/* 토스트 */
+.toast { position: fixed; bottom: 32px; left: 50%; transform: translateX(-50%) translateY(20px); background: #222631; color: #fff; padding: 12px 20px; border-radius: 8px; font-size: 14px; display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 4px 16px rgba(0,0,0,.2); opacity: 0; transition: opacity .2s, transform .2s; z-index: 600; pointer-events: none; line-height: 1; }
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+.toast-ic { display: inline-flex; align-items: center; justify-content: center; color: #1ab864; }
+
+/* 풋터 */
+.page-footer { text-align: center; padding: 24px 16px; font-size: 12px; color: #6d7381; }
+.page-footer .links { margin-bottom: 6px; }
+.page-footer .links a { color: #6d7381; text-decoration: none; margin: 0 8px; }
+.page-footer .links a:hover { color: #416bff; }
+
+@media (max-width: 1023px) {
+  .main { padding: 24px 24px !important; }
+  .split-wrap { grid-template-columns: 1fr; }
+  .pdf-pane { border-right: none; border-bottom: 1px solid #e5e7eb; }
+}
+
+/* 분할 결과 · 미지정 확인 (Figma 4965-47077 · 5133-14516) */
+.res-wrap{border:1px solid #e4e7ec;border-radius:8px;overflow:hidden;margin-bottom:20px}
+.res-table{width:100%;border-collapse:collapse;font-size:15px}
+.res-table th{background:#f6f7f9;color:#3b3f4c;font-weight:500;padding:12px 8px;text-align:center}
+.res-table td{padding:8px;text-align:center;border-top:1px solid #eef0f3;color:#222631}
+.res-table tr.miss td{color:#9aa0ad}
+.pg-in{width:52px;height:40px;border:1px solid #d9d9d9;border-radius:6px;text-align:center;font-size:15px;font-family:inherit}
+.pg-in:disabled{background:#f6f7f9;color:#b3b3b3}
+.pg-tilde{margin:0 6px;color:#6d7381}
+.res-cb{width:20px;height:20px;accent-color:#416bff;cursor:pointer}
+.ov{display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:400;align-items:center;justify-content:center}
+.ov.show{display:flex}
+.ov-box{background:#fff;border-radius:12px;width:512px;max-width:calc(100vw - 48px);padding:24px;box-shadow:0 0 1px #2226314D,0 8px 24px #00000026}
+.ov-hd{display:flex;align-items:center;justify-content:space-between;font-size:20px;font-weight:600;color:#222631;margin-bottom:20px}
+.ov-x{background:none;border:none;cursor:pointer;color:#222631;display:inline-flex;align-items:center;justify-content:center;line-height:1}
+.ov-p{font-size:15px;color:#3b3f4c;line-height:1.5}
+.ov-miss{background:#fff1f2;border-radius:6px;padding:12px 16px;font-size:16px;font-weight:500;color:#222631;margin:12px 0}
+.ov-ft{display:flex;justify-content:flex-end;gap:8px;margin-top:24px}
+.ov-cancel,.ov-ok{display:inline-flex;align-items:center;justify-content:center;height:40px;padding:0 16px;border-radius:4px;font-size:15px;font-weight:500;font-family:inherit;cursor:pointer;line-height:1;vertical-align:middle}
+.ov-cancel{border:1px solid #416bff;background:#fff;color:#416bff}
+.ov-ok{border:none;background:#416bff;color:#fff}
+
+/* ── 공통 크롬 = class_report_v2_260930 상단바·NB 그대로 (2026-09-30 올립) ── */
+html body .g-hd{ height: 58px; background: #fff; border-bottom: 1px solid #dde1e8; display: flex; align-items: center; padding: 0 20px 0 9px; position: fixed; top: 0; left: 0; right: 0; z-index: 200; }
+html body .gh-menu-btn{ width:40px; height:40px; border:none; background:none; border-radius:4px; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; color:#3b3f4c; margin-right:9px; line-height:1; }
+html body .gh-menu-btn:hover{ background:#f6f7f9; }
+html body .g-hd-r{ margin-left: auto; display: flex; align-items: center; gap: 16px; font-size: 15px; color: #18181b; }
+html body .hd-plan{ display: flex; align-items: center; gap: 8px; }
+html body .plan-badge{ display: inline-flex; align-items: center; height: 20px; background: #e9f2ff; border: 1px solid #ccdfff; color: #3151c4; font-size: 12px; font-weight: 500; padding: 0 6px; border-radius: 6px; line-height: 1; }
+html body .credit-wrap{ display: flex; align-items: center; gap: 8px; font-size: 15px; font-weight: 500; color: #18181b; }
+html body .user-btn{ display: inline-flex; align-items: center; justify-content: center; gap: 4px; height: 36px; padding: 0 12px; border: 1px solid #c7cbd3; border-radius: 9999px; background: none; font-size: 14px; color: #27272a; cursor: pointer; line-height: 1; font-weight: 500; }
+html body .icon-sb{ width: 56px; background: #fff; border-right: 1px solid #d9d9d9; position: fixed; top: 58px; bottom: 0; left: 0; display: flex; flex-direction: column; padding: 8px 0; z-index: 150; transition: width .2s ease; }
+html body .icon-sb.expanded{ width: 200px; }
+html body .si{ height: 40px; display: flex; align-items: center; border-radius: 8px; color: #6d7381; cursor: pointer; margin: 0 8px 2px; position: relative; padding: 0 4px 0 8px; gap: 10px; white-space: nowrap; flex-shrink: 0; }
+html body .si:hover{ background: #f1f3f5; }
+html body .si.active{ background: #e9f2ff; color: #416bff; }
+html body .si-icon{ width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+html body .si-label{ font-size: 13px; font-weight: 500; opacity: 0; transition: opacity .1s; overflow: hidden; }
+html body .icon-sb.expanded .si-label{ opacity: 1; }
+html body .si-tip{ position: absolute; left: 48px; top: 50%; transform: translateY(-50%); background: #222631; color: #fff; font-size: 11px; padding: 3px 8px; border-radius: 4px; white-space: nowrap; display: none; z-index: 300; pointer-events: none; }
+html body .si:hover .si-tip{ display: block; }
+html body .icon-sb.expanded .si-tip{ display: none !important; }
+html body .nav-bottom{ margin-top: auto; width: 100%; }
+html body .nav-div{ height: 1px; background: #f1f3f5; margin: 4px 8px; }
+html body .g-hd .credit-wrap{background:none;padding:0}
+html body .g-hd .hd-div{display:none}
+html body .main-shell{margin-top:58px;min-height:calc(100vh - 58px)}
+html body .main-wrap{margin-top:58px}
+
+/* MOCKUP 케이스 토글 (드래그 가능) */
+.mk-toggle{position:fixed;bottom:24px;right:24px;background:#222631;color:#fff;border-radius:24px;padding:5px;display:inline-flex;align-items:center;gap:2px;box-shadow:0 8px 24px rgba(0,0,0,.2);z-index:550;cursor:move;user-select:none}
+.mk-toggle .mk-l{padding:0 8px 0 10px;font-size:11px;font-weight:700;color:#b3b6bd;letter-spacing:.5px}
+.mk-toggle button{padding:7px 12px;border:none;background:none;color:#b3b6bd;font-size:13px;font-weight:500;cursor:pointer;font-family:inherit;border-radius:18px;line-height:1;display:inline-flex;align-items:center;justify-content:center}
+.mk-toggle button:hover{color:#fff}
+.mk-toggle button.on{background:#416bff;color:#fff}
+/* 업로드 실패 케이스 — task_ocr_v3 설문 업로드와 같은 모양 */
+.up-reject{display:flex;align-items:flex-start;gap:12px;background:#fff3f4;border:1px solid #f5b5bc;border-radius:8px;padding:16px 18px}
+.up-reject .t{font-size:16px;font-weight:700;color:#c0394a;margin-bottom:4px}
+.up-reject .d{font-size:14px;color:#9a1b29;line-height:1.6}
+.up-reject .rb{display:inline-flex;align-items:center;justify-content:center;gap:6px;height:32px;padding:0 12px;margin-top:12px;border:1px solid #c7cbd3;border-radius:6px;background:#fff;color:#222631;font-size:14px;font-weight:500;font-family:inherit;cursor:pointer;line-height:1;vertical-align:middle}
+.up-warn{display:flex;align-items:flex-start;gap:10px;background:#fff7ed;border:1px solid #fed7aa;border-radius:8px;padding:12px 14px;margin-bottom:16px;font-size:14px;color:#9a3412;line-height:1.55}
+.up-miss-row td{background:#fff8f8}
+.up-miss-cell{color:#c0394a!important;font-weight:600}
+.up-miss-act{display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:flex-start}
+.up-miss-act .m{display:inline-flex;align-items:center;gap:5px;color:#c0394a;font-size:14px;font-weight:600}
+.up-miss-act select{height:32px;border:1px solid #d9d9d9;border-radius:6px;font-family:inherit;font-size:14px;color:#3b3f4c;padding:0 8px}
+.up-miss-act button{height:32px;padding:0 10px;border:1px solid #d9d9d9;border-radius:6px;background:#fff;color:#6d7381;font-size:14px;font-weight:600;font-family:inherit;cursor:pointer}
+.up-over-chip{display:inline-block;margin-top:4px;font-size:12px;color:#c0394a;background:#fff3f4;border-radius:100px;padding:1px 6px;font-weight:600;white-space:nowrap}
+.up-over-row td{background:#fff8f8}
+
+/* 학생별 파일 일괄 업로드 — task_ocr_v3 .bm-* 그대로 */
+@keyframes spin{ from{transform:rotate(0deg)} to{transform:rotate(360deg)} }
+.bm-dz{ background:white; border:1.5px dashed #a3c3ff; border-radius:12px; padding:44px 24px; min-height:220px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:14px; text-align:center; cursor:pointer; }
+.bm-dz:hover{ background:#fbfcff; border-color:#416bff; }
+.bm-dz .ic{ width:54px; height:54px; border-radius:14px; background:#e9f2ff; color:#416bff; display:flex; align-items:center; justify-content:center; }
+.bm-dz .main{ font-size:16px; font-weight:600; color:#3b3f4c; margin:0; line-height:1.55; }
+.bm-dz .sub{ font-size:14px; color:#9ea3ad; margin:0; line-height:1.6; }
+.bm-proc{ display:flex; align-items:center; gap:14px; background:#f4f8ff; border:1px solid #e0ebff; border-radius:12px; padding:20px 22px; }
+.bm-proc .sp{ width:34px; height:34px; border-radius:50%; border:4px solid #dbe6ff; border-top-color:#416bff; animation:spin 1s linear infinite; flex-shrink:0; }
+.bm-proc .t{ font-size:16px; font-weight:700; color:#222631; }
+.bm-proc .s{ font-size:14px; color:#6d7381; margin-top:2px; }
+.bm-sum{ display:flex; align-items:center; gap:16px; background:white; border:1px solid #dde1e8; border-radius:12px; padding:18px 22px; margin-bottom:18px; }
+.bm-sum .ic{ width:44px; height:44px; border-radius:11px; background:#e9f2ff; color:#3151c4; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+.bm-sum .main{ flex:1; min-width:0; }
+.bm-sum .tt{ font-size:17px; font-weight:700; color:#222631; }
+.bm-sum .ds{ font-size:14px; color:#6d7381; margin-top:3px; }
+.bm-sec{ background:white; border-radius:12px; box-shadow:0 0 1px #2226314D, 0 2px 8px #0000000F; margin-bottom:18px; overflow:hidden; }
+.bm-sec-hd{ display:flex; align-items:center; gap:9px; padding:16px 22px; border-bottom:1px solid #eef0f3; cursor:pointer; }
+.bm-sec-hd .ic{ width:20px; height:20px; flex-shrink:0; }
+.bm-sec-hd.warn .ic{ color:#ea580c; }
+.bm-sec-hd.ok .ic{ color:#319d64; }
+.bm-sec-hd .tt{ font-size:16px; font-weight:700; color:#222631; }
+.bm-sec-hd .sb{ font-size:13px; color:#9aa0ad; margin-left:2px; }
+.bm-sec-hd .sb b{ font-weight:600; color:#3b3f4c; }
+.bm-fold{ margin-left:auto; color:#9aa0ad; display:inline-flex; transition:transform .2s; }
+.bm-sec:not(.collapsed) .bm-fold{ transform:rotate(180deg); }
+.bm-sec.collapsed .bm-body{ display:none; }
+.bm-strip{ display:flex; align-items:flex-start; gap:9px; background:#fff7ed; padding:11px 22px; font-size:13px; color:#9a3412; line-height:1.55; border-bottom:1px solid #ffe8d1; }
+.bm-strip i{ width:15px; height:15px; color:#f97316; flex-shrink:0; margin-top:2px; }
+.bm-row{ display:grid; grid-template-columns:1fr 32px 300px 124px; align-items:center; gap:14px; padding:14px 22px; border-bottom:1px solid #f1f3f5; }
+.bm-row:last-child{ border-bottom:none; }
+.bm-file{ display:flex; align-items:center; gap:10px; min-width:0; }
+.bm-file .fic{ width:34px; height:34px; border-radius:8px; background:#eff3ff; color:#416bff; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+.bm-file .fn{ font-size:15px; font-weight:600; color:#222631; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.bm-file .fm{ font-size:12px; color:#9aa0ad; margin-top:2px; }
+.bm-arrow{ color:#c0c4cd; display:flex; justify-content:center; }
+.bm-stu{ font-size:15px; color:#222631; }
+.bm-stu .nm{ font-weight:600; }
+.bm-stu .nn{ color:#6d7381; font-weight:500; }
+.bm-st{ display:flex; justify-content:flex-end; }
+.bm-pick{ width:100%; height:40px; border:1px solid #d9d9d9; border-radius:8px; padding:0 36px 0 12px; font-size:15px; font-family:inherit; color:#222631; cursor:pointer; appearance:none; -webkit-appearance:none; background-color:#fff; background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%236d7381' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E"); background-repeat:no-repeat; background-position:right 12px center; background-size:18px; }
+.bm-pick:focus{ outline:none; border-color:#416bff; box-shadow:0 0 0 2px rgba(65,107,255,.12); }
+.bm-pick.unset{ border-color:#f5b48a; color:#9a3412; background-color:#fffaf5; }
+.bm-row.done .bm-pick{ border-color:#c7eed8; background-color:#f4fcf7; color:#222631; }
+.bm-row.skip .bm-pick{ border-color:#dfe2e8; background-color:#f6f7f9; color:#6d7381; }
+.bm-row.skip .bm-file .fn{ color:#9aa0ad; text-decoration:line-through; }
+.bm-row.skip .bm-file .fm{ color:#c0c4cd; }
+.bm-row.skip .bm-file .fic{ background:#f1f3f5; color:#9aa0ad; }
+.bm-chip{ display:inline-flex; align-items:center; justify-content:center; gap:3px; border-radius:100px; padding:3px 10px; font-size:13px; font-weight:600; white-space:nowrap; }
+.bm-chip.ok{ background:#eefcf4; color:#319d64; }
+.bm-chip.warn{ background:#fff7ed; color:#ea580c; }
+.bm-chip.gray{ background:#f6f7f9; color:#6d7381; }
+.bm-x{ font-size:13px; font-weight:600; color:#9aa0ad; background:none; border:none; cursor:pointer; font-family:inherit; padding:4px 6px; }
+.bm-x:hover{ color:#db3e51; }
+.bm-undo{ font-size:13px; font-weight:600; color:#3151c4; background:none; border:none; cursor:pointer; font-family:inherit; padding:4px 6px; }
+/* 자동 매칭 행 — 호버 시에만 노출되는 '매칭 수정'(오매칭 정정). 시안 413:14931 */
+.bm-editmatch{ margin-left:8px; height:26px; padding:0 8px; border:none; background:none; color:#6d7381; font-family:inherit; font-size:13px; font-weight:600; cursor:pointer; border-radius:6px; display:inline-flex; align-items:center; justify-content:center; gap:4px; line-height:1; vertical-align:middle; flex-shrink:0; opacity:0; transition:opacity .12s; }
+.bm-row:hover .bm-editmatch{ opacity:1; }
+.bm-editmatch:hover{ background:#eff3ff; color:#416bff; }
+/* 표 머리글 (파일명 / 학생 정보 / 상태) */
+.bm-thead{ display:grid; grid-template-columns:1fr 32px 300px 124px; align-items:center; gap:14px; padding:11px 22px; background:#f6f7f9; border-bottom:1px solid #eef0f3; font-size:13px; font-weight:600; color:#6d7381; }
+.bm-thead .c-st{ text-align:right; }
+.bm-thead2{ display:flex; align-items:center; justify-content:space-between; padding:11px 22px; background:#f6f7f9; border-bottom:1px solid #eef0f3; font-size:13px; font-weight:600; color:#6d7381; }
+.bm-sec-hd.static{ cursor:default; }
+.bm-action{display:flex;align-items:center;gap:10px;margin-top:8px}
+.bm-note{font-size:14px;color:#3b3f4c;margin-right:auto}
+.bm-btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;height:40px;padding:0 16px;border-radius:9999px;font-size:15px;font-weight:500;font-family:inherit;cursor:pointer;line-height:1;vertical-align:middle}
+.bm-btn.outline{border:1px solid #416bff;background:#fff;color:#416bff}
+.bm-btn.primary{border:none;background:#416bff;color:#fff}
+.bm-btn.primary:disabled{background:#a3b8ff;cursor:not-allowed}
+</style>
+</head>
+<body>
+
+<header class="g-hd" id="gnb">
+  <button class="gh-menu-btn" onclick="toggleNav()"><i data-lucide="panel-left-open" style="width:20px;height:20px"></i></button>
+  <svg width="76" height="16" viewBox="0 0 76 16" fill="none" xmlns="http://www.w3.org/2000/svg" style="cursor:pointer" onclick="location.href='home_v1_260612.html'"><path d="M11.3613 4.03516H4.09668V11.9629H8.88281L8.88086 11.9648H15.6016V16H4.02539C1.80242 15.9998 0 14.223 0 12.0322V3.96777C0 1.77696 1.80242 0.000177874 4.02539 0H15.4561L11.3613 4.03516ZM22.0703 11.9648H33.5781V16H22.002C19.7788 16 17.9756 14.2231 17.9756 12.0322V0H22.0703V11.9648ZM40.0459 16H35.9521V0H40.0459V16ZM54.5381 0C56.4564 0 58.0138 1.53228 58.0186 3.42285L58.0166 3.4248V8.54297C58.014 10.4333 56.4567 11.9648 54.5361 11.9648H46.5107L42.416 16V0H54.5381ZM71.9746 0C74.0086 0.000134956 75.6887 1.49046 75.958 3.42285H76V12.5771H75.958C75.6887 14.5095 74.011 15.9999 71.9746 16H64.4238C62.3897 16 60.7098 14.5096 60.4404 12.5771C60.4145 12.398 60.3984 12.2184 60.3984 12.0322V3.96777C60.3984 3.78159 60.4145 3.60205 60.4404 3.42285C60.7098 1.49037 62.3873 0 64.4238 0H71.9746ZM64.4922 12.5771H71.9062V3.42285H64.4922V12.5771ZM46.5107 3.42285V8.54004H53.9238V3.42285H46.5107Z" fill="#365EEF"/></svg>
+  <div class="g-hd-r">
+    <div class="hd-plan">
+      <span class="plan-badge">학교 유료</span>
+      <span style="font-size:15px;font-weight:500;color:#18181b">D-180</span>
+    </div>
+    <div class="credit-wrap"><i data-lucide="bot" style="width:20px;height:20px;color:#416bff"></i><span id="creditWrap">200 크레딧</span></div>
+    <button class="user-btn">최대표 선생님(대표교사) <i data-lucide="chevron-down" style="width:16px;height:16px"></i></button>
+  </div>
+</header>
+
+<nav class="icon-sb" id="icon-sb">
+  <div class="si" onclick="location.href='home_v1_260612.html'"><div class="si-icon"><i data-lucide="home" style="width:20px;height:20px"></i></div><span class="si-label">홈</span><span class="si-tip">홈</span></div>
+  <div class="si" onclick="location.href='eval_plan_v1_260619.html'"><div class="si-icon"><i data-lucide="scissors" style="width:20px;height:20px"></i></div><span class="si-label">평가 준비</span><span class="si-tip">평가 준비</span></div>
+  <div class="si" onclick="location.href='co_teacher_review_v1_260611.html'"><div class="si-icon"><i data-lucide="layout-grid" style="width:20px;height:20px"></i></div><span class="si-label">수업</span><span class="si-tip">수업</span></div>
+  <div class="si active" onclick="location.href='creative_activity_list_v7_260930.html#list'"><div class="si-icon"><i data-lucide="notebook-pen" style="width:20px;height:20px"></i></div><span class="si-label">창의적 체험활동 <span style="font-size:10px;background:#416bff;color:#fff;padding:1px 5px;border-radius:3px;margin-left:2px">Beta</span></span><span class="si-tip">창의적 체험활동</span></div>
+  <div class="si" onclick="location.href='quick_seteuk_dev_list_v1_260604.html'"><div class="si-icon"><i data-lucide="zap" style="width:20px;height:20px"></i></div><span class="si-label">세특 간편 생성기</span><span class="si-tip">세특 간편 생성기</span></div>
+  <div class="si" onclick="notReady('행동특성 및 종합기록')"><div class="si-icon"><i data-lucide="smile" style="width:20px;height:20px"></i></div><span class="si-label">행동특성 및 종합기록</span><span class="si-tip">행동특성 및 종합기록</span></div>
+  <div class="si" onclick="notReady('리포트')"><div class="si-icon"><i data-lucide="bar-chart-2" style="width:20px;height:20px"></i></div><span class="si-label">리포트</span><span class="si-tip">리포트</span></div>
+  <div class="si" onclick="notReady('학교 설정')"><div class="si-icon"><i data-lucide="building-2" style="width:20px;height:20px"></i></div><span class="si-label">학교 설정</span><span class="si-tip">학교 설정</span></div>
+  <div class="nav-bottom">
+    <div class="nav-div"></div>
+    <div class="si" onclick="notReady('매뉴얼 다운로드')"><div class="si-icon"><i data-lucide="file-down" style="width:20px;height:20px"></i></div><span class="si-label">매뉴얼 다운로드</span><span class="si-tip">매뉴얼 다운로드</span></div>
+    <div class="si" onclick="notReady('요금제')"><div class="si-icon"><i data-lucide="credit-card" style="width:20px;height:20px"></i></div><span class="si-label">요금제</span><span class="si-tip">요금제</span></div>
+    <div class="si" onclick="notReady('고객센터')"><div class="si-icon"><i data-lucide="help-circle" style="width:20px;height:20px"></i></div><span class="si-label">고객센터</span><span class="si-tip">고객센터</span></div>
+  </div>
+</nav>
+
+<div class="main-shell">
+<main class="main">
+
+  <a class="back-link" onclick="goBack()">
+    <i data-lucide="chevron-left" style="width:14px;height:14px"></i> 이전으로
+  </a>
+
+  <h1 class="page-title">학생별 파일 일괄 등록 : <span id="pt-cls">2학년 1반</span></h1>
+  <p class="page-sub">학생마다 따로 받은 PDF·사진 파일을 한 번에 올리면, 파일명을 읽어 학생과 자동으로 매칭해 드려요.</p>
+  <p id="howNote" style="display:none;align-items:center;gap:6px;font-size:14px;color:#3b3f4c;margin:-12px 0 20px"><i data-lucide="info" style="width:16px;height:16px;color:#416bff;flex-shrink:0"></i><span id="howText"></span></p>
+
+  <!-- 상태1: 업로드 (task_ocr_v3 '여러 파일 일괄 업로드'와 같은 모양) -->
+  <div id="bm-state-upload">
+    <div class="bm-dz" onclick="bmPick()">
+      <div class="ic"><i data-lucide="folder-up" style="width:26px;height:26px"></i></div>
+      <p class="main">학생별 PDF·이미지 파일을 끌어다 놓거나 클릭해 선택해 주세요</p>
+      <p class="sub">파일명에 학번이나 이름이 있으면 학생과 자동으로 매칭해요<br>PDF · JPG · PNG · 파일당 20MB · 학생당 최대 5개</p>
+    </div>
+    <div class="bm-proc" id="bm-proc" style="display:none;margin-top:16px"><div class="sp"></div><div><div class="t">파일명을 읽어 학생과 매칭하고 있어요</div><div class="s" id="bm-proc-s">파일 11개</div></div></div>
+  </div>
+
+  <!-- 상태2: 매칭 확인 -->
+  <div id="bm-state-match" style="display:none">
+    <div class="bm-sum">
+      <div class="ic"><i data-lucide="folder-check" style="width:24px;height:24px"></i></div>
+      <div class="main">
+        <div class="tt" id="bm-sum-tt">2학년 1반 · 자율활동</div>
+        <div class="ds" id="bm-sum-count">총 11개 파일 업로드됨</div>
+      </div>
+    </div>
+
+    <!-- 확인 필요 (경고 먼저) -->
+    <div class="bm-sec" id="bm-sec-warn">
+      <div class="bm-sec-hd warn" onclick="bmToggleSec('bm-sec-warn')">
+        <i data-lucide="alert-triangle" class="ic"></i>
+        <span class="tt">확인 필요</span>
+        <span class="sb" id="bm-warn-sub"></span>
+        <span class="bm-fold"><i data-lucide="chevron-down" style="width:18px;height:18px"></i></span>
+      </div>
+      <div class="bm-body">
+        <div class="bm-strip"><i data-lucide="info"></i><span>학생을 찾지 못했거나 학생당 5개를 넘는 파일이에요. 어느 학생의 파일인지 직접 지정하거나, ‘이 파일은 등록 안 함’을 선택해 주세요.</span></div>
+        <div id="bm-warn-body"></div>
+      </div>
+    </div>
+
+    <!-- 자동 매칭됨 -->
+    <div class="bm-sec collapsed" id="bm-sec-ok">
+      <div class="bm-sec-hd ok" onclick="bmToggleSec('bm-sec-ok')">
+        <i data-lucide="check-circle-2" class="ic"></i>
+        <span class="tt">매칭 완료</span>
+        <span class="sb" id="bm-ok-sub"></span>
+        <span class="bm-fold"><i data-lucide="chevron-down" style="width:18px;height:18px"></i></span>
+      </div>
+      <div class="bm-body" id="bm-ok-body"></div>
+    </div>
+
+    <!-- 이번에 파일이 없는 학생 -->
+    <div class="bm-sec" id="bm-sec-none">
+      <div class="bm-sec-hd static">
+        <i data-lucide="user-x" class="ic" style="color:#9aa0ad"></i>
+        <span class="tt">이번에 올린 파일이 없는 학생</span>
+        <span class="sb" id="bm-none-sub"></span>
+      </div>
+      <div class="bm-body" id="bm-none-body"></div>
+    </div>
+
+    <div class="bm-action">
+      <span class="bm-note"><span id="bm-note-txt"></span></span>
+      <button class="bm-btn outline" onclick="bmReset()"><i data-lucide="rotate-ccw" style="width:16px;height:16px"></i>파일 초기화</button>
+      <button class="bm-btn primary" id="bm-reg-btn" onclick="bmRegister()"><i data-lucide="check" style="width:18px;height:18px"></i><span id="bm-reg-txt">등록</span></button>
+    </div>
+  </div>
+</main>
+
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const _params = new URLSearchParams(location.search);
+// v2 흐름(창체 목록 v7 → 입력 v2)에서 왔으면 v2로 돌아감
+const INPUT_PAGE = 'creative_activity_input_v2_260930.html';
+const V2Q = ('&v=2&mode=' + encodeURIComponent(_params.get('mode') || 'class') + '&year=' + encodeURIComponent(_params.get('year') || '2026'));
+(function(){
+  const how = _params.get('how');
+  if (!how) return;
+  const el = document.getElementById('howNote');
+  document.getElementById('howText').innerHTML = how === 'add'
+    ? '기존 자료에 <b style="color:#222631">추가</b>돼요. 자료가 5개 찬 학생에게는 추가되지 않아요.'
+    : '학생이 따로 올린 자료까지 등록된 활동지·보고서를 <b style="color:#222631">모두 지우고 교체</b>해요.';
+  el.style.display = 'flex';
+})();
+const ACTIVITY_TYPE = _params.get('type') || '자율활동';
+const CLS = _params.get('cls') || '2학년 1반';
+const BACK_URL = _params.get('back');
+document.getElementById('pt-cls').textContent = CLS;
+
+function toggleNav() {
+  document.getElementById('icon-sb').classList.toggle('expanded');
+  document.body.classList.toggle('nav-expanded');
+}
+
+let toastTimer = null;
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.innerHTML = `<span class="toast-ic"><i data-lucide="check-circle" style="width:16px;height:16px"></i></span>${msg}`;
+  t.classList.add('show');
+  lucide.createIcons();
+  if (toastTimer) clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.classList.remove('show'), 2400);
+}
+
+
+function goBack() {
+  const params = new URLSearchParams({ type: ACTIVITY_TYPE, cls: CLS });
+  location.href = INPUT_PAGE + '?' + params.toString() + V2Q;
+}
+
+// ── 학생별 파일 일괄 업로드 (파일명 → 학생 자동 매칭, PDF·이미지) — task_ocr_v3 '여러 파일 일괄 업로드' 이식 ──
+// 창체 규칙: 한 학생에게 여러 파일 가능, 기존 자료 포함 학생당 최대 5개. 초과분은 '확인 필요'
+const STU = [['20101','김민수',3],['20102','박서연',0],['20103','이지호',1],['20104','최유진',0],['20105','정우진',1],['20106','한지민',1],['20107','유태성',1],['20108','송예린',0],['20109','한도윤',1]];   // [학번, 이름, 이미 올린 활동지·개별 자료 수]
+const HOW = _params.get('how') || 'add';
+const FILES = [
+  { f:'20101_김민수_학교폭력예방교육.pdf', sid:'20101' },
+  { f:'20101_김민수_캠페인사진.jpg', sid:'20101' },
+  { f:'20101_김민수_추가자료.pdf', sid:'20101' },          // 기존 3 + 3 = 6 → 초과
+  { f:'20103_이지호_소감문.pdf', sid:'20103' },
+  { f:'이지호_활동사진.png', sid:'20103' },                  // 이름만 있어도 매칭(유일할 때)
+  { f:'20104_최유진.pdf', sid:'20104' },
+  { f:'20105_정우진_보고서.pdf', sid:'20105' },
+  { f:'20106 한지민.jpg', sid:'20106' },
+  { f:'20107_유태성.pdf', sid:'20107' },
+  { f:'한지웅 - 활동사진.jpg', sid:null, why:'명단에 없는 이름이에요' },
+  { f:'IMG_2034.jpg', sid:null, why:'파일명에 학번·이름이 없어요' },
+];
+let rows = [];   // {f, sid(확정), pick(확인 필요 선택값), state:'ok'|'warn', why}
+const base = sid => HOW === 'replace' ? 0 : (STU.find(s => s[0] === sid) || [0,0,0])[2];
+const nameOf = sid => (STU.find(s => s[0] === sid) || [0,''])[1];
+const isImg = f => /\.(jpe?g|png)$/i.test(f);
+
+function bmPick(){
+  document.getElementById('bm-proc').style.display = 'flex';
+  document.getElementById('bm-proc-s').textContent = `파일 ${FILES.length}개`;
+  setTimeout(bmStartMatch, 700);
+}
+function bmStartMatch(){
+  // 파일명 매칭 → 학생별 개수 세며 5개 넘으면 확인 필요
+  const cnt = {}; rows = [];
+  FILES.forEach(x => {
+    if(!x.sid){ rows.push({ f:x.f, state:'warn', why:x.why, pick:'' }); return; }
+    const now = (cnt[x.sid] ?? base(x.sid));
+    if(now >= 5){ rows.push({ f:x.f, state:'warn', why:'이 학생은 이미 5개예요', pick:'', over:x.sid }); return; }
+    cnt[x.sid] = now + 1;
+    rows.push({ f:x.f, sid:x.sid, state:'ok' });
+  });
+  document.getElementById('bm-state-upload').style.display = 'none';
+  document.getElementById('bm-state-match').style.display = '';
+  document.getElementById('bm-sum-tt').textContent = `${CLS} · ${ACTIVITY_TYPE}`;
+  document.getElementById('bm-sum-count').textContent = `총 ${FILES.length}개 파일 업로드됨`;
+  bmRender();
+}
+function countFor(sid){ return base(sid) + rows.filter(r => (r.state === 'ok' && r.sid === sid) || (r.state === 'warn' && r.pick === sid)).length; }
+function fileIc(f){ return `<div class="fic"><i data-lucide="${isImg(f) ? 'image' : 'file-text'}" style="width:18px;height:18px"></i></div>`; }
+function bmRender(){
+  const warn = rows.map((r, i) => ({ r, i })).filter(x => x.r.state === 'warn');
+  const ok = rows.map((r, i) => ({ r, i })).filter(x => x.r.state === 'ok');
+  // 확인 필요 — 선택지: 5개 미만인 학생 + 등록 안 함 (지금 이 행이 고른 학생은 유지)
+  document.getElementById('bm-warn-body').innerHTML = warn.map(({ r, i }) => {
+    const opts = STU.filter(s => r.pick === s[0] || countFor(s[0]) < 5)
+      .map(s => `<option value="${s[0]}" ${r.pick === s[0] ? 'selected' : ''}>${s[0]} ${s[1]} (${countFor(s[0]) - (r.pick === s[0] ? 1 : 0)}/5)</option>`).join('');
+    const cls = r.pick === '__skip__' ? 'skip' : (r.pick ? 'done' : '');
+    const chip = r.pick === '__skip__' ? '<span class="bm-chip gray">등록 안 함</span>'
+      : r.pick ? '<span class="bm-chip ok"><i data-lucide="check" style="width:13px;height:13px"></i>지정됨</span>'
+      : '<span class="bm-chip warn"><i data-lucide="help-circle" style="width:13px;height:13px"></i>확인 필요</span>';
+    return `<div class="bm-row ${cls}">
+      <div class="bm-file">${fileIc(r.f)}<div style="min-width:0"><div class="fn">${r.f}</div><div class="fm">${r.why}</div></div></div>
+      <div class="bm-arrow"><i data-lucide="arrow-right" style="width:18px;height:18px"></i></div>
+      <div><select class="bm-pick ${r.pick ? '' : 'unset'}" onchange="bmSetPick(${i}, this.value)"><option value="">학생 선택</option>${opts}<option value="__skip__" ${r.pick === '__skip__' ? 'selected' : ''}>이 파일은 등록 안 함</option></select></div>
+      <div class="bm-st">${chip}</div></div>`;
+  }).join('');
+  document.getElementById('bm-sec-warn').style.display = warn.length ? '' : 'none';
+  document.getElementById('bm-warn-sub').textContent = warn.length + '개';
+  // 매칭 완료 — 학생별 몇 번째 파일인지 표시, X로 해제(확인 필요로 이동)
+  const nth = {};
+  document.getElementById('bm-ok-body').innerHTML = (ok.length ? '<div class="bm-thead"><div>파일명</div><div></div><div>학생</div><div class="c-st">상태</div></div>' : '') + ok.map(({ r, i }) => {
+    nth[r.sid] = (nth[r.sid] || base(r.sid)) + 1;
+    return `<div class="bm-row">
+      <div class="bm-file">${fileIc(r.f)}<div style="min-width:0"><div class="fn">${r.f}</div></div></div>
+      <div class="bm-arrow"><i data-lucide="arrow-right" style="width:18px;height:18px"></i></div>
+      <div class="bm-stu"><span class="nm">${r.sid}</span> <span class="nn">${nameOf(r.sid)}</span> <span class="fm" style="color:#9aa0ad;font-size:13px">· ${nth[r.sid]}/5</span></div>
+      <div class="bm-st"><span class="bm-chip ok"><i data-lucide="check" style="width:13px;height:13px"></i>매칭</span><button class="bm-x" title="매칭 해제" onclick="bmUnmatch(${i})">✕</button></div></div>`;
+  }).join('');
+  document.getElementById('bm-ok-sub').textContent = ok.length + '개';
+  // 이번에 파일이 없는 학생
+  const got = new Set(rows.filter(r => r.state === 'ok').map(r => r.sid).concat(rows.filter(r => r.pick && r.pick !== '__skip__').map(r => r.pick)));
+  const none = STU.filter(s => !got.has(s[0]));
+  document.getElementById('bm-none-sub').textContent = none.length + '명';
+  document.getElementById('bm-none-body').innerHTML = `<div style="padding:14px 22px;display:flex;flex-wrap:wrap;gap:8px">${none.map(s => `<span class="bm-chip gray">${s[0]} ${s[1]}${HOW === 'add' && s[2] ? ` · 기존 ${s[2]}개 유지` : ''}</span>`).join('')}</div>`;
+  document.getElementById('bm-sec-none').style.display = none.length ? '' : 'none';
+  // 등록 버튼 게이트
+  const pending = warn.filter(x => !x.r.pick).length;
+  const reg = ok.length + warn.filter(x => x.r.pick && x.r.pick !== '__skip__').length;
+  document.getElementById('bm-reg-txt').textContent = `${reg}건 등록`;
+  document.getElementById('bm-reg-btn').disabled = pending > 0 || reg === 0;
+  document.getElementById('bm-note-txt').textContent = pending ? `확인이 필요한 ${pending}건의 파일을 학생과 매칭해 주세요.` : (HOW === 'replace' ? '등록하면 기존 활동지·보고서는 모두 삭제돼요.' : '기존에 올린 자료는 그대로 두고 더해요.');
+  lucide.createIcons();
+}
+function bmSetPick(i, v){ rows[i].pick = v; bmRender(); }
+function bmUnmatch(i){ rows[i] = { f:rows[i].f, state:'warn', why:'매칭을 해제한 파일이에요', pick:'' }; document.getElementById('bm-sec-warn').classList.remove('collapsed'); bmRender(); }
+function bmToggleSec(id){ document.getElementById(id).classList.toggle('collapsed'); }
+function bmReset(){
+  rows = [];
+  document.getElementById('bm-state-match').style.display = 'none';
+  document.getElementById('bm-state-upload').style.display = '';
+  document.getElementById('bm-proc').style.display = 'none';
+  lucide.createIcons();
+}
+function bmRegister(){
+  const n = document.getElementById('bm-reg-txt').textContent;
+  showToast(`학생별 파일 ${n.replace(' 등록','')}을 등록했어요`);
+  setTimeout(() => {
+    const params = new URLSearchParams({ type: ACTIVITY_TYPE, cls: CLS, demo: '1' });
+    location.href = INPUT_PAGE + '?' + params.toString() + V2Q;
+  }, 700);
+}
+// 해시로 매칭 화면 바로 열기 (#match)
+if (location.hash === '#match') setTimeout(bmStartMatch, 100);
+
+lucide.createIcons();
+</script>
+<script>if(typeof notReady!=='function'){window.notReady=function(n){if(typeof showToast==='function')showToast(n+' 화면은 이 목업에 없어요');};}</script>
+</body>
+</html>
