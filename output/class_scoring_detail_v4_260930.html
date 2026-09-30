@@ -1,0 +1,1365 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>1학년 1반 채점 현황 — 리뉴얼 제안 | CLIPO</title>
+<link rel="icon" type="image/png" href="clipo_favicon.png">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard-gov.min.css">
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<style>
+*{font-family:'Pretendard GOV',-apple-system,sans-serif;box-sizing:border-box;margin:0;padding:0}
+body{background:#f6f7f9;color:#222631;min-height:100vh}
+
+/* ══════ 글로벌 헤더 (CLIPO 표준 g-hd) ══════ */
+.g-hd { height: 58px; background: #fff; border-bottom: 1px solid #dde1e8; display: flex; align-items: center; padding: 0 20px 0 9px; position: fixed; top: 0; left: 0; right: 0; z-index: 200; }
+.gh-menu-btn { width:40px; height:40px; border:none; background:none; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; color:#3b3f4c; margin-right:9px; line-height:1; border-radius:4px; }
+.gh-menu-btn:hover { background:#f6f7f9; }
+.g-hd-r { margin-left: auto; display: flex; align-items: center; gap: 16px; font-size: 15px; color: #18181b; }
+.hd-plan { display: flex; align-items: center; gap: 8px; }
+.plan-badge { display: inline-flex; align-items: center; height: 20px; background: #e9f2ff; border: 1px solid #ccdfff; color: #3151c4; font-size: 12px; font-weight: 500; padding: 0 6px; border-radius: 6px; line-height: 1; }
+.credit-wrap { display: flex; align-items: center; gap: 8px; font-size: 15px; font-weight: 500; color: #18181b; }
+.user-btn { display: inline-flex; align-items: center; justify-content: center; gap: 4px; height: 36px; padding: 0 12px; border: 1px solid #c7cbd3; border-radius: 9999px; background: none; font-size: 14px; color: #27272a; cursor: pointer; line-height: 1; font-weight: 500; }
+
+/* ══════ 사이드바 (CLIPO 표준 icon-sb) ══════ */
+.icon-sb { width: 56px; background: #fff; border-right: 1px solid #d9d9d9; position: fixed; top: 58px; bottom: 0; left: 0; display: flex; flex-direction: column; padding: 8px 0; z-index: 150; transition: width .2s ease; }
+.icon-sb.expanded { width: 200px; }
+.si { height: 40px; display: flex; align-items: center; border-radius: 8px; color: #6d7381; cursor: pointer; margin: 0 8px 2px; position: relative; padding: 0 4px 0 8px; gap: 10px; white-space: nowrap; flex-shrink: 0; }
+.si:hover { background: #f1f3f5; }
+.si.active { background: #e9f2ff; color: #416bff; }
+.si-icon { width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.si-label { font-size: 13px; font-weight: 500; opacity: 0; transition: opacity .1s; overflow: hidden; }
+.icon-sb.expanded .si-label { opacity: 1; }
+.si-tip { position: absolute; left: 48px; top: 50%; transform: translateY(-50%); background: #222631; color: #fff; font-size: 11px; padding: 3px 8px; border-radius: 4px; white-space: nowrap; display: none; z-index: 300; pointer-events: none; }
+.si:hover .si-tip { display: block; }
+.icon-sb.expanded .si-tip { display: none !important; }
+.nav-bottom { margin-top: auto; width: 100%; }
+.nav-div { height: 1px; background: #f1f3f5; margin: 4px 8px; }
+
+/* ══════ 상단 탭 밴드 (CLIPO 표준) ══════ */
+.tab-band{ background:white; border-bottom:1px solid #dde1e8; }
+.tab-band-inner{ max-width:1240px; margin:0 auto; padding:0 32px; display:flex; gap:8px; }
+.sub-tab{ padding:18px 14px; font-size:16px; font-weight:500; color:#3b3f4c; border:none; background:none; cursor:pointer; font-family:inherit; border-bottom:2px solid transparent; margin-bottom:-1px; display:inline-flex; align-items:center; justify-content:center; line-height:1; vertical-align:middle; }
+.sub-tab:hover{ color:#222631; }
+.sub-tab.on{ color:#416bff; border-bottom:2px solid #416bff; }
+
+/* ══════ 메인 ══════ */
+.main-wrap{ position:relative; padding-top:58px; padding-left:56px; transition:padding-left .2s; min-height:100vh; background:#f6f7f9; }
+body.nav-expanded .main-wrap{ padding-left:200px; }
+.main{padding:24px;display:flex;justify-content:center}
+.container{width:100%;max-width:1240px;display:flex;flex-direction:column;gap:24px}
+
+/* 페이지 헤더 */
+.page-header{display:flex;align-items:flex-end;justify-content:space-between;gap:16px}
+.ph-left{flex:1;display:flex;flex-direction:column;gap:8px;min-width:0}
+.btn-back{display:inline-flex;align-items:center;gap:4px;font-size:15px;font-weight:500;color:#3b3f4c;background:none;border:none;cursor:pointer;padding:0;line-height:1;font-family:inherit;align-self:flex-start;margin-bottom:6px}
+.btn-back:hover{color:#222631}
+.page-title{font-size:22px;font-weight:700;color:#222631;line-height:1.3}
+.page-desc{font-size:14px;color:#3b3f4c;line-height:1.55}
+.btn-download{display:inline-flex;align-items:center;justify-content:center;gap:8px;height:40px;padding:0 16px;border-radius:100px;background:#16a34a;border:1px solid #16a34a;color:#fff;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;line-height:1;flex-shrink:0}
+.btn-download:hover{background:#15803d;border-color:#15803d}
+
+/* ══════ 3단계 카드 ══════ */
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.step-card{background:#fff;border:1px solid #eaecf0;border-radius:14px;padding:20px;display:flex;flex-direction:column;gap:12px}
+.step-card-head{display:flex;flex-direction:column;gap:4px}
+.step-card-num{font-size:17px;font-weight:700;color:#222631;line-height:1.3}
+.step-card-desc{font-size:14px;color:#3b3f4c;line-height:1.55;flex:1}
+.step-btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;height:44px;padding:0 16px;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;line-height:1;border:1px solid transparent}
+.step-btn.primary{background:#365eef;color:#fff;border-color:#365eef}
+.step-btn.primary:hover{background:#3151c4;border-color:#3151c4}
+.step-btn.secondary{background:#eef3ff;color:#3151c4;border-color:#dce6ff}
+.step-btn.secondary:hover{background:#e0eaff}
+
+/* ══════ 학생 테이블 카드 ══════ */
+.table-card{background:#fff;border:1px solid #eaecf0;border-radius:14px;padding:24px;display:flex;flex-direction:column;gap:18px}
+.table-card-hd{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.table-card-hd-left{flex:1;display:flex;flex-direction:column;gap:4px;min-width:0}
+.table-card-title{font-size:18px;font-weight:700;color:#222631;line-height:1.3}
+.table-card-desc{font-size:13px;color:#6d7381;line-height:1.55}
+.table-card-actions{display:inline-flex;gap:8px;flex-wrap:wrap}
+.btn-table-action{display:inline-flex;align-items:center;justify-content:center;gap:5px;height:34px;padding:0 12px;border-radius:8px;background:#fff;border:1px solid #dde1e8;color:#3b3f4c;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;line-height:1}
+.btn-table-action:hover{border-color:#a3c3ff;color:#365eef}
+.btn-table-action.primary{background:#eef3ff;border-color:#dce6ff;color:#3151c4}
+.btn-table-action.primary:hover{background:#e0eaff;border-color:#a3c3ff}
+
+/* 테이블 */
+.student-table{width:100%;border-collapse:collapse;table-layout:fixed}
+.student-table thead th{background:#f6f7f9;font-size:14px;font-weight:700;color:#3b3f4c;text-align:center;padding:12px;height:44px;border-bottom:1px solid #dde1e8}
+.student-table thead th:first-child{border-top-left-radius:8px}
+.student-table thead th:last-child{border-top-right-radius:8px}
+.student-table tbody td{padding:14px 12px;font-size:14px;color:#3b3f4c;line-height:1.4;text-align:center;border-bottom:1px solid #eaecf0;vertical-align:middle}
+.student-table tbody tr:last-child td{border-bottom:none}
+.student-table tbody tr:hover{background:#fafbff}
+/* 점수 컬럼 정렬 — 아이콘 자리 상시 확보(폭 흔들림 방지) */
+.th-sortable{cursor:pointer;user-select:none;white-space:nowrap}
+.th-sortable:hover{color:#416bff}
+.sort-dd{position:relative;display:inline-flex}
+.sort-dd-menu{display:none;position:absolute;top:calc(100% + 6px);left:0;min-width:160px;background:#fff;border:1px solid #dde1e8;border-radius:8px;box-shadow:0 8px 24px rgba(0,0,0,.12);padding:4px;z-index:80}
+.sort-dd.open .sort-dd-menu{display:block}
+.sort-dd-opt{display:flex;align-items:center;justify-content:space-between;width:100%;background:none;border:none;font-family:inherit;font-size:14px;color:#222631;padding:9px 12px;border-radius:6px;cursor:pointer;text-align:left;line-height:1;white-space:nowrap}
+.sort-dd-opt:hover{background:#f4f7ff}
+.sort-dd-opt.on::after{content:'✓';color:#416bff;font-weight:700;margin-left:14px}
+.sort-ic{display:inline-flex;vertical-align:middle;margin-left:4px;color:#b3b6bd}
+.sort-ic svg{width:14px;height:14px}
+.th-sortable.sorted{color:#416bff}
+.th-sortable.sorted .sort-ic{color:#416bff}
+.col-id{width:10%}
+.col-name{width:15%;font-weight:600}
+.col-ai-status{width:16%}
+.col-ai-score{width:12%;color:#6d7381}
+.col-final{width:12%;font-weight:600;color:#222631}
+.col-status{width:20%}
+.col-action{width:15%}
+.col-action-group{display:inline-flex;gap:10px;align-items:center;justify-content:center}
+.muted{color:#9ca3af}
+
+/* 상태 뱃지 */
+.status-badge{display:inline-flex;align-items:center;justify-content:center;height:24px;padding:0 10px;border-radius:100px;font-size:12px;font-weight:700;line-height:1}
+.status-badge.done{background:#eefcf4;color:#319d64}
+.status-badge.progress{background:#fff7ed;color:#ea580c}
+.status-badge.need{background:#fef2f2;color:#f2525f}
+.status-badge.fail{background:#fef2f2;color:#f2525f}
+.status-badge.stale{background:#fff7ed;color:#ea580c}
+/* 미채점·채점 중 = 주황 알약 (Figma 1104-21045) · 미제출은 조치 대상이 아니라 중립 회색 */
+.status-badge.todo{background:#fff7ed;color:#ea580c}
+/* 채점 중 = CLIPO 블루 (진행 중이니 기다리면 되는 상태 — 조치 필요한 주황과 구분) */
+.status-badge.running{background:#f4f8ff;color:#3151c4}
+.badge-spinner{width:11px;height:11px;margin-right:5px;border:2px solid #cfe0ff;border-top-color:#416bff;border-radius:50%;animation:spin .7s linear infinite;flex-shrink:0}
+@keyframes spin{to{transform:rotate(360deg)}}
+.status-badge.none{background:#f1f3f5;color:#6d7381}
+
+/* 학생 채점 링크 */
+.btn-detail{display:inline-flex;align-items:center;gap:4px;font-size:14px;font-weight:500;color:#3151c4;background:none;border:none;cursor:pointer;padding:0;line-height:1;font-family:inherit}
+.btn-detail:hover{color:#365eef}
+.btn-detail-sub{color:#6d7381}
+.btn-detail-sub:hover{color:#3b3f4c}
+.btn-detail.disabled{color:#c2c7d0;cursor:not-allowed;pointer-events:none}
+.btn-detail.disabled:hover{color:#c2c7d0}
+.btn-rescore{display:inline-flex;align-items:center;justify-content:center;gap:4px;height:30px;padding:0 12px;border-radius:8px;background:#eef3ff;border:1px solid #dce6ff;color:#3151c4;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;line-height:1}
+.btn-rescore:hover{background:#e0eaff;border-color:#a3c3ff}
+.st-chip-wrap{display:inline-flex;align-items:center;justify-content:center;gap:8px;white-space:nowrap}
+.btn-rescore-text{display:inline-flex;align-items:center;gap:3px;font-size:13px;font-weight:600;color:#3151c4;background:none;border:none;cursor:pointer;padding:0;line-height:1;font-family:inherit;white-space:nowrap}
+.btn-rescore-text:hover{color:#365eef;text-decoration:underline}
+
+/* ══════ 모달 ══════ */
+.modal-overlay{position:fixed;inset:0;background:rgba(34,38,49,.5);display:none;align-items:center;justify-content:center;z-index:1000;padding:24px}
+.modal-overlay.show{display:flex}
+.modal{background:#fff;border-radius:16px;max-width:540px;width:100%;max-height:calc(100vh - 48px);display:flex;flex-direction:column;overflow:hidden;box-shadow:0 12px 40px rgba(0,0,0,.18)}
+.modal-hd{display:flex;align-items:center;justify-content:space-between;padding:20px 24px;border-bottom:1px solid #eaecf0;flex-shrink:0}
+.modal-title{font-size:18px;font-weight:700;color:#222631;line-height:1.3}
+.modal-close{width:32px;height:32px;display:inline-flex;align-items:center;justify-content:center;border:none;background:none;cursor:pointer;color:#6d7381;border-radius:100px}
+.modal-close:hover{background:#f6f7f9;color:#222631}
+.modal-body{padding:20px 24px;overflow-y:auto;display:flex;flex-direction:column;gap:12px}
+.modal-ft{display:flex;justify-content:flex-end;align-items:center;padding:16px 24px;border-top:1px solid #eaecf0;gap:8px;flex-shrink:0;background:#f9fafb}
+.btn-modal-cancel{display:inline-flex;align-items:center;justify-content:center;height:40px;padding:0 18px;border-radius:100px;background:#fff;border:1px solid #dde1e8;color:#3b3f4c;font-size:15px;font-weight:600;cursor:pointer;font-family:inherit;line-height:1}
+.btn-modal-cancel:hover{border-color:#a3c3ff;color:#365eef}
+.btn-modal-save{display:inline-flex;align-items:center;justify-content:center;gap:6px;height:40px;padding:0 18px;border-radius:100px;background:#365eef;border:none;color:#fff;font-size:15px;font-weight:600;cursor:pointer;font-family:inherit;line-height:1}
+.btn-modal-save:hover{background:#3151c4}
+
+/* 방법 선택 카드 */
+.method-section-lbl{font-size:14px;font-weight:600;color:#3b3f4c;line-height:1.4;margin-bottom:10px}
+.method-list{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.method-card{position:relative;display:flex;flex-direction:column;gap:14px;padding:20px;border:1.5px solid #eaecf0;border-radius:14px;cursor:pointer;transition:all .12s;background:#fff;min-height:160px}
+.method-card:hover{border-color:#a3c3ff;background:#fafbff}
+.method-card.selected{border-color:#365eef;background:#f4f8ff}
+.method-icon{display:inline-flex;align-items:center;justify-content:center;width:40px;height:40px;color:#365eef;flex-shrink:0}
+.method-content{display:flex;flex-direction:column;gap:6px;min-width:0}
+.method-title{font-size:16px;font-weight:700;color:#222631;line-height:1.3}
+.method-desc{font-size:14px;color:#6d7381;line-height:1.5}
+.method-radio{position:absolute;top:16px;right:16px}
+.method-radio .radio-ring{width:20px;height:20px;border-radius:50%;border:2px solid #dde1e8;background:#fff;position:relative}
+.method-radio .radio-ring.checked{border-color:#365eef;background:#365eef}
+.method-radio .radio-ring.checked::after{content:"";position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:6px;height:6px;border-radius:50%;background:#fff}
+@media (max-width:560px){
+  .method-list{grid-template-columns:1fr}
+}
+
+.method-hint{display:flex;align-items:flex-start;gap:6px;padding:10px 12px;background:#f4f8ff;border-radius:8px;font-size:12px;color:#3b3f4c;line-height:1.5}
+.method-hint > i{color:#365eef;flex-shrink:0;margin-top:2px}
+.method-hint strong{font-weight:700;color:#3b3f4c}
+.method-hint-link{display:inline-flex;align-items:center;gap:2px;color:#365eef;font-weight:700;cursor:pointer;text-decoration:underline;text-underline-offset:2px;text-decoration-color:#a3c3ff}
+.method-hint-link:hover{color:#3151c4;text-decoration-color:#365eef}
+
+.class-info-box{display:flex;align-items:center;gap:10px;padding:14px 16px;background:#f6f7f9;border-radius:10px;font-size:14px;color:#3b3f4c;line-height:1.4}
+.class-info-box i{color:#365eef;flex-shrink:0}
+.class-info-box strong{color:#222631;font-weight:700}
+
+/* ══════ AI 채점 실행 모달 (2-step) ══════ */
+.modal.bulk-ai-modal{max-width:520px}
+.bulk-ai-modal .field{display:flex;flex-direction:column;gap:10px}
+.bulk-ai-modal .field-lbl{font-size:14px;font-weight:600;color:#3b3f4c;line-height:1}
+
+/* 채점 수준 슬라이더 */
+.scoring-level-desc{font-size:14px;color:#6d7381;line-height:1.55;margin-bottom:12px}
+.scoring-level{display:flex;flex-direction:column;gap:10px;padding:4px 0}
+.scoring-level-slider{width:100%;-webkit-appearance:none;appearance:none;height:6px;background:linear-gradient(to right,#365eef 0%,#365eef 50%,#dde1e8 50%,#dde1e8 100%);border-radius:3px;outline:none;cursor:pointer;margin:0}
+.scoring-level-slider::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:22px;height:22px;border-radius:50%;background:#fff;cursor:pointer;border:3px solid #365eef;box-shadow:0 1px 3px rgba(0,0,0,.15)}
+.scoring-level-slider::-moz-range-thumb{width:22px;height:22px;border-radius:50%;background:#fff;cursor:pointer;border:3px solid #365eef;box-shadow:0 1px 3px rgba(0,0,0,.15)}
+.scoring-level-labels{display:flex;justify-content:space-between;font-size:13px;color:#6d7381;font-weight:500;line-height:1}
+.scoring-level-labels span{flex:1}
+.scoring-level-labels span:nth-child(2){text-align:center}
+.scoring-level-labels span:last-child{text-align:right}
+.scoring-level-labels span.active{color:#365eef;font-weight:600}
+
+/* 라디오 카드 */
+.modal-radio-group{display:flex;flex-direction:column;gap:8px}
+.modal-radio-item{display:flex;align-items:flex-start;gap:10px;padding:12px 14px;border:1px solid #dde1e8;border-radius:12px;cursor:pointer;transition:border-color .15s,background .15s}
+.modal-radio-item:hover{border-color:#a3c3ff;background:#f4f8ff}
+.modal-radio-item.selected{border-color:#365eef;background:#f4f8ff}
+.modal-radio-item .radio-ring{margin-top:2px;flex-shrink:0;width:20px;height:20px}
+.modal-radio-content{display:flex;flex-direction:column;gap:2px}
+.modal-radio-text{font-size:15px;font-weight:600;color:#222631;line-height:1.4}
+.modal-radio-desc{font-size:13px;color:#6d7381;line-height:1.4}
+
+/* 정보 박스 */
+.modal-info{display:flex;gap:8px;padding:12px 14px;border-radius:10px;background:#f4f8ff}
+.modal-info-icon{color:#365eef;flex-shrink:0;margin-top:1px}
+.modal-info-text{font-size:14px;color:#3b3f4c;line-height:1.6}
+.modal-info-text strong{color:#222631;font-weight:700}
+.modal-info-list{margin:6px 0 0 0;padding-left:18px;font-size:13px;color:#3b3f4c;line-height:1.7}
+
+/* 크레딧 안내 + 툴팁 */
+.credit-notice{display:inline-flex;align-items:center;gap:6px;font-size:13px;color:#3b3f4c;line-height:1;white-space:nowrap;flex-shrink:0}
+.credit-notice i{color:#365eef;flex-shrink:0}
+.credit-notice strong{color:#365eef;font-weight:700}
+.credit-notice-sub{color:#6d7381;font-weight:500;margin-left:2px;white-space:nowrap}
+.credit-help{color:#6d7381 !important;cursor:help}
+.credit-tooltip-wrap{position:relative;display:inline-flex;align-items:center;cursor:help;margin-left:2px;line-height:1}
+.credit-tooltip{position:absolute;bottom:calc(100% + 8px);right:-8px;background:#222631;color:#fff;font-size:12px;line-height:1.5;padding:8px 12px;border-radius:8px;width:260px;font-weight:500;opacity:0;visibility:hidden;transition:opacity .15s,visibility .15s;z-index:1100;pointer-events:none;box-shadow:0 4px 16px rgba(0,0,0,.25);text-align:left;white-space:normal}
+.credit-tooltip::after{content:"";position:absolute;top:100%;right:14px;border:5px solid transparent;border-top-color:#222631}
+.credit-tooltip-wrap:hover .credit-tooltip,
+.credit-tooltip-wrap.show .credit-tooltip{opacity:1;visibility:visible}
+
+/* 모달 푸터 (양옆 정렬) */
+.bulk-ai-modal .modal-ft{justify-content:space-between;background:#f9fafb}
+.bulk-ai-modal .modal-actions{display:inline-flex;gap:8px;flex-shrink:0;align-items:center}
+.bulk-ai-modal .btn-modal-cancel,.bulk-ai-modal .btn-modal-save{white-space:nowrap}
+
+/* Step 2: 학생 선택 테이블 */
+.bulk-ai-modal .modal-body.bulk-students{padding:0;display:flex;flex-direction:column;gap:0;overflow:hidden}
+.bulk-ai-table-scroll{flex:1;overflow-y:auto;max-height:460px}
+.bulk-ai-table{width:100%;border-collapse:collapse;font-size:14px}
+.bulk-ai-table thead{position:sticky;top:0;background:#f6f7f9;z-index:1}
+.bulk-ai-table th{padding:12px 10px;border-bottom:1px solid #dde1e8;font-size:13px;font-weight:600;color:#3b3f4c;text-align:left;line-height:1.3}
+.bulk-ai-table th:first-child{width:54px;text-align:center;padding-left:20px}
+.bulk-ai-table th.col-result{width:140px}
+.bulk-ai-table th.col-status{width:130px}
+.bulk-ai-table tbody td{padding:14px 10px;border-bottom:1px solid #eaecf0;color:#222631;line-height:1.4}
+.bulk-ai-table tbody tr:last-child td{border-bottom:0}
+.bulk-ai-table tbody td:first-child{text-align:center;padding-left:20px}
+.bulk-ai-table tbody tr.disabled td{color:#9ca3af;background:#fafbfc}
+.bulk-ai-table tbody tr.disabled td .status-badge{opacity:.7}
+
+/* 체크박스 */
+.bulk-ai-modal .checkbox-row{display:inline-flex;align-items:center;cursor:pointer;user-select:none}
+.bulk-ai-modal .checkbox-box{width:18px;height:18px;border:2px solid #dde1e8;border-radius:5px;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;background:#fff;color:#fff;transition:all .12s}
+.bulk-ai-modal .checkbox-row.checked .checkbox-box{background:#365eef;border-color:#365eef}
+.bulk-ai-modal .checkbox-row.disabled{cursor:not-allowed;opacity:.5}
+.bulk-ai-modal .checkbox-row.disabled .checkbox-box{background:#f6f7f9;border-color:#e5e7eb}
+
+/* ══════ 토스트 ══════ */
+.toast{position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(12px);padding:14px 22px;border-radius:100px;font-size:15px;font-weight:500;line-height:1.4;box-shadow:0 4px 12px rgba(0,0,0,.15);opacity:0;transition:all .25s;z-index:900;pointer-events:none;display:flex;align-items:center;gap:10px;min-width:280px}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.toast.success{background:#319d64;color:#fff}
+.toast.loading{background:#365eef;color:#fff}
+.toast.info{background:#3b3f4c;color:#fff}
+
+/* 반응형 */
+/* 반응형 */
+@media (max-width:960px){
+  .steps{grid-template-columns:1fr}
+  .main{padding:18px 14px}
+  .page-title{font-size:20px}
+  .ph-right{flex-wrap:wrap}
+}
+@media (max-width:720px){
+  .global-header{height:52px;padding:0 12px 0 4px}
+  .gh-product-tag{margin-left:8px;padding-left:8px;font-size:13px}
+  .gh-plan,.gh-dday,.gh-credit,.gh-sep{display:none}
+  .gh-user{font-size:13px}
+  .sub-nav{top:52px;height:48px;padding:0 12px}
+  .sub-nav-item{padding:0 10px;font-size:14px;height:48px}
+  .main{padding:14px 10px}
+  .container{gap:14px}
+  .page-header{flex-direction:column;align-items:stretch;gap:10px}
+  .page-title{font-size:18px}
+  .btn-download{align-self:flex-start;height:36px;padding:0 14px;font-size:13px}
+  .step-card{padding:18px;border-radius:12px}
+  .step-card-num{font-size:16px}
+  .step-btn{height:42px;font-size:13px}
+  .table-card{padding:18px;border-radius:12px}
+  .table-card-hd{gap:8px}
+  .table-card-title{font-size:16px}
+  .student-table{min-width:780px}
+  .table-card{overflow-x:auto}
+  /* 모달 */
+  .modal{max-width:calc(100vw - 32px)}
+}
+@media (max-width:420px){
+  .main{padding:12px 10px}
+  .gh-menu-btn{width:40px;height:40px}
+  .page-title{font-size:17px}
+}
+    /* ── AI 채점 실행 모달 (task_ocr_v3 이식, 2026-08-26) ── */
+    .btn{ height:40px; border-radius:4px; font-weight:600; font-size:15px; font-family:inherit; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; gap:8px; padding:0 16px; border:none; white-space:nowrap; flex-shrink:0; line-height:1; transition:opacity .15s; }
+    .btn:hover{ opacity:.88; }
+    .btn-primary{ background:#416bff; color:white; }
+    .btn-outline{ background:white; color:#3b3f4c; border:1px solid #d9d9d9; }
+    .rm-overlay{ display:none; position:fixed; inset:0; background:rgba(0,0,0,.45); z-index:1600; align-items:center; justify-content:center; padding:24px; }
+    .rm-overlay.open{ display:flex; }
+    /* 점수 일괄 수정 페이지 (v4, #edit) — 제품 화면 구성 그대로. 안내 상자 색은 실제 화면에서 확인하지 못해 목업의 주의 안내 색(주황)을 씀 */
+    .be-alert{ display:flex; align-items:flex-start; gap:12px; padding:16px 20px; background:#fff7ed; border:1px solid #fed7aa; border-radius:12px; }
+    .be-alert > svg{ width:20px; height:20px; color:#ea580c; flex-shrink:0; margin-top:2px; }
+    .be-alert-body{ flex:1; min-width:0; display:flex; flex-direction:column; gap:4px; }
+    .be-alert-t{ font-size:16px; font-weight:700; color:#222631; line-height:1.5; margin:0; word-break:keep-all; }
+    .be-alert-d{ font-size:14px; color:#3b3f4c; line-height:1.65; margin:0; word-break:keep-all; }
+    .be-alert-btn{ display:inline-flex; align-items:center; justify-content:center; line-height:1; vertical-align:middle; flex-shrink:0; align-self:center; height:36px; padding:0 14px; border-radius:8px; background:#fff; border:1px solid #fdba74; color:#c2410c; font-family:inherit; font-size:14px; font-weight:600; cursor:pointer; }
+    .be-alert-btn:hover{ background:#ffedd5; }
+    .be-row-btn{ display:inline-flex; align-items:center; justify-content:center; line-height:1; vertical-align:middle; height:32px; padding:0 12px; border-radius:8px; background:#fff; border:1px solid #dde1e8; color:#3b3f4c; font-family:inherit; font-size:14px; font-weight:600; cursor:pointer; white-space:nowrap; }
+    .be-row-btn:hover{ border-color:#a3c3ff; color:#365eef; }
+    #editTable thead th{ word-break:keep-all; line-height:1.4; height:auto; }
+    /* AI 채점 결과 확인 팝업 (v4) — 제품 화면 그대로: 요약 3칸 + 총점 점수 분포 + 채점 요소별 점수 분포(점수별 학생 수 막대) */
+    .rm-modal.ar-modal{ width:616px; }
+    .ar-body{ padding:4px 24px 24px; display:flex; flex-direction:column; gap:24px; overflow:auto; }
+    .ar-info{ display:flex; align-items:center; gap:8px; padding:12px; background:#f4f8ff; border:1px solid #a3c3ff; border-radius:8px; font-size:14px; font-weight:500; color:#18181b; line-height:1.5; }
+    .ar-info svg{ width:16px; height:16px; color:#365eef; flex-shrink:0; }
+    .ar-sec{ display:flex; flex-direction:column; gap:8px; }
+    .ar-sec-t{ font-size:16px; font-weight:600; color:#18181b; margin:0; line-height:1.5; }
+    .ar-counts{ display:flex; border:1px solid #dde1e8; border-radius:6px; padding:16px; }
+    .ar-count{ flex:1; display:flex; flex-direction:column; align-items:center; gap:8px; }
+    .ar-count-l{ font-size:14px; font-weight:500; color:#52525b; line-height:1.2; }
+    .ar-count-v{ font-size:20px; font-weight:600; color:#18181b; line-height:1.25; }
+    .ar-count-v.ok{ color:#365eef; }
+    .ar-count-v.off{ color:#52525b; }
+    .ar-note{ font-size:14px; color:#52525b; margin:0; line-height:1.5; }
+    .ar-cards{ display:flex; flex-direction:column; gap:12px; }
+    .ar-card{ border:1px solid #dde1e8; border-radius:6px; padding:16px; display:flex; flex-direction:column; gap:12px; }
+    .ar-card-hd{ display:flex; align-items:flex-start; justify-content:space-between; gap:8px; }
+    .ar-card-t{ font-size:16px; font-weight:600; color:#18181b; line-height:1.5; word-break:keep-all; }
+    .ar-avg{ display:inline-flex; align-items:center; justify-content:center; flex-shrink:0; padding:3px 6px; border-radius:4px; background:#e9f2ff; color:#3151c4; font-size:14px; font-weight:500; line-height:1.3; white-space:nowrap; }
+    .ar-plot{ display:flex; align-items:flex-end; height:126px; margin-top:26px; border-top:1px solid #e0e0e0; border-bottom:1px solid #e0e0e0; }
+    .ar-plot.sm{ height:82px; }
+    .ar-col{ flex:1; min-width:0; height:100%; display:flex; align-items:flex-end; justify-content:center; }
+    .ar-bar{ position:relative; width:70%; min-height:2px; background:rgba(65,107,255,.85); border:1px solid #416bff; border-bottom:none; }
+    .ar-bar span{ position:absolute; left:50%; bottom:100%; transform:translateX(-50%); margin-bottom:4px; font-size:14px; font-weight:600; color:#18181b; white-space:nowrap; line-height:1.3; }
+    .ar-x{ display:flex; padding-top:8px; }
+    .ar-x span{ flex:1; min-width:0; text-align:center; font-size:14px; color:#52525b; line-height:1.3; white-space:nowrap; }
+    .rm-modal{ background:#fff; border-radius:12px; width:520px; max-width:calc(100vw - 48px); box-shadow:0 20px 60px rgba(0,0,0,.25); max-height:calc(100vh - 48px); display:flex; flex-direction:column; }
+    .rm-hd{ position:relative; padding:20px 24px 12px; flex-shrink:0; }
+    .rm-title{ font-size:20px; font-weight:600; color:#222631; line-height:1.25; }
+    .rm-close{ position:absolute; top:16px; right:16px; width:36px; height:36px; border:0; background:none; border-radius:6px; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; line-height:1; color:#6d7381; }
+    .rm-close:hover{ background:#f1f3f5; }
+    .rm-body{ padding:0 24px 4px; display:flex; flex-direction:column; gap:14px; overflow:auto; }
+    .rm-ft{ padding:12px 24px 16px; display:flex; justify-content:flex-end; gap:10px; flex-shrink:0; }
+    .rm-field{ display:flex; flex-direction:column; gap:8px; }
+    .rm-field-hd{ display:flex; align-items:center; justify-content:space-between; gap:8px; }
+    .rm-label{ font-size:16px; font-weight:600; color:#222631; display:inline-flex; align-items:center; gap:6px; }
+    /* AI 채점 안내 카드 (모델 버전 표기 대체, 26-08-28) */
+    .rm-guide{ display:flex; background:#f7faff; border:1px solid #e3ebfa; border-radius:10px; padding:12px 16px; }
+    .rm-guide-ic{ width:32px; height:32px; border-radius:9px; background:#e4edff; color:#3151c4; display:flex; align-items:center; justify-content:center; flex-shrink:0; margin-top:1px; }
+    .rm-guide-body{ flex:1; min-width:0; display:flex; flex-direction:column; }
+    .rm-guide-lead{ font-size:15px; font-weight:600; color:#222631; line-height:1.6; margin:0; letter-spacing:-.1px; }
+    .rm-guide-sub{ font-size:15px; font-weight:400; color:#4b5563; line-height:1.6; margin:8px 0 0; letter-spacing:-.1px; }
+    .rm-guide-btn{ align-self:flex-start; display:inline-flex; align-items:center; justify-content:center; line-height:1; gap:6px; height:28px; padding:0 12px; margin-top:8px; background:#fff; border:1px solid #cfdcf7; border-radius:100px; color:#3151c4; font-family:inherit; font-size:13px; font-weight:700; cursor:pointer; }
+    .rm-guide-btn:hover{ background:#eef3ff; border-color:#a3c3ff; }
+    a.rm-guide-btn{ text-decoration:none; }
+    /* 재실행·최초 실행 안내 블록 (26-09-30 모델 카드 대체 — ai_regrading_modal_v1_260930 구성) */
+    .rm-info{ display:flex; gap:10px; align-items:flex-start; width:100%; padding:14px 16px; border-radius:12px; background:#f4f8ff; }
+    .rm-info > i, .rm-info > svg{ width:20px; height:20px; color:#416bff; flex-shrink:0; margin-top:1px; }
+    .rm-info-body{ flex:1; min-width:0; display:flex; flex-direction:column; gap:8px; }
+    .rm-info-list{ list-style:none; display:flex; flex-direction:column; gap:5px; margin:0; padding:0; }
+    .rm-info-list li{ position:relative; padding-left:12px; font-size:14px; color:#3b3f4c; line-height:1.5; word-break:keep-all; }
+    .rm-info-list li::before{ content:''; position:absolute; left:2px; top:9px; width:4px; height:4px; border-radius:50%; background:#8a8f9c; }
+    .rm-info-link{ align-self:flex-start; margin-top:2px; color:#365eef; font-size:14px; font-weight:500; text-decoration:none; display:inline-flex; align-items:center; gap:4px; line-height:1; }
+    .rm-info-link:hover{ text-decoration:underline; }
+    .rm-info-link i, .rm-info-link svg{ width:14px; height:14px; }
+    .rm-desc{ font-size:14px; font-weight:400; color:#52525b; line-height:1.5; word-break:keep-all; margin:0; }
+    .rm-radio .lbl small{ font-size:14px; font-weight:500; color:#52525b; }
+    .rm-info[data-mode]{ display:none; }
+    .rm-modal[data-rerun="0"] .rm-info[data-mode="first"], .rm-modal[data-rerun="1"] .rm-info[data-mode="rerun"]{ display:flex; }
+    .rm-ft .credit-note[data-mode]{ display:none; }
+    .rm-modal[data-rerun="0"] .credit-note[data-mode="first"], .rm-modal[data-rerun="1"] .credit-note[data-mode="rerun"]{ display:inline-flex; }
+    .rm-model-meta{ font-size:14px; font-weight:500; color:#6d7381; }
+    .rm-fb-group{ display:flex; flex-direction:column; gap:8px; }
+    .rm-fb-group-lbl{ display:flex; align-items:center; gap:8px; font-size:14px; font-weight:600; color:#3b3f4c; }
+    .rm-fb-group-lbl small{ font-size:13px; font-weight:400; color:#9ea3ad; }
+    .rm-help{ font-size:14px; color:#6d7381; line-height:1.5; margin:-8px 0 0; } /* 라벨 바로 아래 설명 — 여백은 여기서만 관리 */
+    .rm-qtip{ position:relative; display:inline-flex; align-items:center; cursor:help; }
+    .rm-qtip > i, .rm-qtip > svg{ width:18px; height:18px; color:#6d7381; }
+    .rm-qtip .rm-qtip-box{ display:none; position:absolute; left:0; bottom:calc(100% + 8px); width:280px; max-width:calc(100% + 260px); background:#fff; border:1px solid #e4e7ee; border-radius:8px; box-shadow:0 6px 20px rgba(0,0,0,.12); padding:10px 12px; font-size:14px; font-weight:400; color:#3b3f4c; line-height:1.55; z-index:30; }
+    .rm-qtip:hover .rm-qtip-box{ display:block; }
+    /* 재채점 모달과 동일한 슬라이더 (26-08-28 UI 통일) — 레이블만 각자 다름 */
+    .rm-slider{ width:100%; -webkit-appearance:none; appearance:none; height:6px; background:linear-gradient(to right,#365eef 0%,#365eef 50%,#dde1e8 50%,#dde1e8 100%); border-radius:3px; outline:none; cursor:pointer; margin:6px 0 0; }
+    .rm-slider::-webkit-slider-thumb{ -webkit-appearance:none; appearance:none; width:22px; height:22px; border-radius:50%; background:#fff; cursor:pointer; border:3px solid #365eef; box-shadow:0 1px 3px rgba(0,0,0,.15); }
+    .rm-slider::-moz-range-thumb{ width:22px; height:22px; border-radius:50%; background:#fff; cursor:pointer; border:3px solid #365eef; box-shadow:0 1px 3px rgba(0,0,0,.15); }
+    .rm-slider-marks{ display:flex; justify-content:space-between; margin-top:12px; font-size:16px; color:#222631; line-height:1.35; }
+    .rm-slider-marks small{ font-size:13px; }
+    .rm-slider-marks span{ cursor:pointer; }
+    /* 박스형 라디오 — 재채점 모달과 동일 (26-08-28 UI 통일) */
+    .rm-radio{ display:flex; align-items:center; gap:10px; cursor:pointer; padding:9px 14px; border:1px solid #dde1e8; border-radius:12px; transition:border-color .15s, background .15s; }
+    .rm-radio:hover{ border-color:#a3c3ff; background:#f4f8ff; }
+    .rm-radio.selected{ border-color:#365eef; background:#f4f8ff; }
+    .rm-radio .ring{ width:20px; height:20px; border-radius:50%; border:1.5px solid #c7cbd3; background:#fff; flex-shrink:0; }
+    .rm-radio.selected .ring{ border:6px solid #365eef; }
+    .rm-radio .lbl{ font-size:15px; font-weight:600; color:#222631; line-height:1.4; }
+    .rm-seg{ display:flex; gap:10px; }
+    .rm-seg-opt{ flex:1; display:flex; flex-direction:column; align-items:flex-start; gap:3px; padding:14px 16px; border:1.5px solid #e3e6eb; border-radius:10px; background:#fff; cursor:pointer; font-family:inherit; text-align:left; transition:border-color .12s, background .12s; }
+    .rm-seg-opt > i{ width:20px; height:20px; color:#6d7381; margin-bottom:2px; }
+    .rm-seg-tit{ font-size:15px; font-weight:600; color:#222631; line-height:1.3; }
+    .rm-seg-desc{ font-size:13px; color:#6d7381; line-height:1.45; }
+    .rm-seg-opt.on{ border-color:#416bff; background:#f5f8ff; }
+    .rm-seg-opt.on > i{ color:#416bff; }
+    .rm-seg-opt.on .rm-seg-tit{ color:#365eef; }
+    .rm-tbl-wrap{ border:1px solid #dde1e8; border-radius:8px; overflow:auto; flex:1; min-height:0; }
+    .rm-tbl{ width:100%; border-collapse:separate; border-spacing:0; }
+    .rm-tbl th{ background:#f6f7f9; height:42px; font-size:14px; font-weight:600; color:#222631; text-align:center; border-bottom:1px solid #dde1e8; position:sticky; top:0; z-index:1; }
+    .rm-tbl td{ height:46px; font-size:15px; text-align:center; color:#222631; border-bottom:1px solid #eceef2; }
+    .rm-tbl tr:last-child td{ border-bottom:none; }
+    .rm-tbl tr.sel td{ background:#f4f8ff; }
+    .rm-tbl tr.dis td{ color:#b3b6bd; }
+    .rm-chk{ width:18px; height:18px; accent-color:#416bff; cursor:pointer; vertical-align:middle; }
+    .rm-chk:disabled{ cursor:not-allowed; opacity:.5; }
+    .rm-tag{ display:inline-flex; align-items:center; justify-content:center; height:22px; padding:0 10px; border-radius:100px; font-size:12px; font-weight:700; line-height:1; white-space:nowrap; }
+    .rm-tag.green{ background:#eefcf4; color:#319d64; }
+    .rm-tag.orange{ background:#fff7ed; color:#ea580c; }
+    .rm-tag.red{ background:#fef2f2; color:#f2525f; }
+    .rm-tag.gray{ background:#eef0f3; color:#6d7381; }
+    .rm-modal.wide{ width:672px; }
+    .rm-sub{ font-size:14px; color:#6d7381; margin-top:6px; line-height:1.5; }
+    .rm-ft .credit-note{ margin-right:auto; align-self:center; font-size:13px; color:#6d7381; display:inline-flex; align-items:center; gap:5px; }
+
+/* ===== 리뉴얼(v4, 2026-09-30): 채점 결과 요약 섹션 + 표 보기 스위치 ===== */
+.sum-card{background:#fff;border:1px solid #eaecf0;border-radius:14px;padding:20px 24px}
+.sum-hd{display:flex;align-items:center;justify-content:space-between;gap:16px}
+.sum-more{display:inline-flex;align-items:center;justify-content:center;gap:5px;height:34px;padding:0 10px 0 12px;border:1px solid #dde1e8;border-radius:8px;background:#fff;color:#3b3f4c;font-family:inherit;font-size:14px;font-weight:600;line-height:1;vertical-align:middle;cursor:pointer}
+.sum-more:hover{border-color:#a3c3ff;color:#365eef}
+/* 채점 진행 단계 (v4) */
+.prog-card{background:#fff;border:1px solid #eaecf0;border-radius:14px;padding:18px 24px}
+.step-card-hd{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap;margin-bottom:14px}
+.step-card-cap{font-size:14px;color:#6d7381;line-height:1.5}
+/* 단계 = 세 칸. 칸마다 첫 줄(번호 · 이름 · 지금 상태 · 다음 단계로 이어지는 선) + 둘째 줄(버튼) — 높이를 줄인 모양(2026-09-30) */
+.step-bar{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:0}
+.step-i{min-width:0}
+.step-top{display:flex;align-items:center;gap:8px;min-width:0;height:24px}
+.step-dot{width:24px;height:24px;border-radius:50%;background:#f1f3f5;color:#6d7381;font-size:14px;font-weight:600;line-height:1;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0}
+.step-i.cur .step-dot{background:#416bff;color:#fff}
+.step-i.done .step-dot{background:#eefcf4;color:#319d64}
+.step-i-t{font-size:16px;font-weight:600;color:#222631;line-height:1;white-space:nowrap;flex-shrink:0}
+.step-i-s{font-size:14px;color:#6d7381;line-height:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+.step-line{flex:1;min-width:16px;height:2px;border-radius:1px;background:#e4e7ec;margin:0 14px 0 6px}
+.step-i.done .step-line{background:#a3c3ff}
+.step-i:last-child .step-line{visibility:hidden}
+.step-acts{display:flex;align-items:center;flex-wrap:wrap;gap:6px 8px;margin-top:10px;padding-left:32px}
+.step-sub{display:inline-flex;align-items:center;justify-content:center;gap:5px;height:34px;padding:0 10px;border:1px solid #dde1e8;border-radius:8px;background:#fff;font-family:inherit;font-size:14px;font-weight:600;color:#3b3f4c;line-height:1;vertical-align:middle;cursor:pointer;white-space:nowrap}
+.step-sub:hover{border-color:#a3c3ff;color:#365eef}
+.step-bar .step-btn{height:34px;padding:0 12px;white-space:nowrap}
+.cr-blk + .cr-blk{margin-top:10px}
+.cr-ins{font-size:16px;color:#222631;line-height:1.7;margin:0 0 12px}
+.cr-ins b{font-weight:600}
+.ins-box{background:#f6f7f9;border-radius:10px;padding:16px 18px}
+.ins-t{font-size:16px;font-weight:600;color:#222631;margin-bottom:8px}
+.ins-ul{margin:0;padding-left:20px;font-size:16px;line-height:1.75;color:#222631}
+.ins-ul b{font-weight:600}
+.band-tbl tr.top-row td{background:#f7faff}
+.most{display:inline-flex;align-items:center;justify-content:center;height:22px;padding:0 8px;margin-left:6px;border-radius:100px;background:#e9f2ff;color:#3151c4;font-size:14px;font-weight:600;line-height:1;white-space:nowrap;vertical-align:middle}
+.sc-i{display:inline-block;white-space:nowrap;color:#3b3f4c}
+.sc-i + .sc-i::before{content:'·';margin:0 8px;color:#9ca3af}
+.cr-blk .cr-row{grid-template-columns:240px minmax(0,1fr) 110px 64px;padding:6px 0 6px;cursor:default}
+.cr-blk .cr-row:hover{background:none}
+@media (max-width:1000px){
+  .step-bar{grid-template-columns:1fr}
+  .step-i{position:relative;padding-bottom:16px}
+  .step-i:last-child{padding-bottom:0}
+  .step-i::before{content:'';position:absolute;left:11px;top:28px;bottom:4px;width:2px;border-radius:1px;background:#e4e7ec}
+  .step-i.done::before{background:#a3c3ff}
+  .step-i:last-child::before{display:none}
+  .step-top{flex-wrap:wrap;height:auto;row-gap:6px}
+  .step-line{display:none}
+  .step-i-s{flex-basis:100%;padding-left:32px;white-space:normal;line-height:1.5}
+  .sum-grid{grid-template-columns:1fr}
+  .cr-blk .cr-row{grid-template-columns:minmax(0,1fr) 110px 64px}
+  .cr-blk .cr-bar{display:none}
+}
+.sum-title{font-size:18px;font-weight:700;color:#222631;line-height:1.3}
+.sum-body{margin-top:18px;display:flex;flex-direction:column;gap:18px}
+.sum-bar{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.sum-counts{font-size:14px;color:#6d7381}
+.sum-counts b{font-weight:600;color:#222631}
+.sum-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);gap:20px;align-items:stretch}
+.stat-row{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));border:1px solid #dde1e8;border-radius:8px;align-items:center}
+.stat{padding:18px 12px;text-align:center}
+.stat + .stat{border-left:1px solid #eceef2}
+.stat-l{font-size:14px;color:#6d7381;font-weight:500}
+.stat-v{font-size:24px;font-weight:600;color:#222631;margin-top:6px;line-height:1.2;white-space:nowrap}
+.stat-s{font-size:14px;color:#6d7381;margin-top:4px}
+.hist{border:1px solid #dde1e8;border-radius:8px;padding:14px 18px 12px}
+.hist-t{font-size:14px;font-weight:500;color:#3b3f4c;margin-bottom:8px}
+.hist-bars{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:14px;align-items:end;height:96px;border-bottom:1px solid #dde1e8}
+.hist-col{display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%}
+.hist-n{font-size:14px;color:#3b3f4c;margin-bottom:4px}
+.hist-bar{width:100%;max-width:72px;background:#416bff;border-radius:4px 4px 0 0}
+.hist-x{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:14px;margin-top:6px}
+.hist-x span{font-size:14px;color:#6d7381;text-align:center;white-space:nowrap}
+.sum-cap{font-size:14px;color:#6d7381;margin-top:4px;line-height:1.6}
+.cr-row{display:grid;grid-template-columns:28px 240px minmax(0,1fr) 110px 64px;align-items:center;gap:14px;padding:14px 18px;cursor:pointer}
+.cr-row:hover{background:#f6f7f9}
+.cr-name{font-size:16px;font-weight:600;color:#222631}
+.cr-max{font-size:14px;font-weight:400;color:#6d7381;margin-left:6px}
+.cr-bar{height:10px;background:#e9f2ff;border-radius:5px;overflow:hidden}
+.cr-bar > div{height:100%;background:#416bff;border-radius:5px}
+.cr-avg{font-size:14px;color:#6d7381;text-align:right}
+.cr-pct{font-size:16px;font-weight:600;color:#222631;text-align:right}
+.band-tbl{width:100%;border-collapse:separate;border-spacing:0}
+.band-tbl th{background:#f6f7f9;height:40px;font-size:14px;font-weight:600;color:#3b3f4c;padding:0 12px;text-align:center;border-top:1px solid #dde1e8;border-bottom:1px solid #dde1e8}
+.band-tbl th:first-child{border-left:1px solid #dde1e8;border-top-left-radius:8px}
+.band-tbl th:last-child{border-right:1px solid #dde1e8;border-top-right-radius:8px}
+.band-tbl td{font-size:16px;padding:12px;text-align:center;color:#222631;border-bottom:1px solid #eceef2;line-height:1.6}
+.band-tbl td:first-child{border-left:1px solid #dde1e8}
+.band-tbl td:last-child{border-right:1px solid #dde1e8}
+.band-tbl tr:last-child td{border-bottom:1px solid #dde1e8}
+.band-tbl tr:last-child td:first-child{border-bottom-left-radius:8px}
+.band-tbl tr:last-child td:last-child{border-bottom-right-radius:8px}
+.stu-link{color:#365eef;font-weight:500;cursor:pointer}
+.stu-link:hover{text-decoration:underline}
+.sum-note{display:flex;align-items:flex-start;gap:8px;font-size:14px;color:#3b3f4c;line-height:1.65}
+.sum-note svg{width:16px;height:16px;color:#416bff;flex-shrink:0;margin-top:3px}
+.sum-empty{font-size:16px;color:#6d7381;line-height:1.65}
+</style>
+</head>
+<body>
+
+<!-- ===== Global Header (CLIPO 표준 g-hd) ===== -->
+<header class="g-hd" id="gnb">
+  <button class="gh-menu-btn" onclick="toggleNav()"><i data-lucide="panel-left-open" style="width:20px;height:20px"></i></button>
+  <svg width="76" height="16" viewBox="0 0 76 16" fill="none" xmlns="http://www.w3.org/2000/svg" style="cursor:pointer" onclick="location.href='home_v1_260612.html'"><path d="M11.3613 4.03516H4.09668V11.9629H8.88281L8.88086 11.9648H15.6016V16H4.02539C1.80242 15.9998 0 14.223 0 12.0322V3.96777C0 1.77696 1.80242 0.000177874 4.02539 0H15.4561L11.3613 4.03516ZM22.0703 11.9648H33.5781V16H22.002C19.7788 16 17.9756 14.2231 17.9756 12.0322V0H22.0703V11.9648ZM40.0459 16H35.9521V0H40.0459V16ZM54.5381 0C56.4564 0 58.0138 1.53228 58.0186 3.42285L58.0166 3.4248V8.54297C58.014 10.4333 56.4567 11.9648 54.5361 11.9648H46.5107L42.416 16V0H54.5381ZM71.9746 0C74.0086 0.000134956 75.6887 1.49046 75.958 3.42285H76V12.5771H75.958C75.6887 14.5095 74.011 15.9999 71.9746 16H64.4238C62.3897 16 60.7098 14.5096 60.4404 12.5771C60.4145 12.398 60.3984 12.2184 60.3984 12.0322V3.96777C60.3984 3.78159 60.4145 3.60205 60.4404 3.42285C60.7098 1.49037 62.3873 0 64.4238 0H71.9746ZM64.4922 12.5771H71.9062V3.42285H64.4922V12.5771ZM46.5107 3.42285V8.54004H53.9238V3.42285H46.5107Z" fill="#365EEF"/></svg>
+  <div class="g-hd-r">
+    <div class="hd-plan">
+      <span class="plan-badge">학교 유료</span>
+      <span style="font-size:15px;font-weight:500;color:#18181b">D-180</span>
+    </div>
+    <div class="credit-wrap"><i data-lucide="bot" style="width:20px;height:20px;color:#416bff"></i><span>200 크레딧</span></div>
+    <button class="user-btn">최대표 선생님(대표교사) <i data-lucide="chevron-down" style="width:16px;height:16px"></i></button>
+  </div>
+</header>
+
+<!-- ===== Sidebar (CLIPO 표준 icon-sb) ===== -->
+<nav class="icon-sb" id="icon-sb">
+  <div class="si" onclick="location.href='home_v1_260612.html'"><div class="si-icon"><i data-lucide="home" style="width:20px;height:20px"></i></div><span class="si-label">홈</span><span class="si-tip">홈</span></div>
+  <div class="si" onclick="location.href='eval_plan_v1_260619.html'"><div class="si-icon"><i data-lucide="scissors" style="width:20px;height:20px"></i></div><span class="si-label">평가 준비</span><span class="si-tip">평가 준비</span></div>
+  <div class="si active" onclick="location.href='co_teacher_review_v1_260611.html'"><div class="si-icon"><i data-lucide="layout-grid" style="width:20px;height:20px"></i></div><span class="si-label">수업</span><span class="si-tip">수업</span></div>
+  <div class="si" onclick="location.href='creative_activity_list_v6_260507.html'"><div class="si-icon"><i data-lucide="notebook-pen" style="width:20px;height:20px"></i></div><span class="si-label">창의적 체험활동 <span style="font-size:10px;background:#416bff;color:#fff;padding:1px 5px;border-radius:3px;margin-left:2px">Beta</span></span><span class="si-tip">창의적 체험활동</span></div>
+  <div class="si" onclick="location.href='quick_seteuk_dev_list_v1_260604.html'"><div class="si-icon"><i data-lucide="zap" style="width:20px;height:20px"></i></div><span class="si-label">세특 간편 생성기</span><span class="si-tip">세특 간편 생성기</span></div>
+  <div class="si"><div class="si-icon"><i data-lucide="smile" style="width:20px;height:20px"></i></div><span class="si-label">행동특성 및 종합기록</span><span class="si-tip">행동특성 및 종합기록</span></div>
+  <div class="si"><div class="si-icon"><i data-lucide="bar-chart-2" style="width:20px;height:20px"></i></div><span class="si-label">리포트</span><span class="si-tip">리포트</span></div>
+  <div class="si"><div class="si-icon"><i data-lucide="building-2" style="width:20px;height:20px"></i></div><span class="si-label">학교 설정</span><span class="si-tip">학교 설정</span></div>
+  <div class="nav-bottom">
+    <div class="nav-div"></div>
+    <div class="si"><div class="si-icon"><i data-lucide="file-down" style="width:20px;height:20px"></i></div><span class="si-label">매뉴얼 다운로드</span><span class="si-tip">매뉴얼 다운로드</span></div>
+    <div class="si"><div class="si-icon"><i data-lucide="credit-card" style="width:20px;height:20px"></i></div><span class="si-label">요금제</span><span class="si-tip">요금제</span></div>
+    <div class="si"><div class="si-icon"><i data-lucide="help-circle" style="width:20px;height:20px"></i></div><span class="si-label">고객센터</span><span class="si-tip">고객센터</span></div>
+  </div>
+</nav>
+
+<div class="main-wrap" id="main-wrap">
+  <!-- 상단 탭 밴드 (CLIPO 표준) -->
+  <div class="tab-band">
+    <div class="tab-band-inner">
+      <button class="sub-tab" onclick="location.href='co_teacher_review_v1_260611.html'">수업 홈</button>
+      <button class="sub-tab" onclick="location.href='task_direct_write_v1_260729.html#list'">설계</button>
+      <button class="sub-tab" onclick="location.href='task_ocr_v3_260623.html'">과제물 관리</button>
+      <button class="sub-tab on">채점</button>
+      <button class="sub-tab" onclick="location.href='class_report_v2_260930.html'">리포트</button>
+      <button class="sub-tab" onclick="showToast('success','세부능력 및 특기사항 지원은 준비 중이에요.')">세부능력 및 특기사항 지원</button>
+      <button class="sub-tab" onclick="showToast('success','공동 평가는 준비 중이에요.')">공동 평가</button>
+    </div>
+  </div>
+
+  <!-- 메인 -->
+  <main class="main">
+  <!-- 상세 페이지 (v4) — #result = 채점 요소별 점수(요약에서 들어옴, 선생님이 저장한 최종 점수 기준) -->
+  <div class="container" id="viewCrit" style="display:none">
+    <div class="page-header">
+      <div class="ph-left">
+        <button class="btn-back" onclick="showMain()"><i data-lucide="chevron-left" style="width:18px;height:18px"></i>이전으로</button>
+        <h1 class="page-title" id="detTitle"></h1>
+        <p class="page-desc" id="detDesc"></p>
+      </div>
+    </div>
+    <section class="sum-card"><div class="sum-body" id="critBody" style="margin-top:0"></div></section>
+  </div>
+  <!-- 점수 일괄 수정 페이지 (v4, #edit) — 제품 화면 구성·문구 그대로(09-30 실제 화면에서 확인: 창이 아니라 페이지). 표 머리의 '점수 일괄 수정'에서 들어온다.
+       아직 못 본 것: 행의 '점수 수정' · '학급 점수 분포' · '엑셀 일괄 업로드'를 눌렀을 때의 화면 — 지금은 토스트만 -->
+  <div class="container" id="viewEdit" style="display:none">
+    <div class="page-header">
+      <div class="ph-left">
+        <button class="btn-back" onclick="showMain()"><i data-lucide="chevron-left" style="width:18px;height:18px"></i>이전으로</button>
+        <h1 class="page-title">1학년 1반 점수 일괄 수정</h1>
+        <p class="page-desc">채점 결과를 확인하고 필요한 경우 점수를 새로 입력하거나 수정할 수 있습니다.</p>
+      </div>
+    </div>
+    <div class="be-alert" id="beAlert">
+      <i data-lucide="alert-triangle"></i>
+      <div class="be-alert-body">
+        <p class="be-alert-t">AI 채점을 실행해야 세특 초안에 과제물 내용이 반영됩니다.</p>
+        <p class="be-alert-d">점수를 저장하거나 과제물을 업로드해도, AI 채점 실행 전에는 답안 내용이 세특 초안에 전달되지 않습니다. 반드시 AI 채점을 실행한 후 점수를 확정해 주세요.</p>
+      </div>
+      <button type="button" class="be-alert-btn" onclick="document.getElementById('beAlert').style.display='none'">확인했습니다.</button>
+    </div>
+    <section class="table-card">
+      <div class="table-card-hd">
+        <div class="table-card-hd-left">
+          <h2 class="table-card-title">채점 결과</h2>
+          <p class="table-card-desc" style="font-size:14px;">학생들의 채점 요소별 최종 점수를 확인하고 수정할 수 있습니다.</p>
+        </div>
+        <div class="table-card-actions">
+          <button class="btn-table-action" style="font-size:14px;" onclick="editStub('학급 점수 분포')"><i data-lucide="bar-chart-2" style="width:14px;height:14px"></i>학급 점수 분포</button>
+          <button class="btn-table-action" style="font-size:14px;" onclick="editStub('엑셀 일괄 업로드')"><i data-lucide="upload" style="width:14px;height:14px"></i>엑셀 일괄 업로드</button>
+        </div>
+      </div>
+      <table class="student-table" id="editTable">
+        <thead id="editThead"></thead>
+        <tbody id="editTbody"></tbody>
+      </table>
+    </section>
+  </div>
+  <div class="container" id="viewMain">
+
+    <!-- 페이지 헤더 -->
+    <div class="page-header">
+      <div class="ph-left">
+        <button class="btn-back" onclick="location.href='task_ocr_v3_260623.html#scoring'">
+          <i data-lucide="chevron-left" style="width:18px;height:18px"></i>이전으로
+        </button>
+        <h1 class="page-title">1학년 1반 채점 현황</h1>
+        <p class="page-desc">미래 예측 보고서 작성 AI 채점 결과를 확인하고 점수를 확정해 주세요. 수정이 필요한 학생은 개별 조정할 수 있어요.</p>
+      </div>
+    </div>
+
+    <!-- 채점 진행 단계(v4) — 단계마다 지금 상태 + 그 단계의 버튼. 버튼·동작은 기존 3단계 카드와 같다. 파란 채움은 지금 할 단계 하나만 -->
+    <section class="prog-card">
+      <div class="step-card-hd">
+        <h2 class="sum-title">채점 진행</h2>
+        <p class="step-card-cap">AI 채점부터 결과 공개까지 순서대로 진행해요.</p>
+      </div>
+      <div class="step-bar" id="stepBar"></div>
+    </section>
+
+    <!-- 채점 결과 요약 (v4) — 선생님이 저장한 최종 점수 기준. 화면 맨 위에 늘 보인다. 요소별로 뜯어보는 것은 '채점 요소별 점수' 페이지(#result)로.
+         AI가 매긴 점수는 1단계의 'AI 채점 결과' 팝업(#ai, 제품 화면 그대로)에서 본다 — AI 채점을 한 뒤에만 나타난다 -->
+    <section class="sum-card" id="sumCard">
+      <div class="sum-hd">
+        <h2 class="sum-title">채점 결과 요약</h2>
+        <button type="button" class="sum-more" id="sumMore" onclick="showDetail()">채점 요소별 점수<i data-lucide="chevron-right" style="width:16px;height:16px"></i></button>
+      </div>
+      <div class="sum-body" id="sumBody"></div>
+    </section>
+
+    <!-- 학생 테이블 -->
+    <section class="table-card">
+      <div class="table-card-hd">
+        <div class="table-card-hd-left">
+          <h2 class="table-card-title">과제물 있는 수행평가</h2>
+        </div>
+        <div class="table-card-actions">
+          <div class="sort-dd" id="sortDd">
+            <button class="btn-table-action" onclick="toggleSortMenu(event)">
+              <i data-lucide="arrow-up-down" style="width:14px;height:14px"></i>정렬 : <span id="sortDdLabel">학번 낮은 순</span>
+            </button>
+            <div class="sort-dd-menu" id="sortDdMenu">
+              <button class="sort-dd-opt" data-mode="id-asc" onclick="setSortMode('id-asc')">학번 낮은 순</button>
+              <button class="sort-dd-opt" data-mode="ai-asc" onclick="setSortMode('ai-asc')">AI 점수 낮은 순</button>
+              <button class="sort-dd-opt" data-mode="ai-desc" onclick="setSortMode('ai-desc')">AI 점수 높은 순</button>
+              <button class="sort-dd-opt" data-mode="final-asc" onclick="setSortMode('final-asc')">최종 점수 낮은 순</button>
+              <button class="sort-dd-opt" data-mode="final-desc" onclick="setSortMode('final-desc')">최종 점수 높은 순</button>
+            </div>
+          </div>
+          <button class="btn-table-action" onclick="resetAll()">
+            <i data-lucide="rotate-ccw" style="width:14px;height:14px"></i>초기화
+          </button>
+          <button class="btn-table-action" onclick="bulkEditScores()">
+            <i data-lucide="edit-3" style="width:14px;height:14px"></i>점수 일괄 수정
+          </button>
+        </div>
+      </div>
+
+      <table class="student-table" id="studentTable">
+        <thead id="studentThead"></thead>
+        <tbody id="studentTbody"></tbody>
+      </table>
+    </section>
+
+  </div>
+</main>
+
+<!-- ===== AI 채점 결과 확인 팝업 (v4) — 제품 화면 그대로. 1단계의 'AI 채점 결과' 버튼에서 열린다(AI 채점된 학생이 있을 때만) ===== -->
+<div id="aiResultModal" class="rm-overlay" onclick="if(event.target===this) closeAiResult()">
+  <div class="rm-modal ar-modal">
+    <div class="rm-hd">
+      <div class="rm-title">AI 채점 결과 확인</div>
+      <button class="rm-close" aria-label="닫기" onclick="closeAiResult()"><i data-lucide="x" style="width:20px;height:20px"></i></button>
+    </div>
+    <div class="ar-body" id="aiResultBody"></div>
+  </div>
+</div>
+
+<!-- 학급 결과 공개 방법 선택 모달 -->
+<!-- ===== AI 채점 실행 모달 (1/2): 인식 확인 시점·점수 수준·학생 피드백 구성 ===== -->
+<div id="runModal1" class="rm-overlay" onclick="if(event.target===this) closeRmModal('runModal1')">
+  <div class="rm-modal" data-rerun="0" style="max-height:min(640px,90vh);">
+    <div class="rm-hd">
+      <div class="rm-title" id="rm1-title">AI 채점 실행 (1/2)</div>
+      <button class="rm-close" onclick="closeRmModal('runModal1')"><i data-lucide="x" style="width:20px;height:20px"></i></button>
+    </div>
+    <div class="rm-body">
+      <!-- 안내 블록 — 모델 카드 대체(26-09-30). 버전은 화면에 안 보이고 결과 데이터에만. 사실 근거 = cs_assist/product_facts_clipo.md 채점 근거·재채점 -->
+      <div class="rm-info" data-mode="first">
+        <i data-lucide="info"></i>
+        <div class="rm-info-body">
+          <ul class="rm-info-list">
+            <li>AI가 과제물을 읽고 점수·채점 근거·피드백을 만들어요.</li>
+            <li>채점 뒤 AI가 읽은 답안을 확인하고, 고쳐서 다시 채점할 수 있어요.</li>
+          </ul>
+          <a class="rm-info-link" href="../guide/" target="_blank" rel="noopener"><i data-lucide="book-open"></i>AI 채점은 어떻게 동작하나요?</a>
+        </div>
+      </div>
+      <div class="rm-info" data-mode="rerun">
+        <i data-lucide="info"></i>
+        <div class="rm-info-body">
+          <ul class="rm-info-list">
+            <li>AI 채점만 새로 하고, 선생님이 저장한 점수·피드백은 그대로예요.</li>
+            <li>선생님이 고친 답안이 있으면 고친 대로 채점해요.</li>
+          </ul>
+          <a class="rm-info-link" href="../guide/" target="_blank" rel="noopener"><i data-lucide="book-open"></i>AI 채점은 어떻게 동작하나요?</a>
+        </div>
+      </div>
+      <!-- 채점 수준 -->
+      <div class="rm-field" style="gap:12px;">
+        <div class="rm-field" style="gap:8px;">
+          <span class="rm-label">채점 수준</span>
+          <p class="rm-desc">관대하게 둘수록 점수를 높게 매기고, 피드백도 그에 맞춰 바뀌어요.</p>
+        </div>
+        <div>
+          <input type="range" class="rm-slider" id="rm-slider" min="0" max="2" step="1" value="1" oninput="rmSliderInput()">
+          <div class="rm-slider-marks">
+            <span onclick="rmSetLevel(0)">엄격하게<br><small style="color:#9ea3ad;font-weight:500;">(점수 낮게)</small></span>
+            <span onclick="rmSetLevel(1)" style="margin-left:14px;text-align:center;">기본값</span>
+            <span onclick="rmSetLevel(2)" style="text-align:right;">관대하게<br><small style="color:#9ea3ad;font-weight:500;">(점수 높게)</small></span>
+          </div>
+        </div>
+      </div>
+      <!-- 학생 피드백 초안 — 툴팁 대신 설명문, 선택지 4개 평면 + 괄호 설명 (26-09-30). 라디오 순서·개수 유지(저장값 인덱스) -->
+      <div class="rm-field" style="gap:12px;">
+        <div class="rm-field" style="gap:8px;">
+          <span class="rm-label">학생 피드백 초안</span>
+          <p class="rm-desc">피드백을 AI가 채울지, 선생님이 직접 쓸지 정해요. 채점 뒤 고칠 수 있어요.</p>
+        </div>
+        <div id="rm-fb-list" style="display:flex;flex-direction:column;gap:8px;">
+          <div class="rm-radio" onclick="rmSelectFb(this)"><div class="ring"></div><div class="lbl">AI 채점 근거 <small>(채점요소별로 점수를 준 이유를 넣어요)</small></div></div>
+          <div class="rm-radio" onclick="rmSelectFb(this)"><div class="ring"></div><div class="lbl">AI 피드백 <small>(잘한 점·보완할 점과 채점요소별 피드백을 넣어요)</small></div></div>
+          <div class="rm-radio selected" onclick="rmSelectFb(this)"><div class="ring"></div><div class="lbl">AI 채점 근거 + AI 피드백 <small>(두 가지를 모두 넣어요)</small></div></div>
+          <div class="rm-radio" onclick="rmSelectFb(this)"><div class="ring"></div><div class="lbl">직접 작성 <small>(AI 초안 없이 빈 칸에서 시작해요)</small></div></div>
+        </div>
+      </div>
+    </div>
+    <div class="rm-ft">
+      <span class="credit-note" data-mode="first"><i data-lucide="bot" style="width:16px;height:16px;color:#416bff"></i>학생 1명당 크레딧 1개가 차감돼요</span>
+      <span class="credit-note" data-mode="rerun"><i data-lucide="bot" style="width:16px;height:16px;color:#416bff"></i>학생 1명당 크레딧 1개가 다시 차감돼요</span>
+      <button class="btn btn-primary" id="rm1-next" onclick="rmNext()">다음으로 <i data-lucide="chevron-right" style="width:18px;height:18px"></i></button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== AI 채점 실행 (2/2): 학생 선택 ===== -->
+<div id="runModal2" class="rm-overlay" onclick="if(event.target===this) closeRmModal('runModal2')">
+  <div class="rm-modal" style="height:660px;max-height:90vh;">
+    <div class="rm-hd">
+      <div class="rm-title" id="rm2-title">AI 채점 실행 (2/2)</div>
+      <button class="rm-close" onclick="closeRmModal('runModal2')"><i data-lucide="x" style="width:20px;height:20px"></i></button>
+    </div>
+    <div class="rm-body">
+      <div class="rm-tbl-wrap">
+        <table class="rm-tbl">
+          <thead>
+            <tr>
+              <th style="width:64px;"><input type="checkbox" class="rm-chk" id="rm-chk-all" onchange="rmToggleAll(this)"></th>
+              <th style="width:100px;">학번</th>
+              <th>이름</th>
+              <th style="width:110px;" id="rm2-col-a">AI 채점</th>
+              <th style="width:120px;" id="rm2-col-b">선생님 채점</th>
+            </tr>
+          </thead>
+          <tbody id="rm-student-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+    <div class="rm-ft" style="justify-content:space-between;align-items:center;">
+      <button class="btn btn-outline" onclick="rmBack()"><i data-lucide="chevron-left" style="width:16px;height:16px"></i>이전으로</button>
+      <div style="display:flex;align-items:center;gap:14px;">
+        <button class="btn btn-primary" id="rm-exec-btn" onclick="rmExecPrimary()"><i data-lucide="wand-sparkles" style="width:16px;height:16px"></i>AI 채점 실행 · <span id="rm-exec-count">0</span></button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="bulkMethodModal" onclick="if(event.target===this)closeBulkMethodModal()">
+  <div class="modal">
+    <div class="modal-hd">
+      <span class="modal-title">학생에게 결과 공개</span>
+      <button class="modal-close" onclick="closeBulkMethodModal()"><i data-lucide="x" style="width:18px;height:18px"></i></button>
+    </div>
+    <div class="modal-body">
+      <span class="method-section-lbl">공개 방법</span>
+      <div class="method-list">
+        <label class="method-card selected" data-method="online" onclick="selectBulkMethod(this)">
+          <div class="method-icon"><i data-lucide="monitor-smartphone" style="width:32px;height:32px"></i></div>
+          <div class="method-content">
+            <span class="method-title">클리포에서 결과 확인</span>
+            <span class="method-desc">학생이 클리포에서 직접 결과를 확인합니다.</span>
+          </div>
+          <div class="method-radio"><div class="radio-ring checked"></div></div>
+        </label>
+        <label class="method-card" data-method="pdf" onclick="selectBulkMethod(this)">
+          <div class="method-icon"><i data-lucide="printer" style="width:32px;height:32px"></i></div>
+          <div class="method-content">
+            <span class="method-title">PDF 다운로드 및 출력</span>
+            <span class="method-desc">채점 결과를 PDF로 저장하거나 인쇄합니다.</span>
+          </div>
+          <div class="method-radio"><div class="radio-ring"></div></div>
+        </label>
+      </div>
+    </div>
+    <div class="modal-ft">
+      <button class="btn-modal-cancel" onclick="closeBulkMethodModal()">취소</button>
+      <button class="btn-modal-save" onclick="proceedBulkMethod()">상세 설정으로 이동<i data-lucide="chevron-right" style="width:14px;height:14px"></i></button>
+    </div>
+  </div>
+</div>
+
+<!-- AI 채점 실행 모달 (2-step) — 학급 단위 -->
+  </main>
+</div><!-- /main-wrap -->
+
+<!-- 토스트 -->
+<div class="toast" id="toast">
+  <i id="toastIcon" data-lucide="circle-check-big" style="width:18px;height:18px;flex-shrink:0"></i>
+  <span id="toastMsg"></span>
+</div>
+
+<script>
+// ══════ 좌측 네비 토글 (CLIPO 표준) ══════
+function toggleNav(){ document.getElementById('icon-sb').classList.toggle('expanded'); document.body.classList.toggle('nav-expanded'); }
+
+// ══════ 학생 데이터 (v4) ══════
+// 평가 = 미래 예측 보고서 작성(30점). 명단·요소·점수는 리포트 목업(class_report_v2_260930)의 1-1반과 같다.
+// 케이스 2개: 채점 진행 중(기본 — v3의 상태 구성 그대로) / 점수 저장을 마친 뒤(#done)
+var CRIT = [
+  { id:'c1', name:'배경 지식', max:6,
+    bands:[ {lo:5,hi:6,t:'예측하려는 주제의 개념과 관련 사실을 정확하게 설명함'}, {lo:3,hi:4,t:'주제의 개념은 설명했으나 관련 사실이 일부 부정확함'}, {lo:0,hi:2,t:'주제의 개념 설명이 없거나 사실과 다름'} ] },
+  { id:'c2', name:'과거와 현재 비교', max:8,
+    bands:[ {lo:7,hi:8,t:'과거와 현재의 모습을 같은 기준으로 비교하고 달라진 점을 2가지 이상 제시함'}, {lo:4,hi:6,t:'과거와 현재의 모습을 제시했으나 비교 기준이 드러나지 않음'}, {lo:0,hi:3,t:'과거나 현재 중 한쪽만 서술함'} ] },
+  { id:'c3', name:'미래 예측의 근거', max:10,
+    bands:[ {lo:8,hi:10,t:'예측마다 자료에 나온 수치나 사례를 근거로 들고, 근거와 예측이 이어짐'}, {lo:4,hi:7,t:'근거를 들었으나 자료와 연결되지 않거나 1가지만 제시함'}, {lo:0,hi:3,t:'근거 없이 예측만 서술함'} ] },
+  { id:'c4', name:'표현과 구성', max:6,
+    bands:[ {lo:5,hi:6,t:'처음·가운데·끝이 구분되고 문장이 정확함'}, {lo:3,hi:4,t:'구성은 갖췄으나 문장이 어색한 곳이 있음'}, {lo:0,hi:2,t:'구성이 드러나지 않음'} ] }
+];
+var MAX = 30;
+// ai / fin = 요소별 점수(없으면 null). 진행 중 케이스는 v3와 같은 상태 구성(완료 5 · 확인 필요 2 · 미채점 5 · 채점 중 1)
+var BASE = [
+  {id:'10101', name:'김서윤', ai:[6,7,8,5], fin:[6,7,8,5], status:'완료', statusCls:'done', aiStatus:'채점 완료', link:'scoring_elementary_v3_260623.html', done:{}},
+  {id:'10102', name:'이준호', ai:[5,6,5,5], fin:null, status:'확인 필요', statusCls:'need', aiStatus:'채점 완료', done:{fin:[5,6,5,5]}},                 // 채점됨 + 인식 불확실
+  {id:'10103', name:'박지민', ai:[5,7,4,5], fin:null, status:'확인 필요', statusCls:'need', aiStatus:'채점 완료', done:{fin:[5,7,4,5]}},                 // 인식 결과를 고쳤는데 재채점은 안 함
+  {id:'10105', name:'정현우', ai:null, fin:null, status:'미채점', statusCls:'todo', aiStatus:'-', done:{fin:[4,5,3,4]}},                                 // AI 채점 불가 파일(.hwp) → 선생님이 직접 채점
+  {id:'10106', name:'한지우', ai:[6,8,9,6], fin:[6,8,9,6], status:'완료', statusCls:'done', aiStatus:'채점 완료', done:{}},                              // 직접 입력 · 완료
+  {id:'10107', name:'조민재', ai:[5,7,7,5], fin:[5,6,6,5], status:'완료', statusCls:'done', aiStatus:'채점 완료', done:{}},                              // 선생님이 AI와 다르게 확정
+  {id:'10108', name:'윤하은', ai:null, fin:null, status:'채점 중', statusCls:'running', running:true, aiStatus:'채점 중', done:{ai:[4,6,4,5], fin:[4,6,4,5]}},
+  {id:'10109', name:'임도윤', ai:null, fin:null, status:'미채점', statusCls:'todo', aiStatus:'-', absent:true, done:{}},                                  // 미제출
+  {id:'10110', name:'신예린', ai:null, fin:null, status:'미채점', statusCls:'todo', aiStatus:'-', done:{ai:[6,7,7,5], fin:[6,7,7,5]}},
+  {id:'10111', name:'김도현', ai:null, fin:null, status:'미채점', statusCls:'todo', aiStatus:'채점 실패', done:{ai:[3,4,2,3], fin:[3,4,2,3]}},           // 인식은 됐고 채점만 실패
+  {id:'10112', name:'송하림', ai:[5,7,6,6], fin:[5,7,6,6], status:'완료', statusCls:'done', aiStatus:'채점 완료', done:{}},
+  {id:'10113', name:'노유찬', ai:[5,5,4,4], fin:[5,5,4,4], status:'완료', statusCls:'done', aiStatus:'채점 완료', done:{}},
+  {id:'10114', name:'백시우', ai:null, fin:null, status:'미채점', statusCls:'todo', aiStatus:'채점 실패', done:{ai:[4,6,5,4], fin:[4,6,5,4]}}            // 인식 실패 → 채점 실패
+];
+var view = { done:false, before:false, page:'main', aiPop:false }; // 케이스: before(AI 채점 전) · 기본(채점 진행 중) · done(점수 저장을 마친 뒤) / page: main | fin(채점 요소별 점수) | edit(점수 일괄 수정) / aiPop: AI 채점 결과 확인 팝업
+function sumArr(a){ return a.reduce(function(x, y){ return x + y; }, 0); }
+var STUDENTS = [];
+function buildStudents(){
+  STUDENTS = BASE.map(function(b){
+    var s = { id:b.id, name:b.name, ai:b.ai, fin:b.fin, status:b.status, statusCls:b.statusCls, aiStatus:b.aiStatus, running:b.running, absent:b.absent, link:b.link };
+    if(view.before){ // AI 채점 전: 점수·채점 결과가 하나도 없다
+      s.ai = null; s.fin = null; s.status = '미채점'; s.statusCls = 'todo'; s.aiStatus = '-'; s.running = false;
+    }
+    if(view.done && !b.absent){
+      if(b.done.ai) s.ai = b.done.ai;
+      if(b.done.fin) s.fin = b.done.fin;
+      s.status = '완료'; s.statusCls = 'done'; s.running = false; s.aiStatus = s.ai ? '채점 완료' : '-';
+    }
+    s.aiScore = s.ai ? sumArr(s.ai) : '-';
+    s.finalScore = s.fin ? sumArr(s.fin) : '-';
+    return s;
+  });
+}
+buildStudents();
+
+// ══════ 정렬 드롭다운 (개발 시안 1104:21045 — 헤더 클릭 정렬 폐지) ══════
+var sortMode = 'id-asc';
+var SORT_LABELS = { 'id-asc':'학번 낮은 순', 'ai-asc':'AI 점수 낮은 순', 'ai-desc':'AI 점수 높은 순', 'final-asc':'최종 점수 낮은 순', 'final-desc':'최종 점수 높은 순' };
+function toggleSortMenu(e){ e.stopPropagation(); document.getElementById('sortDd').classList.toggle('open'); syncSortMenu(); }
+document.addEventListener('click', function(){ var d=document.getElementById('sortDd'); if(d) d.classList.remove('open'); });
+function syncSortMenu(){
+  document.querySelectorAll('.sort-dd-opt').forEach(function(o){ o.classList.toggle('on', o.dataset.mode === sortMode); });
+  var l=document.getElementById('sortDdLabel'); if(l) l.textContent = SORT_LABELS[sortMode];
+}
+function setSortMode(mode){
+  sortMode = mode;
+  document.getElementById('sortDd').classList.remove('open');
+  syncSortMenu();
+  renderTable();
+}
+function sortedStudents(){
+  var list = STUDENTS.slice();
+  if(sortMode === 'id-asc'){ list.sort(function(a,b){ return a.id.localeCompare(b.id); }); return list; }
+  var k = sortMode.indexOf('ai') === 0 ? 'aiScore' : 'finalScore';
+  var sign = sortMode.slice(-3) === 'asc' ? 1 : -1;
+  list.sort(function(a, b){
+    var av = a[k], bv = b[k];
+    var aNum = (typeof av === 'number'), bNum = (typeof bv === 'number');
+    if(aNum && bNum) return (av - bv) * sign;
+    if(aNum) return -1;           // 점수 없는 학생('-')은 방향 무관 항상 아래
+    if(bNum) return 1;
+    return a.id.localeCompare(b.id); // 둘 다 '-'면 학번순 유지
+  });
+  return list;
+}
+
+
+
+/* ═══ AI 채점 실행 모달 (task_ocr_v3 이식 — 채점 목록과 단일 모달 공유) ═══ */
+function rmSetMode(rerun){ var m=document.querySelector('#runModal1 .rm-modal'); m.setAttribute('data-rerun', rerun?'1':'0'); document.getElementById('rm1-title').textContent = rerun ? 'AI 채점 재실행 (1/2)' : 'AI 채점 실행 (1/2)'; }
+function openRmModal(id) { document.getElementById(id).classList.add('open'); if(id==='runModal1') rmRestoreSettings(); lucide.createIcons(); }
+function closeRmModal(id) { document.getElementById(id).classList.remove('open'); }
+// CTA — 방식에 따라 채점 실행 / 과제물 인식 시작
+function rmNext() {
+  closeRmModal('runModal1');
+  renderRunStudents();
+  openRmModal('runModal2');
+}
+function rmBack() {
+  closeRmModal('runModal2');
+  openRmModal('runModal1');
+}
+function rmExecPrimary() {
+  var picked = RUN_STUDENTS.filter(function(s){ return !rmIsDisabled(s) && s.checked; });
+  if (picked.length === 0) return;
+  rmExec();
+}
+// ── 채점 설정 기억 (실행 ↔ 재채점 공유) ──
+var SC_LEVEL_KEY = 'clipo_last_scoring_level';
+var SC_FB_KEY    = 'clipo_last_feedback_mode';
+function scGet(k, d){ try { var v = localStorage.getItem(k); return v === null ? d : parseInt(v, 10); } catch(e){ return d; } }
+function scSet(k, v){ try { localStorage.setItem(k, v); } catch(e){} }
+function rmSliderInput() {
+  // 채운 구간을 값에 맞춰 다시 칠한다 (재채점 모달과 동일 방식)
+  var el = document.getElementById('rm-slider');
+  var pct = (parseInt(el.value, 10) / 2) * 100;
+  el.style.background = 'linear-gradient(to right,#365eef 0%,#365eef ' + pct + '%,#dde1e8 ' + pct + '%,#dde1e8 100%)';
+  var marks = document.querySelectorAll('.rm-slider-marks span');
+  for (var i = 0; i < marks.length; i++) marks[i].style.color = (i === parseInt(el.value, 10)) ? '#365eef' : '#222631';
+  scSet(SC_LEVEL_KEY, el.value);
+}
+function rmSetLevel(v) {
+  var el = document.getElementById('rm-slider');
+  el.value = v;
+  rmSliderInput();
+}
+function rmSelectFb(el) {
+  var items = document.querySelectorAll('#rm-fb-list .rm-radio');
+  for (var i = 0; i < items.length; i++) {
+    items[i].classList.toggle('selected', items[i] === el);
+    if (items[i] === el) scSet(SC_FB_KEY, i);
+  }
+}
+function rmRestoreSettings() {
+  // 마지막 선택 복원 — 재채점 모달과 같은 값을 쓴다
+  var sl = document.getElementById('rm-slider');
+  if (sl) { sl.value = scGet(SC_LEVEL_KEY, 1); rmSliderInput(); }
+  var items = document.querySelectorAll('#rm-fb-list .rm-radio');
+  var fb = scGet(SC_FB_KEY, 2);
+  for (var i = 0; i < items.length; i++) items[i].classList.toggle('selected', i === fb);
+}
+// 명단 = 위 STUDENTS 표·학생 채점 상세와 동일한 14명. 직접 입력 2명(한지우·임도윤) · AI 채점 불가 1명(정현우).
+var RUN_STUDENTS = [
+  { id:'10101', name:'김서윤', ai:'-',    t:'완료',     checked:false, method:'file',   file:'10101_미래시나리오.pdf' },
+  { id:'10102', name:'이준호', ai:'-',    t:'확인 필요', checked:true,  method:'file',   file:'10102_미래시나리오.pdf' }, // 채점됨 + 인식 불확실
+  { id:'10103', name:'박지민', ai:'-',    t:'확인 필요', checked:true,  method:'file', file:'10103_미래시나리오.pdf' }, // 인식 수정 후 미재채점
+  { id:'10105', name:'정현우', ai:'-',    t:'미채점',   unsupported:true, method:'file',   file:'10105_미래시나리오.hwp' }, // AI 채점 불가 파일 → 채점 대상 제외 (26-09-14)
+  { id:'10106', name:'한지우', ai:'-',    t:'완료',     checked:false, method:'typing' },
+  { id:'10107', name:'조민재', ai:'-',    t:'완료',     checked:false, method:'file', file:'10107_미래시나리오.pdf' }, // 채점 완료 = 인식 완료
+  { id:'10108', name:'윤하은', ai:'-',    t:'미채점',   checked:true,  method:'file',   file:'10108_미래시나리오.pdf' },
+  { id:'10109', name:'임도윤', ai:'absent', t:'미채점', absent:true,   method:'typing' }, // 미제출 → 채점 대상 제외,
+  { id:'10110', name:'신예린', ai:'-',    t:'미채점',   checked:true,  method:'file',   file:'10110_미래시나리오.pdf' }, // 제출했고 아직 채점 전
+  { id:'10111', name:'김도현', ai:'-',    t:'미채점',   checked:true,  method:'file',   file:'10111_미래시나리오.pdf' },
+  { id:'10112', name:'송하림', ai:'-',    t:'완료',     checked:false, method:'file', file:'10112_미래시나리오.pdf' }, // 채점 완료 = 인식 완료
+  { id:'10113', name:'노유찬', ai:'-',    t:'완료',     checked:false, method:'file',   file:'10113_미래시나리오.pdf' },
+  { id:'10114', name:'백시우', ai:'fail', t:'미채점',   checked:true,  method:'file',   ocrfail:true, file:'10114_미래시나리오.pdf' }, // 인식 실패 → 채점 실패. 다시 채점하면 인식도 재실행
+];
+function rmIsDisabled(s) {
+  // 채점 불가 = 미제출 · AI 채점 불가 파일(26-09-14 줄리 시안). (직접 채점 지정 기능은 26-09-04 삭제 — 실행 모달에서 선택 해제로 충분)
+  // 인식 실패·정확도 낮음은 다시 채점하면 인식이 재실행되므로 선택 가능 (26-08-28)
+  return !!s.absent || !!s.unsupported;
+}
+// 채점 불가 사유 — 라벨에 'OCR' 접두어를 붙이지 않는다
+function rmBlockReason(s) {
+  if (s.absent)    return '과제 미제출';
+  if (s.unsupported) return 'AI 채점 불가';
+  return '';
+}
+// 이전 채점 결과 표시 (선택은 가능 — 다시 채점하면 인식부터 재실행)
+function rmPrevResult(s) {
+  if (s.ocrfail) return '<span class="rm-tag red">인식 실패</span>';
+  if (s.lowacc)  return '<span class="rm-tag red">정확도 낮음</span>';
+  return '';
+}
+function rmTeacherBadge(t) {
+  if (t === '완료') return '<span class="rm-tag green">완료</span>';
+  if (t === '확인 필요') return '<span class="rm-tag red">확인 필요</span>';
+  return '<span style="color:#6d7381;">미채점</span>'; // 미채점 = 담백 회색 텍스트(바탕 상태)
+}
+function rmAiCell(s) {
+  var reason = rmBlockReason(s);
+  if (reason) return '<span style="color:#6d7381;white-space:nowrap;">' + reason + '</span>';
+  var prev = rmPrevResult(s);
+  if (prev) return prev;
+  if (s.ai === 'fail') return '<span class="rm-tag red">채점 실패</span>';
+  return '<span style="color:#6d7381;">-</span>';
+}
+function renderRunStudents() {
+  var tbody = document.getElementById('rm-student-tbody');
+  var html = '';
+  RUN_STUDENTS.forEach(function(s, i) {
+    var disabled = rmIsDisabled(s);
+    var cls = disabled ? 'dis' : (s.checked ? 'sel' : '');
+    html += '<tr class="' + cls + '">'
+      + '<td><input type="checkbox" class="rm-chk" ' + (disabled ? 'disabled' : (s.checked ? 'checked' : '')) + ' onchange="rmToggle(' + i + ', this.checked)"></td>'
+      + '<td>' + s.id + '</td>'
+      + '<td>' + s.name + '</td>'
+      + '<td>' + (rmAiCell(s)) + '</td>'
+      + '<td>' + rmTeacherBadge(s.t) + '</td>'
+      + '</tr>';
+  });
+  tbody.innerHTML = html;
+  if (typeof lucide !== 'undefined') lucide.createIcons();
+  rmUpdateCount();
+}
+function rmToggle(i, on) {
+  RUN_STUDENTS[i].checked = on;
+  renderRunStudents();
+}
+function rmToggleAll(el) {
+  RUN_STUDENTS.forEach(function(s){ if (!rmIsDisabled(s)) s.checked = el.checked; });
+  renderRunStudents();
+}
+function rmUpdateCount() {
+  var n = RUN_STUDENTS.filter(function(s){ return !rmIsDisabled(s) && s.checked; }).length;
+  var eligible = RUN_STUDENTS.filter(function(s){ return !rmIsDisabled(s); }).length;
+  document.getElementById('rm-exec-count').textContent = n;
+  var all = document.getElementById('rm-chk-all');
+  if (all) { all.checked = n === eligible; all.indeterminate = n > 0 && n < eligible; }
+  var btn = document.getElementById('rm-exec-btn');
+  if (btn) { btn.disabled = n === 0; btn.style.opacity = n === 0 ? '.5' : '1'; btn.style.cursor = n === 0 ? 'not-allowed' : 'pointer'; }
+}
+function rmExec() {
+  var n = RUN_STUDENTS.filter(function(s){ return !rmIsDisabled(s) && s.checked; }).length;
+  if (n === 0) return;
+  closeRmModal('runModal2');
+  showToast('success', n + '명의 AI 채점을 시작해요. 완료되면 결과 확인에서 볼 수 있어요.');
+}
+
+// 표: 개발 확정본(v3) 그대로 — 학번 · 이름 · AI 채점 결과 · AI 점수 · 최종 점수 · 채점 상태 · 학생 채점
+function renderTable(){
+  var tbody = document.getElementById('studentTbody');
+  syncSortMenu();
+  document.getElementById('studentThead').innerHTML = '<tr><th class="col-id">학번</th><th class="col-name">이름</th><th class="col-ai-status">AI 채점 결과</th><th class="col-ai-score">AI 점수</th><th class="col-final">최종 점수</th><th class="col-status">채점 상태</th><th class="col-action">학생 채점</th></tr>';
+  tbody.innerHTML = sortedStudents().map(function(s){
+    // AI 채점 결과 = 사실 표기(채점 완료 · 채점 중 · 채점 실패 · -). 색은 쓰지 않는다 — 조치 신호는 '채점 상태'가 담당
+    var aiStatusCell = s.aiStatus === '-' ? '<span class="muted">-</span>' : s.aiStatus;
+    var scoreCell = s.aiScore !== '-' ? '('+s.aiScore+')' : '<span class="muted">-</span>';
+    var finalCell = s.finalScore === '-' ? '<span class="muted">-</span>' : ''+s.finalScore;
+    return '<tr>'
+      +'<td class="col-id">'+s.id+'</td>'
+      +'<td class="col-name">'+s.name+'</td>'
+      +'<td class="col-ai-status">'+aiStatusCell+'</td>'
+      +'<td class="col-ai-score">'+scoreCell+'</td>'
+      +'<td class="col-final">'+finalCell+'</td>'
+      +'<td class="col-status"><span class="status-badge '+s.statusCls+'">'+(s.running?'<span class="badge-spinner"></span>':'')+s.status+'</span></td>'
+      +'<td class="col-action"><div class="col-action-group">'
+      +'<button class="btn-detail" onclick="openStudentScoring(\''+s.id+'\',\''+s.name+'\',\''+(s.link||'scoring_secondary_v1_260708.html')+'\')"><i data-lucide="user" style="width:14px;height:14px"></i>상세 보기</button>'
+      +'</div></td>'
+      +'</tr>';
+  }).join('');
+  lucide.createIcons();
+}
+
+// ══════ 채점 결과 요약 (v4) — 선생님이 저장한 최종 점수 기준. 맨 위에 늘 보임: 평균·최고·최저 + 총점 분포 ══════
+function basisRows(basis){ return STUDENTS.filter(function(s){ return basis === 'ai' ? s.ai : s.fin; }).map(function(s){ var arr = basis === 'ai' ? s.ai : s.fin; return { id:s.id, name:s.name, arr:arr, total:sumArr(arr), link:s.link }; }); }
+function f1(x){ return (Math.round(x * 10) / 10).toFixed(1); }
+function stuName(r){ return '<a class="stu-link" href="' + (r.link || 'scoring_secondary_v1_260708.html') + '?id=' + r.id + '&name=' + encodeURIComponent(r.name) + '">' + r.name + '</a>'; }
+function renderSummary(){
+  var body = document.getElementById('sumBody'), rows = basisRows('fin'), more = document.getElementById('sumMore');
+  more.style.display = rows.length ? '' : 'none';
+  if(!rows.length){ body.innerHTML = '<p class="sum-empty">아직 저장한 점수가 없어요. 점수를 저장하면 여기에 요약이 나와요.</p>'; return; }
+  var totals = rows.map(function(r){ return r.total; }), av = sumArr(totals) / rows.length;
+  var w = MAX / 5, bins = [0,0,0,0,0];
+  totals.forEach(function(t){ bins[Math.min(4, Math.floor(t / w))]++; });
+  var mx = Math.max.apply(null, bins) || 1;
+  var hb = bins.map(function(k){ return '<div class="hist-col"><div class="hist-n">' + k + '명</div><div class="hist-bar" style="height:' + Math.round(k / mx * 64) + 'px"></div></div>'; }).join('');
+  var hx = bins.map(function(_, i){ var lo = i * w, hi = i === 4 ? MAX : (i + 1) * w - 1; return '<span>' + lo + '~' + hi + '점</span>'; }).join('');
+  var rest = STUDENTS.length - rows.length;
+  body.innerHTML = '<div class="sum-bar"><span class="sum-counts">선생님이 점수를 저장한 <b>' + rows.length + '명</b> 기준이에요.' + (rest ? ' 아직 저장하지 않은 ' + rest + '명은 빠져 있어요.' : '') + '</span></div>'
+    + '<div class="sum-grid"><div class="stat-row">'
+    +   '<div class="stat"><div class="stat-l">반 평균</div><div class="stat-v">' + f1(av) + '점</div><div class="stat-s">' + MAX + '점 만점</div></div>'
+    +   '<div class="stat"><div class="stat-l">최고 점수</div><div class="stat-v">' + Math.max.apply(null, totals) + '점</div></div>'
+    +   '<div class="stat"><div class="stat-l">최저 점수</div><div class="stat-v">' + Math.min.apply(null, totals) + '점</div></div></div>'
+    + '<div class="hist"><div class="hist-t">총점 분포</div><div class="hist-bars">' + hb + '</div><div class="hist-x">' + hx + '</div></div></div>';
+  lucide.createIcons();
+}
+
+// ══════ 채점 요소별 점수 페이지 (v4, #result) — 선생님이 저장한 최종 점수 기준. 맨 위 요약에서 들어온다 ══════
+// 눈에 띄는 점 + 요소마다: 어느 채점기준에 몰렸는지 + 구간별 학생과 그 요소 점수. 문장은 모두 점수에서 계산한 사실(AI 호출·크레딧 없음)
+// AI가 매긴 점수는 여기서 다루지 않는다 — 'AI 채점 결과 확인' 팝업(제품 화면 그대로)에서 본다
+function eun(w){ var c = w.charCodeAt(w.length - 1); return (c >= 0xAC00 && c <= 0xD7A3 && (c - 0xAC00) % 28 !== 0) ? '은' : '는'; }
+function rng(b){ return b.lo + '~' + b.hi + '점'; }
+function renderDetail(){
+  var body = document.getElementById('critBody'), rows = basisRows('fin'), N = rows.length;
+  document.getElementById('detTitle').textContent = '1학년 1반 채점 요소별 점수';
+  document.getElementById('detDesc').textContent = '미래 예측 보고서 작성에서 선생님이 저장한 점수를 채점 요소별로 살펴봐요.';
+  if(!N){ body.innerHTML = '<p class="sum-empty">아직 저장한 점수가 없어요. 점수를 저장하면 볼 수 있어요.</p>'; return; }
+  var items = CRIT.map(function(c, i){
+    var a = sumArr(rows.map(function(r){ return r.arr[i]; })) / N;
+    var bands = c.bands.map(function(b){ return { b:b, who:rows.filter(function(r){ var v = r.arr[i]; return v >= b.lo && v <= b.hi; }).sort(function(x, y){ return y.arr[i] - x.arr[i]; }) }; });
+    var top = bands.slice().sort(function(x, y){ return y.who.length - x.who.length; })[0];
+    return { c:c, i:i, a:a, p:a / c.max * 100, bands:bands, top:top, topIdx:bands.indexOf(top), share:top.who.length / N };
+  }).sort(function(x, y){ return x.p - y.p; });
+  var left = STUDENTS.length - N;
+  var countLine = '선생님이 점수를 저장한 <b>' + N + '명</b> 기준이에요.' + (left ? ' 아직 저장하지 않은 ' + left + '명은 빠져 있어요.' : '');
+  var low = items[0], conc = items.slice().sort(function(x, y){ return y.share - x.share; })[0], pts = [];
+  pts.push('점수가 가장 낮은 요소는 <b>‘' + low.c.name + '’</b>예요(평균 ' + f1(low.a) + '점 / ' + low.c.max + '점, 100점 환산 ' + Math.round(low.p) + '점).');
+  if(low.share >= 0.6) pts.push('이 요소에서 ' + N + '명 가운데 <b>' + low.top.who.length + '명</b>이 ‘' + low.top.b.t + '’ 기준에 몰려 있어요.');
+  if(conc !== low && conc.share >= 0.7) pts.push('<b>‘' + conc.c.name + '’</b>' + eun(conc.c.name) + ' ' + (conc.top.who.length === N ? N + '명 모두 ' : N + '명 가운데 ' + conc.top.who.length + '명이 ') + rng(conc.top.b) + ' 구간이에요.' + (conc.topIdx === 0 ? ' 대부분 높은 점수를 받아 학생 사이 차이가 작아요.' : ''));
+  body.innerHTML =
+    '<div class="sum-bar"><span class="sum-counts">' + countLine + '</span></div>'
+    + '<div class="ins-box"><div class="ins-t">눈에 띄는 점</div><ul class="ins-ul">' + pts.map(function(p){ return '<li>' + p + '</li>'; }).join('') + '</ul></div>'
+    + '<p class="sum-cap" style="margin:0;">요소마다 배점이 달라서 오른쪽 점수는 100점으로 환산했어요. 환산 점수가 낮은 순서예요.</p>'
+    + items.map(function(it){
+        var c = it.c;
+        var line = it.share >= 0.6
+          ? (it.top.who.length === N ? N + '명 <b>모두</b> ' + rng(it.top.b) + ' 구간이에요.' : N + '명 가운데 <b>' + it.top.who.length + '명</b>이 ' + rng(it.top.b) + ' 구간에 몰려 있어요.')
+          : '점수가 여러 구간에 나뉘어 있어요(' + it.bands.map(function(x){ return rng(x.b) + ' ' + x.who.length + '명'; }).join(' · ') + ').';
+        var trs = it.bands.map(function(x){
+          var who = x.who.map(function(r){ return '<span class="sc-i">' + stuName(r) + ' ' + r.arr[it.i] + '점</span>'; }).join('');
+          return '<tr' + (x === it.top ? ' class="top-row"' : '') + '><td style="width:96px;">' + rng(x.b) + '</td><td style="text-align:left;">' + x.b.t + '</td>'
+            + '<td style="width:112px;">' + x.who.length + '명' + (x === it.top && x.who.length ? '<span class="most">가장 많음</span>' : '') + '</td>'
+            + '<td style="width:36%;text-align:left;">' + (who || '<span class="muted">-</span>') + '</td></tr>';
+        }).join('');
+        return '<div class="cr-blk"><div class="cr-row">'
+          + '<div class="cr-name">' + c.name + '<span class="cr-max">' + c.max + '점 만점</span></div>'
+          + '<div class="cr-bar"><div style="width:' + Math.round(it.p) + '%"></div></div>'
+          + '<div class="cr-avg">평균 ' + f1(it.a) + '점</div><div class="cr-pct">' + Math.round(it.p) + '점</div></div>'
+          + '<p class="cr-ins">' + line + '</p>'
+          + '<table class="band-tbl"><thead><tr><th>점수 구간</th><th>채점기준</th><th>학생 수</th><th>학생과 이 요소 점수</th></tr></thead><tbody>' + trs + '</tbody></table></div>';
+      }).join('')
+    + '<div class="sum-note"><i data-lucide="info"></i><span>학생 이름을 누르면 그 학생의 채점 화면으로 가요.</span></div>';
+  lucide.createIcons();
+}
+// ══════ AI 채점 결과 확인 팝업 (v4, #ai) — 제품 화면 그대로: 요약 3칸 + 총점 점수 분포 + 채점 요소별 점수 분포 ══════
+// 막대 = 그 점수를 받은 학생 수(가로축은 실제로 나온 점수만). AI 점수 기준이고, AI 채점이 안 된 학생은 분포에서 빠진다
+function avgTxt(x){ var r = Math.round(x * 10) / 10; return (r % 1 ? r.toFixed(1) : r) + '점'; }
+function distChart(vals, small){
+  var cnt = {}; vals.forEach(function(v){ cnt[v] = (cnt[v] || 0) + 1; });
+  var keys = Object.keys(cnt).map(Number).sort(function(a, b){ return a - b; }), mx = Math.max.apply(null, keys.map(function(k){ return cnt[k]; }));
+  return '<div class="ar-chart"><div class="ar-plot' + (small ? ' sm' : '') + '">'
+    + keys.map(function(k){ return '<div class="ar-col"><div class="ar-bar" style="height:' + Math.round(cnt[k] / mx * 100) + '%"><span>' + cnt[k] + '명</span></div></div>'; }).join('') + '</div>'
+    + '<div class="ar-x">' + keys.map(function(k){ return '<span>' + k + '점</span>'; }).join('') + '</div></div>';
+}
+function renderAiResult(){
+  var rows = basisRows('ai'), N = rows.length, nFail = STUDENTS.filter(function(s){ return s.aiStatus === '채점 실패'; }).length;
+  var card = function(title, vals, small){
+    return '<div class="ar-card"><div class="ar-card-hd"><div class="ar-card-t">' + title + '</div><span class="ar-avg">평균 ' + avgTxt(sumArr(vals) / N) + '</span></div>' + distChart(vals, small) + '</div>';
+  };
+  document.getElementById('aiResultBody').innerHTML =
+    '<div class="ar-info"><i data-lucide="info"></i><span>AI 채점 결과는 참고용 초안입니다. 선생님께서 직접 확인 후 수정해 주세요.</span></div>'
+    + '<div class="ar-sec"><p class="ar-sec-t">채점 결과 요약</p><div class="ar-counts">'
+    +   '<div class="ar-count"><span class="ar-count-l">전체</span><span class="ar-count-v">' + STUDENTS.length + '명</span></div>'
+    +   '<div class="ar-count"><span class="ar-count-l">AI 채점 성공</span><span class="ar-count-v ok">' + N + '명</span></div>'
+    +   '<div class="ar-count"><span class="ar-count-l">AI 채점 실패</span><span class="ar-count-v off">' + nFail + '명</span></div></div>'
+    +   '<p class="ar-note">※ 미채점 학생의 채점 결과는 점수 분포에 반영되지 않습니다.</p></div>'
+    + '<div class="ar-sec"><p class="ar-sec-t">총점 점수 분포</p>' + card('1학년 1반 : 미래 예측 보고서 작성의 과제', rows.map(function(r){ return r.total; }), false) + '</div>'
+    + '<div class="ar-sec"><p class="ar-sec-t">채점 요소별 점수 분포</p><div class="ar-cards">'
+    +   CRIT.map(function(c, i){ return card(c.name, rows.map(function(r){ return r.arr[i]; }), true); }).join('') + '</div></div>';
+}
+function openAiResult(){ view.aiPop = true; renderAiResult(); openRmModal('aiResultModal'); document.getElementById('aiResultBody').scrollTop = 0; syncHash(); }
+function closeAiResult(){ view.aiPop = false; closeRmModal('aiResultModal'); syncHash(); }
+
+// ══════ 채점 진행 단계 (v4) — 단계마다 지금 상태(사실만) + 그 단계의 버튼 ══════
+function renderSteps(){
+  var nAi = STUDENTS.filter(function(s){ return s.ai; }).length, nRun = STUDENTS.filter(function(s){ return s.running; }).length;
+  var nFail = STUDENTS.filter(function(s){ return s.aiStatus === '채점 실패'; }).length;
+  var nFin = STUDENTS.filter(function(s){ return s.fin; }).length, nNeed = STUDENTS.filter(function(s){ return s.ai && !s.fin; }).length;
+  var absent = STUDENTS.filter(function(s){ return s.absent; }).length;
+  var s1done = STUDENTS.every(function(s){ return s.ai || s.fin || s.absent; }), s2done = nFin >= STUDENTS.length - absent;
+  var cur = !s1done ? 1 : (!s2done ? 2 : 3); // 지금 할 단계 = 아직 덜 끝난 첫 단계
+  var started = nAi > 0 || nRun > 0 || nFail > 0; // AI 채점을 한 번이라도 실행했는가
+  var steps = [
+    { t:'AI 채점', st:started ? nAi + '명 채점됨' + (nRun ? ' · ' + nRun + '명 채점 중' : '') + (nFail ? ' · ' + nFail + '명 실패' : '') : '아직 채점 전이에요',
+      label:started ? 'AI 채점 다시 하기' : 'AI 채점 시작하기', icon:'wand-sparkles', fn:started ? 'runBulkAi(true)' : 'runBulkAi(false)', tip:'학급 단위의 AI 채점을 실행합니다.',
+      sub: nAi ? { label:'AI 채점 결과', fn:'openAiResult()', icon:'bar-chart-2' } : null }, // AI 채점을 한 뒤에만 나타난다. 제품과 같은 'AI 채점 결과 확인' 팝업이 열린다
+    { t:'점수 검토·확정', st:(nFin || nNeed) ? nFin + '명 저장됨' + (nNeed ? ' · ' + nNeed + '명 확인 필요' : '') : '아직 저장한 점수가 없어요',
+      label:'점수 일괄 확정하기', icon:'stamp', fn:'bulkConfirmScores()', tip:'AI 예상 점수를 토대로 수정이 필요한 학생만 조정하세요.' },
+    { t:'채점 결과 공개', st:'아직 공개 전이에요',
+      label:'학생에게 결과 공개하기', icon:'send', fn:'bulkShareToStudents()', tip:'선생님의 채점 결과와 피드백을 학생에게 공유합니다.',
+      sub:{ label:'채점 결과 다운로드', fn:'downloadScores()', icon:'download' } } // 다운로드도 결과를 쓰는 일이라 공개와 같은 단계에 둔다(올립 09-30)
+  ];
+  document.getElementById('stepBar').innerHTML = steps.map(function(x, i){
+    var k = i + 1, done = k < cur, on = k === cur;
+    // 단계 하나 = 첫 줄: 번호 · 이름 · 지금 상태 · 다음 단계로 이어지는 선 / 둘째 줄: 그 단계의 버튼(주 버튼 + 곁가지 글자 버튼)
+    return '<div class="step-i' + (done ? ' done' : '') + (on ? ' cur' : '') + '">'
+      + '<div class="step-top"><span class="step-dot">' + (done ? '<i data-lucide="check" style="width:14px;height:14px"></i>' : k) + '</span><span class="step-i-t">' + x.t + '</span><span class="step-i-s" title="' + x.st + '">' + x.st + '</span><span class="step-line"></span></div>'
+      + '<div class="step-acts"><button class="step-btn ' + (on ? 'primary' : 'secondary') + '" title="' + x.tip + '" onclick="' + x.fn + '"><i data-lucide="' + x.icon + '" style="width:16px;height:16px"></i>' + x.label + '</button>'
+      +   (x.sub ? '<button class="step-sub" onclick="' + x.sub.fn + '"><i data-lucide="' + x.sub.icon + '" style="width:14px;height:14px"></i>' + x.sub.label + (x.sub.nav ? '<i data-lucide="chevron-right" style="width:14px;height:14px"></i>' : '') + '</button>' : '') + '</div></div>';
+  }).join('');
+}
+// ══════ 표 도구 (v4) ══════
+function downloadScores(){ showToast('success', '채점 결과를 엑셀 파일로 내려받았어요.'); }
+
+// ══════ 점수 일괄 수정 페이지 (v4, #edit) — 제품 화면 그대로: 학년·반·번호·이름·총점·채점 요소별 최종 점수·행마다 '점수 수정' ══════
+function renderEdit(){
+  document.getElementById('editThead').innerHTML = '<tr><th style="width:64px;">학년</th><th style="width:64px;">반</th><th style="width:64px;">번호</th><th style="width:112px;">이름</th><th style="width:80px;">총점</th>'
+    + CRIT.map(function(c){ return '<th>' + c.name + '</th>'; }).join('') + '<th style="width:120px;">점수 수정</th></tr>';
+  document.getElementById('editTbody').innerHTML = STUDENTS.map(function(s){
+    return '<tr><td>1</td><td>1</td><td>' + parseInt(s.id.slice(3), 10) + '</td><td>' + s.name + '</td><td>' + (s.fin ? sumArr(s.fin) : '-') + '</td>'
+      + CRIT.map(function(c, i){ return '<td>' + (s.fin ? s.fin[i] : '-') + '</td>'; }).join('')
+      + '<td><button type="button" class="be-row-btn" onclick="editStub(\'' + s.name + ' 학생 점수 수정\')">점수 수정</button></td></tr>';
+  }).join('');
+  lucide.createIcons();
+}
+// 눌렀을 때의 화면은 아직 실제 제품에서 확인하지 못했다 — 확인한 뒤 그린다
+function editStub(what){ showToast('info', what + ' — 개발 화면 기능 (목업 미구현)'); }
+
+function renderPage(){
+  var p = view.page;
+  document.getElementById('viewMain').style.display = p === 'main' ? '' : 'none';
+  document.getElementById('viewCrit').style.display = p === 'fin' ? '' : 'none';
+  document.getElementById('viewEdit').style.display = p === 'edit' ? '' : 'none';
+  if(p === 'main'){ renderSteps(); renderTable(); renderSummary(); } else if(p === 'edit') renderEdit(); else renderDetail();
+}
+function showEdit(){ view.page = 'edit'; document.getElementById('beAlert').style.display = ''; renderPage(); syncHash(); window.scrollTo(0, 0); }
+function showDetail(){ view.page = 'fin'; renderPage(); syncHash(); window.scrollTo(0, 0); }
+function showMain(){ view.page = 'main'; renderPage(); syncHash(); window.scrollTo(0, 0); }
+
+function rescoreStudent(id, name){
+  showToast('loading', name + ' 학생 AI 채점을 다시 실행해요.');
+}
+
+function openStudentScoring(id, name, link){
+  var url = link + '?id=' + id + '&name=' + encodeURIComponent(name);
+  location.href = url;
+}
+
+// ══════ 3단계 액션 (목업) ══════
+// ══════ 학급 단위 AI 채점 실행 (2-step 모달) ══════
+
+
+function runBulkAi(rerun){
+  // 채점 목록과 동일한 단일 실행 모달 (인식+채점 한 번에 — 사후 확인 모델)
+    rmSetMode(!!rerun); // 이미 채점한 적이 있으면 재실행 창(안내·크레딧 문구가 다르다)
+    openRmModal('runModal1');
+}
+
+function bulkConfirmScores(){
+  // 확정은 별도 '점수 일괄 적용' 화면에서 한다 (26-08-28 올립).
+  // 채점 뒤 내용이 바뀐 학생 경고는 그 화면 상단 배너가 담당.
+  // 돌아올 자리를 넘겨, 그 화면의 [목록으로]가 여기로 돌아오게 한다.
+  location.href = 'class_ai_bulk_confirm_v1_260521.html?from='
+                + encodeURIComponent(location.pathname + location.search);
+}
+function bulkShareToStudents(){
+  openBulkMethodModal();
+}
+
+// 학급 결과 공개 방법 선택 모달
+function openBulkMethodModal(){
+  document.getElementById('bulkMethodModal').classList.add('show');
+  lucide.createIcons();
+}
+function closeBulkMethodModal(){ document.getElementById('bulkMethodModal').classList.remove('show'); }
+function selectBulkMethod(el){
+  document.querySelectorAll('#bulkMethodModal .method-card').forEach(function(c){
+    c.classList.remove('selected');
+    c.querySelector('.radio-ring').classList.remove('checked');
+  });
+  el.classList.add('selected');
+  el.querySelector('.radio-ring').classList.add('checked');
+}
+function proceedBulkMethod(){
+  var sel = document.querySelector('#bulkMethodModal .method-card.selected');
+  var method = sel ? sel.getAttribute('data-method') : 'online';
+  closeBulkMethodModal();
+  if(method === 'online'){
+    location.href = 'class_share_settings_v1_260512.html';
+  } else {
+    location.href = 'class_print_settings_v1_260512.html';
+  }
+}
+function gotoIndividual(){
+  closeBulkMethodModal();
+  showToast('success', '학생별 채점 화면의 [상세 보기]에서 개별 공개를 진행할 수 있어요.');
+}
+
+// Esc로 모달 닫기
+document.addEventListener('keydown', function(e){
+  if(e.key === 'Escape' && document.getElementById('bulkMethodModal').classList.contains('show')){
+    closeBulkMethodModal();
+  }
+});
+
+// ══════ 테이블 액션 ══════
+function resetAll(){ showToast('success', '채점 결과가 초기화됐어요.'); }
+function bulkEditScores(){ showEdit(); } // 제품에서는 창이 아니라 페이지로 간다
+// ══════ 토스트 ══════
+var toastTimer = null;
+function showToast(type, msg){
+  if(toastTimer) clearTimeout(toastTimer);
+  var t = document.getElementById('toast');
+  var ic = document.getElementById('toastIcon');
+  var m = document.getElementById('toastMsg');
+  t.className = 'toast ' + type + ' show';
+  ic.setAttribute('data-lucide', type === 'loading' ? 'loader' : (type === 'info' ? 'info' : 'circle-check-big'));
+  m.textContent = msg;
+  lucide.createIcons();
+  if(type !== 'loading') toastTimer = setTimeout(function(){ t.classList.remove('show'); }, 2400);
+}
+
+// ══════ 해시 라우팅 (v4): #before(AI 채점 전) · 기본(채점 진행 중) · #done(점수 저장을 마친 뒤) — 각각 뒤에 -ai(AI 채점 결과 확인 팝업) · -result(채점 요소별 점수 페이지) · -edit(점수 일괄 수정 페이지). 기본은 #ai · #result · #edit ══════
+var _suppressHash = false;
+function syncHash(){
+  if(_suppressHash) return;
+  var c = view.before ? 'before' : (view.done ? 'done' : ''), p = view.page === 'fin' ? 'result' : (view.page === 'edit' ? 'edit' : (view.aiPop ? 'ai' : '')), h = c ? '#' + c + (p ? '-' + p : '') : (p ? '#' + p : '');
+  if((location.hash || '') !== h) history.replaceState(null, '', location.pathname + location.search + h);
+}
+function routeFromHash(){
+  var h = location.hash; _suppressHash = true;
+  try {
+    view.done = h.indexOf('#done') === 0; view.before = h.indexOf('#before') === 0;
+    view.page = /result$/.test(h) ? 'fin' : (/edit$/.test(h) ? 'edit' : 'main');
+    document.getElementById('beAlert').style.display = ''; // 안내 상자는 페이지에 다시 들어오면 다시 보인다(목업)
+    buildStudents(); renderPage();
+    view.aiPop = view.page === 'main' && /ai$/.test(h) && basisRows('ai').length > 0; // AI 채점된 학생이 없으면 팝업을 열지 않는다
+    if(view.aiPop){ renderAiResult(); openRmModal('aiResultModal'); } else closeRmModal('aiResultModal');
+  } finally { _suppressHash = false; }
+}
+routeFromHash();
+window.addEventListener('hashchange', routeFromHash);
+lucide.createIcons();
+</script>
+</body>
+</html>
