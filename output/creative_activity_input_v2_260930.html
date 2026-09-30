@@ -1267,7 +1267,7 @@ html body .main-wrap{margin-top:58px}
       </label>
       <label class="aor-opt" data-aor="replace" onclick="pickAor('replace')">
         <span class="aor-rd"></span>
-        <span><span class="aor-t">모두 지우고 교체</span><span class="aor-d">학생이 따로 올린 자료까지 등록된 활동지·보고서를 모두 삭제하고 새 파일로 바꿔요.</span></span>
+        <span><span class="aor-t">모두 지우고 교체</span><span class="aor-d">학생별로 올린 자료까지 지금 있는 활동지·보고서를 모두 지우고 새 파일로 바꿔요. 분석을 마친 학생은 다시 분석해야 기록에 반영돼요.</span></span>
       </label>
     </div>
     <p class="aor-note" id="aorFullNote" style="display:none"><i data-lucide="info" style="width:16px;height:16px"></i><span id="aorFullText"></span></p>
@@ -1343,7 +1343,7 @@ html body .main-wrap{margin-top:58px}
     <div style="padding:32px 28px 20px;text-align:center">
       <div style="width:56px;height:56px;border-radius:50%;background:#fff7ed;color:#f97316;display:flex;align-items:center;justify-content:center;margin:0 auto 18px"><i data-lucide="refresh-ccw" style="width:24px;height:24px"></i></div>
       <div style="font-size:18px;font-weight:700;color:#222631;line-height:1.5;margin-bottom:10px">자료를 다시 분석할까요?</div>
-      <div style="font-size:14px;color:#6d7381;line-height:1.6">기존 분석 결과와 선택한 항목이 모두 지워지고<br>새로 분석돼요. 분석 실행 시 <strong style="color:#416bff">1 크레딧</strong>이 차감돼요.</div>
+      <div style="font-size:14px;color:#6d7381;line-height:1.6">분석 결과와 체크한 항목은 새 결과로 바뀌어요.<br>직접 쓴 보충 내용은 그대로 남아요. 분석할 때 <strong style="color:#416bff">1 크레딧</strong>이 사용돼요.</div>
     </div>
     <div style="padding:0 28px 24px;display:flex;gap:8px">
       <button onclick="cancelReanalyze()" style="flex:1;padding:13px;border:1px solid #d9d9d9;border-radius:6px;background:#fff;color:#3b3f4c;font-size:14px;font-weight:600;font-family:inherit;cursor:pointer;line-height:1">취소</button>
@@ -2164,7 +2164,7 @@ function cascadeFromDrawer(){
     }
     // 후속 타깃: 저장 + AI 자료 분석 탭으로 이동 (분석은 사용자가 직접 실행)
     s._dataChangedSinceGen = true;
-    showToast('변경 사항을 저장했어요. 분석을 다시 실행해 주세요');
+    showToast('저장했어요. 바뀐 자료가 기록에 들어가도록 [재분석]을 눌러 주세요');
     renderDrawerBanner(s);
     // AI 자료 분석 탭으로 전환 (기존 분석 결과는 유지, dirty 표시로 안내)
     drawerCurTab = 'items';
@@ -2477,7 +2477,7 @@ function pickIndFile(){
   if(blockIfBusy(s)) return;
   // 정책(2026-09-30): 학생당 활동지·보고서 최대 5개 (학급 일괄 '활동지' + 개별 PDF·이미지 합산)
   const cnt = s.files.filter(f => !f._pendingDelete && (f.kindLabel === '활동지' || f.kindLabel === '개별')).length;
-  if(cnt >= 5){ s._fileErrs = [{name:'추가자료.pdf', reason:'최대 5개를 넘어 올리지 못했어요.'}]; if(isDrawerOpen()) renderDrawerDataPane(s); lucide.createIcons(); return; }
+  if(cnt >= 5){ s._fileErrs = [{name:'추가자료.pdf', reason:'5개까지만 올릴 수 있어요. 필요 없는 파일을 지운 뒤 다시 올려 주세요.'}]; if(isDrawerOpen()) renderDrawerDataPane(s); lucide.createIcons(); return; }
   s._fileErrs = [];
   const n = cnt + 1;
   s.files.push(n % 2 === 0
@@ -2837,7 +2837,7 @@ function applyCase(k){
   if(k === 'full5' || k === 'fileerr'){
     const s = S[0];
     while(pdfCnt(s) < 5){ const n = pdfCnt(s) + 1; s.files.push(n % 2 ? {name:'활동보고서_'+n+'.pdf',size:'1.2MB',type:'pdf',source:'individual',kindLabel:'개별'} : {name:'활동사진_'+n+'.jpg',size:'2.4MB',type:'image',source:'individual',kindLabel:'개별'}); }
-    if(k === 'fileerr'){ s.files.splice(4, 1); s._fileErrs = [{name:'활동지_최종.hwp', reason:'지원하지 않는 형식이에요. PDF나 이미지(JPG·PNG)로 올려 주세요.'},{name:'스캔본_전체.pdf (32MB)', reason:'20MB를 넘어 올리지 못했어요.'}]; }
+    if(k === 'fileerr'){ s.files.splice(4, 1); s._fileErrs = [{name:'활동지_최종.hwp', reason:'지원하지 않는 형식이에요. PDF나 이미지(JPG·PNG)로 올려 주세요.'},{name:'스캔본_전체.pdf (32MB)', reason:'20MB를 넘어 올리지 못했어요. 용량을 줄여 다시 올려 주세요.'}]; }
     goStep(1); refreshAll(); openDrawer(s.id);
   } else if(k === 'changed'){
     openStep(3); const s = S[0]; getS2(s).status = 'done';
@@ -3290,7 +3290,7 @@ function renderS2Main(){
     ? `<button class="s2n-btn-primary sm" onclick="reanalyze(${s.id})"><i data-lucide="wand-sparkles" style="width:16px;height:16px"></i>재분석</button>` : '';
   // 자료 변경 안내(되돌릴 행동 필요 → 주황 박스) / 분석 완료 요약
   const changedBox = changed
-    ? `<div class="s2n-warn"><i data-lucide="alert-circle" style="width:18px;height:18px"></i><span>자료가 변경되었습니다. 위의 버튼을 클릭해서 자료를 다시 분석해 주세요.</span></div>` : '';
+    ? `<div class="s2n-warn"><i data-lucide="alert-circle" style="width:18px;height:18px"></i><span>자료가 바뀌었어요. 바뀐 자료가 기록에 들어가도록 위의 [재분석]을 눌러 다시 분석해 주세요.</span></div>` : '';
   const summaryBox = (!changed && s2.status === 'done') ? s2SummaryBox(s) : '';
   const head = `
     <div class="s2-panel s2n-head">
@@ -3320,7 +3320,7 @@ function renderS2Main(){
       <div class="s2n-state-ic"><i data-lucide="pencil" style="width:20px;height:20px"></i></div>
       <div class="s2n-state-t">활동 내역만 작성되어 있습니다.</div>
       <div class="s2n-state-d">${s2.status === 'done'
-        ? '분석에 사용한 자료가 삭제되어 이전 분석 결과는 사용할 수 없어요. 남은 활동 내역으로 바로 기록을 생성할 수 있어요.'
+        ? '분석에 쓴 자료를 모두 지워서 이전 분석 결과는 쓸 수 없어요. 남은 활동 내역으로 바로 기록을 만들 수 있어요.'
         : '자료 분석 없이 바로 기록 생성 가능합니다.'}</div>
       <div class="s2n-graybox left">${s2Esc(kwText)}</div>
       <button class="s2n-btn-primary" onclick="skipStep2()">기록 생성하러 가기<i data-lucide="chevron-right" style="width:16px;height:16px"></i></button>
@@ -3983,7 +3983,7 @@ function pickRegisterType(type){
     aorType = type;
     const full = STUDENTS.filter(s => s.files.filter(f => f.kindLabel === '활동지' || f.kindLabel === '개별').length >= 5).length;
     window._aorFull = full;
-    document.getElementById('aorFullText').textContent = `자료가 5개 찬 학생 ${full}명에게는 추가되지 않아요.`;
+    document.getElementById('aorFullText').textContent = `자료가 5개 찬 학생 ${full}명에게는 추가되지 않아요. 이 학생들에게도 넣으려면 기존 자료를 먼저 지워 주세요.`;
     closeModal('modal-register');
     pickAor('add');
     document.getElementById('modal-add-or-replace').classList.add('show');

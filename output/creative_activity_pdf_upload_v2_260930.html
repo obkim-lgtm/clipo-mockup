@@ -376,9 +376,9 @@ html body .main-wrap{margin-top:58px}
 <div class="ov" id="missModal">
   <div class="ov-box">
     <div class="ov-hd"><span>PDF 업로드 확인</span><button class="ov-x" onclick="closeMiss()"><i data-lucide="x" style="width:20px;height:20px"></i></button></div>
-    <p class="ov-p">입력되지 않은 페이지 또는 학생이 있습니다.</p>
-    <div class="ov-miss">미지정 페이지 : <span id="missPages"></span></div>
-    <p class="ov-p">미지정 페이지를 그대로 업로드할 경우, 해당 페이지는 제외하고 업로드합니다.</p>
+    <p class="ov-p">어느 학생에게도 넣지 않은 페이지가 있어요.</p>
+    <div class="ov-miss">빠지는 페이지 : <span id="missPages"></span></div>
+    <p class="ov-p">그대로 올리면 이 페이지는 빼고 올려요. 표지나 빈 쪽이면 그대로 올리고, 학생 자료라면 취소한 뒤 페이지 번호를 고쳐 주세요.</p>
     <div class="ov-ft"><button class="ov-cancel" onclick="closeMiss()">취소</button><button class="ov-ok" onclick="closeMiss();saveAndBack()">업로드</button></div>
   </div>
 </div>
@@ -397,7 +397,7 @@ const FULL_SIDS = ['20101'];
   const el = document.getElementById('howNote');
   document.getElementById('howText').innerHTML = how === 'add'
     ? `기존 자료에 <b style="color:#222631">추가</b>돼요. 자료가 5개 찬 학생 ${FULL_SIDS.length}명에게는 추가되지 않아요.`
-    : '학생이 따로 올린 자료까지 등록된 활동지·보고서를 <b style="color:#222631">모두 지우고 교체</b>해요.';
+    : '학생별로 올린 자료까지 지금 있는 활동지·보고서를 <b style="color:#222631">모두 지우고 교체</b>해요. 분석을 마친 학생은 다시 분석해야 기록에 반영돼요.';
   el.style.display = 'flex';
 })();
 const ACTIVITY_TYPE = _params.get('type') || '자율활동';
@@ -549,7 +549,7 @@ function showErrToast(msg){
 }
 // 펜딩 PRD 'C-창체 일괄 업로드 에러 케이스 정리'(7/30): 20MB 초과·열기 실패 = 막힘, 네트워크·처리 오류 = 토스트
 const PDF_REJECTS = {
-  size:   ['파일 용량이 20MB를 넘어요.', '용량을 줄여 다시 올려 주세요.'],
+  size:   ['파일 용량이 20MB를 넘어요.', '스캔 해상도를 낮추거나 PDF를 압축해 다시 올려 주세요.'],
   broken: ['파일을 열 수 없어요.', '암호가 걸려 있다면 해제한 뒤 다시 올려 주세요.'],
 };
 function setPdfCase(c){
