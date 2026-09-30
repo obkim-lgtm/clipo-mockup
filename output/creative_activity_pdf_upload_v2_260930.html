@@ -168,6 +168,27 @@ html body .g-hd .credit-wrap{background:none;padding:0}
 html body .g-hd .hd-div{display:none}
 html body .main-shell{margin-top:58px;min-height:calc(100vh - 58px)}
 html body .main-wrap{margin-top:58px}
+
+/* MOCKUP 케이스 토글 (드래그 가능) */
+.mk-toggle{position:fixed;bottom:24px;right:24px;background:#222631;color:#fff;border-radius:24px;padding:5px;display:inline-flex;align-items:center;gap:2px;box-shadow:0 8px 24px rgba(0,0,0,.2);z-index:550;cursor:move;user-select:none}
+.mk-toggle .mk-l{padding:0 8px 0 10px;font-size:11px;font-weight:700;color:#b3b6bd;letter-spacing:.5px}
+.mk-toggle button{padding:7px 12px;border:none;background:none;color:#b3b6bd;font-size:13px;font-weight:500;cursor:pointer;font-family:inherit;border-radius:18px;line-height:1;display:inline-flex;align-items:center;justify-content:center}
+.mk-toggle button:hover{color:#fff}
+.mk-toggle button.on{background:#416bff;color:#fff}
+/* 업로드 실패 케이스 — task_ocr_v3 설문 업로드와 같은 모양 */
+.up-reject{display:flex;align-items:flex-start;gap:12px;background:#fff3f4;border:1px solid #f5b5bc;border-radius:8px;padding:16px 18px}
+.up-reject .t{font-size:16px;font-weight:700;color:#c0394a;margin-bottom:4px}
+.up-reject .d{font-size:14px;color:#9a1b29;line-height:1.6}
+.up-reject .rb{display:inline-flex;align-items:center;justify-content:center;gap:6px;height:32px;padding:0 12px;margin-top:12px;border:1px solid #c7cbd3;border-radius:6px;background:#fff;color:#222631;font-size:14px;font-weight:500;font-family:inherit;cursor:pointer;line-height:1;vertical-align:middle}
+.up-warn{display:flex;align-items:flex-start;gap:10px;background:#fff7ed;border:1px solid #fed7aa;border-radius:8px;padding:12px 14px;margin-bottom:16px;font-size:14px;color:#9a3412;line-height:1.55}
+.up-miss-row td{background:#fff8f8}
+.up-miss-cell{color:#c0394a!important;font-weight:600}
+.up-miss-act{display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:flex-start}
+.up-miss-act .m{display:inline-flex;align-items:center;gap:5px;color:#c0394a;font-size:14px;font-weight:600}
+.up-miss-act select{height:32px;border:1px solid #d9d9d9;border-radius:6px;font-family:inherit;font-size:14px;color:#3b3f4c;padding:0 8px}
+.up-miss-act button{height:32px;padding:0 10px;border:1px solid #d9d9d9;border-radius:6px;background:#fff;color:#6d7381;font-size:14px;font-weight:600;font-family:inherit;cursor:pointer}
+.up-over-chip{display:inline-block;margin-top:4px;font-size:12px;color:#c0394a;background:#fff3f4;border-radius:100px;padding:1px 6px;font-weight:600;white-space:nowrap}
+.up-over-row td{background:#fff8f8}
 </style>
 </head>
 <body>
@@ -256,6 +277,7 @@ html body .main-wrap{margin-top:58px}
         <!-- 우측 분할 결과 (Figma 4965-47077) -->
         <div class="settings-pane" id="resultPane" style="display:none">
           <div class="settings-title">PDF 분할 결과</div>
+          <div id="pgErr" class="up-warn" style="display:none;background:#fff3f4;border-color:#f5b5bc;color:#9a1b29"><i data-lucide="alert-circle" style="width:18px;height:18px;color:#f2525f;flex-shrink:0;margin-top:1px"></i><div id="pgErrText"></div></div>
           <div class="res-wrap">
             <table class="res-table">
               <thead><tr><th>학번</th><th>이름</th><th>페이지 수</th><th>페이지 번호</th><th>미제출</th></tr></thead>
@@ -330,6 +352,12 @@ html body .main-wrap{margin-top:58px}
 </main>
 </div>
 
+<div class="mk-toggle" id="mkToggle">
+  <span class="mk-l">MOCKUP</span>
+  <button data-c="normal" class="on" onclick="setPdfCase('normal')">정상</button>
+  <button data-c="miss" onclick="setPdfCase('miss')">미지정 페이지</button>
+  <button data-c="pgerr" onclick="setPdfCase('pgerr')">페이지 번호 오류</button>
+</div>
 <div class="toast" id="toast"></div>
 <div class="ov" id="missModal">
   <div class="ov-box">
@@ -430,7 +458,32 @@ function backToSettings() {
   document.getElementById('settingsPane').style.display = '';
   document.querySelector('.footer-actions').style.display = '';
 }
+function checkPageErrors() {
+  // 겹침 · 전체 쪽수 초과 · 시작 > 끝 — 하나라도 있으면 업로드 막기
+  const seen = new Map(); const over = new Set(), dup = new Set(), rev = [];
+  document.querySelectorAll('#resRows tr').forEach(tr => tr.querySelectorAll('.pg-in').forEach(x => x.style.borderColor = ''));
+  document.querySelectorAll('#resRows tr').forEach(tr => {
+    if (tr.querySelector('.res-cb').checked) return;
+    const ins = [...tr.querySelectorAll('.pg-in')]; const [a, b] = ins.map(x => parseInt(x.value, 10));
+    const name = tr.children[1].textContent;
+    if (!(a <= b)) { rev.push(name); ins.forEach(x => x.style.borderColor = '#f2525f'); return; }
+    for (let q = a; q <= b; q++) {
+      if (q > TOTAL_PAGES) { over.add(q); ins[1].style.borderColor = '#f2525f'; }
+      if (seen.has(q)) { dup.add(q); ins.forEach(x => x.style.borderColor = '#f2525f'); seen.get(q).forEach(x => x.style.borderColor = '#f2525f'); }
+      else seen.set(q, ins);
+    }
+  });
+  const msgs = [];
+  if (dup.size) msgs.push(`<b>${[...dup].join(', ')}쪽</b>이 두 학생에게 겹쳐 있어요.`);
+  if (over.size) msgs.push(`전체 <b>${TOTAL_PAGES}쪽</b>을 넘는 번호가 있어요(${[...over].slice(0, 3).join(', ')}쪽).`);
+  if (rev.length) msgs.push(`<b>${rev.join(', ')}</b> 학생의 시작 번호가 끝 번호보다 커요.`);
+  const box = document.getElementById('pgErr');
+  box.style.display = msgs.length ? 'flex' : 'none';
+  document.getElementById('pgErrText').innerHTML = msgs.join(' ') + (msgs.length ? ' 빨간 칸을 고친 뒤 업로드해 주세요.' : '');
+  return msgs.length === 0;
+}
 function finishUpload() {
+  if (!checkPageErrors()) return;
   const used = new Set();
   document.querySelectorAll('#resRows tr').forEach(tr => {
     if (tr.querySelector('.res-cb').checked) return;
@@ -469,6 +522,26 @@ lucide.createIcons();
 </script>
 
 
-<script>if(typeof notReady!=='function'){window.notReady=function(n){if(typeof showToast==='function')showToast(n+' 화면은 이 목업에 없어요');};}</script>
+<script>if(typeof notReady!=='function'){window.notReady=function(n){if(typeof showToast==='function')showToast(n+' 화면은 이 목업에 없어요');};}
+// ── MOCKUP 케이스: 정상 / 미지정 페이지 / 페이지 번호 오류 ──
+function setPdfCase(c){
+  document.querySelectorAll('#mkToggle button').forEach(b => b.classList.toggle('on', b.dataset.c === c));
+  history.replaceState(null, '', '#case-' + c);
+  onFilePicked(); startSplit();
+  const rows = [...document.querySelectorAll('#resRows tr')];
+  const setR = (i, a, b) => { const ins = rows[i].querySelectorAll('.pg-in'); ins[0].value = a; ins[1].value = b; recount(ins[0]); };
+  if (c === 'normal') { setR(6, 13, 17); document.getElementById('pgErr').style.display = 'none'; }
+  if (c === 'pgerr') { setR(2, 4, 6); setR(6, 13, 19); checkPageErrors(); }
+  if (c === 'miss') { document.getElementById('pgErr').style.display = 'none'; finishUpload(); }
+  lucide.createIcons();
+}
+(function(){ const m = (location.hash || '').match(/^#case-(\w+)/); if (m && ['normal','miss','pgerr'].includes(m[1])) setTimeout(() => setPdfCase(m[1]), 200); })();
+
+(function(){ const el=document.getElementById('mkToggle'); if(!el) return; let sx,sy,ox,oy,drag=false,moved=false;
+  el.addEventListener('mousedown',e=>{drag=true;moved=false;sx=e.clientX;sy=e.clientY;const r=el.getBoundingClientRect();ox=r.left;oy=r.top;});
+  document.addEventListener('mousemove',e=>{if(!drag)return;const dx=e.clientX-sx,dy=e.clientY-sy;if(Math.abs(dx)+Math.abs(dy)>3)moved=true;if(!moved)return;el.style.left=(ox+dx)+'px';el.style.top=(oy+dy)+'px';el.style.right='auto';el.style.bottom='auto';});
+  document.addEventListener('mouseup',()=>{drag=false;});
+  el.addEventListener('click',e=>{if(moved){e.stopPropagation();e.preventDefault();moved=false;}},true); })();
+</script>
 </body>
 </html>

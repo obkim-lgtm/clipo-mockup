@@ -149,6 +149,27 @@ html body .g-hd .credit-wrap{background:none;padding:0}
 html body .g-hd .hd-div{display:none}
 html body .main-shell{margin-top:58px;min-height:calc(100vh - 58px)}
 html body .main-wrap{margin-top:58px}
+
+/* MOCKUP 케이스 토글 (드래그 가능) */
+.mk-toggle{position:fixed;bottom:24px;right:24px;background:#222631;color:#fff;border-radius:24px;padding:5px;display:inline-flex;align-items:center;gap:2px;box-shadow:0 8px 24px rgba(0,0,0,.2);z-index:550;cursor:move;user-select:none}
+.mk-toggle .mk-l{padding:0 8px 0 10px;font-size:11px;font-weight:700;color:#b3b6bd;letter-spacing:.5px}
+.mk-toggle button{padding:7px 12px;border:none;background:none;color:#b3b6bd;font-size:13px;font-weight:500;cursor:pointer;font-family:inherit;border-radius:18px;line-height:1;display:inline-flex;align-items:center;justify-content:center}
+.mk-toggle button:hover{color:#fff}
+.mk-toggle button.on{background:#416bff;color:#fff}
+/* 업로드 실패 케이스 — task_ocr_v3 설문 업로드와 같은 모양 */
+.up-reject{display:flex;align-items:flex-start;gap:12px;background:#fff3f4;border:1px solid #f5b5bc;border-radius:8px;padding:16px 18px}
+.up-reject .t{font-size:16px;font-weight:700;color:#c0394a;margin-bottom:4px}
+.up-reject .d{font-size:14px;color:#9a1b29;line-height:1.6}
+.up-reject .rb{display:inline-flex;align-items:center;justify-content:center;gap:6px;height:32px;padding:0 12px;margin-top:12px;border:1px solid #c7cbd3;border-radius:6px;background:#fff;color:#222631;font-size:14px;font-weight:500;font-family:inherit;cursor:pointer;line-height:1;vertical-align:middle}
+.up-warn{display:flex;align-items:flex-start;gap:10px;background:#fff7ed;border:1px solid #fed7aa;border-radius:8px;padding:12px 14px;margin-bottom:16px;font-size:14px;color:#9a3412;line-height:1.55}
+.up-miss-row td{background:#fff8f8}
+.up-miss-cell{color:#c0394a!important;font-weight:600}
+.up-miss-act{display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:flex-start}
+.up-miss-act .m{display:inline-flex;align-items:center;gap:5px;color:#c0394a;font-size:14px;font-weight:600}
+.up-miss-act select{height:32px;border:1px solid #d9d9d9;border-radius:6px;font-family:inherit;font-size:14px;color:#3b3f4c;padding:0 8px}
+.up-miss-act button{height:32px;padding:0 10px;border:1px solid #d9d9d9;border-radius:6px;background:#fff;color:#6d7381;font-size:14px;font-weight:600;font-family:inherit;cursor:pointer}
+.up-over-chip{display:inline-block;margin-top:4px;font-size:12px;color:#c0394a;background:#fff3f4;border-radius:100px;padding:1px 6px;font-weight:600;white-space:nowrap}
+.up-over-row td{background:#fff8f8}
 </style>
 </head>
 <body>
@@ -231,6 +252,17 @@ html body .main-wrap{margin-top:58px}
   <div class="card-sep"></div>
     <div class="card-title">2. 업로드 파일 확인</div>
 
+    <!-- 양식 불일치·빈 파일 — 등록 거부 (task_ocr_v3 설문 업로드와 같은 모양) -->
+    <div id="upReject" style="display:none">
+      <div class="up-reject">
+        <i data-lucide="alert-circle" style="width:20px;height:20px;color:#f2525f;flex-shrink:0;margin-top:1px"></i>
+        <div>
+          <div class="t" id="upRejectT">양식을 읽을 수 없어 등록할 수 없어요.</div>
+          <div class="d" id="upRejectD"></div>
+          <button class="rb" onclick="downloadTemplate()"><i data-lucide="download" style="width:14px;height:14px"></i>활동 내역 양식 다시 받기</button>
+        </div>
+      </div>
+    </div>
     <!-- 빈 상태 -->
     <div id="uploadEmpty">
       <div class="empty-state">
@@ -242,6 +274,7 @@ html body .main-wrap{margin-top:58px}
 
     <!-- 결과 -->
     <div id="resultSection" style="display:none">
+      <div id="upWarn" class="up-warn" style="display:none"><i data-lucide="alert-triangle" style="width:18px;height:18px;color:#f97316;flex-shrink:0;margin-top:1px"></i><div id="upWarnText"></div></div>
       <div class="result-table-wrap">
         <table class="result-table">
           <thead>
@@ -269,6 +302,14 @@ html body .main-wrap{margin-top:58px}
 </main>
 </div>
 
+<div class="mk-toggle" id="mkToggle">
+  <span class="mk-l">MOCKUP</span>
+  <button data-c="normal" class="on" onclick="setUpCase('normal')">정상</button>
+  <button data-c="format" onclick="setUpCase('format')">양식 불일치</button>
+  <button data-c="match" onclick="setUpCase('match')">매칭 실패</button>
+  <button data-c="over" onclick="setUpCase('over')">1,000자 초과</button>
+  <button data-c="blank" onclick="setUpCase('blank')">빈 파일</button>
+</div>
 <div class="toast" id="toast"></div>
 
 <script>
@@ -373,6 +414,54 @@ lucide.createIcons();
 </script>
 
 
-<script>if(typeof notReady!=='function'){window.notReady=function(n){if(typeof showToast==='function')showToast(n+' 화면은 이 목업에 없어요');};}</script>
+<script>if(typeof notReady!=='function'){window.notReady=function(n){if(typeof showToast==='function')showToast(n+' 화면은 이 목업에 없어요');};}
+// ── 업로드 실패 케이스 (task_ocr_v3 설문 업로드와 같은 규칙·모양, 2026-09-30) ──
+let upCase = 'normal';
+function setUpCase(c){
+  upCase = c;
+  document.querySelectorAll('#mkToggle button').forEach(b => b.classList.toggle('on', b.dataset.c === c));
+  history.replaceState(null, '', '#case-' + c);
+  onFilePicked();   // 케이스를 바꿀 때마다 결과를 처음부터 다시 그림(앞 케이스 행·경고가 남지 않게)
+}
+function applyUpCase(){
+  const reject = document.getElementById('upReject'), warn = document.getElementById('upWarn'), save = document.getElementById('saveBtn');
+  if (upCase === 'format' || upCase === 'blank'){
+    document.getElementById('upRejectT').textContent = upCase === 'format' ? '양식을 읽을 수 없어 등록할 수 없어요.' : '파일에 등록할 내용이 없어요.';
+    document.getElementById('upRejectD').innerHTML = upCase === 'format'
+      ? '양식 <b>맨 윗줄(제목 줄)이 지워졌거나 열 순서가 바뀐</b> 것 같아요. 내용을 복사해 붙이실 때 <b>제목 줄은 그대로 두고</b> 학생 내용만 채워 주세요. 헷갈리면 <b>양식을 다시 받아</b> 작성해 주세요.'
+      : '제목 줄 아래에 학생 행이 없어요. 학번·이름과 내용을 채운 뒤 다시 올려 주세요.';
+    warn.style.display = 'none';
+    reject.style.display = ''; document.getElementById('resultSection').style.display = 'none'; document.getElementById('uploadEmpty').style.display = 'none';
+    save.disabled = true; lucide.createIcons(); return;
+  }
+  reject.style.display = 'none';
+  if (upCase === 'match'){
+    const tb = document.getElementById('resultRows'); const n = tb.children.length;
+    const opts = '<option>학생 직접 지정…</option>' + currentRows.slice(0, 3).map(r => `<option>${r.sid} ${r.name}</option>`).join('');
+    const row = (no, sid, name, msg) => `<tr class="up-miss-row">$<td class="up-miss-cell">${sid}</td><td class="up-miss-cell">${name}</td><td colspan="${2}"><div class="up-miss-act"><span class="m"><i data-lucide="user-x" style="width:14px;height:14px"></i>${msg}</span><select>${opts}</select><button>행 제외</button></div></td></tr>`;
+    tb.innerHTML += row(n + 1, '20188', '홍서윤', '명단에 없는 학번·이름이에요') + row(n + 2, '—', currentRows[0].name, '같은 이름이 둘이라 어느 학생인지 확인이 필요해요');
+    warn.style.display = 'flex';
+    document.getElementById('upWarnText').innerHTML = '명단에서 찾을 수 없는 행이 <b>2건</b> 있어요. 학번·이름을 확인해 직접 지정하거나 해당 행을 제외한 뒤 등록할 수 있어요. (같은 이름은 서로 바뀔 수 있으니 한 번 더 확인해 주세요)';
+    save.disabled = true;
+  } else if (upCase === 'over'){
+    const fr = document.querySelector('#resultRows tr'); if (fr){ fr.classList.add('up-over-row'); const c = fr.children[2]; if (c) c.insertAdjacentHTML('beforeend', '<div><span class="up-over-chip">1,000자 초과</span></div>'); }
+    warn.style.display = 'flex'; document.getElementById('upWarnText').innerHTML = '활동 내역 글자수 <b>1,000자</b>를 넘는 학생이 있어요. 넘는 부분은 잘릴 수 있으니 확인 후 등록해 주세요.';
+  } else {
+    warn.style.display = 'none';
+  }
+  lucide.createIcons();
+}
+const _renderResultOrig = renderResult;
+renderResult = function(){ _renderResultOrig(); applyUpCase(); };
+const _clearUploadOrig = clearUpload;
+clearUpload = function(){ _clearUploadOrig(); document.getElementById('upReject').style.display = 'none'; document.getElementById('upWarn').style.display = 'none'; };
+(function(){ const m = (location.hash || '').match(/^#case-(\w+)/); if (m && ['format','match','over','blank'].includes(m[1])) setTimeout(() => setUpCase(m[1]), 200); })();
+
+(function(){ const el=document.getElementById('mkToggle'); if(!el) return; let sx,sy,ox,oy,drag=false,moved=false;
+  el.addEventListener('mousedown',e=>{drag=true;moved=false;sx=e.clientX;sy=e.clientY;const r=el.getBoundingClientRect();ox=r.left;oy=r.top;});
+  document.addEventListener('mousemove',e=>{if(!drag)return;const dx=e.clientX-sx,dy=e.clientY-sy;if(Math.abs(dx)+Math.abs(dy)>3)moved=true;if(!moved)return;el.style.left=(ox+dx)+'px';el.style.top=(oy+dy)+'px';el.style.right='auto';el.style.bottom='auto';});
+  document.addEventListener('mouseup',()=>{drag=false;});
+  el.addEventListener('click',e=>{if(moved){e.stopPropagation();e.preventDefault();moved=false;}},true); })();
+</script>
 </body>
 </html>
