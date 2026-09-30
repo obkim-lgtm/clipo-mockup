@@ -245,7 +245,7 @@ html body .main-shell{margin-top:58px;min-height:calc(100vh - 58px)}
 <main class="list-main">
   <div class="page-head">
     <div>
-      <h1 class="page-title">창의적 체험활동 지원 <span class="beta"><i data-lucide="flask-conical" style="width:12px;height:12px"></i>Beta</span></h1>
+      <h1 class="page-title">창의적 체험활동 지원 <span class="beta"><i data-lucide="flask-conical" style="width:12px;height:12px"></i>Beta</span><button class="howto-link" onclick="showOb()"><i data-lucide="play-circle" style="width:16px;height:16px"></i>사용법 영상</button></h1>
       <p class="page-sub">활동 관련 자료를 업로드하거나 특성을 입력하면 AI가 학생별 기록 초안을 작성해드려요.</p>
     </div>
     <button class="btn-add" onclick="openAddModal()"><i data-lucide="plus" style="width:18px;height:18px"></i>활동 추가</button>
@@ -256,6 +256,11 @@ html body .main-shell{margin-top:58px;min-height:calc(100vh - 58px)}
     <svg width="160" height="140" viewBox="0 0 160 140" fill="none"><ellipse cx="80" cy="74" rx="68" ry="60" fill="#e9f2ff"/><rect x="50" y="34" width="60" height="78" rx="6" fill="#fff" stroke="#416bff" stroke-width="2"/><line x1="60" y1="54" x2="100" y2="54" stroke="#ccdfff" stroke-width="3" stroke-linecap="round"/><line x1="60" y1="66" x2="100" y2="66" stroke="#ccdfff" stroke-width="3" stroke-linecap="round"/><line x1="60" y1="78" x2="88" y2="78" stroke="#ccdfff" stroke-width="3" stroke-linecap="round"/><circle cx="104" cy="98" r="14" fill="#416bff"/><path d="M104 91v14M97 98h14" stroke="#fff" stroke-width="2.5" stroke-linecap="round"/></svg>
     <h2>아직 등록된 활동이 없어요</h2>
     <p>자율·진로·동아리 활동을 추가해 기록을 시작해 보세요.</p>
+    <div class="vid sm" onclick="playVid(this)">
+      <div class="vid-play"><i data-lucide="play" style="width:26px;height:26px"></i></div>
+      <div class="vid-cap">사용법 영상 · 약 40초</div>
+      <div class="vid-ch"><span>활동 만들기</span><span>자료 올리기</span><span>AI 분석·체크</span><span>기록 만들기</span></div>
+    </div>
   </div>
 
   <div id="year-sections"></div>
@@ -276,7 +281,7 @@ html body .main-shell{margin-top:58px;min-height:calc(100vh - 58px)}
   <button class="mt-btn" data-hash="add-direct" onclick="go('add-direct')">개별 학생</button>
   <button class="mt-btn" data-hash="add-dup" onclick="go('add-dup')">이름 중복</button>
   <button class="mt-btn" data-hash="add-2027" onclick="go('add-2027')">학생 없음</button>
-  <button class="mt-btn" onclick="showOb()">온보딩</button>
+  <button class="mt-btn" data-hash="onboarding" onclick="go('onboarding')">첫 진입 영상</button>
 </div>
 
 <!-- 활동 추가 / 이름 수정 모달 (Figma 4958-12383 · 4962-12466 · 4959-12576 확장) -->
@@ -380,66 +385,41 @@ html body .main-shell{margin-top:58px;min-height:calc(100vh - 58px)}
 
 <!-- 첫 진입 온보딩 (v6 그대로 · MOCKUP 토글 [온보딩]으로 확인) -->
 <!-- ── 첫 진입 온보딩 팝업 (3스텝 안내) ── -->
+<!-- 첫 진입 온보딩 (09-30 재설계): 기능 한 줄 + 짧은 영상 + 시작하기.
+     대상 = 창체를 처음 여는 교사 + 기록을 한 번도 만든 적 없는 교사(활동만 만들고 나간 기존 사용자 포함). 기록을 만든 적 있으면 안 띄움.
+     닫아도 제목 옆 [사용법 영상]·빈 화면에서 다시 볼 수 있음 -->
 <div id="ob-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:900;align-items:center;justify-content:center">
   <div class="cob-modal">
-    <button onclick="closeOb()" class="cob-x"><i data-lucide="x" style="width:18px;height:18px"></i></button>
-
-    <!-- Slide 1 — 학생 자료 입력 -->
-    <div class="cob-slide" data-step="1">
-      <div class="cob-hero">
-        <div class="cob-card">
-          <div class="cob-card-name">10101 김하나</div>
-          <div class="cob-chips">
-            <span class="cob-chip"><i data-lucide="paperclip" style="width:12px;height:12px"></i> 활동지_스캔본.pdf</span>
-            <span class="cob-chip"><i data-lucide="list-checks" style="width:12px;height:12px"></i> 자율_설문(행)</span>
-          </div>
-          <div class="cob-card-box">자유낙하 실험 활동, 환경 정화 활동에 참여함. 탐구력·봉사 정신·집중력·의사소통이 돋보임.</div>
-          <div class="cob-card-foot"><span class="cob-card-pill"><i data-lucide="sparkles" style="width:13px;height:13px"></i> AI 자료 분석</span></div>
-        </div>
-      </div>
-      <div class="cob-desc">학생별로 <b>활동지·설문 자료를 올리거나</b> 활동 내역을 직접 입력해요.<br>자료가 없어도 활동 내역만으로 기록을 만들 수 있어요.</div>
+    <button onclick="closeOb()" class="cob-x" title="닫기"><i data-lucide="x" style="width:18px;height:18px"></i></button>
+    <div class="ob2-title">창의적 체험활동 기록, 이렇게 만들어요</div>
+    <div class="ob2-sub">학생 자료를 올리면 AI가 기록에 넣을 내용을 추천하고, 선생님이 고른 내용으로 학생별 기록 초안을 만들어요.</div>
+    <div class="vid " onclick="playVid(this)">
+      <div class="vid-play"><i data-lucide="play" style="width:26px;height:26px"></i></div>
+      <div class="vid-cap">사용법 영상 · 약 40초</div>
+      <div class="vid-ch"><span>활동 만들기</span><span>자료 올리기</span><span>AI 분석·체크</span><span>기록 만들기</span></div>
     </div>
-
-    <!-- Slide 2 — AI 자료 분석 -->
-    <div class="cob-slide" data-step="2" style="display:none">
-      <div class="cob-hero">
-        <div class="cob-card">
-          <div class="cob-card-name">AI 자료 분석 내용</div>
-          <div class="cob-check on"><span class="cob-cb"><i data-lucide="check" style="width:12px;height:12px"></i></span> 자유낙하 실험을 주도적으로 설계하고 변인을 통제함</div>
-          <div class="cob-check on"><span class="cob-cb"><i data-lucide="check" style="width:12px;height:12px"></i></span> 동료와 원활히 소통하며 협력적으로 탐구함</div>
-          <div class="cob-check"><span class="cob-cb"></span> 실험 결과를 체계적으로 정리하고 통찰을 도출함</div>
-        </div>
-      </div>
-      <div class="cob-desc">올린 자료를 <b>AI가 분석해 활동·역량을 항목으로 정리</b>해 드려요.<br>기록에 넣을 항목을 골라 체크하면 돼요.</div>
-    </div>
-
-    <!-- Slide 3 — 기록 확인 및 수정 -->
-    <div class="cob-slide" data-step="3" style="display:none">
-      <div class="cob-hero">
-        <div class="cob-card">
-          <div class="cob-card-head">
-            <span class="cob-card-name" style="display:inline-flex;align-items:center;gap:5px"><i data-lucide="sparkles" style="width:15px;height:15px;color:#416bff"></i> AI Assistant 생성 기록</span>
-            <span class="cob-card-pill sm"><i data-lucide="refresh-ccw" style="width:12px;height:12px"></i> 다시 생성</span>
-          </div>
-          <div class="cob-card-box tall">탐구력과 집중력이 뛰어나 자유낙하 실험 활동에 적극적으로 참여하여 실험 과정을 철저히 분석하고 관찰함. 실험 도중 예상치 못한 변수가 발생했을 때도 침착하게 대처하며 해결 방법을 모색함으로써 실험 결과에 대한 깊이 있는 통찰을 보임. 실험 후반부에 동료들과 원활한 의사소통을…</div>
-        </div>
-      </div>
-      <div class="cob-desc">선택한 항목으로 <b>AI가 기록 초안을 만들어 드려요.</b><br>직접 다듬어 최종 기록을 완성하면 끝이에요. 그럼 시작해 볼까요?</div>
-    </div>
-
-    <!-- Footer: prev / dots / next -->
-    <div class="cob-foot">
-      <button class="cob-nav prev" id="cobPrev" onclick="cobPrev()">이전으로</button>
-      <div class="cob-dots">
-        <span class="cob-dot active" data-d="1"></span>
-        <span class="cob-dot" data-d="2"></span>
-        <span class="cob-dot" data-d="3"></span>
-      </div>
-      <button class="cob-nav next" id="cobNext" onclick="cobNext()">다음으로</button>
+    <div class="ob2-foot">
+      <span class="ob2-note"><i data-lucide="play-circle" style="width:15px;height:15px"></i>제목 옆 [사용법 영상]에서 다시 볼 수 있어요</span>
+      <button class="ob2-start" onclick="startFromOnboarding()">시작하기</button>
     </div>
   </div>
 </div>
 <style>
+.ob2-title{font-size:20px;font-weight:700;color:#222631;margin:6px 36px 8px 4px;word-break:keep-all}
+.ob2-sub{font-size:16px;color:#3b3f4c;line-height:1.6;margin:0 4px 16px;word-break:keep-all}
+.vid{position:relative;aspect-ratio:16/9;border-radius:12px;background:linear-gradient(135deg,#2b3a8f,#416bff);overflow:hidden;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.vid-play{width:60px;height:60px;border-radius:50%;background:rgba(255,255,255,.95);color:#416bff;display:inline-flex;align-items:center;justify-content:center;line-height:1;box-shadow:0 6px 20px rgba(0,0,0,.2)}
+.vid-cap{position:absolute;left:14px;top:12px;font-size:14px;font-weight:600;color:#fff;opacity:.9}
+.vid-ch{position:absolute;left:12px;right:12px;bottom:12px;display:flex;gap:6px;flex-wrap:wrap}
+.vid-ch span{font-size:14px;color:#fff;background:rgba(255,255,255,.18);border-radius:100px;padding:3px 10px}
+.vid.playing .vid-play{display:none}
+.vid.playing::after{content:'영상 재생 중 (목업)';position:absolute;font-size:16px;color:#fff;font-weight:600}
+.vid.sm{max-width:480px;margin:24px auto 0}
+.ob2-foot{display:flex;align-items:center;gap:12px;margin-top:16px}
+.ob2-note{margin-right:auto;display:inline-flex;align-items:center;gap:5px;font-size:14px;color:#6d7381}
+.ob2-start{display:inline-flex;align-items:center;justify-content:center;line-height:1;vertical-align:middle;height:44px;padding:0 24px;border:none;border-radius:9999px;background:#416bff;color:#fff;font-size:16px;font-weight:600;font-family:inherit;cursor:pointer}
+.howto-link{display:inline-flex;align-items:center;justify-content:center;gap:5px;line-height:1;vertical-align:middle;height:30px;padding:0 10px;margin-left:8px;border:none;border-radius:6px;background:#eff3ff;color:#3151c4;font-size:14px;font-weight:600;font-family:inherit;cursor:pointer}
+.howto-link:hover{background:#e0e8ff}
 #ob-overlay.show{display:flex !important}
 .cob-modal{background:#fff;border-radius:16px;width:512px;max-width:calc(100vw - 40px);box-shadow:0 16px 48px rgba(0,0,0,.2);position:relative;overflow:hidden;padding:20px 20px 16px}
 .cob-x{position:absolute;top:14px;right:14px;width:32px;height:32px;border:none;background:none;cursor:pointer;color:#6d7381;display:flex;align-items:center;justify-content:center;border-radius:6px;z-index:3}
@@ -794,6 +774,7 @@ html body .main-shell{margin-top:58px;min-height:calc(100vh - 58px)}
     if (h === 'add-direct') openAddModal({ type: 'jinro', way: 'direct', name: '진로 체험의 날' });
     if (h === 'add-dup') openAddModal({ type: 'jayul', name: '2학기 자율활동', way: 'class' });
     if (h === 'add-2027') openAddModal({ year: '2027', type: 'jayul' });
+    if (h === 'onboarding') showOb();
   }
   window.addEventListener('hashchange', applyHash);
 
@@ -820,23 +801,10 @@ html body .main-shell{margin-top:58px;min-height:calc(100vh - 58px)}
     el.addEventListener('click', e => { if (moved) { e.stopPropagation(); e.preventDefault(); moved = false; } }, true);
   })();
 
-  // ── 온보딩 팝업 (3스텝 캐러셀) ──
-  let cobStep = 1;
-  const COB_TOTAL = 3;
-  function showOb(){ cobStep = 1; cobRender(); document.getElementById('ob-overlay').classList.add('show'); lucide.createIcons(); }
-  function closeOb(){ document.getElementById('ob-overlay').classList.remove('show'); try{localStorage.setItem('clipo_creative_onboarding_seen','1');}catch(e){} }
-  function cobRender(){
-    document.querySelectorAll('.cob-slide').forEach(sl=>{ sl.style.display = (+sl.dataset.step === cobStep) ? '' : 'none'; });
-    document.querySelectorAll('.cob-dot').forEach(d=>{ d.classList.toggle('active', +d.dataset.d === cobStep); });
-    document.getElementById('cobPrev').classList.toggle('hidden', cobStep === 1);
-    document.getElementById('cobNext').textContent = (cobStep === COB_TOTAL) ? '시작하기' : '다음으로';
-    lucide.createIcons();
-  }
-  function cobPrev(){ if(cobStep > 1){ cobStep--; cobRender(); } }
-  function cobNext(){
-    if(cobStep < COB_TOTAL){ cobStep++; cobRender(); }
-    else { startFromOnboarding(); }
-  }
+  // ── 온보딩 팝업 (한 줄 설명 + 영상) ──
+  function showOb(){ document.querySelectorAll('.vid').forEach(v => v.classList.remove('playing')); document.getElementById('ob-overlay').classList.add('show'); lucide.createIcons(); if (location.hash !== '#onboarding') history.replaceState(null, '', '#onboarding'); }
+  function closeOb(){ document.getElementById('ob-overlay').classList.remove('show'); try{localStorage.setItem('clipo_creative_onboarding_seen','1');}catch(e){} if (location.hash === '#onboarding') history.replaceState(null, '', '#list'); }
+  function playVid(el){ el.classList.add('playing'); }
   function startFromOnboarding(){
     closeOb();
     // 활동 카드가 하나도 없으면 활동 추가 모달로 유도, 있으면 그냥 닫기
