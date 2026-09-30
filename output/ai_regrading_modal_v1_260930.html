@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI 채점 재실행 모달 — 구성안 비교</title>
+<link rel="icon" type="image/png" href="clipo_favicon.png">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard-gov.min.css">
+<script src="https://unpkg.com/lucide@latest"></script>
+<style>
+  /* Figma SmAPRoZEpoVlVz2hPvjErc node 4032-40269 (modal--ai-regrading) 토큰 기준. 2026-09-30 */
+  *{ box-sizing:border-box; margin:0; padding:0; }
+  html,body{ height:100%; }
+  body{ font-family:'Pretendard GOV',-apple-system,BlinkMacSystemFont,sans-serif; background:#f1f3f5; color:#18181b; -webkit-font-smoothing:antialiased; }
+
+  /* ── 배경(수업 화면 대신 중립 배경) ── */
+  .stage{ min-height:100%; display:flex; align-items:center; justify-content:center; padding:40px 24px; background:rgba(0,0,0,.45); }
+
+  /* ── 모달 골격 ── */
+  .rm-modal{ background:#fff; border-radius:12px; width:512px; max-width:calc(100vw - 48px); box-shadow:0 20px 60px rgba(0,0,0,.25); display:flex; flex-direction:column; }
+  .rm-hd{ position:relative; padding:24px 24px 16px; }
+  .rm-title{ font-size:18px; font-weight:600; line-height:1.25; color:#18181b; }
+  .rm-close{ position:absolute; top:11px; right:11px; width:36px; height:36px; border:0; background:none; border-radius:4px; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; line-height:1; vertical-align:middle; color:#52525b; }
+  .rm-close:hover{ background:#f1f3f5; }
+  .rm-body{ padding:8px 24px 24px; display:flex; flex-direction:column; gap:20px; }
+  .rm-ft{ padding:8px 24px 16px; display:flex; justify-content:flex-end; align-items:center; gap:12px; }
+  .credit-note{ margin-right:auto; font-size:13px; color:#52525b; display:inline-flex; align-items:center; gap:5px; line-height:1; }
+  .credit-note i, .credit-note svg{ width:16px; height:16px; color:#416bff; }
+
+  .rm-field{ display:flex; flex-direction:column; gap:8px; }
+  .rm-field-hd{ display:flex; align-items:center; justify-content:space-between; gap:8px; width:100%; }
+  .rm-label{ font-size:16px; font-weight:600; color:#18181b; line-height:1.25; display:inline-flex; align-items:center; gap:8px; }
+  .rm-label > i, .rm-label > svg{ width:18px; height:18px; color:#52525b; }
+  .rm-meta{ font-size:13px; font-weight:400; color:#52525b; line-height:1.25; }
+  .rm-help{ font-size:14px; font-weight:400; color:#52525b; line-height:1.5; word-break:keep-all; }
+
+  /* 제안안: 재실행 안내 블록 — 배경+파란 아이콘만(좌측 띠 없음) */
+  .rm-info{ display:flex; gap:10px; align-items:flex-start; width:100%; padding:14px 16px; border-radius:12px; background:#f4f8ff; }
+  .rm-info > i, .rm-info > svg{ width:20px; height:20px; color:#416bff; flex-shrink:0; margin-top:1px; }
+  .rm-info-body{ flex:1; min-width:0; display:flex; flex-direction:column; gap:8px; }
+  .rm-info-tit{ font-size:15px; font-weight:600; color:#18181b; line-height:1.3; }
+  .rm-info-list{ list-style:none; display:flex; flex-direction:column; gap:5px; }
+  .rm-info-list li{ position:relative; padding-left:12px; font-size:14px; color:#3b3f4c; line-height:1.5; word-break:keep-all; }
+  .rm-info-list li:only-child{ padding-left:0; }
+  .rm-info-list li:only-child::before{ display:none; }
+  .rm-info-list li::before{ content:''; position:absolute; left:2px; top:9px; width:4px; height:4px; border-radius:50%; background:#8a8f9c; }
+  .rm-info-link{ align-self:flex-start; margin-top:2px; color:#365eef; font-size:14px; font-weight:500; text-decoration:none; display:inline-flex; align-items:center; gap:4px; line-height:1; }
+  .rm-info-link:hover{ text-decoration:underline; }
+  .rm-info-link i, .rm-info-link svg{ width:14px; height:14px; }
+
+  /* ── 채점 모델 카드 (피그마 원안 Alert_UpdateBanner) ── */
+  .model-card{ display:flex; gap:12px; align-items:flex-start; width:100%; padding:16px; border-radius:12px; border:1.5px solid #a3c3ff; background:rgba(204,223,255,.2); }
+  .model-icon{ width:44px; height:44px; flex-shrink:0; border-radius:8px; background:linear-gradient(-82deg,#6e95ff 0%,#416bff 100%); display:flex; align-items:center; justify-content:center; position:relative; overflow:hidden; }
+  .model-icon::before{ content:''; position:absolute; left:18px; top:-8px; width:34px; height:26px; border-radius:50%; background:rgba(255,255,255,.18); }
+  .model-icon span{ font-family:Baskerville,'Times New Roman',serif; font-weight:700; font-size:20px; letter-spacing:-1.4px; color:#fff; text-shadow:0 0 1px rgba(34,38,49,.3),0 2px 4px rgba(0,0,0,.1); position:relative; }
+  .model-text{ flex:1; min-width:0; display:flex; flex-direction:column; gap:6px; justify-content:center; align-self:stretch; }
+  .model-name{ font-size:15px; font-weight:600; line-height:1.25; color:#18181b; }
+  .model-desc{ font-size:13px; font-weight:400; line-height:1.25; color:#18181b; opacity:.8; }
+
+  /* ── 채점 수준 슬라이더 (피그마 slide_Scoring) ── */
+  .slide-wrap{ padding:0 16px; }
+  .slide-bar{ position:relative; height:24px; display:flex; align-items:center; }
+  .slide-track{ position:relative; width:100%; height:10px; border-radius:9999px; background:#dde1e8; overflow:hidden; box-shadow:inset 0 0 0 1px rgba(9,9,11,.05); }
+  .slide-fill{ position:absolute; left:0; top:0; bottom:0; width:50%; background:#365eef; transition:width .15s; }
+  .slide-thumb{ position:absolute; top:50%; left:50%; width:20px; height:20px; transform:translate(-50%,-50%); border-radius:50%; background:#fff; border:2px solid #365eef; box-shadow:0 0 1px rgba(34,38,49,.3),0 2px 4px rgba(0,0,0,.1); transition:left .15s; }
+  .slide-input{ position:absolute; inset:0; width:100%; opacity:0; cursor:pointer; margin:0; }
+  .slide-marks{ display:flex; justify-content:space-between; padding:0 12px; margin-top:-3px; }
+  .mark{ width:4px; display:flex; flex-direction:column; align-items:center; gap:12px; cursor:pointer; }
+  .mark-dot{ width:6px; height:6px; border-radius:50%; background:#c7cbd3; box-shadow:inset 0 0 0 1px rgba(9,9,11,.08); }
+  .mark-lbl{ display:flex; flex-direction:column; align-items:center; gap:2px; white-space:nowrap; text-align:center; color:#52525b; }
+  .mark-lbl b{ font-size:15px; font-weight:500; line-height:1.25; }
+  .mark-lbl small{ font-size:13px; font-weight:500; line-height:1.25; opacity:.8; min-height:16px; }
+
+  /* ── 피드백 초안 라디오 (피그마 radio set) ── */
+  .radio-set{ display:flex; flex-direction:column; gap:8px; width:100%; }
+  .rm-radio{ display:flex; align-items:center; gap:10px; padding:12px; border:1px solid #dde1e8; border-radius:8px; background:#fff; cursor:pointer; transition:border-color .15s, background .15s; }
+  .rm-radio:hover{ border-color:#a3c3ff; background:#f4f8ff; }
+  .rm-radio.selected{ border:2px solid #416bff; background:#f4f8ff; padding:11px; }
+  .rm-radio .ring{ width:16px; height:16px; border-radius:50%; border:1.5px solid #c7cbd3; background:#fff; flex-shrink:0; }
+  .rm-radio.selected .ring{ border:5px solid #365eef; }
+  .rm-radio .lbl{ font-size:15px; font-weight:500; line-height:1.25; color:#18181b; }
+  .rm-radio .lbl small{ font-size:14px; font-weight:500; color:#52525b; }
+
+  /* ── 버튼 ── */
+  .btn{ height:40px; padding:0 16px; border-radius:4px; border:0; font-family:inherit; font-size:15px; font-weight:500; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; gap:8px; line-height:1; vertical-align:middle; white-space:nowrap; transition:opacity .15s; }
+  .btn:hover{ opacity:.9; }
+  .btn-primary{ background:#365eef; color:#fff; }
+  .btn i, .btn svg{ width:20px; height:20px; }
+
+  /* ── 구성안 토글 (MOCKUP 전용, 드래그 가능) ── */
+  .mk-toggle{ position:fixed; left:16px; top:16px; z-index:50; background:#18181b; color:#fff; border-radius:10px; padding:10px 12px; display:flex; flex-direction:column; gap:8px; box-shadow:0 8px 24px rgba(0,0,0,.3); font-size:13px; user-select:none; }
+  .mk-toggle .mk-hd{ display:flex; align-items:center; gap:8px; cursor:move; color:#a1a1aa; font-weight:600; letter-spacing:.04em; }
+  .mk-toggle .mk-hd i{ width:14px; height:14px; }
+  .mk-btns{ display:flex; gap:6px; }
+  .mk-btn{ height:30px; padding:0 12px; border-radius:6px; border:1px solid #3f3f46; background:#27272a; color:#e4e4e7; font-family:inherit; font-size:13px; font-weight:500; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; line-height:1; vertical-align:middle; }
+  .mk-btn.on{ background:#416bff; border-color:#416bff; color:#fff; }
+  .mk-desc{ color:#a1a1aa; line-height:1.45; max-width:260px; }
+
+  /* 변형별 표시 */
+  [data-only]{ display:none; }
+  body[data-variant="figma"] [data-only="figma"]{ display:flex; }
+  body[data-variant="proposal"] [data-only="proposal"]{ display:flex; }
+  body[data-variant="first"] [data-only="first"]{ display:flex; }
+</style>
+</head>
+<body data-variant="figma">
+
+<!-- MOCKUP 전용 — 구성안 전환 -->
+<div class="mk-toggle" id="mkToggle">
+  <div class="mk-hd" id="mkDrag"><i data-lucide="grip-vertical"></i>MOCKUP · 구성안</div>
+  <div class="mk-btns">
+    <button class="mk-btn on" data-v="figma" onclick="location.hash='figma'">피그마 원안</button>
+    <button class="mk-btn" data-v="proposal" onclick="location.hash='proposal'">제안안 · 재실행</button>
+    <button class="mk-btn" data-v="first" onclick="location.hash='first'">제안안 · 최초 실행</button>
+  </div>
+  <div class="mk-desc" id="mkDesc">채점 모델 카드(v3.3) 포함. 줄리 시안 그대로.</div>
+</div>
+
+<div class="stage">
+  <div class="rm-modal" role="dialog" aria-modal="true">
+    <div class="rm-hd">
+      <div class="rm-title">AI 채점 재실행 (1/2)</div>
+      <button class="rm-close" aria-label="닫기"><i data-lucide="x" style="width:16px;height:16px"></i></button>
+    </div>
+
+    <div class="rm-body">
+      <!-- 제안안: 재실행 안내 블록 (모델 카드 대신). 사라지는 것 → 남는 것 → 비용 순. 사실 근거 = cs_assist/product_facts_clipo.md §채점 근거·재채점 -->
+      <div class="rm-info" data-only="proposal">
+        <i data-lucide="info"></i>
+        <div class="rm-info-body">
+          <ul class="rm-info-list">
+            <li>AI 채점만 새로 하고, 선생님이 저장한 점수·피드백은 그대로예요.</li>
+            <li>선생님이 고친 답안이 있으면 고친 대로 채점해요.</li>
+          </ul>
+          <a class="rm-info-link" href="../guide/" target="_blank" rel="noopener"><i data-lucide="book-open"></i>AI 채점은 어떻게 동작하나요?</a>
+        </div>
+      </div>
+      <!-- 최초 실행: 같은 블록, 문구만 진행 방식 안내로. 읽기(인식) → 채점 → 읽은 내용 확인·고치기(3.3) → 크레딧 -->
+      <div class="rm-info" data-only="first">
+        <i data-lucide="info"></i>
+        <div class="rm-info-body">
+          <ul class="rm-info-list">
+            <li>AI가 과제물을 읽고 점수·채점 근거·피드백을 만들어요.</li>
+            <li>채점 뒤 AI가 읽은 답안을 확인하고, 고쳐서 다시 채점할 수 있어요.</li>
+          </ul>
+          <a class="rm-info-link" href="../guide/" target="_blank" rel="noopener"><i data-lucide="book-open"></i>AI 채점은 어떻게 동작하나요?</a>
+        </div>
+      </div>
+
+      <!-- 피그마 원안: 채점 모델 섹션 -->
+      <div class="rm-field" data-only="figma">
+        <div class="rm-field-hd">
+          <span class="rm-label">채점 모델</span>
+          <span class="rm-meta">2026-09 업데이트</span>
+        </div>
+        <div class="model-card">
+          <div class="model-icon"><span>3.3</span></div>
+          <div class="model-text">
+            <div class="model-name">채점 모델 v3.3</div>
+            <div class="model-desc">학생 답안을 AI가 문항별로 읽고, 수정한 내용으로 다시 채점할 수 있어요.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 채점 수준 -->
+      <div class="rm-field" style="gap:12px;">
+        <div class="rm-field" style="gap:8px;">
+          <span class="rm-label">채점 수준</span>
+          <p class="rm-help">관대하게 둘수록 점수를 높게 매기고, 피드백도 그에 맞춰 바뀌어요.</p>
+        </div>
+        <div class="slide-wrap">
+          <div class="slide-bar">
+            <div class="slide-track"><div class="slide-fill" id="slFill"></div></div>
+            <div class="slide-thumb" id="slThumb"></div>
+            <input type="range" class="slide-input" id="slInput" min="0" max="2" step="1" value="1" oninput="setLevel(this.value)">
+          </div>
+          <div class="slide-marks">
+            <div class="mark" onclick="setLevel(0)"><div class="mark-dot"></div><div class="mark-lbl"><b>관대하게</b><small>(높은 점수)</small></div></div>
+            <div class="mark" onclick="setLevel(1)"><div class="mark-dot"></div><div class="mark-lbl"><b>기본값</b><small>&nbsp;</small></div></div>
+            <div class="mark" onclick="setLevel(2)"><div class="mark-dot"></div><div class="mark-lbl"><b>엄격하게</b><small>(낮은 점수)</small></div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 선생님 피드백 초안 구성 -->
+      <div class="rm-field" style="gap:12px;">
+        <div class="rm-field" style="gap:8px;">
+          <span class="rm-label">학생 피드백 초안</span>
+          <p class="rm-help">피드백을 AI가 채울지, 선생님이 직접 쓸지 정해요. 채점 뒤 고칠 수 있어요.</p>
+        </div>
+        <div class="radio-set" id="fbSet">
+          <div class="rm-radio" onclick="selectFb(this)"><div class="ring"></div><div class="lbl">AI 채점 근거 <small>(채점요소별로 점수를 준 이유를 넣어요)</small></div></div>
+          <div class="rm-radio selected" onclick="selectFb(this)"><div class="ring"></div><div class="lbl">AI 피드백 <small>(잘한 점·보완할 점과 채점요소별 피드백을 넣어요)</small></div></div>
+          <div class="rm-radio" onclick="selectFb(this)"><div class="ring"></div><div class="lbl">AI 채점 근거 + AI 피드백 <small>(두 가지를 모두 넣어요)</small></div></div>
+          <div class="rm-radio" onclick="selectFb(this)"><div class="ring"></div><div class="lbl">직접 작성 <small>(AI 초안 없이 빈 칸에서 시작해요)</small></div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="rm-ft">
+      <span class="credit-note" data-only="proposal"><i data-lucide="bot"></i>학생 1명당 크레딧 1개가 다시 차감돼요</span>
+      <span class="credit-note" data-only="first"><i data-lucide="bot"></i>학생 1명당 크레딧 1개가 차감돼요</span>
+      <button class="btn btn-primary">다음으로 <i data-lucide="chevron-right"></i></button>
+    </div>
+  </div>
+</div>
+
+<script>
+  lucide.createIcons();
+
+  /* 슬라이더 */
+  function setLevel(v){
+    v = +v;
+    document.getElementById('slInput').value = v;
+    const pct = v * 50;
+    document.getElementById('slFill').style.width = pct + '%';
+    document.getElementById('slThumb').style.left = pct + '%';
+  }
+  setLevel(1);
+
+  /* 라디오 */
+  function selectFb(el){
+    document.querySelectorAll('#fbSet .rm-radio').forEach(r => r.classList.remove('selected'));
+    el.classList.add('selected');
+  }
+
+  /* 구성안 전환 — 해시 URL */
+  const DESC = {
+    figma: '채점 모델 카드(v3.3) 포함. 줄리 시안 그대로.',
+    proposal: '재실행. 모델 카드 제거, 본문 맨 위 두 줄 안내(바뀌는 것·남는 것) + 가이드 링크. 크레딧은 푸터.',
+    first: '최초 실행. 같은 자리에 두 줄(무엇을 하는지 → 채점 뒤 읽은 내용 고쳐 다시 채점 가능) + 가이드 링크. 크레딧은 푸터.'
+  };
+  const TITLE = { figma:'AI 채점 재실행 (1/2)', proposal:'AI 채점 재실행 (1/2)', first:'AI 채점 실행 (1/2)' };
+  function applyVariant(){
+    const v = (location.hash.replace('#','') || 'figma');
+    const key = DESC[v] ? v : 'figma';
+    document.body.dataset.variant = key;
+    document.querySelectorAll('.mk-btn').forEach(b => b.classList.toggle('on', b.dataset.v === key));
+    document.getElementById('mkDesc').textContent = DESC[key];
+    document.querySelector('.rm-title').textContent = TITLE[key];
+  }
+  window.addEventListener('hashchange', applyVariant);
+  applyVariant();
+
+  /* 토글 드래그 */
+  (function(){
+    const box = document.getElementById('mkToggle'), hd = document.getElementById('mkDrag');
+    let sx=0, sy=0, ox=0, oy=0, on=false;
+    hd.addEventListener('mousedown', e => { on=true; sx=e.clientX; sy=e.clientY; const r=box.getBoundingClientRect(); ox=r.left; oy=r.top; e.preventDefault(); });
+    window.addEventListener('mousemove', e => { if(!on) return; box.style.left=(ox+e.clientX-sx)+'px'; box.style.top=(oy+e.clientY-sy)+'px'; });
+    window.addEventListener('mouseup', () => on=false);
+  })();
+</script>
+</body>
+</html>

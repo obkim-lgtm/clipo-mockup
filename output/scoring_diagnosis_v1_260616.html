@@ -119,6 +119,22 @@
     .rm-field{ display:flex; flex-direction:column; gap:12px; }
     .rm-field-hd{ display:flex; align-items:center; justify-content:space-between; gap:8px; }
     .rm-label{ font-size:16px; font-weight:600; color:#222631; display:inline-flex; align-items:center; gap:6px; }
+    /* 재실행·최초 실행 안내 블록 (26-09-30 모델 카드 대체 — ai_regrading_modal_v1_260930 구성) */
+    .rm-info{ display:flex; gap:10px; align-items:flex-start; width:100%; padding:14px 16px; border-radius:12px; background:#f4f8ff; }
+    .rm-info > i, .rm-info > svg{ width:20px; height:20px; color:#416bff; flex-shrink:0; margin-top:1px; }
+    .rm-info-body{ flex:1; min-width:0; display:flex; flex-direction:column; gap:8px; }
+    .rm-info-list{ list-style:none; display:flex; flex-direction:column; gap:5px; margin:0; padding:0; }
+    .rm-info-list li{ position:relative; padding-left:12px; font-size:14px; color:#3b3f4c; line-height:1.5; word-break:keep-all; }
+    .rm-info-list li::before{ content:''; position:absolute; left:2px; top:9px; width:4px; height:4px; border-radius:50%; background:#8a8f9c; }
+    .rm-info-link{ align-self:flex-start; margin-top:2px; color:#365eef; font-size:14px; font-weight:500; text-decoration:none; display:inline-flex; align-items:center; gap:4px; line-height:1; }
+    .rm-info-link:hover{ text-decoration:underline; }
+    .rm-info-link i, .rm-info-link svg{ width:14px; height:14px; }
+    .rm-desc{ font-size:14px; font-weight:400; color:#52525b; line-height:1.5; word-break:keep-all; margin:0; }
+    .rm-radio .lbl small{ font-size:14px; font-weight:500; color:#52525b; }
+    .rm-info[data-mode]{ display:none; }
+    .rm-modal[data-rerun="0"] .rm-info[data-mode="first"], .rm-modal[data-rerun="1"] .rm-info[data-mode="rerun"]{ display:flex; }
+    .rm-ft .credit-note[data-mode]{ display:none; }
+    .rm-modal[data-rerun="0"] .credit-note[data-mode="first"], .rm-modal[data-rerun="1"] .credit-note[data-mode="rerun"]{ display:inline-flex; }
     .rm-date{ font-size:14px; color:#6d7381; }
     .rm-model{ display:flex; flex-direction:column; gap:14px; padding:18px; border-radius:10px; background:#f6f9ff; border:1px solid #cdddff; }
     .rm-model-top{ display:flex; gap:14px; align-items:flex-start; }
@@ -1544,41 +1560,39 @@
 
 <!-- ===== AI 채점 실행 모달 (1/2): 채점 모델·채점 수준·학생 피드백 구성 ===== -->
 <div id="runModal1" class="rm-overlay" onclick="if(event.target===this) closeRmModal('runModal1')">
-  <div class="rm-modal">
+  <div class="rm-modal" data-rerun="1">
     <div class="rm-hd">
-      <div class="rm-title">AI 채점 실행 (1/2)</div>
+      <div class="rm-title" id="rm1-title">AI 채점 재실행 (1/2)</div>
       <button class="rm-close" onclick="closeRmModal('runModal1')"><i data-lucide="x" style="width:20px;height:20px"></i></button>
     </div>
     <div class="rm-body">
-      <!-- 채점 모델 -->
-      <div class="rm-field">
-        <div class="rm-field-hd">
-          <span class="rm-label">채점 모델</span>
-          <span class="rm-date">2026-05-20 업데이트</span>
-        </div>
-        <div class="rm-model">
-          <div class="rm-model-top">
-            <div class="rm-model-badge">3.2</div>
-            <div style="flex:1;min-width:0;">
-              <div class="rm-model-name">채점 모델 v3.2</div>
-              <div class="rm-model-desc">수식·그래프·서술형 답안 인식과 채점 정확도를 개선한 AI 모델입니다.</div>
-            </div>
-          </div>
-          <div class="rm-model-div"></div>
-          <ul class="rm-model-feats">
-            <li>수학, 과학, 정보 과목의 채점 정확도를 개선했어요.</li>
-            <li>손글씨·이미지 답안의 OCR 인식률을 높였어요.</li>
-            <li>지시문과 학생 답안을 더 정확히 구분해요.</li>
+      <!-- 안내 블록 — 모델 카드 대체(26-09-30). 버전은 화면에 안 보이고 결과 데이터에만. 사실 근거 = cs_assist/product_facts_clipo.md 채점 근거·재채점 -->
+      <div class="rm-info" data-mode="first">
+        <i data-lucide="info"></i>
+        <div class="rm-info-body">
+          <ul class="rm-info-list">
+            <li>AI가 과제물을 읽고 점수·채점 근거·피드백을 만들어요.</li>
+            <li>채점 뒤 AI가 읽은 답안을 확인하고, 고쳐서 다시 채점할 수 있어요.</li>
           </ul>
-          <div class="rm-model-tip">※ 채점 예시는 아래 버튼을 클릭하시면 확인 가능합니다.</div>
-          <button class="rm-model-btn" onclick="showToast('채점 활용 예시는 이 목업에서 제공하지 않습니다.','info')">채점 활용 예시보기 <i data-lucide="external-link" style="width:14px;height:14px"></i></button>
+          <a class="rm-info-link" href="../guide/" target="_blank" rel="noopener"><i data-lucide="book-open"></i>AI 채점은 어떻게 동작하나요?</a>
         </div>
-        <div class="rm-note">* 항상 가장 좋은 성능으로 채점해드리기 위해, 여러 채점 모델을 하나로 통합했어요.</div>
+      </div>
+      <div class="rm-info" data-mode="rerun">
+        <i data-lucide="info"></i>
+        <div class="rm-info-body">
+          <ul class="rm-info-list">
+            <li>AI 채점만 새로 하고, 선생님이 저장한 점수·피드백은 그대로예요.</li>
+            <li>선생님이 고친 답안이 있으면 고친 대로 채점해요.</li>
+          </ul>
+          <a class="rm-info-link" href="../guide/" target="_blank" rel="noopener"><i data-lucide="book-open"></i>AI 채점은 어떻게 동작하나요?</a>
+        </div>
       </div>
       <!-- AI 점수 수준 (HIAI 동일: 점수 자체를 조절) -->
       <div class="rm-field">
-        <span class="rm-label">AI 점수 수준</span>
-        <p style="font-size:14px;color:#6d7381;margin:2px 0 6px;line-height:1.5;">AI가 매길 점수를 조절합니다. 점수에 맞춰 피드백 내용도 함께 바뀝니다.</p>
+        <div class="rm-field" style="gap:8px;">
+          <span class="rm-label">채점 수준</span>
+          <p class="rm-desc">관대하게 둘수록 점수를 높게 매기고, 피드백도 그에 맞춰 바뀌어요.</p>
+        </div>
         <div>
           <div class="rm-slider-bar" id="rm-slider" onclick="rmSliderClick(event)">
             <div class="rm-slider-fill" id="rm-slider-fill" style="width:50%;"></div>
@@ -1593,18 +1607,23 @@
           </div>
         </div>
       </div>
-      <!-- 학생 피드백 구성 -->
-      <div class="rm-field">
-        <span class="rm-label">학생 피드백 구성 <i data-lucide="circle-help" style="width:18px;height:18px;color:#6d7381;"></i></span>
+      <!-- 학생 피드백 초안 — 툴팁 대신 설명문, 선택지 4개 평면 + 괄호 설명 (26-09-30). 라디오 순서·개수 유지(저장값 인덱스) -->
+      <div class="rm-field" style="gap:12px;">
+        <div class="rm-field" style="gap:8px;">
+          <span class="rm-label">학생 피드백 초안</span>
+          <p class="rm-desc">피드백을 AI가 채울지, 선생님이 직접 쓸지 정해요. 채점 뒤 고칠 수 있어요.</p>
+        </div>
         <div id="rm-fb-list" style="display:flex;flex-direction:column;gap:8px;">
-          <div class="rm-radio" onclick="rmSelectFb(this)"><div class="ring"></div><div class="lbl">자동 구성 : AI 채점 근거</div></div>
-          <div class="rm-radio" onclick="rmSelectFb(this)"><div class="ring"></div><div class="lbl">자동 구성 : AI 피드백</div></div>
-          <div class="rm-radio selected" onclick="rmSelectFb(this)"><div class="ring"></div><div class="lbl">자동 구성 : AI 채점 근거 + AI 피드백</div></div>
-          <div class="rm-radio" onclick="rmSelectFb(this)"><div class="ring"></div><div class="lbl">선생님이 직접 작성</div></div>
+          <div class="rm-radio" onclick="rmSelectFb(this)"><div class="ring"></div><div class="lbl">AI 채점 근거 <small>(채점요소별로 점수를 준 이유를 넣어요)</small></div></div>
+          <div class="rm-radio" onclick="rmSelectFb(this)"><div class="ring"></div><div class="lbl">AI 피드백 <small>(잘한 점·보완할 점과 채점요소별 피드백을 넣어요)</small></div></div>
+          <div class="rm-radio selected" onclick="rmSelectFb(this)"><div class="ring"></div><div class="lbl">AI 채점 근거 + AI 피드백 <small>(두 가지를 모두 넣어요)</small></div></div>
+          <div class="rm-radio" onclick="rmSelectFb(this)"><div class="ring"></div><div class="lbl">직접 작성 <small>(AI 초안 없이 빈 칸에서 시작해요)</small></div></div>
         </div>
       </div>
     </div>
     <div class="rm-ft">
+      <span class="credit-note" data-mode="first"><i data-lucide="bot" style="width:16px;height:16px;color:#416bff"></i>학생 1명당 크레딧 1개가 차감돼요</span>
+      <span class="credit-note" data-mode="rerun"><i data-lucide="bot" style="width:16px;height:16px;color:#416bff"></i>학생 1명당 크레딧 1개가 다시 차감돼요</span>
       <button class="btn btn-primary" onclick="rmNext()">다음으로 <i data-lucide="chevron-right" style="width:18px;height:18px"></i></button>
     </div>
   </div>
