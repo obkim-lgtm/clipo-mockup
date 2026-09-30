@@ -745,7 +745,51 @@ function refreshSaveBtn() {
   document.getElementById('btnSave').disabled = !ready;
 }
 
+// ── 학생 변경(이미 등록한 활동): 기존 참여 학생을 체크한 상태로 열고, 빠지는 학생은 삭제 확인 ──
+let ORIG = new Map();   // sid → 이름 (처음 불러온 참여 학생)
+function preloadExisting() {
+  let store = {};
+  try { store = JSON.parse(localStorage.getItem('clipo_dong_students') || '{}'); } catch(e) {}
+  const saved = store[window.__REG_KEY];
+  if (!saved || !saved.classes) return;
+  Object.entries(saved.classes).forEach(([cname, list]) => {
+    const c = CLASSES.find(x => x.name === cname); if (!c) return;
+    assigned[c.id] = new Set(list.map(x => x.sid));
+    list.forEach(x => ORIG.set(x.sid, x.name));
+  });
+  const h = document.querySelector('.page-title');
+  if (h && ORIG.size) h.innerHTML = h.innerHTML.replace('참여 학생 등록', '참여 학생 변경');
+  if (typeof renderSelectedTable === 'function') renderSelectedTable();
+  refreshSaveBtn();
+}
 function onSave() {
+  if (currentMethod === 'select' && ORIG.size) {
+    const now = new Set(); Object.values(assigned).forEach(set => set.forEach(x => now.add(x)));
+    const removed = [...ORIG.entries()].filter(([sid]) => !now.has(sid));
+    if (removed.length) { showRemoveConfirm(removed); return; }
+  }
+  doSaveRegister();
+}
+function showRemoveConfirm(removed) {
+  let ov = document.getElementById('rmConfirm');
+  if (!ov) {
+    ov = document.createElement('div'); ov.id = 'rmConfirm';
+    ov.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:500;display:flex;align-items:center;justify-content:center';
+    document.body.appendChild(ov);
+  }
+  const names = removed.map(([sid, n]) => sid + ' ' + n);
+  const shown = names.slice(0, 2).join(', ') + (names.length > 2 ? ` 외 ${names.length - 2}명` : '');
+  ov.innerHTML = `<div style="background:#fff;border-radius:12px;padding:28px 20px 20px;width:400px;max-width:calc(100vw - 48px);text-align:center;box-shadow:0 0 1px #2226314D,0 8px 24px #00000026">
+    <div style="width:48px;height:48px;border-radius:50%;background:#fdecee;color:#f2525f;display:flex;align-items:center;justify-content:center;margin:0 auto 20px"><i data-lucide="trash-2" style="width:22px;height:22px"></i></div>
+    <p style="font-size:18px;font-weight:700;color:#222631;line-height:1.5;margin-bottom:12px">빠지는 학생의 자료와 기록이<br>모두 삭제됩니다.</p>
+    <p style="font-size:15px;color:#3b3f4c;margin-bottom:24px">${shown}</p>
+    <div style="display:flex;gap:12px">
+      <button onclick="document.getElementById('rmConfirm').remove()" style="flex:1;height:40px;border:1px solid #f2525f;background:#fff;color:#f2525f;border-radius:4px;font-size:15px;font-weight:500;font-family:inherit;cursor:pointer">아니오</button>
+      <button onclick="document.getElementById('rmConfirm').remove();doSaveRegister()" style="flex:1;height:40px;border:none;background:#f2525f;color:#fff;border-radius:4px;font-size:15px;font-weight:500;font-family:inherit;cursor:pointer">네, 삭제합니다.</button>
+    </div></div>`;
+  if (window.lucide) lucide.createIcons();
+}
+function doSaveRegister() {
   const dongName = document.getElementById('dongName').textContent.trim();
   let saveClasses = {};
   if (currentMethod === 'select') {
@@ -786,5 +830,6 @@ function showToast(msg) {
 
 
 <script>if(typeof notReady!=='function'){window.notReady=function(n){if(typeof showToast==='function')showToast(n+' 화면은 이 목업에 없어요');};}</script>
+<script>try{ preloadExisting(); }catch(e){ console.warn(e); }</script>
 </body>
 </html>

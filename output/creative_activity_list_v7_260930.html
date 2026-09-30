@@ -327,6 +327,8 @@ html body .main-shell{margin-top:58px;min-height:calc(100vh - 58px)}
         <select class="field-select" id="classSelect" onchange="updateSubmit()"><option value="">학급을 선택해 주세요.</option></select>
         <p class="field-hint">※ 원하는 학급이 없을 경우 학교 설정에서 학생을 등록해 주세요. <a href="#" onclick="event.preventDefault();showToast('학교 설정으로 이동')">학교 설정</a></p>
       </div>
+    </div>
+    <div class="field" id="yearEmptyWrap" style="display:none">
       <div id="emptyNotice" class="empty-notice" style="display:none">
         <div class="ntx">
           <p class="nhd">※ 해당 학년도에 등록된 학생이 없습니다.</p>
@@ -666,8 +668,12 @@ html body .main-shell{margin-top:58px;min-height:calc(100vh - 58px)}
     document.getElementById('directNote').style.display = way === 'direct' ? 'flex' : 'none';
     updateSubmit();
   }
+  function yearHasStudents() { return Object.keys(CLASS_DATA[document.getElementById('yearSelect').value] || {}).length > 0; }
   function showClassField() {
-    document.getElementById('classWrap').style.display = (mode === 'create' && curWay === 'class') ? '' : 'none';
+    const has = yearHasStudents();
+    document.getElementById('classWrap').style.display = (mode === 'create' && curWay === 'class' && has) ? '' : 'none';
+    // 학생이 없는 학년도: 반 단위·개별 학생·동아리 모두 등록할 학생이 없으므로 안내 + 저장 막기
+    document.getElementById('yearEmptyWrap').style.display = (mode === 'create' && !has) ? '' : 'none';
   }
 
   // 학급 하나의 드롭다운(학년별 묶음). 같은 학급에 같은 유형 활동이 있어도 선택 가능 — '등록됨' 비활성 조건 해제
@@ -677,7 +683,8 @@ html body .main-shell{margin-top:58px;min-height:calc(100vh - 58px)}
     document.getElementById('classSelect').innerHTML = '<option value="">학급을 선택해 주세요.</option>' +
       grades.map(g => `<optgroup label="${g}학년">` + Array.from({ length: CLASS_DATA[year][g] }, (_, i) => `<option value="${g}학년 ${i + 1}반">${g}학년 ${i + 1}반</option>`).join('') + '</optgroup>').join('');
     document.getElementById('classSelectWrap').style.display = grades.length ? '' : 'none';
-    document.getElementById('emptyNotice').style.display = grades.length ? 'none' : 'flex';
+    document.getElementById('emptyNotice').style.display = 'flex';
+    showClassField();
     lucide.createIcons();
     updateSubmit();
   }
@@ -697,6 +704,7 @@ html body .main-shell{margin-top:58px;min-height:calc(100vh - 58px)}
     if (isDup) err.textContent = `${year}학년도 ${TYPE[curType].label}에 같은 이름이 있어요. 다른 이름을 입력해 주세요.`;
 
     let ready = !!name && !isDup;
+    if (mode === 'create' && !yearHasStudents()) ready = false;
     if (mode === 'rename') {
       ready = ready && name !== byId(renameId).name;
     } else if (curWay === 'class') {
