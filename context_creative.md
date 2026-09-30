@@ -2,6 +2,10 @@
 
 > 새 채팅 시작 시 이 문서 내용을 같이 첨부하면 즉시 컨텍스트 복원 가능
 > 마지막 갱신: 2026-05-28
+>
+> ⚠️ **2026-09-30 이후 창체 작업은 2학기 개선판이 기준이다.** 아래 v1 파일들(목록 v6·입력 v1·업로드 v1)은 6/4 배포분 기록이다.
+> - 현행 목업: 목록 `output/creative_activity_list_v7_260930.html` → 참여 학생 등록 `output/creative_activity_student_register_v1_260930.html` → 활동 상세 `output/creative_activity_input_v2_260930.html` → 일괄 등록 `output/creative_activity_{survey,pdf,keyword}_upload_v2_260930.html`
+> - 정책 = `creative_activity_policy_spec.md` §10 · 진행·결정 경위 = `docs/handoff/HANDOFF_creative_s2_update_260928.md` §7·§8
 
 ## 0. 빠른 시작 (다른 PC에서)
 새 채팅 첫 메시지에:
