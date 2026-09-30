@@ -306,7 +306,7 @@ html body .main-shell{margin-top:58px;min-height:calc(100vh - 58px)}
 
     <div class="field" id="fName">
       <p class="field-label" id="nameLabel">활동명</p>
-      <input class="field-input" id="nameInput" type="text" maxlength="30" placeholder="자율활동 이름을 입력해 주세요." oninput="updateSubmit()">
+      <input class="field-input" id="nameInput" type="text" maxlength="30" placeholder="자율활동 이름을 입력해 주세요." oninput="nameAuto=false;updateSubmit()">
       <p class="field-err" id="nameErr"></p>
     </div>
 
@@ -324,7 +324,7 @@ html body .main-shell{margin-top:58px;min-height:calc(100vh - 58px)}
     <div class="field" id="classWrap">
       <p class="field-label">학급</p>
       <div id="classSelectWrap">
-        <select class="field-select" id="classSelect" onchange="updateSubmit()"><option value="">학급을 선택해 주세요.</option></select>
+        <select class="field-select" id="classSelect" onchange="autoFillName();updateSubmit()"><option value="">학급을 선택해 주세요.</option></select>
         <p class="field-hint">※ 원하는 학급이 없을 경우 학교 설정에서 학생을 등록해 주세요. <a href="#" onclick="event.preventDefault();showToast('학교 설정으로 이동')">학교 설정</a></p>
       </div>
     </div>
@@ -615,7 +615,23 @@ html body .main-shell{margin-top:58px;min-height:calc(100vh - 58px)}
 
   const PH = { jayul: '자율활동 이름을 입력해 주세요.', jinro: '진로활동 이름을 입력해 주세요.', dong: '동아리 이름을 입력해 주세요.' };
 
+  // 반 단위 활동명 자동 채우기(올립 09-30): 학급을 고르면 비어 있는 이름 칸을 학급명으로.
+  // 같은 학년도·유형에 이미 있으면 '(2)'·'(3)'… 교사가 직접 고치면 그 뒤로는 덮어쓰지 않음
+  let nameAuto = false;
+  function autoFillName() {
+    const input = document.getElementById('nameInput');
+    const cls = document.getElementById('classSelect').value;
+    if (mode !== 'create' || curType === 'dong' || curWay !== 'class') return;
+    if (input.value.trim() && !nameAuto) return;
+    if (!cls) { if (nameAuto) { input.value = ''; } return; }
+    const year = document.getElementById('yearSelect').value;
+    let name = cls, n = 2;
+    while (dupName(year, curType, name, null)) name = `${cls} (${n++})`;
+    input.value = name; nameAuto = true;
+    updateSubmit();
+  }
   function openAddModal(opts = {}) {
+    nameAuto = false;
     mode = 'create'; renameId = null;
     document.getElementById('modalTitle').textContent = '활동 추가';
     document.getElementById('fYear').style.display = '';
@@ -660,13 +676,16 @@ html body .main-shell{margin-top:58px;min-height:calc(100vh - 58px)}
     setNameField(type);
     document.getElementById('fWay').style.display = '';
     selectWay(type === 'dong' ? 'direct' : 'class');   // 유형별 기본 등록 방식
+    autoFillName();
   }
   function selectWay(way) {
     curWay = way;
+    if (nameAuto && way !== 'class') { document.getElementById('nameInput').value = ''; nameAuto = false; }
     document.querySelectorAll('.way-btn').forEach(b => b.classList.toggle('selected', b.dataset.way === way));
     showClassField();
     document.getElementById('directNote').style.display = way === 'direct' ? 'flex' : 'none';
     updateSubmit();
+    autoFillName();
   }
   function yearHasStudents() { return Object.keys(CLASS_DATA[document.getElementById('yearSelect').value] || {}).length > 0; }
   function showClassField() {
