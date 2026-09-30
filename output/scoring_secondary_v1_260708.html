@@ -76,6 +76,11 @@ body{background:#fff;color:#222631;overflow:hidden;height:100vh}
 .ve-empty-cta{display:inline-flex;align-items:center;justify-content:center;line-height:1;gap:6px;height:36px;padding:0 16px;margin-top:6px;background:#fff;border:1px solid #dde1e8;border-radius:100px;color:#3b3f4c;font-family:inherit;font-size:14px;font-weight:600;cursor:pointer}
 .ve-empty-cta:hover{border-color:#a3c3ff;color:#3151c4}
 .ve-ctrl-off{opacity:.4;pointer-events:none}
+/* 재채점 필요 띠 (줄리 2965:22464) */
+.rescore-bar{display:none;align-items:center;gap:10px;min-height:56px;padding:10px 20px;background:#feeedd;color:#ea580c;flex-shrink:0}
+.rescore-bar .rb-t{flex:1;min-width:0;font-size:15px;font-weight:500;color:#222631;line-height:1.5}
+.rescore-bar .rb-go{display:inline-flex;align-items:center;justify-content:center;line-height:1;vertical-align:middle;height:32px;padding:0 6px;border:none;background:none;color:#ea580c;font-family:inherit;font-size:15px;font-weight:600;cursor:pointer;white-space:nowrap;border-radius:6px}
+.rescore-bar .rb-go:hover{background:rgba(234,88,12,.08)}
 /* ══════ 줄리 시안 26-09-30 — 좌측 뷰어 ══════ */
 .viewer-filebar .ve-seg{margin-left:auto;background:#eef0f3;padding:3px;border-radius:8px}
 .viewer-filebar .ve-seg-btn{height:32px;padding:0 12px;color:#6d7381;font-size:14px}
@@ -1314,17 +1319,6 @@ body.vs-hide-topbar .vs-float{display:inline-flex}
 
   <!-- 우측: 채점 패널 -->
   <div class="grading-panel">
-    <div id="ocrEditedBanner" style="display:none;align-items:center;gap:10px;background:#fff7ed;border-bottom:1px solid #fed7aa;padding:14px 20px;">
-      <i data-lucide="refresh-cw" style="width:16px;height:16px;color:#ea580c;flex-shrink:0;"></i>
-      <span style="font-size:14px;color:#3b3f4c;line-height:1.6;flex:1;"><strong style="color:#c2410c;">인식 결과를 고쳤어요.</strong> 지금 점수는 고치기 전 답안 기준이에요.</span>
-      <button onclick="ocrRerunNow()" style="display:inline-flex;align-items:center;justify-content:center;line-height:1;gap:5px;height:32px;padding:0 12px;background:#fff;border:1px solid #fed7aa;border-radius:100px;color:#ea580c;font-family:inherit;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap;"><i data-lucide="rotate-cw" style="width:13px;height:13px;"></i>다시 채점</button>
-    </div>
-    <div id="staleBanner" style="display:none;align-items:center;gap:10px;background:#fff7ed;border-bottom:1px solid #fed7aa;padding:14px 20px;">
-      <i data-lucide="refresh-cw" style="width:16px;height:16px;color:#ea580c;flex-shrink:0;"></i>
-      <span style="font-size:14px;color:#3b3f4c;line-height:1.6;flex:1;"><strong style="color:#c2410c;">과제물이 바뀌었어요.</strong> 지금 점수는 이전 과제물 기준이에요.</span>
-      <button onclick="ocrRerunNow()" style="display:inline-flex;align-items:center;justify-content:center;line-height:1;gap:5px;height:32px;padding:0 12px;background:#fff;border:1px solid #fed7aa;border-radius:100px;color:#ea580c;font-family:inherit;font-size:13px;font-weight:700;cursor:pointer;white-space:nowrap;"><i data-lucide="rotate-cw" style="width:13px;height:13px;"></i>다시 채점</button>
-    </div>
-
     <!-- 총점 -->
     <div class="total-score-section">
       <div class="score-total">
@@ -1347,6 +1341,17 @@ body.vs-hide-topbar .vs-float{display:inline-flex}
           <span class="radio-text">미응시</span>
         </label>
       </div>
+    </div>
+    <!-- 재채점 필요 띠 (줄리 2965:22464) — 총점 줄 바로 아래. 과제물 교체 / 인식 결과 수정 후 미재채점 -->
+    <div class="rescore-bar" id="staleBanner">
+      <i data-lucide="rotate-ccw" style="width:18px;height:18px"></i>
+      <span class="rb-t">과제물이 변경되어 다시 채점이 필요합니다.</span>
+      <button class="rb-go" onclick="ocrRerunNow()">채점 실행</button>
+    </div>
+    <div class="rescore-bar" id="ocrEditedBanner">
+      <i data-lucide="rotate-ccw" style="width:18px;height:18px"></i>
+      <span class="rb-t">인식 결과가 수정되어 다시 채점이 필요합니다.</span>
+      <button class="rb-go" onclick="ocrRerunNow()">채점 실행</button>
     </div>
 
     <!-- 채점 결과 -->
